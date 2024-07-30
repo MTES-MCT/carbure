@@ -1,8 +1,12 @@
-Bonjour {{ user.name }},
+Bonjour{% if not invitation %} {{ user.name }}{% endif %},
+
+{% if invitation %}
+Vous avez été invité à rejoindre CarbuRe au sein de l'entité {{ entity_name }}.</p>
+{% endif %}
 
 Veuillez cliquer sur le lien suivant pour confirmer votre inscription sur CarbuRe :
 
-https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}
+https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}}{% if invitation %}&invite=1{% endif %}
 
 Ce lien n'est valable que quelques minutes. Il est à usage unique.
 

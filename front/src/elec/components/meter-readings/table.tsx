@@ -10,21 +10,24 @@ import { compact } from "common/utils/collection"
 import { To } from "react-router-dom"
 
 interface MeterReadingsApplicationsTableProps {
-  applications: ElecMeterReadingsApplication[];
-  onDownloadMeterReadingsApplication: (application: ElecMeterReadingsApplication) => void;
+  applications: ElecMeterReadingsApplication[]
+  onDownloadMeterReadingsApplication: (
+    application: ElecMeterReadingsApplication
+  ) => void
   rowLink?: (row: ElecMeterReadingsApplication) => To
-  loading?: boolean;
-  displayCpo?: boolean;
+  loading?: boolean
+  displayCpo?: boolean
 }
 
-const MeterReadingsApplicationsTable: React.FC<MeterReadingsApplicationsTableProps> = ({
+const MeterReadingsApplicationsTable: React.FC<
+  MeterReadingsApplicationsTableProps
+> = ({
   applications,
   onDownloadMeterReadingsApplication,
   rowLink,
   loading,
-  displayCpo = false
+  displayCpo = false,
 }) => {
-
   const { t } = useTranslation()
 
   return (
@@ -35,7 +38,9 @@ const MeterReadingsApplicationsTable: React.FC<MeterReadingsApplicationsTablePro
       columns={compact([
         {
           header: t("Statut"),
-          cell: (application) => <ApplicationStatus status={application.status} />,
+          cell: (application) => (
+            <ApplicationStatus status={application.status} />
+          ),
         },
         {
           header: t("Période"),
@@ -45,50 +50,43 @@ const MeterReadingsApplicationsTable: React.FC<MeterReadingsApplicationsTablePro
                 quarter: application.quarter,
                 year: application.year,
               })}
-
             />
           ),
         },
         displayCpo && {
           header: t("Aménageur"),
-          cell: (application) => (
-            <Cell
-              text={`${application.cpo.name}`}
-            />
-          ),
+          cell: (application) => <Cell text={`${application.cpo.name}`} />,
         },
         {
           header: t("Points de recharge"),
           cell: (application) => (
-            <Cell
-              text={`${formatNumber(application.charge_point_count)}`}
-            />
+            <Cell text={`${formatNumber(application.charge_point_count)}`} />
           ),
         },
         {
           header: t("kwh renouvelables"),
           cell: (application) => (
             <Cell
-              text={`${formatNumber(Math.round(application.energy_total))}` + " kWh"}
+              text={
+                `${formatNumber(Math.round(application.energy_total))}` + " kWh"
+              }
             />
           ),
         },
         actionColumn<ElecMeterReadingsApplication>((application) =>
           compact([
-
             <Button
               captive
               variant="icon"
               icon={Download}
               title={t("Exporter les relevés trimestriels")}
               action={() => onDownloadMeterReadingsApplication(application)}
-            />
+            />,
           ])
         ),
-
       ])}
     />
-  );
-};
+  )
+}
 
-export default MeterReadingsApplicationsTable;
+export default MeterReadingsApplicationsTable

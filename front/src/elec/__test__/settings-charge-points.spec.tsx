@@ -7,16 +7,17 @@ import { cpo } from "carbure/__test__/data"
 import ElecChargePointsSettings from "elec/components/charge-points/settings"
 import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
-import { okChargePointsApplicationsEmpty, okChargePointsCheckError } from "./api"
+import {
+  okChargePointsApplicationsEmpty,
+  okChargePointsCheckError,
+} from "./api"
 
 const SettingsWithHooks = () => {
   return (
     <TestRoot url={`/org/${cpo.id}/settings`}>
       <Route
         path={`/org/${cpo.id}/settings`}
-        element={
-          <ElecChargePointsSettings companyId={cpo.id} />
-        }
+        element={<ElecChargePointsSettings companyId={cpo.id} />}
       />
     </TestRoot>
   )
@@ -24,16 +25,16 @@ const SettingsWithHooks = () => {
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: "warn" })
-
 })
 
 beforeEach(() => {
   setEntity(cpo)
 })
-afterEach(() => { server.resetHandlers() })
+afterEach(() => {
+  server.resetHandlers()
+})
 
 afterAll(() => server.close())
-
 
 test("check the charge point section of the settings", async () => {
   render(<SettingsWithHooks />)
@@ -41,7 +42,6 @@ test("check the charge point section of the settings", async () => {
   screen.getByText("Inscriptions de points de recharge")
   screen.getByText("Inscrire des points de recharge")
 })
-
 
 test("check the applications list", async () => {
   render(<SettingsWithHooks />)
@@ -54,7 +54,6 @@ test("check the applications list", async () => {
   screen.getByText("Accepté")
   screen.getByText("13/11/2023")
   screen.getByText("Refusé")
-
 })
 
 test("check the applications list empty", async () => {
@@ -73,32 +72,37 @@ test("upload dialog opened", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
-  const subscribeButton = await screen.findByText("Inscrire des points de recharge")
+  const subscribeButton = await screen.findByText(
+    "Inscrire des points de recharge"
+  )
   await user.click(subscribeButton)
 
-  screen.getByText("Cet outil vous permet de vérifier la conformité de votre demande d'inscription.")
+  screen.getByText(
+    "Cet outil vous permet de vérifier la conformité de votre demande d'inscription."
+  )
   const templateButton = screen.getByText("sur ce lien")
   user.click(templateButton)
 
-  const url = templateButton.getAttribute('href')
+  const url = templateButton.getAttribute("href")
   expect(url).toEqual("/templates/points-de-recharge-inscription.xlsx")
-
 })
 
 const uploadChargePointsFile = async () => {
   const user = userEvent.setup()
 
   //Open Upload modal
-  const subscribeButton = await screen.findByText("Inscrire des points de recharge")
+  const subscribeButton = await screen.findByText(
+    "Inscrire des points de recharge"
+  )
   await user.click(subscribeButton)
-  const uploadButton = await screen.findByText("Vérifier le fichier");
-  expect(uploadButton).toBeDisabled();
+  const uploadButton = await screen.findByText("Vérifier le fichier")
+  expect(uploadButton).toBeDisabled()
 
   //Upload file
-  const fileInput = screen.getByLabelText(/Choisir un fichier/i);
-  const file = new File(['(contents)'], 'example.xlsx', { type: 'text/plain' });
-  fireEvent.change(fileInput, { target: { files: [file] } });
-  expect(uploadButton).not.toBeDisabled();
+  const fileInput = screen.getByLabelText(/Choisir un fichier/i)
+  const file = new File(["(contents)"], "example.xlsx", { type: "text/plain" })
+  fireEvent.change(fileInput, { target: { files: [file] } })
+  expect(uploadButton).not.toBeDisabled()
 
   await user.click(uploadButton)
 

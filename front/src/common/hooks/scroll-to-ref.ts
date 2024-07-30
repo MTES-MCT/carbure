@@ -16,5 +16,4 @@ const useScrollToRef = (enabled?: boolean) => {
   }
 }
 
-
 export default useScrollToRef

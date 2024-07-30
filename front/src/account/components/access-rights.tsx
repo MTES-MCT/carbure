@@ -82,7 +82,10 @@ export const AccountAccesRights = () => {
 
       {user.requests.length > 0 && (
         <Table
-          onAction={(right) => right.status === UserRightStatus.Accepted && navigate(`/org/${right.entity.id}`)}
+          onAction={(right) =>
+            right.status === UserRightStatus.Accepted &&
+            navigate(`/org/${right.entity.id}`)
+          }
           rows={user.requests}
           columns={[
             {
@@ -228,8 +231,11 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
           </Form>
         </section>
         <section>
-          <Button variant="link" label={t("Ma société n'est pas enregistrée sur CarbuRe.")} action={showAddCompanyDialog} />
-
+          <Button
+            variant="link"
+            label={t("Ma société n'est pas enregistrée sur CarbuRe.")}
+            action={showAddCompanyDialog}
+          />
         </section>
       </main>
       <footer>

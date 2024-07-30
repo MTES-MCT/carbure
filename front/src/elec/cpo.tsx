@@ -14,8 +14,6 @@ import ProvisionCertificateList from "./components/provision-certificates/list"
 import CPOTransferCertificateList from "./components/transfer-certificates/list-cpo"
 import { elecSnapshot } from "./__test__/data"
 
-
-
 const defaultElecSnapshot: ElecCPOSnapshot = {
   provisioned_energy: 0,
   remaining_energy: 0,
@@ -42,7 +40,6 @@ export const ElecCPO = () => {
   // const snapshot = elecSnapshot //TODO TEST with testing data
 
   return (
-
     <Main>
       <header>
         <section>
@@ -64,21 +61,25 @@ export const ElecCPO = () => {
         </section>
       </header>
 
-
       <Routes>
         <Route
           path="provisioned/*"
           element={
-            <ProvisionCertificateList snapshot={snapshot} year={years.selected} />
+            <ProvisionCertificateList
+              snapshot={snapshot}
+              year={years.selected}
+            />
           }
         />
         <Route
           path="transferred/*"
           element={
-            <CPOTransferCertificateList snapshot={snapshot} year={years.selected} />
+            <CPOTransferCertificateList
+              snapshot={snapshot}
+              year={years.selected}
+            />
           }
         />
-
 
         <Route
           path="*"
@@ -89,59 +90,68 @@ export const ElecCPO = () => {
             />
           }
         />
-
       </Routes>
     </Main>
-
-
   )
 }
 
 export default ElecCPO
-
-
 
 interface ElecTabsProps {
   loading: boolean
   snapshot: ElecCPOSnapshot
 }
 
-
-function ElecTabs({
-  loading,
-  snapshot
-}: ElecTabsProps) {
+function ElecTabs({ loading, snapshot }: ElecTabsProps) {
   const { t } = useTranslation()
 
-  return (<Tabs variant="main" tabs={[{
-    key: "provisioned",
-    path: "provisioned",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.remaining_energy, 3)} MWh
-      </p>
-      <strong>
-        {t("Énergie disponible")}
-
-      </strong>
-    </>
-  }, {
-    key: "transferred",
-    path: "transferred",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy, 3)} MWh
-      </p>
-      <strong>
-        {t("Énergie cédée")}
-      </strong>
-    </>
-  }]} />);
+  return (
+    <Tabs
+      variant="main"
+      tabs={[
+        {
+          key: "provisioned",
+          path: "provisioned",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  formatNumber(snapshot?.remaining_energy, 3)
+                )}{" "}
+                MWh
+              </p>
+              <strong>{t("Énergie disponible")}</strong>
+            </>
+          ),
+        },
+        {
+          key: "transferred",
+          path: "transferred",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  formatNumber(snapshot?.transferred_energy, 3)
+                )}{" "}
+                MWh
+              </p>
+              <strong>{t("Énergie cédée")}</strong>
+            </>
+          ),
+        },
+      ]}
+    />
+  )
 }
-
-

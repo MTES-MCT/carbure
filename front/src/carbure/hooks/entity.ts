@@ -35,7 +35,8 @@ export function useEntityManager(user: UserManager): EntityManager {
     activity_description: entity?.activity_description ?? "",
     legal_name: entity?.legal_name ?? "",
     registration_id: entity?.registration_id ?? "",
-    sustainability_officer_phone_number: entity?.sustainability_officer_phone_number ?? "",
+    sustainability_officer_phone_number:
+      entity?.sustainability_officer_phone_number ?? "",
     sustainability_officer_email: entity?.sustainability_officer_email ?? "",
     sustainability_officer: entity?.sustainability_officer ?? "",
     registered_address: entity?.registered_address ?? "",

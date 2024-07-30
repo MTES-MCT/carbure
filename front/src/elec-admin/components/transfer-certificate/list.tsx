@@ -9,7 +9,10 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
 import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
-import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
+import {
+  ElecAdminSnapshot,
+  ElecAdminTransferCertificateFilter,
+} from "elec-admin/types"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
@@ -26,37 +29,40 @@ type TransferListProps = {
 }
 
 const TransferList = ({ snapshot, year }: TransferListProps) => {
-
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useAdminTransferCertificateQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useAdminTransferCertificateQueryParamsStore(
+    entity,
+    year,
+    status,
+    snapshot
+  )
   const query = useAdminTransferCertificatesQuery(state)
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
     params: [query],
   })
 
-  const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
+  const showTransferCertificateDetails = (
+    transferCertificate: ElecTransferCertificatePreview
+  ) => {
     return {
       pathname: location.pathname,
       search: location.search,
       hash: `transfer-certificate/${transferCertificate.id}`,
     }
-
   }
 
-  const transferCertificatesData = transferCertificatesResponse.result?.data.data
-
-
+  const transferCertificatesData =
+    transferCertificatesResponse.result?.data.data
 
   const total = transferCertificatesData?.total ?? 0
   const count = transferCertificatesData?.returned ?? 0
   return (
     <>
-
       <Bar>
         <TransferCertificateFilters
           filters={FILTERS}
@@ -68,7 +74,6 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
         />
       </Bar>
       <section>
-
         <ActionBar>
           <StatusSwitcher
             status={status}
@@ -76,17 +81,14 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
             snapshot={snapshot}
           />
 
-          {count > 0 &&
-
+          {count > 0 && (
             <Button
               asideX={true}
               icon={Download}
               label={t("Exporter vers Excel")}
-              action={() => api.downloadTransferCertificates(query)
-              }
+              action={() => api.downloadTransferCertificates(query)}
             />
-          }
-
+          )}
         </ActionBar>
 
         {count > 0 && transferCertificatesData ? (
@@ -94,7 +96,9 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
             <ElecAdminTransferCertificateTable
               loading={transferCertificatesResponse.loading}
               order={state.order}
-              transferCertificates={transferCertificatesData.elec_transfer_certificates}
+              transferCertificates={
+                transferCertificatesData.elec_transfer_certificates
+              }
               rowLink={showTransferCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
@@ -112,30 +116,29 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
             )}
           </>
         ) : (
-          <NoResult
-            loading={transferCertificatesResponse.loading}
-          />
+          <NoResult loading={transferCertificatesResponse.loading} />
         )}
-      </section >
+      </section>
 
-
-      <HashRoute path="transfer-certificate/:id" element={<ElecAdminTransferDetailsDialog />} />
+      <HashRoute
+        path="transfer-certificate/:id"
+        element={<ElecAdminTransferDetailsDialog />}
+      />
     </>
   )
 }
 export default TransferList
 
-
 const FILTERS = [
   ElecAdminTransferCertificateFilter.Cpo,
   ElecAdminTransferCertificateFilter.Operator,
   ElecAdminTransferCertificateFilter.TransferDate,
-  ElecAdminTransferCertificateFilter.CertificateId
+  ElecAdminTransferCertificateFilter.CertificateId,
 ]
-
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
-  const status = matchStatus?.params?.status?.toUpperCase() as ElecTransferCertificateStatus
+  const status =
+    matchStatus?.params?.status?.toUpperCase() as ElecTransferCertificateStatus
   return status ?? ElecTransferCertificateStatus.Pending
 }

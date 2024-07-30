@@ -65,9 +65,17 @@ const DoubleCountingFilesCheckerDialog = ({
     if (checkedFile) {
       onClose()
       if (checkedFile.error_count) {
-        portal((close) => <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />)
+        portal((close) => (
+          <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />
+        ))
       } else {
-        portal((close) => <ValidDetailsDialog fileData={checkedFile} onClose={close} file={value.doubleCountingFile as File} />)
+        portal((close) => (
+          <ValidDetailsDialog
+            fileData={checkedFile}
+            onClose={close}
+            file={value.doubleCountingFile as File}
+          />
+        ))
       }
     }
   }
@@ -88,8 +96,12 @@ const DoubleCountingFilesCheckerDialog = ({
             </p>
             <p>
               <Trans>
-                Le modèle Excel à remplir est disponible {" "}
-                <ExternalLink href={"https://www.ecologie.gouv.fr/sites/default/files/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202020.xlsx"}>
+                Le modèle Excel à remplir est disponible{" "}
+                <ExternalLink
+                  href={
+                    "https://www.ecologie.gouv.fr/sites/default/files/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202020.xlsx"
+                  }
+                >
                   sur ce lien
                 </ExternalLink>
                 .
@@ -99,7 +111,11 @@ const DoubleCountingFilesCheckerDialog = ({
               loading={uploadFile.loading}
               icon={value.doubleCountingFile ? Check : Upload}
               label={t("Importer le fichier excel à analyser")}
-              placeholder={value.doubleCountingFile ? value.doubleCountingFile.name : t("Choisir un fichier")}
+              placeholder={
+                value.doubleCountingFile
+                  ? value.doubleCountingFile.name
+                  : t("Choisir un fichier")
+              }
               {...bind("doubleCountingFile")}
             />
           </Form>

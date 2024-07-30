@@ -1,4 +1,7 @@
-import { ElecAdminAuditQuery, ElecAdminAuditStates } from "elec-audit-admin/types"
+import {
+  ElecAdminAuditQuery,
+  ElecAdminAuditStates,
+} from "elec-audit-admin/types"
 import { useMemo } from "react"
 
 export function useElectAdminAuditQuery({

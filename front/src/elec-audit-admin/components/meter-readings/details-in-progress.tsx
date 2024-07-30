@@ -9,9 +9,6 @@ import SampleSummary from "../sample/details-sample-summary"
 import ChargePointsSampleMap from "../sample/sample-map"
 import ApplicationSummary from "./details-application-summary"
 
-
-
-
 interface MeterReadingsApplicationDetailsInProgressProps {
   meterReadingsApplication: ElecMeterReadingsApplicationDetails | undefined
   onAccept: (force?: boolean) => void
@@ -22,7 +19,7 @@ export const MeterReadingsApplicationDetailsInProgress = ({
   meterReadingsApplication,
   onAccept,
   onReject,
-  onDownloadSample
+  onDownloadSample,
 }: MeterReadingsApplicationDetailsInProgressProps) => {
   const { t } = useTranslation()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
@@ -37,29 +34,51 @@ export const MeterReadingsApplicationDetailsInProgress = ({
         {meterReadingsApplication?.sample && (
           <section>
             <SampleSummary sample={meterReadingsApplication?.sample} />
-            <ChargePointsSampleMap chargePoints={meterReadingsApplication?.sample?.charge_points} />
-            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} style={{ width: "min-content" }} />
+            <ChargePointsSampleMap
+              chargePoints={meterReadingsApplication?.sample?.charge_points}
+            />
+            <Button
+              icon={Download}
+              label={t("Télécharger l'échantillon")}
+              variant="secondary"
+              action={onDownloadSample}
+              style={{ width: "min-content" }}
+            />
           </section>
         )}
         <section>
           <Checkbox
             value={confirmCheckbox}
             onChange={setConfirmCheckbox}
-            label={t("Je confirme avoir reçu le résultat d'audit de la part de l'auditeur par e-mail afin de valider ou refuser le relevé T{{quarter}} {{year}}.", {
-              quarter: meterReadingsApplication?.quarter,
-              year: meterReadingsApplication?.year,
-            })}
+            label={t(
+              "Je confirme avoir reçu le résultat d'audit de la part de l'auditeur par e-mail afin de valider ou refuser le relevé T{{quarter}} {{year}}.",
+              {
+                quarter: meterReadingsApplication?.quarter,
+                year: meterReadingsApplication?.year,
+              }
+            )}
           />
         </section>
       </main>
 
       <footer>
-        <Button icon={Check} label={t("Valider")} variant="success" action={onAccept} disabled={!confirmCheckbox} />
-        <Button icon={Cross} label={t("Refuser")} variant="danger" action={onReject} disabled={!confirmCheckbox} />
+        <Button
+          icon={Check}
+          label={t("Valider")}
+          variant="success"
+          action={onAccept}
+          disabled={!confirmCheckbox}
+        />
+        <Button
+          icon={Cross}
+          label={t("Refuser")}
+          variant="danger"
+          action={onReject}
+          disabled={!confirmCheckbox}
+        />
       </footer>
     </>
   )
 }
-
 
 export default MeterReadingsApplicationDetailsInProgress

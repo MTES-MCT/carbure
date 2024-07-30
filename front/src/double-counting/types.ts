@@ -20,7 +20,7 @@ export enum DoubleCountingStatus {
   Accepted = "ACCEPTED",
   Expired = "EXPIRED",
   ExpiresSoon = "EXPIRES_SOON",
-  Incoming = "INCOMING"
+  Incoming = "INCOMING",
 }
 
 export enum AgreementStatus {
@@ -72,7 +72,6 @@ export interface DoubleCountingProduction {
   approved_quota: number
 }
 
-
 export interface DoubleCountingQuota {
   approved_quota: number
   biofuel: Biofuel
@@ -113,14 +112,16 @@ export interface DoubleCountingUploadError {
   meta?: null | any
 }
 
-export interface DoubleCountingUploadErrors extends DoubleCountingApplicationOverview {
+export interface DoubleCountingUploadErrors
+  extends DoubleCountingApplicationOverview {
   // sourcing_history?: DoubleCountingUploadError[]
   sourcing_forecast?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
 }
 
-export interface DoubleCountingApplicationDetails extends DoubleCountingApplicationOverview {
+export interface DoubleCountingApplicationDetails
+  extends DoubleCountingApplicationOverview {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
@@ -137,7 +138,9 @@ export interface DoubleCountingAgreementsSnapshot {
   agreements_incoming: number
 }
 
-export interface DoubleCountingSnapshot extends DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot { }
+export interface DoubleCountingSnapshot
+  extends DoubleCountingAgreementsSnapshot,
+    DoubleCountingApplicationSnapshot {}
 
 export interface DoubleCountingApplicationsOverview {
   rejected: DoubleCountingApplicationOverview[]
@@ -162,11 +165,11 @@ export interface DoubleCountingAgreementOverview {
 
 export interface DoubleCountingAgreementPublic {
   production_site: {
-    name: string,
-    country: string,
-    postal_code: string,
+    name: string
+    country: string
+    postal_code: string
     address: string
-  },
+  }
   certificate_id: string
   valid_from: Date
   valid_until: Date

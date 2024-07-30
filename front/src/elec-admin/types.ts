@@ -14,13 +14,14 @@ export interface ElecAdminSnapshot {
   transferred_energy: number
 }
 
-
 export enum ElecAdminProvisionCertificateStatus {
   Available = "AVAILABLE",
   History = "HISTORY",
 }
 
-export type ElecAdminProvisionCertificateFilterSelection = Partial<Record<ElecAdminProvisionCertificateFilter, string[]>>
+export type ElecAdminProvisionCertificateFilterSelection = Partial<
+  Record<ElecAdminProvisionCertificateFilter, string[]>
+>
 
 export interface ElecAdminProvisionCertificateStates {
   entity: Entity
@@ -40,7 +41,6 @@ export enum ElecAdminProvisionCertificateFilter {
   OperatingUnit = "operating_unit",
   Cpo = "cpo",
 }
-
 
 export interface ElecAdminProvisionCertificateQuery {
   entity_id: number
@@ -78,7 +78,9 @@ export interface ElecAdminTransferCertificateQuery {
   [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
 }
 
-export type ElecAdminTransferCertificateFilterSelection = Partial<Record<ElecAdminTransferCertificateFilter, string[]>>
+export type ElecAdminTransferCertificateFilterSelection = Partial<
+  Record<ElecAdminTransferCertificateFilter, string[]>
+>
 
 export interface ElecAdminTransferCertificateStates {
   entity: Entity

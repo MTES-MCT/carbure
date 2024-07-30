@@ -46,9 +46,9 @@ export const LotSummaryBar = ({
   })
 
   const unitToField = {
-    l: "total_volume" as "total_volume",
-    kg: "total_weight" as "total_weight",
-    MJ: "total_lhv_amount" as "total_lhv_amount",
+    l: "total_volume" as const,
+    kg: "total_weight" as const,
+    MJ: "total_lhv_amount" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"
@@ -165,9 +165,9 @@ export const LotSummary = ({
   const summaryData = summary.result?.data.data
 
   const unitToField = {
-    l: "volume_sum" as "volume_sum",
-    kg: "weight_sum" as "weight_sum",
-    MJ: "lhv_amount_sum" as "lhv_amount_sum",
+    l: "volume_sum" as const,
+    kg: "weight_sum" as const,
+    MJ: "lhv_amount_sum" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"
@@ -366,9 +366,9 @@ export const QuantityCell = ({ item }: SummaryCellProps) => {
   const entity = useEntity()
 
   const unitToField = {
-    l: "volume_sum" as "volume_sum",
-    kg: "weight_sum" as "weight_sum",
-    MJ: "lhv_amount_sum" as "lhv_amount_sum",
+    l: "volume_sum" as const,
+    kg: "weight_sum" as const,
+    MJ: "lhv_amount_sum" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"
@@ -381,9 +381,9 @@ export const RemainingQuantityCell = ({ item }: SummaryCellProps) => {
   const entity = useEntity()
 
   const unitToField = {
-    l: "remaining_volume_sum" as "remaining_volume_sum",
-    kg: "remaining_weight_sum" as "remaining_weight_sum",
-    MJ: "remaining_lhv_amount_sum" as "remaining_lhv_amount_sum",
+    l: "remaining_volume_sum" as const,
+    kg: "remaining_weight_sum" as const,
+    MJ: "remaining_lhv_amount_sum" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"

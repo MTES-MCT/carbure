@@ -6,11 +6,9 @@ import { useTranslation } from "react-i18next"
 import {
   DoubleCountingProduction,
   DoubleCountingSourcing,
-  DoubleCountingSourcingAggregation
+  DoubleCountingSourcingAggregation,
 } from "../types"
 import YearTable from "./year-table"
-
-
 
 type SourcingTableProps = {
   sourcing: DoubleCountingSourcing[]
@@ -31,12 +29,10 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     },
     {
       header: t("Origine"),
-      cell: (s) => (
+      cell: (s) =>
         s.origin_country?.code_pays ? (
           <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
-        )
-          : null
-      ),
+        ) : null,
     },
     {
       header: t("Approvisionnement"),
@@ -50,7 +46,9 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
       cell: (s) =>
         s.transit_country ? (
           <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
-        ) : "-",
+        ) : (
+          "-"
+        ),
     },
   ]
 
@@ -74,60 +72,64 @@ export const SourcingAggregationTable = ({
     {
       header: t("Poids total en tonnes"),
       cell: (s) => <Cell text={formatNumber(s.sum)} />,
-    }
+    },
   ]
 
   return <YearTable columns={columns} rows={sourcing} />
 }
 
-
-export const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourcing[] }) => {
-
-  const [aggregateSourcing, setAggregateSourcing] = useState(true);
+export const SourcingFullTable = ({
+  sourcing,
+}: {
+  sourcing: DoubleCountingSourcing[]
+}) => {
+  const [aggregateSourcing, setAggregateSourcing] = useState(true)
   const { t } = useTranslation()
 
-  const aggregateDoubleCountingSourcing = (data: DoubleCountingSourcing[]): DoubleCountingSourcingAggregation[] => {
-    const aggregationMap = new Map<string, DoubleCountingSourcingAggregation>();
+  const aggregateDoubleCountingSourcing = (
+    data: DoubleCountingSourcing[]
+  ): DoubleCountingSourcingAggregation[] => {
+    const aggregationMap = new Map<string, DoubleCountingSourcingAggregation>()
     for (const item of data) {
-      const key = `${item.feedstock.code}_${item.year}`;
-      const aggregation = aggregationMap.get(key);
+      const key = `${item.feedstock.code}_${item.year}`
+      const aggregation = aggregationMap.get(key)
 
       if (aggregation) {
-        aggregation.sum += item.metric_tonnes;
-        aggregation.count += 1;
+        aggregation.sum += item.metric_tonnes
+        aggregation.count += 1
       } else {
         aggregationMap.set(key, {
           year: item.year,
           sum: item.metric_tonnes,
           count: 1,
-          feedstock: item.feedstock
-        });
+          feedstock: item.feedstock,
+        })
       }
     }
 
-    return Array.from(aggregationMap.values());
+    return Array.from(aggregationMap.values())
   }
 
-  const aggregated_sourcing: DoubleCountingSourcingAggregation[] = aggregateDoubleCountingSourcing(sourcing);
+  const aggregated_sourcing: DoubleCountingSourcingAggregation[] =
+    aggregateDoubleCountingSourcing(sourcing)
 
-  return <>
-
-    {sourcing?.length > 0 &&
-      <Checkbox readOnly value={aggregateSourcing} onChange={() => setAggregateSourcing(!aggregateSourcing)}>
-        {t("Agréger les données d'approvisionnement par matière première")}
-      </Checkbox>
-    }
-    {!aggregateSourcing &&
-      <SourcingTable
-        sourcing={sourcing ?? []}
-      />
-    }
-    {aggregateSourcing &&
-      <SourcingAggregationTable
-        sourcing={aggregated_sourcing ?? []}
-      />
-    }
-  </>
+  return (
+    <>
+      {sourcing?.length > 0 && (
+        <Checkbox
+          readOnly
+          value={aggregateSourcing}
+          onChange={() => setAggregateSourcing(!aggregateSourcing)}
+        >
+          {t("Agréger les données d'approvisionnement par matière première")}
+        </Checkbox>
+      )}
+      {!aggregateSourcing && <SourcingTable sourcing={sourcing ?? []} />}
+      {aggregateSourcing && (
+        <SourcingAggregationTable sourcing={aggregated_sourcing ?? []} />
+      )}
+    </>
+  )
 }
 
 type ProductionTableProps = {

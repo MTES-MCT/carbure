@@ -1,11 +1,8 @@
-
 import useEntity from "carbure/hooks/entity"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import {
-  Return
-} from "common/components/icons"
+import { Return } from "common/components/icons"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -17,7 +14,6 @@ import ApplicationTabs from "double-counting-admin/components/applications/appli
 import { DoubleCountingStatus as DCStatus } from "double-counting/types"
 import * as api from "double-counting/api"
 
-
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -26,16 +22,16 @@ export const ApplicationDetailsDialog = () => {
   const entity = useEntity()
   const match = useHashMatch("double-counting/applications/:id")
 
-
-  const applicationResponse = useQuery(api.getDoubleCountingApplicationDetails, {
-    key: "dc-application",
-    params: [entity.id, parseInt(match?.params.id!)],
-  })
-
+  const applicationResponse = useQuery(
+    api.getDoubleCountingApplicationDetails,
+    {
+      key: "dc-application",
+      params: [entity.id, parseInt(match?.params.id || "")],
+    }
+  )
 
   const application = applicationResponse.result?.data.data
   const dcaStatus = application?.status ?? DCStatus.Pending
-
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#double-counting" })
@@ -50,21 +46,18 @@ export const ApplicationDetailsDialog = () => {
         </header>
 
         <main>
-
           <ApplicationInfo application={application} />
 
-          {application &&
+          {application && (
             <ApplicationTabs
               productionSite={application.production_site}
               sourcing={application.sourcing}
               production={application.production}
             />
-          }
+          )}
         </main>
 
         <footer>
-
-
           <Button icon={Return} action={closeDialog}>
             <Trans>Retour</Trans>
           </Button>
@@ -75,4 +68,3 @@ export const ApplicationDetailsDialog = () => {
     </Portal>
   )
 }
-

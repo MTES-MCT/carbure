@@ -1,0 +1,9 @@
+Bonjour {{ user.name }},
+
+Vous avez été invité à rejoindre CarbuRe au sein de l'entité {{ entity_name }}.
+
+Connectez-vous avec votre compte existant pour y accéder.
+
+Bonne journée,
+
+L'équipe CarbuRe

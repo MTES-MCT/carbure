@@ -31,7 +31,10 @@ const Companies = () => {
       />
 
       {isEmpty && (
-        <NoResult label={t("Aucune société trouvée pour cette recherche")} loading={entities.loading} />
+        <NoResult
+          label={t("Aucune société trouvée pour cette recherche")}
+          loading={entities.loading}
+        />
       )}
 
       {!isEmpty && (

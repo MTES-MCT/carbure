@@ -6,7 +6,7 @@ import { SafQuery } from "saf/types"
 export interface ExportButtonProps {
   asideX?: boolean
   query: SafQuery
-  download: Function
+  download: (query: SafQuery) => unknown
 }
 
 export const ExportButton = ({

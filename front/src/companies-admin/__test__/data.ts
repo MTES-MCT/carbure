@@ -1,7 +1,6 @@
 import { company } from "carbure/__test__/data"
 import { EntityDetails } from "companies-admin/types"
 
-
 const companyPreview: EntityDetails = {
   entity: company,
   users: 1,
@@ -16,5 +15,7 @@ const companyPreview: EntityDetails = {
   charge_points_pending: 1,
   meter_readings_pending: 1,
 }
-export const companiesSummary: EntityDetails[] = [companyPreview, companyPreview]
-
+export const companiesSummary: EntityDetails[] = [
+  companyPreview,
+  companyPreview,
+]

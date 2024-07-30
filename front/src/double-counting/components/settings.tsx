@@ -9,7 +9,10 @@ import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDateYear } from "common/utils/formatters"
 import ApplicationStatus from "double-counting/components/application-status"
-import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting/types"
+import {
+  DoubleCountingApplicationOverview,
+  DoubleCountingStatus,
+} from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "double-counting/api"
@@ -24,7 +27,6 @@ const DoubleCountingSettings = () => {
   const location = useLocation()
 
   const applicationsData = useQuery(api.getDoubleCountingAgreements, {
-
     key: "dc-agreements",
     params: [entity.id],
   })
@@ -33,8 +35,14 @@ const DoubleCountingSettings = () => {
   const isEmpty = applications.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  function showApplicationDialog(application: DoubleCountingApplicationOverview) {
-    if ([DoubleCountingStatus.Pending, DoubleCountingStatus.Rejected].includes(application.status)) {
+  function showApplicationDialog(
+    application: DoubleCountingApplicationOverview
+  ) {
+    if (
+      [DoubleCountingStatus.Pending, DoubleCountingStatus.Rejected].includes(
+        application.status
+      )
+    ) {
       navigate({
         pathname: location.pathname,
         hash: `double-counting/applications/${application.id}`,
@@ -48,9 +56,7 @@ const DoubleCountingSettings = () => {
   }
 
   function showUploadDialog() {
-    portal((resolve) => (
-      <DoubleCountingUploadDialog onClose={resolve} />
-    ))
+    portal((resolve) => <DoubleCountingUploadDialog onClose={resolve} />)
   }
 
   return (
@@ -88,7 +94,12 @@ const DoubleCountingSettings = () => {
           columns={[
             {
               header: t("Statut"),
-              cell: (dc) => <ApplicationStatus status={dc.status} expirationDate={dc.period_end} />,
+              cell: (dc) => (
+                <ApplicationStatus
+                  status={dc.status}
+                  expirationDate={dc.period_end}
+                />
+              ),
             },
             {
               header: t("Site de production"),
@@ -106,22 +117,28 @@ const DoubleCountingSettings = () => {
               header: t("N° d'agrément"),
               cell: (dc) => (
                 <span>
-                  {dc.status === DoubleCountingStatus.Rejected && (
-                    <>-</>
-                  )}
-                  {dc.status === DoubleCountingStatus.Pending && t("En cours de traitement...")}
+                  {dc.status === DoubleCountingStatus.Rejected && <>-</>}
+                  {dc.status === DoubleCountingStatus.Pending &&
+                    t("En cours de traitement...")}
 
                   {dc.status === DoubleCountingStatus.Accepted && (
                     <>{dc.certificate_id}</>
                   )}
-
                 </span>
               ),
             },
             {
               header: t("Quotas"),
-              cell: (dc) => <Cell text={dc.quotas_progression != null ? Math.round(dc.quotas_progression * 100) + "%" : "-"} />,
-            }
+              cell: (dc) => (
+                <Cell
+                  text={
+                    dc.quotas_progression != null
+                      ? Math.round(dc.quotas_progression * 100) + "%"
+                      : "-"
+                  }
+                />
+              ),
+            },
             // {
             //   header: t("Date de soumission"),
             //   cell: (dc) => <Cell text={formatDate(dc.created_at)} />,
