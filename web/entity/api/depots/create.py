@@ -11,6 +11,7 @@ from core.carburetypes import CarbureError
 def create_depot(request, context):
     data = request.POST.copy()
     data["entity"] = context["entity"].id
+    data["is_enabled"] = False
 
     serializer = DepotSerializer(data=data)
 

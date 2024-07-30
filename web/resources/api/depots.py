@@ -6,8 +6,9 @@ from django.http import JsonResponse
 def get_depots(request):
     q = request.GET.get("query", False)
     pub = request.GET.get("public_only", False)
+
     try:
-        dsites = Depot.objects.all().order_by("name")
+        dsites = Depot.objects.all().order_by("name").filter(is_enabled=True)
         if pub:
             dsites = dsites.filter(private=False)
         if q:
