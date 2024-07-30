@@ -56,6 +56,9 @@
 		"predev": "only-include-used-icons",
 		"prebuild": "only-include-used-icons"
 	},
+	"eslintConfig": {
+    "extends": "react-app"
+  },
 	"jest": {
 		"transformIgnorePatterns": [
 			"node_modules/(?!axios)/"
