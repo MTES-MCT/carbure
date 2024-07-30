@@ -7,11 +7,18 @@ import { RadioGroup } from "common/components/radio"
 import { useTranslation } from "react-i18next"
 import { TextInput } from "common/components/input"
 import { Mail, Plus, Return } from "common/components/icons"
-import { UserRole } from "carbure/types"
+import { User, UserRole } from "carbure/types"
+import { useAsyncCallback } from "react-async-hook"
+import { AxiosResponse } from "axios"
+import { Api } from "common/services/api"
+import { useNotify } from "common/components/notifications"
 
 export type AddUserDialogProps = {
   onClose: PortalInstance["close"]
-  onAddNewUser?: (email: string, role: UserRole) => Promise<unknown>
+  onAddNewUser: (
+    email: string,
+    role: UserRole
+  ) => Promise<AxiosResponse<Api<User>>>
 }
 
 export const AddUserDialog = ({
@@ -19,19 +26,38 @@ export const AddUserDialog = ({
   onAddNewUser,
 }: AddUserDialogProps) => {
   const { t } = useTranslation()
-  const { value, bind } = useForm<{
+  const { value, bind, setFieldError } = useForm<{
     email: string | undefined
     role: UserRole | undefined
   }>({
     email: "",
     role: UserRole.ReadOnly,
   })
+  const notify = useNotify()
+
+  const addNewUserMutation = useAsyncCallback(onAddNewUser, {
+    onSuccess: (response) => {
+      onClose()
+      const email = response.data.data?.email
+
+      notify(
+        t("L'utilisateur {{email}} a bien été ajouté !", {
+          email,
+        }),
+        {
+          variant: "success",
+        }
+      )
+    },
+    onError: (err) => {
+      setFieldError("email", t("Le format d'email n'est pas valide"))
+    },
+  })
 
   const handleSubmit = async () => {
+    setFieldError("email", "")
     // Wait for backend request before closing dialog
-    await onAddNewUser?.(value.email!, value.role!)
-
-    onClose()
+    addNewUserMutation.execute(value.email!, value.role!)
   }
 
   return (
@@ -64,6 +90,7 @@ export const AddUserDialog = ({
           icon={Plus}
           label={t("Ajouter")}
           disabled={!value.email || !value.role}
+          loading={addNewUserMutation.loading}
           submit="add-user"
         />
         <Button asideX icon={Return} action={onClose} label={t("Retour")} />
