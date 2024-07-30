@@ -361,7 +361,7 @@ class Depot(models.Model):
     thermal_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
     useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
-    is_enabled = models.BooleanField(default=False)
+    is_enabled = models.BooleanField(default=True)
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
