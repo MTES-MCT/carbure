@@ -21,7 +21,7 @@ from producers.models import ProductionSite
 
 
 class DepotSerializer(serializers.ModelSerializer):
-    # country = CountrySerializer(read_only=True)
+    country = CountrySerializer(read_only=True)
 
     class Meta:
         model = Depot
@@ -36,10 +36,6 @@ class DepotSerializer(serializers.ModelSerializer):
             "postal_code",
             "gps_coordinates",
             "accise",
-            "private",
-            "electrical_efficiency",
-            "thermal_efficiency",
-            "useful_temperature",
         ]
 
 

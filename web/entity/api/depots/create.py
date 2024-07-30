@@ -1,7 +1,7 @@
 from django.views.decorators.http import require_POST
 from core.models import UserRights
 from core.decorators import check_rights
-from core.serializers import DepotSerializer
+from entity.serializers.depot import DepotSerializer
 from core.common import ErrorResponse, SuccessResponse
 from core.carburetypes import CarbureError
 
@@ -12,8 +12,7 @@ def create_depot(request, context):
     serializer = DepotSerializer(data=request.POST)
 
     if not serializer.is_valid():
-        errors = {key: e for key, e in serializer.errors.items()}
-        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=errors)
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=serializer.errors)
 
     serializer.save()
 
