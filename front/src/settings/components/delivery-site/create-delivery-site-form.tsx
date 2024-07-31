@@ -1,20 +1,10 @@
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
-import {
-  Depot,
-  DepotType,
-  Entity,
-  EntityDepot,
-  EntityType,
-  OwnershipType,
-} from "carbure/types"
-import Checkbox from "common/components/checkbox"
+import { Depot, DepotType, EntityDepot, OwnershipType } from "carbure/types"
 import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
-import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
-import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
+import { depotTypeOptions } from "./delivery-site.const"
 import { AutoCompleteCountries } from "carbure/components/autocomplete-countries"
 import { useRef } from "react"
 

@@ -7,18 +7,18 @@ import { useTranslation } from "react-i18next"
 import {
   DeliverySiteForm,
   DeliverySiteFormType,
-} from "./new-delivery-site-form"
+} from "./create-delivery-site-form"
 import * as api from "../../api/delivery-sites"
 import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
 
-type NewDeliverySiteDialogProps = {
+type CreateDeliverySiteDialogProps = {
   onClose: PortalInstance["close"]
 }
 
-export const NewDeliverySiteDialog = ({
+export const CreateDeliverySiteDialog = ({
   onClose,
-}: NewDeliverySiteDialogProps) => {
+}: CreateDeliverySiteDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
@@ -28,7 +28,7 @@ export const NewDeliverySiteDialog = ({
       closeAll()
       notify(
         t(
-          "Votre demande d'ajout de dépôt a bien été prise en compte ! Vous serez notifié lorsque celle-ci aura été traitée."
+          "Votre demande d'ajout de dépôt a bien été prise en compte ! Vous serez notifié par mail lorsque celle-ci aura été traitée."
         ),
         {
           variant: "success",
