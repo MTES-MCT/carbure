@@ -15,7 +15,6 @@ import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
 import ElecChargePointsSettings from "elec/components/charge-points/settings"
-import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 import ElecAdminMeterReadingsSettings from "elec/components/meter-readings/admin-settings"
 
 const EntityDetails = () => {
