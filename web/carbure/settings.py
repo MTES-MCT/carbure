@@ -103,6 +103,7 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'carbure.middlewares.spa.WhiteNoiseSPAMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -174,6 +175,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGE_CODE = 'fr'
+LANGUAGES = [
+  ('fr', 'Français'),
+  ('en', 'English'),
+]
 
 TIME_ZONE = 'Europe/Paris'
 

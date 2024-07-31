@@ -1,4 +1,5 @@
 import axios from "axios"
+import { getI18n } from "react-i18next"
 
 const API_ROOT = `${window.location.origin}/api`
 
@@ -16,6 +17,12 @@ export const api = axios.create({
   transformRequest: (data) => toFormData(data),
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "X-CSRFTOKEN",
+})
+
+// Set the Accept-Language header using the current i18n language
+api.interceptors.request.use((config) => {
+  config.headers["Accept-Language"] = getI18n().language
+  return config
 })
 
 export function download(endpoint: string, params: any) {
