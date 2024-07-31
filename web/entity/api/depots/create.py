@@ -2,6 +2,7 @@ from django.views.decorators.http import require_POST
 from core.models import UserRights
 from core.decorators import check_user_rights
 from entity.serializers.depot import DepotSerializer
+from entity.services.geolocation import get_coordinates
 from core.common import ErrorResponse, SuccessResponse
 from core.carburetypes import CarbureError
 from datetime import datetime
@@ -17,11 +18,20 @@ def create_depot(request, entity, entity_id):
     if not serializer.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=serializer.errors)
 
-    serializer.save()
+    depot = serializer.save()
+
+    depot.gps_coordinates = get_gps_coordinates(depot)
+    depot.save()
 
     send_email_to_user(entity, serializer.validated_data["name"], request.user)
 
     return SuccessResponse()
+
+
+def get_gps_coordinates(depot):
+    address = depot.address + " " + depot.postal_code + " " + depot.city + ", " + depot.country.name
+    xy = get_coordinates(address)
+    return f"{xy[0]},{xy[1]}" if xy else None
 
 
 def send_email_to_user(entity, depot_name, user):
