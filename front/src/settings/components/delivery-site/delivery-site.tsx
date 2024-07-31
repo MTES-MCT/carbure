@@ -26,7 +26,7 @@ import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import { NewDeliverySiteDialog } from "./new-delivery-site-dialog"
+import { CreateDeliverySiteDialog } from "./create-delivery-site-dialog"
 import { DeliverySiteDialog } from "./delivery-site-dialog"
 import { depotTypeLabels, ownerShipTypeOptions } from "./delivery-site.const"
 import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
@@ -190,8 +190,8 @@ export const DeliverySiteFinderDialog = ({
     )
   }
 
-  const openNewDeliverySiteDialog = () => {
-    portal((close) => <NewDeliverySiteDialog onClose={close} />)
+  const openCreateDeliverySiteDialog = () => {
+    portal((close) => <CreateDeliverySiteDialog onClose={close} />)
   }
 
   return (
@@ -237,7 +237,7 @@ export const DeliverySiteFinderDialog = ({
               />
             )}
 
-            <Button variant="link" action={openNewDeliverySiteDialog}>
+            <Button variant="link" action={openCreateDeliverySiteDialog}>
               <Trans>
                 Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
               </Trans>

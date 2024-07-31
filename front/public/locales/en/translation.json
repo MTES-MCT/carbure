@@ -1471,7 +1471,7 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
   "Brouillon_plural": "Drafts",
   "Veuillez remplir les informations suivantes :": "Please complete the following information:",
-  "Votre demande d'ajout de dépôt a bien été prise en compte ! Vous serez notifié lorsque celle-ci aura été traitée.": "Your depot request has been successfully received! You will be notified when your request has been processed.",
+  "Votre demande d'ajout de dépôt a bien été prise en compte ! Vous serez notifié par mail lorsque celle-ci aura été traitée.": "Your depot request has been successfully received! You will be notified with a mail when your request has been processed.",
   "Une erreur est survenue lors de l'ajout de votre dépôt.": "An error occurred while adding your depot.",
   "Cet identifiant douanier est invalide. Il doit être constitué de 15 caractères numériques.": "This customs identifier is invalid. It must be composed of 15 numeric characters."
 }
