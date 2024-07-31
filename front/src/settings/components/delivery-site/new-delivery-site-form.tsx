@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next"
-import { findCountries } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
 import {
   Depot,
@@ -9,8 +8,6 @@ import {
   EntityType,
   OwnershipType,
 } from "carbure/types"
-import { normalizeCountry } from "carbure/utils/normalizers"
-import Autocomplete from "common/components/autocomplete"
 import Checkbox from "common/components/checkbox"
 import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
@@ -24,7 +21,6 @@ import { useRef } from "react"
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
   onSubmit?: (values: DeliverySiteFormType) => void
-  isReadOnly?: boolean
 
   // Submit button is outside the generic component, we have to pass the same id between form and button
   formId?: string
@@ -43,12 +39,8 @@ export type DeliverySiteFormType = Partial<
     | "electrical_efficiency"
     | "thermal_efficiency"
     | "useful_temperature"
-  > &
-    Pick<EntityDepot, "ownership_type">
-> & {
-  blending_entity?: Entity | undefined
-  blending_outsourced: boolean
-}
+  >
+>
 
 const mapDeliverySiteToForm: (
   deliverySite?: EntityDepot
@@ -70,13 +62,11 @@ const mapDeliverySiteToForm: (
 
 export const DeliverySiteForm = ({
   deliverySite,
-  isReadOnly = false,
   onSubmit,
   formId = "delivery-site",
 }: DeliverySiteFormProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const { value, bind, setFieldError } = useForm<DeliverySiteFormType>(
+  const { value, bind } = useForm<DeliverySiteFormType>(
     mapDeliverySiteToForm(deliverySite)
   )
 
@@ -85,13 +75,13 @@ export const DeliverySiteForm = ({
     const validityState = depotIdRef.current?.validity
     depotIdRef.current?.setCustomValidity("")
 
-    if (validityState?.patternMismatch) {
-      const message = t(
-        "Cet identifiant douanier est invalide. Il doit être constitué de 15 caractères numériques."
-      )
-      depotIdRef.current?.setCustomValidity(message)
-      depotIdRef.current?.reportValidity()
-    }
+    // if (validityState?.patternMismatch) {
+    //   const message = t(
+    //     "Cet identifiant douanier est invalide. Il doit être constitué de 15 caractères numériques."
+    //   )
+    //   depotIdRef.current?.setCustomValidity(message)
+    //   depotIdRef.current?.reportValidity()
+    // }
   }
 
   return (
@@ -101,7 +91,6 @@ export const DeliverySiteForm = ({
         type="text"
         label={t("Nom du site")}
         {...bind("name")}
-        readOnly={isReadOnly}
         required
       />
 
@@ -111,10 +100,9 @@ export const DeliverySiteForm = ({
         label={t("Identifiant officiel")}
         placeholder="Ex: FR1A00000580012"
         {...bind("depot_id")}
-        readOnly={isReadOnly}
         required
         inputRef={depotIdRef}
-        pattern="[0-9]{15}"
+        // pattern="[0-9]{15}"
         onChange={(value) => {
           checkDepotIdValidity()
           bind("depot_id").onChange(value)
@@ -125,39 +113,11 @@ export const DeliverySiteForm = ({
         label={t("Type de dépôt")}
         options={depotTypeOptions}
         {...bind("depot_type")}
-        disabled={isReadOnly}
         required
       />
 
-      <RadioGroup
-        label={t("Propriété")}
-        {...bind("ownership_type")}
-        options={ownerShipTypeOptions}
-        disabled={isReadOnly}
-        required
-      />
-
-      {entity.entity_type === EntityType.Operator && (
-        <>
-          <Checkbox
-            label={t("L'incorporation est effectuée par un tiers")}
-            {...bind("blending_outsourced")}
-            disabled={isReadOnly}
-          />
-
-          {value.blending_outsourced && (
-            <AutoCompleteOperators
-              label={t("Incorporateur Tiers")}
-              readOnly={isReadOnly}
-              required
-              {...bind("blending_entity")}
-            />
-          )}
-        </>
-      )}
       {value.depot_type === DepotType.PowerPlant && (
         <NumberInput
-          readOnly={isReadOnly}
           label={t("Rendement électrique")}
           min={0}
           max={1}
@@ -169,7 +129,6 @@ export const DeliverySiteForm = ({
       )}
       {value.depot_type === DepotType.HeatPlant && (
         <NumberInput
-          readOnly={isReadOnly}
           label={t("Rendement thermique")}
           min={0}
           max={1}
@@ -181,7 +140,6 @@ export const DeliverySiteForm = ({
       )}
       {value.depot_type === DepotType.CogenerationPlant && (
         <NumberInput
-          readOnly={isReadOnly}
           label={t("Température utile")}
           min={0}
           max={1}
@@ -192,47 +150,14 @@ export const DeliverySiteForm = ({
         />
       )}
 
-      <TextInput
-        readOnly={isReadOnly}
-        label={t("Adresse")}
-        {...bind("address")}
-        required
-      />
+      <TextInput label={t("Adresse")} {...bind("address")} required />
 
       <Row style={{ gap: "var(--spacing-s)" }}>
-        <TextInput
-          readOnly={isReadOnly}
-          label={t("Ville")}
-          {...bind("city")}
-          required
-        />
-        <TextInput
-          readOnly={isReadOnly}
-          label={t("Code postal")}
-          {...bind("postal_code")}
-          required
-        />
+        <TextInput label={t("Ville")} {...bind("city")} required />
+        <TextInput label={t("Code postal")} {...bind("postal_code")} required />
       </Row>
 
-      {!isReadOnly ? (
-        <AutoCompleteCountries
-          label={t("Pays")}
-          {...bind("country")}
-          required
-        />
-      ) : (
-        <TextInput
-          readOnly
-          label={t("Pays")}
-          placeholder={t("Rechercher un pays...")}
-          name="country"
-          value={
-            value.country
-              ? (t(value.country.code_pays, { ns: "countries" }) as string)
-              : ""
-          }
-        />
-      )}
+      <AutoCompleteCountries label={t("Pays")} {...bind("country")} required />
     </Form>
   )
 }

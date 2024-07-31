@@ -4,7 +4,10 @@ import { Edit, Return } from "common/components/icons"
 import { PortalInstance, useCloseAllPortals } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import { DeliverySiteForm, DeliverySiteFormType } from "./delivery-site-form"
+import {
+  DeliverySiteForm,
+  DeliverySiteFormType,
+} from "./new-delivery-site-form"
 import * as api from "../../api/delivery-sites"
 import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
@@ -49,9 +52,6 @@ export const NewDeliverySiteDialog = ({
       values.depot_type!,
       values.address!,
       values.postal_code!,
-      values.ownership_type!,
-      values.blending_outsourced,
-      values.blending_entity,
       values.electrical_efficiency!,
       values.thermal_efficiency!,
       values.useful_temperature!
@@ -61,7 +61,7 @@ export const NewDeliverySiteDialog = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Ajouter un dépôt")}</h1>
+        <h1>{t("Créer un nouveau dépôt")}</h1>
       </header>
 
       <main>
