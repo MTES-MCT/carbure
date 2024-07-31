@@ -4,9 +4,7 @@ import Pagination from "common/components/pagination"
 import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import ElectTransferDetailsDialog, {
-  ElecTransferDetailsDialog,
-} from "elec/components/transfer-certificates/details"
+import { ElecTransferDetailsDialog } from "elec/components/transfer-certificates/details"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
 import {
