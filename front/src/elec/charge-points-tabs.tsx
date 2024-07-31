@@ -18,8 +18,8 @@ export const ChargePointsTabs = ({
       variant="main"
       tabs={[
         {
-          key: "charge-points-pending",
-          path: "charge-points-pending",
+          key: "pending",
+          path: "pending",
           label: (
             <TabItem
               title={t("Inscriptions de points de recharge")}
@@ -40,8 +40,8 @@ export const ChargePointsTabs = ({
           ),
         },
         {
-          key: "charge-points",
-          path: "charge-points",
+          key: "list",
+          path: "list",
           label: (
             <TabItem
               title={t("Points de recharge inscrits")}
