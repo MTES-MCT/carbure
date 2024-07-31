@@ -4,6 +4,7 @@ import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
+import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api-charge-points"
 import { ChargePointsTabs } from "./charge-points-tabs"
 import { ChargePointsSnapshot } from "./types-charge-points"
@@ -49,6 +50,16 @@ const ChargePoints = () => {
           />
         </section>
       </header>
+
+      <Routes>
+        <Route path="meter-readings" element={<div>METER READINGS PAGE</div>} />
+
+        <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} />
+
+        <Route path="pending" element={<div>CHARGE POINTS PENDING</div>} />
+
+        <Route path="*" element={<Navigate replace to="pending" />} />
+      </Routes>
     </Main>
   )
 }
