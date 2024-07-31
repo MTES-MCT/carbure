@@ -9,11 +9,7 @@ from core.carburetypes import CarbureError
 @require_POST
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
 def create_depot(request, context):
-    data = request.POST.copy()
-    data["entity"] = context["entity"].id
-    data["is_enabled"] = False
-
-    serializer = DepotSerializer(data=data)
+    serializer = DepotSerializer(data=request.POST)
 
     if not serializer.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=serializer.errors)
