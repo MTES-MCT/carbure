@@ -213,6 +213,7 @@ export const DeliverySiteFinderDialog = ({
               placeholder={t("Rechercher un dépôt...")}
               getOptions={(search) => common.findDepots(search)}
               normalize={normalizeDepot}
+              required
               {...bind("depot")}
             />
 
