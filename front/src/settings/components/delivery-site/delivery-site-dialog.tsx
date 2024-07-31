@@ -139,37 +139,6 @@ export const DeliverySiteDialog = ({
             />
           </Form>
         </section>
-
-        {isPowerOrHeatPlant && (
-          <>
-            <hr />
-            <section>
-              {electricalEfficiency && (
-                <TextInput
-                  readOnly
-                  label={t("Rendement électrique")}
-                  value={formatPercentage(electricalEfficiency * 100)}
-                />
-              )}
-              {thermalEfficiency && (
-                <TextInput
-                  readOnly
-                  label={t("Rendement thermique")}
-                  value={formatPercentage(thermalEfficiency * 100)}
-                />
-              )}
-              {usefulTemperature && (
-                <TextInput
-                  readOnly
-                  label={t("Température utile")}
-                  value={formatNumber(usefulTemperature) + "˚C"}
-                />
-              )}
-            </section>
-          </>
-        )}
-
-        <section></section>
       </main>
 
       <footer>
