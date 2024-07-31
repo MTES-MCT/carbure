@@ -11,6 +11,7 @@ import AgreementPublicList from "double-counting/components/agreement-public-lis
 import ElecAdmin from "elec-admin"
 import ElecAdminAudit from "elec-audit-admin"
 import ElecCPO from "elec/cpo"
+import ChargePoints from "elec/charge-points"
 import { ElecOperator } from "elec/operator"
 import { Navigate, Route, Routes } from "react-router-dom"
 import Registry from "registry"
@@ -102,84 +103,161 @@ const Org = () => {
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
 
-  // prettier-ignore
   return (
     <Routes>
       <Route path="settings" element={<Settings />} />
 
-      {(isIndustry || isPowerOrHeatProducer) &&
-        (<>
+      {(isIndustry || isPowerOrHeatProducer) && (
+        <>
           <Route path="transactions/:year/*" element={<Transactions />} />
           <Route path="registry" element={<Registry />} />
-          <Route path="transactions" element={<Navigate replace to={`${currentYear}`} />} />
+          <Route
+            path="transactions"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
           <Route path="*" element={<Navigate replace to="transactions" />} />
         </>
-        )}
+      )}
 
-      {has_saf && isOperator && (<>
-        <Route path="saf/:year/*" element={<SafOperator />} />
-        <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
-        <Route path="*" element={<Navigate replace to={`saf/${currentYear}/tickets-sources`} />} />
+      {has_saf && isOperator && (
+        <>
+          <Route path="saf/:year/*" element={<SafOperator />} />
+          <Route
+            path="saf"
+            element={<Navigate replace to={`${currentYear}/ticket-sources`} />}
+          />
+          <Route
+            path="*"
+            element={
+              <Navigate replace to={`saf/${currentYear}/tickets-sources`} />
+            }
+          />
+        </>
+      )}
 
-      </>)}
+      {isAirline && (
+        <>
+          <Route path="saf/:year/*" element={<SafAirline />} />
+          <Route
+            path="saf"
+            element={<Navigate replace to={`${currentYear}/tickets`} />}
+          />
+          <Route
+            path="*"
+            element={<Navigate replace to={`saf/${currentYear}/tickets`} />}
+          />
+        </>
+      )}
 
-      {isAirline && (<>
-        <Route path="saf/:year/*" element={<SafAirline />} />
-        <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
-        <Route path="*" element={<Navigate replace to={`saf/${currentYear}/tickets`} />} />
-      </>)}
+      {isAdmin && (
+        <>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="*" element={<Navigate replace to="dashboard" />} />
+        </>
+      )}
 
-      {isAdmin && (<>
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="*" element={<Navigate replace to="dashboard" />} />
-      </>)}
-
+      {isAdmin && (
+        <>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="*" element={<Navigate replace to="dashboard" />} />
+        </>
+      )}
 
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
-      {isCPO && (<>
-        <Route path="elec/:year/*" element={<ElecCPO />} />
-        <Route path="elec" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
-        <Route path="*" element={<Navigate replace to={`elec/${currentYear}/provisioned`} />} />
-      </>)}
-      {((isOperator && has_elec)) && (<>
-        <Route path="elec/:year/*" element={<ElecOperator />} />
-        <Route path="elec" element={<Navigate replace to={`${currentYear}`} />} />
-        <Route path="*" element={<Navigate replace to={`elec/${currentYear}/pending`} />} />
+      {isCPO && (
+        <>
+          <Route path="elec/:year/*" element={<ElecCPO />} />
+          <Route
+            path="elec"
+            element={<Navigate replace to={`${currentYear}/provisioned`} />}
+          />
+          <Route
+            path="*"
+            element={
+              <Navigate replace to={`elec/${currentYear}/provisioned`} />
+            }
+          />
+        </>
+      )}
+      {isOperator && has_elec && (
+        <>
+          <Route path="elec/:year/*" element={<ElecOperator />} />
+          <Route
+            path="elec"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+          <Route
+            path="*"
+            element={<Navigate replace to={`elec/${currentYear}/pending`} />}
+          />
+        </>
+      )}
+      {(isOperator && has_elec) ||
+        (isCPO && (
+          <>
+            <Route path="charge-points/:year/*" element={<ChargePoints />} />
+            <Route
+              path="charge-points"
+              element={<Navigate replace to={`${currentYear}`} />}
+            />
+          </>
+        ))}
 
-      </>)}
+      {isAuditor && (
+        <>
+          <Route path="elec-audit/:year/*" element={<ElecAudit />} />
+          <Route
+            path="elec-audit"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+        </>
+      )}
 
-      {isAuditor && (<>
-        <Route path="elec-audit/:year/*" element={<ElecAudit />} />
-        <Route path="elec-audit" element={<Navigate replace to={`${currentYear}`} />} />
-      </>)}
+      {(isAdmin || isAuditor) && (
+        <>
+          <Route path="controls/:year/*" element={<Controls />} />
+          <Route
+            path="controls"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+        </>
+      )}
+      {isAuditor && (
+        <Route path="*" element={<Navigate replace to="controls" />} />
+      )}
 
-      {(isAdmin || isAuditor) && (<>
-        <Route path="controls/:year/*" element={<Controls />} />
-        <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />
-      </>)}
-      {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
+      {(isAdmin || hasDCA) && (
+        <Route path="double-counting/*" element={<DoubleCounting />} />
+      )}
+      {hasDCA && (
+        <Route path="*" element={<Navigate replace to="double-counting" />} />
+      )}
 
-
-      {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
-      {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
-
-      {(isAdmin || hasAirline || isElecAdmin) &&
+      {(isAdmin || hasAirline || isElecAdmin) && (
         <Route path="entities/*" element={<Entities />} />
-      }
-      {(isAdmin || isElecAdmin) &&
+      )}
+      {(isAdmin || isElecAdmin) && (
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
-          <Route path="elec-admin" element={<Navigate replace to={`${currentYear}`} />} />
+          <Route
+            path="elec-admin"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
         </>
-      }
-      {(isAdmin || isElecAdmin) &&
+      )}
+      {(isAdmin || isElecAdmin) && (
         <>
           <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />
-          <Route path="elec-admin-audit" element={<Navigate replace to={`${currentYear}`} />} />
+          <Route
+            path="elec-admin-audit"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
         </>
-      }
-      {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
+      )}
+      {hasAirline && (
+        <Route path="*" element={<Navigate replace to="entities" />} />
+      )}
     </Routes>
   )
 }
