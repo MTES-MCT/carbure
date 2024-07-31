@@ -49,7 +49,7 @@ export function createNewDeliverySite(
     entity_id,
     name,
     city,
-    country_id: country.code_pays,
+    country_code: country.code_pays,
     depot_id,
     depot_type,
     address,
