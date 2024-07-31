@@ -12,7 +12,6 @@ import * as api from "./api-cpo"
 import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types-cpo"
 import ProvisionCertificateList from "./components/provision-certificates/list"
 import CPOTransferCertificateList from "./components/transfer-certificates/list-cpo"
-import { elecSnapshot } from "./__test__/data"
 
 const defaultElecSnapshot: ElecCPOSnapshot = {
   provisioned_energy: 0,
