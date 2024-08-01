@@ -1,14 +1,11 @@
-from core.decorators import check_user_rights, otp_or_403
-from core.models import UserRights, UserRightsRequests, Entity
+from core.decorators import check_user_rights
+from core.models import UserRights, UserRightsRequests
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 
 
-@otp_or_403
 @check_user_rights(role=[UserRights.ADMIN])
-def revoke_user(request, *args, **kwargs):
-    entity_id = kwargs["context"]["entity_id"]
-    entity = Entity.objects.get(id=entity_id)
+def revoke_user(request, entity, entity_id):
     email = request.POST.get("email", None)
     user_model = get_user_model()
 

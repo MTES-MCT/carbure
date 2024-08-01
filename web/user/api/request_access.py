@@ -1,5 +1,5 @@
-from core.decorators import otp_or_403
-from core.models import Entity, UserRights, UserRightsRequests
+from core.decorators import check_user_rights
+from core.models import UserRights, UserRightsRequests
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -7,22 +7,13 @@ from django.http import JsonResponse
 from core.utils import CarbureEnv
 
 
-@otp_or_403
-def request_entity_access(request):
-    entity_id = request.POST.get("entity_id", False)
+@check_user_rights()
+def request_entity_access(request, entity, entity_id):
     comment = request.POST.get("comment", "")
     role = request.POST.get("role", False)
 
-    if not entity_id:
-        return JsonResponse({"status": "error", "message": "Missing entity_id"}, status=400)
-
     if not role:
         return JsonResponse({"status": "error", "message": "Please specify a role"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception:
-        return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
 
