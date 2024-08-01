@@ -1,15 +1,16 @@
 import Alert from "common/components/alert"
 import Button from "common/components/button"
-import { Download, Edit } from "common/components/icons"
+import { ChevronRight, Download, Edit } from "common/components/icons"
 import ChargePointsSampleMap from "elec-audit-admin/components/sample/sample-map"
 import { ElecAuditorApplicationDetails } from "elec-auditor/types"
 import { Trans, useTranslation } from "react-i18next"
 
 
-const DownloadSampleSection = ({ application, header, onDownloadSample }: {
+const DownloadSampleSection = ({ application, header, onDownloadSample, onSampleDownloaded }: {
   application: ElecAuditorApplicationDetails,
   header: JSX.Element,
   onDownloadSample: () => void
+  onSampleDownloaded: () => void
 }) => {
   const { t } = useTranslation()
 
@@ -23,6 +24,7 @@ const DownloadSampleSection = ({ application, header, onDownloadSample }: {
       ) : <p><Trans>Le fichier CSV listant l'intégralité des points de recharge à auditer vous a été envoyé par email par l'aménageur.</Trans></p>
       }
       <section>
+        <Button icon={Download} label={t("Télécharger les points à auditer")} variant="primary" action={onDownloadSample} />
 
         <Alert icon={Edit} variant="info" label={t("Précision sur les champs du tableau à remplir :")} >
           <p>
@@ -61,7 +63,7 @@ const DownloadSampleSection = ({ application, header, onDownloadSample }: {
       </section>
     </main>
     <footer>
-      <Button icon={Download} label={t("Télécharger les points à auditer")} variant="primary" action={onDownloadSample} />
+      <Button icon={ChevronRight} label={t("Suivant")} variant="secondary" action={onSampleDownloaded} asideX />
 
     </footer>
   </>

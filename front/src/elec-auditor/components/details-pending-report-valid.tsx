@@ -1,18 +1,19 @@
 import { UploadCheckReportInfo } from "carbure/types"
 import Button from "common/components/button"
-import { Send } from "common/components/icons"
+import { ChevronLeft, Send } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "elec-auditor/api"
 import useEntity from "carbure/hooks/entity"
 
-const ReportValidSection = ({ applicationId, header, file, fileName, onReportAccepted }: {
+const ReportValidSection = ({ applicationId, header, file, fileName, onReportAccepted, onPrev }: {
   applicationId: number,
   header: JSX.Element,
   file: File,
   fileName: string,
   onReportAccepted: () => void
+  onPrev: () => void
 }) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -57,6 +58,8 @@ const ReportValidSection = ({ applicationId, header, file, fileName, onReportAcc
     </main>
     <footer>
       <Button icon={Send} label={t("Transmettre le résultat d'audit")} variant="primary" action={onAcceptFile} loading={acceptAuditReport.loading} />
+      <Button icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={onPrev} asideX />
+
     </footer>
   </>
 }
