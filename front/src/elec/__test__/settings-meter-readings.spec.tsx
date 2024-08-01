@@ -6,9 +6,10 @@ import { TestRoot, render } from "setupTests"
 import userEvent from "@testing-library/user-event"
 import { cpo } from "carbure/__test__/data"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import server from "../../settings/__test__/api"
+import server from "../../settings/__test__/server"
 import {
   okMeterReadingsApplicationsEmpty,
+  okMeterReadingsCheckValid,
   okMeterReadingsApplicationsUrgencyCritical,
   okMeterReadingsApplicationsWithoutChargePoints,
   okMeterReadingsCheckError,
@@ -116,6 +117,7 @@ test("upload dialog opened with urgency critical", async () => {
 
 test("upload valid file", async () => {
   const user = userEvent.setup()
+  server.use(okMeterReadingsCheckValid)
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
