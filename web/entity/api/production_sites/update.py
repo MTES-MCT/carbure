@@ -1,14 +1,11 @@
-from core.decorators import check_rights
+from core.decorators import check_user_rights
 from core.models import Pays, UserRights
 from django.http import JsonResponse
 from producers.models import ProductionSite
 
 
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def update_production_site(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity = context["entity"]
-
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def update_production_site(request, entity, entity_id):
     production_site_id = request.POST.get("production_site_id", False)
 
     if not production_site_id:
