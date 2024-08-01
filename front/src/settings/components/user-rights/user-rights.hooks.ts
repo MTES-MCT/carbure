@@ -47,3 +47,9 @@ export const useAcceptUserRights = () =>
   useMutation(api.acceptUserRightsRequest, {
     invalidates: ["entity-rights"],
   })
+
+export const useInviteUser = () => {
+  return useMutation(api.inviteUser, {
+    invalidates: ["entity-rights"],
+  })
+}

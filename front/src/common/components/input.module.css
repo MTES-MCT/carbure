@@ -75,6 +75,11 @@
   color: var(--red-dark);
 }
 
+.field[data-error] .error {
+  color: var(--red-dark);
+  font-size: 0.8em;
+}
+
 .text[data-disabled] .control {
   background-color: transparent;
 }

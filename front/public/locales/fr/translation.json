@@ -31,6 +31,7 @@
   "Addresse email": "Addresse email",
   "Mon compte": "Mon compte",
   "Votre compte a bien été activé, vous pouvez maintenant vous connecter sur CarbuRe.": "Votre compte a bien été activé, vous pouvez maintenant vous connecter sur CarbuRe.",
+  "Votre compte a bien été activé, vous allez recevoir un mail pour définir votre mot de passe.": "Votre compte a bien été activé, vous allez recevoir un mail pour définir votre mot de passe.",
   "Une erreur s'est produite lors de l'activation de votre compte, merci de recommencer le processus d'inscription.": "Une erreur s'est produite lors de l'activation de votre compte, merci de recommencer le processus d'inscription.",
   "Se connecter": "Se connecter",
   "Réessayer de s'inscrire": "Réessayer de s'inscrire",
@@ -67,7 +68,7 @@
   "Vous pouvez maintenant modifier votre mot de passe en renseignant les champs ci-dessous": "Vous pouvez maintenant modifier votre mot de passe en renseignant les champs ci-dessous",
   "Nouveau mot de passe": "Nouveau mot de passe",
   "Répéter le nouveau mot de passe": "Répéter le nouveau mot de passe",
-  "Les mots de passe de correspondent pas": "Les mots de passe de correspondent pas",
+  "Les mots de passe ne correspondent pas": "Les mots de passe ne correspondent pas",
   "Enregistrer le nouveau mot de passe": "Enregistrer le nouveau mot de passe",
   "Le compte a bien été créé !": "Le compte a bien été créé !",
   "Le compte n'a pas pu être créé !": "Le compte n'a pas pu être créé !",
@@ -1556,5 +1557,10 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> doit être déclaré avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
-  "Brouillon_plural": "Brouillons"
+  "Brouillon_plural": "Brouillons",
+  "Ajouter un utilisateur": "Ajouter un utilisateur",
+  "Veuillez remplir les informations suivantes:": "Veuillez remplir les informations suivantes:",
+  "L'utilisateur {{email}} a bien été ajouté !": "L'utilisateur {{email}} a bien été ajouté !",
+  "Une erreur est survenue lors de l'ajout de l'utilisateur": "Une erreur est survenue lors de l'ajout de l'utilisateur",
+  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe."
 }

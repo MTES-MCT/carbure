@@ -1,6 +1,10 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import Form, { useForm } from "common/components/form"
@@ -21,28 +25,37 @@ import css from "./auth.module.css"
 export const Activate = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-
   const { uidb64, token } = useToken()
+
+  const [searchParams] = useSearchParams()
+  const isUserInvited = Boolean(searchParams.get("invite")) || false
 
   const activate = useQuery(api.activateAccount, {
     key: "activate-account",
-    params: [uidb64, token],
+    params: [uidb64, token, isUserInvited],
   })
 
   const isSuccess = activate.status === "success"
   const isError = activate.status === "error"
 
+  const activatedMessage = isUserInvited
+    ? t(
+        "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe."
+      )
+    : t(
+        "Votre compte a bien été activé, vous pouvez maintenant vous connecter sur CarbuRe."
+      )
+
+  const userInvitedSearchParams = createSearchParams({
+    uidb64: uidb64 || "",
+    token: activate.result?.data.data.token || "",
+  })
+
   return (
     <Container>
       <section>
         {activate.loading && <Loader size={48} className={css.loader} />}
-        {isSuccess && (
-          <p>
-            {t(
-              "Votre compte a bien été activé, vous pouvez maintenant vous connecter sur CarbuRe."
-            )}
-          </p>
-        )}
+        {isSuccess && <p>{activatedMessage}</p>}
         {isError && (
           <p style={{ color: "var(--red-dark)" }}>
             {t(
@@ -53,7 +66,19 @@ export const Activate = () => {
       </section>
 
       <footer>
-        {isSuccess && (
+        {isUserInvited && (
+          <Button
+            center
+            variant="primary"
+            icon={UserCheck}
+            label={t("Définir mon mot de passe")}
+            to={{
+              pathname: "../reset-password",
+              search: userInvitedSearchParams.toString(),
+            }}
+          />
+        )}
+        {isSuccess && !isUserInvited && (
           <Button
             center
             variant="primary"
@@ -62,7 +87,7 @@ export const Activate = () => {
             action={() => navigate("../login")}
           />
         )}
-        {isError && (
+        {isError && !isUserInvited && (
           <Button
             center
             variant="warning"
