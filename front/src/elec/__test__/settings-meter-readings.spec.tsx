@@ -10,6 +10,7 @@ import server from "../../settings/__test__/api"
 import {
   okMeterReadingsApplicationsEmpty,
   okMeterReadingsApplicationsUrgencyCritical,
+  okMeterReadingsApplicationsWithoutChargePoints,
   okMeterReadingsCheckError,
 } from "./api"
 
@@ -143,4 +144,12 @@ test("upload file with error", async () => {
   server.use(okMeterReadingsCheckError)
   await uploadMeterReadingsFile()
   screen.getByText("À corriger")
+})
+
+test("When an application has 0 charge points, the user can't send its meter readings", async () => {
+  server.use(okMeterReadingsApplicationsWithoutChargePoints)
+  setEntity(cpo)
+  render(<SettingsWithHooks />)
+  await waitWhileLoading()
+  screen.getByText("Vous n'avez aucun relevé à déclarer")
 })
