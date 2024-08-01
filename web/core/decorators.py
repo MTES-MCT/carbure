@@ -6,46 +6,6 @@ from core.common import ErrorResponse
 from functools import wraps
 
 
-# check that request.POST contains an entity_id and request.user is allowed to make changes
-def check_rights(entity_id_field, role=None):
-    def actual_decorator(function):
-        @wraps(function)
-        def wrap(request, *args, **kwargs):
-            if not request.user.is_verified():
-                return JsonResponse({"status": "forbidden", "message": "User not OTP verified"}, status=403)
-
-            entity_id = request.POST.get(entity_id_field, request.GET.get(entity_id_field, False))
-            if not entity_id:
-                return JsonResponse({"status": "error", "message": "Missing field %s" % (entity_id_field)}, status=400)
-
-            try:
-                entity = Entity.objects.get(id=entity_id)
-            except Exception:
-                return JsonResponse({"status": "error", "message": "Unknown Entity id %s" % (entity_id)}, status=400)
-
-            try:
-                rights = UserRights.objects.get(user=request.user, entity=entity)
-                if role is not None:
-                    if isinstance(role, list):
-                        if rights.role not in role:
-                            return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
-                    elif role != rights.role:
-                        return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
-                    else:
-                        # all types of roles allowed
-                        pass
-            except:
-                return JsonResponse({"status": "forbidden", "message": "User does not belong to entity"}, status=403)
-            context = {}
-            context["entity"] = entity
-            kwargs["context"] = context
-            return function(request, *args, **kwargs)
-
-        return wrap
-
-    return actual_decorator
-
-
 def is_admin(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
