@@ -57,8 +57,8 @@ def invite_user(request, entity, entity_id):
         return ErrorResponse(400, InviteUserError.ACCESS_ALREADY_GIVEN)
 
     try:
-        UserRightsRequests.objects.update_or_create(user=user, entity=entity, role=role, status="ACCEPTED")
-        UserRights.objects.update_or_create(user=user, entity=entity, role=role)
+        UserRightsRequests.objects.update_or_create(user=user, entity=entity, defaults={"role": role, "status": "ACCEPTED"})
+        UserRights.objects.create(user=user, entity=entity, role=role)
 
     except:
         return ErrorResponse(400, InviteUserError.INVITE_FAILED)
