@@ -10,6 +10,7 @@ import { Form } from "common/components/form"
 import { RadioGroup } from "common/components/radio"
 
 import useEntity from "carbure/hooks/entity"
+import { getUserRoleOptions } from "carbure/utils/normalizers"
 
 type ChangeUserRoleDialogProps = {
   request: UserRightRequest
@@ -59,20 +60,11 @@ export const ChangeUserRoleDialog = ({
               name="role"
               value={role}
               onChange={setRole}
-              options={[
-                {
-                  value: UserRole.ReadOnly,
-                  label: t("Lecture seule"),
-                },
-                {
-                  value: UserRole.ReadWrite,
-                  label: t("Lecture/écriture"),
-                },
-                {
-                  value: UserRole.Admin,
-                  label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-                },
-              ]}
+              options={getUserRoleOptions([
+                UserRole.ReadOnly,
+                UserRole.ReadWrite,
+                UserRole.Admin,
+              ])}
             />
           </Form>
         </section>

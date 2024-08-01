@@ -4,7 +4,7 @@ from core.models import CarbureLot, EntityDepot, UserRights
 from django.http import JsonResponse
 
 
-@check_rights("entity_id", role=[UserRights.ADMIN])
+@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
 def delete_depot(request, *args, **kwargs):
     entity = kwargs["context"]["entity"]
     delivery_site_id = request.POST.get("delivery_site_id", False)
