@@ -67,6 +67,8 @@ export const ApplicationDetailsPending = ({
 
   const downloadSample = () => {
     onDownloadSample()
+  }
+  const handleSampleDownloaded = () => {
     setStep("check-report")
   }
 
@@ -93,16 +95,16 @@ export const ApplicationDetailsPending = ({
   return (
     <>
       {step === "download-sample" &&
-        <DownloadSampleSection application={application} header={<Header />} onDownloadSample={downloadSample} />
+        <DownloadSampleSection application={application} header={<Header />} onDownloadSample={downloadSample} onSampleDownloaded={handleSampleDownloaded} />
       }
       {step === "check-report" &&
-        <CheckReportSection application={application} header={<Header />} onReportChecked={reportChecked} />
+        <CheckReportSection application={application} header={<Header />} onReportChecked={reportChecked} onPrev={() => setStep("download-sample")} />
       }
 
       {step === "report-checked" && checkInfo &&
         <>
           {checkInfo.error_count === 0 && checkedFile && application.sample &&
-            <ReportValidSection header={<Header />} fileName={checkInfo.file_name} onReportAccepted={onReportAccepted} file={checkedFile} applicationId={application.sample?.application_id} />
+            <ReportValidSection header={<Header />} fileName={checkInfo.file_name} onReportAccepted={onReportAccepted} file={checkedFile} applicationId={application.sample?.application_id} onPrev={() => setStep("check-report")} />
           }
           {checkInfo.error_count > 0 &&
             <ReportErrorsSection header={<Header />} checkInfo={checkInfo} onCheckAgain={() => setStep("check-report")} />
