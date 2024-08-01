@@ -75,7 +75,7 @@ const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) =>
             onSwitch={actions.setStatus}
             historyCount={snapshot.meter_readings_applications_history}
             pendingCount={snapshot.meter_readings_applications_pending}
-            // auditDoneCount={snapshot.charge_points_applications_audit_done}
+            auditDoneCount={snapshot.charge_points_applications_audit_done}
             auditInProgressCount={snapshot.meter_readings_applications_audit_in_progress}
           />
 

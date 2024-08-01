@@ -16,13 +16,14 @@ import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "./types"
 const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   charge_points_applications: 0,
   charge_points_applications_pending: 0,
-  charge_points_applications_history: 0,
   charge_points_applications_audit_done: 0,
   charge_points_applications_audit_in_progress: 0,
+  charge_points_applications_history: 0,
   meter_readings_applications: 0,
   meter_readings_applications_pending: 0,
-  meter_readings_applications_history: 0,
+  meter_readings_applications_audit_done: 0,
   meter_readings_applications_audit_in_progress: 0,
+  meter_readings_applications_history: 0,
 }
 
 

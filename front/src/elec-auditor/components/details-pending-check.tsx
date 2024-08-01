@@ -3,7 +3,7 @@ import useEntity from "carbure/hooks/entity"
 import { UploadCheckError, UploadCheckReportInfo } from "carbure/types"
 import Button from "common/components/button"
 import Form, { useForm } from "common/components/form"
-import { Check, Send, Upload } from "common/components/icons"
+import { Check, ChevronLeft, Send, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
@@ -13,10 +13,11 @@ import { useTranslation } from "react-i18next"
 
 
 
-const CheckReportSection = ({ application, header, onReportChecked }: {
+const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
   application: ElecAuditorApplicationDetails,
   header: JSX.Element,
   onReportChecked: (file: File, checkData: UploadCheckReportInfo) => void
+  onPrev: () => void
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -94,7 +95,9 @@ const CheckReportSection = ({ application, header, onReportChecked }: {
       </section>
     </main>
     <footer>
-      <Button icon={Send} label={t("Vérifier le fichier")} variant="primary" action={uploadFile} disabled={!value.file} />
+      <Button icon={Send} label={t("Vérifier le fichier")} variant="primary" action={uploadFile} disabled={!value.file} loading={checkAuditReport.loading} />
+      <Button icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={onPrev} asideX />
+
     </footer>
   </>
 }

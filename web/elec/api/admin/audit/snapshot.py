@@ -39,6 +39,7 @@ def get_snapshot(request):
                 "charge_points_applications_audit_in_progress": charge_points_applications.filter(
                     status=ElecChargePointApplication.AUDIT_IN_PROGRESS
                 ).count(),
+                "charge_points_applications_audit_done": 0,  # TODO
                 "charge_points_applications_history": charge_points_applications.filter(
                     status__in=[ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED]
                 ).count(),
@@ -49,6 +50,7 @@ def get_snapshot(request):
                 "meter_readings_applications_audit_in_progress": meter_readings_applications.filter(
                     status=ElecMeterReadingApplication.AUDIT_IN_PROGRESS
                 ).count(),
+                "meter_readings_applications_audit_done": 0,  # TODO
                 "meter_readings_applications_history": meter_readings_applications.filter(
                     status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]
                 ).count(),
