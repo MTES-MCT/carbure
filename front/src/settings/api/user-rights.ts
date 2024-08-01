@@ -1,6 +1,6 @@
 import api, { Api } from "common/services/api"
 import { EntityRights } from "settings/types"
-import { UserRole } from "carbure/types"
+import { User, UserRole } from "carbure/types"
 
 export function getEntityRights(entity_id: number) {
   return api.get<Api<EntityRights>>("/entity/users", {
@@ -22,4 +22,12 @@ export function changeUserRole(
   role: UserRole
 ) {
   return api.post("/entity/users/change-role", { entity_id, email, role })
+}
+
+export function inviteUser(entity_id: number, email: string, role: UserRole) {
+  return api.post<Api<User>>("/entity/users/invite-user", {
+    entity_id,
+    email,
+    role,
+  })
 }

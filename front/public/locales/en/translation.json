@@ -31,6 +31,7 @@
   "Addresse email": "Email address",
   "Mon compte": "My account",
   "Votre compte a bien été activé, vous pouvez maintenant vous connecter sur CarbuRe.": "Your account has been activated, you can now login to CarbuRe.",
+  "Votre compte a bien été activé, vous allez recevoir un mail pour définir votre mot de passe.": "Your account has been activated, you will receive an email to set your password.",
   "Une erreur s'est produite lors de l'activation de votre compte, merci de recommencer le processus d'inscription.": "An error happened while activating your account, please start again the sign up process.",
   "Se connecter": "Login",
   "Réessayer de s'inscrire": "Try to register again",
@@ -67,7 +68,7 @@
   "Vous pouvez maintenant modifier votre mot de passe en renseignant les champs ci-dessous": "You can now modify your password by filling the forms below",
   "Nouveau mot de passe": "New password",
   "Répéter le nouveau mot de passe": "Repeat new password",
-  "Les mots de passe de correspondent pas": "The passwords do not match",
+  "Les mots de passe ne correspondent pas": "The passwords do not match",
   "Enregistrer le nouveau mot de passe": "Save new password",
   "Le compte a bien été créé !": "The account was created!",
   "Le compte n'a pas pu être créé !": "The account could not be created!",
@@ -1469,5 +1470,10 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} batches</b> show <b>anomalies</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} batch</b> must be declared before <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
-  "Brouillon_plural": "Drafts"
+  "Brouillon_plural": "Drafts",
+  "Ajouter un utilisateur": "Add new user",
+  "Veuillez remplir les informations suivantes:": "Please complete the following information:",
+  "L'utilisateur {{email}} a bien été ajouté !": "The user {{email}} has been successfully added!",
+  "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user",
+  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password.."
 }

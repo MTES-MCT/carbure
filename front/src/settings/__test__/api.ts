@@ -1,16 +1,6 @@
 import { rest } from "msw"
-import { setupServer } from "msw/node"
-
 import { OwnershipType } from "carbure/types"
 
-import {
-  okCountrySearch,
-  okDeliverySitesSearch,
-  okErrorsTranslations,
-  okFieldsTranslations,
-  okProductionSitesSearch,
-  okTranslations,
-} from "carbure/__test__/api"
 import {
   deliverySite,
   entityRequest,
@@ -24,18 +14,10 @@ import {
   Data,
   clone,
   mockGetWithResponseData,
+  mockPostWithResponseData,
   setEntity,
 } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import {
-  okChargePointsAddSuccess,
-  okChargePointsApplications,
-  okChargePointsCheckValid,
-  okMeterReadingsAddSuccess,
-  okMeterReadingsApplications,
-  okMeterReadingsCheckError,
-  okMeterReadingsCheckValid,
-} from "elec/__test__/api"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -255,6 +237,12 @@ export const okEntityRights = rest.get(
   }
 )
 
+export const okInviteUser = mockPostWithResponseData("/entity/users/invite", {
+  email: "test@test.com",
+  rights: [{ entity: producer, rights: "rw" }],
+  requests: [],
+})
+
 export const okSelfCertificates = rest.get(
   "/api/entity/certificates",
   (req, res, ctx) => {
@@ -312,7 +300,7 @@ export const koDoubleCountUploadApplication = rest.post(
   }
 )
 
-export default setupServer(
+export default {
   okSettings,
   okEnableMac,
   okDisableMac,
@@ -322,26 +310,14 @@ export default setupServer(
   okAddDeliverySite,
   okDeleteDeliverySite,
   okProductionSites,
-  okProductionSitesSearch,
   okAddProductionSite,
   okUpdateProductionSite,
   okDeleteProductionSite,
   okSetBiocarburant,
   okSetMatierePremiere,
   okSetCertificates,
-  okDeliverySitesSearch,
-  okCountrySearch,
   okEntityRights,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
   okSelfCertificates,
   okDoubleCountApplications,
   okDoubleCountUploadAgreements,
-  okChargePointsApplications,
-  okChargePointsCheckValid,
-  okChargePointsAddSuccess,
-  okMeterReadingsApplications,
-  okMeterReadingsCheckValid,
-  okMeterReadingsAddSuccess
-)
+}

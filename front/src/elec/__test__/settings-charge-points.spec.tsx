@@ -5,7 +5,7 @@ import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
 import ElecChargePointsSettings from "elec/components/charge-points/settings"
-import server from "../../settings/__test__/api"
+import server from "../../settings/__test__/server"
 import userEvent from "@testing-library/user-event"
 import {
   okChargePointsApplicationsEmpty,
