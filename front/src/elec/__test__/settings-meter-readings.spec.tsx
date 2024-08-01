@@ -146,11 +146,10 @@ test("upload file with error", async () => {
   screen.getByText("À corriger")
 })
 
-test("When an application has 0 charge points, the user can't send its statement", async () => {
+test("When an application has 0 charge points, the user can't send its meter readings", async () => {
   server.use(okMeterReadingsApplicationsWithoutChargePoints)
   setEntity(cpo)
   render(<SettingsWithHooks />)
   await waitWhileLoading()
-
   screen.getByText("Vous n'avez aucun relevé à déclarer")
 })
