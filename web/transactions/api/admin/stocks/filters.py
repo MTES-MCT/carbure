@@ -2,11 +2,11 @@ from core.helpers import (
     get_all_stock,
     get_stock_filters_data,
 )
-from core.decorators import is_admin
+from core.decorators import check_admin_rights
 from django.http.response import JsonResponse
 
 
-@is_admin
+@check_admin_rights()
 def get_stock_filters(request, *args, **kwargs):
     field = request.GET.get("field", False)
     if not field:

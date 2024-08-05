@@ -6,36 +6,6 @@ from core.common import ErrorResponse
 from functools import wraps
 
 
-def is_admin(function):
-    @wraps(function)
-    def wrap(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return JsonResponse({"status": "forbidden", "message": "User not authenticated"}, status=403)
-        if not request.user.is_verified():
-            return JsonResponse({"status": "forbidden", "message": "User not verified"}, status=403)
-        if not request.user.is_staff:
-            return JsonResponse({"status": "forbidden", "message": "User not admin"}, status=403)
-        return function(request, *args, **kwargs)
-
-    return wrap
-
-
-def is_admin_or_external_admin(function):
-    @wraps(function)
-    def wrap(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return JsonResponse({"status": "forbidden", "message": "User not authenticated"}, status=403)
-        if not request.user.is_verified():
-            return JsonResponse({"status": "forbidden", "message": "User not verified"}, status=403)
-        ext_admins = Entity.objects.filter(entity_type=Entity.EXTERNAL_ADMIN)
-        has_rights_to_ext_admin = UserRights.objects.filter(entity__in=ext_admins, user=request.user).count()
-        if not request.user.is_staff and has_rights_to_ext_admin == 0:
-            return JsonResponse({"status": "forbidden", "message": "User not admin"}, status=403)
-        return function(request, *args, **kwargs)
-
-    return wrap
-
-
 def otp_or_403(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):

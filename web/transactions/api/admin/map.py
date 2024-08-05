@@ -3,8 +3,7 @@ import random
 
 import folium
 from core.helpers import filter_lots
-from core.decorators import is_admin
-from core.models import Entity
+from core.decorators import check_admin_rights
 from csp.decorators import csp_exempt
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
@@ -13,13 +12,11 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
-@is_admin
+@check_admin_rights()
 @csp_exempt
 @xframe_options_sameorigin
-def map(request):
+def map(request, entity, entity_id):
     status = request.GET.get("status", False)
-    entity_id = request.GET.get("entity_id", False)
-    entity = Entity.objects.get(id=entity_id)
     lots = TransactionsAdminLotsRepository.get_admin_lots_by_status(entity, status)
     lots = filter_lots(lots, request.GET, entity)
 
