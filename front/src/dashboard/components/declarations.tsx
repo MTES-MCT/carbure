@@ -41,7 +41,7 @@ const Declarations = () => {
 
   const declarations = useQuery(api.getDeclarations, {
     key: "transactions-admin-declarations",
-    params: [period!],
+    params: [entity.id, period!],
   })
 
   const periodData = (periods.result ?? []).map(String).sort((a, b) => a < b ? 1 : -1) // prettier-ignore
