@@ -1,17 +1,11 @@
 from django.http.response import JsonResponse
-
-from core.decorators import check_user_rights, is_auditor
-from core.helpers import (
-    get_auditor_stock,
-    get_stock_filters_data,
-)
+from core.decorators import check_user_rights
+from core.helpers import get_auditor_stock, get_stock_filters_data
+from core.models import UserRights
 
 
-@check_user_rights()
-@is_auditor
+@check_user_rights(role=[UserRights.AUDITOR])
 def get_stock_filters(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
     field = request.GET.get("field", False)
     if not field:
         return JsonResponse(

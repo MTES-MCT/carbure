@@ -1,6 +1,6 @@
 from django.http.response import JsonResponse
 
-from core.decorators import check_user_rights, is_auditor
+from core.decorators import check_user_rights
 from core.helpers import (
     get_known_certificates,
     get_lot_comments,
@@ -23,11 +23,9 @@ from core.serializers import (
 from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
-@check_user_rights()
-@is_auditor
-def get_lot_details(request, *args, **kwargs):
+@check_user_rights(role=[UserRights.AUDITOR])
+def get_lot_details(request, entity, entity_id):
     lot_id = request.GET.get("lot_id", False)
-    entity_id = request.GET.get("entity_id", False)
     if not lot_id:
         return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)
 
