@@ -3,7 +3,7 @@ from core.helpers import (
     get_lot_updates,
     get_stock_events,
 )
-from core.decorators import is_admin
+from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureStock,
@@ -17,8 +17,8 @@ from core.serializers import (
 from django.http.response import JsonResponse
 
 
-@is_admin
-def get_stock_details(request, *args, **kwargs):
+@check_admin_rights()
+def get_stock_details(request):
     stock_id = request.GET.get("stock_id", False)
     if not stock_id:
         return JsonResponse(
