@@ -110,19 +110,6 @@ def check_user_rights(role=None, entity_type=None):
     return actual_decorator
 
 
-def is_auditor(function):
-    @wraps(function)
-    def wrap(request, *args, **kwargs):
-        entity_id = kwargs["context"]["entity_id"]
-        try:
-            Entity.objects.get(id=entity_id, entity_type=Entity.AUDITOR)
-        except:
-            return JsonResponse({"status": "forbidden", "message": "Entity is not auditor"}, status=403)
-        return function(request, *args, **kwargs)
-
-    return wrap
-
-
 class AdminRightsError:
     MISSING_ENTITY_ID = "MISSING_ENTITY_ID"
     USER_NOT_AUTHENTICATED = "USER_NOT_AUTHENTICATED"

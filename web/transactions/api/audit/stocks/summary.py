@@ -1,20 +1,16 @@
 import traceback
-
 from django.http.response import JsonResponse
-
-from core.decorators import check_user_rights, is_auditor
+from core.decorators import check_user_rights
 from core.helpers import (
     filter_stock,
     get_auditor_stock,
     get_stocks_summary_data,
 )
+from core.models import UserRights
 
 
-@check_user_rights()
-@is_auditor
+@check_user_rights(role=[UserRights.AUDITOR])
 def get_stocks_summary(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
     short = request.GET.get("short", False)
     try:
         stock = get_auditor_stock(request.user)
@@ -23,6 +19,4 @@ def get_stocks_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get stock summary"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get stock summary"}, status=400)
