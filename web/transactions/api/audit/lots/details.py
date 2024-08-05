@@ -1,30 +1,15 @@
 from django.http.response import JsonResponse
 
 from core.decorators import check_user_rights
-from core.helpers import (
-    get_known_certificates,
-    get_lot_comments,
-    get_lot_errors,
-    get_lot_updates,
-)
+from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates
 from core.helpers import get_transaction_distance
-
-from core.models import (
-    CarbureLot,
-    CarbureStock,
-    Entity,
-    UserRights,
-)
-from core.serializers import (
-    CarbureLotAdminSerializer,
-    CarbureLotReliabilityScoreSerializer,
-    CarbureStockPublicSerializer,
-)
+from core.models import CarbureLot, CarbureStock, Entity, UserRights
+from core.serializers import CarbureLotAdminSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
 from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
-@check_user_rights(role=[UserRights.AUDITOR])
-def get_lot_details(request, entity, entity_id):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def get_lot_details(request, entity_id):
     lot_id = request.GET.get("lot_id", False)
     if not lot_id:
         return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)

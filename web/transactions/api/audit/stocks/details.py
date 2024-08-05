@@ -1,18 +1,9 @@
 from django.http.response import JsonResponse
 
 from core.decorators import check_user_rights
-from core.helpers import (
-    get_lot_comments,
-    get_lot_updates,
-    get_stock_events,
-)
+from core.helpers import get_lot_comments, get_lot_updates, get_stock_events
+from core.models import CarbureLot, CarbureStock, CarbureStockTransformation, Entity, UserRights
 
-from core.models import (
-    CarbureLot,
-    CarbureStock,
-    CarbureStockTransformation,
-    UserRights,
-)
 from core.serializers import (
     CarbureLotPublicSerializer,
     CarbureStockPublicSerializer,
@@ -20,8 +11,8 @@ from core.serializers import (
 )
 
 
-@check_user_rights(role=[UserRights.AUDITOR])
-def get_stock_details(request, *args, **kwargs):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def get_stock_details(request):
     stock_id = request.GET.get("stock_id", False)
     if not stock_id:
         return JsonResponse({"status": "error", "message": "Missing stock_id"}, status=400)
