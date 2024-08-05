@@ -1,9 +1,9 @@
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
-from core.models import CarbureLot, CarbureLotComment, Entity, UserRights
+from core.models import CarbureLot, CarbureLotComment, Entity
 
 
-@check_user_rights(role=[UserRights.AUDITOR])
+@check_user_rights(entity_type=[Entity.AUDITOR])
 def add_comment(request, entity, entity_id):
     selection = request.POST.getlist("selection", [])
     comment = request.POST.get("comment", False)

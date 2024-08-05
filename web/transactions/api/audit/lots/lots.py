@@ -2,12 +2,12 @@ import traceback
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
 from core.helpers import get_lots_with_metadata
-from core.models import Entity, UserRights
+from core.models import Entity
 from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
-@check_user_rights(role=[UserRights.AUDITOR])
-def get_lots(request, entity, entity_id):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def get_lots(request, entity):
     status = request.GET.get("status", False)
     selection = request.GET.get("selection", False)
     if not status and not selection:

@@ -2,11 +2,11 @@ import traceback
 from django.http.response import JsonResponse
 from core.common import SuccessResponse
 from core.decorators import check_user_rights
-from core.models import CarbureLot, UserRights
+from core.models import CarbureLot, Entity
 
 
-@check_user_rights(role=[UserRights.AUDITOR])
-def mark_nonconform(request, *args, **kwargs):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def mark_nonconform(request):
     selection = request.POST.getlist("selection", [])
     try:
         lots = CarbureLot.objects.filter(id__in=selection)

@@ -1,11 +1,11 @@
 import traceback
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
-from core.models import GenericError, UserRights
+from core.models import Entity, GenericError
 
 
-@check_user_rights(role=[UserRights.AUDITOR])
-def toggle_warning(request, *args, **kwargs):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def toggle_warning(request):
     lot_id = request.POST.get("lot_id")
     errors = request.POST.getlist("errors")
     checked = request.POST.get("checked") == "true"
