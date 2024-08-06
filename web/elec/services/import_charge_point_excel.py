@@ -2,6 +2,7 @@ import traceback
 from django import forms
 import pandas as pd
 from django.core.files.uploadedfile import UploadedFile
+from django.utils.translation import gettext_lazy as _
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
@@ -131,15 +132,15 @@ class ExcelChargePointValidator(Validator):
         charge_point_id = charge_point.get("charge_point_id")
 
         if not self.data.get("is_in_tdg"):
-            self.add_error("charge_point_id", f"Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr")  # fmt:skip
+            self.add_error("charge_point_id", _("Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr").format(charge_point_id=charge_point_id))  # fmt:skip
         else:
             if charge_point.get("is_article_2"):
                 if not charge_point.get("measure_reference_point_id"):
-                    self.add_error("measure_reference_point_id", "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu.")  # fmt:skip
+                    self.add_error("measure_reference_point_id", _("L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu."))  # fmt:skip
             else:
                 if not charge_point.get("mid_id"):
-                    self.add_error("mid_id", "Le numéro MID est obligatoire.")
+                    self.add_error("mid_id", _("Le numéro MID est obligatoire."))
                 if not charge_point.get("measure_date"):
-                    self.add_error("measure_date", "La date du dernier relevé est obligatoire.")
+                    self.add_error("measure_date", _("La date du dernier relevé est obligatoire."))
                 if not isinstance(charge_point.get("measure_energy"), float):
-                    self.add_error("measure_energy", "L'énergie mesurée lors du dernier relevé est obligatoire.")  # fmt:skip
+                    self.add_error("measure_energy", _("L'énergie mesurée lors du dernier relevé est obligatoire."))  # fmt:skip
