@@ -33,7 +33,7 @@ export const MeterReadingsApplicationAcceptDialog = ({
     onSuccess() {
       onClose()
       onValidated()
-      notify(t("Les relevés T{{quarter}} {{year}} ont été acceptés !", { quarter: application.quarter, year: application.year }), { variant: "success" })
+      notify(t("Les relevés T{{quarter}} {{year}} ont été acceptés et les certificats de fournitures versés !", { quarter: application.quarter, year: application.year }), { variant: "success" })
 
     },
     onError(err) {
