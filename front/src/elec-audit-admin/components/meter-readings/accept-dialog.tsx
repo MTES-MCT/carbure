@@ -28,32 +28,19 @@ export const MeterReadingsApplicationAcceptDialog = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const acceptMeterReadingsApplication = useMutation(
-    api.acceptMeterReadingsApplication,
-    {
-      invalidates: [
-        "audit-meter-readings-applications",
-        "elec-admin-audit-snapshot",
-      ],
-      onSuccess() {
-        onClose()
-        onValidated()
-        notify(
-          t("Les relevés T{{quarter}} {{year}} ont été acceptés !", {
-            quarter: application.quarter,
-            year: application.year,
-          }),
-          { variant: "success" }
-        )
-      },
-      onError(err) {
-        notifyError(
-          err,
-          t("Impossible d'accepter les relevés des points de recharge")
-        )
-      },
-    }
-  )
+  const acceptMeterReadingsApplication = useMutation(api.acceptMeterReadingsApplication, {
+    invalidates: ["audit-meter-readings-applications", "elec-admin-audit-snapshot"],
+    onSuccess() {
+      onClose()
+      onValidated()
+      notify(t("Les relevés T{{quarter}} {{year}} ont été acceptés et les certificats de fournitures versés !", { quarter: application.quarter, year: application.year }), { variant: "success" })
+
+    },
+    onError(err) {
+      notifyError(err, t("Impossible d'accepter les relevés des points de recharge"))
+    },
+  })
+
 
   const acceptApplication = (forceValidation: boolean) => {
     acceptMeterReadingsApplication.execute(
