@@ -75,15 +75,14 @@ export const ChargePointsApplicationDetailsDialog = () => {
         </header>
         {chargePointApplication?.status ===
           ElecAuditApplicationStatus.Pending && (
-          <ChargePointsApplicationDetailsPending
-            chargePointApplication={chargePointApplication}
-            onAccept={acceptApplication}
-            onReject={rejectApplication}
-            onDownloadSample={downloadSample}
-          />
-        )}
-        {chargePointApplication?.status ===
-          ElecAuditApplicationStatus.AuditInProgress && (
+            <ChargePointsApplicationDetailsPending
+              chargePointApplication={chargePointApplication}
+              onAccept={acceptApplication}
+              onReject={rejectApplication}
+              onDownloadSample={downloadSample}
+            />
+          )}
+        {(chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress || chargePointApplication?.status === ElecAuditApplicationStatus.AuditDone) && (
           <ChargePointsApplicationDetailsInProgress
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
