@@ -1,18 +1,10 @@
 from django.http.response import JsonResponse
-
-from core.decorators import check_user_rights, is_auditor
-
-from core.models import (
-    CarbureLot,
-    CarbureLotComment,
-    Entity,
-)
+from core.decorators import check_user_rights
+from core.models import CarbureLot, CarbureLotComment, Entity
 
 
-@check_user_rights()
-@is_auditor
-def add_comment(request, *args, **kwargs):
-    entity_id = request.POST.get("entity_id")
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def add_comment(request, entity, entity_id):
     selection = request.POST.getlist("selection", [])
     comment = request.POST.get("comment", False)
     is_visible_by_admin = request.POST.get("is_visible_by_admin") == "true"
