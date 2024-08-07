@@ -13,10 +13,12 @@ class ElecChargePointApplication(models.Model):
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
     AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
+    AUDIT_DONE = "AUDIT_DONE"
     STATUSES = [
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
         (REJECTED, REJECTED),
+        (AUDIT_DONE, AUDIT_DONE),
         (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS),
     ]
 
