@@ -38,7 +38,9 @@ const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
       const response = (err as AxiosError<{ status: string, error: string, data: UploadCheckReportInfo }>).response
 
       if (response?.status === 400 && response.data.error === "VALIDATION_FAILED") {
-        // const checkedData = response!.data.data
+        const checkedData = response!.data.data
+        onReportChecked(value.file!, checkedData)
+
         notify(
           t(
             "Une erreur est survenur lors de la validation du fichier."
