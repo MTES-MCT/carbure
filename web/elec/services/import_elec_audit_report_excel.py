@@ -1,22 +1,24 @@
 import pandas as pd
 from django import forms
+from django.db.models import QuerySet
 from django.core.files.uploadedfile import UploadedFile
+from django.utils.translation import gettext_lazy as _
 
 from core.utils import Validator, is_true
+from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_charge_point import ElecChargePoint
 
 
-def import_elec_audit_report_excel(
-    excel_file: UploadedFile,
-):
+def import_elec_audit_report_excel(excel_file: UploadedFile, audited_charge_points: QuerySet[ElecAuditChargePoint]):
     report_data = ExcelElecAuditReport.parse_audit_report_excel(excel_file)
-    return ExcelElecAuditReportValidator.bulk_validate(report_data)  # fmt:skip
+    audited_charge_point_ids = audited_charge_points.values_list("charge_point__charge_point_id", flat=True)
+    return ExcelElecAuditReportValidator.bulk_validate(report_data, {"audited_charge_point_ids": audited_charge_point_ids})  # fmt:skip
 
 
 class ExcelElecAuditReport:
     EXCEL_COLUMNS = [
         "charge_point_id",
-        "",
+        "",  # DO NOT REMOVE: this column exists on the excel file, we just don't care about its content
         "observed_mid_or_prm_id",
         "is_auditable",
         "has_dedicated_pdl",
@@ -29,7 +31,7 @@ class ExcelElecAuditReport:
     @staticmethod
     def parse_audit_report_excel(excel_file: UploadedFile):
         meter_readings_data = pd.read_excel(excel_file, usecols=list(range(3, 12)))
-        meter_readings_data["line"] = meter_readings_data.index + 1  # add a line number to locate data in the excel file
+        meter_readings_data["line"] = meter_readings_data.index + 2  # add a line number to locate data in the excel file
         meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelElecAuditReport.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
         meter_readings_data = meter_readings_data.drop_duplicates("charge_point_id")
         meter_readings_data.dropna(inplace=True, how="all")
@@ -69,3 +71,15 @@ class ExcelElecAuditReportValidator(Validator):
             report["observed_energy_reading"] = 0
 
         return report
+
+    def validate(self, audited_charge_point):
+        charge_point_id = audited_charge_point.get("charge_point_id")
+        expected_ids = self.context.get("audited_charge_point_ids")
+
+        if charge_point_id not in expected_ids:
+            self.add_error(
+                "charge_point_id",
+                _(
+                    "Le point de charge {charge_point_id} ne fait pas partie de l'échantillon sélectionné pour cet audit."
+                ).format(charge_point_id=charge_point_id),
+            )

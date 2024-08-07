@@ -37,7 +37,8 @@ def check_report(request: HttpRequest, entity: Entity):
     if not audit_sample:
         return ErrorResponse(404, CarbureError.NOT_FOUND)
 
-    charge_point_audits, errors = import_elec_audit_report_excel(excel_file)
+    audited_charge_points = audit_sample.audited_charge_points.all().select_related("charge_point")
+    charge_point_audits, errors = import_elec_audit_report_excel(excel_file, audited_charge_points)
 
     data = {}
     data["file_name"] = excel_file.name
