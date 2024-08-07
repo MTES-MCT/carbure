@@ -1,14 +1,10 @@
-from core.decorators import check_user_rights, otp_or_403
-from core.models import UserRights, UserRightsRequests, Entity
+from core.decorators import check_user_rights
+from core.models import UserRights, UserRightsRequests
 from django.http import JsonResponse
 
 
-@otp_or_403
 @check_user_rights(role=[UserRights.ADMIN])
-def accept_user(request, *args, **kwargs):
-    entity_id = kwargs["context"]["entity_id"]
-    entity = Entity.objects.get(id=entity_id)
-
+def accept_user(request, entity, entity_id):
     request_id = request.POST.get("request_id", None)
 
     if request_id is None:
