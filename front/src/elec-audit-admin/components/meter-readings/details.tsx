@@ -85,16 +85,15 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
         {meterReadingsApplication?.status ===
           ElecAuditApplicationStatus.Pending && (
-          <MeterReadingsApplicationDetailsPending
-            meterReadingsApplication={meterReadingsApplication}
-            onAccept={acceptApplication}
-            onReject={rejectApplication}
-            onDownloadSample={downloadSample}
-          />
-        )}
+            <MeterReadingsApplicationDetailsPending
+              meterReadingsApplication={meterReadingsApplication}
+              onAccept={acceptApplication}
+              onReject={rejectApplication}
+              onDownloadSample={downloadSample}
+            />
+          )}
 
-        {meterReadingsApplication?.status ===
-          ElecAuditApplicationStatus.AuditInProgress && (
+        {(meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress || meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditDone) && (
           <MeterReadingsApplicationDetailsInProgress
             meterReadingsApplication={meterReadingsApplication}
             onAccept={acceptApplication}
