@@ -2,26 +2,6 @@
 
 set -e
 
-if [ -z "$1" ]; then
-  SOURCE_ENV="carbure-prod"
-else
-  SOURCE_ENV=$1
-fi
-
-if [ "$SOURCE_ENV" = "carbure-prod" ]; then
-  SCALINGO_MYSQL_UUID="ad-5fac8322-ec5b-4fe3-89ed-468e9895f180"
-  SCALINGO_MYSQL_DB="carbure_pro_"
-elif [ "$SOURCE_ENV" = "carbure-dev" ]; then
-  SCALINGO_MYSQL_UUID="ad-60b35da0-a857-4ca0-a779-9419088dc724"
-  SCALINGO_MYSQL_DB="carbure_dev_"
-fi
-
-# setup scalingo on servers
-if [ "$IMAGE_TAG" = "dev" ] || [ "$IMAGE_TAG" = "staging" ]; then
-  dbclient-fetcher mysql 8
-  install-scalingo-cli && scalingo login --api-token $SCALINGO_TOKEN
-fi
-
 # This condition is useful when you want to use a local database dump,
 # for example, to debug a particular version.
 if [ "$1" != "local" ]; then
@@ -30,7 +10,7 @@ if [ "$1" != "local" ]; then
   mkdir -p /tmp/backups
 
   # download latest backup
-  scalingo --region osc-secnum-fr1 --app $SOURCE_ENV --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
+  cp 20241022000204_carbure_pro_9311.tar.gz /tmp/backups
 fi
 
 # decompress backup
@@ -39,10 +19,10 @@ tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
 
 # remove lines mentionning production database
 echo "> Cleaning SQL..."
-grep -vE "(${SCALINGO_MYSQL_DB})" /tmp/backups/*.sql > /tmp/backups/backup.sql
+grep -vE "(carbure_pro_)" /tmp/backups/*.sql > /tmp/backups/backup.sql
 
 # extract DATABASE_URL parts
-export MYSQL_DATABASE=$(echo $DATABASE_URL | cut -d'/' -f4 | cut -d'?' -f1)
+export MYSQL_DATABASE=$(echo $DATABASE_URL | cut -d'/' -f4)
 export DB_DETAILS=$(echo $DATABASE_URL | cut -d'/' -f3)
 export MYSQL_HOST=$(echo $DB_DETAILS | cut -d'@' -f2 | cut -d':' -f1)
 export MYSQL_PORT=$(echo $DB_DETAILS | cut -d'@' -f2 | cut -d':' -f2)

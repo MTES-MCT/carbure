@@ -60,7 +60,7 @@ if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
         environment=f"carbure-{image_tag}",
     )
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS") + ["localhost"]
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
 SESSION_COOKIE_SAMESITE = "Strict"
