@@ -43,7 +43,7 @@ def accept_report(request: HttpRequest, entity: Entity):
         return ErrorResponse(404, CarbureError.NOT_FOUND)
 
     audited_charge_points = audit_sample.audited_charge_points.select_related("charge_point").all()
-    charge_point_reports, errors = import_elec_audit_report_excel(excel_file)
+    charge_point_reports, errors = import_elec_audit_report_excel(excel_file, audited_charge_points)
 
     if len(errors) == 0:
         reports_by_charge_point_id = {report["charge_point_id"]: report for report in charge_point_reports}
