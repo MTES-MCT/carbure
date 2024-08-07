@@ -13,7 +13,15 @@ class ElecMeterReadingApplication(models.Model):
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
     AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
-    STATUSES = [(PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS)]
+    AUDIT_DONE = "AUDIT_DONE"
+
+    STATUSES = [
+        (PENDING, PENDING),
+        (ACCEPTED, ACCEPTED),
+        (REJECTED, REJECTED),
+        (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS),
+        (AUDIT_DONE, AUDIT_DONE),
+    ]
 
     # niveaux d'urgence d'une déclaration par rapport à la date de dépôt et les deadlines
     LOW = "LOW"
