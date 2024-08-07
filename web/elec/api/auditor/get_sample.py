@@ -7,7 +7,7 @@ from core.excel import ExcelResponse
 from core.models import Entity
 from elec.repositories.elec_audit_repository import ElecAuditRepository
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
-from elec.services.export_charge_point_excel import export_audited_charge_points_sample_to_excel
+from elec.services.export_audited_charge_points_sample_to_excel import export_audited_charge_points_sample_to_excel
 
 
 class GetSampleError:
