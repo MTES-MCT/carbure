@@ -12,6 +12,8 @@ from core.decorators import check_user_rights
 from core.models import Entity
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample
+from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.elec_audit_repository import ElecAuditRepository
 from elec.services.import_elec_audit_report_excel import import_elec_audit_report_excel
 
@@ -60,6 +62,14 @@ def accept_report(request: HttpRequest, entity: Entity):
             audit_sample.auditor = entity
             audit_sample.status = ElecAuditSample.AUDITED
             audit_sample.save()
+
+            if audit_sample.charge_point_application:
+                audit_sample.charge_point_application.status = ElecChargePointApplication.AUDIT_DONE
+                audit_sample.charge_point_application.save()
+
+            if audit_sample.meter_reading_application:
+                audit_sample.meter_reading_application.status = ElecMeterReadingApplication.AUDIT_DONE
+                audit_sample.meter_reading_application.save()
 
             ElecAuditChargePoint.objects.bulk_update(
                 updated_audited_charge_point,
