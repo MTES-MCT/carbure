@@ -81,7 +81,7 @@ export const ChargePointsApplicationDetailsDialog = () => {
             onDownloadSample={downloadSample}
           />
         )}
-        {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
+        {(chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress || chargePointApplication?.status === ElecAuditApplicationStatus.AuditDone) && (
           <ChargePointsApplicationDetailsInProgress
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
