@@ -113,7 +113,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         charge_point_audit_2 = ElecAuditChargePoint.objects.create(
             audit_sample=charge_point_audit_sample,
-            charge_point=charge_point_1,
+            charge_point=charge_point_2,
         )
 
         charge_point_audit_3 = ElecAuditChargePoint.objects.create(
@@ -184,7 +184,9 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("charge_point_audit_sample.xlsx", reader.read())
 
-        charge_point_audits, errors = import_elec_audit_report_excel(file)
+        charge_point_audit_sample, _ = self.create_audit_samples()
+        audited_charge_points = charge_point_audit_sample.audited_charge_points.all()
+        charge_point_audits, errors = import_elec_audit_report_excel(file, audited_charge_points)
 
         self.assertEqual(len(charge_point_audits), 3)
         self.assertEqual(len(errors), 0)
