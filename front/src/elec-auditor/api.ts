@@ -5,6 +5,7 @@ import {
   ElecAuditorApplicationsFilter,
   ElecAuditorApplicationsQuery,
   ElecAuditorApplicationsSnapshot,
+  ElecAuditorUploadCheckReportInfo,
 } from "./types"
 import { UploadCheckReportInfo } from "carbure/types"
 
@@ -74,7 +75,7 @@ export function checkAuditReport(
   auditSampleId: number,
   file: File
 ) {
-  return api.post<Api<UploadCheckReportInfo>>("/elec/auditor/check-report", {
+  return api.post<Api<ElecAuditorUploadCheckReportInfo>>("/elec/auditor/check-report", {
     entity_id: entityId,
     audit_sample_id: auditSampleId,
     file,
