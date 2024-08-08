@@ -381,6 +381,19 @@ class Depot(models.Model):
             "useful_temperature": self.useful_temperature,
         }
 
+    def clean(self):
+        fields_to_clear = {
+            "POWER PLANT": ["thermal_efficiency", "useful_temperature"],
+            "HEAT PLANT": ["electrical_efficiency", "useful_temperature"],
+            "COGENERATION PLANT": ["electrical_efficiency", "thermal_efficiency"],
+        }
+
+        fields = fields_to_clear.get(self.depot_type, [])
+        for field in fields:
+            setattr(self, field, None)
+
+        super().clean()
+
     class Meta:
         db_table = "depots"
         verbose_name = "Dépôt"
