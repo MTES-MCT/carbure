@@ -1,4 +1,4 @@
-import { Entity, EntityPreview, UploadCheckError } from "carbure/types"
+import { Entity, EntityPreview, UploadCheckError, UploadCheckReportInfo } from "carbure/types"
 import { Order } from "common/components/table"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 
@@ -15,6 +15,11 @@ export enum ElecAuditorApplicationsStatus {
   AuditInProgress = "IN_PROGRESS",
   AuditDone = "AUDITED",
 }
+
+export interface ElecAuditorUploadCheckReportInfo extends UploadCheckReportInfo {
+  comment_count?: number
+}
+
 
 export type ElecAuditorApplicationsFilterSelection = Partial<Record<ElecAuditorApplicationsFilter, string[]>>
 

@@ -1,24 +1,25 @@
 import { UploadCheckReportInfo } from "carbure/types"
 import Button from "common/components/button"
-import { ChevronLeft, Send } from "common/components/icons"
+import { ChevronLeft, Message, Send } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import * as api from "elec-auditor/api"
 import useEntity from "carbure/hooks/entity"
+import Alert from "common/components/alert"
 
-const ReportValidSection = ({ applicationId, header, file, fileName, onReportAccepted, onPrev }: {
+const ReportValidSection = ({ applicationId, header, file, fileName, onReportAccepted, commentCount, onPrev }: {
   applicationId: number,
   header: JSX.Element,
   file: File,
   fileName: string,
+  commentCount?: number,
   onReportAccepted: () => void
   onPrev: () => void
 }) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
-
   const acceptAuditReport = useMutation(api.acceptAuditReport, {
     invalidates: ["elec-audit-applications", "elec-audit-snapshot"],
     onSuccess: () => {
@@ -53,9 +54,16 @@ const ReportValidSection = ({ applicationId, header, file, fileName, onReportAcc
   return <>
     <main>
       {header}
-      <p>{t("Votre fichier d'audit {{fileName}} ne comporte aucune erreur.", { fileName })}</p>
-      <p>{t("Les informations peuvent être transmises à la DGEC.")}</p>
-    </main>
+      <section>
+
+        <p><Trans defaults={"Votre fichier d'audit <b>{{ fileName }}</b> ne comporte aucune erreur. Les informations peuvent être transmises à la DGEC."} values={{ fileName }} /></p>
+        {commentCount &&
+          <Alert icon={Message} variant="info" >
+            <Trans defaults={"Vous avez commentés <b>{{ count }} points de charges </b> dans ce fichier excel. Ils seront transmis à l'administration."} values={{ count: commentCount }} />
+          </Alert>
+        }
+      </section>
+    </main >
     <footer>
       <Button icon={Send} label={t("Transmettre le résultat d'audit")} variant="primary" action={onAcceptFile} loading={acceptAuditReport.loading} />
       <Button icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={onPrev} asideX />

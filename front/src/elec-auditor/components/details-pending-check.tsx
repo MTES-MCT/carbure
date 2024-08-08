@@ -41,14 +41,6 @@ const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
         const checkedData = response!.data.data
         onReportChecked(value.file!, checkedData)
 
-        notify(
-          t(
-            "Une erreur est survenur lors de la validation du fichier."
-          ),
-          {
-            variant: "danger",
-          }
-        )
       } else if (response?.status === 413) {
         notify(
           t(
