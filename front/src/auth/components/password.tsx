@@ -172,7 +172,7 @@ export const ResetPassword = () => {
             type="password"
             label={t("Répéter le nouveau mot de passe")}
             {...bind("repeatNewPassword")}
-            error={!isPassOk ? t("Les mots de passe de correspondent pas") : undefined} // prettier-ignore
+            error={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
           />
         </Form>
       </section>

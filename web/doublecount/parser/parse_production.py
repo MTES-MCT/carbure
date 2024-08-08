@@ -46,6 +46,7 @@ def parse_requested_quota(excel_file: Workbook) -> List[RequestedQuotaRow]:
         other_name="requested_quota",
         other_index=4,
         other_required=True,
+        other_alternative_index=10,  # outside of france production
     )
 
     return requested_quota_rows
@@ -58,9 +59,10 @@ def parse_production_data(
     year_index: int,
     feedstock_index: int,
     biofuel_index: int,
-    other_name: str,
-    other_index: int,
-    other_required: bool = False,
+    other_name: str,  # column to get data like "max_production_capacity" or "estimated_production" or "requested_quota"
+    other_index: int,  # index of the column in the excel file
+    other_required: bool = False,  # if the other value is required
+    other_alternative_index: int = None,  # alternative index of the other_column in the excel file to allow the first one is zero (ex : outside of france production)
 ) -> List[Any]:
     data_rows = []
     current_year = -1
@@ -73,8 +75,12 @@ def parse_production_data(
         biofuel_name = None if "SOMME :" == row[biofuel_index].value else row[biofuel_index].value
         feedstock_name = row[feedstock_index].value
         elem_data = intOrZero(row[other_index].value)
+        elem_alternative_data = 0
+        if elem_data == 0 and other_alternative_index:  # outside of france production
+            elem_alternative_data = intOrZero(row[other_alternative_index].value)
 
-        if current_year == -1 or (other_required and not elem_data) or (not feedstock_name and not biofuel_name):
+        other_column_empty = other_required and not (elem_data or elem_alternative_data)
+        if current_year == -1 or other_column_empty or (not feedstock_name and not biofuel_name):
             continue
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)

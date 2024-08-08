@@ -1,9 +1,11 @@
 import { Trans, useTranslation } from "react-i18next"
 import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { AlertCircle, Plus } from "common/components/icons"
 import { SearchInput } from "common/components/input"
+import { Button, MailTo } from "common/components/button"
 import Table, { actionColumn, Cell } from "common/components/table"
+import { usePortal } from "common/components/portal"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { getUserRoleLabel } from "carbure/utils/normalizers"
 import { Panel } from "common/components/scaffold"
@@ -14,6 +16,7 @@ import { AcceptUserButton } from "./accept-user-button"
 import { RevokeUserButton } from "./revoke-user-button"
 import { RejectUserButton } from "./reject-user-button"
 import { useState } from "react"
+import { AddUserDialog, AddUserDialogProps } from "./add-user-dialog"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
@@ -38,6 +41,8 @@ type EntityUserRightsProps = {
 
   // Allow search input
   isSearchable?: boolean
+
+  onAddNewUser?: AddUserDialogProps["onAddNewUser"]
 }
 
 const RIGHTS_ORDER = {
@@ -55,9 +60,12 @@ export const UserRightsTable = ({
   onRevokeUser,
   onRejectUser,
   onInputChange,
+  onAddNewUser,
 }: EntityUserRightsProps) => {
   const { t } = useTranslation()
   const [query, setQuery] = useState<string>("")
+  const portal = usePortal()
+
   const displaySearchInput =
     isSearchable && (query.length > 0 || rights.length > 0)
   // Pass all the request as parameter to let the parent do anything
@@ -76,6 +84,19 @@ export const UserRightsTable = ({
         <h1>
           <Trans>Utilisateurs</Trans>
         </h1>
+        {onAddNewUser && (
+          <Button
+            asideX
+            variant="primary"
+            icon={Plus}
+            label={t("Ajouter un utilisateur")}
+            action={() =>
+              portal((close) => (
+                <AddUserDialog onClose={close} onAddNewUser={onAddNewUser} />
+              ))
+            }
+          />
+        )}
       </header>
 
       <section>

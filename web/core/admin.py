@@ -58,6 +58,7 @@ class EntityAdmin(admin.ModelAdmin):
     list_display = ("entity_type", "name", "parent_entity", "is_enabled")
     search_fields = ("entity_type", "name")
     list_filter = ["entity_type"]
+    readonly_fields = ["is_enabled"]
 
     actions = ["enable_entity"]
 
