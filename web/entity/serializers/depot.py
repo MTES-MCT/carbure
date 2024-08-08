@@ -14,4 +14,8 @@ class DepotSerializer(serializers.ModelSerializer):
         validated_data["country"] = validated_data.pop("country_code")
         validated_data["entity"] = validated_data.pop("entity_id")
         validated_data["is_enabled"] = False
-        return super().create(validated_data)
+
+        depot_instance = Depot(**validated_data)
+        depot_instance.full_clean()
+        depot_instance.save()
+        return depot_instance
