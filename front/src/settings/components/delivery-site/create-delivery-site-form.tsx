@@ -10,7 +10,7 @@ import { useRef } from "react"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
-  onSubmit?: (values: DeliverySiteFormType) => void
+  onCreate: (values: DeliverySiteFormType) => void
 
   // Submit button is outside the generic component, we have to pass the same id between form and button
   formId?: string
@@ -52,7 +52,7 @@ const mapDeliverySiteToForm: (
 
 export const DeliverySiteForm = ({
   deliverySite,
-  onSubmit,
+  onCreate,
   formId = "delivery-site",
 }: DeliverySiteFormProps) => {
   const { t } = useTranslation()
@@ -61,21 +61,25 @@ export const DeliverySiteForm = ({
   )
 
   const depotIdRef = useRef<HTMLInputElement>(null)
-  const checkDepotIdValidity = () => {
-    const validityState = depotIdRef.current?.validity
-    depotIdRef.current?.setCustomValidity("")
 
-    // if (validityState?.patternMismatch) {
-    //   const message = t(
-    //     "Cet identifiant douanier est invalide. Il doit être constitué de 15 caractères numériques."
-    //   )
-    //   depotIdRef.current?.setCustomValidity(message)
-    //   depotIdRef.current?.reportValidity()
-    // }
+  const handleSubmit = (values: DeliverySiteFormType) => {
+    onCreate({
+      name: values.name!,
+      city: values.city!,
+      country: values.country!,
+      depot_id: values.depot_id!,
+      depot_type: values.depot_type!,
+      address: values.address!,
+      postal_code: values.postal_code!,
+      electrical_efficiency: value.depot_type === DepotType.PowerPlant ? values.electrical_efficiency : undefined,
+      thermal_efficiency: value.depot_type === DepotType.HeatPlant ? values.thermal_efficiency : undefined,
+      useful_temperature: value.depot_type === DepotType.CogenerationPlant ? values.useful_temperature : undefined!
+    })
   }
 
+
   return (
-    <Form id={formId} onSubmit={() => onSubmit?.(value)}>
+    <Form id={formId} onSubmit={() => handleSubmit(value)}>
       <TextInput
         variant="outline"
         type="text"
@@ -92,11 +96,6 @@ export const DeliverySiteForm = ({
         {...bind("depot_id")}
         required
         inputRef={depotIdRef}
-        // pattern="[0-9]{15}"
-        onChange={(value) => {
-          checkDepotIdValidity()
-          bind("depot_id").onChange(value)
-        }}
       />
 
       <RadioGroup
@@ -108,7 +107,7 @@ export const DeliverySiteForm = ({
 
       {value.depot_type === DepotType.PowerPlant && (
         <NumberInput
-          label={t("Rendement électrique")}
+          label={t("Rendement électrique (entre 0 et 1)")}
           min={0}
           max={1}
           step={0.1}
@@ -119,7 +118,7 @@ export const DeliverySiteForm = ({
       )}
       {value.depot_type === DepotType.HeatPlant && (
         <NumberInput
-          label={t("Rendement thermique")}
+          label={t("Rendement thermique (entre 0 et 1)")}
           min={0}
           max={1}
           step={0.1}
@@ -130,9 +129,7 @@ export const DeliverySiteForm = ({
       )}
       {value.depot_type === DepotType.CogenerationPlant && (
         <NumberInput
-          label={t("Température utile")}
-          min={0}
-          max={1}
+          label={t("Température utile (°C)")}
           step={0.1}
           {...bind("useful_temperature")}
           value={value.useful_temperature ?? undefined}

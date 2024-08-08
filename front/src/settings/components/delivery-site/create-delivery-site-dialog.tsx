@@ -70,7 +70,7 @@ export const CreateDeliverySiteDialog = ({
         </section>
         <section>
           <DeliverySiteForm
-            onSubmit={handleSubmit}
+            onCreate={handleSubmit}
             formId="new-delivery-site"
           />
         </section>

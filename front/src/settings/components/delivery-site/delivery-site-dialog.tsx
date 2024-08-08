@@ -9,7 +9,7 @@ import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Return } from "common/components/icons"
 import { Dialog } from "common/components/dialog"
-import { formatNumber, formatPercentage } from "common/utils/formatters"
+import { formatCelsiusDegree, formatNumber, formatPercentage } from "common/utils/formatters"
 import { DeliverySiteForm } from "./create-delivery-site-form"
 import Form from "common/components/form"
 import { RadioGroup } from "common/components/radio"
@@ -102,19 +102,19 @@ export const DeliverySiteDialog = ({
               />
             )}
 
-            {form.electrical_efficiency && (
+            {form.thermal_efficiency && (
               <TextInput
                 readOnly
                 label={t("Rendement électrique")}
-                value={formatPercentage(form.electrical_efficiency * 100)}
+                value={formatPercentage(form.thermal_efficiency * 100)}
               />
             )}
 
-            {form.electrical_efficiency && (
+            {form.useful_temperature && (
               <TextInput
                 readOnly
                 label={t("Rendement électrique")}
-                value={formatPercentage(form.electrical_efficiency * 100)}
+                value={formatCelsiusDegree(form.useful_temperature)}
               />
             )}
 
