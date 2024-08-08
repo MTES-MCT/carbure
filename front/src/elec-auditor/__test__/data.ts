@@ -1,7 +1,7 @@
 import { cpo } from "carbure/__test__/data";
 import { UploadCheckError, UploadCheckReportInfo } from "carbure/types";
 import { ElecAdminAuditSnapshot, ElecApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
-import { ElecAuditorApplication, ElecAuditorApplicationDetails, ElecAuditorApplicationsData, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus } from "elec-auditor/types";
+import { ElecAuditorApplication, ElecAuditorApplicationDetails, ElecAuditorApplicationsData, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus, ElecAuditorUploadCheckReportInfo } from "elec-auditor/types";
 import { elecAuditApplicationSample, elecChargePointApplicationAuditDone, elecChargePointApplicationAuditInProgress, elecChargePointsApplications, elecMeterReadingsApplications } from "elec/__test__/data";
 import { ElecChargePointsApplication } from "elec/types";
 
@@ -61,12 +61,12 @@ const error: UploadCheckError = {
   error: 'NO_CHARGE_POINT_DETECTED'
 }
 
-export const elecAuditApplicationCheckReportError: UploadCheckReportInfo = {
+export const elecAuditApplicationCheckReportError: ElecAuditorUploadCheckReportInfo = {
   errors: [error],
   file_name: "auditreport.xlsx",
   error_count: 1
 }
-export const elecAuditApplicationCheckReportSuccess: UploadCheckReportInfo = {
+export const elecAuditApplicationCheckReportSuccess: ElecAuditorUploadCheckReportInfo = {
   file_name: "auditreport.xlsx",
   error_count: 0
 }
