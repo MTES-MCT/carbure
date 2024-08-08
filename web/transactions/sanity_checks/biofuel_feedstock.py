@@ -40,6 +40,7 @@ def check_provenance_mp(lot: CarbureLot):
 
 
 def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: MatierePremiere):
+
     if biofuel.is_alcool and not feedstock.compatible_alcool:
         yield f"{biofuel} issu de fermentation et {feedstock} n'est pas fermentescible"
 
@@ -65,6 +66,9 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
 
     if biofuel.code == "EEHA" and feedstock.code not in emha_feedstocks:
         yield f"{biofuel} doit être à base d'huiles ou graisses animales"
+
+    if biofuel.code == "EEAG" and (feedstock.code == "HUILE_ALIMENTAIRE_USAGEE" or feedstock.code in emha_feedstocks):
+        yield f"{biofuel} doit être fait à base de graisses hormis les huiles alimentaires usagées ou les graisses animales"
 
     fat_biofuels = ("EMHA", "HOE", "HOG", "HOC", "HCC", "HCG", "HCE", "B100")
     fat_feedstocks = ("HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "HUILES_OU_GRAISSES_ANIMALES_CAT3")

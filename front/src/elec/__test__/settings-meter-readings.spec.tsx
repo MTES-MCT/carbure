@@ -6,10 +6,12 @@ import { TestRoot, render } from "setupTests"
 import userEvent from "@testing-library/user-event"
 import { cpo } from "carbure/__test__/data"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import server from "../../settings/__test__/api"
+import server from "../../settings/__test__/server"
 import {
   okMeterReadingsApplicationsEmpty,
+  okMeterReadingsCheckValid,
   okMeterReadingsApplicationsUrgencyCritical,
+  okMeterReadingsApplicationsWithoutChargePoints,
   okMeterReadingsCheckError,
 } from "./api"
 
@@ -115,6 +117,7 @@ test("upload dialog opened with urgency critical", async () => {
 
 test("upload valid file", async () => {
   const user = userEvent.setup()
+  server.use(okMeterReadingsCheckValid)
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
@@ -143,4 +146,12 @@ test("upload file with error", async () => {
   server.use(okMeterReadingsCheckError)
   await uploadMeterReadingsFile()
   screen.getByText("À corriger")
+})
+
+test("When an application has 0 charge points, the user can't send its meter readings", async () => {
+  server.use(okMeterReadingsApplicationsWithoutChargePoints)
+  setEntity(cpo)
+  render(<SettingsWithHooks />)
+  await waitWhileLoading()
+  screen.getByText("Vous n'avez aucun relevé à déclarer")
 })

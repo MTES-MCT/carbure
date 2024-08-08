@@ -5,7 +5,7 @@ import { TestRoot, render } from "setupTests"
 
 import { admin } from "carbure/__test__/data"
 import ElecAdminAudit from "elec-audit-admin"
-import { setupServer } from "msw/lib/node"
+import { setupServer } from "msw/node"
 import {
   okGenerateSample,
   okGetChargePointsApplicationDetails,
