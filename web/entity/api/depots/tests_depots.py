@@ -17,6 +17,7 @@ class EntityDepotsTest(TestCase):
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.pays = Pays.objects.filter(code_pays="FR")[0]
         # self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
 
     def test_depots(self):
@@ -59,7 +60,7 @@ class EntityDepotsTest(TestCase):
             "entity_id": self.admin.id,
             "name": "Dépôt de test",
             "city": "Paris",
-            "country": 77,
+            "country_code": self.pays.code_pays,
             "depot_type": "BIOFUEL DEPOT",
             "depot_id": "123456789012345",
         }
@@ -76,7 +77,7 @@ class EntityDepotsTest(TestCase):
             "entity_id": self.admin.id,
             "name": "Dépôt de test",
             "city": "Paris",
-            "country": 77,
+            "country_code": self.pays.code_pays,
             "depot_type": "BIOFUEL DEPOT",
         }
         url_create = reverse("entity-depot-create")
