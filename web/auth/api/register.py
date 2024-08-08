@@ -27,7 +27,7 @@ def register(request):
         return ErrorResponse(400, CarbureError.INVALID_REGISTRATION_FORM, data=errors)
 
 
-def send_email(user, request, subject, email_type="account_activation_email", extra_context=None):
+def send_email(user, request, subject, email_type="account_activation_email", extra_context={}):
     current_site = get_current_site(request)
     email_subject = subject
     email_context = {
