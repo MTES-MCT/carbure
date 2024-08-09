@@ -1,12 +1,7 @@
-import { cpo } from "carbure/__test__/data";
-import { EntityPreview, EntityType, UploadCheckError } from "carbure/types";
-import { ElecApplicationSample } from "elec-audit-admin/types";
-import { ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationUrgencyStatus } from "elec/types";
-import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
-import { EntityPreview, EntityType } from "carbure/types"
+import { cpo } from "carbure/__test__/data"
+import { EntityPreview, EntityType, UploadCheckError } from "carbure/types"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 import {
-  UploadCheckError,
   ElecAuditApplicationStatus,
   ElecChargePointsApplication,
   ElecChargePointsApplicationCheckInfo,
@@ -16,7 +11,6 @@ import {
   ElecMeterReadingsApplicationDetails,
   ElecMeterReadingsApplicationsResponse,
   ElecProvisionCertificatePreview,
-  MeterReadingsApplicationError,
   MeterReadingsApplicationUrgencyStatus,
 } from "elec/types"
 
@@ -115,6 +109,7 @@ export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplicat
   charge_point_count: 5,
   power_total: 1000,
   application_date: "2023-09-01",
+  // audit_order_date: "2023-09-02",
   status: ElecAuditApplicationStatus.AuditInProgress,
 }
 
@@ -127,6 +122,7 @@ export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = 
   charge_point_count: 5,
   power_total: 1000,
   application_date: "2023-09-01",
+  // audit_order_date: "2023-09-02",
   status: ElecAuditApplicationStatus.AuditDone,
 
 }
