@@ -7,7 +7,7 @@ from core.decorators import check_user_rights
 from core.models import Entity
 from core.utils import MultipleValueField
 from elec.repositories.elec_audit_repository import ElecAuditRepository
-from elec.serializers.elec_audit_sample_serializer import ElecAuditSampleSerializer
+from elec.serializers.elec_audit_sample import ElecAuditSampleSerializer
 from django.core.paginator import Paginator
 
 
