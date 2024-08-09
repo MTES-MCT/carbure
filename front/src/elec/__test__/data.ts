@@ -13,6 +13,7 @@ import {
   ElecProvisionCertificatePreview,
   MeterReadingsApplicationUrgencyStatus,
 } from "elec/types"
+import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo"
 
 export const elecSnapshot: ElecCPOSnapshot = {
   provisioned_energy: 650000,
