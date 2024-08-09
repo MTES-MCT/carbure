@@ -1,7 +1,7 @@
 import useEntity from "carbure/hooks/entity"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import { Check, Return } from "common/components/icons"
+import { AlertCircle, Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
@@ -10,10 +10,12 @@ import ApplicationStatus from "elec/components/application-status"
 import {
   ElecChargePointsApplication,
   ElecAuditApplicationStatus,
+  ElecChargePointsApplicationDetails,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
+import Alert from "common/components/alert"
 export type ApplicationDialogProps = {
-  application: ElecChargePointsApplication
+  application: ElecChargePointsApplicationDetails
   onClose: () => void
   onValidated: () => void
   forceValidation: boolean
@@ -64,6 +66,7 @@ export const ChargePointsApplicationAcceptDialog = ({
     )
   }
 
+  const sample = application.sample
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -80,12 +83,15 @@ export const ChargePointsApplicationAcceptDialog = ({
                 applicationDate: formatDate(application.application_date),
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> points de recharge importés le <b>{{applicationDate}}</b>  ."
+              defaults="<b>Valider l'inscription de <b>{{count}} points de recharge</b> importés le <b>{{applicationDate}}</b> ?"
             />
           </p>
-          <p>
-            <Trans>Voulez-vous accepter cette demande ?</Trans>
-          </p>
+          {sample && (
+            <Alert icon={AlertCircle} variant="info" >
+              <Trans defaults={"L'aménageur <b>{{cpo}}</b> sera notifié et pourra visualiser les points de recharge depuis son espace Carbure."} values={{ cpo: application.cpo.name }} />
+            </Alert>
+          )}
+
         </section>
       </main>
 
@@ -94,8 +100,8 @@ export const ChargePointsApplicationAcceptDialog = ({
           icon={Check}
           label={
             forceValidation
-              ? t("Accepter la demande sans audit")
-              : t("Accepter la demande")
+              ? t("Accepter l'inscription sans audit")
+              : t("Accepter l'inscription")
           }
           variant="success"
           action={() => acceptApplication(forceValidation)}

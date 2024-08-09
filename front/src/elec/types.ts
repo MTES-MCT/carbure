@@ -78,8 +78,7 @@ export interface ElecChargePointsApplication {
   // audit_order_date?: string
 }
 
-export interface ElecChargePointsApplicationDetails
-  extends ElecChargePointsApplication {
+export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
   email_contacts: string[]
   sample?: ElecApplicationSample
 }
