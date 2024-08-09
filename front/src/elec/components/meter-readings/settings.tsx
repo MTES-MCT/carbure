@@ -69,7 +69,6 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
       application.id
     )
   }
-  console.log("charge point count", chargePointCount)
   return (
     <Panel id="elec-meter-readings">
       <header>
@@ -89,7 +88,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High
                   ? "warning"
                   : urgencyStatus ===
-                      MeterReadingsApplicationUrgencyStatus.Critical
+                    MeterReadingsApplicationUrgencyStatus.Critical
                     ? "danger"
                     : "primary"
             }
