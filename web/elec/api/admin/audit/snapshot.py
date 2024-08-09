@@ -47,7 +47,7 @@ def get_snapshot(request):
                 "meter_readings_applications_audit_in_progress": meter_readings_applications.filter(
                     status=ElecMeterReadingApplication.AUDIT_IN_PROGRESS
                 ).count(),
-                "meter_readings_applications_audit_in_progress": meter_readings_applications.filter(
+                "meter_readings_applications_audit_done": meter_readings_applications.filter(
                     status=ElecMeterReadingApplication.AUDIT_DONE
                 ).count(),
                 "meter_readings_applications_history": meter_readings_applications.filter(
