@@ -21,7 +21,7 @@
 }
 
 .alert header {
-  display: flex;
+  display: inline-block;
   gap: var(--spacing-s);
   align-items: center;
 }
@@ -33,6 +33,8 @@
 
 .info [data-icon] {
   color: var(--blue-medium);
+  float: left;
+  margin-right: 3px;
 }
 
 .success {
