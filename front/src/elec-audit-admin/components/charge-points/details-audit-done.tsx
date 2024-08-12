@@ -32,10 +32,10 @@ export const ChargePointsApplicationDetailsAuditDone = ({
     return api.downloadAuditReport(entity.id, chargePointApplication?.sample?.application_id!)
   }
 
-  if (chargePointApplication?.sample) {
-    chargePointApplication.sample.auditor_name = "Veritas"
-    chargePointApplication.sample.comment_count = 2
-  }
+  // if (chargePointApplication?.sample) {
+  //   chargePointApplication.sample.auditor_name = "Veritas"
+  //   chargePointApplication.sample.comment_count = 2
+  // }
   const commentCount = chargePointApplication?.sample?.comment_count
   const auditorName = chargePointApplication?.sample?.auditor_name
   return (
@@ -56,7 +56,7 @@ export const ChargePointsApplicationDetailsAuditDone = ({
         {commentCount &&
           <section>
             <Alert icon={Message} variant="info" >
-              <Trans defaults={"<b>{{ count }} points de charges </b>  ont été commentés par l'auditeur {{auditorName}} dans le fichier excel."} values={{ count: commentCount, auditorName }} />
+              <Trans defaults={"<b>{{ count }} points de charges </b>  ont été commentés par l'auditeur <b>{{auditorName}}</b> dans le fichier excel."} values={{ count: commentCount, auditorName }} />
             </Alert>
           </section>
         }
@@ -65,7 +65,7 @@ export const ChargePointsApplicationDetailsAuditDone = ({
             value={confirmCheckbox}
             onChange={setConfirmCheckbox}
             label={t(
-              "Je confirme avoir téléchargé et verifié le résultat d’audit afin de valider l’inscription des points de recharge ci-dessus."
+              "Je confirme avoir téléchargé et verifié le résultat d'audit afin de valider l'inscription des points de recharge ci-dessus."
             )}
           />
         </section>
