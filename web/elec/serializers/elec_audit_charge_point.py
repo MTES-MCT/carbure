@@ -27,7 +27,7 @@ class ElecAuditChargePointSerializer(serializers.ModelSerializer):
     observed_mid_or_prm_id = serializers.CharField()
     observed_energy_reading = serializers.FloatField()
     has_dedicated_pdl = serializers.BooleanField()
-    audit_date = serializers.DateField()
+    audit_date = serializers.DateField(format="%d/%m/%Y")
     comment = serializers.CharField()
     charge_point_id = serializers.SlugRelatedField(source="charge_point", slug_field="charge_point_id", read_only=True)
     latitude = serializers.SlugRelatedField(source="charge_point", slug_field="latitude", read_only=True)

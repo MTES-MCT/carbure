@@ -16,7 +16,6 @@ def export_audited_charge_points_sample_to_excel(audited_charge_points, entity):
                 "columns": [
                     {"label": "Latitude", "value": "latitude"},
                     {"label": "Longitude", "value": "longitude"},
-                    # {"label": "Nom de la station", "value": "station_name"},
                     {"label": "Identifiant de la station", "value": "station_id"},
                     {"label": "Identifiant du point de recharge", "value": "charge_point_id"},
                     {"label": "Identifiant PRM ou MID", "value": get_prm_or_mid},
