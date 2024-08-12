@@ -1,29 +1,25 @@
-import useEntity from "carbure/hooks/entity"
-import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
-import { Check, Cross, Download, Message } from "common/components/icons"
-import * as api from "elec-audit-admin/api"
-import { ElecChargePointsApplicationDetails } from "elec/types"
+import { Check, Cross } from "common/components/icons"
+import { ElecMeterReadingsApplicationDetails } from "elec/types"
 import { useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
-import SampleSummary from "../sample/details-sample-summary"
-import ApplicationSummary from "./details-application-summary"
+import { useTranslation } from "react-i18next"
 import SampleDetailsAuditDoneSection from "../sample/details-sample-audit-done-section"
+import ApplicationSummary from "./details-application-summary"
 
-interface ChargePointsApplicationDetailsAuditDoneProps {
-  chargePointApplication: ElecChargePointsApplicationDetails | undefined
+interface MeterReadingsApplicationDetailsAuditDoneProps {
+  meterReadingsApplication: ElecMeterReadingsApplicationDetails | undefined
   onAccept: (force?: boolean) => void
   onReject: (force?: boolean) => void
   onDownloadSample: () => void
 }
-export const ChargePointsApplicationDetailsAuditDone = ({
-  chargePointApplication,
+export const MeterReadingsApplicationDetailsAuditDone = ({
+  meterReadingsApplication,
   onAccept,
   onReject,
-  onDownloadSample
-}: ChargePointsApplicationDetailsAuditDoneProps) => {
+  onDownloadSample,
+}: MeterReadingsApplicationDetailsAuditDoneProps) => {
   const { t } = useTranslation()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
 
@@ -31,17 +27,16 @@ export const ChargePointsApplicationDetailsAuditDone = ({
     <>
       <main>
         <section>
-          <ApplicationSummary application={chargePointApplication} />
+          <ApplicationSummary application={meterReadingsApplication} />
         </section>
         <Divider />
-        <SampleDetailsAuditDoneSection sample={chargePointApplication?.sample!} onDownloadSample={onDownloadSample} />
-
+        <SampleDetailsAuditDoneSection sample={meterReadingsApplication?.sample!} onDownloadSample={onDownloadSample} />
         <section>
           <Checkbox
             value={confirmCheckbox}
             onChange={setConfirmCheckbox}
             label={t(
-              "Je confirme avoir téléchargé et verifié le résultat d'audit afin de valider l'inscription des points de recharge ci-dessus."
+              "Je confirme avoir téléchargé et verifié le résultat d'audit afin de valider les relevés trimestriels des points de recharge ci-dessus."
             )}
           />
         </section>
@@ -67,4 +62,5 @@ export const ChargePointsApplicationDetailsAuditDone = ({
   )
 }
 
-export default ChargePointsApplicationDetailsAuditDone
+export default MeterReadingsApplicationDetailsAuditDone
+

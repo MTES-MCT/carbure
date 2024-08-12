@@ -14,6 +14,7 @@ import MeterReadingsApplicationDetailsInProgress from "./details-in-progress"
 import { MeterReadingsApplicationDetailsPending } from "./details-pending"
 import MeterReadingsApplicationRejectDialog from "./reject-dialog"
 import MeterReadingsApplicationHistory from "./details-history"
+import MeterReadingsApplicationDetailsAuditDone from "./details-audit-done"
 
 export const MeterReadingsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -93,8 +94,16 @@ export const MeterReadingsApplicationDetailsDialog = () => {
             />
           )}
 
-        {(meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress || meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditDone) && (
+        {(meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress) && (
           <MeterReadingsApplicationDetailsInProgress
+            meterReadingsApplication={meterReadingsApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )}
+        {(meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditDone) && (
+          <MeterReadingsApplicationDetailsAuditDone
             meterReadingsApplication={meterReadingsApplication}
             onAccept={acceptApplication}
             onReject={rejectApplication}

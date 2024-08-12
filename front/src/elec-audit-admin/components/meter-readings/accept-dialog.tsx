@@ -28,16 +28,23 @@ export const MeterReadingsApplicationAcceptDialog = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
 
+  const energyTotal = formatNumber(application.energy_total)
+  const cpoName = application.cpo.name
   const acceptMeterReadingsApplication = useMutation(api.acceptMeterReadingsApplication, {
     invalidates: ["audit-meter-readings-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       onClose()
       onValidated()
-      notify(t("Les relevés T{{quarter}} {{year}} ont été acceptés et les certificats de fournitures versés !", { quarter: application.quarter, year: application.year }), { variant: "success" })
+      notify(t("Les relevés T{{quarter}} {{year}} de {{cpoName}} ont été validés et {{energyTotal}} kWh leur ont été versés !", {
+        quarter: application.quarter,
+        year: application.year,
+        cpoName,
+        energyTotal,
+      }), { variant: "success" })
 
     },
     onError(err) {
-      notifyError(err, t("Impossible d'accepter les relevés des points de recharge"))
+      notifyError(err, t("Impossible d'accepter les relevés des points de recharge."))
     },
   })
 
@@ -67,26 +74,21 @@ export const MeterReadingsApplicationAcceptDialog = ({
                 year: application.year,
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> relevés envoyés pour T{{quarter}} {{year}}.</b>"
+              defaults="Valider les relevés trimestriels de <b>{{count}} points de recharge</b> pour <b>T{{quarter}} {{year}}</b> et verser le certificat de fourniture correspondants ?</b>"
             />
           </p>
-          <p>
-            <Trans>Voulez-vous accepter cette demande ?</Trans>
-          </p>
+
         </section>
 
         <section>
-          <Alert variant="info">
-            <InfoCircle />
-            <p>
-              <Trans
-                defaults="{{energyTotal}} MWh renouvelables seront ajoutés à l'énergie disponible de l'aménageur {{cpo}}."
-                values={{
-                  energyTotal: formatNumber(application.energy_total),
-                  cpo: application.cpo.name,
-                }}
-              ></Trans>
-            </p>
+          <Alert variant="info" icon={InfoCircle}>
+            <Trans
+              defaults="<b>{{energyTotal}} kWh</b> seront ajoutés à l'énergie disponible de l'aménageur <b>{{cpoName}}</b> sous forme de certificat de fourniture."
+              values={{
+                energyTotal,
+                cpoName,
+              }}
+            ></Trans>
           </Alert>
         </section>
       </main>
