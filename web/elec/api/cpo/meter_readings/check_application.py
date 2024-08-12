@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from django import forms
 from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
@@ -10,6 +11,7 @@ from elec.services.meter_readings_application_quarter import get_application_qua
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
+from elec.models.elec_meter_reading import ElecMeterReading
 
 
 class CheckMeterReadingApplicationForm(forms.Form):
@@ -46,9 +48,23 @@ def check_application(request: HttpRequest, entity):
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
-    meter_reading_data, errors = import_meter_reading_excel(excel_file, charge_points, previous_application, renewable_share)
+    meter_reading_data, errors, original = import_meter_reading_excel(
+        excel_file, charge_points, previous_application, renewable_share
+    )
 
-    pending_application_already_exists = MeterReadingRepository.get_replaceable_applications(entity).count() > 0
+    charge_points_by_id = [item["charge_point_id"] for item in meter_reading_data]
+    meter_readings = ElecMeterReading.objects.filter(cpo=entity, charge_point_id__in=charge_points_by_id)
+
+    previous_date = {}
+    for item in meter_readings:
+        previous_date[item.charge_point_id] = item.reading_date
+
+    duplicates = {}
+    for row in original:
+        reading_date = row["reading_date"]
+        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
+        if previous_date.get(row["charge_point_id"]) == reading_date:
+            duplicates[reading_date] = row["line"]
 
     data = {}
     data["file_name"] = excel_file.name
@@ -57,7 +73,19 @@ def check_application(request: HttpRequest, entity):
     data["year"] = year
     data["errors"] = []
     data["error_count"] = 0
-    data["pending_application_already_exists"] = pending_application_already_exists
+
+    if duplicates:
+        for reading_date, line in duplicates.items():
+            errors.append(
+                {
+                    "error": "INVALID_DATA",
+                    "line": line,
+                    "meta": {"reading_date": [_(f"Le relevé du {reading_date} existe déjà")]},
+                }
+            )
+        data["errors"] = errors
+        data["error_count"] = len(errors)
+        return ErrorResponse(400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data)
 
     if len(errors) > 0:
         data["errors"] = errors
