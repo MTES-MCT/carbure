@@ -1,11 +1,14 @@
 from django import forms
+from django.conf import settings
 from django.http import HttpRequest
+from django.core.mail import send_mail
 
 from django.views.decorators.http import require_POST
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
+from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 
@@ -42,10 +45,37 @@ def accept_application(request: HttpRequest):
     application.status = ElecChargePointApplication.ACCEPTED
     application.save()
 
-    ## marque l'échantillon comme "audité"
+    # marque l'échantillon comme "audité"
     audit_sample = application.audit_sample.first()
     if audit_sample:
         audit_sample.status = ElecAuditSample.AUDITED
         audit_sample.save()
 
+    send_email_to_cpo(application)
+
     return SuccessResponse()
+
+
+def send_email_to_cpo(application: ElecChargePointApplication):
+    charge_point_count = application.elec_charge_points.count()
+    charge_point_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/settings#elec-charge-points"
+
+    text_message = f"""
+    Bonjour,
+
+    La DGEC vient de valider l'inscription de {charge_point_count} points de recharge.
+    Vous pouvez les retrouver dans votre espace CarbuRe via <a href="{charge_point_link}">ce lien</a>.
+
+    Merci beaucoup
+
+    Bien cordialement,
+    L'équipe CarbuRe
+    """
+
+    send_mail(
+        subject=f"[CarbuRe] Inscription de {charge_point_count} points de recharge validée",
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=["carbure@beta.gouv.fr"],
+        fail_silently=False,
+    )
