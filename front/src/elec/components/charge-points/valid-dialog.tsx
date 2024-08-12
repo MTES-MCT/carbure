@@ -1,23 +1,13 @@
 import useEntity from "carbure/hooks/entity"
-import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import {
-  AlertCircle,
-  Check,
-  Cross,
-  Plus,
-  Return,
-  Send,
-} from "common/components/icons"
+import { Return, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
-import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { ElecChargePointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { addChargePoints } from "elec/api-cpo"
-import { ReplaceAlert } from "./replace-alert"
 
 export type ValidDetailsDialogProps = {
   fileData: ElecChargePointsApplicationCheckInfo
@@ -34,7 +24,6 @@ export const ValidDetailsDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const portal = usePortal()
 
   const chargePointsApplication = useMutation(addChargePoints, {
     invalidates: ["charge-points-applications"],
@@ -58,19 +47,7 @@ export const ValidDetailsDialog = ({
   })
 
   const submitChargePointsApplication = () => {
-    const confirmApplication = () => {
-      chargePointsApplication.execute(entity.id, file)
-    }
-    if (fileData.pending_application_already_exists) {
-      portal((resolve) => (
-        <ReplaceApplicationConfirmDialog
-          onClose={resolve}
-          onConfirm={confirmApplication}
-        />
-      ))
-    } else {
-      confirmApplication()
-    }
+    chargePointsApplication.execute(entity.id, file)
   }
 
   return (
@@ -105,8 +82,6 @@ export const ValidDetailsDialog = ({
               audit.
             </Trans>
           </p>
-
-          {fileData.pending_application_already_exists && <ReplaceAlert />}
         </section>
       </main>
 
@@ -114,11 +89,7 @@ export const ValidDetailsDialog = ({
         <Button
           icon={Send}
           loading={chargePointsApplication.loading}
-          label={
-            fileData.pending_application_already_exists
-              ? t("Remplacer la demande d'inscription")
-              : t("Envoyer la demande d'inscription")
-          }
+          label={t("Envoyer la demande d'inscription")}
           variant="primary"
           action={submitChargePointsApplication}
         />
@@ -130,48 +101,3 @@ export const ValidDetailsDialog = ({
 }
 
 export default ValidDetailsDialog
-
-const ReplaceApplicationConfirmDialog = ({
-  onClose,
-  onConfirm,
-}: {
-  onClose: () => void
-  onConfirm: () => void
-}) => {
-  const { t } = useTranslation()
-
-  const confirmApplication = () => {
-    onConfirm()
-    onClose()
-  }
-
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Remplacer la demande d'inscription ?")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <p style={{ textAlign: "left" }}>
-            <Trans>
-              Souhaitez-vous confirmer le remplacement de la précédente demande
-              d'inscription par celle-ci ?
-            </Trans>
-          </p>
-        </section>
-      </main>
-
-      <footer>
-        <Button
-          icon={Check}
-          label={t("Confirmer le remplacement")}
-          variant="warning"
-          action={confirmApplication}
-        />
-
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-      </footer>
-    </Dialog>
-  )
-}

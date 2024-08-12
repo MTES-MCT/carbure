@@ -43,17 +43,9 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   })
 
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists =
-      currentApplication?.status === ElecAuditApplicationStatus.Pending
-    if (
-      currentApplication &&
-      currentApplication.status !== ElecAuditApplicationStatus.Pending
-    )
-      return
     portal((resolve) => (
       <ElecMeterReadingsFileUpload
         onClose={resolve}
-        pendingApplicationAlreadyExists={pendingApplicationAlreadyExists}
         companyId={companyId}
         currentApplicationPeriod={currentApplicationPeriod!}
       />
@@ -88,7 +80,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High
                   ? "warning"
                   : urgencyStatus ===
-                    MeterReadingsApplicationUrgencyStatus.Critical
+                      MeterReadingsApplicationUrgencyStatus.Critical
                     ? "danger"
                     : "primary"
             }
