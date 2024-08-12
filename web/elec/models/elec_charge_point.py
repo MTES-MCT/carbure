@@ -22,9 +22,6 @@ class ElecChargePoint(models.Model):
     charge_point_id = models.CharField(max_length=64)
     current_type = models.CharField(max_length=2, choices=CURRENT_TYPES)
     installation_date = models.DateField()
-    mid_id = models.CharField(max_length=128, null=True, blank=True)
-    measure_date = models.DateField(null=True, blank=True)
-    measure_energy = models.FloatField(null=True, blank=True)
     is_article_2 = models.BooleanField(default=False)
     measure_reference_point_id = models.CharField(max_length=64, null=True, blank=True)
 
@@ -36,3 +33,15 @@ class ElecChargePoint(models.Model):
     cpo_siren = models.CharField(max_length=64, null=True, blank=True)
     latitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
     longitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
+
+    @property
+    def mid_id(self):
+        return self.current_meter.mid_certificate if self.current_meter else None
+
+    @property
+    def measure_date(self):
+        return self.current_meter.initial_index_date if self.current_meter else None
+
+    @property
+    def measure_energy(self):
+        return self.current_meter.initial_index if self.current_meter else None

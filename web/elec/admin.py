@@ -96,7 +96,7 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "station_id",
         "station_name",
         "cpo__name",
-        "mid_id",
+        "current_meter__mid_certificate",
     ]
 
 
@@ -130,10 +130,10 @@ class ElecMeterReadingAdmin(admin.ModelAdmin):
     ]
     search_fields = [
         "id",
-        "charge_point_id",
+        "meter__charge_point__id",
         "cpo__name",
-        "charge_point__station_id",
-        "charge_point__station_name",
+        "meter__charge_point__station_id",
+        "meter__charge_point__station_name",
     ]
 
 
