@@ -44,7 +44,7 @@ def check_report(request: HttpRequest):
     data["charge_point_count"] = len(charge_point_audits)
     data["errors"] = []
     data["error_count"] = 0
-    data["comment_count"] = audited_charge_points.exclude(comment="").count()
+    data["comment_count"] = len([cp for cp in charge_point_audits if cp.get("comment")])
 
     if len(errors) > 0:
         data["errors"] = errors
