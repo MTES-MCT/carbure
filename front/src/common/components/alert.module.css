@@ -21,9 +21,11 @@
 }
 
 .alert header {
+  /* display: inline-block; */
   display: flex;
-  gap: var(--spacing-s);
+  column-gap: var(--spacing-s);
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .info {
@@ -33,6 +35,8 @@
 
 .info [data-icon] {
   color: var(--blue-medium);
+  /* float: left;
+  margin-right: 3px; */
 }
 
 .success {

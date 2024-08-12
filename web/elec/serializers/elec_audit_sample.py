@@ -23,7 +23,6 @@ class ElecAuditSampleSerializer(serializers.ModelSerializer):
     charge_point_count = serializers.SerializerMethodField()
     station_count = serializers.SerializerMethodField()
     application_date = serializers.SerializerMethodField()
-    # status = serializers.SerializerMethodField()
 
     def get_charge_point_count(self, instance):
         return instance.charge_point_count or 0
@@ -36,12 +35,6 @@ class ElecAuditSampleSerializer(serializers.ModelSerializer):
             return instance.charge_point_application.created_at
         elif instance.meter_reading_application:
             return instance.meter_reading_application.created_at
-
-    # def get_status(self, instance):
-    #     if instance.charge_point_application:
-    #         return instance.charge_point_application.status
-    #     elif instance.meter_reading_application:
-    #         return instance.meter_reading_application.status
 
 
 class ElecAuditSampleDetailsSerializer(ElecAuditSampleSerializer):

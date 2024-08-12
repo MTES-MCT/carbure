@@ -51,6 +51,8 @@ export interface ElecApplicationSample {
   application_id: number
   percentage: number
   charge_points: ElecChargePointPreview[]
+  comment_count?: number
+  auditor_name?: string
 }
 
 export interface ElecMeterReadingsApplicationsData {
