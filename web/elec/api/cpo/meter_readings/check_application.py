@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from django import forms
 from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
@@ -79,7 +80,7 @@ def check_application(request: HttpRequest, entity):
                 {
                     "error": "INVALID_DATA",
                     "line": line,
-                    "meta": {"reading_date": [f"Le relevé du {reading_date} existe déjà"]},
+                    "meta": {"reading_date": [_(f"Le relevé du {reading_date} existe déjà")]},
                 }
             )
         data["errors"] = errors

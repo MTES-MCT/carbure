@@ -1,5 +1,6 @@
 from django.http import HttpRequest
 from pandas.core.frame import DataFrame
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
@@ -29,7 +30,7 @@ def check_application(request: HttpRequest, entity):
 
     duplicates = {}
     if isinstance(original, DataFrame):
-        for _, row in original.iterrows():
+        for __, row in original.iterrows():
             charge_point_id = row["charge_point_id"]
             if charge_point_id in replaced_charge_points_by_id:
                 duplicates[charge_point_id] = row["line"]
@@ -46,7 +47,7 @@ def check_application(request: HttpRequest, entity):
                 {
                     "error": "INVALID_DATA",
                     "line": line,
-                    "meta": {"charge_point_id": [f"Le point de recharge {charge_point_id} existe déjà"]},
+                    "meta": {"charge_point_id": [_(f"Le point de recharge {charge_point_id} existe déjà")]},
                 }
             )
         data["errors"] = errors
