@@ -30,14 +30,15 @@ class ExcelChargePointError:
 def import_charge_point_excel(excel_file: UploadedFile):
     try:
         # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
-        charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
+        original_charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
-        charge_point_data = TransportDataGouv.merge_charge_point_data(charge_point_data)
+        merged_charge_point_data = TransportDataGouv.merge_charge_point_data(original_charge_point_data)
         # parse the data and validate errors
-        return ExcelChargePoints.validate_charge_points(charge_point_data)
+        charge_point_data = ExcelChargePoints.validate_charge_points(merged_charge_point_data)
+        return charge_point_data[0], charge_point_data[1], original_charge_point_data
     except:
         traceback.print_exc()
-        return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
+        return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}], []
 
 
 class ExcelChargePoints:
