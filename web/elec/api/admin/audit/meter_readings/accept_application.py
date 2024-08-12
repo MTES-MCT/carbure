@@ -1,12 +1,15 @@
-from sys import audit
+from django.conf import settings
 import pandas as pd
 from django import forms
+from django.db.models import Sum
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
+from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
@@ -63,7 +66,6 @@ def accept_application(request: HttpRequest):
     ## créer les ElecProvisionCertificate à partir des groupes
     certificate_model_instances = []
     for group in meter_readings_df_grouped.to_dict(orient="records"):
-
         certif = ElecProvisionCertificate(
             cpo=application.cpo,
             quarter=application.quarter,
@@ -79,10 +81,39 @@ def accept_application(request: HttpRequest):
     application.status = ElecChargePointApplication.ACCEPTED
     application.save()
 
-    ## marque l'échantillon comme "audité"
+    # marque l'échantillon comme "audité"
     audit_sample = application.audit_sample.first()
     if audit_sample:
         audit_sample.status = ElecAuditSample.AUDITED
         audit_sample.save()
 
+    send_email_to_cpo(application)
+
     return SuccessResponse()
+
+
+def send_email_to_cpo(application: ElecMeterReadingApplication):
+    quarter = f"T{application.quarter} {application.year}"
+    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum('renewable_energy'))['total_energy'], 2)
+    meter_reading_count = application.elec_meter_readings.count()
+    meter_reading_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec/{application.year}/provisioned"
+
+    text_message = f"""
+    Bonjour,
+
+    La DGEC vient de valider votre relevé trimestriel {quarter} pour les {meter_reading_count} points de recharge renseignés.
+    {total_energy} kWh renouvelable vous ont été versés sous forme de certificat de fourniture dans votre espace Carbure visible sur <a href="{meter_reading_link}">ce lien</a>.
+
+    Merci beaucoup
+
+    Bien cordialement,
+    L'équipe CarbuRe
+    """
+
+    send_mail(
+        subject=f"[CarbuRe] Relevés {quarter} validés",
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=["carbure@beta.gouv.fr"],
+        fail_silently=False,
+    )
