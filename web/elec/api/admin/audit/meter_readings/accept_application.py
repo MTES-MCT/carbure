@@ -36,10 +36,7 @@ def accept_application(request: HttpRequest):
     application = form.cleaned_data["application_id"]
     force_validation = form.cleaned_data["force_validation"]
 
-    if (
-        application.status != ElecMeterReadingApplication.PENDING
-        and application.status != ElecMeterReadingApplication.AUDIT_IN_PROGRESS
-    ):
+    if application.status in (ElecMeterReadingApplication.ACCEPTED, ElecMeterReadingApplication.REJECTED):
         return ErrorResponse(400, AcceptApplicationError.ALREADY_CHECKED, "Application has already been checked by admin")
 
     if application.status == ElecMeterReadingApplication.PENDING and not force_validation:
