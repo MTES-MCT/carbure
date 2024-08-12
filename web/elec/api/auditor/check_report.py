@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import Entity, UserRights
+from core.models import Entity
 from elec.repositories.elec_audit_repository import ElecAuditRepository
 from elec.services.import_elec_audit_report_excel import import_elec_audit_report_excel
 
@@ -16,14 +16,13 @@ class CheckReportForm(forms.Form):
 
 
 class CheckReportError:
-
     VALIDATION_FAILED = "VALIDATION_FAILED"
     NO_CHARGE_POINT_DETECTED = "NO_CHARGE_POINT_DETECTED"
 
 
 @require_POST
 @check_user_rights(entity_type=[Entity.AUDITOR])
-def check_report(request: HttpRequest, entity: Entity):
+def check_report(request: HttpRequest):
     form = CheckReportForm(request.POST, request.FILES)
 
     if not form.is_valid():
@@ -45,6 +44,7 @@ def check_report(request: HttpRequest, entity: Entity):
     data["charge_point_count"] = len(charge_point_audits)
     data["errors"] = []
     data["error_count"] = 0
+    data["comment_count"] = audited_charge_points.exclude(comment="").count()
 
     if len(errors) > 0:
         data["errors"] = errors
