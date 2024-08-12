@@ -6,6 +6,12 @@ from django.urls import reverse
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from elec.models import ElecChargePoint, ElecChargePointApplication
+import copy
+from core.tests_utils import setup_current_user
+from core.models import Entity
+from django.test import TestCase
+from django.urls import reverse
+from elec.models import ElecChargePointApplication, ElecChargePoint, ElecMeter
 
 
 class ElecCharginPointsTest(TestCase):
@@ -29,6 +35,16 @@ class ElecCharginPointsTest(TestCase):
             "gogogo",
             [(self.cpo, "RW"), (self.admin, "ADMIN")],
         )
+
+        meter_data = dict(
+            mid_certificate="123-456",
+            initial_index=1000.123,
+            initial_index_date=datetime.date(2023, 6, 29),
+            charge_point=None,
+        )
+
+        self.meter = ElecMeter.objects.create(**meter_data)
+        self.meter2 = ElecMeter.objects.create(**meter_data)
 
     def test_get_applications_wrong_entity(self):
         response = self.client.get(
@@ -55,9 +71,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -72,9 +86,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter2,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -129,9 +141,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -140,15 +150,16 @@ class ElecCharginPointsTest(TestCase):
             cpo_siren="12345",
         )
 
+        self.meter.charge_point = charge_point
+        self.meter.save()
+
         charge_point2 = ElecChargePoint.objects.create(
             application=application2,
             cpo=self.cpo,
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter2,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -156,6 +167,9 @@ class ElecCharginPointsTest(TestCase):
             cpo_name="Bob",
             cpo_siren="67890",
         )
+
+        self.meter2.charge_point = charge_point2
+        self.meter2.save()
 
         response = self.client.get(
             reverse("elec-admin-charge-points-get-charge-points"),
@@ -208,7 +222,6 @@ class ElecCharginPointsTest(TestCase):
 
     def test_get_application_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-        application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
 
         charge_point = ElecChargePoint.objects.create(
             application=application,
@@ -216,9 +229,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -227,22 +238,8 @@ class ElecCharginPointsTest(TestCase):
             cpo_siren="12345",
         )
 
-        ElecChargePoint.objects.create(
-            application=application2,
-            cpo=self.cpo,
-            charge_point_id="ABCDE",
-            current_type="AC",
-            installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
-            measure_reference_point_id="123456",
-            station_name="Station",
-            station_id="FGHIJ",
-            nominal_power=40,
-            cpo_name="Bob",
-            cpo_siren="67890",
-        )
+        self.meter.charge_point = charge_point
+        self.meter.save()
 
         response = self.client.get(
             reverse("elec-admin-charge-points-get-application-details"),

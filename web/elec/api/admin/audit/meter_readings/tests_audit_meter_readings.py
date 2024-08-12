@@ -2,6 +2,9 @@
 
 import datetime
 
+import copy
+from core.tests_utils import setup_current_user
+from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
 
@@ -13,6 +16,7 @@ from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
+from elec.models.elec_meter import ElecMeter
 
 
 class ElecAdminAuditMeterReadingsTest(TestCase):
@@ -37,6 +41,16 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             [(self.cpo, "RW"), (self.admin, "ADMIN")],
         )
 
+        meter_data = dict(
+            mid_certificate="123-456",
+            initial_index=1000.123,
+            initial_index_date=datetime.date(2023, 6, 29),
+            charge_point=None,
+        )
+
+        self.meter = ElecMeter.objects.create(**meter_data)
+        self.meter2 = ElecMeter.objects.create(**meter_data)
+
     def create_application(self):
         charge_point_application = ElecChargePointApplication.objects.create(cpo=self.cpo)
 
@@ -46,9 +60,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             charge_point_id="ABCDE12345",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -59,15 +71,16 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             longitude=2.3522,
         )
 
+        self.meter.charge_point = charge_point1
+        self.meter.save()
+
         charge_point2 = ElecChargePoint.objects.create(
             application=charge_point_application,
             cpo=self.cpo,
             charge_point_id="FGX10398",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 12),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter2,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -78,13 +91,16 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             longitude=2.1522,
         )
 
+        self.meter2.charge_point = charge_point2
+        self.meter2.save()
+
         meter_readings_application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=3, year=2023)
 
         meter_reading1 = ElecMeterReading.objects.create(
             extracted_energy=1234,
             renewable_energy=2345,
             reading_date=datetime.date(2023, 8, 29),
-            charge_point=charge_point1,
+            meter=self.meter,
             application=meter_readings_application,
             cpo=self.cpo,
         )
@@ -93,7 +109,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             extracted_energy=8900,
             renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
-            charge_point=charge_point1,
+            meter=self.meter,
             application=meter_readings_application,
             cpo=self.cpo,
         )
@@ -102,7 +118,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             extracted_energy=8900,
             renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
-            charge_point=charge_point2,
+            meter=self.meter2,
             application=meter_readings_application,
             cpo=self.cpo,
         )
@@ -124,6 +140,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         )
         assert response.status_code == 200
         data = response.json()["data"]
+
         assert len(data["charge_points"]) == 1
         assert application.status == ElecChargePointApplication.PENDING
         audit_sample = application.audit_sample.first()
