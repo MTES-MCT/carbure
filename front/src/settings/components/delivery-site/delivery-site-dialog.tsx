@@ -10,10 +10,9 @@ import Button from "common/components/button"
 import { Return } from "common/components/icons"
 import { Dialog } from "common/components/dialog"
 import { formatCelsiusDegree, formatNumber, formatPercentage } from "common/utils/formatters"
-import { DeliverySiteForm } from "./create-delivery-site-form"
 import Form from "common/components/form"
 import { RadioGroup } from "common/components/radio"
-import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
+import { depotTypeOptions } from "./delivery-site.const"
 import useEntity from "carbure/hooks/entity"
 import Checkbox from "common/components/checkbox"
 import { Row } from "common/components/scaffold"
@@ -105,7 +104,7 @@ export const DeliverySiteDialog = ({
             {form.thermal_efficiency && (
               <TextInput
                 readOnly
-                label={t("Rendement électrique")}
+                label={t("Rendement thermique ")}
                 value={formatPercentage(form.thermal_efficiency * 100)}
               />
             )}
@@ -113,7 +112,7 @@ export const DeliverySiteDialog = ({
             {form.useful_temperature && (
               <TextInput
                 readOnly
-                label={t("Rendement électrique")}
+                label={t("Température utile")}
                 value={formatCelsiusDegree(form.useful_temperature)}
               />
             )}
