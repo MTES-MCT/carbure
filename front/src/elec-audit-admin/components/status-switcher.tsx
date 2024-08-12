@@ -40,7 +40,7 @@ export const StatusSwitcher = ({
         {
           key: ElecAdminAuditStatus.AuditDone,
           path: ElecAdminAuditStatus.AuditDone.toLowerCase(),
-          label: t("Audit réalisé ({{count}})", { count: auditDoneCount })
+          label: t("Audit à valider ({{count}})", { count: auditDoneCount })
         },
         {
           key: ElecAdminAuditStatus.History,
