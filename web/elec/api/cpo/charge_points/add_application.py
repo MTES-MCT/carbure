@@ -4,8 +4,7 @@ from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.models.elec_charge_point import ElecChargePoint
-from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models import ElecChargePoint, ElecChargePointApplication, ElecMeter
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.services.import_charge_point_excel import import_charge_point_excel
 
@@ -41,22 +40,43 @@ def add_application(request: HttpRequest, entity: Entity):
             cpo=entity, status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED]
         )
 
-        # delete older pending applications
+        # Delete older pending applications
         replaced_applications.delete()
 
         application = ElecChargePointApplication(cpo=entity)
+        application.save()
 
+        # We can't use a bulk_create here because we need the ID of each meter created to associate it to the right charge point
+        meters = []
+        for data in charge_point_data:
+            meter = ElecMeter(
+                mid_certificate=data.pop("mid_id"),
+                initial_index=data.pop("measure_energy"),
+                initial_index_date=data.pop("measure_date"),
+                charge_point=None,
+            )
+            meter.save()
+            meters.append(meter)
+
+        # Prepare charge points to bulk create
         charge_points = [
             ElecChargePoint(
                 **data,
+                current_meter=meter,
                 application=application,
                 cpo=entity,
                 previous_version=replaced_charge_points_by_id.get(data["charge_point_id"])
             )
-            for data in charge_point_data
+            for data, meter in zip(charge_point_data, meters)
         ]
-
-        application.save()
         ElecChargePoint.objects.bulk_create(charge_points)
+
+        new_charge_points = ElecChargePoint.objects.filter(current_meter__in=meters).order_by("id")
+
+        # Associate the right charge point to the right meter
+        for meter, charge_point in zip(meters, new_charge_points):
+            meter.charge_point = charge_point
+
+        ElecMeter.objects.bulk_update(meters, ["charge_point"])
 
     return SuccessResponse()
