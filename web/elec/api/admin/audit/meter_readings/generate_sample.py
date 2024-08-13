@@ -31,7 +31,6 @@ def generate_sample(request):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     application = form.cleaned_data["application_id"]
-
     percentage = (form.cleaned_data["percentage"] or 10) / 100
 
     application_audits = ElecAuditSample.objects.filter(meter_reading_application=application)
@@ -44,6 +43,12 @@ def generate_sample(request):
         return ErrorResponse(GenerateSampleErrors.ALREADY_AUDITED)
 
     charge_points = MeterReadingRepository.get_application_charge_points(application.cpo, application)
+    meter_readings = MeterReadingRepository.get_application_meter_readings(application.cpo, application)
+
+    readings_by_charge_point_id = {}
+    for meter_reading in meter_readings:
+        readings_by_charge_point_id[meter_reading.charge_point.charge_point_id] = meter_reading
+
     charge_point_sample = extract_audit_sample(charge_points, percentage)
 
     new_audit = ElecAuditSample.objects.create(
@@ -52,7 +57,15 @@ def generate_sample(request):
         percentage=percentage * 100,
     )
 
-    charge_point_audits = [ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample]  # fmt:skip
+    charge_point_audits = [
+        ElecAuditChargePoint(
+            audit_sample=new_audit,
+            charge_point=charge_point,
+            meter_reading=readings_by_charge_point_id.get(charge_point.charge_point_id),
+        )
+        for charge_point in charge_point_sample
+    ]
+
     ElecAuditChargePoint.objects.bulk_create(charge_point_audits)
 
     return SuccessResponse(

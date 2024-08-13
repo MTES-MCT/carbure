@@ -12,6 +12,7 @@ export interface ElecAdminAuditSnapshot {
   charge_points_applications_pending: number
   charge_points_applications: number
   meter_readings_applications_history: number
+  meter_readings_applications_audit_done: number
   meter_readings_applications_pending: number
   meter_readings_applications_audit_in_progress: number
   meter_readings_applications: number
@@ -50,6 +51,8 @@ export interface ElecApplicationSample {
   application_id: number
   percentage: number
   charge_points: ElecChargePointPreview[]
+  comment_count?: number
+  auditor_name?: string
 }
 
 export interface ElecMeterReadingsApplicationsData {

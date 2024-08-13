@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Entity, ExternalAdminRights
+from core.models import ExternalAdminRights
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
@@ -30,10 +30,7 @@ def reject_application(request: HttpRequest):
     application = form.cleaned_data["application_id"]
     force_rejection = form.cleaned_data["force_rejection"]
 
-    if (
-        application.status != ElecMeterReadingApplication.PENDING
-        and application.status != ElecMeterReadingApplication.AUDIT_IN_PROGRESS
-    ):
+    if application.status in (ElecMeterReadingApplication.ACCEPTED, ElecMeterReadingApplication.REJECTED):
         return ErrorResponse(400, RejectApplicationError.ALREADY_CHECKED, "Application has already been checked by admin")
 
     if application.status == ElecMeterReadingApplication.PENDING and not force_rejection:

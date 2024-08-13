@@ -86,8 +86,10 @@ def filter_meter_readings_applications(applications, **filters):
 
     if filters.get("status") == "PENDING":
         applications = applications.filter(status=ElecMeterReadingApplication.PENDING)
-    if filters.get("status") == "AUDIT_IN_PROGRESS":
+    elif filters.get("status") == "AUDIT_IN_PROGRESS":
         applications = applications.filter(status=ElecMeterReadingApplication.AUDIT_IN_PROGRESS)
+    elif filters.get("status") == "AUDIT_DONE":
+        applications = applications.filter(status=ElecMeterReadingApplication.AUDIT_DONE)
     elif filters.get("status") == "HISTORY":
         applications = applications.filter(
             status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]

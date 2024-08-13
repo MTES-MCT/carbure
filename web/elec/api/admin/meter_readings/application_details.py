@@ -33,7 +33,7 @@ def get_application_details(request):
 
     charge_points = ChargePointRepository.get_charge_points_for_meter_readings(company)
     previous_application = MeterReadingRepository.get_previous_application(company, application.quarter, application.year)
-    meter_readings = MeterReadingRepository.get_application_meter_readings(company, application)
+    meter_readings = MeterReadingRepository.get_application_meter_readings_summary(company, application)
 
     meter_readings_data = create_meter_readings_data(charge_points, previous_application, meter_readings)
 

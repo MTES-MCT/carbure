@@ -1,7 +1,6 @@
 import os
 import datetime
 from decimal import Decimal
-from pprint import pprint
 from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
@@ -69,6 +68,25 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(data["error"], "WRONG_ENTITY_TYPE")
 
     def test_check_full_ac_charge_point_errors(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.save()
+
+        ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="FRBBBB222203",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            mid_id="123-456",
+            measure_date=datetime.date(2023, 6, 29),
+            measure_energy=1000.1234,
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+        )
+
         filepath = "%s/web/elec/fixtures/full_ac_charge_points_error.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -84,8 +102,6 @@ class ElecCharginPointsTest(TestCase):
             "data": {
                 "file_name": "full_ac_charge_points_error.xlsx",
                 "charge_point_count": 0,
-                "replaced": [],
-                "replaced_count": 0,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -141,9 +157,13 @@ class ElecCharginPointsTest(TestCase):
                             ]
                         },
                     },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 41,
+                        "meta": {"charge_point_id": ["Le point de recharge FRBBBB222203 existe déjà"]},
+                    },
                 ],
-                "error_count": 6,
-                "pending_application_already_exists": False,
+                "error_count": 7,
             },
             "error": "VALIDATION_FAILED",
         }
@@ -169,9 +189,6 @@ class ElecCharginPointsTest(TestCase):
                 "charge_point_count": 6,
                 "errors": [],
                 "error_count": 0,
-                "replaced": [],
-                "replaced_count": 0,
-                "pending_application_already_exists": False,
             },
         }
 

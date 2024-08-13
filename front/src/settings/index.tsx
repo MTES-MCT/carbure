@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-import DeliverySitesSettings from "./components/delivery-site"
+import DeliverySitesSettings from "./components/delivery-site/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
 
 import useEntity from "carbure/hooks/entity"

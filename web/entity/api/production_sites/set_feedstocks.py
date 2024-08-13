@@ -1,12 +1,12 @@
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
-from core.decorators import check_rights
+from core.decorators import check_user_rights
 from core.models import CarbureLot, GenericError, MatierePremiere, UserRights
 from django.http import JsonResponse
 from producers.models import ProductionSite, ProductionSiteInput
 
 
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def set_production_site_feedstocks(request, *args, **kwargs):
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def set_production_site_feedstocks(request, entity, entity_id):
     site = request.POST.get("production_site_id")
     mp_list = request.POST.getlist("matiere_premiere_codes")
 
