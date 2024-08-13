@@ -5,11 +5,11 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import * as api from "elec-auditor/api"
-import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus } from "elec-auditor/types"
+import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStates, ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { To, useLocation, useMatch } from "react-router-dom"
 import ApplicationDetailsDialog from "./details"
 import ApplicationsFilters from "./list-filters"
-import { useApplicationsQuery } from "./list-query"
+import { useQueryBuilder } from "../../common/hooks/query-builder"
 import { useApplicationsQueryParamsStore } from "./list-query-params-store"
 import { StatusSwitcher } from "./status-switcher"
 import ApplicationsTable from "./table"
@@ -27,7 +27,7 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   const location = useLocation()
 
   const [state, actions] = useApplicationsQueryParamsStore(entity, year, status, snapshot)
-  const query = useApplicationsQuery(state)
+  const query = useQueryBuilder<ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot>(state);
   const auditApplicationsResponse = useQuery(api.getApplications, {
     key: "elec-audit-applications",
     params: [query],

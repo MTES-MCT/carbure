@@ -12,6 +12,7 @@ import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-cer
 import {
   ElecAdminSnapshot,
   ElecAdminTransferCertificateFilter,
+  ElecAdminTransferCertificateFilterSelection,
 } from "elec-admin/types"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
@@ -22,6 +23,7 @@ import ElecAdminTransferDetailsDialog from "./details"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
+import { useQueryBuilder } from "common/hooks/query-builder"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -40,7 +42,8 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
     status,
     snapshot
   )
-  const query = useAdminTransferCertificatesQuery(state)
+  const query = useQueryBuilder<ElecAdminTransferCertificateFilterSelection, ElecAdminSnapshot>(state);
+
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
     params: [query],

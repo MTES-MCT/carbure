@@ -38,8 +38,6 @@ export function getApplications(query: ElecAuditorApplicationsQuery) {
 const QUERY_RESET: Partial<ElecAuditorApplicationsQuery> = {
   limit: undefined,
   from_idx: undefined,
-  sort_by: undefined,
-  order: undefined,
 }
 
 export async function getFilters(

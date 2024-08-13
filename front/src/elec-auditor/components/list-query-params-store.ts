@@ -80,6 +80,7 @@ export function useApplicationsQueryParamsStore(
 
       setOrder: (order: Order | undefined) => ({
         order,
+
       }),
 
       setSelection: (selection: number[]) => ({

@@ -6,6 +6,7 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   ElecAdminAuditFilter,
+  ElecAdminAuditFilterSelection,
   ElecAdminAuditSnapshot,
   ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
@@ -19,6 +20,7 @@ import ElecAdminAuditFilters from "../list-filters"
 import { useElectAdminAuditQuery } from "../list-query"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
 import { usePageTitle } from "./page-title"
+import { useQueryBuilder } from "common/hooks/query-builder"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -40,7 +42,8 @@ const MeterReadingsApplicationsList = ({
     snapshot,
     usePageTitle
   )
-  const query = useElectAdminAuditQuery(state)
+  const query = useQueryBuilder<ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot>(state);
+
   const meterReadingsApplicationsResponse = useQuery(
     api.getMeterReadingsApplications,
     {

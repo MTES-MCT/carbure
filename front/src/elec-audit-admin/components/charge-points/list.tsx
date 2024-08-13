@@ -6,6 +6,7 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   ElecAdminAuditFilter,
+  ElecAdminAuditFilterSelection,
   ElecAdminAuditSnapshot,
   ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
@@ -19,8 +20,8 @@ import ElecAdminAuditFilters from "../list-filters"
 import { StatusSwitcher } from "../status-switcher"
 import ChargePointsApplicationDetailsDialog from "./details"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
-import { useElectAdminAuditQuery } from "../list-query"
 import { usePageTitle } from "./page-title"
+import { useQueryBuilder } from "common/hooks/query-builder"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -43,7 +44,7 @@ const ChargePointsApplicationsList = ({
     snapshot,
     usePageTitle
   )
-  const query = useElectAdminAuditQuery(state)
+  const query = useQueryBuilder<ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot>(state);
   const chargePointsApplicationsResponse = useQuery(
     apiAudit.getChargePointsApplications,
     {
@@ -153,3 +154,4 @@ export function useAutoStatus() {
     matchStatus?.params?.status?.toUpperCase() as ElecAdminAuditStatus
   return status ?? ElecAdminAuditStatus.Pending
 }
+

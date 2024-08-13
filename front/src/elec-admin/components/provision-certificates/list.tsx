@@ -8,6 +8,7 @@ import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provi
 import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
 import {
   ElecAdminProvisionCertificateFilter,
+  ElecAdminProvisionCertificateFilterSelection,
   ElecAdminProvisionCertificateStatus,
   ElecAdminSnapshot,
 } from "elec-admin/types"
@@ -19,6 +20,7 @@ import ElecAdminProvisionDetailsDialog from "./details"
 import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
+import { useQueryBuilder } from "common/hooks/query-builder"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -34,7 +36,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     status,
     snapshot
   )
-  const query = useProvisionCertificatesQuery(state)
+  const query = useQueryBuilder<ElecAdminProvisionCertificateFilterSelection, ElecAdminSnapshot>(state);
   const location = useLocation()
 
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
