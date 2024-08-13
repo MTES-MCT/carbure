@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("elec", "0035_elecauditsample_auditor_elecauditsample_cpo_and_more"),
+        ("elec", "0039_alter_elecauditchargepoint_observed_energy_reading"),
     ]
 
     operations = [
