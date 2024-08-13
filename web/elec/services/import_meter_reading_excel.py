@@ -7,6 +7,7 @@ from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
+from elec.models.elec_meter import ElecMeter
 
 
 def import_meter_reading_excel(
@@ -58,7 +59,7 @@ class ExcelMeterReadings:
 
 
 class ExcelMeterReadingValidator(Validator):
-    charge_point_id = forms.CharField()
+    meter = forms.ModelChoiceField(queryset=ElecMeter.objects.all())
     extracted_energy = forms.FloatField(min_value=0)
     reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     renewable_energy = forms.FloatField()
@@ -76,7 +77,7 @@ class ExcelMeterReadingValidator(Validator):
         self.context["charge_point"] = charge_point
         self.context["previous_extracted_energy"] = previous_extracted_energy
 
-        meter_reading["charge_point_id"] = charge_point.pk if charge_point else None
+        meter_reading["meter"] = charge_point.current_meter if charge_point else None
         meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share  # fmt:skip
 
         return meter_reading
