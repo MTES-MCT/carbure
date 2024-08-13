@@ -11,7 +11,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
-
 @require_POST
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def create_depot(request, entity, entity_id):
@@ -61,7 +60,7 @@ def send_email_to_user(entity, depot_name, user):
 
 def send_email_to_dgec(entity, depot_name, user):
     today = datetime.now().strftime("%d/%m/%Y")
-    recipient_list = ["carbure@beta.gouv.fr"] 
+    recipient_list = ["carbure@beta.gouv.fr"]
     admin_link = f"{CarbureEnv.get_base_url()}/admin/core/depot/?is_enabled=False"
     text_message = f"""
     Bonjour,

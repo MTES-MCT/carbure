@@ -10,6 +10,27 @@ class DepotSerializer(serializers.ModelSerializer):
         model = Depot
         fields = "__all__"
 
+    def validate(self, data):
+        if data.get("depot_type") == Depot.COGENERATION_PLANT:
+            if (
+                data.get("thermal_efficiency") is None
+                or data.get("electrical_efficiency") is None
+                or data.get("useful_temperature") is None
+            ):
+                raise serializers.ValidationError(
+                    "Les paramètres thermal_efficiency, electrical_efficiency et useful_temperature sont obligatoires"
+                )
+
+        elif data.get("depot_type") == Depot.HEAT_PLANT:
+            if data.get("thermal_efficiency") is None:
+                raise serializers.ValidationError("Le paramètre thermal_efficiency est obligatoire")
+
+        elif data.get("depot_type") == Depot.POWER_PLANT:
+            if data.get("electrical_efficiency") is None:
+                raise serializers.ValidationError("Le paramètre electrical_efficiency est obligatoire")
+
+        return data
+
     def create(self, validated_data):
         validated_data["country"] = validated_data.pop("country_code")
         validated_data["entity"] = validated_data.pop("entity_id")
