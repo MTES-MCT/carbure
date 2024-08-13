@@ -18,8 +18,9 @@ import * as api from "elec-admin/api"
 import ElecAdminAuditFilters from "../list-filters"
 import { StatusSwitcher } from "../status-switcher"
 import ChargePointsApplicationDetailsDialog from "./details"
-import { useElectAdminAuditQuery } from "./list-query"
-import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
+import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
+import { useElectAdminAuditQuery } from "../list-query"
+import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -39,7 +40,8 @@ const ChargePointsApplicationsList = ({
     entity,
     year,
     status,
-    snapshot
+    snapshot,
+    usePageTitle
   )
   const query = useElectAdminAuditQuery(state)
   const chargePointsApplicationsResponse = useQuery(
