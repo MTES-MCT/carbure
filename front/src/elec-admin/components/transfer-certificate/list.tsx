@@ -8,7 +8,6 @@ import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
-import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
 import {
   ElecAdminSnapshot,
   ElecAdminTransferCertificateFilter,
@@ -24,6 +23,7 @@ import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
 import { useQueryBuilder } from "common/hooks/query-builder"
+import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -40,7 +40,8 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
     entity,
     year,
     status,
-    snapshot
+    snapshot,
+    usePageTitle
   )
   const query = useQueryBuilder<ElecAdminTransferCertificateFilterSelection, ElecAdminSnapshot>(state);
 

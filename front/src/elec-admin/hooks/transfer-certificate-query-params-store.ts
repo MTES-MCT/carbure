@@ -2,25 +2,24 @@ import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
-import useTitle from "common/hooks/title"
 import {
   ElecAdminSnapshot,
   ElecAdminTransferCertificateFilterSelection,
   ElecAdminTransferCertificateStates,
 } from "elec-admin/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
-import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
 
 export function useAdminTransferCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecTransferCertificateStatus,
-  snapshot?: ElecAdminSnapshot
+  snapshot?: ElecAdminSnapshot,
+  onUpdatePageTitle?: (state: ElecAdminTransferCertificateStates) => void
+
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
-
   const [state, actions] = useStore(
     {
       entity,
@@ -28,9 +27,7 @@ export function useAdminTransferCertificateQueryParamsStore(
       snapshot,
       status,
       filters: filtersParams,
-      // search: undefined,
-      // invalid: false,
-      // deadline: false,
+      search: undefined,
       order: undefined,
       selection: [],
       page: 0,
@@ -40,8 +37,6 @@ export function useAdminTransferCertificateQueryParamsStore(
       setEntity: (entity: Entity) => ({
         entity,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
         page: 0,
       }),
@@ -49,8 +44,6 @@ export function useAdminTransferCertificateQueryParamsStore(
       setYear: (year: number) => ({
         year,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
         page: 0,
       }),
@@ -58,8 +51,6 @@ export function useAdminTransferCertificateQueryParamsStore(
       setSnapshot: (snapshot: ElecAdminSnapshot) => ({
         snapshot,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
         page: 0,
       }),
@@ -68,21 +59,10 @@ export function useAdminTransferCertificateQueryParamsStore(
         return {
           status,
           filters: filtersParams,
-          // invalid: false,
-          // deadline: false,
           selection: [],
           page: 0,
         }
       },
-
-      // setType: (type: ElecCPOQ) => {
-      //   return {
-      //     type,
-      //     filters: filtersParams,
-      //     selection: [],
-      //     page: 0,
-      //   }
-      // },
 
       setFilters: (filters: ElecAdminTransferCertificateFilterSelection) => {
         setTimeout(() => {
@@ -126,7 +106,7 @@ export function useAdminTransferCertificateQueryParamsStore(
   )
 
   // sync tab title with current state
-  usePageTitle(state)
+  onUpdatePageTitle && onUpdatePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
@@ -148,22 +128,4 @@ export function useAdminTransferCertificateQueryParamsStore(
   }
 
   return [state, actions] as [typeof state, typeof actions]
-}
-
-export function usePageTitle(state: ElecAdminTransferCertificateStates) {
-  const { t } = useTranslation()
-
-  const statuses: any = {
-    [ElecTransferCertificateStatus.Pending]:
-      t("Énergie cédée") + " " + t("en attente"),
-    [ElecTransferCertificateStatus.Accepted]:
-      t("Énergie cédée") + " " + t("acceptée"),
-    [ElecTransferCertificateStatus.Rejected]:
-      t("Énergie cédée") + " " + t("rejetée"),
-  }
-  const entity = state.entity.name
-  const year = state.year
-  const status = statuses[state.status.toUpperCase()]
-
-  useTitle(`${entity} ∙ ${status} ${year}`)
 }
