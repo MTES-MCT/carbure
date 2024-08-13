@@ -327,6 +327,7 @@ class Depot(models.Model):
     OTHER = "OTHER"
     EFS = "EFS"
     EFPE = "EFPE"
+    EFCA = "EFCA"
     OILDEPOT = "OIL DEPOT"
     BIOFUELDEPOT = "BIOFUEL DEPOT"
     HEAT_PLANT = "HEAT PLANT"
@@ -337,6 +338,7 @@ class Depot(models.Model):
         (OTHER, "Autre"),
         (EFS, "EFS"),
         (EFPE, "EFPE"),
+        (EFCA, "EFCA"),
         (OILDEPOT, "OIL DEPOT"),
         (BIOFUELDEPOT, "BIOFUEL DEPOT"),
         (HEAT_PLANT, "HEAT PLANT"),
@@ -385,10 +387,10 @@ class Depot(models.Model):
         fields_to_clear = {
             "POWER PLANT": ["thermal_efficiency", "useful_temperature"],
             "HEAT PLANT": ["electrical_efficiency", "useful_temperature"],
-            "COGENERATION PLANT": ["electrical_efficiency", "thermal_efficiency"],
+            "COGENERATION PLANT": [],
         }
 
-        fields = fields_to_clear.get(self.depot_type, [])
+        fields = fields_to_clear.get(self.depot_type, ["electrical_efficiency", "useful_temperature", "thermal_efficiency"])
         for field in fields:
             setattr(self, field, None)
 
