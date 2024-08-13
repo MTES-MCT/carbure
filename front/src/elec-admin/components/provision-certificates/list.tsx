@@ -21,6 +21,7 @@ import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
 import { useQueryBuilder } from "common/hooks/query-builder"
+import { usePageTitle } from "./page-title"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -34,7 +35,8 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     entity,
     year,
     status,
-    snapshot
+    snapshot,
+    usePageTitle
   )
   const query = useQueryBuilder<ElecAdminProvisionCertificateFilterSelection, ElecAdminSnapshot>(state);
   const location = useLocation()

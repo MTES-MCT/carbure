@@ -2,14 +2,12 @@ import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
-import useTitle from "common/hooks/title"
 import {
   ElecAdminProvisionCertificateFilterSelection,
   ElecAdminProvisionCertificateStates,
   ElecAdminProvisionCertificateStatus,
   ElecAdminSnapshot,
 } from "elec-admin/types"
-import { useTranslation } from "react-i18next"
 import { SafQueryType } from "saf/types"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
 
@@ -17,7 +15,8 @@ export function useProvistionCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAdminProvisionCertificateStatus,
-  snapshot?: ElecAdminSnapshot
+  snapshot?: ElecAdminSnapshot,
+  onUpdatePageTitle?: (state: ElecAdminProvisionCertificateStates) => void
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -29,9 +28,7 @@ export function useProvistionCertificateQueryParamsStore(
       snapshot,
       status,
       filters: filtersParams,
-      // search: undefined,
-      // invalid: false,
-      // deadline: false,
+      search: undefined,
       order: undefined,
       selection: [],
       page: 0,
@@ -41,8 +38,6 @@ export function useProvistionCertificateQueryParamsStore(
       setEntity: (entity: Entity) => ({
         entity,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
         page: 0,
       }),
@@ -50,8 +45,6 @@ export function useProvistionCertificateQueryParamsStore(
       setYear: (year: number) => ({
         year,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
         page: 0,
       }),
@@ -59,8 +52,6 @@ export function useProvistionCertificateQueryParamsStore(
       setSnapshot: (snapshot: ElecAdminSnapshot) => ({
         snapshot,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
         page: 0,
       }),
@@ -69,8 +60,6 @@ export function useProvistionCertificateQueryParamsStore(
         return {
           status,
           filters: filtersParams,
-          // invalid: false,
-          // deadline: false,
           selection: [],
           page: 0,
         }
@@ -127,7 +116,7 @@ export function useProvistionCertificateQueryParamsStore(
   )
 
   // sync tab title with current state
-  usePageTitle(state)
+  onUpdatePageTitle && onUpdatePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
@@ -149,19 +138,4 @@ export function useProvistionCertificateQueryParamsStore(
   }
 
   return [state, actions] as [typeof state, typeof actions]
-}
-
-export function usePageTitle(state: ElecAdminProvisionCertificateStates) {
-  const { t } = useTranslation()
-
-  const statuses: any = {
-    [ElecAdminProvisionCertificateStatus.Available]: t("Énergie attribuée"),
-    [ElecAdminProvisionCertificateStatus.History]: t("Énergie cédée"),
-  }
-
-  const entity = state.entity.name
-  const year = state.year
-  const status = statuses[state.status.toUpperCase()]
-
-  useTitle(`${entity} ∙ ${status} ${year}`)
 }
