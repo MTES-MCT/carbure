@@ -16,8 +16,9 @@ import * as api from "../../api"
 import { StatusSwitcher } from "../status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
 import ElecAdminAuditFilters from "../list-filters"
-import { useElectAdminAuditQuery } from "./list-query"
-import { useElecAdminAuditMeterReadingsQueryParamsStore } from "./list-query-params-store"
+import { useElectAdminAuditQuery } from "../list-query"
+import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
+import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -32,11 +33,12 @@ const MeterReadingsApplicationsList = ({
   const status = useAutoStatus()
   const location = useLocation()
 
-  const [state, actions] = useElecAdminAuditMeterReadingsQueryParamsStore(
+  const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(
     entity,
     year,
     status,
-    snapshot
+    snapshot,
+    usePageTitle
   )
   const query = useElectAdminAuditQuery(state)
   const meterReadingsApplicationsResponse = useQuery(

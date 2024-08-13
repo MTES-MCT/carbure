@@ -2,21 +2,20 @@ import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
-import useTitle from "common/hooks/title"
 import {
   ElecAdminAuditFilterSelection,
   ElecAdminAuditSnapshot,
   ElecAdminAuditStates,
   ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
-import { useTranslation } from "react-i18next"
-import { useFilterSearchParams } from "../../../elec-admin/hooks/provision-certificate-filter-search-params"
+import { useFilterSearchParams } from "../../elec-admin/hooks/provision-certificate-filter-search-params"
 
-export function useElecAdminAuditMeterReadingsQueryParamsStore(
+export function useElecAdminAuditChargePointsQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAdminAuditStatus,
-  snapshot?: ElecAdminAuditSnapshot
+  snapshot?: ElecAdminAuditSnapshot,
+  onUpdatePageTitle?: (state: ElecAdminAuditStates) => void
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -126,7 +125,7 @@ export function useElecAdminAuditMeterReadingsQueryParamsStore(
   )
 
   // sync tab title with current state
-  usePageTitle(state)
+  onUpdatePageTitle && onUpdatePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
@@ -150,17 +149,3 @@ export function useElecAdminAuditMeterReadingsQueryParamsStore(
   return [state, actions] as [typeof state, typeof actions]
 }
 
-export function usePageTitle(state: ElecAdminAuditStates) {
-  const { t } = useTranslation()
-
-  const title = "Relevés des points de recharge"
-  const statuses: any = {
-    [ElecAdminAuditStatus.Pending]: t(title) + " " + t("en attente"),
-    [ElecAdminAuditStatus.History]: t(title) + " " + t("historique"),
-  }
-  const entity = state.entity.name
-  const year = state.year
-  const status = statuses[state.status.toUpperCase()]
-
-  useTitle(`${entity} ∙ ${status} ${year}`)
-}
