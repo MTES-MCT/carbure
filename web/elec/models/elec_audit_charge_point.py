@@ -13,11 +13,11 @@ class ElecAuditChargePoint(models.Model):
 
     audit_sample = models.ForeignKey(ElecAuditSample, on_delete=models.deletion.CASCADE, related_name="audited_charge_points")  # fmt:skip
 
-    is_auditable = models.BooleanField(default=False)
+    is_auditable = models.BooleanField(null=True, blank=True)
     current_type = models.CharField(max_length=2, null=True, blank=True, choices=ElecChargePoint.CURRENT_TYPES)
     observed_mid_or_prm_id = models.CharField(max_length=128, null=True, blank=True)
-    observed_energy_reading = models.FloatField(default=0)
-    has_dedicated_pdl = models.BooleanField(default=False)
+    observed_energy_reading = models.FloatField(null=True, blank=True)
+    has_dedicated_pdl = models.BooleanField(null=True, blank=True)
     audit_date = models.DateField(null=True, blank=True)
     comment = models.CharField(max_length=512, default="")
 

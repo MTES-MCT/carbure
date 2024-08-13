@@ -1,11 +1,10 @@
-from core.decorators import check_rights
+from core.decorators import check_user_rights
 from core.models import EntityDepot
 from django.http import JsonResponse
 
 
-@check_rights("entity_id")
-def get_depots(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
+@check_user_rights()
+def get_depots(request, entity, entity_id):
     try:
         ds = EntityDepot.objects.filter(entity=entity)
         ds = [d.natural_key() for d in ds]

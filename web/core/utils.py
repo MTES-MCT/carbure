@@ -225,3 +225,9 @@ class CarbureEnv:
             return CarbureEnv.base_url_dev
         else:
             return CarbureEnv.base_url_prod
+
+
+# checks if a pandas DataFrame cell contains a truthy value
+def is_true(df, column):
+    values = df[column].astype(str).str.lower()
+    return (values == "true") | (values == "1") | (values == "oui") | (values == "yes") | (values == "x")

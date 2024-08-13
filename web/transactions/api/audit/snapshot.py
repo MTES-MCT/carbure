@@ -1,20 +1,13 @@
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
-
-from core.decorators import check_user_rights, is_auditor
-from core.helpers import (
-    get_auditor_stock,
-)
-
-from core.models import (
-    CarbureLot,
-)
+from core.decorators import check_user_rights
+from core.helpers import get_auditor_stock
+from core.models import CarbureLot, Entity
 from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
-@check_user_rights()
-@is_auditor
-def get_snapshot(request, *args, **kwargs):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def get_snapshot(request):
     year = request.GET.get("year", False)
     if year:
         try:

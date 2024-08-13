@@ -1,15 +1,8 @@
-from django.http import HttpResponse
 from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_admin_rights, check_user_rights, is_admin_or_external_admin
-import boto3
-import os
+from core.decorators import check_user_rights
 from core.models import UserRights
-from doublecount.models import (
-    DoubleCountingApplication,
-)
-from doublecount.serializers import (
-    DoubleCountingApplicationSerializer,
-)
+from doublecount.models import DoubleCountingApplication
+from doublecount.serializers import DoubleCountingApplicationSerializer
 
 
 class DoubleCountingApplicationError:

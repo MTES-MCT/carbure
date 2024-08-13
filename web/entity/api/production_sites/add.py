@@ -1,13 +1,13 @@
 import datetime
 
-from core.decorators import check_rights
+from core.decorators import check_user_rights
 from core.models import Entity, Pays, UserRights
 from django.http import JsonResponse
 from producers.models import ProductionSite
 
 
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def add_production_site(request, *args, **kwargs):
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def add_production_site(request, entity, entity_id):
     country = request.POST.get("country_code")
     name = request.POST.get("name")
     date_mise_en_service = request.POST.get("date_mise_en_service")

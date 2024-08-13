@@ -1,10 +1,10 @@
 from django.http import HttpRequest
-
+from pandas.core.frame import DataFrame
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.services.import_charge_point_excel import import_charge_point_excel
 
@@ -23,23 +23,36 @@ def check_application(request: HttpRequest, entity):
     if not excel_file:
         return ErrorResponse(400, CheckChargePointApplicationError.MISSING_FILE)
 
-    charge_points, errors = import_charge_point_excel(excel_file)
-
+    charge_points, errors, original = import_charge_point_excel(excel_file)
     new_charge_points = [cp["charge_point_id"] for cp in charge_points]
     replaced_charge_points = ChargePointRepository.get_replaced_charge_points(entity, new_charge_points)
+    replaced_charge_points_by_id = replaced_charge_points.values_list("charge_point_id", flat=True)
 
-    replaceable_applications = ElecChargePointApplication.objects.filter(
-        cpo=entity, status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED]
-    )
+    duplicates = {}
+    if isinstance(original, DataFrame):
+        for __, row in original.iterrows():
+            charge_point_id = row["charge_point_id"]
+            if charge_point_id in replaced_charge_points_by_id:
+                duplicates[charge_point_id] = row["line"]
 
     data = {}
     data["file_name"] = excel_file.name
-    data["charge_point_count"] = len(charge_points)
+    data["charge_point_count"] = len(charge_points) - len(duplicates)
     data["errors"] = []
     data["error_count"] = 0
-    data["replaced_count"] = replaced_charge_points.count()
-    data["replaced"] = [cp.charge_point_id for cp in replaced_charge_points]
-    data["pending_application_already_exists"] = replaceable_applications.count() > 0
+
+    if duplicates:
+        for charge_point_id, line in duplicates.items():
+            errors.append(
+                {
+                    "error": "INVALID_DATA",
+                    "line": line,
+                    "meta": {"charge_point_id": [_(f"Le point de recharge {charge_point_id} existe déjà")]},
+                }
+            )
+        data["errors"] = errors
+        data["error_count"] = len(errors)
+        return ErrorResponse(400, CheckChargePointApplicationError.VALIDATION_FAILED, data)
 
     if len(errors) > 0:
         data["errors"] = errors

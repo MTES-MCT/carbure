@@ -36,6 +36,10 @@ export function formatPercentage(num: number) {
   return formatNumber(num) + "%"
 }
 
+export function formatCelsiusDegree(num: number) {
+  return formatNumber(num) + " °C"
+}
+
 export function formatUnit(num: number, unit: Unit) {
   const unitLabel = {
     l: i18next.t("litres", { count: num }),

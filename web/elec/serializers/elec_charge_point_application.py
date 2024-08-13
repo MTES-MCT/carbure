@@ -57,10 +57,14 @@ class ElecChargePointApplicationDetailsSerializer(ElecChargePointApplicationSeri
             return None
 
         audited_charge_points = audit_sample.audited_charge_points.all()
+        comment_count = audited_charge_points.exclude(comment="").count()
+        auditor_name = audit_sample.auditor.name if audit_sample.auditor else None
         charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points)
 
         return {
             "application_id": instance.id,
             "percentage": audit_sample.percentage,
+            "comment_count": comment_count,
+            "auditor_name": auditor_name,
             "charge_points": ElecChargePointSampleSerializer(charge_points, many=True).data,
         }

@@ -1,20 +1,12 @@
 import useEntity from "carbure/hooks/entity"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
-import {
-  AlertCircle,
-  Check,
-  Cross,
-  Download,
-  Plus,
-} from "common/components/icons"
+import { AlertCircle, Download, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
-import Table, { Cell, actionColumn } from "common/components/table"
 import { useQuery } from "common/hooks/async"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ApplicationStatus from "elec/components/application-status"
 import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
 import {
   ElecChargePointsApplication,
@@ -23,9 +15,7 @@ import {
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "elec/api-cpo"
-// import { elecChargePointsApplications } from "elec/__test__/data"
 import Metric from "common/components/metric"
-import { compact } from "common/utils/collection"
 
 import { useMatch } from "react-router-dom"
 import ChargePointsApplicationsTable from "./table"
@@ -68,16 +58,7 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   const isEmpty = applications.length === 0
 
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists =
-      applications.filter(
-        (app) => app.status === ElecAuditApplicationStatus.Pending
-      ).length > 0
-    portal((resolve) => (
-      <ElecChargePointsFileUpload
-        onClose={resolve}
-        pendingApplicationAlreadyExists={pendingApplicationAlreadyExists}
-      />
-    ))
+    portal((resolve) => <ElecChargePointsFileUpload onClose={resolve} />)
   }
 
   function downloadChargePoints() {

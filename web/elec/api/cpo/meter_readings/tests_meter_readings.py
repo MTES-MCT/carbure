@@ -54,6 +54,12 @@ ERROR_METER_READINGS = [
         "current_reading": 600,
         "reading_date": datetime.date(2024, 9, 29),
     },
+    {
+        "charge_point_id": "FR00IJKL",
+        "previous_reading": 500,
+        "current_reading": 800,
+        "reading_date": datetime.date(2024, 9, 29),
+    },
 ]
 
 
@@ -184,6 +190,15 @@ class ElecMeterReadingsTest(TestCase):
             application=self.meter_reading_application,
         )
 
+        self.meter_reading_3 = ElecMeterReading.objects.create(
+            extracted_energy=4,
+            renewable_energy=2,
+            reading_date=datetime.date(2024, 9, 29),
+            charge_point=self.charge_point_3,
+            cpo=self.cpo,
+            application=self.meter_reading_application,
+        )
+
     def test_application_template(self):
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-application-template"),
@@ -238,9 +253,8 @@ class ElecMeterReadingsTest(TestCase):
                     "file_name": "readings.xlsx",
                     "quarter": 3,
                     "year": 2024,
-                    "pending_application_already_exists": False,
                     "meter_reading_count": 2,
-                    "error_count": 1,
+                    "error_count": 2,
                     "errors": [
                         {
                             "error": "INVALID_DATA",
@@ -248,6 +262,11 @@ class ElecMeterReadingsTest(TestCase):
                             "meta": {
                                 "extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]
                             },
+                        },
+                        {
+                            "error": "INVALID_DATA",
+                            "line": 4,
+                            "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
                         },
                     ],
                 },
@@ -285,7 +304,6 @@ class ElecMeterReadingsTest(TestCase):
                     "year": 2024,
                     "errors": [],
                     "error_count": 0,
-                    "pending_application_already_exists": False,
                 },
             },
         )
@@ -381,9 +399,9 @@ class ElecMeterReadingsTest(TestCase):
                     "applications": [
                         {
                             "application_date": application_date,
-                            "charge_point_count": 1,
+                            "charge_point_count": 2,
                             "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                            "energy_total": 24.92,
+                            "energy_total": 26.92,
                             "id": application.id,
                             "quarter": 2,
                             "status": "ACCEPTED",

@@ -98,10 +98,8 @@ const ChargePointsApplicationsList = ({
             onSwitch={actions.setStatus}
             historyCount={snapshot.charge_points_applications_history}
             pendingCount={snapshot.charge_points_applications_pending}
-            // auditDoneCount={snapshot.charge_points_applications_audit_done}
-            auditInProgressCount={
-              snapshot.charge_points_applications_audit_in_progress
-            }
+            auditDoneCount={snapshot.charge_points_applications_audit_done}
+            auditInProgressCount={snapshot.charge_points_applications_audit_in_progress}
           />
         </ActionBar>
 

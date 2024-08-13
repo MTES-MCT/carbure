@@ -1,9 +1,9 @@
-from decimal import Decimal
 import os
 from typing import Iterable
 import requests
 import pandas as pd
 from dateutil.parser import isoparse
+from core.utils import is_true
 
 
 class TransportDataGouv:
@@ -230,8 +230,3 @@ class TransportDataGouv:
 
         # remove the charge points that were not listed in the original imported excel file
         return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]
-
-
-def is_true(df, column):
-    values = df[column].astype(str).str.lower()
-    return (values == "true") | (values == "1") | (values == "oui") | (values == "yes") | (values == "x")

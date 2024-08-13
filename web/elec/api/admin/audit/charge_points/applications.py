@@ -82,8 +82,10 @@ def filter_charge_point_applications(applications, **filters):
 
     if filters["status"] == "PENDING":
         applications = applications.filter(status=ElecChargePointApplication.PENDING)
-    if filters["status"] == "AUDIT_IN_PROGRESS":
+    elif filters["status"] == "AUDIT_IN_PROGRESS":
         applications = applications.filter(status=ElecChargePointApplication.AUDIT_IN_PROGRESS)
+    elif filters["status"] == "AUDIT_DONE":
+        applications = applications.filter(status=ElecChargePointApplication.AUDIT_DONE)
     elif filters["status"] == "HISTORY":
         applications = applications.filter(
             status__in=[ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED]

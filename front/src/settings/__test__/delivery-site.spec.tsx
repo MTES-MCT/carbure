@@ -7,8 +7,8 @@ import { getField, setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
 import { setDeliverySites } from "./api"
 import server from "./server"
-import DeliverySitesSettings from "settings/components/delivery-site"
 import { getDeliverySites } from "settings/api/delivery-sites"
+import DeliverySitesSettings from "settings/components/delivery-site/delivery-site"
 
 const SettingsWithHooks = () => {
   return (

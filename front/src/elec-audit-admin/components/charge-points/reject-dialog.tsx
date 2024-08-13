@@ -1,19 +1,18 @@
 import useEntity from "carbure/hooks/entity"
 import { Button } from "common/components/button"
+import Checkbox from "common/components/checkbox"
 import { Dialog } from "common/components/dialog"
 import { Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import * as api from "../../api"
 import ApplicationStatus from "elec/components/application-status"
 import {
-  ElecChargePointsApplication,
-  ElecAuditApplicationStatus,
+  ElecChargePointsApplication
 } from "elec/types"
-import { Trans, useTranslation } from "react-i18next"
 import { useState } from "react"
-import Checkbox from "common/components/checkbox"
+import { Trans, useTranslation } from "react-i18next"
+import * as api from "../../api"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
   onClose: () => void

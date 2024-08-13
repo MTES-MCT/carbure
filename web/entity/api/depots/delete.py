@@ -1,12 +1,11 @@
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
-from core.decorators import check_rights
+from core.decorators import check_user_rights
 from core.models import CarbureLot, EntityDepot, UserRights
 from django.http import JsonResponse
 
 
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def delete_depot(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def delete_depot(request, entity, entity_id):
     delivery_site_id = request.POST.get("delivery_site_id", False)
 
     try:

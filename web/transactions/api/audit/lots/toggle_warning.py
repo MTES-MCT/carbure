@@ -1,17 +1,11 @@
 import traceback
-
 from django.http.response import JsonResponse
-
-from core.decorators import check_user_rights, is_auditor
-
-from core.models import (
-    GenericError,
-)
+from core.decorators import check_user_rights
+from core.models import Entity, GenericError
 
 
-@check_user_rights()
-@is_auditor
-def toggle_warning(request, *args, **kwargs):
+@check_user_rights(entity_type=[Entity.AUDITOR])
+def toggle_warning(request):
     lot_id = request.POST.get("lot_id")
     errors = request.POST.getlist("errors")
     checked = request.POST.get("checked") == "true"
@@ -33,6 +27,4 @@ def toggle_warning(request, *args, **kwargs):
         return JsonResponse({"status": "success"})
     except:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not update warning"}, status=500
-        )
+        return JsonResponse({"status": "error", "message": "Could not update warning"}, status=500)

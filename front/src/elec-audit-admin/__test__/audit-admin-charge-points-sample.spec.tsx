@@ -53,7 +53,7 @@ test("check the charge points applications listing", async () => {
   screen.getByText("En attente")
   screen.getByText("Refusé")
   screen.getByText("En cours d'audit")
-  screen.getByText("Audit réalisé")
+  screen.getByText("Audit à valider")
   screen.getByText("Accepté")
 })
 

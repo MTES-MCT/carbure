@@ -242,3 +242,16 @@ export function rejectMeterReadingsApplication(
     force_rejection: forceRejection,
   })
 }
+
+
+
+export function downloadAuditReport(
+  entityId: number,
+  sampleId: number
+) {
+  return download("/elec/admin/audit/get-report", {
+    entity_id: entityId,
+    audit_sample_id: sampleId,
+    export: true,
+  })
+}

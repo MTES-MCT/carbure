@@ -14,6 +14,7 @@ import ChargePointsApplicationDetailsInProgress from "./details-in-progress"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
 import ChargePointsApplicationHistory from "./details-history"
 import { ChargePointsApplicationDetailsPending } from "./details-pending"
+import ChargePointsApplicationDetailsAuditDone from "./details-audit-done"
 
 export const ChargePointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -75,16 +76,23 @@ export const ChargePointsApplicationDetailsDialog = () => {
         </header>
         {chargePointApplication?.status ===
           ElecAuditApplicationStatus.Pending && (
-          <ChargePointsApplicationDetailsPending
+            <ChargePointsApplicationDetailsPending
+              chargePointApplication={chargePointApplication}
+              onAccept={acceptApplication}
+              onReject={rejectApplication}
+              onDownloadSample={downloadSample}
+            />
+          )}
+        {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
+          <ChargePointsApplicationDetailsInProgress
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
             onReject={rejectApplication}
             onDownloadSample={downloadSample}
           />
         )}
-        {chargePointApplication?.status ===
-          ElecAuditApplicationStatus.AuditInProgress && (
-          <ChargePointsApplicationDetailsInProgress
+        {chargePointApplication?.status === ElecAuditApplicationStatus.AuditDone && (
+          <ChargePointsApplicationDetailsAuditDone
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
             onReject={rejectApplication}

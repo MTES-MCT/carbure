@@ -1,19 +1,13 @@
 from dateutil.relativedelta import relativedelta
-
-
 import datetime
 import math
 from django.http.response import JsonResponse
-
-from core.decorators import is_admin
-
+from core.decorators import check_admin_rights
 from core.models import Entity, SustainabilityDeclaration, CarbureLot
-from core.serializers import (
-    SustainabilityDeclarationSerializer,
-)
+from core.serializers import SustainabilityDeclarationSerializer
 
 
-@is_admin
+@check_admin_rights()
 def get_declarations(request):
     period = request.GET.get("period", False)
     if not period:

@@ -22,6 +22,14 @@ const SampleSummary = ({ sample }: { sample?: ElecApplicationSample }) => {
           label={t("Pourcentage de puissance installée à auditeur")}
           value={sample?.percentage + "%"}
         />
+
+        {sample?.auditor_name && (
+          <TextInput
+            readOnly
+            label={t("Auditeur")}
+            value={sample?.auditor_name}
+          />
+        )}
       </Form>
     </>
   )

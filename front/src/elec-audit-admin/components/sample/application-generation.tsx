@@ -6,13 +6,7 @@ import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
-import {
-  Check,
-  ChevronLeft,
-  Cross,
-  Download,
-  Send,
-} from "common/components/icons"
+import { Check, ChevronLeft, ChevronRight, Cross, Download, Send } from "common/components/icons"
 import { Api } from "common/services/api"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 import {
@@ -37,9 +31,9 @@ export type GenerationState =
 
 interface ApplicationSampleGenerationProps {
   application:
-    | ElecChargePointsApplicationDetails
-    | ElecMeterReadingsApplicationDetails
-    | undefined
+  | ElecChargePointsApplicationDetails
+  | ElecMeterReadingsApplicationDetails
+  | undefined
   onAccept: (force: boolean) => void
   onReject: (force: boolean) => void
   onDownloadSample: () => void
@@ -160,29 +154,14 @@ export const ApplicationSampleGeneration = ({
             </>
           )}
 
-          {step === "email" && (
-            <>
-              <Alert
-                icon={Send}
-                variant="info"
-                label={t(
-                  "Action requise par l'administrateur pour poursuivre l'audit des points de recharge :"
-                )}
-              >
-                <ul>
-                  <li>
-                    <Trans>
-                      Joindre le fichier téléchargé comportant l'échantillon des
-                      points de recharge à auditer
-                    </Trans>
-                  </li>
-                  <li>
-                    <Trans>Transmettre cet e-mail à l'aménageur</Trans>
-                  </li>
-                </ul>
-              </Alert>
-            </>
-          )}
+          {step === "email" && <>
+            <Alert icon={Send} variant="info" label={t("Action requise par l'administrateur pour poursuivre l'audit des points de recharge :")} >
+              <ul>
+                <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
+                <li><Trans>Transmettre cet e-mail à l'aménageur</Trans></li>
+              </ul>
+            </Alert>
+          </>}
 
           {step === "confirmation" && (
             <>
@@ -224,44 +203,24 @@ export const ApplicationSampleGeneration = ({
         )}
 
         {step === "verification" && (
-          <Button
-            icon={Download}
-            label={t("Télécharger l'échantillon")}
-            variant="primary"
-            action={handleDownloadSample}
-          />
-        )}
-
-        {step === "email" && application && (
           <>
-            <MailtoButton
-              cpo={application.cpo}
-              emailIntro={emailIntro}
-              emailContacts={application.email_contacts!}
-              onGenerate={() => setStep("confirmation")}
-            />
-            <Button
-              asideX
-              icon={ChevronLeft}
-              label={t("Précédent")}
-              variant="secondary"
-              action={() => setStep("verification")}
-            />
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="primary" action={handleDownloadSample} />
+            <Button icon={ChevronRight} label={t("Suivant")} variant="secondary" action={() => setStep("email")} asideX />
           </>
         )}
 
-        {step === "confirmation" && application && (
-          <>
-            <Button
-              icon={Send}
-              label={t("Envoyer en audit")}
-              variant="primary"
-              action={startAudit}
-              disabled={!confirmCheckbox || startAuditQueryLoading}
-              loading={startAuditQueryLoading}
-            />
-          </>
-        )}
+        {step === "email" && application && <>
+          <MailtoButton cpo={application.cpo} emailIntro={emailIntro} emailContacts={application.email_contacts!} onGenerate={() => setStep("confirmation")} />
+          <Button icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={() => setStep("verification")} asideX />
+          <Button icon={ChevronRight} label={t("Suivant")} variant="secondary" action={() => setStep("confirmation")} asideY />
+
+        </>}
+
+        {step === "confirmation" && application && <>
+          <Button icon={Send} label={t("Envoyer en audit")} variant="primary" action={startAudit} disabled={!confirmCheckbox || startAuditQueryLoading} loading={startAuditQueryLoading} />
+          <Button icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={() => setStep("email")} asideX />
+
+        </>}
       </footer>
     </>
   )

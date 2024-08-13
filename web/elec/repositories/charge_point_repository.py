@@ -26,11 +26,7 @@ class ChargePointRepository:
 
     @staticmethod
     def get_registered_charge_points(cpo):
-        return (
-            ElecChargePoint.objects.select_related("application")
-            .filter(cpo=cpo, application__status=ElecChargePointApplication.ACCEPTED, next_version=None)
-            .order_by("charge_point_id")
-        )
+        return ElecChargePoint.objects.select_related("application").filter(cpo=cpo).order_by("charge_point_id")
 
     @staticmethod
     def get_charge_points_for_meter_readings(cpo):

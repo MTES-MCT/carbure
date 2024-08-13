@@ -72,7 +72,7 @@ export const MeterReadingsApplicationRejectDialog = ({
     <Dialog onClose={onClose}>
       <header>
         <ApplicationStatus status={application.status} big />
-        <h1>{t("Refuser les relevé")}</h1>
+        <h1>{t("Refuser les relevés")}</h1>
       </header>
 
       <main>
@@ -84,7 +84,7 @@ export const MeterReadingsApplicationRejectDialog = ({
                 year: application.year,
               }}
               count={application.charge_point_count}
-              defaults="Refuser le relevé des <b>{{count}}</b> points de recharge pour T{{quarter}} {{year}} ."
+              defaults="Refuser le relevé des <b>{{count}}</b> points de recharge pour T{{quarter}} {{year}} ?"
             />
           </p>
 

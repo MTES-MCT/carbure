@@ -14,17 +14,14 @@ import { Trans, useTranslation } from "react-i18next"
 import { checkChargePointsApplication } from "elec/api-cpo"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
-import { ReplaceAlert } from "./replace-alert"
 import { TDGInfo } from "./tdg-info"
 
 type ElecChargePointsFileUploadProps = {
   onClose: () => void
-  pendingApplicationAlreadyExists: boolean
 }
 
 const ElecChargePointsFileUpload = ({
   onClose,
-  pendingApplicationAlreadyExists,
 }: ElecChargePointsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -122,7 +119,6 @@ const ElecChargePointsFileUpload = ({
               {...bind("chargePointsFile")}
             />
           </Form>
-          {pendingApplicationAlreadyExists && <ReplaceAlert />}
         </section>
       </main>
 
