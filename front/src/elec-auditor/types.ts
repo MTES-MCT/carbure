@@ -35,9 +35,6 @@ export interface ElecAuditorApplicationsQuery {
   entity_id: number
   status?: string
   year?: number
-  search?: string
-  sort_by?: string
-  order?: string
   from_idx?: number
   limit?: number
   [ElecAuditorApplicationsFilter.Cpo]?: string[]
@@ -47,7 +44,7 @@ export interface ElecAuditorApplicationsStates {
   entity: Entity
   year: number
   filters: ElecAuditorApplicationsFilterSelection
-  search?: string
+  // search?: string
   status: string
   selection: number[]
   page: number
