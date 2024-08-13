@@ -11,6 +11,7 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
@@ -47,6 +48,13 @@ class ElecCharginPointsTest(TestCase):
             "Tester",
             "gogogo",
             [(self.cpo, "RW"), (self.operator, "RW")],
+        )
+
+        self.meter = ElecMeter.objects.create(
+            mid_certificate="123-456",
+            initial_index=1000.1234,
+            initial_index_date=datetime.date(2023, 6, 29),
+            charge_point=None,
         )
 
     def test_check_charge_point_wrong_entity(self):
@@ -351,9 +359,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -366,9 +372,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="BCDEF",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -479,9 +483,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -496,9 +498,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="BCDEF",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -714,9 +714,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -731,9 +729,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
