@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("elec", "0037_move_data_in_meter_table"),
+        ("elec", "0041_move_data_in_meter_table"),
     ]
 
     operations = [
