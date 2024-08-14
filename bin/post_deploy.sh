@@ -1,8 +1,5 @@
 #! /usr/bin/env bash
 
-# collect static files
-python3 ./web/manage.py collectstatic --noinput
-
 # apply new migrations
 python3 ./web/manage.py migrate --noinput
 
