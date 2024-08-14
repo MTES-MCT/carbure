@@ -325,7 +325,7 @@ class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
     def choices(self, changelist):
         data = list(super(RelatedOnlyDropdownFilter, self).choices(changelist))
         # all elements except select-all
-        tosort = [x for x in data if x["display"] != _("All")]
+        tosort = [x for x in data if x["display"] != _("Tous")]
         sortedlist = sorted(tosort, key=lambda x: x["display"])
         selectall = data[0]
         sortedlist.insert(0, selectall)
