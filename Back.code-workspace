@@ -21,10 +21,6 @@
     "[typescriptreact]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "workbench.colorCustomizations": {
-      "titleBar.activeBackground": "#000000",
-      "titleBar.activeForeground": "#000000"
-    },
     "git.openRepositoryInParentFolders": "always",
     "[python]": {
       "editor.defaultFormatter": "ms-python.black-formatter"
