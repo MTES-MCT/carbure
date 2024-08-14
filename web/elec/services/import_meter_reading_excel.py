@@ -1,6 +1,7 @@
 import pandas as pd
 from typing import Iterable
 from django.core.files.uploadedfile import UploadedFile
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
@@ -85,6 +86,6 @@ class ExcelMeterReadingValidator(Validator):
         previous_extracted_energy = self.context.get("previous_extracted_energy")
 
         if charge_point is None:
-            self.add_error("charge_point_id", "Le point de recharge n'a pas encore été inscrit sur la plateforme.")
+            self.add_error("charge_point_id", _("Le point de recharge n'a pas encore été inscrit sur la plateforme."))
         elif meter_reading.get("extracted_energy", 0) < previous_extracted_energy:
-            self.add_error("extracted_energy", "La quantité d'énergie soutirée est inférieure au précédent relevé.")
+            self.add_error("extracted_energy", _("La quantité d'énergie soutirée est inférieure au précédent relevé."))

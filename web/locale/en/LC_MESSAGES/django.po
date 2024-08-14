@@ -1,0 +1,66 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-08-14 12:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: FRENCH <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: web/auth/api/request_activation_link.py:55
+msgid "Utilisateur inconnu."
+msgstr "Unknown user."
+
+#: web/auth/api/request_activation_link.py:58
+msgid "Email"
+msgstr "Email"
+
+#: web/core/admin.py:328
+msgid "Tous"
+msgstr "All"
+
+#: web/elec/services/import_charge_point_excel.py:135
+#, python-brace-format
+msgid ""
+"Le point de recharge {charge_point_id} n'est pas listé dans les données "
+"consolidées de transport.data.gouv.fr"
+msgstr ""
+"The charging point {charge_point_id} is not listed in the consolidated data "
+"of transport.data.gouv.fr"
+
+#: web/elec/services/import_charge_point_excel.py:139
+msgid ""
+"L'identifiant du point de mesure est obligatoire pour les stations ayant au "
+"moins un point de recharge en courant continu."
+msgstr ""
+"The identifier of the measuring point is mandatory for stations with at "
+"least one DC charging point."
+
+#: web/elec/services/import_charge_point_excel.py:142
+msgid "Le numéro MID est obligatoire."
+msgstr "MID number is mandatory."
+
+#: web/elec/services/import_charge_point_excel.py:144
+msgid "La date du dernier relevé est obligatoire."
+msgstr "Date of the last reading is mandatory."
+
+#: web/elec/services/import_charge_point_excel.py:146
+msgid "L'énergie mesurée lors du dernier relevé est obligatoire."
+msgstr "Mesured energy during the last reading is mandatory."
+
+#: web/elec/services/import_meter_reading_excel.py:94
+msgid "Le point de recharge n'a pas encore été inscrit sur la plateforme."
+msgstr "The charging point has not yet been registered on the platform."
+
+#: web/elec/services/import_meter_reading_excel.py:96
+msgid "La quantité d'énergie soutirée est inférieure au précédent relevé."
+msgstr "The amount of energy withdrawn is less than the previous reading."
+
+#: web/transactions/api/lots/add.py:14
+msgid "Le lot n'a pas pu être créé."
+msgstr "The lot could not be created."
