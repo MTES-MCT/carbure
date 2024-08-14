@@ -40,7 +40,7 @@ def search_company(request, *args, **kwargs):
     france = {"name": "France", "name_en": "France", "code_pays": "FR", "is_in_europe": True}
     company_preview = {
         "name": company_found["nom_complet"],
-        "legal_name": company_found["nom_complet"],
+        "legal_name": company_found["nom_raison_sociale"],
         "registration_id": company_found["siren"],
         "registered_address": company_address,
         "registered_city": company_siege["libelle_commune"],
