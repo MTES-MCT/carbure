@@ -1,8 +1,9 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
+import { SnapshotType } from "common/hooks/query-builder"
 import { ElecTransferCertificateStates } from "elec/types-cpo"
 
-export interface ElecAdminSnapshot {
+export interface ElecAdminSnapshot extends SnapshotType {
   provision_certificates: number
   provision_certificates_available: number
   provision_certificates_history: number
@@ -18,6 +19,7 @@ export enum ElecAdminProvisionCertificateStatus {
   Available = "AVAILABLE",
   History = "HISTORY",
 }
+
 
 export type ElecAdminProvisionCertificateFilterSelection = Partial<
   Record<ElecAdminProvisionCertificateFilter, string[]>

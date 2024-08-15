@@ -1,8 +1,9 @@
 import { Entity, EntityPreview, UploadCheckError, UploadCheckReportInfo } from "carbure/types"
 import { Order } from "common/components/table"
+import { SnapshotType } from "common/hooks/query-builder"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 
-export interface ElecAuditorApplicationsSnapshot {
+export interface ElecAuditorApplicationsSnapshot extends SnapshotType {
   charge_points_applications_audit_in_progress: number
   charge_points_applications_audit_done: number
 }

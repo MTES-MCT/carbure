@@ -6,13 +6,14 @@ import useTitle from "common/hooks/title"
 import { ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStates, ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./filter-search-params"
+import { QueryStates, SnapshotType } from "common/hooks/query-builder"
 
 
 export function useApplicationsQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAuditorApplicationsStatus,
-  snapshot?: ElecAuditorApplicationsSnapshot,
+  snapshot?: SnapshotType,
 ) {
 
   const [limit, saveLimit] = useLimit()
@@ -29,7 +30,7 @@ export function useApplicationsQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as ElecAuditorApplicationsStates,
+    } as QueryStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -45,7 +46,7 @@ export function useApplicationsQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: ElecAuditorApplicationsSnapshot) => ({
+      setSnapshot: (snapshot: SnapshotType) => ({
         snapshot,
         filters: filtersParams,
         selection: [],
@@ -104,7 +105,7 @@ export function useApplicationsQueryParamsStore(
   )
 
   // sync tab title with current state
-  usePageTitle(state)
+  // usePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {

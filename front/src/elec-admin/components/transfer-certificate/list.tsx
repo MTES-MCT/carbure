@@ -43,7 +43,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
     snapshot,
     usePageTitle
   )
-  const query = useQueryBuilder<ElecAdminTransferCertificateFilterSelection, ElecAdminSnapshot>(state);
+  const query = useQueryBuilder(state);
 
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",

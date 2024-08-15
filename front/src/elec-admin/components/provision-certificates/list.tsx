@@ -5,7 +5,7 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
-import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
+
 import {
   ElecAdminProvisionCertificateFilter,
   ElecAdminProvisionCertificateFilterSelection,
@@ -36,9 +36,9 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     year,
     status,
     snapshot,
-    usePageTitle
+    // usePageTitle
   )
-  const query = useQueryBuilder<ElecAdminProvisionCertificateFilterSelection, ElecAdminSnapshot>(state);
+  const query = useQueryBuilder(state);
   const location = useLocation()
 
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {

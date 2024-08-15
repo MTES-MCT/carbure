@@ -9,13 +9,15 @@ import {
   ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
 import { useFilterSearchParams } from "../../elec-admin/hooks/provision-certificate-filter-search-params"
+import { QueryStates, SnapshotType } from "common/hooks/query-builder"
+import { Query } from "@testing-library/react"
 
 export function useElecAdminAuditChargePointsQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAdminAuditStatus,
-  snapshot?: ElecAdminAuditSnapshot,
-  onUpdatePageTitle?: (state: ElecAdminAuditStates) => void
+  snapshot?: SnapshotType,
+  onUpdatePageTitle?: (state: Partial<QueryStates>) => void
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -34,7 +36,7 @@ export function useElecAdminAuditChargePointsQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as ElecAdminAuditStates,
+    } as QueryStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -54,7 +56,7 @@ export function useElecAdminAuditChargePointsQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: ElecAdminAuditSnapshot) => ({
+      setSnapshot: (snapshot: SnapshotType) => ({
         snapshot,
         filters: filtersParams,
         // invalid: false,

@@ -10,13 +10,14 @@ import {
 } from "elec-admin/types"
 import { SafQueryType } from "saf/types"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
+import { QueryStates, SnapshotType } from "common/hooks/query-builder"
 
 export function useProvistionCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAdminProvisionCertificateStatus,
-  snapshot?: ElecAdminSnapshot,
-  onUpdatePageTitle?: (state: ElecAdminProvisionCertificateStates) => void
+  snapshot?: SnapshotType,
+  onUpdatePageTitle?: (state: QueryStates) => void
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -33,7 +34,7 @@ export function useProvistionCertificateQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as ElecAdminProvisionCertificateStates,
+    } as QueryStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -49,7 +50,7 @@ export function useProvistionCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: ElecAdminSnapshot) => ({
+      setSnapshot: (snapshot: SnapshotType) => ({
         snapshot,
         filters: filtersParams,
         selection: [],
