@@ -27,7 +27,7 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   const location = useLocation()
 
   const [state, actions] = useApplicationsQueryParamsStore(entity, year, status, snapshot)
-  const query = useQueryBuilder<ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot>(state);
+  const query = useQueryBuilder(state);
   const auditApplicationsResponse = useQuery(api.getApplications, {
     key: "elec-audit-applications",
     params: [query],

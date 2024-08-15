@@ -17,7 +17,6 @@ import * as api from "../../api"
 import { StatusSwitcher } from "../status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
 import ElecAdminAuditFilters from "../list-filters"
-import { useElectAdminAuditQuery } from "../list-query"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
 import { usePageTitle } from "./page-title"
 import { useQueryBuilder } from "common/hooks/query-builder"
@@ -40,9 +39,9 @@ const MeterReadingsApplicationsList = ({
     year,
     status,
     snapshot,
-    usePageTitle
+    // usePageTitle
   )
-  const query = useQueryBuilder<ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot>(state);
+  const query = useQueryBuilder(state);
 
   const meterReadingsApplicationsResponse = useQuery(
     api.getMeterReadingsApplications,

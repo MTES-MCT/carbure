@@ -1,11 +1,12 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
+import { QueryStates, SnapshotType } from "common/hooks/query-builder"
 import {
   ElecChargePointsApplication,
   ElecMeterReadingsApplication,
 } from "elec/types"
 
-export interface ElecAdminAuditSnapshot {
+export interface ElecAdminAuditSnapshot extends SnapshotType {
   charge_points_applications_audit_done: number
   charge_points_applications_audit_in_progress: number
   charge_points_applications_history: number
@@ -76,7 +77,7 @@ export interface ElecAdminAuditQuery {
   // [ElecAdminAuditFilter.Period]?: string[]
 }
 
-export interface ElecAdminAuditStates {
+export interface ElecAdminAuditStates extends QueryStates {
   entity: Entity
   year: number
   filters: ElecAdminAuditFilterSelection

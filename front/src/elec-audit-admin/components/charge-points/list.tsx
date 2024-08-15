@@ -42,9 +42,9 @@ const ChargePointsApplicationsList = ({
     year,
     status,
     snapshot,
-    usePageTitle
+    // usePageTitle
   )
-  const query = useQueryBuilder<ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot>(state);
+  const query = useQueryBuilder(state);
   const chargePointsApplicationsResponse = useQuery(
     apiAudit.getChargePointsApplications,
     {

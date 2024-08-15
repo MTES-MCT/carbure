@@ -1,20 +1,24 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
+import { ElecAdminProvisionCertificateFilter } from "elec-admin/types"
 import { useMemo } from "react"
 
 
+export type SnapshotType = Record<string, number>
 
-export interface QueryStates<TFilterSelection, TSnapshot> {
+export type FilterSelectionType = Record<string, string[]>
+
+export interface QueryStates {
   entity: Entity
   year: number
-  filters: TFilterSelection
+  filters: FilterSelectionType
   search?: string
   status: string
   selection: number[]
   page: number
   limit?: number
   order?: Order
-  snapshot?: TSnapshot
+  snapshot?: SnapshotType
 }
 
 
@@ -31,7 +35,7 @@ interface BaseQuery {
 
 
 
-export function useQueryBuilder<TFilterSelection, TSnapshot>(params: QueryStates<TFilterSelection, TSnapshot>) {
+export function useQueryBuilder(params: QueryStates) {
   const {
     entity,
     year,
@@ -54,7 +58,7 @@ export function useQueryBuilder<TFilterSelection, TSnapshot>(params: QueryStates
       sort_by: order?.column,
       order: order?.direction,
       ...filters,
-    }),
+    } as BaseQuery),
     [entity.id, status, search, limit, order, filters, page, year]
   )
 }
