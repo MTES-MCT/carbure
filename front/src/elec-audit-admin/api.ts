@@ -3,6 +3,7 @@ import {
   ElecChargePointsApplication,
   ElecChargePointsApplicationDetails,
   ElecMeterReadingsApplicationDetails,
+  QUERY_RESET,
 } from "elec/types"
 import {
   ElecAdminAuditFilter,
@@ -12,6 +13,7 @@ import {
   ElecChargePointsApplicationsData,
   ElecMeterReadingsApplicationsData,
 } from "./types"
+import { CBQUERY_RESET } from "common/hooks/query-builder"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/audit/years", {
@@ -47,18 +49,13 @@ export function getChargePointsApplications(query: ElecAdminAuditQuery) {
   )
 }
 
-const QUERY_RESET: Partial<ElecAdminAuditQuery> = {
-  limit: undefined,
-  from_idx: undefined,
-  sort_by: undefined,
-  order: undefined,
-}
+
 
 export async function getElecAdminAuditChargePointsApplicationsFilters(
   field: ElecAdminAuditFilter,
   query: ElecAdminAuditQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
   const result = await api
     .get<Api<string[]>>("/elec/admin/audit/charge-points/filters", { params })
     .then((res) => res.data.data ?? [])
@@ -148,10 +145,10 @@ export function getMeterReadingsApplications(query: ElecAdminAuditQuery) {
 }
 
 export async function getElecAdminAuditMeterReadingsApplicationsFilters(
-  field: ElecAdminAuditFilter,
+  filter: ElecAdminAuditFilter,
   query: ElecAdminAuditQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter, ...query, ...CBQUERY_RESET }
   const result = await api
     .get<Api<string[]>>("/elec/admin/audit/meter-readings/filters", { params })
     .then((res) => res.data.data ?? [])

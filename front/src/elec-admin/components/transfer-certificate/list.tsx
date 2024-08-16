@@ -22,7 +22,7 @@ import ElecAdminTransferDetailsDialog from "./details"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
-import { useQueryBuilder } from "common/hooks/query-builder"
+import { useCBQueryBuilder } from "common/hooks/query-builder"
 import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
@@ -43,7 +43,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
     snapshot,
     usePageTitle
   )
-  const query = useQueryBuilder(state);
+  const query = useCBQueryBuilder(state);
 
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",

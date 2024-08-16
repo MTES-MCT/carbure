@@ -1,9 +1,9 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { SnapshotType } from "common/hooks/query-builder"
+import { CBSnapshotType } from "common/hooks/query-builder"
 import { ElecTransferCertificateStates } from "elec/types-cpo"
 
-export interface ElecAdminSnapshot extends SnapshotType {
+export interface ElecAdminSnapshot extends CBSnapshotType {
   provision_certificates: number
   provision_certificates_available: number
   provision_certificates_history: number

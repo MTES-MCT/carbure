@@ -9,7 +9,7 @@ import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorAppli
 import { To, useLocation, useMatch } from "react-router-dom"
 import ApplicationDetailsDialog from "./details"
 import ApplicationsFilters from "./list-filters"
-import { useQueryBuilder } from "../../common/hooks/query-builder"
+import { useCBQueryBuilder } from "../../common/hooks/query-builder"
 import { useApplicationsQueryParamsStore } from "./list-query-params-store"
 import { StatusSwitcher } from "./status-switcher"
 import ApplicationsTable from "./table"
@@ -27,7 +27,7 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   const location = useLocation()
 
   const [state, actions] = useApplicationsQueryParamsStore(entity, year, status, snapshot)
-  const query = useQueryBuilder(state);
+  const query = useCBQueryBuilder(state);
   const auditApplicationsResponse = useQuery(api.getApplications, {
     key: "elec-audit-applications",
     params: [query],

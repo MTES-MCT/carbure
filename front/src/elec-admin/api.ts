@@ -4,6 +4,7 @@ import {
   ElecMeterReadingsApplication,
   ElecProvisionCertificatesDetails,
   ElecTransferCertificatesDetails,
+  QUERY_RESET,
 } from "elec/types"
 import {
   ElecProvisionCertificatesData,
@@ -36,12 +37,7 @@ export function importProvisionCertificates(entity_id: number, file: File) {
   })
 }
 
-const QUERY_RESET: Partial<ElecAdminProvisionCertificateQuery> = {
-  limit: undefined,
-  from_idx: undefined,
-  sort_by: undefined,
-  order: undefined,
-}
+
 export async function getProvisionCertificateFilters(
   field: ElecAdminProvisionCertificateFilter,
   query: ElecAdminProvisionCertificateQuery

@@ -6,14 +6,14 @@ import useTitle from "common/hooks/title"
 import { ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStates, ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./filter-search-params"
-import { QueryStates, SnapshotType } from "common/hooks/query-builder"
+import { CBQueryStates, CBSnapshotType } from "common/hooks/query-builder"
 
 
 export function useApplicationsQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAuditorApplicationsStatus,
-  snapshot?: SnapshotType,
+  snapshot?: CBSnapshotType,
 ) {
 
   const [limit, saveLimit] = useLimit()
@@ -30,7 +30,7 @@ export function useApplicationsQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as QueryStates,
+    } as CBQueryStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -46,7 +46,7 @@ export function useApplicationsQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: SnapshotType) => ({
+      setSnapshot: (snapshot: CBSnapshotType) => ({
         snapshot,
         filters: filtersParams,
         selection: [],

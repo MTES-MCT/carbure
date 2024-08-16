@@ -1,16 +1,16 @@
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
-import { Grid } from "common/components/scaffold"
-import { defaultNormalizer } from "common/utils/normalize"
+import { Grid } from "common/components/scaffold";
+import { CBFilterSelectionType } from "common/hooks/query-builder";
+import { defaultNormalizer } from "common/utils/normalize";
 import {
-  ElecAdminAuditFilter,
-  ElecAdminAuditFilterSelection,
-} from "elec-audit-admin/types"
-import { useTranslation } from "react-i18next"
+  ElecAdminAuditFilter
+} from "elec-audit-admin/types";
+import { useTranslation } from "react-i18next";
 
 export interface FiltersProps {
   filters: ElecAdminAuditFilter[]
-  selected: ElecAdminAuditFilterSelection
-  onSelect: (filters: ElecAdminAuditFilterSelection) => void
+  selected: CBFilterSelectionType
+  onSelect: (filters: CBFilterSelectionType) => void
   getFilterOptions: (filter: ElecAdminAuditFilter) => Promise<any[]>
 }
 

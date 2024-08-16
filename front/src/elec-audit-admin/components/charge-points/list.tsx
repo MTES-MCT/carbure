@@ -4,24 +4,22 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import * as api from "elec-admin/api"
 import {
   ElecAdminAuditFilter,
-  ElecAdminAuditFilterSelection,
   ElecAdminAuditSnapshot,
-  ElecAdminAuditStatus,
+  ElecAdminAuditStatus
 } from "elec-audit-admin/types"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as apiAudit from "../../api"
-import * as api from "elec-admin/api"
 import ElecAdminAuditFilters from "../list-filters"
 import { StatusSwitcher } from "../status-switcher"
 import ChargePointsApplicationDetailsDialog from "./details"
-import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
 import { usePageTitle } from "./page-title"
-import { useQueryBuilder } from "common/hooks/query-builder"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -34,17 +32,16 @@ const ChargePointsApplicationsList = ({
 }: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
     snapshot,
-    // usePageTitle
+    usePageTitle
   )
-  const query = useQueryBuilder(state);
+  const query = useCBQueryBuilder(state);
   const chargePointsApplicationsResponse = useQuery(
     apiAudit.getChargePointsApplications,
     {
