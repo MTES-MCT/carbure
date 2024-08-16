@@ -1,22 +1,22 @@
 import useEntity from "carbure/hooks/entity"
+import HashRoute from "common/components/hash-route"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
-import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import FilterSelect from "common/molecules/filter-select"
 import {
   ElecTransferCertificateFilter,
   ElecTransferCertificatePreview,
 } from "elec/types"
 import { ElecCPOSnapshot, ElecTransferCertificateStatus } from "elec/types-cpo"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-cpo"
 import { StatusSwitcher } from "./cpo-status-switcher"
-import TransferCertificateFilters from "./filters"
-import ElecTransferCertificateTable from "./table"
-import HashRoute from "common/components/hash-route"
 import ElecTransferDetailsDialog from "./details"
+import ElecTransferCertificateTable from "./table"
 
 type CPOTransferCertificateListProps = {
   snapshot: ElecCPOSnapshot
@@ -29,13 +29,15 @@ const CPOTransferCertificateList = ({
 }: CPOTransferCertificateListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useTransferCertificateQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
     snapshot
   )
-  const query = useTransferCertificatesQuery(state)
+  const { t } = useTranslation()
+
+  const query = useCBQueryBuilder(state)
   const location = useLocation()
 
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
@@ -58,11 +60,18 @@ const CPOTransferCertificateList = ({
 
   const total = transferCertificatesData?.total ?? 0
   const count = transferCertificatesData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecTransferCertificateFilter.Operator]: t("Redevable"),
+    [ElecTransferCertificateFilter.Cpo]: t("Aménageur"),
+    [ElecTransferCertificateFilter.TransferDate]: t("Date d'émission"),
+    [ElecTransferCertificateFilter.CertificateId]: t("Numéro"),
+  }
   return (
     <>
       <Bar>
-        <TransferCertificateFilters
-          filters={FILTERS}
+        <FilterSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>

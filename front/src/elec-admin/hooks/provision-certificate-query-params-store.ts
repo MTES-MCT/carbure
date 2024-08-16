@@ -10,13 +10,13 @@ import {
 } from "elec-admin/types"
 import { SafQueryType } from "saf/types"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
-import { CBQueryStates, CBSnapshotType } from "common/hooks/query-builder"
+import { CBQueryStates, CBSnapshot } from "common/hooks/query-builder"
 
 export function useProvistionCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: string,
-  snapshot?: CBSnapshotType,
+  snapshot?: CBSnapshot,
   onUpdatePageTitle?: (state: CBQueryStates) => void
 ) {
   const [limit, saveLimit] = useLimit()
@@ -50,7 +50,7 @@ export function useProvistionCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: CBSnapshotType) => ({
+      setSnapshot: (snapshot: CBSnapshot) => ({
         snapshot,
         filters: filtersParams,
         selection: [],

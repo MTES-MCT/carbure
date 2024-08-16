@@ -1,12 +1,10 @@
-import { Entity } from "carbure/types"
-import { Order } from "common/components/table"
-import { CBQueryParams, CBQueryStates, CBSnapshotType } from "common/hooks/query-builder"
+import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import {
   ElecChargePointsApplication,
   ElecMeterReadingsApplication,
 } from "elec/types"
 
-export interface ElecAdminAuditSnapshot extends CBSnapshotType {
+export interface ElecAdminAuditSnapshot extends CBSnapshot {
   charge_points_applications_audit_done: number
   charge_points_applications_audit_in_progress: number
   charge_points_applications_history: number

@@ -35,7 +35,6 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   })
 
   const applications = applicationsResponse.result?.data.data ?? []
-  // const applications = elecChargePointsApplications // TEST with applications
 
   const acceptedApplications = applications.filter(
     (app) => app.status === ElecAuditApplicationStatus.Accepted

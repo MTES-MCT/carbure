@@ -4,13 +4,13 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import FilterSelect from "common/molecules/filter-select"
 import * as api from "elec-auditor/api"
-import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStates, ElecAuditorApplicationsStatus } from "elec-auditor/types"
+import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus } from "elec-auditor/types"
+import { useTranslation } from "react-i18next"
 import { To, useLocation, useMatch } from "react-router-dom"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "../../common/hooks/query-builder"
 import ApplicationDetailsDialog from "./details"
-import ApplicationsFilters from "./list-filters"
-import { useCBQueryBuilder } from "../../common/hooks/query-builder"
-import { useApplicationsQueryParamsStore } from "./list-query-params-store"
 import { StatusSwitcher } from "./status-switcher"
 import ApplicationsTable from "./table"
 
@@ -25,8 +25,9 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const location = useLocation()
+  const { t } = useTranslation()
 
-  const [state, actions] = useApplicationsQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   const query = useCBQueryBuilder(state);
   const auditApplicationsResponse = useQuery(api.getApplications, {
     key: "elec-audit-applications",
@@ -46,12 +47,16 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   const auditApplicationsData = auditApplicationsResponse.result?.data.data
   const total = auditApplicationsData?.total ?? 0
   const count = auditApplicationsData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecAuditorApplicationsFilter.Cpo]: t("Aménageur"),
+  }
   return (
     <>
 
       <Bar>
-        <ApplicationsFilters
-          filters={FILTERS}
+        <FilterSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>

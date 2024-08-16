@@ -1,29 +1,28 @@
 import useEntity from "carbure/hooks/entity"
+import Alert from "common/components/alert"
+import Button from "common/components/button"
+import HashRoute from "common/components/hash-route"
+import { Bolt, Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import ElectTransferDetailsDialog, {
+import { formatNumber } from "common/utils/formatters"
+import {
   ElecTransferDetailsDialog,
 } from "elec/components/transfer-certificates/details"
-import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
-import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
+
 import {
   ElecTransferCertificateFilter,
   ElecTransferCertificatePreview,
 } from "elec/types"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-operator"
-import TransferCertificateFilters from "./filters"
 import ElecTransferCertificateTable from "./table"
-import Button from "common/components/button"
-import Alert from "common/components/alert"
-import { Download, Bolt } from "common/components/icons"
-import { useTranslation } from "react-i18next"
-import HashRoute from "common/components/hash-route"
-import { formatNumber } from "common/utils/formatters"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import FilterSelect from "common/molecules/filter-select"
 
 type OperatorTransferCertificateListProps = {
   snapshot: ElecOperatorSnapshot
@@ -36,13 +35,13 @@ const OperatorTransferCertificateList = ({
 }: OperatorTransferCertificateListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useTransferCertificateQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
     snapshot
   )
-  const query = useTransferCertificatesQuery(state)
+  const query = useCBQueryBuilder(state)
   const { t } = useTranslation()
   const location = useLocation()
 
@@ -66,6 +65,13 @@ const OperatorTransferCertificateList = ({
 
   const total = transferCertificatesData?.total ?? 0
   const count = transferCertificatesData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecTransferCertificateFilter.Operator]: t("Redevable"),
+    [ElecTransferCertificateFilter.Cpo]: t("Aménageur"),
+    [ElecTransferCertificateFilter.TransferDate]: t("Date d'émission"),
+    [ElecTransferCertificateFilter.CertificateId]: t("Numéro"),
+  }
   return (
     <>
       <Bar>
@@ -78,8 +84,8 @@ const OperatorTransferCertificateList = ({
       </Bar>
 
       <Bar>
-        <TransferCertificateFilters
-          filters={FILTERS}
+        <FilterSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>

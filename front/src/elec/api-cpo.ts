@@ -1,14 +1,7 @@
-import { api, Api, download } from "common/services/api"
-import {
-  ElecCPOProvisionCertificateFilter,
-  ElecCPOProvisionCertificateQuery,
-  ElecCPOSnapshot,
-  ElecTransferCertificateQuery,
-  ElecProvisionCertificatesData,
-  ElecTransferCertificatesData,
-} from "./types-cpo"
-import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
+import { EntityPreview } from "carbure/types"
+import { CBQUERY_RESET } from "common/hooks/query-builder"
+import { api, Api, download } from "common/services/api"
 import {
   ElecChargePointsApplication,
   ElecChargePointsApplicationCheckInfo,
@@ -16,10 +9,15 @@ import {
   ElecMeterReadingsApplicationCheckInfo,
   ElecMeterReadingsApplicationsResponse,
   ElecProvisionCertificatesDetails,
-  ElecTransferCertificateFilter,
-  ElecTransferCertificatesDetails,
-  QUERY_RESET,
+  ElecTransferCertificatesDetails
 } from "./types"
+import {
+  ElecCPOProvisionCertificateQuery,
+  ElecCPOSnapshot,
+  ElecProvisionCertificatesData,
+  ElecTransferCertificateQuery,
+  ElecTransferCertificatesData
+} from "./types-cpo"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/cpo/years", { params: { entity_id } })
@@ -32,10 +30,10 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 export async function getProvisionCertificateFilters(
-  field: ElecCPOProvisionCertificateFilter,
+  field: string,
   query: ElecCPOProvisionCertificateQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
 
   return api
     .get<
@@ -107,10 +105,10 @@ export function getTransferCertificateDetails(
 }
 
 export async function getTransferCertificateFilters(
-  field: ElecTransferCertificateFilter,
+  field: string,
   query: ElecTransferCertificateQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
 
   return api
     .get<

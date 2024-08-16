@@ -8,9 +8,9 @@ import { useSearchParams } from "react-router-dom"
 
 
 /* Types */
-export type CBSnapshotType = Record<string, number>
+export type CBSnapshot = Record<string, number>
 
-export type CBFilterSelectionType = Record<string, string[]>
+export type CBFilterSelection = Record<string, string[]>
 
 export const CBQUERY_RESET: Partial<CBQueryParams> = {
   limit: undefined,
@@ -21,14 +21,14 @@ export const CBQUERY_RESET: Partial<CBQueryParams> = {
 export interface CBQueryStates {
   entity: Entity
   year: number
-  filters: CBFilterSelectionType
+  filters: CBFilterSelection
   search?: string
   status: string
   selection: number[]
   page: number
   limit?: number
   order?: Order
-  snapshot?: CBSnapshotType
+  snapshot?: CBSnapshot
 }
 
 export interface CBQueryParams {
@@ -81,7 +81,7 @@ export function useCBQueryParamsStore(
   entity: Entity,
   year: number,
   status: string,
-  snapshot?: CBSnapshotType,
+  snapshot?: CBSnapshot,
   onUpdatePageTitle?: (state: CBQueryStates) => void
 ) {
   const [limit, saveLimit] = useLimit()
@@ -121,7 +121,7 @@ export function useCBQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: CBSnapshotType) => ({
+      setSnapshot: (snapshot: CBSnapshot) => ({
         snapshot,
         filters: filtersParams,
         // invalid: false,
@@ -150,7 +150,7 @@ export function useCBQueryParamsStore(
       //   }
       // },
 
-      setFilters: (filters: CBFilterSelectionType) => {
+      setFilters: (filters: CBFilterSelection) => {
         setTimeout(() => {
           setFiltersParams(filters)
         })
@@ -223,7 +223,7 @@ export function useCBQueryParamsStore(
 function useFilterSearchParams() {
   const [filtersParams, setFiltersParams] = useSearchParams()
   const filters = useMemo(() => {
-    const filters: CBFilterSelectionType = {}
+    const filters: CBFilterSelection = {}
     filtersParams.forEach((value, filter) => {
       const fkey = filter as string
       filters[fkey] = filters[fkey] ?? []

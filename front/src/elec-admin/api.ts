@@ -4,7 +4,6 @@ import {
   ElecMeterReadingsApplication,
   ElecProvisionCertificatesDetails,
   ElecTransferCertificatesDetails,
-  QUERY_RESET,
 } from "elec/types"
 import {
   ElecProvisionCertificatesData,
@@ -17,6 +16,7 @@ import {
   ElecAdminTransferCertificateFilter,
   ElecAdminTransferCertificateQuery,
 } from "./types"
+import { CBQUERY_RESET } from "common/hooks/query-builder"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/years", {
@@ -42,7 +42,7 @@ export async function getProvisionCertificateFilters(
   field: ElecAdminProvisionCertificateFilter,
   query: ElecAdminProvisionCertificateQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
 
   return api
     .get<
@@ -108,7 +108,7 @@ export async function getTransferCertificateFilters(
   field: ElecAdminTransferCertificateFilter,
   query: ElecAdminTransferCertificateQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
   return api
     .get<
       Api<{ filter_values: string[] }>
