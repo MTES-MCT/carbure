@@ -33,4 +33,5 @@ urlpatterns = [
     path("clients", get_clients, name="elec-cpo-clients"),
     path("charge-points/", include("elec.api.cpo.charge_points")),
     path("meter-readings/", include("elec.api.cpo.meter_readings")),
+    path("meters/", include("elec.api.cpo.meters")),
 ]
