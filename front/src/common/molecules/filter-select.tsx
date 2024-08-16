@@ -2,36 +2,28 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold";
 import { CBFilterSelectionType } from "common/hooks/query-builder";
 import { defaultNormalizer } from "common/utils/normalize";
-import {
-  ElecAdminAuditFilter
-} from "elec-audit-admin/types";
-import { useTranslation } from "react-i18next";
 
 export interface FiltersProps {
-  filters: ElecAdminAuditFilter[]
+  filterLabels: Record<string, string>
   selected: CBFilterSelectionType
   onSelect: (filters: CBFilterSelectionType) => void
-  getFilterOptions: (filter: ElecAdminAuditFilter) => Promise<any[]>
+  getFilterOptions: (filter: string) => Promise<any[]>
 }
 
-export function ElecAdminAuditFilters({
-  filters,
+export function FilterSelect({
+  filterLabels,
   selected,
   onSelect,
   getFilterOptions,
 }: FiltersProps) {
-  const { t } = useTranslation()
 
-  const filterLabels = {
-    [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
-    [ElecAdminAuditFilter.Quarter]: t("Trimestre"),
-  }
+  const filters = Object.keys(filterLabels)
 
   return (
     <Grid>
       {filters.map((filter) => {
         return (
-          <FilterSelect
+          <FilterMultiSelect
             key={filter}
             field={filter}
             placeholder={filterLabels[filter]}
@@ -47,19 +39,19 @@ export function ElecAdminAuditFilters({
   )
 }
 
-export type FilterSelectProps = { field: ElecAdminAuditFilter } & Omit<
+export type FilterMultiSelectProps = { field: string } & Omit<
   MultiSelectProps<string>,
   "options"
 >
 
-export default ElecAdminAuditFilters
+export default FilterSelect
 
-export const FilterSelect = ({
+export const FilterMultiSelect = ({
   field,
   value = [],
   onChange,
   ...props
-}: FilterSelectProps) => (
+}: FilterMultiSelectProps) => (
   <MultiSelect
     {...props}
     clear

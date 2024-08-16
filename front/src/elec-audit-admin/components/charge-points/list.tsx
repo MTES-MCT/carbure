@@ -16,7 +16,7 @@ import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as apiAudit from "../../api"
-import ElecAdminAuditFilters from "../list-filters"
+import FilterSelect from "../../../common/molecules/filter-select"
 import { StatusSwitcher } from "../status-switcher"
 import ChargePointsApplicationDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
@@ -33,7 +33,7 @@ const ChargePointsApplicationsList = ({
   const entity = useEntity()
   const status = useAutoStatus()
   const location = useLocation()
-
+  const { t } = useTranslation()
   const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
@@ -75,11 +75,17 @@ const ChargePointsApplicationsList = ({
 
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
+    [ElecAdminAuditFilter.Quarter]: t("Trimestre"),
+  }
+
   return (
     <>
       <Bar>
-        <ElecAdminAuditFilters
-          filters={FILTERS}
+        <FilterSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
@@ -96,10 +102,7 @@ const ChargePointsApplicationsList = ({
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
-            historyCount={snapshot.charge_points_applications_history}
-            pendingCount={snapshot.charge_points_applications_pending}
-            auditDoneCount={snapshot.charge_points_applications_audit_done}
-            auditInProgressCount={snapshot.charge_points_applications_audit_in_progress}
+            snapshot={snapshot}
           />
         </ActionBar>
 

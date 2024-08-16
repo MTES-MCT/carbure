@@ -52,7 +52,7 @@ export function getChargePointsApplications(query: ElecAdminAuditQuery) {
 
 
 export async function getElecAdminAuditChargePointsApplicationsFilters(
-  field: ElecAdminAuditFilter,
+  field: string,
   query: ElecAdminAuditQuery
 ) {
   const params = { filter: field, ...query, ...CBQUERY_RESET }
@@ -145,7 +145,7 @@ export function getMeterReadingsApplications(query: ElecAdminAuditQuery) {
 }
 
 export async function getElecAdminAuditMeterReadingsApplicationsFilters(
-  filter: ElecAdminAuditFilter,
+  filter: string,
   query: ElecAdminAuditQuery
 ) {
   const params = { filter, ...query, ...CBQUERY_RESET }
