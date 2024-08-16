@@ -7,19 +7,18 @@ import { useQuery } from "common/hooks/async"
 import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
 import {
   ElecAdminAuditFilter,
-  ElecAdminAuditQuery,
   ElecAdminAuditSnapshot,
   ElecAdminAuditStatus
 } from "elec-audit-admin/types"
 import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
 import { ElecMeterReadingsApplication } from "elec/types"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
-import * as api from "../../api"
 import FilterSelect from "../../../common/molecules/filter-select"
+import * as api from "../../api"
 import { StatusSwitcher } from "../status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
 import { usePageTitle } from "./page-title"
-import { useTranslation } from "react-i18next"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot

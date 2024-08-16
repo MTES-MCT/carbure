@@ -1,19 +1,17 @@
+import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
 import {
   ElecChargePointsApplication,
   ElecChargePointsApplicationDetails,
-  ElecMeterReadingsApplicationDetails,
-  QUERY_RESET,
+  ElecMeterReadingsApplicationDetails
 } from "elec/types"
 import {
-  ElecAdminAuditFilter,
   ElecAdminAuditQuery,
   ElecAdminAuditSnapshot,
   ElecApplicationSample,
   ElecChargePointsApplicationsData,
-  ElecMeterReadingsApplicationsData,
+  ElecMeterReadingsApplicationsData
 } from "./types"
-import { CBQUERY_RESET } from "common/hooks/query-builder"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/audit/years", {

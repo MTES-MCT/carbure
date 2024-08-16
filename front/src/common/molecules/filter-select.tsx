@@ -1,12 +1,12 @@
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold";
-import { CBFilterSelectionType } from "common/hooks/query-builder";
+import { CBFilterSelection } from "common/hooks/query-builder";
 import { defaultNormalizer } from "common/utils/normalize";
 
 export interface FiltersProps {
   filterLabels: Record<string, string>
-  selected: CBFilterSelectionType
-  onSelect: (filters: CBFilterSelectionType) => void
+  selected: CBFilterSelection
+  onSelect: (filters: CBFilterSelection) => void
   getFilterOptions: (filter: string) => Promise<any[]>
 }
 
@@ -46,7 +46,7 @@ export type FilterMultiSelectProps = { field: string } & Omit<
 
 export default FilterSelect
 
-export const FilterMultiSelect = ({
+const FilterMultiSelect = ({
   field,
   value = [],
   onChange,
