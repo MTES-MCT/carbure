@@ -21,11 +21,13 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "nominal_power",
             "cpo_name",
             "cpo_siren",
+            "status",
         ]
 
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
     measure_energy = serializers.SerializerMethodField()
     nominal_power = serializers.SerializerMethodField()
+    status = serializers.CharField(source="application.status", read_only=True)
 
     def get_measure_energy(self, instance):
         return round(instance.measure_energy or 0, 3)
@@ -47,3 +49,17 @@ class ElecChargePointSampleSerializer(serializers.ModelSerializer):
             "measure_reference_point_id",
             "is_article_2",
         ]
+
+
+class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ElecChargePoint
+        fields = [
+            "id",
+            "charge_point_id",
+        ]
+
+
+class ElecChargePointIdSerializer(serializers.Serializer):
+    charge_point_id = serializers.PrimaryKeyRelatedField(queryset=ElecChargePoint.objects.all(), required=True)
