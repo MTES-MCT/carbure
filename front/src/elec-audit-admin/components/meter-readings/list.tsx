@@ -4,22 +4,21 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
 import {
   ElecAdminAuditFilter,
-  ElecAdminAuditFilterSelection,
+  ElecAdminAuditQuery,
   ElecAdminAuditSnapshot,
-  ElecAdminAuditStatus,
+  ElecAdminAuditStatus
 } from "elec-audit-admin/types"
 import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
 import { ElecMeterReadingsApplication } from "elec/types"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
+import ElecAdminAuditFilters from "../list-filters"
 import { StatusSwitcher } from "../status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
-import ElecAdminAuditFilters from "../list-filters"
-import { useElecAdminAuditChargePointsQueryParamsStore } from "../list-query-params-store"
 import { usePageTitle } from "./page-title"
-import { useQueryBuilder } from "common/hooks/query-builder"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -34,14 +33,14 @@ const MeterReadingsApplicationsList = ({
   const status = useAutoStatus()
   const location = useLocation()
 
-  const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
     snapshot,
-    // usePageTitle
+    usePageTitle
   )
-  const query = useQueryBuilder(state);
+  const query = useCBQueryBuilder(state);
 
   const meterReadingsApplicationsResponse = useQuery(
     api.getMeterReadingsApplications,
@@ -67,7 +66,6 @@ const MeterReadingsApplicationsList = ({
     api.downloadMeterReadingsApplication(entity.id, meterReadingApplication.id)
   }
 
-  // const meterReadingsApplicationsData = elecAdminMeterReadingsApplicationsList
   const meterReadingsApplicationsData =
     meterReadingsApplicationsResponse.result?.data.data
 

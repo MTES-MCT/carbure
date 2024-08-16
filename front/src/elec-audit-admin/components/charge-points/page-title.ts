@@ -1,13 +1,12 @@
-import { QueryStates } from "common/hooks/query-builder"
+import { CBQueryStates } from "common/hooks/query-builder"
 import useTitle from "common/hooks/title"
 import {
-  ElecAdminAuditStates,
   ElecAdminAuditStatus
 } from "elec-audit-admin/types"
 import { useTranslation } from "react-i18next"
 
 
-export function usePageTitle(state: ElecAdminAuditStates) {
+export function usePageTitle(state: CBQueryStates) {
   const { t } = useTranslation()
 
   const title = "Inscriptions des points de recharge"

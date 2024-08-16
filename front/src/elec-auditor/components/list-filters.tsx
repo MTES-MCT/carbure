@@ -1,7 +1,6 @@
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold";
 import { defaultNormalizer } from "common/utils/normalize";
-import { ElecAdminAuditFilter, ElecAdminAuditFilterSelection } from "elec-audit-admin/types";
 import { ElecAuditorApplicationsFilter, ElecAuditorApplicationsFilterSelection } from "elec-auditor/types";
 import { useTranslation } from "react-i18next";
 

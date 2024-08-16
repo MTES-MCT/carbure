@@ -20,7 +20,7 @@ import ElecAdminProvisionDetailsDialog from "./details"
 import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
-import { useQueryBuilder } from "common/hooks/query-builder"
+import { useCBQueryBuilder } from "common/hooks/query-builder"
 import { usePageTitle } from "./page-title"
 
 type ProvisionListProps = {
@@ -38,7 +38,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     snapshot,
     // usePageTitle
   )
-  const query = useQueryBuilder(state);
+  const query = useCBQueryBuilder(state);
   const location = useLocation()
 
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
@@ -130,7 +130,7 @@ const FILTERS = [
   ElecAdminProvisionCertificateFilter.OperatingUnit,
 ]
 
-export function useAutoStatus() {
+export function useAutoStatus(): ElecAdminProvisionCertificateStatus {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
   const status =
     matchStatus?.params?.status?.toUpperCase() as ElecAdminProvisionCertificateStatus
