@@ -23,7 +23,7 @@ class ElecSnapshotForm(forms.Form):
 
 @require_GET
 @check_user_rights()
-def get_snapshot(request, *args, **kwargs):
+def get_certificate_snapshot(request, *args, **kwargs):
     snapshot_form = ElecSnapshotForm(request.GET)
 
     if not snapshot_form.is_valid():
