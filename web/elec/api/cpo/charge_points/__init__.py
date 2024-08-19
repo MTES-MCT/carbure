@@ -14,5 +14,5 @@ urlpatterns = [
     path("application-details", get_application_details, name="elec-cpo-charge-points-get-application-details"),
     path("check-application", check_application, name="elec-cpo-charge-points-check-application"),
     path("add-application", add_application, name="elec-cpo-charge-points-add-application"),
-    path("filters", get_charge_points_filters, name="elec-admin-cpo-charge-points-filters"),
+    path("filters", get_charge_points_filters, name="elec-cpo-charge-points-filters"),
 ]
