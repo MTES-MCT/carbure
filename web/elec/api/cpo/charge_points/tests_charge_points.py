@@ -9,6 +9,8 @@ from core.tests_utils import setup_current_user
 from core.models import Entity
 from django.core.files.uploadedfile import SimpleUploadedFile
 from elec.models.elec_charge_point import ElecChargePoint
+from elec.models.elec_meter_reading import ElecMeterReading
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 
 
@@ -337,7 +339,12 @@ class ElecCharginPointsTest(TestCase):
         application2.created_at = datetime.date(2023, 12, 29)
         application2.save()
 
-        charge_point = ElecChargePoint.objects.create(
+        application3 = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application3.created_at = datetime.date(2024, 12, 29)
+        application3.status = "ACCEPTED"
+        application3.save()
+
+        ElecChargePoint.objects.create(
             application=application,
             cpo=self.cpo,
             charge_point_id="ABCDE",
@@ -352,10 +359,10 @@ class ElecCharginPointsTest(TestCase):
             nominal_power=150,
         )
 
-        charge_point2 = ElecChargePoint.objects.create(
+        ElecChargePoint.objects.create(
             application=application2,
             cpo=self.cpo,
-            charge_point_id="ABCDE",
+            charge_point_id="BCDEF",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
             mid_id="123-456",
@@ -397,15 +404,73 @@ class ElecCharginPointsTest(TestCase):
                     "charge_point_count": 1,
                     "power_total": 40,
                 },
+                {
+                    "id": application3.id,
+                    "cpo": cpo,
+                    "status": "ACCEPTED",
+                    "application_date": "2024-12-29",
+                    "station_count": 0,
+                    "charge_point_count": 0,
+                    "power_total": 0,
+                },
             ],
         }
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, expected)
 
+        # With year filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-applications"),
+            {"entity_id": self.cpo.id, "year": 2023},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 2)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-applications"),
+            {"entity_id": self.cpo.id, "year": 2024},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
+        self.assertEqual(data["data"][0]["application_date"], "2024-12-29")
+
+        # With status
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-applications"),
+            {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-applications"),
+            {"entity_id": self.cpo.id, "status": "PENDING"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 2)
+        self.assertEqual(data["data"][0]["status"], "PENDING")
+
+        # With pagination
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-applications"),
+            {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
+
     def test_get_charge_points_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 1, 5)
+        application.save()
         application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application2.created_at = datetime.date(2023, 1, 6)
+        application2.save()
 
         charge_point = ElecChargePoint.objects.create(
             application=application,
@@ -427,7 +492,7 @@ class ElecCharginPointsTest(TestCase):
         charge_point2 = ElecChargePoint.objects.create(
             application=application2,
             cpo=self.cpo,
-            charge_point_id="ABCDE",
+            charge_point_id="BCDEF",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
             mid_id="123-456",
@@ -439,6 +504,38 @@ class ElecCharginPointsTest(TestCase):
             nominal_power=40,
             cpo_name="Bob",
             cpo_siren="67890",
+        )
+
+        meter_reading_application = ElecMeterReadingApplication.objects.create(
+            status=ElecMeterReadingApplication.ACCEPTED,
+            quarter=2,
+            year=2024,
+            cpo=self.cpo,
+        )
+
+        ElecMeterReadingApplication.objects.create(
+            status=ElecMeterReadingApplication.PENDING,
+            quarter=3,
+            year=2024,
+            cpo=self.cpo,
+        )
+
+        ElecMeterReading.objects.create(
+            extracted_energy=40,
+            renewable_energy=20,
+            reading_date=datetime.date(2024, 9, 30),
+            charge_point=charge_point,
+            cpo=self.cpo,
+            application=meter_reading_application,
+        )
+
+        ElecMeterReading.objects.create(
+            extracted_energy=4,
+            renewable_energy=2,
+            reading_date=datetime.date(2024, 9, 29),
+            charge_point=charge_point,
+            cpo=self.cpo,
+            application=meter_reading_application,
         )
 
         response = self.client.get(
@@ -469,7 +566,7 @@ class ElecCharginPointsTest(TestCase):
                 {
                     "id": charge_point2.id,
                     "cpo": self.cpo.name,
-                    "charge_point_id": "ABCDE",
+                    "charge_point_id": "BCDEF",
                     "current_type": "AC",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
@@ -489,6 +586,124 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, expected)
+
+        # With year filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "year": 2022},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "year": 2023},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 2)
+        self.assertEqual(ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.created_at.year, 2023)
+
+        # With status
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "status": "PENDING"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 2)
+        self.assertEqual(ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.status, "PENDING")
+
+        # With created_at filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "created_at": "2023-01-04"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "created_at": "2023-01-05"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
+        self.assertEqual(
+            ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.created_at, datetime.date(2023, 1, 5)
+        )
+
+        # With charge_point_id filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "charge_point_id": "AAAAA"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "charge_point_id": "ABCDE"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
+        self.assertEqual(data["data"][0]["charge_point_id"], "ABCDE")
+
+        # With last_extracted_energy filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "last_extracted_energy": "4"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "last_extracted_energy": "40"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
+
+        # With is_article_2 filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "is_article_2": True},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "is_article_2": False},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 2)
+        self.assertEqual(ElecChargePoint.objects.get(id=data["data"][0]["id"]).is_article_2, False)
+
+        # With pagination
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
 
     def test_get_application_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)

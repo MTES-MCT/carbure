@@ -4,6 +4,7 @@
 import io
 import datetime
 from unittest.mock import patch
+from unittest import mock
 import openpyxl
 from decimal import Decimal
 from core.tests_utils import setup_current_user
@@ -152,6 +153,13 @@ class ElecMeterReadingsTest(TestCase):
         self.meter_reading_application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
             quarter=2,
+            year=2024,
+            cpo=self.cpo,
+        )
+
+        ElecMeterReadingApplication.objects.create(
+            status=ElecMeterReadingApplication.PENDING,
+            quarter=3,
             year=2024,
             cpo=self.cpo,
         )
@@ -367,34 +375,88 @@ class ElecMeterReadingsTest(TestCase):
         self.maxDiff = None
         data = response.json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            {
-                "data": {
-                    "applications": [
-                        {
-                            "application_date": application_date,
-                            "charge_point_count": 2,
-                            "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                            "energy_total": 26.92,
-                            "id": application.id,
-                            "quarter": 2,
-                            "status": "ACCEPTED",
-                            "year": 2024,
-                        }
-                    ],
-                    "current_application": None,
-                    "current_application_period": {
-                        "deadline": "2024-10-15",
-                        "quarter": 3,
-                        "urgency_status": "HIGH",
-                        "year": 2024,
+        expected = {
+            "data": {
+                "applications": [
+                    {
+                        "application_date": application_date,
                         "charge_point_count": 2,
+                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                        "energy_total": 26.92,
+                        "id": mock.ANY,
+                        "quarter": 2,
+                        "status": "ACCEPTED",
+                        "year": 2024,
                     },
+                    {
+                        "application_date": application_date,
+                        "charge_point_count": 0,
+                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                        "energy_total": 0,
+                        "id": application.id,
+                        "quarter": 3,
+                        "status": "PENDING",
+                        "year": 2024,
+                    },
+                ],
+                "current_application": mock.ANY,
+                "current_application_period": {
+                    "deadline": "2024-10-15",
+                    "quarter": 3,
+                    "urgency_status": "HIGH",
+                    "year": 2024,
+                    "charge_point_count": 2,
                 },
-                "status": "success",
             },
+            "status": "success",
+        }
+
+        self.assertEqual(data, expected)
+
+        # With year filter
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "year": 2023},
         )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "year": 2024},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 2)
+        self.assertEqual(data["data"]["applications"][0]["year"], 2024)
+
+        # With status
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "status": "PENDING"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 1)
+        self.assertEqual(data["data"]["applications"][0]["status"], "PENDING")
+
+        # With pagination
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 1)
 
     def test_get_application_details(self):
         response = self.client.get(
