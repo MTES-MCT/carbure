@@ -44,7 +44,9 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
-        return ElecMeterReading.objects.filter(cpo=cpo, application=application).select_related("charge_point")
+        return ElecMeterReading.objects.filter(cpo=cpo, application=application).select_related(
+            "meter", "meter__charge_point"
+        )
 
     @staticmethod
     def get_application_meter_readings_summary(cpo: Entity, application: ElecMeterReadingApplication):

@@ -22,7 +22,7 @@ def import_meter_reading_excel(
     meter_readings_data = ExcelMeterReadings.validate_meter_readings(
         original_meter_readings_data, existing_charge_points, previous_application, renewable_share
     )
-    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data
+    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data  # fmt:skip
 
 
 class ExcelMeterReadings:
