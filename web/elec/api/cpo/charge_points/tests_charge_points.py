@@ -552,10 +552,12 @@ class ElecCharginPointsTest(TestCase):
                     "cpo": self.cpo.name,
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
+                    "application_date": "2023-01-05",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.123,
+                    "latest_extracted_energy": 40,
                     "is_article_2": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
@@ -570,10 +572,12 @@ class ElecCharginPointsTest(TestCase):
                     "cpo": self.cpo.name,
                     "charge_point_id": "BCDEF",
                     "current_type": "AC",
+                    "application_date": "2023-01-06",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.123,
+                    "latest_extracted_energy": 0,
                     "is_article_2": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
@@ -626,10 +630,10 @@ class ElecCharginPointsTest(TestCase):
         assert len(data["data"]) == 2
         assert ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.status == "PENDING"
 
-        # With created_at filter
+        # With application_date filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "created_at": "2023-01-04"},
+            {"entity_id": self.cpo.id, "application_date": "2023-01-04"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -637,7 +641,7 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "created_at": "2023-01-05"},
+            {"entity_id": self.cpo.id, "application_date": "2023-01-05"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -662,10 +666,10 @@ class ElecCharginPointsTest(TestCase):
         assert len(data["data"]) == 1
         assert data["data"][0]["charge_point_id"] == "ABCDE"
 
-        # With last_extracted_energy filter
+        # With latest_extracted_energy filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "last_extracted_energy": "4"},
+            {"entity_id": self.cpo.id, "latest_extracted_energy": "4"},
         )
         data = response.json()
         self.assertEqual(response.status_code, 200)
@@ -673,7 +677,15 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "last_extracted_energy": "40"},
+            {"entity_id": self.cpo.id, "latest_extracted_energy": "40"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "latest_extracted_energy": "0"},
         )
         data = response.json()
         self.assertEqual(response.status_code, 200)
@@ -753,10 +765,12 @@ class ElecCharginPointsTest(TestCase):
                     "cpo": self.cpo.name,
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
+                    "application_date": "2024-08-21",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.123,
+                    "latest_extracted_energy": 0,
                     "is_article_2": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
