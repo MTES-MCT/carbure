@@ -185,9 +185,10 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
-                    "nominal_power": 150,
+                    "nominal_power": 150.0,
                     "cpo_name": "Alice",
                     "cpo_siren": "12345",
+                    "status": "PENDING",
                 },
                 {
                     "id": charge_point2.id,
@@ -202,9 +203,10 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
-                    "nominal_power": 40,
+                    "nominal_power": 40.0,
                     "cpo_name": "Bob",
                     "cpo_siren": "67890",
+                    "status": "PENDING",
                 },
             ],
         }
@@ -255,9 +257,10 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
-                    "nominal_power": 150,
+                    "nominal_power": 150.0,
                     "cpo_name": "Alice",
                     "cpo_siren": "12345",
+                    "status": "PENDING",
                 }
             ],
         }

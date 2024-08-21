@@ -65,9 +65,7 @@ def get_charge_points(request, entity):
 
 
 def filter_charge_points(charge_points, **filters):
-    charge_points = charge_points.prefetch_related(
-        "elec_meter_readings",
-    )
+    charge_points = charge_points.prefetch_related("elec_meters")
 
     if filters["year"]:
         charge_points = charge_points.filter(application__created_at__year=filters["year"])
@@ -87,16 +85,16 @@ def filter_charge_points(charge_points, **filters):
     if filters["charge_point_id"]:
         charge_points = charge_points.filter(charge_point_id=filters["charge_point_id"])
 
-    if filters["last_extracted_energy"] is not None:
-        latest_reading_subquery = (
-            ElecMeterReading.objects.filter(charge_point=OuterRef("pk")).order_by("-reading_date").values("pk")[:1]
-        )
-        charge_points = charge_points.annotate(latest_reading_id=Subquery(latest_reading_subquery))
-        charge_points = charge_points.filter(
-            elec_meter_readings__pk=F("latest_reading_id"),
-            elec_meter_readings__extracted_energy=filters["last_extracted_energy"],
-        )
-        charge_points = charge_points.filter(elec_meter_readings__extracted_energy=filters["last_extracted_energy"])
+    # if filters["last_extracted_energy"] is not None:
+    #     latest_reading_subquery = (
+    #         ElecMeterReading.objects.filter(charge_point=OuterRef("pk")).order_by("-reading_date").values("pk")[:1]
+    #     )
+    #     charge_points = charge_points.annotate(latest_reading_id=Subquery(latest_reading_subquery))
+    #     charge_points = charge_points.filter(
+    #         elec_meter_readings__pk=F("latest_reading_id"),
+    #         elec_meter_readings__extracted_energy=filters["last_extracted_energy"],
+    #     )
+    #     charge_points = charge_points.filter(elec_meter_readings__extracted_energy=filters["last_extracted_energy"])
 
     if filters["is_article_2"]:
         charge_points = charge_points.filter(is_article_2=filters["is_article_2"])
