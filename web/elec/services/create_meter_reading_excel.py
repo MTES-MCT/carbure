@@ -165,7 +165,8 @@ def get_previous_readings_by_charge_point(
     # then if there was a previous registration, use its data to specify the previous reading latest value
     if previous_application:
         for reading in previous_application.elec_meter_readings.all():
-            previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
+            if reading.charge_point:
+                previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
 
     return previous_readings_by_charge_point
 
