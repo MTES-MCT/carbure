@@ -22,9 +22,9 @@ class ElecSnapshotForm(forms.Form):
     entity_id = forms.IntegerField()
     category = forms.CharField()
     year = forms.IntegerField()
-    created_at = forms.DateField(required=False)
+    application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
-    last_extracted_energy = forms.FloatField(required=False)
+    latest_extracted_energy = forms.FloatField(required=False)
     is_article_2 = forms.BooleanField(required=False)
 
 

@@ -20,10 +20,12 @@ def export_charge_points_to_excel(charge_points, entity):
                     # cpo excel data
                     {"label": "Identifiant du point de recharge", "value": "charge_point_id"},
                     {"label": "Type de courant", "value": "current_type"},
+                    {"label": "Date d'inscription", "value": "application_date"},
                     {"label": "Date d'installation date", "value": "installation_date"},
                     {"label": "Identifiant MID", "value": "mid_id"},
                     {"label": "Date du dernier relevé", "value": "measure_date"},
                     {"label": "Énergie mesurée lors du dernier relevé", "value": "measure_energy"},
+                    {"label": "Énergie extraite mesurée lors du dernier relevé", "value": "latest_extracted_energy"},
                     # {"label": "is_article_2", "value": "is_article_2"},
                     # {"label": "is_auto_consumption", "value": "is_auto_consumption"},
                     # {"label": "is_article_4", "value": "is_article_4"},
