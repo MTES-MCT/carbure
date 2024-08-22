@@ -34,6 +34,16 @@ class EntitySerializer(serializers.ModelSerializer):
         ]
 
 
+class EntitySummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = [
+            "id",
+            "name",
+            "entity_type",
+        ]
+
+
 class FeedStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatierePremiere
