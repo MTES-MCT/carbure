@@ -16,7 +16,13 @@ from core.models import (
     GenericError,
     SustainabilityDeclaration,
 )
-from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
+from doublecount.serializers import (
+    BiofuelSerializer,
+    CountrySerializer,
+    EntitySerializer,
+    EntitySummarySerializer,
+    FeedStockSerializer,
+)
 from producers.models import ProductionSite
 
 
@@ -377,11 +383,11 @@ class CarbureStockTransformationPublicSerializer(serializers.ModelSerializer):
 
 
 class CarbureLotPublicSerializer(serializers.ModelSerializer):
-    carbure_producer = EntitySerializer(read_only=True)
+    carbure_producer = EntitySummarySerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     production_country = CountrySerializer(read_only=True)
-    carbure_supplier = EntitySerializer(read_only=True)
-    carbure_client = EntitySerializer(read_only=True)
+    carbure_supplier = EntitySummarySerializer(read_only=True)
+    carbure_client = EntitySummarySerializer(read_only=True)
     carbure_dispatch_site = DepotSerializer(read_only=True)
     dispatch_site_country = CountrySerializer(read_only=True)
     carbure_delivery_site = DepotSerializer(read_only=True)
@@ -389,8 +395,8 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
     feedstock = FeedStockSerializer(read_only=True)
     biofuel = BiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
-    added_by = EntitySerializer(read_only=True)
-    carbure_vendor = EntitySerializer(read_only=True)
+    added_by = EntitySummarySerializer(read_only=True)
+    carbure_vendor = EntitySummarySerializer(read_only=True)
 
     class Meta:
         model = CarbureLot
