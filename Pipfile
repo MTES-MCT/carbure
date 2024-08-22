@@ -49,6 +49,7 @@ types-factory-boy = "*"
 types-pyjwt = "*"
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
 types-six = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3"
