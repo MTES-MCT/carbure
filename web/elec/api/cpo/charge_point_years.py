@@ -1,9 +1,11 @@
 import traceback
+
+from django.views.decorators.http import require_GET
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
-from django.views.decorators.http import require_GET
-from core.utils import combine
 from core.decorators import check_user_rights
+from core.utils import combine
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 

@@ -1,12 +1,13 @@
-from transactions.api.lots.tests.tests_utils import get_lot
-from core.models import CarbureLot, CarbureStock, Entity, UserRights
-from transactions.models import YearConfig
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
+
 from core.carburetypes import CarbureError
+from core.models import CarbureLot, CarbureStock, Entity, UserRights
+from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.models import YearConfig
 
 
 class LotsFlowTest(TestCase):

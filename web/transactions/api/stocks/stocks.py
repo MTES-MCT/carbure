@@ -1,7 +1,9 @@
-from core.decorators import check_user_rights
-from django.http.response import JsonResponse
-from core.helpers import get_entity_stock, get_stock_with_metadata
 import traceback
+
+from django.http.response import JsonResponse
+
+from core.decorators import check_user_rights
+from core.helpers import get_entity_stock, get_stock_with_metadata
 
 
 @check_user_rights()

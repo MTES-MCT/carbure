@@ -1,21 +1,16 @@
 # test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb
 from datetime import date
-from math import prod
-import os
-import stat
-from core.tests_utils import setup_current_user
-from core.models import Entity, UserRights
+
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
 
-from doublecount.errors import DoubleCountingError
+from core.models import Entity, UserRights
+from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
-
 
 User = get_user_model()
 

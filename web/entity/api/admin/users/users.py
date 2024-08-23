@@ -1,7 +1,8 @@
-from core.decorators import check_admin_rights
-from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.http import JsonResponse
+
+from core.decorators import check_admin_rights
 
 
 @check_admin_rights()

@@ -1,15 +1,15 @@
-import datetime
 import csv
+import datetime
 import traceback
 from math import floor
 
 from django import forms
-from django.db.models import Q
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import HttpResponse
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_provision_certificate import ElecProvisionCertificate

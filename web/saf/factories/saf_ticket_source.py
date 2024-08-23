@@ -1,8 +1,9 @@
-import factory
 import random
 from datetime import datetime
 
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
+import factory
+
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
 from saf.models import SafTicketSource
 

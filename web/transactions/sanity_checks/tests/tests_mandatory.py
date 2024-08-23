@@ -1,11 +1,13 @@
 import datetime
+
 from django.test import TestCase
 
-from core.carburetypes import CarbureSanityCheckErrors, CarbureCertificatesErrors
-from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, Pays
-from transactions.factories import CarbureLotFactory
+from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
+from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
-from ..helpers import enrich_lot, has_error, get_prefetched_data
+from transactions.factories import CarbureLotFactory
+
+from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
 
 

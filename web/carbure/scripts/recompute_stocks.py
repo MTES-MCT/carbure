@@ -1,10 +1,10 @@
 import argparse
 import os
+
 import django
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Sum
-from django.core.paginator import Paginator
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -77,7 +77,7 @@ def recompute_stocks(apply, batch):
 
     print(f"> {bad_count} stocks with wrong remaining volumes were updated")
 
-    print(f"> Done")
+    print("> Done")
 
 
 if __name__ == "__main__":

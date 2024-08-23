@@ -1,20 +1,19 @@
 import os
+
 import django
-import argparse
-from django.db.models import Sum, Count, Min, Q
-import calendar
-import datetime
-import json
+from django.db.models import Q
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import *
 from django.core import serializers
-    
+
+from core.models import *
+
+
 def load_feyzin_data():
     feyzin = Entity.objects.get(name='TERF Feyzin')
-    
+
     transactions = {tx.id: tx for tx in LotTransaction.objects.filter(Q(carbure_client=feyzin) | Q(carbure_vendor=feyzin))}
     lots = {l.id: l for l in LotV2.objects.filter(id__in=transactions.keys())}
 
@@ -42,8 +41,8 @@ def load_feyzin_data():
             else:
                 print('lot already in db')
             tx.save()
-            
-    
-    
+
+
+
 if __name__ == '__main__':
     load_feyzin_data()

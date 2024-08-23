@@ -1,9 +1,12 @@
 # /api/saf/operator/ticket-sources/filters
 
 import traceback
+
 from django.db.models.functions import Coalesce
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+
 from .ticket_sources import TicketSourceFilterForm, find_ticket_sources
 
 

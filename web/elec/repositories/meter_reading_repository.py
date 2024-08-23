@@ -1,4 +1,5 @@
-from django.db.models import Count, Sum, F, Q
+from django.db.models import Count, F, Q, Sum
+
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_charge_point import ElecChargePoint

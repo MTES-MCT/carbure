@@ -1,14 +1,14 @@
 # test with : python web/manage.py test doublecount.api.applications.tests_applications.DoubleCountApplicationsTest --keepdb
-from math import prod
 import os
-from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, UserRights
-from django.test import TestCase
-from django.urls import reverse
+
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from doublecount.api.admin.applications.add import DoubleCountingAddError
+from django.test import TestCase
+from django.urls import reverse
 
+from core.models import Entity, Pays, UserRights
+from core.tests_utils import setup_current_user
+from doublecount.api.admin.applications.add import DoubleCountingAddError
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication

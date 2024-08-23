@@ -1,17 +1,18 @@
-import os
 import datetime
+import os
 from decimal import Decimal
 from unittest.mock import patch
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
-from core.tests_utils import setup_current_user
 from core.models import Entity
-from django.core.files.uploadedfile import SimpleUploadedFile
+from core.tests_utils import setup_current_user
 from elec.models.elec_charge_point import ElecChargePoint
+from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.models.elec_charge_point_application import ElecChargePointApplication
 
 
 class ElecCharginPointsTest(TestCase):

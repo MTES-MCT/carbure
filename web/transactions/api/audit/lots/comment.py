@@ -1,4 +1,5 @@
 from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotComment, Entity
 

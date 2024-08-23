@@ -1,14 +1,13 @@
-import sys
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def pretty_print_oldlot(tx):
     print("OLD txid {id} (parent_tx_id {parent_tx_id}) lot_id {lot_id} (parent lot_id {parent_lot_id}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} [Supplier {supplier}] [Client {client}]".format(id=tx.id, parent_tx_id=tx.parent_tx.id if tx.parent_tx else None, lot_id=tx.lot.id, parent_lot_id=tx.lot.parent_lot.id if tx.lot.parent_lot else None, carbure_id=tx.lot.carbure_id, period=tx.lot.period, dae=tx.dae, biofuel=tx.lot.biocarburant.name, feedstock=tx.lot.matiere_premiere.name, volume=tx.lot.volume, delivery_date=tx.delivery_date, supplier=tx.carbure_vendor.name if tx.carbure_vendor else 'UNKNOWN', client=tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
@@ -38,9 +37,9 @@ def compare():
             except:
                 print('Could not find stock associated to this stock_lot')
     return
-        
 
-    
+
+
     # old_stocks = LotTransaction.objects.filter(is_stock=True, delivery_status__in=['A', 'F'])
     # for s in old_stocks:
     #     try:
@@ -51,10 +50,10 @@ def compare():
     #         #pretty_print_oldlot(s)
     #         #pretty_print_stock(new_stock)
     #     except Exception as e:
-    #         pretty_print_oldlot(s)            
+    #         pretty_print_oldlot(s)
     #         print('Could not find new stock: %s' % (e))
     #         break
-    
+
 if __name__ == '__main__':
     compare()
-    
+

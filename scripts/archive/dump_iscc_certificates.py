@@ -1,11 +1,12 @@
-import sys, os
+import os
+
 import django
-import datetime
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from certificates.models import EntityISCCTradingCertificate, ProductionSiteCertificate
+
 
 def check_entity_certificates():
     associated = EntityISCCTradingCertificate.objects.all().order_by('entity_id')
@@ -17,7 +18,7 @@ def check_entity_certificates():
 
 def main():
     check_entity_certificates()
-    
+
 if __name__ == '__main__':
     main()
 

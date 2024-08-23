@@ -1,11 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 
-
-from core.tests_utils import setup_current_user
 from core.models import Entity
-from saf.factories import SafTicketSourceFactory, SafTicketFactory
-from saf.models import SafTicketSource, SafTicket
+from core.tests_utils import setup_current_user
+from saf.factories import SafTicketFactory, SafTicketSourceFactory
+from saf.models import SafTicket, SafTicketSource
 
 
 class SafYearsTest(TestCase):

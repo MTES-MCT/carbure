@@ -1,15 +1,15 @@
 import argparse
+import datetime
 import os
+
 import django
 from tqdm import tqdm
-import datetime
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from transactions.sanity_checks.helpers import get_prefetched_data
 from core.models import CarbureLot
-from ml.models import EECStats, EPStats, ETDStats
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540)  # approx 18 months
 

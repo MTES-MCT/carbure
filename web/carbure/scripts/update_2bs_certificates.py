@@ -2,25 +2,24 @@
 # coding: utf-8
 
 import argparse
+import csv
+import os
+import unicodedata
+from datetime import date
 from typing import Tuple
+
+import django
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
-from datetime import date
-import os
-import django
-import csv
-import argparse
-import unicodedata
 from django.conf import settings
-from django.core.mail import send_mail, get_connection
+from django.core.mail import get_connection, send_mail
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
-
+from core.utils import bulk_update_or_create
 
 DESTINATION_FOLDER = "/tmp"
 

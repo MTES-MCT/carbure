@@ -1,8 +1,10 @@
-import pandas as pd
 from typing import Iterable
+
+import pandas as pd
+from django import forms
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.translation import gettext_lazy as _
-from django import forms
+
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication

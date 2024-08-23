@@ -1,13 +1,15 @@
 import os
 import unicodedata
+from os import environ as env
+
+import xlsxwriter
 from django import forms
-from django.db import connection, transaction
 from django.conf import settings
 from django.core.paginator import Paginator
-import xlsxwriter
-from core.xlsx_v3 import make_carbure_lots_sheet
+from django.db import connection, transaction
+
 from core.models import Entity, UserRights
-from os import environ as env
+from core.xlsx_v3 import make_carbure_lots_sheet
 
 
 # transform a string into a standard form in lower case without accents

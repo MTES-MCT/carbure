@@ -1,7 +1,8 @@
 from datetime import datetime
-from django.http.response import JsonResponse
 
 from django.http import JsonResponse
+from django.http.response import JsonResponse
+
 from certificates.models import DoubleCountingRegistration
 from core.decorators import check_user_rights
 from core.models import UserRights

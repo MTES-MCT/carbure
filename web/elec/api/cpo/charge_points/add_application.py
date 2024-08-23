@@ -1,7 +1,8 @@
-from pandas.core.frame import DataFrame
-from django.http import HttpRequest
 from django.db import transaction
+from django.http import HttpRequest
 from django.views.decorators.http import require_POST
+from pandas.core.frame import DataFrame
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights

@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Biocarburant, MatierePremiere, Pays
 
+
 class EECStats(models.Model):
     feedstock = models.ForeignKey(MatierePremiere, null=False, blank=False, on_delete=models.CASCADE)
     origin = models.ForeignKey(Pays, null=False, blank=False, on_delete=models.CASCADE)

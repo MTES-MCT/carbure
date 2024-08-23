@@ -1,15 +1,16 @@
+from datetime import datetime
+
+from django.conf import settings
+from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
-from core.models import UserRights
+
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.models import UserRights
+from core.utils import CarbureEnv
 from entity.serializers.depot import DepotSerializer
 from entity.services.geolocation import get_coordinates
-from core.common import ErrorResponse, SuccessResponse
-from core.carburetypes import CarbureError
-from core.utils import CarbureEnv
-from datetime import datetime
-from django.core.mail import send_mail
-from django.conf import settings
-
 
 
 @require_POST
@@ -61,7 +62,7 @@ def send_email_to_user(entity, depot_name, user):
 
 def send_email_to_dgec(entity, depot_name, user):
     today = datetime.now().strftime("%d/%m/%Y")
-    recipient_list = ["carbure@beta.gouv.fr"] 
+    recipient_list = ["carbure@beta.gouv.fr"]
     admin_link = f"{CarbureEnv.get_base_url()}/admin/core/depot/?is_enabled=False"
     text_message = f"""
     Bonjour,

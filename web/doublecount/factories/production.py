@@ -1,9 +1,9 @@
-from urllib import request
-import factory
 from datetime import datetime
 
-from core.models import Biocarburant, MatierePremiere, Pays
-from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
+import factory
+
+from core.models import Biocarburant, MatierePremiere
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 
 
 class DoubleCountingProductionFactory(factory.django.DjangoModelFactory):

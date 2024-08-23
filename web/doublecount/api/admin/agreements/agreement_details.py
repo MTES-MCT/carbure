@@ -1,15 +1,8 @@
-from django.http import JsonResponse
-import pandas as pd
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Biocarburant, CarbureLot, MatierePremiere
-from django.db.models.aggregates import Count, Sum
 from doublecount.helpers import get_agreement_quotas
-
-from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
-from doublecount.serializers import BiofuelSerializer, FeedStockSerializer
 
 
 class DoubleCountingAgreementError:

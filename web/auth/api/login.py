@@ -1,7 +1,7 @@
+from django.contrib.auth import authenticate, login
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
 
 
 def user_login(request):

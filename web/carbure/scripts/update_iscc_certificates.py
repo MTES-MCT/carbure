@@ -3,28 +3,29 @@
 
 # Extraction des certificats ISCC https://www.iscc-system.org/certificates/all-certificates/
 import os
-from pprint import pprint
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-import re
-import json
-from typing import Tuple, cast
-import shutil
 import argparse
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
+import json
+import re
+import shutil
 from datetime import date, datetime  # Pour le nom du fichier sauvegardé
 from os import listdir
 from os.path import isfile
+from typing import Tuple, cast
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.mail import send_mail, get_connection
-from core.common import Perf
-from core.utils import bulk_update_or_create
+from django.core.mail import get_connection, send_mail
+
 from core.models import GenericCertificate
+from core.utils import bulk_update_or_create
 
 ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=2"
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"

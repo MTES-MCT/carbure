@@ -1,14 +1,14 @@
-import sys
 import os
+import sys
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def pretty_print(tx):
     print('Tx [%d] Parent Tx [%s] Lot [%d] Parent Lot [%s] %s %s %d (remaining %d) From %s To %s [Period %s - %s] Forwarded: %s Stock: %s' % (tx.id, tx.parent_tx_id, tx.lot.id, tx.lot.parent_lot_id, tx.lot.biocarburant.name, tx.lot.matiere_premiere.name, tx.lot.volume, tx.lot.remaining_volume,
@@ -22,12 +22,12 @@ def show_tx_and_parents(tx):
 
 def show_tx_and_child(tx):
     pretty_print(tx)
-    
+
     child = LotTransaction.objects.filter(parent_tx=tx)
     if child:
         for c in child:
             show_tx_and_child(c)
-        
+
 def show_lot_and_child(id):
     tx = LotTransaction.objects.get(id=id)
 
@@ -39,6 +39,6 @@ def show_lot_and_child(id):
         child_volume += c.lot.volume
 
     print('Parent volume [%d] remaining [%d] theo remaining [%d] diff [%d] child volume [%d]' % (tx.lot.volume, tx.lot.remaining_volume, tx.lot.volume - child_volume, tx.lot.remaining_volume - (tx.lot.volume - child_volume), child_volume))
-    
+
 if __name__ == '__main__':
     show_lot_and_child(id=int(sys.argv[1]))

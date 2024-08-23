@@ -1,4 +1,4 @@
-from .node import Node, TraceabilityError, GHG_FIELDS
+from .node import GHG_FIELDS, Node, TraceabilityError
 
 
 class TicketSourceNode(Node):

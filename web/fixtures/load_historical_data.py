@@ -1,16 +1,16 @@
-import sys, os
+import datetime
+import os
+
 import django
 import openpyxl
-import datetime
-import dateutil
-from tqdm import tqdm
 from django.contrib.auth import get_user_model
+from tqdm import tqdm
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 usermodel = get_user_model()
-from core.models import Entity, MatierePremiere, Pays, Biocarburant, CarbureLot
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 
 default_eec_values = {
     'ETHBETTERAVE':12,
@@ -125,7 +125,7 @@ def load_lot(lot):
         print('Could not find operator %s in operators' % (lop))
         return
     op = operators[lop]
-        
+
     lc = lot['production_site_country']
     if lc is not None and lc != '':
         lc = lc.upper().strip()
@@ -184,7 +184,7 @@ def load_lot(lot):
             if year < 20:
                 year += 2000
             month = int(dd[3:5])
-            day = int(dd[0:2])        
+            day = int(dd[0:2])
             dd = datetime.datetime(year=year, month=month, day=day)
         except:
             print('could not load date')
@@ -303,13 +303,13 @@ def load_lot(lot):
     obj.delivery_type = CarbureLot.BLENDING
     #obj.save()
     return obj
-    
+
 def load_file(year, filename, delete=False):
     if delete:
         lots = CarbureLot.objects.filter(added_by=mtes, year=year, free_field='import carbure').delete()
         print(lots)
         return
-    
+
     wb = openpyxl.load_workbook(filename, data_only=True)
     lots_sheet = wb['Feuil1']
     colid2field = {}
@@ -342,6 +342,6 @@ def load_histo_data():
     for year, f in files:
         print('Loading file %s'  % (f))
         load_file(year, f, delete=True)
-        
+
 if __name__ == '__main__':
     load_histo_data()

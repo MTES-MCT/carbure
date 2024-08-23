@@ -1,18 +1,20 @@
 from datetime import date, datetime
+
 from django import forms
-from django.http import HttpRequest
 from django.db import transaction
+from django.http import HttpRequest
 from django.views.decorators.http import require_POST
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.services.meter_readings_application_quarter import get_application_quarter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
+from elec.services.meter_readings_application_quarter import get_application_quarter
 
 
 class AddMeterReadingApplicationForm(forms.Form):

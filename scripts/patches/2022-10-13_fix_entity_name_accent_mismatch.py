@@ -1,15 +1,16 @@
-import os
-import django
 import argparse
-from django.db.models import Q
+import os
+
+import django
 from django.core.paginator import Paginator
+from django.db.models import Q
 from tqdm import tqdm
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from core.models import CarbureLot, Depot, Entity
 from core.utils import normalize_string
-from core.models import CarbureLot, Entity, Depot
 from producers.models import ProductionSite
 
 

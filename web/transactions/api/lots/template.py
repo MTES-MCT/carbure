@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse, JsonResponse
-from core.decorators import check_user_rights
 
+from core.decorators import check_user_rights
 from core.models import (
     Entity,
 )

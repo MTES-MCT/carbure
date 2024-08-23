@@ -1,7 +1,8 @@
-from core.tests_utils import setup_current_user
-from core.models import Entity, UserRights
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import Entity, UserRights
+from core.tests_utils import setup_current_user
 
 
 class EntityProductionSiteTest(TestCase):

@@ -1,4 +1,5 @@
 import os
+
 import django
 from tqdm import tqdm
 
@@ -6,6 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import *
+
 
 def freeze_old_declarations():
     declarations = SustainabilityDeclaration.objects.filter(period__lt='2022-01-01', declared=False)

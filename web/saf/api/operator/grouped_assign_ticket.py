@@ -1,12 +1,14 @@
 # /api/saf/operator/assign-ticket
 
 import traceback
+
 from django.db import transaction
-from django.db.models.aggregates import Sum, Max
-from core.common import SuccessResponse, ErrorResponse
+from django.db.models.aggregates import Max, Sum
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.models import CarbureNotification, UserRights
 from saf.models import SafTicketSource, create_ticket_from_source
-from core.models import UserRights, CarbureNotification
 
 
 class SafTicketGroupedAssignError:

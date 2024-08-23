@@ -1,7 +1,7 @@
-from core.decorators import check_user_rights, otp_or_403
-from core.models import Entity, UserRights, UserRightsRequests
-from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+
+from core.decorators import check_user_rights
+from core.models import Entity, UserRights
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])

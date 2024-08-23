@@ -1,16 +1,16 @@
 # test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb
 from datetime import date
 
-from core.tests_utils import setup_current_user
-from core.models import CarbureLot, Entity, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import CarbureLot, Entity, Pays, UserRights
+from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
 from doublecount.factories.sourcing import DoubleCountingSourcingFactory
 from doublecount.models import DoubleCountingApplication
-
 from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
 

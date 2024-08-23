@@ -1,16 +1,16 @@
-from core.tests_utils import setup_current_user
-from core.models import (
-    Entity,
-    Pays,
-    ProductionSite,
-    MatierePremiere,
-    Biocarburant,
-    UserRights,
-)
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+
+from core.models import (
+    Biocarburant,
+    Entity,
+    MatierePremiere,
+    ProductionSite,
+    UserRights,
+)
+from core.tests_utils import setup_current_user
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
 class EntityProductionSiteTest(TestCase):

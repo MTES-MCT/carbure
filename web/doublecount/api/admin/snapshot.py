@@ -1,12 +1,14 @@
 # /api/saf/operator/snapshot
 
 import traceback
+from datetime import datetime
+
+from django.db.models.query_utils import Q
+
 from certificates.models import DoubleCountingRegistration
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from doublecount.models import DoubleCountingApplication
-from django.db.models.query_utils import Q
-from datetime import datetime
 
 
 class SafSnapshotError:

@@ -1,17 +1,18 @@
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from django.db import transaction
-from django.db.models import Q
-from core.models import CarbureLot, Entity, Depot
+
+from core.models import Entity
 
 
 @transaction.atomic
 def update_entites_address():
-    
+
     entity = Entity.objects.get(id=126)
     entity.registered_address = "48 Boulevard de l'Europe"
     entity.registered_zipcode = "59600"
@@ -40,15 +41,7 @@ def update_entites_address():
     entity.registered_city = "NANTERRE"
     entity.registered_country = "France"
     entity.save()
-    
-    entity = Entity.objects.get(id=88)
-    entity.registered_address = "POL IND  ALCES C/MENCIA PARC M80"
-    entity.registered_zipcode = "13600"
-    entity.registered_city = "ALCAZAR DE SAN JUAN"
-    entity.registered_country = "ES"
-    entity.save()
-   
-    
+
     entity = Entity.objects.get(id=88)
     entity.registered_address = "POL IND  ALCES C/MENCIA PARC M80"
     entity.registered_zipcode = "13600"
@@ -56,7 +49,15 @@ def update_entites_address():
     entity.registered_country = "ES"
     entity.save()
 
-     
+
+    entity = Entity.objects.get(id=88)
+    entity.registered_address = "POL IND  ALCES C/MENCIA PARC M80"
+    entity.registered_zipcode = "13600"
+    entity.registered_city = "ALCAZAR DE SAN JUAN"
+    entity.registered_country = "ES"
+    entity.save()
+
+
     entity = Entity.objects.get(id=129)
     entity.registered_address = "Rue du Rhone 50,"
     entity.registered_zipcode = "1204"
@@ -64,7 +65,7 @@ def update_entites_address():
     entity.registered_country = "Switzerland"
     entity.save()
 
- 
+
     entity = Entity.objects.get(id=131)
     entity.registered_address = "Ketenislaan 3"
     entity.registered_zipcode = "9130"
@@ -120,7 +121,7 @@ def update_entites_address():
     entity.registered_city = "Paradiso"
     entity.registered_country = "Switzerland"
     entity.save()
-  
+
     entity = Entity.objects.get(id=51)
     entity.registered_address = "8 rue Ellenhard"
     entity.registered_zipcode = "67000"

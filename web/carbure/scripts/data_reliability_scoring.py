@@ -1,7 +1,7 @@
 import argparse
-import django
 import os
-import json
+
+import django
 
 from transactions.sanity_checks.helpers import get_prefetched_data
 
@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from tqdm import tqdm
 
-from core.models import CarbureLot, GenericError
+from core.models import CarbureLot
 from transactions.sanity_checks.sanity_checks import bulk_scoring
 
 

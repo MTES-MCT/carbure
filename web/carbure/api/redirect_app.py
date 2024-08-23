@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 
+
 # redirect calls starting with /app to / and keep all query params
 def redirect_app(request, path):
     url = "/" + path

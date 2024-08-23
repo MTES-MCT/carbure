@@ -1,9 +1,10 @@
+from django.http.response import JsonResponse
+
+from core.decorators import check_admin_rights
 from core.helpers import (
     get_all_stock,
     get_stock_filters_data,
 )
-from core.decorators import check_admin_rights
-from django.http.response import JsonResponse
 
 
 @check_admin_rights()

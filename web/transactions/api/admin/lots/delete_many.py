@@ -1,21 +1,20 @@
 from django import forms
 from django.db import transaction
-from core.carburetypes import CarbureError
-from core.decorators import check_admin_rights
-from core.common import SuccessResponse, ErrorResponse
 
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
-    CarbureLotEvent,
     CarbureLotComment,
+    CarbureLotEvent,
     CarbureNotification,
 )
-
 from core.traceability import (
     LotNode,
-    get_traceability_nodes,
-    bulk_update_traceability_nodes,
     bulk_delete_traceability_nodes,
+    bulk_update_traceability_nodes,
+    get_traceability_nodes,
 )
 
 from .update_many import group_lots_by_entity, serialize_node

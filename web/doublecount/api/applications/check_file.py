@@ -1,7 +1,8 @@
 # /api/stats/entity
-import traceback
 import datetime
-from core.common import SuccessResponse, ErrorResponse
+import traceback
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights
 from doublecount.helpers import check_dc_file

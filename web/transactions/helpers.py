@@ -1,14 +1,14 @@
-import pandas as pd
-from transactions.models import YearConfig
-
 import datetime
 import traceback
-import dateutil
 from typing import List
+
+import dateutil
+import pandas as pd
 from django.db.models.query import QuerySet
-from django.forms import model_to_dict
-from core.carburetypes import CarbureUnit, CarbureStockErrors
+
+from core.carburetypes import CarbureStockErrors, CarbureUnit
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
+from transactions.models import YearConfig
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
 
@@ -571,7 +571,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         else:
             try:
                 parent_stock = CarbureStock.objects.get(carbure_id=carbure_stock_id)
-            except Exception as e:
+            except Exception:
                 # traceback.print_exc()
                 print("Could not find stock %s" % (carbure_stock_id))
                 return None, []

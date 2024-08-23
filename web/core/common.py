@@ -1,24 +1,20 @@
 import datetime
-import unicodedata
-from django.http import JsonResponse
-import openpyxl
-import numpy as np
 import os
+import unicodedata
 from multiprocessing import Process
 from time import perf_counter
-
-import pandas as pd
-from pandas._typing import Scalar
 from typing import List
 
-from core.carburetypes import Carbure, CarbureUnit
-
-from core.models import CarbureLot, GenericCertificate, Biocarburant
-from core.models import TransactionDistance
-from core.ign_distance import get_distance
+import numpy as np
+import openpyxl
+import pandas as pd
+from django.http import JsonResponse
+from pandas._typing import Scalar
 
 from certificates.models import DoubleCountingRegistration
-
+from core.carburetypes import Carbure, CarbureUnit
+from core.ign_distance import get_distance
+from core.models import Biocarburant, CarbureLot, GenericCertificate, TransactionDistance
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 

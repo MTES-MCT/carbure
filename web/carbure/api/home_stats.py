@@ -1,9 +1,10 @@
 import datetime
 import traceback
 
-from core.models import CarbureLot, Entity
 from django.db.models.aggregates import Count, Sum
 from django.http.response import JsonResponse
+
+from core.models import CarbureLot, Entity
 
 
 def get_home_stats(request):

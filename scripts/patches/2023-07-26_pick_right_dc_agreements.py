@@ -1,17 +1,18 @@
 import argparse
 import os
-import django
 
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from tqdm import tqdm
-from django.db import transaction
 from django.core.paginator import Paginator
-from core.models import CarbureLot
+from django.db import transaction
+from tqdm import tqdm
+
 from certificates.models import DoubleCountingRegistration
-from transactions.sanity_checks import bulk_sanity_checks, get_prefetched_data
+from core.models import CarbureLot
+from transactions.sanity_checks import bulk_sanity_checks
 
 
 @transaction.atomic

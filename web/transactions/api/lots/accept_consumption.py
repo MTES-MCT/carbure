@@ -1,4 +1,5 @@
 from django.db import transaction
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.helpers import filter_lots, get_entity_lots_by_status

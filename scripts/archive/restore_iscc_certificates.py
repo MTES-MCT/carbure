@@ -1,12 +1,13 @@
-import sys, os
-import django
 import datetime
+import os
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from certificates.models import EntityISCCTradingCertificate, ISCCCertificate, ProductionSiteCertificate
 from core.models import Entity
-from certificates.models import EntityISCCTradingCertificate, ProductionSiteCertificate, ISCCCertificate
 from producers.models import ProductionSite
 
 entity_certs = [
@@ -70,25 +71,25 @@ def check_entity_certificates():
     twoyearsago = datetime.datetime.now() - datetime.timedelta(days=730)
     for entity_id, certificate in entity_certs:
         entity = Entity.objects.get(id=entity_id)
-        print('Adding %s with certificate_id %s' % (entity.name, certificate))        
+        print('Adding %s with certificate_id %s' % (entity.name, certificate))
         found = ISCCCertificate.objects.filter(certificate_id=certificate, valid_until__gt=twoyearsago)
         if found.count() > 1:
             print('multiple matches')
-            iscc = found[0]            
+            iscc = found[0]
             continue
         else:
             iscc = found[0]
             print('Found certif for %s' % (iscc.certificate_holder))
             EntityISCCTradingCertificate.objects.update_or_create(entity=entity, certificate=iscc)
             print('Done')
-    for psite_id, certificate in psite_certs:       
+    for psite_id, certificate in psite_certs:
         psite = ProductionSite.objects.get(id=psite_id)
         iscc = EntityISCCTradingCertificate.objects.get(entity=psite.producer, certificate__certificate_id=certificate, certificate__valid_until__gt=twoyearsago)
         ProductionSiteCertificate.objects.update_or_create(entity=psite.producer, production_site=psite, type='ISCC', certificate_iscc=iscc)
 
 def main():
     check_entity_certificates()
-    
+
 if __name__ == '__main__':
     main()
 

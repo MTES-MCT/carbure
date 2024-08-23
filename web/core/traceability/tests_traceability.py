@@ -1,24 +1,21 @@
 from django.test import TestCase
 
-from core.tests_utils import setup_current_user
-
 from core.models import (
-    Entity,
     Biocarburant,
     CarbureLot,
     CarbureStock,
     CarbureStockTransformation,
+    Entity,
 )
+from core.tests_utils import setup_current_user
+from core.traceability import LotNode, Node
+from saf.factories import SafTicketFactory, SafTicketSourceFactory
 from saf.models import SafTicket, SafTicketSource
-
 from transactions.factories import (
     CarbureLotFactory,
     CarbureStockFactory,
     CarbureStockTransformFactory,
 )
-from saf.factories import SafTicketSourceFactory, SafTicketFactory
-
-from core.traceability import Node, LotNode
 
 
 class TraceabilityTest(TestCase):

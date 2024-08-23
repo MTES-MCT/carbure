@@ -1,7 +1,5 @@
 from typing import TypedDict
 
-from transactions.helpers import MISSING_COUNTRY_OF_ORIGIN
-
 
 class DoubleCountingError:
     EXCEL_PARSING_ERROR = "EXCEL_PARSING_ERROR"
