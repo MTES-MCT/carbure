@@ -1,10 +1,11 @@
-from django.conf import settings
 import pandas as pd
 from django import forms
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Sum
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights

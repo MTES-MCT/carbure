@@ -1,10 +1,11 @@
-from django.db.models.query_utils import Q
 from datetime import datetime
+
+from django.db.models.query_utils import Q
+from django.http import JsonResponse
 from django.http.response import JsonResponse
 
-from django.http import JsonResponse
 from certificates.models import DoubleCountingRegistration
-from certificates.serializers import DoubleCountingRegistrationPublicSerializer, DoubleCountingRegistrationSerializer
+from certificates.serializers import DoubleCountingRegistrationPublicSerializer
 
 
 def get_agreements_public_list(request, *args, **kwargs):

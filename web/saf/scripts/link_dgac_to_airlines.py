@@ -1,4 +1,5 @@
 import os
+
 import django
 from django.db import transaction
 
@@ -6,6 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from django.contrib.auth import get_user_model
+
 from core.models import Entity, UserRights
 
 User = get_user_model()

@@ -1,6 +1,7 @@
+from django.http import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import CarbureLot, UserRights
-from django.http import JsonResponse
 from producers.models import ProductionSite
 
 

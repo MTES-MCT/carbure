@@ -1,26 +1,26 @@
 from django import forms
 from django.db import transaction
-from core.decorators import check_admin_rights
-from core.common import SuccessResponse, ErrorResponse
-from core.serializers import GenericErrorSerializer
-from core.models import (
-    CarbureLotEvent,
-    CarbureLotComment,
-    GenericError,
-    CarbureNotification,
-)
-from transactions.helpers import compute_lot_quantity
-from transactions.sanity_checks import bulk_sanity_checks, get_prefetched_data
-from carbure.tasks import background_bulk_scoring
-from transactions.forms import LotForm
 
+from carbure.tasks import background_bulk_scoring
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_admin_rights
+from core.models import (
+    CarbureLotComment,
+    CarbureLotEvent,
+    CarbureNotification,
+    GenericError,
+)
+from core.serializers import GenericErrorSerializer
 from core.traceability import (
     LotNode,
-    get_traceability_nodes,
     bulk_update_traceability_nodes,
     diff_to_metadata,
+    get_traceability_nodes,
     serialize_integrity_errors,
 )
+from transactions.forms import LotForm
+from transactions.helpers import compute_lot_quantity
+from transactions.sanity_checks import bulk_sanity_checks, get_prefetched_data
 
 
 class UpdateManyError:

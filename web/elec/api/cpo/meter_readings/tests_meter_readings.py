@@ -1,19 +1,20 @@
 # Test : python web/manage.py test elec.api.cpo.meter_readings.tests_meter_readings.ElecMeterReadingsTest --keepdb
 
 
-import io
 import datetime
-from unittest.mock import patch
-from unittest import mock
-import openpyxl
+import io
 from decimal import Decimal
-from core.tests_utils import setup_current_user
-from core.models import Entity
+from unittest import mock
+from unittest.mock import patch
+
+import openpyxl
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from elec.models.elec_charge_point import ElecChargePoint
 
+from core.models import Entity
+from core.tests_utils import setup_current_user
+from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication

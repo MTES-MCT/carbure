@@ -1,12 +1,14 @@
 import datetime
+
 from django.test import TestCase
 
 from core.carburetypes import CarbureMLGHGErrors, CarbureSanityCheckErrors
 from core.models import Entity, MatierePremiere
 from ml.models import ETDStats
 from transactions.factories import CarbureLotFactory
-from ..ghg import oct2015, jan2021
-from ..helpers import enrich_lot, has_error, get_prefetched_data, july1st2021
+
+from ..ghg import jan2021, oct2015
+from ..helpers import enrich_lot, get_prefetched_data, has_error, july1st2021
 from ..sanity_checks import sanity_checks
 
 

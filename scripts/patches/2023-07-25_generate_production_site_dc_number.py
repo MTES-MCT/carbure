@@ -1,11 +1,13 @@
 # pipenv run python scripts/patches/2023-07-25_generate_production_site_dc_number.py
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from django.db import transaction
+
 from core.models import ProductionSite
 
 

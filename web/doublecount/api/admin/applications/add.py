@@ -1,31 +1,28 @@
-from django import forms
-from django.db.models import Q
-
 import traceback
+
+from django import forms
+from django.db import transaction
+from django.db.models import Q
 
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from doublecount.parser.dc_parser import parse_dc_excel
-
-from producers.models import ProductionSite
-from doublecount.models import (
-    DoubleCountingApplication,
-    DoubleCountingSourcing,
-    DoubleCountingProduction,
-)
+from core.models import Entity
 from doublecount.helpers import (
     load_dc_filepath,
     load_dc_period,
-    load_dc_sourcing_data,
     load_dc_production_data,
+    load_dc_sourcing_data,
     send_dca_confirmation_email,
 )
-from core.models import Entity
-
-from core.common import ErrorResponse, SuccessResponse
-
-from django.db import transaction
+from doublecount.models import (
+    DoubleCountingApplication,
+    DoubleCountingProduction,
+    DoubleCountingSourcing,
+)
+from doublecount.parser.dc_parser import parse_dc_excel
+from producers.models import ProductionSite
 
 
 class DoubleCountingAdminAddFrom(forms.Form):

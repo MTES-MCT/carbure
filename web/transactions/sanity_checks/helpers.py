@@ -1,9 +1,7 @@
-from collections import defaultdict
 import datetime
+from collections import defaultdict
+
 from certificates.models import DoubleCountingRegistration
-from ml.models import EECStats, EPStats, ETDStats
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-from transactions.models.year_config import YearConfig
 from core.models import (
     Biocarburant,
     CarbureLot,
@@ -17,6 +15,9 @@ from core.models import (
     Pays,
     SustainabilityDeclaration,
 )
+from ml.models import EECStats, EPStats, ETDStats
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from transactions.models.year_config import YearConfig
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 

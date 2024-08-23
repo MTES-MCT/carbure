@@ -1,4 +1,3 @@
-from email.policy import default
 
 
 DC_FEEDSTOCK_UNRECOGNIZED = "__unrecognized__"

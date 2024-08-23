@@ -1,11 +1,13 @@
 import traceback
+
+import pandas as pd
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 from core.utils import normalize_string
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
-import pandas as pd
 
 
 class CertificateImportError:

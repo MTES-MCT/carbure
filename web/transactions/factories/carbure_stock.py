@@ -1,17 +1,14 @@
 import factory
 
-from producers.models import ProductionSite
-
 from core.models import (
+    Biocarburant,
     CarbureStock,
-    CarbureStockTransformation,
-    CarbureLot,
+    Depot,
     Entity,
     MatierePremiere,
-    Biocarburant,
     Pays,
-    Depot,
 )
+from producers.models import ProductionSite
 
 
 class CarbureStockFactory(factory.django.DjangoModelFactory):

@@ -1,6 +1,7 @@
-import sys, os
-import django
 import csv
+import os
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -16,8 +17,8 @@ with open(filename) as csvfile:
         if code == 'code':
             # header
             continue
-       
-        name = row[1]        
+
+        name = row[1]
         compat_alcool = row[2]
         compat_graisse = row[3]
         is_double_compte = row[4]

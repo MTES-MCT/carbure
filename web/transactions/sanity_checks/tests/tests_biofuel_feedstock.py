@@ -3,7 +3,8 @@ from django.test import TestCase
 from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Entity, MatierePremiere
 from transactions.factories import CarbureLotFactory
-from ..helpers import enrich_lot, has_error, get_prefetched_data
+
+from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
 
 

@@ -1,6 +1,7 @@
 import os
-import django
 from datetime import datetime
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()

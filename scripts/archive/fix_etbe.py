@@ -1,14 +1,13 @@
-import sys
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def pretty_print_stock(stock):
     print("STOCK {period} [{client}] {id} {carbure_id} {initial_volume} remaining {remaining_volume} {biofuel} {feedstock}".format(period=stock.parent_lot.period if stock.parent_lot else stock.parent_transformation.source_stock.parent_lot.period, client=stock.carbure_client.name, id=stock.id, carbure_id=stock.carbure_id, initial_volume=stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination, remaining_volume=stock.remaining_volume, biofuel=stock.biofuel.name, feedstock=stock.feedstock.name))
@@ -43,9 +42,9 @@ def fix_etbe():
             print('Multiple transformations')
             for t in transfos:
                 pretty_print_transfo(t)
-                
-            
+
+
 
 if __name__ == '__main__':
     fix_etbe()
-    
+

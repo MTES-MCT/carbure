@@ -1,8 +1,8 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
 from core.serializers import EntityPreviewSerializer
 from elec.models import ElecMeterReadingApplication
-from django.contrib.auth import get_user_model
-
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
 

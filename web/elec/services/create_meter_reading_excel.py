@@ -1,7 +1,8 @@
 from datetime import date, timedelta
 from typing import Iterable, Optional, TypedDict
+
 from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, PatternFill, Side, Border
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 from elec.models import ElecChargePoint, ElecMeterReadingApplication
 from elec.repositories.meter_reading_repository import MeterReadingRepository

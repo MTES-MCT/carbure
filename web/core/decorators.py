@@ -1,9 +1,10 @@
 import inspect
-from core.models import UserRights, Entity, ExternalAdminRights
-from django.http import JsonResponse
-from django.db.models import Q
-from core.common import ErrorResponse
 from functools import wraps
+
+from django.http import JsonResponse
+
+from core.common import ErrorResponse
+from core.models import Entity, ExternalAdminRights, UserRights
 
 
 def otp_or_403(function):

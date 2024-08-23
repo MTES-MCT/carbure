@@ -1,7 +1,4 @@
-from auth.tokens import account_activation_token
 from authtools.forms import UserCreationForm
-from core.carburetypes import CarbureError
-from core.common import ErrorResponse, SuccessResponse
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
@@ -9,6 +6,10 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django_otp.plugins.otp_email.models import EmailDevice
+
+from auth.tokens import account_activation_token
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 
 
 def register(request):

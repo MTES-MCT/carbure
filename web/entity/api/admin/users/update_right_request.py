@@ -1,11 +1,9 @@
-from core.decorators import check_admin_rights
-from django.http import JsonResponse
-from core.models import ExternalAdminRights, UserRights
-
-from core.models import UserRightsRequests
 from django.conf import settings
 from django.core.mail import send_mail
+from django.http import JsonResponse
 
+from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights, UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
 

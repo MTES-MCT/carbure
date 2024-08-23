@@ -2,10 +2,10 @@
 
 import datetime
 import os
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
-import pandas
 
 from core.models import Entity, UserRights
 from core.tests_utils import setup_current_user

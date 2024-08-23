@@ -1,14 +1,12 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 
-from transactions.api.lots.tests.tests_utils import get_lot
-from core.tests_utils import setup_current_user
-from core.models import CarbureLot, Entity, UserRights
-from django_otp.plugins.otp_email.models import EmailDevice
-from transactions.models import YearConfig
 from core.carburetypes import CarbureError
+from core.models import CarbureLot, Entity
+from core.tests_utils import setup_current_user
+from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.models import YearConfig
 
 
 class LotCorrectionTest(TestCase):

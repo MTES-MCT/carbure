@@ -1,6 +1,8 @@
 import traceback
+
 from django.db.models import Case, Value, When
 from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import CarbureLot, Entity
 

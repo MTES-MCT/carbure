@@ -1,12 +1,12 @@
 # test with : python web/manage.py test elec.api.admin.audit.charge_points.tests_audit_charge_points.ElecAdminAuditChargePointsTest --keepdb
 
 import datetime
-import stat
-from core.tests_utils import setup_current_user
-from core.models import Entity
+
 from django.test import TestCase
 from django.urls import reverse
 
+from core.models import Entity
+from core.tests_utils import setup_current_user
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 

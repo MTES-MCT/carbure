@@ -1,11 +1,11 @@
 from django import forms
 from django.http import HttpRequest
-
 from django.views.decorators.http import require_POST
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Entity, ExternalAdminRights
+from core.models import ExternalAdminRights
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 
 

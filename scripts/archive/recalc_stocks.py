@@ -1,7 +1,6 @@
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -24,12 +23,12 @@ def reset_remaining_volume(tx):
             tx.lot.save()
         return
 
-    
+
     if tx.lot.volume != tx.lot.remaining_volume:
         print('Reset %s remaining volume from %f to %f. Tx id [%d] Lot id [%d] client %s' % (tx.lot.biocarburant.code, tx.lot.remaining_volume, tx.lot.volume, tx.id, tx.lot.id, tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
         tx.lot.remaining_volume = tx.lot.volume
         tx.lot.save()
-        
+
 def handle_complex_stock(tx, child_tx):
     if tx.lot.is_transformed:
         print("ignoring ETBE")
@@ -48,7 +47,7 @@ def handle_complex_stock(tx, child_tx):
         sum_volume += c.lot.volume
     diff = round(tx.lot.volume - sum_volume, 2) - round(tx.lot.remaining_volume, 2)
     if abs(diff) > 0.1:
-        print('Parent volume [%d] remaining [%d] theo remaining [%d] diff [%d] child volume [%d]' % (tx.lot.volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, tx.lot.remaining_volume - (tx.lot.volume - sum_volume), sum_volume))    
+        print('Parent volume [%d] remaining [%d] theo remaining [%d] diff [%d] child volume [%d]' % (tx.lot.volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, tx.lot.remaining_volume - (tx.lot.volume - sum_volume), sum_volume))
         print('Tx id [%d] Lot Id [%d]' % (tx.id, tx.lot.id))
         print('Parent remaining_volume != initial volume - child volume: Lot initial volume [%f] Sum of child [%f] Remaining [%f] Theo Remaining [%f] Diff [%f]' % (tx.lot.volume, sum_volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, diff))
         print('Original Lot Period [%s] Volume [%f] BC [%s] MP [%s] Client [%s]' % (tx.lot.period, tx.lot.volume, tx.lot.biocarburant.code, tx.lot.matiere_premiere.code, tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
@@ -60,7 +59,7 @@ def handle_complex_stock(tx, child_tx):
             print('Saving')
             tx.lot.save()
         print('New remaining volume: [%f]' % (tx.lot.remaining_volume))
-            
+
 def fix_other_stock():
     # ensure forwarded lots are marked as such
     lots_with_parent = LotV2.objects.filter(parent_lot__isnull=False)
@@ -72,10 +71,10 @@ def fix_other_stock():
             for t in parent_tx:
                 print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
             for t in tx:
-                print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
+                print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)
                 if t.parent_tx is None:
                     if tx.count() == 1:
-                        print('Marking Parent tx as %d' % (parent.id))                        
+                        print('Marking Parent tx as %d' % (parent.id))
                         t.parent_tx_id = parent.id
                         t.save()
                         if parent.lot.biocarburant != t.lot.biocarburant:
@@ -125,7 +124,7 @@ def fix_other_stock():
         else:
             print('Could not find parent for tx id %d lot id %d parent lot id %d' % (tx.id, tx.lot.id, tx.lot.parent_lot_id))
 
-    
+
     stocks = LotTransaction.objects.filter(lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
     for l in stocks:
         child_txs = LotTransaction.objects.filter(parent_tx=l, lot__status='Validated')
@@ -156,7 +155,7 @@ def fix_other_stock():
                 if l.lot.volume == l.lot.remaining_volume:
                     # mark as blending
                     l.is_stock = False
-                    l.save()                
+                    l.save()
                 reset_remaining_volume(l)
             else:
                 if not l.lot.is_transformed:

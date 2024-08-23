@@ -1,19 +1,11 @@
-import sys, os
+import os
+
 import django
-import csv
-import calendar
-import datetime
-import re
-import argparse
-import openpyxl
-import pandas as pd
-from typing import TYPE_CHECKING, Dict, List, Optional
-from pandas._typing import FilePathOrBuffer, Scalar
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from certificates.models import SNCategory, SNCertificate, SNCertificateScope, EntitySNTradingCertificate
+from certificates.models import EntitySNTradingCertificate, SNCertificate
 from core.models import Entity
 
 user_said_yes = lambda q: input(q).lower().strip()[0] == "y"
@@ -42,7 +34,7 @@ def try_assign_sn_certificates():
                             print('NO')
                 else:
                     print('Could not find match for %s' % (cert.certificate_holder))
-        
+
 def main():
     try_assign_sn_certificates()
 

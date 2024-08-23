@@ -2,11 +2,12 @@ import datetime
 import json
 import random
 
-from core.tests_utils import setup_current_user
-from core.models import Biocarburant, CarbureLot, CarbureStock, CarbureStockTransformation, Depot, Entity
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import Biocarburant, CarbureLot, CarbureStock, CarbureStockTransformation, Depot, Entity
+from core.tests_utils import setup_current_user
 from transactions.factories import CarbureLotFactory, CarbureStockFactory
 
 

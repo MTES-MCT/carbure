@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from core.models import CarbureLot, Depot
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCSVSerializer, CarbureLotPublicSerializer
 

@@ -1,18 +1,19 @@
 # test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
-from datetime import date
 import json
 import os
+from datetime import date
 from pprint import pprint
-from doublecount.api.admin.applications.add import DoubleCountingAddError
-from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
-from certificates.models import DoubleCountingRegistration
 
-from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, UserRights
-from django.test import TestCase
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
+from django.urls import reverse
+
+from certificates.models import DoubleCountingRegistration
+from core.models import Entity, Pays, UserRights
+from core.tests_utils import setup_current_user
+from doublecount.api.admin.applications.add import DoubleCountingAddError
+from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
 from doublecount.factories import (
     DoubleCountingApplicationFactory,
     DoubleCountingProductionFactory,
@@ -20,7 +21,6 @@ from doublecount.factories import (
 )
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.doc_file import DoubleCountingDocFileFactory
-
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
 

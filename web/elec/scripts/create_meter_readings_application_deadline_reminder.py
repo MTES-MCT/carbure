@@ -1,12 +1,13 @@
 import os
-import django
 from datetime import date
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from elec.repositories.meter_reading_repository import MeterReadingRepository
 from core.models import CarbureNotification
+from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.meter_readings_application_quarter import (
     get_application_quarter,
 )

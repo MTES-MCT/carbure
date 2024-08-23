@@ -1,11 +1,12 @@
 # /api/saf/airline/tickets
 
-from math import floor
 import traceback
+from math import floor
+
 from django.core.paginator import Paginator
 from django.db.models import Q
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from saf.models import SafTicket

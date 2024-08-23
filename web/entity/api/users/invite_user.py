@@ -1,10 +1,11 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_http_methods
-from django import forms
+
+from auth.api.register import send_email as send_registration_email
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import UserRights, UserRightsRequests, Entity
-from auth.api.register import send_email as send_registration_email
+from core.models import UserRights, UserRightsRequests
 
 User = get_user_model()
 

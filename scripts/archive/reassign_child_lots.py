@@ -1,14 +1,13 @@
-import sys
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def pretty_print_oldlot(tx):
     print("OLD txid {id} (parent_tx_id {parent_tx_id}) lot_id {lot_id} (parent lot_id {parent_lot_id}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} Supplier {supplier} Client {client}".format(id=tx.id, parent_tx_id=tx.parent_tx.id if tx.parent_tx else None, lot_id=tx.lot.id, parent_lot_id=tx.lot.parent_lot.id if tx.lot.parent_lot else None, carbure_id=tx.lot.carbure_id, period=tx.lot.period, dae=tx.dae, biofuel=tx.lot.biocarburant.name, feedstock=tx.lot.matiere_premiere.name, volume=tx.lot.volume, delivery_date=tx.delivery_date, supplier=tx.carbure_vendor.name if tx.carbure_vendor else 'UNKNOWN', client=tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
@@ -44,7 +43,7 @@ def handle_lot(lot):
     except:
         # could not find stock. is it a TRADING Lot ?
         print('Could not find linked stock')
-            
+
         res = input("Enter new parent lot_id:")
         try:
             tid = int(res)
@@ -58,7 +57,7 @@ def handle_lot(lot):
         #candidate.save()
         lot.parent_lot_id = tid
         #lot.save()
-            
+
 def reassign():
     odd_lots = CarbureLot.objects.filter(carbure_producer__isnull=False, parent_lot__isnull=True, parent_stock__isnull=True, carbure_supplier__entity_type=Entity.TRADER)
     for lot in odd_lots:
@@ -66,8 +65,8 @@ def reassign():
             continue
         print('##################################################')
         handle_lot(lot)
-        
-            
+
+
 if __name__ == '__main__':
     reassign()
-    
+

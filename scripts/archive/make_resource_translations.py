@@ -1,9 +1,10 @@
 import json
-import django
 import os
+
+import django
+import environ
 from django.db.models import F
 
-import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
@@ -12,8 +13,7 @@ env = environ.Env(
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
-from core.models import MatierePremiere, Biocarburant, Pays
-
+from core.models import Biocarburant, MatierePremiere, Pays
 
 queries = {
     'feedstocks.json': MatierePremiere.objects.all().annotate(value=F('code'), label=F('name')).values('value', 'label').order_by('value'),

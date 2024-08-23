@@ -1,3 +1,8 @@
+from django.db.models.aggregates import Count, Sum
+from django.db.models.expressions import F
+from django.db.models.functions.comparison import Coalesce
+from django.db.models.query_utils import Q
+
 from core.models import (
     CarbureLot,
     CarbureLotComment,
@@ -5,10 +10,6 @@ from core.models import (
 from core.serializers import (
     CarbureLotCommentSerializer,
 )
-from django.db.models.aggregates import Count, Sum
-from django.db.models.expressions import F
-from django.db.models.functions.comparison import Coalesce
-from django.db.models.query_utils import Q
 
 
 def get_admin_summary_data(lots, short=False):

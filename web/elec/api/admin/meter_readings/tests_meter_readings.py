@@ -1,12 +1,12 @@
 import datetime
-from datetime import timezone, timedelta
 from decimal import Decimal
-from core.tests_utils import setup_current_user
-from core.models import Entity
+
 from django.test import TestCase
 from django.urls import reverse
-from elec.models.elec_charge_point import ElecChargePoint
 
+from core.models import Entity
+from core.tests_utils import setup_current_user
+from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication

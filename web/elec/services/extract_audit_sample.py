@@ -1,6 +1,8 @@
 import random
 from collections import defaultdict
+
 from django.db.models import QuerySet
+
 from elec.models import ElecChargePoint
 
 

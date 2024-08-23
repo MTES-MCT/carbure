@@ -1,4 +1,5 @@
 from django.db.models import Count, Sum
+
 from elec.models import ElecChargePointApplication
 from elec.models.elec_charge_point import ElecChargePoint
 

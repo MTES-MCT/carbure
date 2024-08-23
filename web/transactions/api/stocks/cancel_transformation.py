@@ -1,9 +1,10 @@
 from django import forms
 from django.db import transaction
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import CarbureStock, CarbureStock, CarbureStockEvent, CarbureStockTransformation, UserRights
+from core.models import CarbureStock, CarbureStockEvent, CarbureStockTransformation, UserRights
 from core.utils import MultipleValueField
 
 

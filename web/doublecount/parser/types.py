@@ -1,4 +1,3 @@
-from os import name
 from typing import TypedDict
 
 

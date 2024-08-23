@@ -1,18 +1,15 @@
-from urllib import request
+from datetime import datetime
+
 from django import forms
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db import transaction
 
 from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import otp_or_403
-from core.models import EntityCertificate, GenericCertificate, Entity, Pays, UserRightsRequests
-from core.common import SuccessResponse, ErrorResponse
-from django.core.mail import send_mail
-from django.conf import settings
-
-from datetime import datetime
-
+from core.models import Entity, EntityCertificate, GenericCertificate, Pays, UserRightsRequests
 from core.utils import CarbureEnv
-import urllib.parse
 
 
 class ApplyForNewCompanyError:

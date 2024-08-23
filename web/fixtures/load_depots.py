@@ -1,6 +1,7 @@
-import sys, os
-import django
 import csv
+import os
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()

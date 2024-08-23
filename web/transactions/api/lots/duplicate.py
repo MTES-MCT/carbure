@@ -1,10 +1,9 @@
 from django.db.models.fields import NOT_PROVIDED
-
 from django.http.response import JsonResponse
-from core.decorators import check_user_rights
-from transactions.sanity_checks import bulk_sanity_checks, bulk_scoring, get_prefetched_data
 
+from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotEvent, Entity, UserRights
+from transactions.sanity_checks import bulk_sanity_checks, bulk_scoring, get_prefetched_data
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

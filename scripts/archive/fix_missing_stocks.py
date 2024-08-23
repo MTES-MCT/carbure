@@ -1,14 +1,13 @@
-import sys
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def fix_missing_stocks():
     lots_wo_carbureid = CarbureLot.objects.filter(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED], carbure_id='')
@@ -23,7 +22,7 @@ def fix_missing_stocks():
         stock.generate_carbure_id()
         stock.save()
 
-        
+
     should_be_stock = CarbureLot.objects.filter(carbure_client_id=93, delivery_type=CarbureLot.BLENDING, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     for lot in should_be_stock:
         print('Should be stock %d' % (lot.id))
@@ -54,8 +53,8 @@ def fix_missing_stocks():
         stock.save()
         lot.delivery_type = CarbureLot.STOCK
         lot.save()
-    
-                
+
+
 if __name__ == '__main__':
     fix_missing_stocks()
-    
+

@@ -1,13 +1,12 @@
 # test with : python web/manage.py test entity.api.registration.tests_add_company.EntityRegistrationAddCompanyTest --keepdb
 
 import datetime
-from faulthandler import is_enabled
 
-from core.tests_utils import setup_current_user
-from core.models import Entity, EntityCertificate, GenericCertificate, UserRights, UserRightsRequests
 from django.test import TestCase
 from django.urls import reverse
 
+from core.models import Entity, EntityCertificate, GenericCertificate, UserRights, UserRightsRequests
+from core.tests_utils import setup_current_user
 from entity.helpers import enable_entity
 
 

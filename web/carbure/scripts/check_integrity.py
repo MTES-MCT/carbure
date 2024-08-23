@@ -1,8 +1,8 @@
 import argparse
-import django
-import os
 import json
+import os
 
+import django
 from django.core.paginator import Paginator
 from tqdm import tqdm
 

@@ -1,14 +1,15 @@
 import os
-import django
-from django.db.models.aggregates import StdDev
-from django.db.models import Avg, Count, Min, Max
 
+import django
+from django.db.models import Avg, Count, Max, Min
+from django.db.models.aggregates import StdDev
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from core.models import CarbureLot, MatierePremiere
 from ml.models import EECStats, EPStats, ETDStats
-from core.models import Entity, MatierePremiere, Biocarburant, CarbureLot
+
 
 def load_eec_data():
     default_values = {

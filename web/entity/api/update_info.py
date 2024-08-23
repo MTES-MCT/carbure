@@ -1,9 +1,8 @@
-from math import e
 from django import forms
 
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import Pays, UserRights, Entity
-from core.common import SuccessResponse, ErrorResponse
+from core.models import Entity, Pays, UserRights
 
 
 class UpdateEntityError:

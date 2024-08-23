@@ -1,9 +1,11 @@
 import datetime
-from core.tests_utils import setup_current_user
-from core.models import Entity
+
 from django.test import TestCase
 from django.urls import reverse
-from elec.models import ElecChargePointApplication, ElecChargePoint
+
+from core.models import Entity
+from core.tests_utils import setup_current_user
+from elec.models import ElecChargePoint, ElecChargePointApplication
 
 
 class ElecCharginPointsTest(TestCase):

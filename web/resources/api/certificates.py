@@ -1,7 +1,8 @@
-from core.models import GenericCertificate
-from core.serializers import GenericCertificateSerializer
 from django.db.models.query_utils import Q
 from django.http.response import JsonResponse
+
+from core.models import GenericCertificate
+from core.serializers import GenericCertificateSerializer
 
 
 def get_certificates(request, *args, **kwargs):

@@ -1,9 +1,9 @@
-from core.decorators import otp_or_403
-from core.models import Entity, UserRights, UserRightsRequests
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import JsonResponse
 
+from core.decorators import otp_or_403
+from core.models import Entity, UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
 

@@ -1,9 +1,11 @@
+from django.http.response import JsonResponse
+
+from core.decorators import check_admin_rights
 from core.helpers import (
     get_lot_comments,
     get_lot_updates,
     get_stock_events,
 )
-from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureStock,
@@ -14,7 +16,6 @@ from core.serializers import (
     CarbureStockPublicSerializer,
     CarbureStockTransformationPublicSerializer,
 )
-from django.http.response import JsonResponse
 
 
 @check_admin_rights()

@@ -1,7 +1,8 @@
 # /api/saf/operator/assign-ticket
 
 import traceback
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 

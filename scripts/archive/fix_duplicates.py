@@ -1,14 +1,13 @@
-import sys
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def fix_duplicates():
     odd_lots = CarbureLot.objects.filter(parent_lot__delivery_type=CarbureLot.BLENDING)
@@ -20,8 +19,8 @@ def fix_duplicates():
         else:
             print('%d %d duplicates' % (lot.parent_lot.id, lot.id))
             lot.delete()
-    
+
 
 if __name__ == '__main__':
     fix_duplicates()
-    
+

@@ -1,13 +1,13 @@
-import traceback
-import xlsxwriter
 import datetime
 import random
+import traceback
+
 import pandas as pd
+import xlsxwriter
 
+from core.models import Biocarburant, CarbureStock, Depot, Entity, GenericCertificate, MatierePremiere, Pays, ProductionSite
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
-from core.models import CarbureStock, GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
-
 
 UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
                     {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': '', 'date':'2014-03-01', 'dc':''},

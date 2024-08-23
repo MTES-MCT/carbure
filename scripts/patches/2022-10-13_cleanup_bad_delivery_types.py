@@ -1,11 +1,11 @@
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import CarbureLot
-
 
 ok_delivery_types = (
     CarbureLot.UNKNOWN,

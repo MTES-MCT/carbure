@@ -1,14 +1,15 @@
-from core.decorators import check_user_rights
+import json
+
 from django.http.response import JsonResponse
+
+from core.decorators import check_user_rights
 from core.helpers import handle_eth_to_etbe_transformation
 from core.models import (
-    Entity,
-    CarbureStock,
     CarbureStock,
     CarbureStockTransformation,
+    Entity,
     UserRights,
 )
-import json
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

@@ -1,10 +1,12 @@
-import sys, os
+import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import LotV2, LotTransaction, Entity
+from core.models import Entity, LotTransaction
+
 
 def try_assign_volumes():
     entities = Entity.objects.filter(entity_type__in=['Producteur', 'Trader'])
@@ -20,7 +22,7 @@ def try_assign_volumes():
             s.lot.save()
         else:
             print('Found tx with children %d' % (s.id))
-       
+
 def main():
     try_assign_volumes()
 

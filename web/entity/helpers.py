@@ -1,7 +1,8 @@
+from django.conf import settings
+from django.core.mail import send_mail
+
 from core.models import UserRights, UserRightsRequests
 from core.utils import CarbureEnv
-from django.core.mail import send_mail
-from django.conf import settings
 
 
 def enable_entity(entity):

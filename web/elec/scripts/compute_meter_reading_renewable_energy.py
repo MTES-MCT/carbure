@@ -1,13 +1,14 @@
 import argparse
-import django
 import os
-from tqdm import tqdm
-from django.db import transaction
 
+import django
+from django.db import transaction
+from tqdm import tqdm
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
@@ -15,12 +16,9 @@ from elec.services.create_meter_reading_excel import get_previous_readings_by_ch
 from transactions.models.year_config import YearConfig
 
 
-from elec.models.elec_meter_reading import ElecMeterReading
-
-
 @transaction.atomic
 def compute_meter_reading_renewable_energy(batch):
-    print(f"> Compute meter reading renewable energy based on previous readings")
+    print("> Compute meter reading renewable energy based on previous readings")
 
     meter_reading_applications = ElecMeterReadingApplication.objects.all().select_related("cpo")
 

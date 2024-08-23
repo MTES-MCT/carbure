@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from certificates.models import ProductionSiteCertificate
-from certificates.models import DoubleCountingRegistration, DoubleCountingRegistrationInputOutput
+from certificates.models import DoubleCountingRegistration, DoubleCountingRegistrationInputOutput, ProductionSiteCertificate
 
 
 class ProductionSiteCertificateAdmin(admin.ModelAdmin):

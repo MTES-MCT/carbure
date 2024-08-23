@@ -1,13 +1,13 @@
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def check_odd_forward():
     lots = LotTransaction.objects.filter(is_forwarded=True)
@@ -30,8 +30,8 @@ def check_odd_forward():
                 # cancel forward
                 l.is_forwarded = False
                 l.save()
-                    
-            
+
+
 
 if __name__ == '__main__':
     check_odd_forward()

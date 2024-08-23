@@ -1,6 +1,7 @@
 from core.common import compute_quantities
 from core.models import CarbureLot
-from .node import Node, GHG_FIELDS
+
+from .node import GHG_FIELDS, Node
 
 
 class LotNode(Node):

@@ -2,7 +2,7 @@ import logging
 import re
 
 from django.conf import settings
-from django.urls import resolve, Resolver404
+from django.urls import Resolver404, resolve
 
 DEFAULT_LOG_LEVEL = logging.DEBUG
 DEFAULT_HTTP_4XX_LOG_LEVEL = logging.ERROR
@@ -195,7 +195,7 @@ class LoggingMiddleware(object):
         for i, part in enumerate(parts):
             if "Content-Type:" in part:
                 match = BINARY_REGEX.search(part)
-                if match and match.group(2) in BINARY_TYPES and not match.group(4) in ("", "\r\n"):
+                if match and match.group(2) in BINARY_TYPES and match.group(4) not in ("", "\r\n"):
                     part = match.expand(r"\1\2/\3\r\n\r\n(binary data)\r\n")
 
             if i != last:

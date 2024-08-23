@@ -1,10 +1,11 @@
-from transactions.api.lots.tests.tests_utils import get_lot
-from core.models import CarbureLot, Entity, UserRights
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
+
+from core.models import CarbureLot, Entity, UserRights
+from transactions.api.lots.tests.tests_utils import get_lot
 
 
 class LotsTestUnits(TestCase):

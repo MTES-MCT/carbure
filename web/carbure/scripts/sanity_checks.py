@@ -1,7 +1,8 @@
 import argparse
-from typing import Iterable
-import django
 import os
+from typing import Iterable
+
+import django
 
 from transactions.sanity_checks.helpers import get_prefetched_data
 

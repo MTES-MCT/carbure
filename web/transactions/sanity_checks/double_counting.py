@@ -1,8 +1,7 @@
-from ast import List
-from typing import Generator
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import Biocarburant, CarbureLot, MatierePremiere
 from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_incompatibilities
+
 from .helpers import generic_error
 
 
@@ -105,7 +104,7 @@ def get_dc_biofuel_feedstock_incompatibilities(
     if (
         biofuel.is_graisse
         and feedstock.compatible_graisse
-        and not biofuel.code in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV", "EEAG"]
+        and biofuel.code not in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV", "EEAG"]
     ):
         return None
 

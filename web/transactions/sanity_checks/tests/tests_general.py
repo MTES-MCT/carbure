@@ -1,14 +1,16 @@
 import datetime
+
 from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
-from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot, SustainabilityDeclaration
-from transactions.factories import CarbureLotFactory
-from transactions.models import YearConfig
+from core.models import Biocarburant, CarbureLot, Depot, Entity, EntityDepot, MatierePremiere, SustainabilityDeclaration
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
+from transactions.factories import CarbureLotFactory
+from transactions.models import YearConfig
+
+from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
-from ..helpers import enrich_lot, has_error, get_prefetched_data
 
 
 class GeneralSanityChecksTest(TestCase):

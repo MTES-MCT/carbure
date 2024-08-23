@@ -1,8 +1,9 @@
-from core.tests_utils import setup_current_user
-from core.models import Entity, UserRights
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+
+from core.models import Entity, UserRights
+from core.tests_utils import setup_current_user
 
 
 class UserTest(TestCase):
@@ -57,7 +58,7 @@ class UserTest(TestCase):
         postdata = {"entity_id": producer.id, "comment": "", "role": "RO"}
         response = self.client.post(reverse("user-request-access"), postdata)
         self.assertEqual(response.status_code, 200)
- 
+
         # get settings - 1 pending request
         response = self.client.get(reverse(url))
         self.assertEqual(response.status_code, 200)

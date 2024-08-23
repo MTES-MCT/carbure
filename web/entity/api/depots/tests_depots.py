@@ -1,7 +1,8 @@
-from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, Depot
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import Depot, Entity, Pays
+from core.tests_utils import setup_current_user
 
 
 class EntityDepotsTest(TestCase):

@@ -1,5 +1,6 @@
 from django import forms
 from django.views.decorators.http import require_GET
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse

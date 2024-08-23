@@ -2,7 +2,7 @@
 
 import traceback
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicketSource
 from saf.serializers import SafTicketSourceDetailsSerializer

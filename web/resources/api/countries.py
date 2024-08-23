@@ -1,6 +1,7 @@
-from core.models import Pays
 from django.db.models import Q
 from django.http import JsonResponse
+
+from core.models import Pays
 
 
 def get_countries(request):

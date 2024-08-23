@@ -1,14 +1,9 @@
 import argparse
-from decimal import Decimal
-import django
 import os
-import pandas as pd
-from tqdm import tqdm
-from collections import defaultdict
-from django.db import transaction
-from django.core.paginator import Paginator
-from django.db.models.functions import Length
 
+import django
+import pandas as pd
+from django.db import transaction
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -20,7 +15,7 @@ from elec.services.transport_data_gouv import TransportDataGouv
 
 @transaction.atomic
 def refresh_charge_point_data(cpo, batch):
-    print(f"> Refresh charge point data from TDG")
+    print("> Refresh charge point data from TDG")
 
     charge_points = ElecChargePoint.objects.all().order_by("charge_point_id")
     if cpo:

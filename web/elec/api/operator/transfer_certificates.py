@@ -1,15 +1,12 @@
-from math import floor
 import traceback
+from math import floor
 
 from django.core.paginator import Paginator
-from core.decorators import check_user_rights
+from django.views.decorators.http import require_GET
 
 from core.common import ErrorResponse, SuccessResponse
-from django.views.decorators.http import require_GET
+from core.decorators import check_user_rights
 from core.excel import ExcelResponse
-from elec.models.elec_transfer_certificate import ElecTransferCertificate
-from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
-
 from elec.api.admin.transfer_certificates.transfer_certificates import (
     TransferCertificatesError,
     TransferCertificatesFilterForm,
@@ -18,6 +15,8 @@ from elec.api.admin.transfer_certificates.transfer_certificates import (
     find_transfer_certificates,
     sort_transfer_certificates,
 )
+from elec.models.elec_transfer_certificate import ElecTransferCertificate
+from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 
 @require_GET

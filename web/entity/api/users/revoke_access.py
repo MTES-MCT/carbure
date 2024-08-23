@@ -1,7 +1,8 @@
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests
-from django.http import JsonResponse
-from django.contrib.auth import get_user_model
 
 
 @check_user_rights(role=[UserRights.ADMIN])

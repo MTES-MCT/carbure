@@ -1,6 +1,6 @@
-import sys, os
+import os
+
 import django
-import csv
 import pandas as pd
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")

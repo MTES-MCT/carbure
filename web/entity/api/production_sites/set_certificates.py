@@ -1,9 +1,10 @@
 import traceback
 
+from django.http.response import JsonResponse
+
 from certificates.models import ProductionSiteCertificate
 from core.decorators import check_user_rights
 from core.models import Entity, EntityCertificate
-from django.http.response import JsonResponse
 from producers.models import ProductionSite
 
 

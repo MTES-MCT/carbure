@@ -1,4 +1,5 @@
 from django.db.models import Count
+
 from core.models import Entity, UserRights
 from elec.models.elec_audit_sample import ElecAuditSample
 

@@ -1,5 +1,6 @@
+from datetime import date, datetime
+
 import factory
-from datetime import datetime, date
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile
 

@@ -1,9 +1,8 @@
-from core.decorators import check_admin_rights
-from django.http import JsonResponse
 from django.db.models import Q
-from core.models import ExternalAdminRights
+from django.http import JsonResponse
 
-from core.models import UserRightsRequests
+from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights, UserRightsRequests
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])

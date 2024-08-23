@@ -1,10 +1,10 @@
-import traceback
+
+from django.test import TestCase
+from django.urls import reverse
 
 from core.carburetypes import CarbureError
 from core.models import CarbureLot, Entity
 from core.tests_utils import setup_current_user
-from django.test import TestCase
-from django.urls import reverse
 from transactions.factories import CarbureLotFactory
 from transactions.models import YearConfig
 
