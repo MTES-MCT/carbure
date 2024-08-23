@@ -20,3 +20,6 @@ select = [
     "INP", # No PEP420
     "PT", # Pytest rules
 ]
+ignore = [
+    "T201", # Print
+]
