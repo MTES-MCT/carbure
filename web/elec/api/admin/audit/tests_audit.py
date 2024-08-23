@@ -79,7 +79,7 @@ class ElecAdminAuditTest(TestCase):
         )
         data = response.json()
         years = data["data"]
-        self.assertEqual(len(years), 0)
+        assert len(years) == 0
 
         # 1 year
         self.create_application()
@@ -89,7 +89,7 @@ class ElecAdminAuditTest(TestCase):
         )
         data = response.json()
         years = data["data"]
-        self.assertEqual(len(years), 1)
+        assert len(years) == 1
 
     def test_get_snapshot(self):
         # no snapshot
@@ -99,7 +99,7 @@ class ElecAdminAuditTest(TestCase):
         )
         data = response.json()
         snapshot = data["data"]
-        self.assertEqual(snapshot["charge_points_applications"], 0)
+        assert snapshot["charge_points_applications"] == 0
 
         # filled snapshot
         self.create_application()
@@ -109,6 +109,6 @@ class ElecAdminAuditTest(TestCase):
         )
         data = response.json()
         snapshot = data["data"]
-        self.assertEqual(snapshot["charge_points_applications"], 2)
-        self.assertEqual(snapshot["charge_points_applications_pending"], 1)
-        self.assertEqual(snapshot["charge_points_applications_history"], 1)
+        assert snapshot["charge_points_applications"] == 2
+        assert snapshot["charge_points_applications_pending"] == 1
+        assert snapshot["charge_points_applications_history"] == 1

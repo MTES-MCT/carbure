@@ -33,8 +33,8 @@ class SafSnapshotTest(TestCase):
             "tickets_accepted": 0,
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], expected)
+        assert response.status_code == 200
+        assert response.json()["data"] == expected
 
     def test_saf_snapshot(self):
         response = self.client.get(reverse("saf-airline-snapshot"), {"entity_id": self.entity.id, "year": 2022})
@@ -44,5 +44,5 @@ class SafSnapshotTest(TestCase):
             "tickets_accepted": 10,
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], expected)
+        assert response.status_code == 200
+        assert response.json()["data"] == expected

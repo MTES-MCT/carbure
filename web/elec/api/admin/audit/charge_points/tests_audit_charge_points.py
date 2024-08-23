@@ -73,7 +73,7 @@ class ElecAdminAuditChargePointsTest(TestCase):
 
     def test_accept_application(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
+        assert application.status == ElecChargePointApplication.PENDING
 
         # try to accept whitout audit
         response = self.client.post(
@@ -84,9 +84,9 @@ class ElecAdminAuditChargePointsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         data = response.json()
-        self.assertEqual(data["error"], "AUDIT_NOT_STARTED")
+        assert data["error"] == "AUDIT_NOT_STARTED"
 
         # force accept without audit
         response = self.client.post(
@@ -98,11 +98,11 @@ class ElecAdminAuditChargePointsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
+        assert response.status_code == 200
+        assert response.json() == {"status": "success"}
 
         application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.ACCEPTED)
+        assert application.status == ElecChargePointApplication.ACCEPTED
 
         # try to accept already accepted application
         response = self.client.post(
@@ -113,9 +113,9 @@ class ElecAdminAuditChargePointsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         data = response.json()
-        self.assertEqual(data["error"], "ALREADY_CHECKED")
+        assert data["error"] == "ALREADY_CHECKED"
 
     def test_reject_application(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -128,9 +128,9 @@ class ElecAdminAuditChargePointsTest(TestCase):
                 "entity_id": self.admin.id,
             },
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         data = response.json()
-        self.assertEqual(data["error"], "AUDIT_NOT_STARTED")
+        assert data["error"] == "AUDIT_NOT_STARTED"
 
         # force to reject without audit
         response = self.client.post(
@@ -142,11 +142,11 @@ class ElecAdminAuditChargePointsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
+        assert response.status_code == 200
+        assert response.json() == {"status": "success"}
 
         application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.REJECTED)
+        assert application.status == ElecChargePointApplication.REJECTED
 
         # try to accept already accepted application
         response = self.client.post(
@@ -157,9 +157,9 @@ class ElecAdminAuditChargePointsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         data = response.json()
-        self.assertEqual(data["error"], "ALREADY_CHECKED")
+        assert data["error"] == "ALREADY_CHECKED"
 
     def test_start_audit(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -172,8 +172,8 @@ class ElecAdminAuditChargePointsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
+        assert response.status_code == 200
+        assert response.json() == {"status": "success"}
 
         application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.AUDIT_IN_PROGRESS)
+        assert application.status == ElecChargePointApplication.AUDIT_IN_PROGRESS

@@ -37,7 +37,7 @@ def load_dc_sourcing_data(dca, sourcing_data):
     countries = {f.code_pays: f for f in Pays.objects.all()}
 
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
-    for idx, row in sourcing_data.iterrows():
+    for _idx, row in sourcing_data.iterrows():
         feedstock = feedstocks.get(row.feedstock, None)
         origin_country = countries.get(row.origin_country, None)
         supply_country = countries.get(row.supply_country, None)
@@ -57,7 +57,7 @@ def load_dc_production_data(dca, production_data):
     biofuels = {f.code: f for f in Biocarburant.objects.all()}
 
     DoubleCountingProduction.objects.filter(dca=dca).delete()
-    for idx, row in production_data.iterrows():
+    for _idx, row in production_data.iterrows():
         feedstock = feedstocks.get(row.feedstock, None)
         biofuel = biofuels.get(row.biofuel, None)
         dcs = DoubleCountingProduction(dca=dca)

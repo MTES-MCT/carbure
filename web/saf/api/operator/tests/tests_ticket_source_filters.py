@@ -82,8 +82,8 @@ class SafTicketSourceFiltersTest(TestCase):
             "filter": "feedstocks",
         }
         response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], [])
+        assert response.status_code == 200
+        assert response.json()["data"] == []
 
     def test_ticket_source_filters_feedstock(self):
         query = {
@@ -94,17 +94,9 @@ class SafTicketSourceFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted(
-                [
-                    "HUILE_ALIMENTAIRE_USAGEE",
-                    "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
-                    "BLE",
-                    "COLZA",
-                ]
-            ),
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted(
+            ["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "BLE", "COLZA"]
         )
 
     def test_ticket_source_filters_period_feedstock(self):
@@ -117,10 +109,9 @@ class SafTicketSourceFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted(["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"]),
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted(
+            ["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"]
         )
 
     def test_ticket_source_filters_period(self):
@@ -132,11 +123,8 @@ class SafTicketSourceFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted([202201, 202202]),
-        )
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted([202201, 202202])
 
     def test_ticket_source_filters_client(self):
         query = {
@@ -147,8 +135,5 @@ class SafTicketSourceFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted([self.client1.name, self.client2.name]),
-        )
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted([self.client1.name, self.client2.name])

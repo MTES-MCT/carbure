@@ -65,8 +65,8 @@ class InvalidateDeclarationTest(TestCase):
 
         response = self.client.post(reverse("transactions-declarations-invalidate"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
 
         sent_lots, received_lots = self.get_entity_lots(lot_status=CarbureLot.ACCEPTED)
 
@@ -75,14 +75,14 @@ class InvalidateDeclarationTest(TestCase):
             declared_by_client=False,
         )
 
-        self.assertEqual(undeclared_sent_lots.count(), 50)
+        assert undeclared_sent_lots.count() == 50
 
         undeclared_received_lots = received_lots.filter(
             declared_by_supplier=False,
             declared_by_client=False,
         )
 
-        self.assertEqual(undeclared_received_lots.count(), 50)
+        assert undeclared_received_lots.count() == 50
 
     def test_invalidate_declaration_on_locked_year(self):
         YearConfig.objects.create(year=2021, locked=True)
@@ -93,6 +93,6 @@ class InvalidateDeclarationTest(TestCase):
         }
 
         response = self.client.post(reverse("transactions-declarations-invalidate"), query)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["status"], "error")
-        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
+        assert response.status_code == 400
+        assert response.json()["status"] == "error"
+        assert response.json()["error"] == CarbureError.YEAR_LOCKED

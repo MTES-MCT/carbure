@@ -109,7 +109,7 @@ def find_provision_certificates(provision_certificates, **filters):
             status_filter = status_filter | Q(remaining_energy_amount=0)
         provision_certificates = provision_certificates.filter(status_filter)
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         provision_certificates = provision_certificates.filter(
             Q(cpo__name__icontains=filters["search"]) | Q(operating_unit__icontains=filters["search"])
         )

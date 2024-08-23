@@ -50,16 +50,14 @@ def main(args):
             "nb_notifications": notifs.count(),
             "domain": domain,
             "lots_in": lots_in,
-            "lots_in_suppliers": ",".join(
-                set([n.linked_tx.carbure_vendor.name for n in lots_in if n.linked_tx.carbure_vendor])
-            ),
+            "lots_in_suppliers": ",".join({n.linked_tx.carbure_vendor.name for n in lots_in if n.linked_tx.carbure_vendor}),
             "lots_fixed": lots_fixed,
             "lots_fixed_suppliers": ",".join(
-                set([n.linked_tx.carbure_vendor.name for n in lots_fixed if n.linked_tx.carbure_vendor])
+                {n.linked_tx.carbure_vendor.name for n in lots_fixed if n.linked_tx.carbure_vendor}
             ),
             "lots_tofix": lots_tofix,
             "lots_tofix_clients": ",".join(
-                set([n.linked_tx.carbure_client.name for n in lots_tofix if n.linked_tx.carbure_client])
+                {n.linked_tx.carbure_client.name for n in lots_tofix if n.linked_tx.carbure_client}
             ),
             "nb_notifications": len(notifs),
         }

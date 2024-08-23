@@ -35,7 +35,7 @@ class SafTicketAcceptTest(TestCase):
 
         response = self.client.post(reverse("saf-airline-accept-ticket"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
 
-        self.assertEqual(SafTicket.objects.get(id=self.ticket.id).status, SafTicket.ACCEPTED)
+        assert SafTicket.objects.get(id=self.ticket.id).status == SafTicket.ACCEPTED

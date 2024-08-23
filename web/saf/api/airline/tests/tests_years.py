@@ -26,5 +26,5 @@ class SafYearsTest(TestCase):
 
     def test_saf_years(self):
         response = self.client.get(reverse("saf-airline-years"), {"entity_id": self.entity.id})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], [2021, 2022])
+        assert response.status_code == 200
+        assert response.json()["data"] == [2021, 2022]

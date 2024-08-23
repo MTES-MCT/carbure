@@ -110,10 +110,10 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
     def test_accept_application(self):
         application, meter_readings = self.create_application()
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
+        assert application.status == ElecChargePointApplication.PENDING
 
         # create sample
-        self.assertIsNone(application.audit_sample.first())
+        assert application.audit_sample.first() is None
         response = self.client.post(
             reverse("elec-admin-audit-meter-readings-generate-sample"),
             {
@@ -122,13 +122,13 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
                 "percentage": 10,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(len(data["charge_points"]), 1)
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
+        assert len(data["charge_points"]) == 1
+        assert application.status == ElecChargePointApplication.PENDING
         audit_sample = application.audit_sample.first()
-        self.assertIsNotNone(audit_sample)
-        self.assertEqual(audit_sample.status, ElecAuditSample.IN_PROGRESS)
+        assert audit_sample is not None
+        assert audit_sample.status == ElecAuditSample.IN_PROGRESS
 
         # force accept without audit
         response = self.client.post(
@@ -140,21 +140,21 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
+        assert response.status_code == 200
+        assert response.json() == {"status": "success"}
 
         application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.ACCEPTED)
+        assert application.status == ElecChargePointApplication.ACCEPTED
 
         # audit_sample should be marked as audited
         audit_sample.refresh_from_db()
-        self.assertEqual(audit_sample.status, ElecAuditSample.AUDITED)
+        assert audit_sample.status == ElecAuditSample.AUDITED
 
         # provision certificate should have been created
         certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
-        self.assertEqual(len(certificates), 2)
-        self.assertEqual(
-            certificates.first().energy_amount,
-            (meter_readings[0].renewable_energy + meter_readings[1].renewable_energy) / 1000,
+        assert len(certificates) == 2
+        assert (
+            certificates.first().energy_amount
+            == (meter_readings[0].renewable_energy + meter_readings[1].renewable_energy) / 1000
         )
-        self.assertEqual(certificates[1].energy_amount, meter_readings[2].renewable_energy / 1000)
+        assert certificates[1].energy_amount == meter_readings[2].renewable_energy / 1000

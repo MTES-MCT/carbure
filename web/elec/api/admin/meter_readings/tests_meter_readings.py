@@ -168,25 +168,22 @@ class ElecMeterReadingsTest(TestCase):
         application_date = application.created_at.isoformat()
 
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            {
-                "status": "success",
-                "data": [
-                    {
-                        "application_date": application_date,
-                        "charge_point_count": 1,
-                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                        "energy_total": 24.92,
-                        "id": application.id,
-                        "quarter": 2,
-                        "status": "ACCEPTED",
-                        "year": 2024,
-                    }
-                ],
-            },
-        )
+        assert response.status_code == 200
+        assert data == {
+            "status": "success",
+            "data": [
+                {
+                    "application_date": application_date,
+                    "charge_point_count": 1,
+                    "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                    "energy_total": 24.92,
+                    "id": application.id,
+                    "quarter": 2,
+                    "status": "ACCEPTED",
+                    "year": 2024,
+                }
+            ],
+        }
 
     def test_get_application_details(self):
         response = self.client.get(
@@ -196,18 +193,15 @@ class ElecMeterReadingsTest(TestCase):
 
         data = response.json()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            {
-                "status": "success",
-                "data": [
-                    {
-                        "charge_point_id": "FR00EFGH",
-                        "previous_reading": 500.0,
-                        "current_reading": 600.0,
-                        "reading_date": "2024-05-21",
-                    },
-                ],
-            },
-        )
+        assert response.status_code == 200
+        assert data == {
+            "status": "success",
+            "data": [
+                {
+                    "charge_point_id": "FR00EFGH",
+                    "previous_reading": 500.0,
+                    "current_reading": 600.0,
+                    "reading_date": "2024-05-21",
+                }
+            ],
+        }

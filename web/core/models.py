@@ -823,7 +823,7 @@ class CarbureLot(models.Model):
         data_source_is_producer = CarbureLotReliabilityScore(
             lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, max_score=3, score=0
         )
-        if self.carbure_producer != None:
+        if self.carbure_producer is not None:
             data_source_is_producer.score = 3
 
         # lot declared by both 1 POINT
@@ -1036,7 +1036,9 @@ def lot_pre_save_update_quantities(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=CarbureLot)
-def lot_post_save_gen_carbure_id(sender, instance, created, update_fields={}, *args, **kwargs):
+def lot_post_save_gen_carbure_id(sender, instance, created, update_fields=None, *args, **kwargs):
+    if update_fields is None:
+        update_fields = {}
     old_carbure_id = instance.carbure_id
     instance.generate_carbure_id()
 

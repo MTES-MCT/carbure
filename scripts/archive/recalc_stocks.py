@@ -154,7 +154,7 @@ def fix_other_stock():
                                 parent.lot.save()
                         else:
                             print("You said NO")
-                            assert False
+                            raise AssertionError()
                 parent = t
         if tx.count() == 1 and parent_tx.count() == 1:
             # pretty sure this is a forward
@@ -224,7 +224,7 @@ def fix_other_stock():
                     print("Operator stock with more than one transaction, need investigation")
                     print(l.id, l.lot.id)
                     print(child_txs)
-                    assert False
+                    raise AssertionError()
             continue
         if child_txs.count() == 0:
             if l.is_mac:

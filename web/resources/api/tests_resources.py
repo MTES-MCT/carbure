@@ -33,15 +33,15 @@ class ResourcesTest(TestCase):
         url = "resources-feedstocks"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 4)
+        assert len(response.json()["data"]) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=bl")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_bcs(self):
         # create biocarburants
@@ -53,16 +53,16 @@ class ResourcesTest(TestCase):
         url = "resources-biofuels"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 4)
+        assert len(response.json()["data"]) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=anol")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
 
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_countries(self):
         # create countries
@@ -74,15 +74,15 @@ class ResourcesTest(TestCase):
         url = "resources-countries"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 4)
+        assert len(response.json()["data"]) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=isl")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_ges(self):
         pass
@@ -97,15 +97,15 @@ class ResourcesTest(TestCase):
         url = "resources-entities"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 4)
+        assert len(response.json()["data"]) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=op")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 4)
+        assert len(data) == 4
 
     def test_get_producers(self):
         # create entities
@@ -118,15 +118,15 @@ class ResourcesTest(TestCase):
         url = "resources-producers"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 2)
+        assert len(response.json()["data"]) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=od2")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_operators(self):
         # create entities
@@ -140,15 +140,15 @@ class ResourcesTest(TestCase):
         url = "resources-operators"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 2)
+        assert len(response.json()["data"]) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=op2")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_traders(self):
         # create entities
@@ -163,15 +163,15 @@ class ResourcesTest(TestCase):
         url = "resources-traders"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 2)
+        assert len(response.json()["data"]) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=tr1")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_delivery_sites(self):
         # create delivery sites
@@ -184,15 +184,15 @@ class ResourcesTest(TestCase):
         url = "resources-depots"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 2)
+        assert len(response.json()["data"]) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=carca")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
     def test_get_production_sites(self):
         # create production sites
@@ -227,12 +227,12 @@ class ResourcesTest(TestCase):
         url = "resources-production-sites"
         response = self.client.get(reverse(url))
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()["data"]), 2)
+        assert len(response.json()["data"]) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=ne3")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns filtered data
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1

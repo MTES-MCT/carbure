@@ -29,7 +29,9 @@ class ElecTransferCertificate(models.Model):
 
 # Automatically create certificate id
 @receiver(post_save, sender=ElecTransferCertificate)
-def lot_post_save_gen_certificate_id(sender, instance, created, update_fields={}, *args, **kwargs):
+def lot_post_save_gen_certificate_id(sender, instance, created, update_fields=None, *args, **kwargs):
+    if update_fields is None:
+        update_fields = {}
     old_certificate_id = instance.certificate_id
     instance.generate_certificate_id()
 

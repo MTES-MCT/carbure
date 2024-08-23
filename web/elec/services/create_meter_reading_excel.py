@@ -125,8 +125,10 @@ def create_meter_readings_excel(
 def create_meter_readings_data(
     charge_points: Iterable[ElecChargePoint],
     previous_application: ElecMeterReadingApplication,
-    current_readings: list[dict] = [],
+    current_readings: list[dict] = None,
 ):
+    if current_readings is None:
+        current_readings = []
     previous_readings_by_charge_point = get_previous_readings_by_charge_point(charge_points, previous_application)
     current_readings_by_charge_point = get_current_readings_by_charge_point(current_readings)
 

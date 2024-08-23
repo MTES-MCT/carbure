@@ -48,17 +48,17 @@ class EntityUserTest(TestCase):
 
         url = "entity-users-revoke-access"
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "email": self.user2.email})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_change_user_role_missing_params(self):
         res = self.client.post(
             Endpoint.change_user_role,
             {"email": self.user.email, "entity_id": self.trader.id},
         )
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "UPDATE_FAILED")
-        self.assertIsNotNone(data["data"]["role"])
+        assert data["error"] == "UPDATE_FAILED"
+        assert data["data"]["role"] is not None
 
     def test_change_user_role_missing_user(self):
         res = self.client.post(
@@ -69,9 +69,9 @@ class EntityUserTest(TestCase):
                 "role": "RW",
             },
         )
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "MISSING_USER")
+        assert data["error"] == "MISSING_USER"
 
     def test_change_user_role_no_prior_rights(self):
         other_user = User.objects.create(email="other@carbure.test", name="Other", password="other")
@@ -79,20 +79,20 @@ class EntityUserTest(TestCase):
             Endpoint.change_user_role,
             {"email": other_user.email, "entity_id": self.trader.id, "role": "RW"},
         )
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "NO_PRIOR_RIGHTS")
+        assert data["error"] == "NO_PRIOR_RIGHTS"
 
     def test_change_user_role_ok(self):
         user_right = UserRights.objects.get(user=self.user, entity=self.trader)
-        self.assertEqual(user_right.role, "ADMIN")
+        assert user_right.role == "ADMIN"
         res = self.client.post(
             Endpoint.change_user_role,
             {"email": self.user.email, "entity_id": self.trader.id, "role": "RW"},
         )
-        self.assertEqual(res.status_code, 200)
+        assert res.status_code == 200
         user_right = UserRights.objects.get(user=self.user, entity=self.trader)
-        self.assertEqual(user_right.role, "RW")
+        assert user_right.role == "RW"
 
     def test_invite_user_new_user_success(self):
         params = {
@@ -101,18 +101,16 @@ class EntityUserTest(TestCase):
             "role": UserRights.ADMIN,
         }
         res = self.client.post(Endpoint.invite_user, params)
-        self.assertEqual(res.status_code, 200)
+        assert res.status_code == 200
         new_user = User.objects.get(email="newuser@carbure.local")
-        self.assertIsNotNone(new_user)
-        self.assertEqual(
+        assert new_user is not None
+        assert (
             UserRightsRequests.objects.filter(
                 user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"
-            ).count(),
-            1,
+            ).count()
+            == 1
         )
-        self.assertEqual(
-            UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count(), 1
-        )
+        assert UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count() == 1
 
     def test_invite_user_missing_params(self):
         params = {
@@ -120,10 +118,10 @@ class EntityUserTest(TestCase):
             "email": "newuser@carbure.local",
         }
         res = self.client.post(Endpoint.invite_user, params)
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "INVITE_FAILED")
-        self.assertIsNotNone(data["data"]["role"])
+        assert data["error"] == "INVITE_FAILED"
+        assert data["data"]["role"] is not None
 
     def test_invite_user_bad_email(self):
         params = {
@@ -132,10 +130,10 @@ class EntityUserTest(TestCase):
             "role": UserRights.ADMIN,
         }
         res = self.client.post(Endpoint.invite_user, params)
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "INVITE_FAILED")
-        self.assertIsNotNone(data["data"]["email"])
+        assert data["error"] == "INVITE_FAILED"
+        assert data["data"]["email"] is not None
 
     def test_invite_user_already_granted(self):
         params = {
@@ -144,9 +142,9 @@ class EntityUserTest(TestCase):
             "role": UserRights.RW,
         }
         res = self.client.post(Endpoint.invite_user, params)
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "ACCESS_ALREADY_GIVEN")
+        assert data["error"] == "ACCESS_ALREADY_GIVEN"
 
     def test_invite_user_existing_user_success(self):
         params = {
@@ -155,15 +153,13 @@ class EntityUserTest(TestCase):
             "role": UserRights.ADMIN,
         }
         res = self.client.post(Endpoint.invite_user, params)
-        self.assertEqual(res.status_code, 200)
+        assert res.status_code == 200
         new_user = User.objects.get(email=self.user2.email)
-        self.assertIsNotNone(new_user)
-        self.assertEqual(
+        assert new_user is not None
+        assert (
             UserRightsRequests.objects.filter(
                 user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"
-            ).count(),
-            1,
+            ).count()
+            == 1
         )
-        self.assertEqual(
-            UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count(), 1
-        )
+        assert UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count() == 1

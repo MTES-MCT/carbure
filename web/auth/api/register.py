@@ -23,12 +23,14 @@ def register(request):
         send_email(user, request, subject)
         return SuccessResponse()
     else:
-        errors = {key: e for key, e in form.errors.items()}
+        errors = dict(form.errors.items())
         # return JsonResponse({'status': 'error', 'message': 'Invalid Form', 'errors': errors}, status=400)
         return ErrorResponse(400, CarbureError.INVALID_REGISTRATION_FORM, data=errors)
 
 
-def send_email(user, request, subject, email_type="account_activation_email", extra_context={}):
+def send_email(user, request, subject, email_type="account_activation_email", extra_context=None):
+    if extra_context is None:
+        extra_context = {}
     current_site = get_current_site(request)
     email_subject = subject
     email_context = {

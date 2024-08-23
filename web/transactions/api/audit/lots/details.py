@@ -19,7 +19,6 @@ def get_lot_details(request, entity_id):
     client_id = str(lot.carbure_client_id)
     supplier_id = str(lot.carbure_supplier_id)
 
-    has_right_to_audit_owner = False
     has_right_to_audit_client = False
     has_right_to_audit_supplier = False
     if owner_id in request.session["rights"] and request.session["rights"][owner_id] == UserRights.AUDITOR:

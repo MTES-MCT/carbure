@@ -82,7 +82,7 @@ for i, lot in enumerate(lots):
         print("Could not load lot %s" % (lot))
     lupscd = lot["production_site_commissioning_date"]
     if type(lupscd) != type(today) and type(lupscd) != type(now):
-        if lupscd == None:
+        if lupscd is None:
             lupscd = datetime.datetime(year=2008, month=10, day=5)
         # float and integers
         elif type(lupscd) == type(0.01) or type(lupscd) == type(2000):

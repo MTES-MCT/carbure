@@ -39,17 +39,15 @@ class BiofuelFeedstockSanityChecksTest(TestCase):
         lot = self.create_lot(feedstock=colza)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.feedstock = residus_viniques
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def x_test_provenance_mp(self):
-        error = CarbureSanityCheckErrors.PROVENANCE_MP
         pass
 
     def x_test_mp_bc_incoherent(self):
-        error = CarbureSanityCheckErrors.MP_BC_INCOHERENT
         pass

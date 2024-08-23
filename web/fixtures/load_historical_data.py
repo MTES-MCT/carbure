@@ -149,7 +149,7 @@ def load_lot(lot):
         print("Could not find lot country")
         print(lot)
     lupscd = lot["production_site_commissioning_date"]
-    if lupscd == None:
+    if lupscd is None:
         lupscd = datetime.datetime(year=2008, month=10, day=5)
     elif type(lupscd) == type(today) or type(lupscd) == type(now):
         # do nothing
@@ -200,7 +200,7 @@ def load_lot(lot):
     if isinstance(dd, int):
         dd = datetime.date.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + lot["delivery_date"] - 2)
     try:
-        period = dd.strftime("%Y-%m")
+        dd.strftime("%Y-%m")
     except:
         print("delivery date problem")
         print(lot)

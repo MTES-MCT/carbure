@@ -20,10 +20,10 @@ def cleanup_s3db(args):
     today = datetime.date.today()
     last_month = today - datetime.timedelta(days=30)
     prefix = last_month.strftime("%Y/%m")
-    backups = [o for o in bucket.objects.filter(Prefix=prefix)]
+    backups = list(bucket.objects.filter(Prefix=prefix))
 
     to_delete = backups[0:-1]
-    client = boto3.client("s3")
+    boto3.client("s3")
     deleted = 0
     for o in to_delete:
         print("Delete object %s" % o)

@@ -24,8 +24,10 @@ ExcelConfig = list[SheetConfig]
 
 
 def export_to_excel(
-    location: str, config: ExcelConfig, format: dict = {"bold": True}, column_width: int = 10, header_height: int = 20
+    location: str, config: ExcelConfig, format: dict = None, column_width: int = 10, header_height: int = 20
 ):
+    if format is None:
+        format = {"bold": True}
     workbook = xlsxwriter.Workbook(location)
 
     bold_and_wrap_format = workbook.add_format(format)
@@ -113,7 +115,7 @@ class TableParser:
     def bool(cell):
         if isinstance(cell, str):
             cell = cell.lower()
-        if cell == "oui" or cell == "yes" or cell == "x" or cell == 1 or cell == True or cell == "true":
+        if cell == "oui" or cell == "yes" or cell == "x" or cell == 1 or cell is True or cell == "true":
             return True
         elif not cell or pd.isna(cell) or cell == "non" or cell == "no" or cell == "false":
             return False

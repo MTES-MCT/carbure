@@ -10,7 +10,7 @@ def get_production_sites(request, entity, entity_id):
     psites = ProductionSite.objects.filter(producer=entity)
 
     psitesbyid = {p.id: p for p in psites}
-    for k, v in psitesbyid.items():
+    for _k, v in psitesbyid.items():
         v.inputs = []
         v.outputs = []
 

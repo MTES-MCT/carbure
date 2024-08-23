@@ -139,7 +139,7 @@ def get_prefetched_data(entity=None):
 
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
-    depotsbyentities = dict()
+    depotsbyentities = {}
     associated_depots = EntityDepot.objects.select_related("entity", "depot").all()
     for entitydepot in associated_depots:
         if entitydepot.entity.pk in depotsbyentities:

@@ -163,12 +163,14 @@ class Validator(forms.Form):
     DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y"]
 
     @classmethod
-    def bulk_validate(SpecializedValidator, items, context={}) -> tuple[list, list]:
+    def bulk_validate(SpecializedValidator, items, context=None) -> tuple[list, list]:
         """
         Use this method to validate a list of dicts with the current Validator.
         Ex: If you defined a LotValidator, you can run `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`
         """
 
+        if context is None:
+            context = {}
         valid_items = []
         errors = []
 
@@ -183,7 +185,9 @@ class Validator(forms.Form):
 
     # extend the default Form constructor by adding the ability to set a context with external data
     # useful during calls to self.extend() and self.validate() as you can use data that doesn't belong to the FormData itself
-    def __init__(self, data, context={}, **kwargs):
+    def __init__(self, data, context=None, **kwargs):
+        if context is None:
+            context = {}
         super().__init__(data=data, **kwargs)
         self.context = context
         extended_data = self.extend(self.data)

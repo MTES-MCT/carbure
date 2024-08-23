@@ -28,7 +28,7 @@ class LotsCertifMayhemTest(TestCase):
             password=self.password,
         )
         loggedin = self.client.login(username=self.user1.email, password=self.password)
-        self.assertTrue(loggedin)
+        assert loggedin
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
@@ -48,17 +48,17 @@ class LotsCertifMayhemTest(TestCase):
 
         # pass otp verification
         response = self.client.post(reverse("auth-request-otp"))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
         response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
         response = self.client.post(reverse("transactions-lots-add"), lot)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
         lot_id = data["id"]
         lot = CarbureLot.objects.get(id=lot_id)
@@ -71,7 +71,7 @@ class LotsCertifMayhemTest(TestCase):
         )
         if response.status_code != 200:
             print(response.json())
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
 
@@ -81,15 +81,15 @@ class LotsCertifMayhemTest(TestCase):
         # producer to operator, will use entity.default_certificate
         lot = self.create_draft()
         lot = self.send_lot(lot)
-        self.assertEqual(lot.supplier_certificate, self.producer.default_certificate)
-        self.assertEqual(lot.vendor_certificate, None)
+        assert lot.supplier_certificate == self.producer.default_certificate
+        assert lot.vendor_certificate is None
 
     def test_send_lot_with_supplier_certificate(self):
         # producer to operator, will use what is provided
         lot = self.create_draft(supplier_certificate="TOTO")
         lot = self.send_lot(lot)
-        self.assertEqual(lot.supplier_certificate, "TOTO")
-        self.assertEqual(lot.vendor_certificate, None)
+        assert lot.supplier_certificate == "TOTO"
+        assert lot.vendor_certificate is None
 
     def test_send_lot_with_vendor_certificate(self):
         # TRADING - trading lot with no supplier certificate provided
@@ -100,12 +100,12 @@ class LotsCertifMayhemTest(TestCase):
             carbure_production_site="",
             unknown_producer="BIOFUEL GMBH",
         )
-        self.assertEqual(lot.supplier_certificate, "")
-        self.assertEqual(lot.vendor_certificate, "TOTO")
+        assert lot.supplier_certificate == ""
+        assert lot.vendor_certificate == "TOTO"
         lot = self.send_lot(lot)
         child = CarbureLot.objects.get(parent_lot=lot)
-        self.assertEqual(child.supplier_certificate, "TOTO")
-        self.assertEqual(child.vendor_certificate, None)
+        assert child.supplier_certificate == "TOTO"
+        assert child.vendor_certificate is None
 
     def test_send_lot_with_both_certificates(self):
         # TRADING - both certificates
@@ -117,9 +117,9 @@ class LotsCertifMayhemTest(TestCase):
             carbure_production_site="",
             unknown_producer="BIOFUEL GMBH",
         )
-        self.assertEqual(lot.supplier_certificate, "MY_SUPPLIER")
-        self.assertEqual(lot.vendor_certificate, "MY_CERTIFICATE")
+        assert lot.supplier_certificate == "MY_SUPPLIER"
+        assert lot.vendor_certificate == "MY_CERTIFICATE"
         lot = self.send_lot(lot)
         child = CarbureLot.objects.get(parent_lot=lot)
-        self.assertEqual(child.supplier_certificate, "MY_CERTIFICATE")
-        self.assertEqual(child.vendor_certificate, None)
+        assert child.supplier_certificate == "MY_CERTIFICATE"
+        assert child.vendor_certificate is None

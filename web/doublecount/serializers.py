@@ -245,12 +245,12 @@ class DoubleCountingApplicationPartialSerializerWithForeignKeys(serializers.Mode
 
     def get_aggregated_sourcing(self, dca):
         agg = dca.sourcing.all().values("year", "feedstock").annotate(sum=Sum("metric_tonnes"), count=Count("metric_tonnes"))
-        feedstock_ids = set(list([a["feedstock"] for a in agg]))
+        feedstock_ids = {a["feedstock"] for a in agg}
         feedstocks = {f.id: f for f in MatierePremiere.objects.filter(id__in=feedstock_ids)}
         for a in agg:
             s = FeedStockSerializer(feedstocks[a["feedstock"]])
             a["feedstock"] = s.data
-        return [a for a in agg]
+        return list(agg)
 
     class Meta:
         model = DoubleCountingApplication

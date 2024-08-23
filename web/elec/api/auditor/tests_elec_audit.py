@@ -106,17 +106,17 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             charge_point_application=charge_point_application,
         )
 
-        charge_point_audit_1 = ElecAuditChargePoint.objects.create(
+        ElecAuditChargePoint.objects.create(
             audit_sample=charge_point_audit_sample,
             charge_point=charge_point_1,
         )
 
-        charge_point_audit_2 = ElecAuditChargePoint.objects.create(
+        ElecAuditChargePoint.objects.create(
             audit_sample=charge_point_audit_sample,
             charge_point=charge_point_2,
         )
 
-        charge_point_audit_3 = ElecAuditChargePoint.objects.create(
+        ElecAuditChargePoint.objects.create(
             audit_sample=charge_point_audit_sample,
             charge_point=charge_point_3,
         )
@@ -156,19 +156,19 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             meter_reading_application=meter_reading_application,
         )
 
-        meter_reading_audit_1 = ElecAuditChargePoint.objects.create(
+        ElecAuditChargePoint.objects.create(
             audit_sample=meter_reading_audit_sample,
             meter_reading=meter_reading_1,
             charge_point=charge_point_1,
         )
 
-        meter_reading_audit_2 = ElecAuditChargePoint.objects.create(
+        ElecAuditChargePoint.objects.create(
             audit_sample=meter_reading_audit_sample,
             meter_reading=meter_reading_2,
             charge_point=charge_point_2,
         )
 
-        meter_reading_audit_3 = ElecAuditChargePoint.objects.create(
+        ElecAuditChargePoint.objects.create(
             audit_sample=meter_reading_audit_sample,
             meter_reading=meter_reading_3,
             charge_point=charge_point_3,
@@ -188,8 +188,8 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         audited_charge_points = charge_point_audit_sample.audited_charge_points.all()
         charge_point_audits, errors = import_elec_audit_report_excel(file, audited_charge_points)
 
-        self.assertEqual(len(charge_point_audits), 3)
-        self.assertEqual(len(errors), 0)
+        assert len(charge_point_audits) == 3
+        assert len(errors) == 0
 
         self.assertDictEqual(
             charge_point_audits[0],
@@ -249,7 +249,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_accept_report(self):
         _, meter_reading_audit_sample = self.create_audit_samples()
@@ -269,28 +269,28 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         charge_points_audited = meter_reading_audit_sample.audited_charge_points.select_related("charge_point").all()
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertEqual(charge_points_audited[0].is_auditable, True)
-        self.assertEqual(charge_points_audited[0].current_type, "AC")
-        self.assertEqual(charge_points_audited[0].observed_mid_or_prm_id, "[MID] 123-456")
-        self.assertEqual(charge_points_audited[0].observed_energy_reading, 1234)
-        self.assertEqual(charge_points_audited[0].has_dedicated_pdl, True)
-        self.assertEqual(charge_points_audited[0].audit_date, datetime.date(2024, 6, 1))
-        self.assertEqual(charge_points_audited[0].comment, "")
+        assert charge_points_audited[0].is_auditable is True
+        assert charge_points_audited[0].current_type == "AC"
+        assert charge_points_audited[0].observed_mid_or_prm_id == "[MID] 123-456"
+        assert charge_points_audited[0].observed_energy_reading == 1234
+        assert charge_points_audited[0].has_dedicated_pdl is True
+        assert charge_points_audited[0].audit_date == datetime.date(2024, 6, 1)
+        assert charge_points_audited[0].comment == ""
 
-        self.assertEqual(charge_points_audited[1].is_auditable, True)
-        self.assertEqual(charge_points_audited[1].current_type, "DC")
-        self.assertEqual(charge_points_audited[1].observed_mid_or_prm_id, "[MID] 123-457")
-        self.assertEqual(charge_points_audited[1].observed_energy_reading, 8900)
-        self.assertEqual(charge_points_audited[1].has_dedicated_pdl, False)
-        self.assertEqual(charge_points_audited[1].audit_date, datetime.date(2024, 6, 2))
-        self.assertEqual(charge_points_audited[1].comment, "")
+        assert charge_points_audited[1].is_auditable is True
+        assert charge_points_audited[1].current_type == "DC"
+        assert charge_points_audited[1].observed_mid_or_prm_id == "[MID] 123-457"
+        assert charge_points_audited[1].observed_energy_reading == 8900
+        assert charge_points_audited[1].has_dedicated_pdl is False
+        assert charge_points_audited[1].audit_date == datetime.date(2024, 6, 2)
+        assert charge_points_audited[1].comment == ""
 
-        self.assertEqual(charge_points_audited[2].is_auditable, False)
-        self.assertEqual(charge_points_audited[2].current_type, "")
-        self.assertEqual(charge_points_audited[2].observed_mid_or_prm_id, "")
-        self.assertEqual(charge_points_audited[2].observed_energy_reading, 0)
-        self.assertEqual(charge_points_audited[2].has_dedicated_pdl, False)
-        self.assertEqual(charge_points_audited[2].audit_date, None)
-        self.assertEqual(charge_points_audited[2].comment, "Charge point was not found")
+        assert charge_points_audited[2].is_auditable is False
+        assert charge_points_audited[2].current_type == ""
+        assert charge_points_audited[2].observed_mid_or_prm_id == ""
+        assert charge_points_audited[2].observed_energy_reading == 0
+        assert charge_points_audited[2].has_dedicated_pdl is False
+        assert charge_points_audited[2].audit_date is None
+        assert charge_points_audited[2].comment == "Charge point was not found"

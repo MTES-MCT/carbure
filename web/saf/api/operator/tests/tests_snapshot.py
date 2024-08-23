@@ -49,8 +49,8 @@ class SafSnapshotTest(TestCase):
             "tickets_received_accepted": 0,
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], expected)
+        assert response.status_code == 200
+        assert response.json()["data"] == expected
 
     def test_saf_snapshot_complex(self):
         response = self.client.get(
@@ -70,5 +70,5 @@ class SafSnapshotTest(TestCase):
             "tickets_received_accepted": 0,
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], expected)
+        assert response.status_code == 200
+        assert response.json()["data"] == expected

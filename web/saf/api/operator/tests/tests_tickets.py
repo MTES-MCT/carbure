@@ -78,7 +78,7 @@ class SafTicketsTest(TestCase):
 
         response = self.client.get(reverse("saf-operator-tickets"), query)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         expected_ticket = {
             "id": 4321,
@@ -111,8 +111,8 @@ class SafTicketsTest(TestCase):
             "ghg_reduction": 65.0,
         }
 
-        self.assertEqual(response.json()["data"]["saf_tickets"], [expected_ticket])
-        self.assertEqual(response.json()["data"]["from"], 0)
-        self.assertEqual(response.json()["data"]["returned"], 1)
-        self.assertEqual(response.json()["data"]["total"], 2)
-        self.assertEqual(response.json()["data"]["ids"], [4321, 54321])
+        assert response.json()["data"]["saf_tickets"] == [expected_ticket]
+        assert response.json()["data"]["from"] == 0
+        assert response.json()["data"]["returned"] == 1
+        assert response.json()["data"]["total"] == 2
+        assert response.json()["data"]["ids"] == [4321, 54321]
