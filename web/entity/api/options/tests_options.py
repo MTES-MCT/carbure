@@ -31,85 +31,85 @@ class EntityProductionSiteTest(TestCase):
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # no entity_id
         response = self.client.post(reverse(url), {"has_mac": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # entity I do not belong to
         response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_mac": "true"})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         # rights RW, mac option OK
         response = self.client.post(reverse(url), {"entity_id": self.entity2.id, "has_mac": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity2.id)
-        self.assertEqual(entity.has_mac, True)
+        assert entity.has_mac is True
         # should pass
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_mac": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity1.id)
-        self.assertEqual(entity.has_mac, True)
+        assert entity.has_mac is True
 
         # disable:
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "false"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # no entity_id
         response = self.client.post(reverse(url), {"has_mac": "false"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # entity I do not belong to
         response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_mac": "false"})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         # should pass
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_mac": "false"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity1.id)
-        self.assertEqual(entity.has_mac, False)
+        assert entity.has_mac is False
 
         # revert
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_mac": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity1.id)
-        self.assertEqual(entity.has_mac, True)
+        assert entity.has_mac is True
 
     def test_trading_option(self):
         url = "entity-options-trading"
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_trading": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # no entity_id
         response = self.client.post(reverse(url), {"has_trading": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # entity I do not belong to
         response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_trading": "true"})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         # should pass
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_trading": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity1.id)
-        self.assertEqual(entity.has_trading, True)
+        assert entity.has_trading is True
 
         # disable:
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_trading": "false"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # no entity_id
         response = self.client.post(reverse(url), {"has_trading": "false"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         # entity I do not belong to
         response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_trading": "false"})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         # should pass
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_trading": "false"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity1.id)
-        self.assertEqual(entity.has_trading, False)
+        assert entity.has_trading is False
 
         # revert
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_trading": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity1.id)
-        self.assertEqual(entity.has_trading, True)
+        assert entity.has_trading is True
 
         # should not work on Operator
         # because operators cannot trade # deprecated as of 2022
@@ -121,29 +121,29 @@ class EntityProductionSiteTest(TestCase):
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_elec": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         # no entity_id
         response = self.client.post(reverse(url), {"has_elec": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         # entity I do not belong to
         response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_elec": "true"})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # toggle to true
         response = self.client.post(reverse(url), {"entity_id": self.entity2.id, "has_elec": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity2.id)
-        self.assertEqual(entity.has_elec, True)
+        assert entity.has_elec is True
 
         # revert to false
         response = self.client.post(reverse(url), {"entity_id": self.entity2.id, "has_elec": "false"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         entity = Entity.objects.get(id=self.entity2.id)
-        self.assertEqual(entity.has_elec, False)
+        assert entity.has_elec is False
 
         # should only work on Operator
         response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_elec": "true"})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["error"], "NOT_OPERATOR")
+        assert response.status_code == 400
+        assert response.json()["error"] == "NOT_OPERATOR"

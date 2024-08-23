@@ -85,17 +85,17 @@ class DoubleCountingSanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.feedstock = self.dc_feedstock
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.production_site_double_counting_certificate = "FR_00999_2023"
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_unknown_double_counting_certificate_unknown_production_site(self):
         error = CarbureCertificatesErrors.UNKNOWN_DOUBLE_COUNTING_CERTIFICATE
@@ -109,12 +109,12 @@ class DoubleCountingSanityChecksTest(TestCase):
         # case 1: unknown production site + unknown DC cert => error
         lot.production_site_double_counting_certificate = "FR_123456789_2050"
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         # case 2: unknown production site + known DC cert => ok
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_unknown_double_counting_certificate_known_production_site(self):
         error = CarbureCertificatesErrors.UNKNOWN_DOUBLE_COUNTING_CERTIFICATE
@@ -128,22 +128,22 @@ class DoubleCountingSanityChecksTest(TestCase):
         # case 1: known production site + unknown DC cert => error
         lot.production_site_double_counting_certificate = "FR_123456789_2050"
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         # case 2: known production site + known DC cert of wrong psite => error
         lot.production_site_double_counting_certificate = self.other_dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         # case 3: known production site + known DC cert of right psite => ok
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         # case 4: known production site + known DC cert without linked prod site => ok
         lot.production_site_double_counting_certificate = self.free_dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_expired_double_counting_certificate(self):
         error = CarbureCertificatesErrors.EXPIRED_DOUBLE_COUNTING_CERTIFICATE
@@ -158,12 +158,12 @@ class DoubleCountingSanityChecksTest(TestCase):
         # case 1: dc reference is expired
         lot.production_site_double_counting_certificate = self.old_dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         # case 1: dc reference is up to date
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_invalid_double_counting_certificate(self):
         error = CarbureCertificatesErrors.INVALID_DOUBLE_COUNTING_CERTIFICATE
@@ -178,9 +178,9 @@ class DoubleCountingSanityChecksTest(TestCase):
         # case 1: dc reference is in the future
         lot.production_site_double_counting_certificate = self.future_dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         # case 1: dc reference is up to date
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)

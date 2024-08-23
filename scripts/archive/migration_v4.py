@@ -339,7 +339,7 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
                     lot.biofuel.name,
                 )
             )
-            assert False
+            raise AssertionError()
 
     # if is_forwarded, check Child TX (Processing / Trading without storage) and create them
     if tx.is_forwarded:
@@ -412,7 +412,7 @@ def migrate_tx(tx):
         # event.save()
         BULK_EVENTS.append(event)
     # errors
-    errors = GenericError.objects.filter(tx=tx).update(lot=new_tx)
+    GenericError.objects.filter(tx=tx).update(lot=new_tx)
     del tx
     del new_tx
 

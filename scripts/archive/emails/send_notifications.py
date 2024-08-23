@@ -44,8 +44,8 @@ def main(args):
 
         email_context = {
             "entity": entity,
-            "notif_txs": [n for n in notifs if n.linked_tx != None],
-            "notif_declarations": [n for n in notifs if n.linked_declaration != None],
+            "notif_txs": [n for n in notifs if n.linked_tx is not None],
+            "notif_declarations": [n for n in notifs if n.linked_declaration is not None],
             "nb_notifications": len(notifs),
         }
         html_message = loader.render_to_string("emails/notifications.html", email_context)

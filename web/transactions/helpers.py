@@ -604,7 +604,7 @@ def bulk_insert_lots(
     errors: List[GenericError],
     prefetched_data: dict,
 ) -> QuerySet:
-    created = CarbureLot.objects.bulk_create(lots, batch_size=100)
+    CarbureLot.objects.bulk_create(lots, batch_size=100)
     inserted_lots = (
         CarbureLot.objects.select_related(
             "carbure_producer",

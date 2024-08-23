@@ -44,11 +44,11 @@ def send_email_to_user(entity, depot_name, user):
     text_message = f"""
     Bonjour,
 
-    Votre demande de création du dépôt {depot_name} pour la société {entity.name} a bien été enregistrée à la date du {today}. 
+    Votre demande de création du dépôt {depot_name} pour la société {entity.name} a bien été enregistrée à la date du {today}.
     L'équipe de la DGEC va étudier votre demande et vous serez notifiés lorsque celle-ci aura été traitée.
-    
+
     Bien cordialement,
-    L'équipe CarbuRe 
+    L'équipe CarbuRe
     """
 
     send_mail(
@@ -68,14 +68,14 @@ def send_email_to_dgec(entity, depot_name, user):
     Bonjour,
 
     Une demande de création de dépôt {depot_name} pour la société {entity.name} a été déposé le {today} par l’utilisateur {user.email}.
-    
+
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
 
     1 - Visualisez la liste des dépôts à valider sur ce lien : {admin_link}
     2 - Selectionnez le dépôt {depot_name}.
     3 - Selectionnez l'action "Valider les dépôts sélectionnés".
     4 - Cliquez sur "Envoyer".
-    
+
     Bien à vous,
     CarbuRe
     """

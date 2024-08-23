@@ -16,7 +16,7 @@ def reassign():
     for lot in odd_lots:
         # find child
         try:
-            child = CarbureLot.objects.get(parent_lot=lot)
+            CarbureLot.objects.get(parent_lot=lot)
             print("Found child")
             lot.delivery_type = CarbureLot.TRADING
             lot.save()

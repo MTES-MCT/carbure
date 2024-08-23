@@ -44,17 +44,17 @@ class GeneralSanityChecksTest(TestCase):
         lot = self.create_lot(delivery_type=CarbureLot.BLENDING, biofuel=emag)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.delivery_type = CarbureLot.RFC
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.biofuel = eth
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_mac_not_efpe(self):
         error = CarbureSanityCheckErrors.MAC_NOT_EFPE
@@ -65,17 +65,17 @@ class GeneralSanityChecksTest(TestCase):
         lot = self.create_lot(delivery_type=CarbureLot.BLENDING, carbure_delivery_site=efs)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.delivery_type = CarbureLot.RFC
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.carbure_delivery_site = efpe
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_volume_faible(self):
         error = CarbureSanityCheckErrors.VOLUME_FAIBLE
@@ -83,12 +83,12 @@ class GeneralSanityChecksTest(TestCase):
         lot = self.create_lot(volume=2001)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.volume = 1999
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_year_locked(self):
         error = CarbureSanityCheckErrors.YEAR_LOCKED
@@ -100,7 +100,7 @@ class GeneralSanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         YearConfig.objects.create(year=2017, locked=True)
         prefetched_data = get_prefetched_data()
@@ -108,17 +108,17 @@ class GeneralSanityChecksTest(TestCase):
         lot.year = 2017
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.correction_status = CarbureLot.IN_CORRECTION
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.year = 2010
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_depot_not_configured(self):
         error = CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED
@@ -138,12 +138,12 @@ class GeneralSanityChecksTest(TestCase):
         prefetched_data = get_prefetched_data(self.producer)
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.carbure_delivery_site = depot
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def x_test_mp_not_configured(self):
         error = CarbureSanityCheckErrors.MP_NOT_CONFIGURED
@@ -163,12 +163,12 @@ class GeneralSanityChecksTest(TestCase):
         prefetched_data = get_prefetched_data(self.producer)
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.feedstock = feedstock
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def x_test_bc_not_configured(self):
         error = CarbureSanityCheckErrors.BC_NOT_CONFIGURED
@@ -188,12 +188,12 @@ class GeneralSanityChecksTest(TestCase):
         prefetched_data = get_prefetched_data(self.producer)
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.biofuel = biofuel
 
         error_list = self.run_checks(lot, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_declaration_already_validated(self):
         error = CarbureSanityCheckErrors.DECLARATION_ALREADY_VALIDATED
@@ -230,30 +230,30 @@ class GeneralSanityChecksTest(TestCase):
         prefetched_data = get_prefetched_data(self.producer)
 
         error_list = self.run_checks(lot1, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         error_list = self.run_checks(lot2, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         error_list = self.run_checks(lot3, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         declaration.declared = False
         declaration.save()
         prefetched_data = get_prefetched_data(self.producer)
 
         error_list = self.run_checks(lot1, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         error_list = self.run_checks(lot2, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         declaration.declared = True
         declaration.save()
         prefetched_data = get_prefetched_data(self.producer)
 
         error_list = self.run_checks(lot1, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         error_list = self.run_checks(lot2, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)

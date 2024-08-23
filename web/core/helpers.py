@@ -276,7 +276,9 @@ def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     )
 
 
-def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
+def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=None):
+    if blacklist is None:
+        blacklist = []
     year = query.get("year", False)
     periods = query.getlist("periods", [])
     production_sites = query.getlist("production_sites", [])
@@ -463,7 +465,7 @@ def sort_lots(lots, query):
 
 
 def prepare_filters(filter_list):
-    return sorted(list(set([i for i in filter_list if i is not None])))
+    return sorted({i for i in filter_list if i is not None})
 
 
 UNKNOWN_VALUE = "UNKNOWN"
@@ -659,7 +661,9 @@ def get_stock_with_metadata(stock, query):
         return response
 
 
-def filter_stock(stock, query, blacklist=[]):
+def filter_stock(stock, query, blacklist=None):
+    if blacklist is None:
+        blacklist = []
     periods = query.getlist("periods", [])
     depots = query.getlist("depots", [])
     feedstocks = query.getlist("feedstocks", [])

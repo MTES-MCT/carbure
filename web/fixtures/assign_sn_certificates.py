@@ -8,7 +8,9 @@ django.setup()
 from certificates.models import EntitySNTradingCertificate, SNCertificate
 from core.models import Entity
 
-user_said_yes = lambda q: input(q).lower().strip()[0] == "y"
+
+def user_said_yes(q):
+    return input(q).lower().strip()[0] == "y"
 
 
 def try_assign_sn_certificates():

@@ -87,11 +87,11 @@ class DoubleCountAgreementsTest(TestCase):
         application1 = data[0]
         application2 = data[1]
         application3 = data[2]
-        self.assertEqual(len(data), 3)
+        assert len(data) == 3
 
-        self.assertEqual(application1["quotas_progression"], None)
-        self.assertEqual(application2["quotas_progression"], 0)
-        self.assertEqual(application3["quotas_progression"], None)
+        assert application1["quotas_progression"] is None
+        assert application2["quotas_progression"] == 0
+        assert application3["quotas_progression"] is None
 
     def test_get_agreements_quotas(self):
         # check quotas

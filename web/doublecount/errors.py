@@ -31,7 +31,9 @@ class DcError(TypedDict):
     meta: dict
 
 
-def error(type: str, line: int = -1, meta: dict = {}, is_blocking: bool = True) -> DcError:
+def error(type: str, line: int = -1, meta: dict = None, is_blocking: bool = True) -> DcError:
+    if meta is None:
+        meta = {}
     return {
         "error": type,
         "line_number": line,

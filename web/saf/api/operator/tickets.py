@@ -134,7 +134,7 @@ def find_tickets(**filters):
     else:
         raise Exception("Status '%s' does not exist for tickets" % filters["status"])
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         tickets = tickets.filter(
             Q(carbure_id__icontains=filters["search"])
             | Q(supplier__name__icontains=filters["search"])

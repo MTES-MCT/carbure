@@ -106,7 +106,7 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
     for _, row in df.iterrows():
         try:
             if "." in row["valid_from"]:
-                vf = row["valid_from"].split(".")
+                row["valid_from"].split(".")
             elif "-" in row["valid_from"]:
                 valid_from = datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
             else:

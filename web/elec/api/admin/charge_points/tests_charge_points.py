@@ -37,8 +37,8 @@ class ElecCharginPointsTest(TestCase):
         )
 
         data = response.json()
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(data["error"], "ENTITY_NOT_FOUND")
+        assert response.status_code == 404
+        assert data["error"] == "ENTITY_NOT_FOUND"
 
     def test_get_applications_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -116,8 +116,8 @@ class ElecCharginPointsTest(TestCase):
             ],
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, expected)
+        assert response.status_code == 200
+        assert data == expected
 
     def test_get_charge_points_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -203,8 +203,8 @@ class ElecCharginPointsTest(TestCase):
         }
 
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, expected)
+        assert response.status_code == 200
+        assert data == expected
 
     def test_get_application_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -227,7 +227,7 @@ class ElecCharginPointsTest(TestCase):
             cpo_siren="12345",
         )
 
-        charge_point2 = ElecChargePoint.objects.create(
+        ElecChargePoint.objects.create(
             application=application2,
             cpo=self.cpo,
             charge_point_id="ABCDE",
@@ -273,5 +273,5 @@ class ElecCharginPointsTest(TestCase):
         }
 
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, expected)
+        assert response.status_code == 200
+        assert data == expected

@@ -13,7 +13,7 @@ def get_my_certificates(request, *args, **kwargs):
     production_site_id = request.GET.get("production_site_id", False)
     entity = Entity.objects.get(id=entity_id)
     links = EntityCertificate.objects.filter(entity=entity)
-    certificates = [l for l in links]
+    certificates = list(links)
     if production_site_id:
         links = ProductionSiteCertificate.objects.filter(entity=entity, production_site_id=production_site_id)
         certificates = [l.certificate for l in links]

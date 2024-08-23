@@ -17,7 +17,7 @@ DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540)  # approx 18 m
 def calc_ml_score(year=None, period=None):
     data = get_prefetched_data()
     # {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
-    etd = data["etd"]
+    data["etd"]
     # {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
     eec = data["eec"]
     # {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}

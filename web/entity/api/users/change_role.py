@@ -24,7 +24,7 @@ def change_user_role(request, entity, entity_id):
     form = ChangeRoleForm(request.POST)
 
     if not form.is_valid():
-        errors = {key: e for key, e in form.errors.items()}
+        errors = dict(form.errors.items())
         return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED, data=errors)
 
     email = form.cleaned_data["email"]

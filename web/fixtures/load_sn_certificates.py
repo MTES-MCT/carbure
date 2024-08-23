@@ -57,10 +57,9 @@ def load_certificates():
     data = data[1:]
     df = pd.DataFrame(data, columns=column_names)
     df.fillna("", inplace=True)
-    total_certs = len(df)
+    len(df)
     # print(total_certs)
     # print(df)
-    i = 0
     for row in df.iterrows():
         cert = row[1]
         # print(cert)

@@ -27,7 +27,7 @@ def invite_user(request, entity, entity_id):
     form = InviteUserForm(request.POST)
 
     if not form.is_valid():
-        errors = {key: e for key, e in form.errors.items()}
+        errors = dict(form.errors.items())
         return ErrorResponse(400, InviteUserError.INVITE_FAILED, data=errors)
 
     email = form.cleaned_data["email"]

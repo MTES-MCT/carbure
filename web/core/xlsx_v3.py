@@ -1365,9 +1365,15 @@ def make_template_carbure_stocks_sheet(workbook, entity):
 
     today = datetime.date.today().strftime("%d/%m/%Y")
     rows = []
-    get_carbure_stock = lambda: random.choice(stock) if stock.count() > 0 else None
-    get_carbure_stock_id = lambda x: x.carbure_id if x else "CARBURE_STOCK_ID"
-    get_carbure_stock_volume_to_send = lambda x: round(x.remaining_volume / 2, 2) if x else 34588
+
+    def get_carbure_stock():
+        return random.choice(stock) if stock.count() > 0 else None
+
+    def get_carbure_stock_id(x):
+        return x.carbure_id if x else "CARBURE_STOCK_ID"
+
+    def get_carbure_stock_volume_to_send(x):
+        return round(x.remaining_volume / 2, 2) if x else 34588
 
     stock = get_carbure_stock()
     rows.append(

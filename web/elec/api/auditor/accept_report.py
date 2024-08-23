@@ -111,10 +111,10 @@ def send_email_to_dgec(audit_sample: ElecAuditSample):
 
     admin_link = f"{CarbureEnv.get_base_url()}/org/9/elec-admin-audit/{year}"
 
-    if audit_sample.charge_point_application != None:
+    if audit_sample.charge_point_application is not None:
         application_id = audit_sample.charge_point_application.pk
         admin_link += f"/charge-points/audit_in_progress#application/{application_id}"
-    elif audit_sample.meter_reading_application != None:
+    elif audit_sample.meter_reading_application is not None:
         application_id = audit_sample.meter_reading_application.pk
         admin_link += f"/meter_readings/audit_in_progress#application/{application_id}"
 

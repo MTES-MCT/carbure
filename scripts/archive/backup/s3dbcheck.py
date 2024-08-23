@@ -24,7 +24,7 @@ def check_backup(args):
         date = yesterday.strftime("%Y/%m/%d")
 
     found = False
-    for o in bucket.objects.filter(Prefix=date):
+    for _o in bucket.objects.filter(Prefix=date):
         found = True
 
     if not found:

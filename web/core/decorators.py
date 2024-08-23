@@ -93,7 +93,10 @@ class AdminRightsError:
 
 
 # TODO sur les endpoints accessibles par des external admin, il faut en plus verifier qu'il n'agissent que sur les types d'entités autorisées (ex : DGAC sur companies aeriennes uniquement, cf get_entities)
-def check_admin_rights(allow_external=[], allow_role=None):
+def check_admin_rights(allow_external=None, allow_role=None):
+    if allow_external is None:
+        allow_external = []
+
     def decorator(view_function):
         @wraps(view_function)
         def wrap(request, *args, **kwargs):

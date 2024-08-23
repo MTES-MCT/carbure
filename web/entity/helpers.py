@@ -37,7 +37,7 @@ def enable_entity(entity):
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
     Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {CarbureEnv.get_base_url()}/account
- 
+
     Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/affichage/traduction
 
     Bien cordialement,

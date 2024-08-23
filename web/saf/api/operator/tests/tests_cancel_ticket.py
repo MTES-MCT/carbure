@@ -40,10 +40,10 @@ class SafCancelTicketTest(TestCase):
 
         response = self.client.post(reverse("saf-operator-cancel-ticket"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
 
-        self.assertEqual(SafTicket.objects.count(), 0)
+        assert SafTicket.objects.count() == 0
 
         ticket_source = SafTicketSource.objects.get(id=self.ticket_source.id)
-        self.assertEqual(ticket_source.assigned_volume, 0)
+        assert ticket_source.assigned_volume == 0

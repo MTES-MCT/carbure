@@ -15,8 +15,8 @@ def check_duplicates():
     for l in lots_with_parent:
         if l.parent_lot.carbure_client == l.carbure_client:
             if (
-                l.parent_lot.carbure_supplier == None
-                and l.carbure_supplier != None
+                l.parent_lot.carbure_supplier is None
+                and l.carbure_supplier is not None
                 and l.carbure_supplier != l.carbure_client
             ):
                 print(

@@ -82,7 +82,9 @@ class DoubleCountingRegistration(models.Model):
 
 
 @receiver(post_save, sender=DoubleCountingRegistration)
-def dc_registration_post_update_production_site(sender, instance, created, update_fields={}, *args, **kwargs):
+def dc_registration_post_update_production_site(sender, instance, created, update_fields=None, *args, **kwargs):
+    if update_fields is None:
+        update_fields = {}
     production_site_id = instance.production_site_id
     try:
         production_site = ProductionSite.objects.get(pk=production_site_id)

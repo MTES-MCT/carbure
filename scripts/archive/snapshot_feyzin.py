@@ -13,7 +13,7 @@ from core.models import *
 
 def snapshot_feyzin_data():
     feyzin = Entity.objects.get(name="TERF Feyzin")
-    terf = Entity.objects.get(name="TERF")
+    Entity.objects.get(name="TERF")
 
     transactions = LotTransaction.objects.filter(Q(carbure_client=feyzin) | Q(carbure_vendor=feyzin))
     serialized_obj = serializers.serialize("json", transactions)

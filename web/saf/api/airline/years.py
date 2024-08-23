@@ -16,7 +16,7 @@ def get_years(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_years = SafTicket.objects.filter(client_id=entity_id).values_list("year", flat=True).distinct()
-        years = sorted(list(set(ticket_years)))
+        years = sorted(set(ticket_years))
         return SuccessResponse(years)
     except Exception:
         traceback.print_exc()

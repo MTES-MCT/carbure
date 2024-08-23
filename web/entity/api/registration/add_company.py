@@ -109,11 +109,11 @@ def send_email_to_user(entity, user):
     text_message = f"""
     Bonjour,
 
-    Votre demande d'inscription pour la société {entity.name} a bien enregistrée à la date du {today}. 
+    Votre demande d'inscription pour la société {entity.name} a bien enregistrée à la date du {today}.
     L'équipe de la DGEC va étudier votre demande et vous serez notifié lorsque celle-ci aura été traitée.
-    
+
     Bien cordialement,
-    L'équipe CarbuRe 
+    L'équipe CarbuRe
     """
 
     send_mail(
@@ -135,14 +135,14 @@ def send_email_to_dgec(entity, user):
     text_message = f"""
     Bonjour,
 
-    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {user.email}. 
+    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {user.email}.
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
 
     1 - Visualisez la liste des sociétés à valider sur ce lien : {admin_link}.
     2 - Selectionnez la société {entity.name}.
     3 - Selectionnez l'action "Activer les sociétés sélectionnées".
     4 - Cliquez sur "Envoyer".
-    
+
     Bonne journée
     """
     send_mail(

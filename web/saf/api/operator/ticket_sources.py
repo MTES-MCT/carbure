@@ -139,7 +139,7 @@ def find_ticket_sources(**filters):
     else:
         raise Exception("Status '%s' does not exist for ticket sources" % filters["status"])
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         ticket_sources = ticket_sources.filter(
             Q(carbure_id__icontains=filters["search"])
             | Q(saf_tickets__client__name__icontains=filters["search"])

@@ -2,7 +2,7 @@ import datetime
 
 from django.test import TestCase
 
-from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
+from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
 from transactions.factories import CarbureLotFactory
@@ -39,12 +39,12 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(volume=10000)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.volume = 0
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_missing_biofuel(self):
         error = CarbureSanityCheckErrors.MISSING_BIOFUEL
@@ -52,12 +52,12 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(biofuel=Biocarburant.objects.first())
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.biofuel = None
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_missing_feedstock(self):
         error = CarbureSanityCheckErrors.MISSING_FEEDSTOCK
@@ -65,12 +65,12 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(feedstock=MatierePremiere.objects.first())
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.feedstock = None
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_unknown_production_site(self):
         error = CarbureSanityCheckErrors.UNKNOWN_PRODUCTION_SITE
@@ -78,12 +78,12 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(carbure_producer=self.producer, carbure_production_site=ProductionSite.objects.first())
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.carbure_production_site = None
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_missing_production_site_comdate(self):
         error = CarbureSanityCheckErrors.MISSING_PRODUCTION_SITE_COMDATE
@@ -91,13 +91,13 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(carbure_producer=self.producer, carbure_production_site=ProductionSite.objects.first())
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.carbure_production_site = None
         lot.production_site_commissioning_date = None
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_missing_transport_document_reference(self):
         error = CarbureSanityCheckErrors.MISSING_TRANSPORT_DOCUMENT_REFERENCE
@@ -105,17 +105,17 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(delivery_type=CarbureLot.RFC, transport_document_reference="")
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.delivery_type = CarbureLot.BLENDING
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.transport_document_reference = "ABCD"
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_missing_carbure_delivery_site(self):
         error = CarbureSanityCheckErrors.MISSING_CARBURE_DELIVERY_SITE
@@ -127,17 +127,17 @@ class MandatorySanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.delivery_type = CarbureLot.BLENDING
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.carbure_delivery_site = Depot.objects.first()
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_missing_carbure_client(self):
         error = CarbureSanityCheckErrors.MISSING_CARBURE_CLIENT
@@ -149,20 +149,20 @@ class MandatorySanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.delivery_type = CarbureLot.BLENDING
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.carbure_client = self.producer
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_missing_delivery_date(self):
-        error = CarbureSanityCheckErrors.MISSING_DELIVERY_DATE
+        pass
 
         # @TODO testing delivery_date=None actually breaks other sanity checks, fix that
 
@@ -182,17 +182,17 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(delivery_date=datetime.date.today())
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.delivery_date = datetime.date(2000, 1, 1)
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.delivery_date = datetime.date(2040, 1, 1)
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_missing_delivery_site_country(self):
         error = CarbureSanityCheckErrors.MISSING_DELIVERY_SITE_COUNTRY
@@ -200,12 +200,12 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(delivery_site_country=None)
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.delivery_site_country = Pays.objects.first()
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_missing_feedstock_country_of_origin(self):
         error = CarbureSanityCheckErrors.MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN
@@ -215,12 +215,12 @@ class MandatorySanityChecksTest(TestCase):
         lot = self.create_lot(country_of_origin=None, delivery_site_country=country)
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.country_of_origin = country
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def x_test_missing_supplier_certificate(self):
-        error = CarbureCertificatesErrors.MISSING_SUPPLIER_CERTIFICATE
+        pass

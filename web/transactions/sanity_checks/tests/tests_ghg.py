@@ -45,12 +45,12 @@ class GhgSanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot_red_i)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot_red_i.ghg_reduction = 105
 
         error_list = self.run_checks(lot_red_i)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         # prepare a lot for RED II values
         lot_red_ii = self.create_lot(
@@ -60,12 +60,12 @@ class GhgSanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot_red_ii)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot_red_ii.ghg_reduction_red_ii = 105
 
         error_list = self.run_checks(lot_red_ii)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_reduc_sup_99(self):
         error = CarbureSanityCheckErrors.GHG_REDUC_SUP_99
@@ -78,12 +78,12 @@ class GhgSanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.ghg_reduction_red_ii = 99.9
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_reduc_inf_50(self):
         error = CarbureSanityCheckErrors.GHG_REDUC_INF_50
@@ -96,12 +96,12 @@ class GhgSanityChecksTest(TestCase):
         )
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.ghg_reduction_red_ii = 5
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_etd_0(self):
         error = CarbureSanityCheckErrors.GHG_ETD_0
@@ -109,12 +109,12 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(etd=1)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.etd = -1
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_ep_0(self):
         error = CarbureSanityCheckErrors.GHG_EP_0
@@ -122,12 +122,12 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(ep=1)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.ep = -1
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_el_neg(self):
         error = CarbureSanityCheckErrors.GHG_EL_NEG
@@ -135,12 +135,12 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(el=1)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.el = -1
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_eec_0(self):
         error = CarbureSanityCheckErrors.GHG_EEC_0
@@ -151,18 +151,18 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(eec=0, feedstock=other_feedstock)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.eec = 1
         lot.feedstock = conv_feedstock
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.eec = 0
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_eec_with_residue(self):
         error = CarbureSanityCheckErrors.EEC_WITH_RESIDUE
@@ -174,24 +174,24 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(feedstock=other_feedstock, eec=1)
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.eec = 0
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.eec = 1
         lot.feedstock = conv_feedstock
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.eec = 1
         lot.feedstock = ep2
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_ghg_reduc_inf_60(self):
         error = CarbureSanityCheckErrors.GHG_REDUC_INF_60
@@ -199,18 +199,18 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(production_site_commissioning_date=None)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.production_site_commissioning_date = oct2015 + datetime.timedelta(days=15)
         lot.ghg_reduction_red_ii = 61
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.ghg_reduction_red_ii = 59
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_ghg_reduc_inf_65(self):
         error = CarbureSanityCheckErrors.GHG_REDUC_INF_65
@@ -218,18 +218,18 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(production_site_commissioning_date=None)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.production_site_commissioning_date = jan2021 + datetime.timedelta(days=15)
         lot.ghg_reduction_red_ii = 64
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
         lot.ghg_reduction_red_ii = 66
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
     def test_etd_anormal_high(self):
         error = CarbureMLGHGErrors.ETD_ANORMAL_HIGH
@@ -241,27 +241,27 @@ class GhgSanityChecksTest(TestCase):
         lot = self.create_lot(feedstock=etd.feedstock, etd=1)
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        assert not has_error(error, error_list)
 
         lot.etd = max(2 * etd.default_value, 5) + 1
         error_list = self.run_checks(lot)
 
-        self.assertTrue(has_error(error, error_list))
+        assert has_error(error, error_list)
 
     def test_etd_no_eu_too_low(self):
-        error = CarbureMLGHGErrors.ETD_NO_EU_TOO_LOW
+        pass
 
     def x_test_etd_eu_default_value(self):
-        error = CarbureMLGHGErrors.ETD_EU_DEFAULT_VALUE
+        pass
 
     def x_test_eec_anormal_low(self):
-        error = CarbureMLGHGErrors.EEC_ANORMAL_LOW
+        pass
 
     def x_test_eec_anormal_high(self):
-        error = CarbureMLGHGErrors.EEC_ANORMAL_HIGH
+        pass
 
     def x_test_ep_anormal_low(self):
-        error = CarbureMLGHGErrors.EP_ANORMAL_LOW
+        pass
 
     def x_test_ep_anormal_high(self):
-        error = CarbureMLGHGErrors.EP_ANORMAL_HIGH
+        pass
