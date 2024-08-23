@@ -1,5 +1,6 @@
 [tool.ruff]
 src = ["scripts", "web"]
+exclude = ["__init__.py"]
 line-length = 125
 
 [tool.ruff.lint]
