@@ -144,9 +144,7 @@ class LoggingMiddleware(object):
         skip_logging, because = self._should_log_route(request)
         if skip_logging:
             if because is not None:
-                self.logger.log_error(
-                    logging.INFO, resp_log, {"args": {}, "kwargs": {"extra": {"no_logging": because}}}
-                )
+                self.logger.log_error(logging.INFO, resp_log, {"args": {}, "kwargs": {"extra": {"no_logging": because}}})
             return response
         logging_context = self._get_logging_context(request, response)
 
@@ -220,4 +218,4 @@ class LoggingMiddleware(object):
                 self.logger.log(level, self._chunked_to_max(response.content), logging_context)
 
     def _chunked_to_max(self, msg):
-        return msg[0:self.max_body_length]
+        return msg[0 : self.max_body_length]

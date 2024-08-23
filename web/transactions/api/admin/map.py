@@ -103,8 +103,7 @@ def map(request, entity, entity_id):
 
     print(m._repr_html_()[0:50])
 
-    html = (
-        """
+    html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,9 +115,7 @@ def map(request, entity, entity_id):
 %s
 </body>
 </html>
-    """
-        % m._repr_html_()
-    )
+    """ % m._repr_html_()
 
     return HttpResponse(html)
 

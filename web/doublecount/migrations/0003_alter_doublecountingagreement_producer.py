@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0006_alter_carburenotification_type"),
         ("doublecount", "0002_alter_doublecountingagreement_production_site"),
@@ -15,8 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="doublecountingagreement",
             name="producer",
-            field=models.ForeignKey(
-                null=True, on_delete=django.db.models.deletion.CASCADE, to="core.entity"
-            ),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="core.entity"),
         ),
     ]

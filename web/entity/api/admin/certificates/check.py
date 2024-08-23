@@ -15,9 +15,7 @@ def check_entity_certificate(request):
         ec.checked_by_admin = True
         ec.rejected_by_admin = False
         ec.save()
-        slots = CarbureLot.objects.filter(
-            carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id
-        )
+        slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
         plots = CarbureLot.objects.filter(
             carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id
         )

@@ -25,7 +25,6 @@ def request_entity_access(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
-
         rr, created = UserRightsRequests.objects.update_or_create(
             user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "ACCEPTED"}
         )

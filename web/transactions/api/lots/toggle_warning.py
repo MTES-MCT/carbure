@@ -40,6 +40,4 @@ def toggle_warning(request, *args, **kwargs):
         return JsonResponse({"status": "success"})
     except:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not update warning"}, status=500
-        )
+        return JsonResponse({"status": "error", "message": "Could not update warning"}, status=500)

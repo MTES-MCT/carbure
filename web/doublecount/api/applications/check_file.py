@@ -25,9 +25,7 @@ def check_file(request, *args, **kwargs):
         info, errors, sourcing_data, production_data = check_dc_file(file)
         error_count = (
             # len(errors["sourcing_history"])
-            +len(errors["sourcing_forecast"])
-            + len(errors["production"])
-            + len(errors["global"])
+            +len(errors["sourcing_forecast"]) + len(errors["production"]) + len(errors["global"])
         )
 
         has_dechets_industriels = check_has_dechets_industriels(production_data)

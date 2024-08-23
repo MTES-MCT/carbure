@@ -9,7 +9,6 @@ from certificates.serializers import DoubleCountingRegistrationPublicSerializer
 
 
 def get_agreements_public_list(request, *args, **kwargs):
-
     year = datetime.now().year
 
     agreements_active = (

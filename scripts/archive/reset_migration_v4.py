@@ -24,6 +24,5 @@ def cleanup_tables():
     cursor.execute(sql)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     cleanup_tables()

@@ -18,14 +18,10 @@ def get_template(request, *args, **kwargs):
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type="application/vnd.ms-excel")
-            response[
-                "Content-Disposition"
-            ] = 'attachment; filename="carbure_template.xlsx"'
+            response["Content-Disposition"] = 'attachment; filename="carbure_template.xlsx"'
             return response
     except Exception:
-        return JsonResponse(
-            {"status": "error", "message": "Error creating template file"}, status=500
-        )
+        return JsonResponse({"status": "error", "message": "Error creating template file"}, status=500)
 
 
 @check_user_rights()
@@ -39,11 +35,7 @@ def get_template_stock(request, *args, **kwargs):
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type="application/vnd.ms-excel")
-            response[
-                "Content-Disposition"
-            ] = 'attachment; filename="carbure_template_stocks.xlsx"'
+            response["Content-Disposition"] = 'attachment; filename="carbure_template_stocks.xlsx"'
             return response
     except Exception:
-        return JsonResponse(
-            {"status": "error", "message": "Error creating template file"}, status=500
-        )
+        return JsonResponse({"status": "error", "message": "Error creating template file"}, status=500)

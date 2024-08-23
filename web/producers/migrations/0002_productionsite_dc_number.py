@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('producers', '0001_initial'),
+        ("producers", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productionsite',
-            name='dc_number',
-            field=models.CharField(blank=True, default='', max_length=64, null=True),
+            model_name="productionsite",
+            name="dc_number",
+            field=models.CharField(blank=True, default="", max_length=64, null=True),
         ),
     ]

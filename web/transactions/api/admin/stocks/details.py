@@ -22,25 +22,17 @@ from core.serializers import (
 def get_stock_details(request):
     stock_id = request.GET.get("stock_id", False)
     if not stock_id:
-        return JsonResponse(
-            {"status": "error", "message": "Missing stock_id"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Missing stock_id"}, status=400)
 
     stock = CarbureStock.objects.get(pk=stock_id)
 
     data = {}
     data["stock"] = CarbureStockPublicSerializer(stock).data
-    data["parent_lot"] = (
-        CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
-    )
+    data["parent_lot"] = CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
     data["parent_transformation"] = (
-        CarbureStockTransformationPublicSerializer(stock.parent_transformation).data
-        if stock.parent_transformation
-        else None
+        CarbureStockTransformationPublicSerializer(stock.parent_transformation).data if stock.parent_transformation else None
     )
-    children = CarbureLot.objects.filter(parent_stock=stock).exclude(
-        lot_status=CarbureLot.DELETED
-    )
+    children = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED)
     data["children_lot"] = CarbureLotPublicSerializer(children, many=True).data
     data["children_transformation"] = CarbureStockTransformationPublicSerializer(
         CarbureStockTransformation.objects.filter(source_stock=stock), many=True

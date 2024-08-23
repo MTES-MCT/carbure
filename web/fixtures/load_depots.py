@@ -8,7 +8,7 @@ django.setup()
 
 from core.models import Depot, Pays
 
-filename = '%s/web/fixtures/csv/depots.csv' % (os.environ['CARBURE_HOME'])
+filename = "%s/web/fixtures/csv/depots.csv" % (os.environ["CARBURE_HOME"])
 
 with open(filename) as csvfile:
     reader = csv.reader(csvfile, quotechar='"')
@@ -20,4 +20,6 @@ with open(filename) as csvfile:
         if city == "Ville":
             continue
         country_obj = Pays.objects.get(code_pays=country)
-        obj, created = Depot.objects.update_or_create(depot_id=depot_id, defaults={'name': name, 'city':city, 'country': country_obj})
+        obj, created = Depot.objects.update_or_create(
+            depot_id=depot_id, defaults={"name": name, "city": city, "country": country_obj}
+        )

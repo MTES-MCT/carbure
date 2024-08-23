@@ -21,9 +21,7 @@ class ResourcesTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
 
     def test_get_mps(self):
         # create matieres premieres
@@ -180,9 +178,7 @@ class ResourcesTest(TestCase):
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         Depot.objects.update_or_create(name="Depot1", depot_id="007", country=fr)
         Depot.objects.update_or_create(name="Gennevilliers", depot_id="042", country=fr)
-        Depot.objects.update_or_create(
-            name="Gennevilliers 2", depot_id="043", country=fr
-        )
+        Depot.objects.update_or_create(name="Gennevilliers 2", depot_id="043", country=fr)
         Depot.objects.update_or_create(name="Carcassonne", depot_id="044", country=fr)
 
         url = "resources-depots"
@@ -200,9 +196,7 @@ class ResourcesTest(TestCase):
 
     def test_get_production_sites(self):
         # create production sites
-        producer, _ = Entity.objects.update_or_create(
-            name="toto", entity_type="Producteur"
-        )
+        producer, _ = Entity.objects.update_or_create(name="toto", entity_type="Producteur")
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
         ProductionSite.objects.update_or_create(

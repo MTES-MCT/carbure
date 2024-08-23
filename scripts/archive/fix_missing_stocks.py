@@ -10,29 +10,30 @@ from core.models import *
 
 
 def fix_missing_stocks():
-    lots_wo_carbureid = CarbureLot.objects.filter(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED], carbure_id='')
+    lots_wo_carbureid = CarbureLot.objects.filter(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED], carbure_id="")
     for lot in lots_wo_carbureid:
-        print('Generate carbureid for lot %d' % (lot.id))
+        print("Generate carbureid for lot %d" % (lot.id))
         lot.generate_carbure_id()
         lot.save()
 
-    stocks_wo_carbureid = CarbureStock.objects.filter(carbure_id='')
+    stocks_wo_carbureid = CarbureStock.objects.filter(carbure_id="")
     for stock in stocks_wo_carbureid:
-        print('Generate carbureid for stock %d' % (stock.id))
+        print("Generate carbureid for stock %d" % (stock.id))
         stock.generate_carbure_id()
         stock.save()
 
-
-    should_be_stock = CarbureLot.objects.filter(carbure_client_id=93, delivery_type=CarbureLot.BLENDING, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    should_be_stock = CarbureLot.objects.filter(
+        carbure_client_id=93, delivery_type=CarbureLot.BLENDING, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN]
+    )
     for lot in should_be_stock:
-        print('Should be stock %d' % (lot.id))
+        print("Should be stock %d" % (lot.id))
         stock = CarbureStock()
         stock.parent_lot = lot
         if lot.carbure_delivery_site is None:
             lot.lot_status = CarbureLot.PENDING
             lot.delivery_type = CarbureLot.UNKNOWN
             lot.save()
-            return JsonResponse({'status': 'error', 'message': 'Cannot add stock for unknown Depot'}, status=400)
+            return JsonResponse({"status": "error", "message": "Cannot add stock for unknown Depot"}, status=400)
         stock.depot = lot.carbure_delivery_site
         stock.carbure_client = lot.carbure_client
         stock.remaining_volume = lot.volume
@@ -49,12 +50,11 @@ def fix_missing_stocks():
         stock.ghg_reduction = lot.ghg_reduction
         stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
         stock.save()
-        stock.carbure_id = '%sS%d' % (lot.carbure_id, stock.id)
+        stock.carbure_id = "%sS%d" % (lot.carbure_id, stock.id)
         stock.save()
         lot.delivery_type = CarbureLot.STOCK
         lot.save()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fix_missing_stocks()
-

@@ -20,9 +20,7 @@ def get_lots_summary(request, *args, **kwargs):
     status = request.GET.get("status", False)
     short = request.GET.get("short", False) == "true"
     if not status:
-        return JsonResponse(
-            {"status": "error", "message": "Missing status"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
         lots = get_entity_lots_by_status(entity, status)
@@ -31,6 +29,4 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get lots summary"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get lots summary"}, status=400)

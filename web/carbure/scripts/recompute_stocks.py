@@ -14,7 +14,6 @@ from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockE
 
 @transaction.atomic
 def recompute_stocks(apply, batch):
-
     all_stocks = (
         CarbureStock.objects.all()
         .order_by("id")

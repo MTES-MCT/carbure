@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0003_alter_entity_entity_type'),
+        ("core", "0003_alter_entity_entity_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='entity',
-            name='has_saf_tickets',
+            model_name="entity",
+            name="has_saf_tickets",
             field=models.BooleanField(default=False),
         ),
     ]

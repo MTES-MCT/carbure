@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0031_alter_carburenotification_type"),
         ("elec", "0034_elecauditsample_percentage"),
