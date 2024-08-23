@@ -6,7 +6,6 @@ from core.utils import CarbureEnv
 
 
 def enable_entity(entity):
-
     # get entity admin
     try:
         right_request = UserRightsRequests.objects.get(entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")

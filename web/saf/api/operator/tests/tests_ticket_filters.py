@@ -20,14 +20,10 @@ class SafTicketFiltersTest(TestCase):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.client1 = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
         self.client2 = Entity.objects.filter(entity_type=Entity.OPERATOR)[2]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         self.hau = MatierePremiere.objects.get(code="HUILE_ALIMENTAIRE_USAGEE")
-        self.hga = MatierePremiere.objects.get(
-            code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"
-        )
+        self.hga = MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2")
 
         SafTicket.objects.all().delete()
 
@@ -60,9 +56,7 @@ class SafTicketFiltersTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             sorted(response.json()["data"]),
-            sorted(
-                ["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"]
-            ),
+            sorted(["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"]),
         )
 
     def test_ticket_filters_period_feedstock(self):

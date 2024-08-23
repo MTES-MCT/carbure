@@ -20,19 +20,11 @@ class ElecTransferCertificateSerializer(serializers.ModelSerializer):
     supplier = EntityPreviewSerializer(read_only=True)
     client = EntityPreviewSerializer(read_only=True)
 
+
 class ElecTransferCertificateDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElecTransferCertificate
-        fields = [
-            "id",
-            "supplier",
-            "client",
-            "transfer_date",
-            "energy_amount",
-            "status",
-            "certificate_id",
-            "comment"
-        ]
+        fields = ["id", "supplier", "client", "transfer_date", "energy_amount", "status", "certificate_id", "comment"]
 
     supplier = EntityPreviewSerializer(read_only=True)
     client = EntityPreviewSerializer(read_only=True)

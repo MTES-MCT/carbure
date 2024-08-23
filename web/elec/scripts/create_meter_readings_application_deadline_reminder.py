@@ -14,7 +14,6 @@ from elec.services.meter_readings_application_quarter import (
 
 
 def create_meter_readings_application_deadline_reminder() -> None:
-
     today = date.today()
     # get current quarter to declare
     current_year, current_quarter = get_application_quarter(today)

@@ -37,9 +37,7 @@ def update_right_request(request):
 
         Votre demande d'accès à la Société %s vient d'être validée par l'administration.
 
-        """ % (
-            right_request.entity.name
-        )
+        """ % (right_request.entity.name)
         recipient_list = [right_request.user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
         send_mail(
             subject=email_subject,

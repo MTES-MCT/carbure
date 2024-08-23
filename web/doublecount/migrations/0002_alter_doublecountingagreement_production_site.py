@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("producers", "0001_initial"),
         ("doublecount", "0001_initial"),

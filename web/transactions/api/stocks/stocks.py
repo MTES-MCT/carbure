@@ -15,6 +15,4 @@ def get_stocks(request, *args, **kwargs):
         return get_stock_with_metadata(stock, request.GET)
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get stock"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get stock"}, status=400)

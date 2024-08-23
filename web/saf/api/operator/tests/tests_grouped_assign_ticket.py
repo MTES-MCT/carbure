@@ -19,9 +19,7 @@ class SafGroupedAssignTicketTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.ticket_client = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicketSource.objects.all().delete()
         self.ticket_source1 = SafTicketSourceFactory.create(added_by_id=self.entity.id, delivery_period=202202, total_volume=30000, assigned_volume=0)  # fmt:skip
@@ -41,9 +39,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202204,
         }
 
-        response = self.client.post(
-            reverse("saf-operator-grouped-assign-ticket"), query
-        )
+        response = self.client.post(reverse("saf-operator-grouped-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
@@ -60,9 +56,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202202,
         }
 
-        response = self.client.post(
-            reverse("saf-operator-grouped-assign-ticket"), query
-        )
+        response = self.client.post(reverse("saf-operator-grouped-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
@@ -83,9 +77,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202206,
         }
 
-        response = self.client.post(
-            reverse("saf-operator-grouped-assign-ticket"), query
-        )
+        response = self.client.post(reverse("saf-operator-grouped-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
@@ -110,12 +102,8 @@ class SafGroupedAssignTicketTest(TestCase):
             ticket.country_of_origin_id,
             ticket.parent_ticket_source.country_of_origin_id,
         )
-        self.assertEqual(
-            ticket.carbure_producer_id, ticket.parent_ticket_source.carbure_producer_id
-        )
-        self.assertEqual(
-            ticket.unknown_producer, ticket.parent_ticket_source.unknown_producer
-        )
+        self.assertEqual(ticket.carbure_producer_id, ticket.parent_ticket_source.carbure_producer_id)
+        self.assertEqual(ticket.unknown_producer, ticket.parent_ticket_source.unknown_producer)
         self.assertEqual(
             ticket.carbure_production_site_id,
             ticket.parent_ticket_source.carbure_production_site_id,
@@ -139,12 +127,8 @@ class SafGroupedAssignTicketTest(TestCase):
         self.assertEqual(ticket.eccr, ticket.parent_ticket_source.eccr)
         self.assertEqual(ticket.eee, ticket.parent_ticket_source.eee)
         self.assertEqual(ticket.ghg_total, ticket.parent_ticket_source.ghg_total)
-        self.assertEqual(
-            ticket.ghg_reference, ticket.parent_ticket_source.ghg_reference
-        )
-        self.assertEqual(
-            ticket.ghg_reduction, ticket.parent_ticket_source.ghg_reduction
-        )
+        self.assertEqual(ticket.ghg_reference, ticket.parent_ticket_source.ghg_reference)
+        self.assertEqual(ticket.ghg_reduction, ticket.parent_ticket_source.ghg_reduction)
         self.assertEqual(ticket.parent_ticket_source_id, ticket.parent_ticket_source.id)
         self.assertEqual(ticket.parent_ticket_source.assigned_volume, 30000)
 

@@ -12,14 +12,12 @@ from core.models import Entity
 
 @transaction.atomic
 def update_entites_address():
-
     entity = Entity.objects.get(id=126)
     entity.registered_address = "48 Boulevard de l'Europe"
     entity.registered_zipcode = "59600"
     entity.registered_city = "Maubeuge"
     entity.registered_country = "France"
     entity.save()
-
 
     entity = Entity.objects.get(id=132)
     entity.registered_address = "Jafza 14,"
@@ -49,7 +47,6 @@ def update_entites_address():
     entity.registered_country = "ES"
     entity.save()
 
-
     entity = Entity.objects.get(id=88)
     entity.registered_address = "POL IND  ALCES C/MENCIA PARC M80"
     entity.registered_zipcode = "13600"
@@ -57,14 +54,12 @@ def update_entites_address():
     entity.registered_country = "ES"
     entity.save()
 
-
     entity = Entity.objects.get(id=129)
     entity.registered_address = "Rue du Rhone 50,"
     entity.registered_zipcode = "1204"
     entity.registered_city = "Geneva"
     entity.registered_country = "Switzerland"
     entity.save()
-
 
     entity = Entity.objects.get(id=131)
     entity.registered_address = "Ketenislaan 3"
@@ -128,6 +123,7 @@ def update_entites_address():
     entity.registered_city = "STRASBOURG"
     entity.registered_country = "France"
     entity.save()
+
 
 if __name__ == "__main__":
     update_entites_address()

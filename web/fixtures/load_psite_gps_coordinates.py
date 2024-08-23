@@ -8,9 +8,9 @@ django.setup()
 
 from producers.models import ProductionSite
 
-filename = '%s/web/fixtures/csv/production_sites_gps.csv' % (os.environ['CARBURE_HOME'])
+filename = "%s/web/fixtures/csv/production_sites_gps.csv" % (os.environ["CARBURE_HOME"])
 
-df = pd.read_csv(filename, delimiter=';').set_index('zip')['gps'].to_dict()
+df = pd.read_csv(filename, delimiter=";").set_index("zip")["gps"].to_dict()
 print(df)
 
 
@@ -20,12 +20,12 @@ for p in psites:
     try:
         code = int(p.postal_code)
     except:
-        print('missing zip code for %s' % p.name)
+        print("missing zip code for %s" % p.name)
         continue
     if code in df:
-        print('FOUND gps for %s' % (p.name))
+        print("FOUND gps for %s" % (p.name))
         print(df[code])
         p.gps_coordinates = df[code]
         p.save()
     else:
-        print('could not find gps for %s, %s' % (p.name, p.postal_code))
+        print("could not find gps for %s, %s" % (p.name, p.postal_code))

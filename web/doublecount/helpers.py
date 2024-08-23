@@ -438,9 +438,7 @@ def send_dca_status_email(dca):
 
         Bonne journée,
         L'équipe CarbuRe
-        """ % (
-            dca.production_site.name
-        )
+        """ % (dca.production_site.name)
     elif dca.status == DoubleCountingApplication.REJECTED:
         text_message = """
         Bonjour,
@@ -449,9 +447,7 @@ def send_dca_status_email(dca):
 
         Bonne journée,
         L'équipe CarbuRe
-        """ % (
-            dca.production_site.name
-        )
+        """ % (dca.production_site.name)
     else:
         # no mail to send
         return

@@ -19,9 +19,7 @@ class SafCancelTicketTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.ticket_client = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicket.objects.all().delete()
         self.ticket_source = SafTicketSourceFactory.create(added_by_id=self.entity.id, total_volume=30000, assigned_volume=10000)  # fmt:skip

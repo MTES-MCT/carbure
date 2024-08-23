@@ -41,14 +41,27 @@ def get_certificate_snapshot(request, *args, **kwargs):
 
         return SuccessResponse(
             {
-                "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
-                "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))["remaining_energy_amount__sum"] or 0,  # fmt:skip
-                "provision_certificates_available": provision_certificates_of_year.filter(remaining_energy_amount__gt=0).count(),
+                "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"]
+                or 0,  # fmt:skip
+                "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))[
+                    "remaining_energy_amount__sum"
+                ]
+                or 0,  # fmt:skip
+                "provision_certificates_available": provision_certificates_of_year.filter(
+                    remaining_energy_amount__gt=0
+                ).count(),
                 "provision_certificates_history": provision_certificates_of_year.filter(remaining_energy_amount=0).count(),
-                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
-                "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
-                "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
-                "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
+                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"]
+                or 0,  # fmt:skip
+                "transfer_certificates_pending": transfer_certificates.filter(
+                    status=ElecTransferCertificate.PENDING
+                ).count(),
+                "transfer_certificates_accepted": transfer_certificates.filter(
+                    status=ElecTransferCertificate.ACCEPTED
+                ).count(),
+                "transfer_certificates_rejected": transfer_certificates.filter(
+                    status=ElecTransferCertificate.REJECTED
+                ).count(),
             }
         )
     except Exception:

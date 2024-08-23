@@ -20,7 +20,6 @@ MAX_NOTIF_PER_HOUR = 20
 
 
 def send_notification_emails(test: bool = False) -> None:
-
     entities = Entity.objects.annotate(num_notifs=Count("carburenotification")).order_by("-num_notifs")
     domain = os.environ["ALLOWED_HOSTS"]
     one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
@@ -37,7 +36,6 @@ def send_notification_emails(test: bool = False) -> None:
         return
 
     for entity in entities:
-
         all_notifs = CarbureNotification.objects.filter(
             dest=entity,
             send_by_email=True,

@@ -41,7 +41,6 @@ def check_provenance_mp(lot: CarbureLot):
 
 
 def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: MatierePremiere):
-
     if biofuel.is_alcool and not feedstock.compatible_alcool:
         yield f"{biofuel} issu de fermentation et {feedstock} n'est pas fermentescible"
 

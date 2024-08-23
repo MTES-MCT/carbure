@@ -12,7 +12,6 @@ from entity.helpers import enable_entity
 
 class EntityRegistrationAddCompanyTest(TestCase):
     def setUp(self):
-
         self.cpo = Entity.objects.create(name="CPO", entity_type=Entity.CPO, has_elec=True)
 
         self.user = setup_current_user(

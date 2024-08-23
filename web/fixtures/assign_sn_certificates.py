@@ -10,6 +10,7 @@ from core.models import Entity
 
 user_said_yes = lambda q: input(q).lower().strip()[0] == "y"
 
+
 def try_assign_sn_certificates():
     certificates = SNCertificate.objects.all()
     for cert in certificates:
@@ -24,19 +25,21 @@ def try_assign_sn_certificates():
                 # try approximate match
                 approx_matching = Entity.objects.filter(name__icontains=cert.certificate_holder[0:6])
                 if approx_matching.count() > 0:
-                    print('Found approx matching for %s:' % (cert.certificate_holder))
+                    print("Found approx matching for %s:" % (cert.certificate_holder))
                     for m in approx_matching:
                         print(m)
-                        if user_said_yes('Confirm match?'):
-                            print('YES')
+                        if user_said_yes("Confirm match?"):
+                            print("YES")
                             EntitySNTradingCertificate.objects.create(entity=m, certificate=cert)
                         else:
-                            print('NO')
+                            print("NO")
                 else:
-                    print('Could not find match for %s' % (cert.certificate_holder))
+                    print("Could not find match for %s" % (cert.certificate_holder))
+
 
 def main():
     try_assign_sn_certificates()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
