@@ -1,6 +1,7 @@
-from core.models import Biocarburant
 from django.db.models import Q
 from django.http import JsonResponse
+
+from core.models import Biocarburant
 
 
 def get_biofuels(request):

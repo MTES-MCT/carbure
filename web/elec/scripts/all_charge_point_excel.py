@@ -1,20 +1,20 @@
 import argparse
-import django
 import os
-from tqdm import tqdm
+
+import django
 from django.db import transaction
+from tqdm import tqdm
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.excel import export_to_excel
 from elec.models.elec_charge_point import ElecChargePoint
-from elec.services.transport_data_gouv import TransportDataGouv
 
 
 @transaction.atomic
 def all_charge_point_excel(cpo):
-    print(f"> Refresh charge point data from TDG")
+    print("> Refresh charge point data from TDG")
 
     charge_points = ElecChargePoint.objects.all().order_by("cpo", "charge_point_id")
     if cpo:

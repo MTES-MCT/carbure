@@ -1,6 +1,6 @@
 import os
+
 import django
-import argparse
 from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
@@ -9,12 +9,13 @@ django.setup()
 
 from core.models import *
 
+
 def reset_remaining_volume(tx):
     if tx.lot.volume != tx.lot.remaining_volume:
         print('Reset %s remaining volume from %f to %f. Tx id [%d] Lot id [%d] client %s' % (tx.lot.biocarburant.code, tx.lot.remaining_volume, tx.lot.volume, tx.id, tx.lot.id, tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
         tx.lot.remaining_volume = tx.lot.volume
         tx.lot.save()
-        
+
 def handle_complex_stock(tx, child_tx):
     sum_child = child_tx.filter(is_forwarded=False).aggregate(Sum('lot__volume'))
     sum_volume = sum_child['lot__volume__sum']
@@ -32,7 +33,7 @@ def handle_complex_stock(tx, child_tx):
         tx.lot.remaining_volume = tx.lot.volume - sum_volume
         tx.lot.save()
         print('New remaining volume: [%f]' % (tx.lot.remaining_volume))
-        
+
 
 def fix_etbe():
     transformations = ETBETransformation.objects.all()
@@ -50,7 +51,7 @@ def fix_etbe():
         try:
             initial_eth_stock_line = ETBETransformation.objects.get(new_stock=t).previous_stock
             transformations = ETBETransformation.objects.filter(previous_stock=initial_eth_stock_line)
-            
+
             total_volume_converted_to_etbe = 0
             for t in transformations:
                 total_volume_converted_to_etbe += t.volume_ethanol
@@ -71,9 +72,9 @@ def fix_etbe():
                 initial_eth_stock_line.lot.save()
         except:
             continue
-        
-        
-            
+
+
+
 def fix_other_stock():
     stocks = LotTransaction.objects.filter(lot__year=2021, lot__status='Validated')
     for l in stocks:

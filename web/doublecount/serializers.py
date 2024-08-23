@@ -1,11 +1,11 @@
 from django.db.models.aggregates import Count, Sum
 from rest_framework import serializers
-from certificates.models import ProductionSiteCertificate
 
+from certificates.models import ProductionSiteCertificate
+from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
-from .models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
-from core.models import Entity, GenericCertificate, MatierePremiere, Biocarburant, Pays
+from .models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction, DoubleCountingSourcing
 
 
 class EntitySerializer(serializers.ModelSerializer):

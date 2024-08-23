@@ -1,12 +1,12 @@
 from django.contrib import admin
 
 from elec.models import (
-    ElecProvisionCertificate,
-    ElecTransferCertificate,
     ElecChargePoint,
     ElecChargePointApplication,
     ElecMeterReading,
     ElecMeterReadingApplication,
+    ElecProvisionCertificate,
+    ElecTransferCertificate,
 )
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample

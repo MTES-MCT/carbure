@@ -1,7 +1,8 @@
+from django.http import JsonResponse
+
 from carbure.tasks import background_bulk_scoring
 from core.decorators import check_admin_rights
 from core.models import CarbureLot, EntityCertificate
-from django.http import JsonResponse
 
 
 @check_admin_rights()

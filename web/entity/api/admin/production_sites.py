@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+
 from core.decorators import check_admin_rights
 from core.models import ProductionSite
 

@@ -1,11 +1,11 @@
 from datetime import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 
-
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
-from saf.models import SafTicketSource, SafTicket
+from saf.models import SafTicket, SafTicketSource
 
 
 class SafTicketSourceDetailsTest(TestCase):

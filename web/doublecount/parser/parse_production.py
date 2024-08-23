@@ -1,10 +1,11 @@
 from typing import List
+
 from openpyxl import Workbook
 from pyparsing import Any
-from doublecount.parser.helpers import extract_year
 
-from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow
 from doublecount.parser.excel_to_carbure_convertor import get_biofuel_from_dc_biofuel, get_feedstock_from_dc_feedstock
+from doublecount.parser.helpers import extract_year
+from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow
 
 
 def parse_production_max(excel_file: Workbook, start_year) -> List[ProductionMaxRow]:

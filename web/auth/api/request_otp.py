@@ -7,6 +7,7 @@ from django.template import loader
 from django.utils import timezone
 from django_otp import user_has_device
 from django_otp.plugins.otp_email.models import EmailDevice
+
 from core.common import SuccessResponse
 
 

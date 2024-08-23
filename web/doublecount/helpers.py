@@ -1,20 +1,30 @@
-from calendar import c
 import datetime
-from django.core.mail import EmailMessage
 import os
-from typing import List
-from django.http import JsonResponse
-from django.conf import settings
+import re
 import traceback
 import unicodedata
-import re
-from django.db import transaction
+from typing import List
+
 import pandas as pd
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.db import transaction
+from django.db.models.aggregates import Count, Sum
+from django.http import JsonResponse
+
 from certificates.models import DoubleCountingRegistration
-from core.models import CarbureLot, Entity, Pays, Biocarburant, MatierePremiere, UserRights
-from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
-from doublecount.dc_sanity_checks import check_production_row, check_production_row_integrity, check_sourcing_row
-from doublecount.models import DoubleCountingApplication
+from core.common import CarbureException
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays, UserRights
+from doublecount.dc_sanity_checks import (
+    DoubleCountingError,
+    check_dc_globally,
+    check_production_row,
+    check_production_row_integrity,
+    check_sourcing_row,
+    error,
+)
+from doublecount.errors import DoubleCountingError, error
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
 from doublecount.parser.dc_parser import (
     ProductionForecastRow,
     ProductionMaxRow,
@@ -22,12 +32,6 @@ from doublecount.parser.dc_parser import (
     SourcingRow,
     parse_dc_excel,
 )
-from doublecount.errors import DoubleCountingError, error
-from django.db.models.aggregates import Count, Sum
-
-
-from core.common import CarbureException
-from doublecount.dc_sanity_checks import check_dc_globally, error, DoubleCountingError
 from doublecount.serializers import (
     BiofuelSerializer,
     DoubleCountingProductionSerializer,

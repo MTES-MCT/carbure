@@ -1,8 +1,8 @@
+from django.db.models import Count, Q, Value
+
 from core.common import SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
-from django.db.models import Q, Count, Value
-
 from doublecount.models import DoubleCountingApplication
 from elec.models import ElecChargePointApplication, ElecMeterReadingApplication
 

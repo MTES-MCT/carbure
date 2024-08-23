@@ -1,13 +1,14 @@
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from django.db import transaction
-from django.db.models import Q
-from core.models import ProductionSite, CarbureLot
+
 from certificates.models import DoubleCountingRegistration
+from core.models import CarbureLot, ProductionSite
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
 

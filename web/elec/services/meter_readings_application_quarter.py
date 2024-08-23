@@ -1,5 +1,5 @@
-from datetime import date, timedelta
 import calendar
+from datetime import date, timedelta
 
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 

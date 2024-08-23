@@ -1,4 +1,5 @@
-from core.models import CarbureLot, Biocarburant
+from core.models import Biocarburant, CarbureLot
+
 from .node import Node, TraceabilityError
 
 ETHANOL = -1

@@ -1,6 +1,7 @@
+from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent, UserRights
-from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

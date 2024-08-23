@@ -1,7 +1,8 @@
+from django.http.response import JsonResponse
+
 from certificates.models import ProductionSiteCertificate
 from core.decorators import check_user_rights
 from core.models import Entity, EntityCertificate, GenericCertificate, UserRights
-from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])

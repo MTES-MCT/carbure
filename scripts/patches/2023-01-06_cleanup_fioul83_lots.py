@@ -1,4 +1,5 @@
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
@@ -6,7 +7,8 @@ django.setup()
 
 from django.db import transaction
 from django.db.models import Q
-from core.models import CarbureLot, Entity, Depot
+
+from core.models import CarbureLot, Depot, Entity
 
 
 @transaction.atomic

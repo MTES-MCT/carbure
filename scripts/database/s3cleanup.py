@@ -1,8 +1,8 @@
-import sys
-import os
-import boto3
-import datetime
 import argparse
+import os
+import sys
+
+import boto3
 
 
 def cleanup_s3db(args):
@@ -39,7 +39,7 @@ def cleanup_s3db(args):
         bucket.delete_objects(Delete={"Objects": to_delete})
         print(f"> Deleted {len(to_delete)} backups from the bucket")
     else:
-        print(f"> Backups are already cleaned")
+        print("> Backups are already cleaned")
 
 
 def main():

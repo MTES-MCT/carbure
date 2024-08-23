@@ -1,14 +1,15 @@
+import argparse
+import datetime
 import os
 from typing import cast
+
 import django
-import datetime
-import argparse
-from django.utils import timezone
-from django.template import loader
-from django.db.models import Count, Min, Max
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.conf import settings
 import pytz
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.db.models import Count, Max, Min
+from django.template import loader
+from django.utils import timezone
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()

@@ -1,8 +1,9 @@
+from django.db.models.query_utils import Q
+from django.http.response import JsonResponse
+
 from carbure.tasks import background_bulk_sanity_checks
 from core.decorators import check_user_rights
 from core.models import CarbureLot, Entity, EntityCertificate, GenericCertificate, UserRights
-from django.db.models.query_utils import Q
-from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])

@@ -1,15 +1,14 @@
 import argparse
 import os
+
 import django
 from django.db import transaction
-from django.db.models import F
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from transactions.services.carbure_id import bulk_generate_lot_carbure_id, bulk_generate_stock_carbure_id
 from core.models import CarbureLot, CarbureStock
+from transactions.services.carbure_id import bulk_generate_lot_carbure_id, bulk_generate_stock_carbure_id
 
 
 def update_carbure_id(apply, lots, stocks):
@@ -29,7 +28,7 @@ def update_carbure_id_for_lots(apply):
     bad_id_lots = bulk_generate_lot_carbure_id(all_lots, save=apply)
     print(f"> {bad_id_lots.count()} lots with wrong id")
 
-    print(f"> Done")
+    print("> Done")
 
 
 @transaction.atomic
@@ -41,7 +40,7 @@ def update_carbure_id_for_stocks(apply):
     bad_id_stocks = bulk_generate_stock_carbure_id(all_stocks, save=apply)
     print(f"> {bad_id_stocks.count()} stocks with wrong id")
 
-    print(f"> Done")
+    print("> Done")
 
 
 if __name__ == "__main__":

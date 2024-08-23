@@ -1,6 +1,6 @@
 from django.db import models
-from core.models import Entity
 
+from core.models import Entity
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 
 

@@ -1,6 +1,7 @@
-import sys, os
-import django
 import csv
+import os
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -24,5 +25,5 @@ with open(filename) as csvfile:
         is_graisse = row[6]
         is_displayed = row[7]
         compat_essence = row[8]
-        compat_diesel = row[9]        
+        compat_diesel = row[9]
         obj, created = Biocarburant.objects.update_or_create(code=code, defaults={'name': name, 'description':'', 'pci_kg':pcikg, 'pci_litre':pcil, 'masse_volumique':mv, 'is_alcool': is_alcool, 'is_graisse': is_graisse, 'is_displayed': is_displayed, 'compatible_essence': compat_essence, 'compatible_diesel': compat_diesel})

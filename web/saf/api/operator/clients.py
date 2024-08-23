@@ -2,10 +2,11 @@
 
 import traceback
 
-from django.db.models import Q
-from core.common import SuccessResponse, ErrorResponse
-from core.models import Entity
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+
+from core.common import ErrorResponse, SuccessResponse
+from core.models import Entity
 from saf.serializers.saf_ticket import SafClientSerializer
 
 

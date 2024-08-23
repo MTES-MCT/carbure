@@ -1,21 +1,17 @@
-import sys, os
-import django
-import csv
-import calendar
 import datetime
-import re
-import argparse
+import os
+from typing import List
+
+import django
 import openpyxl
 import pandas as pd
-from typing import TYPE_CHECKING, Dict, List, Optional
 from pandas._typing import Scalar
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
+from core.utils import bulk_update_or_create
 
 today = datetime.date.today()
 CSV_FOLDER = os.environ["CARBURE_HOME"] + "/web/fixtures/csv/"

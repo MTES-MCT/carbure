@@ -1,14 +1,15 @@
-import os
-import django
-import argparse
-from django.db.models import Sum, Count, Min
 import calendar
 import datetime
+import os
+
+import django
+from django.db.models import Count
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import *
+
 
 def fix_declaration_deadlines():
     decs = SustainabilityDeclaration.objects.all()
@@ -34,5 +35,5 @@ def fix_declaration_duplicates():
             to_delete.delete()
 
 if __name__ == '__main__':
-    fix_declaration_deadlines()    
+    fix_declaration_deadlines()
     fix_declaration_duplicates()

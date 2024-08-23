@@ -1,4 +1,4 @@
-from .node import Node, GHG_FIELDS
+from .node import GHG_FIELDS, Node
 
 
 class TicketNode(Node):

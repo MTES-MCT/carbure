@@ -1,12 +1,14 @@
 import datetime
-from django.test import TestCase
-from certificates.models import DoubleCountingRegistration
 
+from django.test import TestCase
+
+from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
-from core.models import Entity, MatierePremiere
+from core.models import MatierePremiere
 from producers.models import ProductionSite
 from transactions.factories import CarbureLotFactory
-from ..helpers import enrich_lot, has_error, get_prefetched_data
+
+from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
 
 

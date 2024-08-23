@@ -1,10 +1,11 @@
 # /api/stats/entity
-import jwt
 import time
 import traceback
 
+import jwt
 from django.conf import settings
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
 

@@ -1,5 +1,6 @@
-from core.common import SuccessResponse
 from django.contrib.auth import logout
+
+from core.common import SuccessResponse
 
 
 def user_logout(request):

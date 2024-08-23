@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from core.models import Depot, Pays, Entity
+
+from core.models import Depot, Entity, Pays
 
 
 class DepotSerializer(serializers.ModelSerializer):

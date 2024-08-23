@@ -1,24 +1,25 @@
-import subprocess
 import datetime
+import subprocess
 from os import environ as env
-from huey import crontab
-from huey.contrib.djhuey import periodic_task, db_periodic_task, db_task
-from django.db.models.query import QuerySet
 
-from elec.scripts.create_meter_readings_application_deadline_reminder import (
-    create_meter_readings_application_deadline_reminder,
-)
-from elec.scripts.create_meter_readings_application_reminder import create_meter_readings_application_reminder
-from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
-from ml.scripts.calc_ml_score import calc_ml_score
-from ml.scripts.load_data import load_ml_data
+from django.db.models.query import QuerySet
+from huey import crontab
+from huey.contrib.djhuey import db_periodic_task, db_task, periodic_task
+
 from carbure.scripts.create_declaration_reminder import create_declaration_reminder
 from carbure.scripts.send_notification_emails import send_notification_emails
 from carbure.scripts.update_2bs_certificates import update_2bs_certificates
 from carbure.scripts.update_iscc_certificates import update_iscc_certificates
 from carbure.scripts.update_redcert_certificates import update_redcert_certificates
+from elec.scripts.create_meter_readings_application_deadline_reminder import (
+    create_meter_readings_application_deadline_reminder,
+)
+from elec.scripts.create_meter_readings_application_reminder import create_meter_readings_application_reminder
+from ml.scripts.calc_ml_score import calc_ml_score
+from ml.scripts.load_data import load_ml_data
 from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 from saf.scripts.link_dgac_to_airlines import link_dgac_to_airlines
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
 
 
 @db_task()

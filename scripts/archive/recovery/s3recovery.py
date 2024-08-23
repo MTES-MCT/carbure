@@ -1,8 +1,9 @@
 import argparse
-import boto3
 import datetime
-import sys
 import os
+import sys
+
+import boto3
 
 
 def dl_backup(bucket, date):

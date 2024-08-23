@@ -1,17 +1,18 @@
-import os
-import datetime
 import calendar
+import datetime
+import os
 from multiprocessing.context import Process
+
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F, OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
-from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
-from core.common import try_get_certificate, try_get_double_counting_certificate
 
+from core.common import try_get_certificate, try_get_double_counting_certificate
 from core.ign_distance import get_distance
 from core.models import (
     Biocarburant,
@@ -22,12 +23,12 @@ from core.models import (
     CarbureStockTransformation,
     Depot,
     Entity,
+    GenericError,
     MatierePremiere,
     Pays,
     TransactionDistance,
     UserRights,
 )
-from core.models import GenericError
 from core.serializers import (
     CarbureLotAdminEventSerializer,
     CarbureLotAdminSerializer,
@@ -41,7 +42,6 @@ from core.serializers import (
 )
 from core.utils import CarbureEnv
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
-
 
 sort_key_to_django_field = {
     "period": "delivery_date",

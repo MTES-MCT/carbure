@@ -1,12 +1,8 @@
-from calendar import calendar
-from pydoc import cli
-from unittest.util import three_way_cmp
-from core.models import CarbureLot, CarbureNotification, SustainabilityDeclaration
-import datetime
-from django.db.models import Count
-from django.db.models import F, Q, When
+from django.db.models import Count, Q
 
+from core.models import CarbureLot, CarbureNotification
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
+
 
 def notify_correction_request(lots):
     lots_by_supplier = lots.select_related('carbure_client').filter(carbure_supplier__isnull=False)\

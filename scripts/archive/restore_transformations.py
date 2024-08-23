@@ -1,17 +1,15 @@
 import os
+
 import django
-import argparse
-from django.db.models import Sum, Count, Min, Q
-import calendar
-import datetime
-import json
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import *
 from django.core import serializers
-    
+
+from core.models import *
+
+
 def load_feyzin_data():
     trans = {tx.id: tx for tx in ETBETransformation.objects.all()}
 
@@ -26,6 +24,6 @@ def load_feyzin_data():
         if tx.object.id not in trans:
             print('restoring transformation %d' % (tx.object.id))
             tx.save()
-                
+
 if __name__ == '__main__':
     load_feyzin_data()

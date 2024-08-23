@@ -1,14 +1,12 @@
 from django.db.models.query_utils import Q
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
-
 from core.decorators import check_user_rights
-from core.helpers import get_lot_comments, get_lot_errors, get_lot_updates
-from core.helpers import get_transaction_distance, get_known_certificates
+from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_transaction_distance
 from core.models import CarbureLot, CarbureStock, Entity
-from core.traceability import LotNode
-
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
+from core.traceability import LotNode
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerPublicSerializer
 
 

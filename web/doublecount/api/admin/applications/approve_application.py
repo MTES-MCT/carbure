@@ -1,12 +1,10 @@
 from certificates.models import DoubleCountingRegistration
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-
 from doublecount.models import (
     DoubleCountingApplication,
     DoubleCountingProduction,
 )
-
-from core.common import ErrorResponse, SuccessResponse
 
 
 class DoubleCountingApplicationApproveError:

@@ -1,7 +1,7 @@
+
 from core.common import SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import CarbureLot, CarbureStockTransformation
-from django.http.response import JsonResponse
 
 
 @check_admin_rights()

@@ -1,12 +1,13 @@
 import argparse
 import os
-import django
 
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from django.db import transaction
+
 from core.models import MatierePremiere
 
 

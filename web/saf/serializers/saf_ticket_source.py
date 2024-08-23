@@ -1,11 +1,12 @@
 import datetime
-from rest_framework import serializers
-from core.excel import export_to_excel, get_nested_value
 
-from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
-from core.serializers import CarbureLotPublicSerializer, ProductionSiteSerializer, EntityPreviewSerializer
-from saf.models import SafTicketSource
+from rest_framework import serializers
+
+from core.excel import export_to_excel
 from core.models import CarbureLot
+from core.serializers import CarbureLotPublicSerializer, EntityPreviewSerializer, ProductionSiteSerializer
+from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
+from saf.models import SafTicketSource
 
 
 class SafTicketSourceParentLotSerializer(serializers.ModelSerializer):

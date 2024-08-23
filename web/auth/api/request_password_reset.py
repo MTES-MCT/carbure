@@ -1,13 +1,13 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.template import loader
-from django.conf import settings
-from django.core.mail import send_mail
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.auth import get_user_model
-from core.carburetypes import CarbureError
 
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 
 

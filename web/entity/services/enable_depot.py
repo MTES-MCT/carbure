@@ -1,8 +1,10 @@
-from core.utils import CarbureEnv
-from core.models import UserRights
-from django.core.mail import send_mail
-from django.conf import settings
 from datetime import datetime
+
+from django.conf import settings
+from django.core.mail import send_mail
+
+from core.models import UserRights
+from core.utils import CarbureEnv
 
 
 def enable_depot(depot):
@@ -20,7 +22,7 @@ def enable_depot(depot):
         raise Exception("Cette société n'a pas d'admin actif")
 
     send_email_to_admin_users(entity, depot, admins)
-    
+
     return f"Le dépôt {depot.name} est activé et les administrateurs de {entity.name} ont été notifiés"
 
 

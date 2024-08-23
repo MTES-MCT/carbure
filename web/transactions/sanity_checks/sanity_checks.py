@@ -1,15 +1,16 @@
 import traceback
-from django.db.models import QuerySet
-from core.models import CarbureLot, GenericError
-from .helpers import get_prefetched_data
-from .mandatory import *
-from .ghg import *
-from .general import *
-from .double_counting import *
-from .biofuel_feedstock import *
-from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError
 
 from django.db import transaction
+from django.db.models import QuerySet
+
+from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError
+
+from .biofuel_feedstock import *
+from .double_counting import *
+from .general import *
+from .ghg import *
+from .helpers import get_prefetched_data
+from .mandatory import *
 
 
 def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:

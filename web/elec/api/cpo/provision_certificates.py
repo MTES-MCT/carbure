@@ -1,8 +1,9 @@
-from math import floor
 import traceback
+from math import floor
 
-from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_GET
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from elec.api.admin.provision_certificates.provision_certificates import (

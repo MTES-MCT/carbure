@@ -1,9 +1,9 @@
 import json
-from core.decorators import check_user_rights
+
 from django.http.response import JsonResponse
-from transactions.helpers import try_get_date
-from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
-from transactions.sanity_checks import get_prefetched_data
+
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
+from core.decorators import check_user_rights
 from core.models import (
     CarbureLot,
     CarbureLotEvent,
@@ -14,6 +14,8 @@ from core.models import (
     Pays,
     UserRights,
 )
+from transactions.helpers import try_get_date
+from transactions.sanity_checks import get_prefetched_data
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -53,7 +55,7 @@ def stock_split(request, *args, **kwargs):
 
         try:
             stock = CarbureStock.objects.get(carbure_id=entry["stock_id"])
-        except Exception as e:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find stock"}, status=400)
 
         if stock.carbure_client_id != int(entity_id):

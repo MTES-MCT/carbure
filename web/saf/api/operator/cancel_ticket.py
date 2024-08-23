@@ -1,11 +1,13 @@
 # /api/saf/operator/cancel-ticket
 
 import traceback
+
 from django.db import transaction
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from saf.models import SafTicket
 from core.models import UserRights
+from saf.models import SafTicket
 
 
 class SafTicketCancelError:

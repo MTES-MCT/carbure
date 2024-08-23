@@ -1,5 +1,6 @@
-from django.db import models
 from math import floor
+
+from django.db import models
 
 
 class SafTicket(models.Model):

@@ -1,9 +1,9 @@
 from typing import Iterable
-from core.utils import run_query
-from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
-from saf.models import SafTicket, SafTicketSource
 
-from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
+from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
+from core.traceability import LotNode, StockNode, StockTransformNode, TicketNode, TicketSourceNode
+from core.utils import run_query
+from saf.models import SafTicket, SafTicketSource
 
 
 # use a recursive query to quickly fetch the whole families of the given lots

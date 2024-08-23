@@ -1,7 +1,7 @@
 import pandas as pd
 from django import forms
-from django.db.models import QuerySet
 from django.core.files.uploadedfile import UploadedFile
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from core.utils import Validator, is_true

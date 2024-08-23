@@ -1,9 +1,11 @@
 from django.db.models.expressions import OuterRef, Subquery
+
 from core.common import ErrorResponse, SuccessResponse
-from elec.models import ElecChargePoint, ElecMeterReading
-from .charge_points import ChargePointFilterForm, filter_charge_points
 from core.decorators import check_user_rights
 from core.models import Entity
+from elec.models import ElecChargePoint, ElecMeterReading
+
+from .charge_points import ChargePointFilterForm, filter_charge_points
 
 
 class ChargePointFilterError:

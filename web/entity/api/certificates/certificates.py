@@ -1,8 +1,9 @@
+from django.http.response import JsonResponse
+
 from certificates.models import ProductionSiteCertificate
 from core.decorators import check_user_rights
 from core.models import Entity, EntityCertificate
 from core.serializers import EntityCertificateSerializer
-from django.http.response import JsonResponse
 
 
 @check_user_rights()

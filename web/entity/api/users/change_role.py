@@ -1,5 +1,6 @@
-from django.contrib.auth import get_user_model
 from django import forms
+from django.contrib.auth import get_user_model
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests

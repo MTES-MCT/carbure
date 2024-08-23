@@ -1,7 +1,7 @@
-import os
-import django
 import argparse
+import os
 
+import django
 from django.db import transaction
 from django.db.models import Q
 
@@ -9,8 +9,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import CarbureLot, CarbureLotEvent
+from core.traceability import bulk_delete_traceability_nodes, bulk_update_traceability_nodes, get_traceability_nodes
 from core.utils import generate_reports
-from core.traceability import get_traceability_nodes, bulk_update_traceability_nodes, bulk_delete_traceability_nodes
 
 
 @transaction.atomic

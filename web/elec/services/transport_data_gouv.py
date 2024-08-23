@@ -1,8 +1,10 @@
 import os
 from typing import Iterable
-import requests
+
 import pandas as pd
+import requests
 from dateutil.parser import isoparse
+
 from core.utils import is_true
 
 

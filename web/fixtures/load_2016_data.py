@@ -1,15 +1,15 @@
-import sys, os
+import datetime
+import os
+
 import django
 import openpyxl
-import datetime
-import dateutil
 from django.contrib.auth import get_user_model
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 usermodel = get_user_model()
-from core.models import LotV2, LotTransaction, Entity, MatierePremiere, Pays, Biocarburant
+from core.models import Biocarburant, Entity, LotTransaction, LotV2, MatierePremiere, Pays
 
 # load data
 producers = {p.name.upper():p for p in Entity.objects.filter(entity_type='Producteur')}
@@ -174,7 +174,7 @@ for i, lot in enumerate(lots):
         try:
             year = int(dd[6:10])
             month = int(dd[3:5])
-            day = int(dd[0:2])        
+            day = int(dd[0:2])
             dd = datetime.datetime(year=year, month=month, day=day)
             #dd = dateutil.parser.parse(dd, dayfirst=True)
         except:
@@ -285,7 +285,7 @@ for i, lot in enumerate(lots):
     tx.delivery_status = 'F'
     try:
         tx.save()
-        print('created lot %d' % (i), end='\r')        
+        print('created lot %d' % (i), end='\r')
     except Exception as e:
         print('could not create lot %s' % (lot))
         print(e)

@@ -1,12 +1,13 @@
 import traceback
-from django import forms
+
 import pandas as pd
+from django import forms
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.translation import gettext_lazy as _
+
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
-
 
 """
 Résumé de l'algo:

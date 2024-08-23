@@ -1,14 +1,13 @@
-import sys
 import os
+
 import django
-import argparse
-from django.db.models import Sum
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
 from core.models import *
+
 
 def pretty_print_stock(stock):
     print("STOCK {period} [{client}] {id} {carbure_id} {initial_volume} remaining {remaining_volume} {biofuel} {feedstock}".format(period=stock.parent_lot.period if stock.parent_lot else stock.parent_transformation.source_stock.parent_lot.period, client=stock.carbure_client.name, id=stock.id, carbure_id=stock.carbure_id, initial_volume=stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination, remaining_volume=stock.remaining_volume, biofuel=stock.biofuel.name, feedstock=stock.feedstock.name))
@@ -26,15 +25,15 @@ def recalc():
         l.volume = round(l.volume, 2)
         l.save()
         pretty_print_lot(l)
-    print('################################ DONE')          
+    print('################################ DONE')
 
     print('################################ ETBE STOCKS')
     odd_lots = CarbureStock.objects.filter(biofuel__code='ETBE', remaining_volume__gt=1)
     for l in odd_lots:
         l.remaining_volume = round(l.remaining_volume, 2)
-        l.save()        
+        l.save()
         pretty_print_stock(l)
-    print('################################ DONE')          
+    print('################################ DONE')
 
 
     odd_lots = CarbureLot.objects.filter(parent_lot__isnull=False, parent_stock__isnull=True, biofuel__code='ETBE')
@@ -47,8 +46,8 @@ def recalc():
             print('Found stock')
         except:
             pass
-    
-    
+
+
 if __name__ == '__main__':
     recalc()
-    
+

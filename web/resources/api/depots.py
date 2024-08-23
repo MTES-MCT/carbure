@@ -1,6 +1,7 @@
-from core.models import Depot
 from django.db.models import Q
 from django.http import JsonResponse
+
+from core.models import Depot
 
 
 def get_depots(request):

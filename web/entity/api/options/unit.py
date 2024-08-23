@@ -1,6 +1,7 @@
+from django.http import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from django.http import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])

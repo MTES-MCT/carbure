@@ -1,9 +1,10 @@
 # test with : python web/manage.py test entity.api.registration.tests_search_company.EntityRegistrationSearchCompanyTest --keepdb
 
-from core.tests_utils import setup_current_user
-from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import Entity
+from core.tests_utils import setup_current_user
 
 
 class EntityRegistrationSearchCompanyTest(TestCase):

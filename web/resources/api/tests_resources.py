@@ -1,6 +1,8 @@
 import datetime
 
-from core.tests_utils import setup_current_user
+from django.test import TestCase
+from django.urls import reverse
+
 from core.models import (
     Biocarburant,
     Depot,
@@ -9,8 +11,7 @@ from core.models import (
     Pays,
     ProductionSite,
 )
-from django.test import TestCase
-from django.urls import reverse
+from core.tests_utils import setup_current_user
 
 
 class ResourcesTest(TestCase):

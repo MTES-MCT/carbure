@@ -1,9 +1,11 @@
 # /api/saf/airline/tickets/filters
 
 import traceback
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from .tickets import parse_ticket_query, find_tickets
+
+from .tickets import find_tickets, parse_ticket_query
 
 
 class SafTicketFiltersError:

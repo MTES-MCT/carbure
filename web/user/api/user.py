@@ -1,7 +1,8 @@
-from core.decorators import otp_or_403
-from core.models import UserRights, UserRightsRequests
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+
+from core.decorators import otp_or_403
+from core.models import UserRights, UserRightsRequests
 
 
 @ensure_csrf_cookie

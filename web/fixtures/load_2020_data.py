@@ -1,14 +1,15 @@
-import sys, os
+import datetime
+import os
+
 import django
 import openpyxl
-import datetime
 from django.contrib.auth import get_user_model
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 usermodel = get_user_model()
-from core.models import LotV2, LotTransaction, Entity, MatierePremiere, Pays, Biocarburant
+from core.models import Biocarburant, Entity, LotTransaction, LotV2, MatierePremiere, Pays
 
 # load data
 producers = {p.name:p for p in Entity.objects.filter(entity_type='Producteur')}
@@ -58,7 +59,7 @@ for i, row in enumerate(lots_sheet):
 for i, lot in enumerate(lots):
     if lot['dae'] is None:
         lot['dae'] = 'MISSING_DAE'
-    
+
     lop = lot['Opérateur']
     if lop not in operators:
         print('Could not find operator %s in operators' % (lop))
@@ -98,9 +99,9 @@ for i, lot in enumerate(lots):
             elif lupscd.startswith('après '):
                 lupscd = datetime.datetime.strptime(lupscd[6:].strip(), '%d/%m/%Y') + datetime.timedelta(days=1)
             elif lupscd.lower().startswith('anterieur au '):
-                lupscd = datetime.datetime.strptime(lupscd[13:].strip(), '%d/%m/%Y') - datetime.timedelta(days=1)              
+                lupscd = datetime.datetime.strptime(lupscd[13:].strip(), '%d/%m/%Y') - datetime.timedelta(days=1)
             elif lupscd.lower().startswith('postérieur au '):
-                lupscd = datetime.datetime.strptime(lupscd[14:].strip(), '%d/%m/%Y') + datetime.timedelta(days=1)              
+                lupscd = datetime.datetime.strptime(lupscd[14:].strip(), '%d/%m/%Y') + datetime.timedelta(days=1)
             else:
                 try:
                     lupscd = datetime.datetime.strptime(lupscd, '%d/%m/%Y')
@@ -111,7 +112,7 @@ for i, lot in enumerate(lots):
             print('Unknown type for production site com date: %s %s' % (lupscd, type(lupscd)))
             continue
 
-    
+
     d = {'period': '',
          'producer_is_in_carbure': False, 'carbure_producer': None, 'unknown_producer':'',
          'production_site_is_in_carbure': False, 'carbure_production_site': None,

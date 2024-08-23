@@ -1,24 +1,24 @@
-import os
-import django
-import datetime
 import argparse
-import openpyxl
-import requests
-import pandas as pd
-import numpy as np
+import datetime
+import os
 from typing import List, Tuple, cast
-from pandas._typing import Scalar
+
+import django
+import numpy as np
+import openpyxl
+import pandas as pd
+import requests
+from django.conf import settings
+from django.core.mail import get_connection, send_mail
 from openpyxl.cell.cell import Cell
 from openpyxl.worksheet.worksheet import Worksheet
-from django.conf import settings
-from django.core.mail import send_mail, get_connection
+from pandas._typing import Scalar
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
-
+from core.utils import bulk_update_or_create
 
 today = datetime.date.today()
 REDCERT_CERT_PAGE = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"

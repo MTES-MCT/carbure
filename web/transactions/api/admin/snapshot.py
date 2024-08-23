@@ -1,10 +1,11 @@
+from django.db.models.query_utils import Q
+from django.http.response import JsonResponse
+
 from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureStock,
 )
-from django.db.models.query_utils import Q
-from django.http.response import JsonResponse
 
 
 @check_admin_rights()
