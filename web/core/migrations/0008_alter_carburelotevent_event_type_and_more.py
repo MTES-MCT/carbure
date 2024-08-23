@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0007_alter_externaladminrights_right"),
     ]
@@ -36,14 +35,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="carburelot",
-            index=models.Index(
-                fields=["parent_lot"], name="carbure_lot_parent__517847_idx"
-            ),
+            index=models.Index(fields=["parent_lot"], name="carbure_lot_parent__517847_idx"),
         ),
         migrations.AddIndex(
             model_name="carburelot",
-            index=models.Index(
-                fields=["parent_stock"], name="carbure_lot_parent__f99f44_idx"
-            ),
+            index=models.Index(fields=["parent_stock"], name="carbure_lot_parent__f99f44_idx"),
         ),
     ]

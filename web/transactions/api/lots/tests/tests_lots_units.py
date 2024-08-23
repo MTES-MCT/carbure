@@ -39,23 +39,15 @@ class LotsTestUnits(TestCase):
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
-        UserRights.objects.update_or_create(
-            entity=self.producer, user=self.user1, role=UserRights.RW
-        )
-        UserRights.objects.update_or_create(
-            entity=self.trader, user=self.user1, role=UserRights.RW
-        )
-        UserRights.objects.update_or_create(
-            entity=self.operator, user=self.user1, role=UserRights.RW
-        )
+        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
 
         # pass otp verification
         response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(
-            reverse("auth-verify-otp"), {"otp_token": device.token}
-        )
+        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):

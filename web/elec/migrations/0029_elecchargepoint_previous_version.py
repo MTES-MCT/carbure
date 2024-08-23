@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("elec", "0028_alter_elecmeterreadingapplication_created_at"),
     ]

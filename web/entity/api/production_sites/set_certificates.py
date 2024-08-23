@@ -32,7 +32,5 @@ def set_production_site_certificates(request, *args, **kwargs):
                 {"status": "error", "message": "Certificate %s is not associated with your entity" % (certificate_id)},
                 status=400,
             )
-        ProductionSiteCertificate.objects.update_or_create(
-            entity=entity, production_site=production_site, certificate=link
-        )
+        ProductionSiteCertificate.objects.update_or_create(entity=entity, production_site=production_site, certificate=link)
     return JsonResponse({"status": "success"})

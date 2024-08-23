@@ -45,9 +45,7 @@ class LotForm(forms.Form):
     unknown_producer = forms.CharField(required=False)
 
     # multiple choice field to handle duplicate production sites
-    carbure_production_site = forms.ModelMultipleChoiceField(
-        queryset=PRODUCTION_SITES, to_field_name="name", required=False
-    )
+    carbure_production_site = forms.ModelMultipleChoiceField(queryset=PRODUCTION_SITES, to_field_name="name", required=False)
 
     unknown_production_site = forms.CharField(required=False)
     production_site_certificate = forms.CharField(required=False)

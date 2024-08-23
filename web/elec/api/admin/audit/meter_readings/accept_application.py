@@ -95,7 +95,7 @@ def accept_application(request: HttpRequest):
 
 def send_email_to_cpo(application: ElecMeterReadingApplication):
     quarter = f"T{application.quarter} {application.year}"
-    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum('renewable_energy'))['total_energy'], 2)
+    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec/{application.year}/provisioned"
 

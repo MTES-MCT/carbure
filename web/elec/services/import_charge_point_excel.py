@@ -50,7 +50,9 @@ class ExcelChargePoints:
         "mid_id": ["Numéro MID du certificat d'examen du type", "Numéro LNE du certificat d'examen du type"],
         "measure_date": ["Date du relevé"],
         "measure_energy": ["Energie active totale soutirée à la date du relevé"],
-        "measure_reference_point_id": ["Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station"],  # fmt:skip
+        "measure_reference_point_id": [
+            "Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station"
+        ],  # fmt:skip
         "_": [""],
         "current_type": ["Type de courant électrique associé au point de recharge"],
         "is_article_2": ["La station du point de recharge est soumise à l'article 2 du décret n°2022-1330"],

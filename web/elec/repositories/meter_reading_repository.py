@@ -8,7 +8,6 @@ from transactions.models.year_config import YearConfig
 
 
 class MeterReadingRepository:
-
     @staticmethod
     def get_annotated_applications():
         return ElecMeterReadingApplication.objects.all().annotate(
@@ -67,7 +66,6 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_entities_without_application(quarter, year):
-
         return Entity.objects.annotate(
             meter_readings_charge_points_count=Count(
                 "elec_charge_points",

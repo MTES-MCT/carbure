@@ -39,10 +39,7 @@ def fix_declared_deleted_lots(apply):
 
     for node in lot_nodes_to_update:
         # apply the update to the lot
-        node.update({
-            "supplier_certificate": "2BS010181",
-            "production_site_certificate": "2BS010001"
-        })
+        node.update({"supplier_certificate": "2BS010181", "production_site_certificate": "2BS010001"})
 
         # if the node changed, recursively apply the update to related nodes
         if len(node.diff) > 0:
@@ -52,7 +49,6 @@ def fix_declared_deleted_lots(apply):
 
     # prepare analysis of traceability for deleting the relevant lots
     lot_nodes_to_delete = get_traceability_nodes(lots_to_delete)
-
 
     for node in lot_nodes_to_delete:
         deleted, updated = node.delete()

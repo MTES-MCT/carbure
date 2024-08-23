@@ -19,8 +19,6 @@ def add_certificate(request, *args, **kwargs):
     entity = Entity.objects.get(id=entity_id)
     certificate = GenericCertificate.objects.get(certificate_type=certificate_type, certificate_id=certificate_id)
     EntityCertificate.objects.update_or_create(entity=entity, certificate=certificate)
-    lots = CarbureLot.objects.filter(
-        Q(supplier_certificate=certificate_id) | Q(production_site_certificate=certificate_id)
-    )
+    lots = CarbureLot.objects.filter(Q(supplier_certificate=certificate_id) | Q(production_site_certificate=certificate_id))
     background_bulk_sanity_checks(lots)
     return JsonResponse({"status": "success"})

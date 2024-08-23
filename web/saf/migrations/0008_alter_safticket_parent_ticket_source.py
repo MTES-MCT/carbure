@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("saf", "0007_rename_added_by_safticket_supplier"),
     ]

@@ -9,7 +9,6 @@ from core.tests_utils import setup_current_user
 
 class EntityRegistrationSearchCompanyTest(TestCase):
     def setUp(self):
-
         self.cpo = Entity.objects.create(
             name="CPO",
             entity_type=Entity.CPO,

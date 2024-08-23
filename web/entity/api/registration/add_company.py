@@ -37,7 +37,6 @@ class ApplyForNewCompanyForm(forms.Form):
 
 @otp_or_403
 def add_company(request, *args, **kwargs):
-
     form = ApplyForNewCompanyForm(request.POST)
 
     if not form.is_valid():

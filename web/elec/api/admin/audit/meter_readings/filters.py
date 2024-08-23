@@ -36,7 +36,6 @@ def get_meter_readings_applications_filters(request, *args, **kwargs):
 
 
 def get_filter_values(applications, filter):
-
     if not filter:
         raise Exception("No filter was specified")
 

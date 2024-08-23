@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('saf', '0012_alter_safticket_agreement_reference'),
+        ("saf", "0012_alter_safticket_agreement_reference"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='safticket',
-            name='client_comment',
+            model_name="safticket",
+            name="client_comment",
             field=models.TextField(blank=True, default=None, null=True),
         ),
     ]

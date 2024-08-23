@@ -124,7 +124,7 @@ def send_email_summary(
 
     fraud = False
     if len(newly_invalidated_certificates):
-        for (_, previous, prev_valid_date, new_valid_date) in newly_invalidated_certificates:
+        for _, previous, prev_valid_date, new_valid_date in newly_invalidated_certificates:
             fraud = True
             mail_content += "**** Certificat expiré *****<br />"
             mail_content += "%s - %s" % (previous.certificate_id, previous.certificate_holder)

@@ -18,6 +18,4 @@ def get_stocks_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get stock summary"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get stock summary"}, status=400)

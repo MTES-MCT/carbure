@@ -38,12 +38,12 @@ class UserTest(TestCase):
 
     def test_entity_access_request(self):
         producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
-        #admin
+        # admin
         User = get_user_model()
-        user_admin = User.objects.create_user( email="tester@carbure.local", name="Requestor", password="gogogo"    )
+        user_admin = User.objects.create_user(email="tester@carbure.local", name="Requestor", password="gogogo")
         UserRights.objects.update_or_create(user=user_admin, entity=producer, defaults={"role": UserRights.ADMIN})
 
-        #requester
+        # requester
         setup_current_user(self, "tester-requesting@carbure.local", "Tester", "gogogo", [])
 
         # get settings - 0 pending requests

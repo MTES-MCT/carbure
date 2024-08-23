@@ -18,6 +18,5 @@ def change_stock_volume(stock_id, volume):
     print(s.remaining_volume, s.remaining_lhv_amount, s.remaining_weight)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     change_stock_volume(1275, 855017)
-
