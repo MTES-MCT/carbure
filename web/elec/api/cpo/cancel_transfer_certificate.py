@@ -82,7 +82,7 @@ def cancel_transfer_certificate(request, *args, **kwargs):
             transfer_certificate.delete()
             CarbureNotification.objects.filter(meta__transfer_certificate_id=transfer_certificate.id).delete()
             return SuccessResponse(ElecTransferCertificateSerializer(transfer_certificate).data)
-        except:
+        except Exception:
             traceback.print_exc()
             return ErrorResponse(400, ElecCancelError.CANCEL_FAILED)
 

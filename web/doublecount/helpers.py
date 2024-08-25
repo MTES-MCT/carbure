@@ -103,7 +103,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
         # Feedstock
         try:
             feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
-        except:
+        except Exception:
             feedstock = None
 
         if feedstock and not feedstock.is_double_compte:
@@ -141,11 +141,11 @@ def get_country(string, countries):
     country_string = string.strip()
     try:
         country = countries.get(code_pays=country_string)
-    except:
+    except Exception:
         country = None
         try:
             country = countries.get(name=country_string)
-        except:
+        except Exception:
             country = None
 
     return country
@@ -283,7 +283,7 @@ def load_dc_production_data(
 def get_material(code, list):
     try:
         return list.get(code=code)
-    except:
+    except Exception:
         return None
 
 
@@ -422,7 +422,7 @@ def get_lot_dc_agreement(feedstock, delivery_date, production_site):
                 dc_certificate = current_certificate.certificate_id
             else:  # le certificat renseigné sur le site de production est mis par defaut
                 dc_certificate = production_site.dc_reference
-        except:
+        except Exception:
             dc_certificate = production_site.dc_reference
     else:
         dc_certificate = None

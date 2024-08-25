@@ -24,7 +24,7 @@ def get_clients(request, *args, **kwargs):
         is_saf_operator = Q(entity_type=Entity.OPERATOR, has_saf=True)
         entities = Entity.objects.filter(is_airline | is_saf_operator).order_by("name")
 
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafClientsError.MALFORMED_PARAMS)
 

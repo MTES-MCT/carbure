@@ -42,7 +42,7 @@ def reject_transfer_certificate(request, *args, **kwargs):
         transfer_certificate.comment = comment
         transfer_certificate.save()
         return SuccessResponse()
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, ElecRejectError.REJECT_FAILED)
 

@@ -19,7 +19,7 @@ def set_production_site_certificates(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Please provide a production_site_id"}, status=400)
     try:
         production_site = ProductionSite.objects.get(producer=entity, id=production_site_id)
-    except:
+    except Exception:
         traceback.print_exc()
         return JsonResponse({"status": "error", "message": "Production site not found"}, status=400)
 
@@ -27,7 +27,7 @@ def set_production_site_certificates(request, *args, **kwargs):
     for certificate_id in certificate_ids:
         try:
             link = EntityCertificate.objects.get(entity_id=entity_id, certificate__certificate_id=certificate_id)
-        except:
+        except Exception:
             return JsonResponse(
                 {"status": "error", "message": "Certificate %s is not associated with your entity" % (certificate_id)},
                 status=400,

@@ -14,6 +14,6 @@ def mark_nonconform(request):
         lots = CarbureLot.objects.filter(id__in=selection)
         lots.update(audit_status=CarbureLot.NONCONFORM)
         return SuccessResponse()
-    except:
+    except Exception:
         traceback.print_exc()
         return JsonResponse({"status": "error", "message": "Could not mark lots as conform"}, status=500)

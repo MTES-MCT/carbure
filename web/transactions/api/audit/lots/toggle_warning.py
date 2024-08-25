@@ -15,7 +15,7 @@ def toggle_warning(request):
         for error in errors:
             try:
                 lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
-            except:
+            except Exception:
                 traceback.print_exc()
                 return JsonResponse(
                     {
@@ -27,6 +27,6 @@ def toggle_warning(request):
             lot_error.acked_by_auditor = checked
             lot_error.save()
         return JsonResponse({"status": "success"})
-    except:
+    except Exception:
         traceback.print_exc()
         return JsonResponse({"status": "error", "message": "Could not update warning"}, status=500)

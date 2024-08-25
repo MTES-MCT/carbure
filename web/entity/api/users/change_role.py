@@ -32,7 +32,7 @@ def change_user_role(request, entity, entity_id):
 
     try:
         user = User.objects.get(email=email)
-    except:
+    except Exception:
         return ErrorResponse(400, ChangeUserRoleError.MISSING_USER)
 
     rights = UserRights.objects.filter(user=user, entity_id=entity_id).first()
@@ -48,7 +48,7 @@ def change_user_role(request, entity, entity_id):
         if rights_request:
             rights_request.role = role
             rights_request.save()
-    except:
+    except Exception:
         return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED)
 
     return SuccessResponse()

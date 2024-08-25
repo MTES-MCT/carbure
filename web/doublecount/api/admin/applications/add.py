@@ -100,7 +100,7 @@ def add_application_by_type(request, entity_type):
         if certificate_id_to_link:
             try:
                 agreement = DoubleCountingRegistration.objects.get(certificate_id=certificate_id_to_link)
-            except:
+            except Exception:
                 return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
         else:
             try:
@@ -109,7 +109,7 @@ def add_application_by_type(request, entity_type):
                     valid_from=start,
                 )
                 return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
-            except:
+            except Exception:
                 agreement = None
 
     # create application
@@ -142,7 +142,7 @@ def add_application_by_type(request, entity_type):
 
     try:
         send_dca_confirmation_email(dca)
-    except:
+    except Exception:
         print("email send error")
         traceback.print_exc()
     return SuccessResponse()

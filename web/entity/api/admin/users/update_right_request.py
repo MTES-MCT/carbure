@@ -18,7 +18,7 @@ def update_right_request(request):
 
     try:
         right_request = UserRightsRequests.objects.get(id=urr_id)
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find request"}, status=400)
 
     right_request.status = status

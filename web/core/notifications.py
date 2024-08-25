@@ -21,7 +21,7 @@ def notify_correction_request(lots):
                 meta__contains={"client": supplier["carbure_client__name"]},
             )
             notif.meta["count"] = notif.meta["count"] + supplier["count"]
-        except:
+        except Exception:
             notif = CarbureNotification()
             notif.type = CarbureNotification.CORRECTION_REQUEST
             notif.dest_id = supplier["carbure_supplier"]
@@ -48,7 +48,7 @@ def notify_correction_done(lots):
                 meta__contains={"supplier": client["carbure_supplier__name"]},
             )
             notif.meta["count"] = notif.meta["count"] + client["count"]
-        except:
+        except Exception:
             notif = CarbureNotification()
             notif.type = CarbureNotification.CORRECTION_DONE
             notif.dest_id = client["carbure_client"]
@@ -75,7 +75,7 @@ def notify_lots_rejected(lots):
                 meta__contains={"client": supplier["carbure_client__name"]},
             )
             notif.meta["count"] = notif.meta["count"] + supplier["count"]
-        except:
+        except Exception:
             notif = CarbureNotification()
             notif.type = CarbureNotification.LOTS_REJECTED
             notif.dest_id = supplier["carbure_supplier"]
@@ -107,7 +107,7 @@ def notify_lots_received(lots):
                 meta__contains={"supplier": client["carbure_supplier__name"]},
             )
             notif.meta["count"] = notif.meta["count"] + client["count"]
-        except:
+        except Exception:
             notif = CarbureNotification()
             notif.type = CarbureNotification.LOTS_RECEIVED
             notif.dest_id = client["carbure_client"]
@@ -133,7 +133,7 @@ def notify_lots_recalled(lots):
                 meta__contains={"supplier": client["carbure_supplier__name"]},
             )
             notif.meta["count"] = notif.meta["count"] + client["count"]
-        except:
+        except Exception:
             notif = CarbureNotification()
             notif.type = CarbureNotification.LOTS_RECALLED
             notif.dest_id = client["carbure_client"]

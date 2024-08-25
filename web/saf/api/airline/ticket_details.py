@@ -18,7 +18,7 @@ def get_ticket_details(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_id = int(request.GET.get("ticket_id"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
 

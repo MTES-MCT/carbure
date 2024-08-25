@@ -103,5 +103,5 @@ def parse_production_data(
 def intOrZero(value):
     try:
         return int(value)
-    except:
+    except Exception:
         return 0

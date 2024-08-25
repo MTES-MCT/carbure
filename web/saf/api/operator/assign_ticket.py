@@ -29,7 +29,7 @@ def assign_ticket(request, *args, **kwargs):
         agreement_date = request.POST.get("agreement_date")
         free_field = request.POST.get("free_field")
         assignment_period = int(request.POST.get("assignment_period"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketAssignError.MALFORMED_PARAMS)
 

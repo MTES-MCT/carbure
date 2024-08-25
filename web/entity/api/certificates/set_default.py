@@ -15,7 +15,7 @@ def set_default_certificate(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Please provide a certificate_id"}, status=400)
     try:
         link = EntityCertificate.objects.get(entity_id=entity_id, certificate__certificate_id=certificate_id)
-    except:
+    except Exception:
         traceback.print_exc()
         return JsonResponse(
             {"status": "error", "message": "Could not find certificate_id associated with your entity"}, status=400

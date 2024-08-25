@@ -39,7 +39,7 @@ def lots_delete(request, entity):
             deleted, updated = node.delete(entity.id)
             deleted_nodes += deleted
             updated_nodes += updated
-        except:
+        except Exception:
             delete_error_lots.append(node.data)
 
     if len(delete_error_lots) > 0:

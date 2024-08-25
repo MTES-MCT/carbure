@@ -92,7 +92,7 @@ def dc_registration_post_update_production_site(sender, instance, created, updat
         production_site.eligible_dc = True
 
         production_site.save()
-    except:
+    except Exception:
         # print("Production Site not found")
         pass
 

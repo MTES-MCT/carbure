@@ -70,7 +70,7 @@ now = datetime.datetime.now()
 mtes = Entity.objects.get(name="MTE - DGEC")
 try:
     robot = usermodel.objects.get(name="MTE Robot 2016")
-except:
+except Exception:
     usermodel.objects.create_user(name="MTE Robot 2016", email="robot2016@carbure.beta.gouv.fr")
     robot = usermodel.objects.get(name="MTE Robot 2016")
 
@@ -155,10 +155,10 @@ for i, lot in enumerate(lots):
                 try:
                     lupscd = datetime.datetime.strptime(lupscd, "%d/%m/%Y")
                     # lupscd = dateutil.parser.parse(lupscd, dayfirst=true)
-                except:
+                except Exception:
                     try:
                         lupscd = datetime.datetime.strptime(lupscd, "%d-%m-%Y")
-                    except:
+                    except Exception:
                         print("could not parse date %s" % (lupscd))
                         continue
                 # try:
@@ -166,7 +166,7 @@ for i, lot in enumerate(lots):
                 #    month = int(lupscd[5:7])
                 #    day = int(lupscd[8:10])
                 #    lupscd = datetime.date(year=year, month=month, day=day)
-                # except:
+                # except Exception:
                 #    print('Could not get production site com date: %s %s' % (lupscd, type(lupscd)))
                 #    continue
         else:
@@ -181,7 +181,7 @@ for i, lot in enumerate(lots):
             day = int(dd[0:2])
             dd = datetime.datetime(year=year, month=month, day=day)
             # dd = dateutil.parser.parse(dd, dayfirst=True)
-        except:
+        except Exception:
             print("could not load date")
             print(dd)
             print(lot)
@@ -192,7 +192,7 @@ for i, lot in enumerate(lots):
         dd = datetime.date.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + lot["delivery_date"] - 2)
     try:
         period = dd.strftime("%Y-%m")
-    except:
+    except Exception:
         print("delivery date problem")
         print(lot)
         continue
@@ -256,7 +256,7 @@ for i, lot in enumerate(lots):
         ghg_total = ghg_total.replace(",", ".")
     try:
         ghg_total = float(ghg_total)
-    except:
+    except Exception:
         print("could not parse ghg value %s" % (ghg_total))
         continue
     d["ghg_total"] = ghg_total

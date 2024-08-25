@@ -74,13 +74,13 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
         try:
             vf = row[DBS_VALID_FROM_KEY].split("/")
             valid_from = date(year=int(vf[2]), month=int(vf[1]), day=int(vf[0]))
-        except:
+        except Exception:
             valid_from = date(year=1970, month=1, day=1)
 
         try:
             vu = row[DBS_VALID_UNTIL_KEY].split("/")
             valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
-        except:
+        except Exception:
             valid_until = date(year=1970, month=1, day=1)
 
         certificates.append(

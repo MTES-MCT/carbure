@@ -44,7 +44,7 @@ def invite_user(request, entity, entity_id):
         email_subject = "Carbure - Invitation à rejoindre une entité"
         email_type = "invite_user_email"
 
-    except:
+    except Exception:
         # Create a new user (non active) with a random password
         user = User.objects.create_user(email=email, password=User.objects.make_random_password(20), is_active=False)
         user.save()
@@ -61,7 +61,7 @@ def invite_user(request, entity, entity_id):
         UserRightsRequests.objects.update_or_create(user=user, entity=entity, defaults={"role": role, "status": "ACCEPTED"})
         UserRights.objects.create(user=user, entity=entity, role=role)
 
-    except:
+    except Exception:
         return ErrorResponse(400, InviteUserError.INVITE_FAILED)
 
     # Send email

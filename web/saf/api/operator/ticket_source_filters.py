@@ -34,7 +34,7 @@ def get_ticket_source_filters(request, *args, **kwargs):
         data = get_filter_values(ticket_sources, filter)
 
         return SuccessResponse(list(set(data)))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketSourceFiltersError.FILTER_LISTING_FAILED)
 

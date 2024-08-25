@@ -113,7 +113,7 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
                 print("* Unrecognized date format [%s]" % (row["valid_from"]))
                 print(row)
                 valid_from = date(year=1970, month=1, day=1)
-        except:
+        except Exception:
             valid_from = date(year=1970, month=1, day=1)
 
         try:
@@ -126,7 +126,7 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
                 print("* Unrecognized date format [%s]" % (row["valid_until"]))
                 print(row)
                 valid_until = date(year=1970, month=1, day=1)
-        except:
+        except Exception:
             valid_until = date(year=1970, month=1, day=1)
 
         if "," in row["certificate_holder"]:

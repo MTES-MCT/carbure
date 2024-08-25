@@ -20,7 +20,7 @@ def create_entity(request, *args, **kwargs):
         entity_type = request.POST.get("entity_type")
         has_saf = request.POST.get("has_saf") == "true"
         has_elec = request.POST.get("has_elec") == "true"
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CreateEntityError.MALFORMED_PARAMS)
 

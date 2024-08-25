@@ -39,7 +39,7 @@ def get_agreements(request, *args, **kwargs):
         try:
             agreement = DoubleCountingRegistration.objects.get(application_id=application["id"])
             application["agreement_id"] = agreement.id
-        except:
+        except Exception:
             application["agreement_id"] = None
 
     return JsonResponse({"status": "success", "data": applications_data})

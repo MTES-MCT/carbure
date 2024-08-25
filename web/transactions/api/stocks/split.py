@@ -33,7 +33,7 @@ def stock_split(request, *args, **kwargs):
         # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'
         # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,
         # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None, supplier_certificate: "MON_CERTIFICAT"}]
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Cannot parse payload into JSON"}, status=400)
 
     if not isinstance(unserialized, list):
@@ -66,7 +66,7 @@ def stock_split(request, *args, **kwargs):
 
         try:
             volume = float(entry["volume"])
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not parse volume"}, status=400)
 
         # create child lot
@@ -103,7 +103,7 @@ def stock_split(request, *args, **kwargs):
         if country_code is not None:
             try:
                 lot.delivery_site_country = Pays.objects.get(code_pays=country_code)
-            except:
+            except Exception:
                 lot.delivery_site_country = None
         lot.transport_document_type = entry.get("transport_document_type", CarbureLot.OTHER)
         lot.delivery_type = entry.get("delivery_type", CarbureLot.UNKNOWN)
@@ -113,11 +113,11 @@ def stock_split(request, *args, **kwargs):
             delivery_site = Depot.objects.get(depot_id=delivery_site_id)
             lot.carbure_delivery_site = delivery_site
             lot.delivery_site_country = delivery_site.country
-        except:
+        except Exception:
             pass
         try:
             lot.carbure_client = Entity.objects.get(id=entry.get("carbure_client_id", None))
-        except:
+        except Exception:
             lot.carbure_client = None
         if lot.delivery_type in [
             CarbureLot.BLENDING,

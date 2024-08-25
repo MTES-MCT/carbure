@@ -15,7 +15,7 @@ def request_password_reset(request):
     username = request.POST.get("username", "")
     try:
         user = get_user_model().objects.get(email=username)
-    except:
+    except Exception:
         # return JsonResponse({'status': 'error', 'message': 'User not found'}, status=400)
         return ErrorResponse(400, CarbureError.PASSWORD_RESET_USER_NOT_FOUND)
 

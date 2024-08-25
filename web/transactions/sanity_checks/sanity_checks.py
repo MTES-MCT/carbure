@@ -89,7 +89,7 @@ def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
     for lot in lots:
         try:
             errors += sanity_checks(lot, prefetched_data)
-        except:
+        except Exception:
             traceback.print_exc()
 
     # save new errors

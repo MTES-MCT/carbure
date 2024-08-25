@@ -28,7 +28,7 @@ def get_tickets(request, *args, **kwargs):
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
         export = "export" in request.GET
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
 

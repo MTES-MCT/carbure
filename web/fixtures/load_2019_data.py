@@ -104,7 +104,7 @@ for i, lot in enumerate(lots):
                     month = int(lupscd[5:7])
                     day = int(lupscd[8:10])
                     lupscd = datetime.date(year=year, month=month, day=day)
-                except:
+                except Exception:
                     print("Could not get production site com date: %s %s" % (lupscd, type(lupscd)))
                     continue
         else:

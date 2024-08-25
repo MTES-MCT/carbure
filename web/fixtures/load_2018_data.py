@@ -45,7 +45,7 @@ now = datetime.datetime.now()
 mtes = Entity.objects.get(name="MTE - DGEC")
 try:
     robot = usermodel.objects.get(name="MTE Robot 2018")
-except:
+except Exception:
     usermodel.objects.create_user(name="MTE Robot 2018", email="robot2018@carbure.beta.gouv.fr")
     robot = usermodel.objects.get(name="MTE Robot 2018")
 
@@ -122,10 +122,10 @@ for i, lot in enumerate(lots):
                 try:
                     lupscd = datetime.datetime.strptime(lupscd, "%d/%m/%Y")
                     # lupscd = dateutil.parser.parse(lupscd, dayfirst=true)
-                except:
+                except Exception:
                     try:
                         lupscd = datetime.datetime.strptime(lupscd, "%d-%m-%Y")
-                    except:
+                    except Exception:
                         print("could not parse date %s" % (lupscd))
                         continue
                 # try:
@@ -133,7 +133,7 @@ for i, lot in enumerate(lots):
                 #    month = int(lupscd[5:7])
                 #    day = int(lupscd[8:10])
                 #    lupscd = datetime.date(year=year, month=month, day=day)
-                # except:
+                # except Exception:
                 #    print('Could not get production site com date: %s %s' % (lupscd, type(lupscd)))
                 #    continue
         else:
@@ -151,7 +151,7 @@ for i, lot in enumerate(lots):
         dd = datetime.datetime(2018, 1, 1)
     try:
         period = dd.strftime("%Y-%m")
-    except:
+    except Exception:
         print("delivery date problem")
         print(lot)
         continue
