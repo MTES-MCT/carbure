@@ -37,6 +37,6 @@ def toggle_pin(request):
         if notify_auditor:
             lots.update(highlighted_by_auditor=True)
         return SuccessResponse()
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)

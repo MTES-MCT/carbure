@@ -171,10 +171,10 @@ def load_lot(lot):
         else:
             try:
                 lupscd = datetime.datetime.strptime(lupscd, "%d/%m/%Y")
-            except:
+            except Exception:
                 try:
                     lupscd = datetime.datetime.strptime(lupscd, "%d-%m-%Y")
-                except:
+                except Exception:
                     print("could not parse date %s" % (lupscd))
                     return
     else:
@@ -190,7 +190,7 @@ def load_lot(lot):
             month = int(dd[3:5])
             day = int(dd[0:2])
             dd = datetime.datetime(year=year, month=month, day=day)
-        except:
+        except Exception:
             print("could not load date")
             print(dd)
             print(lot)
@@ -201,7 +201,7 @@ def load_lot(lot):
         dd = datetime.date.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + lot["delivery_date"] - 2)
     try:
         dd.strftime("%Y-%m")
-    except:
+    except Exception:
         print("delivery date problem")
         print(lot)
         return
@@ -230,7 +230,7 @@ def load_lot(lot):
         vol = vol.replace(",", "").replace(" ", "")
         try:
             vol = float(vol)
-        except:
+        except Exception:
             print("Could not load volume: %s" % (vol))
             return
     if vol == 0 or vol is None:
@@ -283,7 +283,7 @@ def load_lot(lot):
             else:
                 d["eec"] = eec
                 d["ep"] -= eec
-    except:
+    except Exception:
         ### else only take GES TOTAL
         ghg_total = lot["GES TOTAL"]
         if isinstance(ghg_total, str):
@@ -291,7 +291,7 @@ def load_lot(lot):
             try:
                 ghg_total = float(ghg_total)
                 d["ghg_total"] = ghg_total
-            except:
+            except Exception:
                 print("could not parse ghg value %s" % (ghg_total))
                 print(lot)
                 return

@@ -26,7 +26,7 @@ def validate_declaration(request, *args, **kwargs):
     try:
         entity_id = int(request.POST.get("entity_id", None))
         period = int(request.POST.get("period", None))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, ValidateDeclarationError.MALFORMED_PARAMS)
 
@@ -36,7 +36,7 @@ def validate_declaration(request, *args, **kwargs):
 
     try:
         declaration = SustainabilityDeclaration.init_declaration(entity_id, period)
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, ValidateDeclarationError.DECLARATION_CANNOT_BE_CREATED)
 

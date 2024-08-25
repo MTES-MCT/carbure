@@ -87,6 +87,6 @@ def create_transfer_certificate(request, *args, **kwargs):
             transfer_certificate.save()
             notify_elec_transfer_certificate(transfer_certificate)
             return SuccessResponse(ElecTransferCertificateSerializer(transfer_certificate).data)
-        except:
+        except Exception:
             traceback.print_exc()
             return ErrorResponse(400, ElecTransferError.CREATION_FAILED)

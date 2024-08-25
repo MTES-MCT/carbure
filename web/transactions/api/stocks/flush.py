@@ -16,7 +16,7 @@ def stock_flush(request, *args, **kwargs):
     for stock_id in stock_ids:
         try:
             stock = CarbureStock.objects.get(pk=stock_id)
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find stock"}, status=400)
 
         if stock.carbure_client_id != entity_id:

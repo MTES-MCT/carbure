@@ -21,7 +21,7 @@ def toggle_warning(request, *args, **kwargs):
             try:
                 lot = CarbureLot.objects.get(id=lot_id)
                 lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
-            except:
+            except Exception:
                 traceback.print_exc()
                 return JsonResponse(
                     {
@@ -38,6 +38,6 @@ def toggle_warning(request, *args, **kwargs):
                 lot_error.acked_by_recipient = checked
             lot_error.save()
         return JsonResponse({"status": "success"})
-    except:
+    except Exception:
         traceback.print_exc()
         return JsonResponse({"status": "error", "message": "Could not update warning"}, status=500)

@@ -38,7 +38,7 @@ def import_charge_point_excel(excel_file: UploadedFile):
         # parse the data and validate errors
         charge_point_data = ExcelChargePoints.validate_charge_points(merged_charge_point_data)
         return charge_point_data[0], charge_point_data[1], original_charge_point_data
-    except:
+    except Exception:
         traceback.print_exc()
         return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}], []
 

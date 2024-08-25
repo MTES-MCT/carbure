@@ -104,7 +104,7 @@ for i, lot in enumerate(lots):
             else:
                 try:
                     lupscd = datetime.datetime.strptime(lupscd, "%d/%m/%Y")
-                except:
+                except Exception:
                     print("Could not get production site com date: [%s] %s" % (lupscd, type(lupscd)))
                     continue
         else:
@@ -134,7 +134,7 @@ for i, lot in enumerate(lots):
             d["period"] = dd.strftime("%Y-%m")
             delivery_date = dd
             # d['year'] = dd.year
-        except:
+        except Exception:
             print("unknown delivery_date type %s or format %s" % (lot["delivery_date"], type(lot["delivery_date"])))
             print(lot)
             continue
@@ -145,7 +145,7 @@ for i, lot in enumerate(lots):
             vol = lot["volume"]
         else:
             vol = float(lot["volume"])
-    except:
+    except Exception:
         print("Could not parse volume")
         print("%s - [%s]" % (type(lot["volume"]), lot["volume"]))
         print(lot)

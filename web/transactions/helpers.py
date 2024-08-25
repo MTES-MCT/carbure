@@ -18,7 +18,7 @@ def check_locked_year(current_year: int):
     try:
         YearConfig.objects.get(year=current_year, locked=True)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -345,7 +345,7 @@ def fill_volume_info(lot, data):
             lot.volume = quantity["volume"]
             lot.weight = quantity["weight"]
             lot.lhv_amount = quantity["lhv_amount"]
-        except:
+        except Exception:
             traceback.print_exc()
             errors.append(
                 GenericError(
@@ -410,39 +410,39 @@ def fill_ghg_info(lot, data):
     errors = []
     try:
         lot.eec = abs(float(data.get("eec", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eec", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.el = float(data.get("el", 0))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="el", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.ep = abs(float(data.get("ep", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="ep", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.etd = abs(float(data.get("etd", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="etd", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eu = abs(float(data.get("eu", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eu", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.esca = abs(float(data.get("esca", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="esca", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccs = abs(float(data.get("eccs", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eccs", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccr = abs(float(data.get("eccr", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eccr", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eee = abs(float(data.get("eee", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eee", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     lot.update_ghg()
     return errors
@@ -545,7 +545,7 @@ def fill_client_data(lot, data, entity, prefetched_data):
                         display_to_creator=True,
                     )
                 )
-    except:
+    except Exception:
         pass
     lot.unknown_client = data.get("unknown_client", None)
     return errors

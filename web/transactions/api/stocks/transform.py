@@ -24,7 +24,7 @@ def stock_transform(request, *args, **kwargs):
     try:
         unserialized = json.loads(payload)
         # expected format: [{stock_id: 12344, transformation_type: 'ETBE', otherfields}]
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Cannot parse payload into JSON"}, status=400)
 
     if not isinstance(unserialized, list):
@@ -42,7 +42,7 @@ def stock_transform(request, *args, **kwargs):
 
         try:
             stock = CarbureStock.objects.get(pk=entry["stock_id"])
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find stock"}, status=400)
 
         if stock.carbure_client != entity:

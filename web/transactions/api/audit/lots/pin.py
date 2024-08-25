@@ -22,6 +22,6 @@ def toggle_pin(request):
         if notify_admin:
             lots.update(highlighted_by_admin=True)
         return JsonResponse({"status": "success"})
-    except:
+    except Exception:
         traceback.print_exc()
         return JsonResponse({"status": "error", "message": "Could not pin lots"}, status=500)

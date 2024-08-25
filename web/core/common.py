@@ -90,7 +90,7 @@ def get_uploaded_files_directory():
     if not os.path.exists(directory):
         try:
             os.makedirs(directory)
-        except:
+        except Exception:
             return "/tmp"
     return directory
 
@@ -158,7 +158,7 @@ def get_transaction_distance(tx):
         res["distance"] = td.distance
         res["source"] = "DB"
         return res
-    except:
+    except Exception:
         # not found
         # launch in parallel
         p = Process(target=get_distance, args=(starting_point, delivery_point))
@@ -235,7 +235,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         for key in ["el"]:  # negative value allowed
             try:
                 lot[key] = float(lot_row.get(key, 0))
-            except:
+            except Exception:
                 lot[key] = 0
         for key in [
             "eec",
@@ -249,7 +249,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         ]:  # positive value only
             try:
                 lot[key] = abs(float(lot_row.get(key, 0)))
-            except:
+            except Exception:
                 lot[key] = 0
         lot["transport_document_reference"] = lot_row.get("dae", "")
         lot["delivery_date"] = lot_row.get("delivery_date", "")
@@ -284,7 +284,7 @@ def ErrorResponse(status_code, error=None, data=None, status=Carbure.ERROR, mess
         response_data["error"] = error[0]
         try:
             response_data["message"] = error[1].format(**data)
-        except:
+        except Exception:
             response_data["message"] = error[1]
     # for basic errors
     else:

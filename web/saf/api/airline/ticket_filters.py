@@ -18,7 +18,7 @@ def get_ticket_filters(request, *args, **kwargs):
     try:
         query = parse_ticket_query(request.GET)
         filter = request.GET.get("filter")
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketFiltersError.MALFORMED_PARAMS)
 
@@ -31,7 +31,7 @@ def get_ticket_filters(request, *args, **kwargs):
         data = get_filter_values(tickets, filter)
 
         return SuccessResponse(list(set(data)))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketFiltersError.FILTER_LISTING_FAILED)
 

@@ -27,7 +27,7 @@ def get_application_details(request, *args, **kwargs):
         return ErrorResponse(400, DoubleCountingApplicationError.MALFORMED_PARAMS)
     try:
         application = DoubleCountingApplication.objects.get(id=application_id)
-    except:
+    except Exception:
         return ErrorResponse(400, DoubleCountingApplicationError.APPLICATION_NOT_FOUND)
 
     serializer = DoubleCountingApplicationSerializer(application)

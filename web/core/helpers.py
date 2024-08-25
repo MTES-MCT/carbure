@@ -836,7 +836,7 @@ def get_transaction_distance(lot):
         res["distance"] = td.distance
         res["source"] = "DB"
         return res
-    except:
+    except Exception:
         # not found, launch in background for next time
         p = Process(target=get_distance, args=(starting_point, delivery_point))
         p.start()

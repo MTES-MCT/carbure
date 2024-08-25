@@ -107,7 +107,7 @@ class TableParser:
             for column, parser in column_parsers.items():
                 try:
                     df.at[i, column] = parser(row[column])
-                except:
+                except Exception:
                     errors.append({"row": i, "column": column})
         return df, errors
 
@@ -126,7 +126,7 @@ class TableParser:
     def id(cell):
         try:
             return str(int(float(cell))).strip().upper()
-        except:
+        except Exception:
             return TableParser.str(cell).strip().upper()
 
     @staticmethod

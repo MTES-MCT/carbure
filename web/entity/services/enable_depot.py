@@ -18,7 +18,7 @@ def enable_depot(depot):
     entity = depot.entity
     try:
         admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN)
-    except:
+    except Exception:
         raise Exception("Cette société n'a pas d'admin actif")
 
     send_email_to_admin_users(entity, depot, admins)

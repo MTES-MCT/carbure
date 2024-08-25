@@ -22,7 +22,7 @@ def reject_ticket(request, *args, **kwargs):
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_id = int(request.POST.get("ticket_id"))
         comment = request.POST.get("comment")
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketRejectError.MALFORMED_PARAMS)
 

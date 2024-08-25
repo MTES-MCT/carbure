@@ -50,7 +50,7 @@ def check_user_rights(role=None, entity_type=None):
 
             try:
                 entity = Entity.objects.get(pk=entity_id)
-            except:
+            except Exception:
                 return ErrorResponse(400, UserRightsError.ENTITY_NOT_FOUND, message="Entity was not found")
 
             # store user current rights in session
@@ -113,7 +113,7 @@ def check_admin_rights(allow_external=None, allow_role=None):
             try:
                 # check that entity exists and is admin
                 entity = Entity.objects.get(id=entity_id, entity_type__in=[Entity.ADMIN, Entity.EXTERNAL_ADMIN])
-            except:
+            except Exception:
                 return ErrorResponse(404, AdminRightsError.ENTITY_NOT_FOUND)
 
             try:
@@ -122,7 +122,7 @@ def check_admin_rights(allow_external=None, allow_role=None):
                     UserRights.objects.get(entity=entity, user=request.user, role__in=allow_role)
                 else:
                     UserRights.objects.get(entity=entity, user=request.user)
-            except:
+            except Exception:
                 return ErrorResponse(403, AdminRightsError.USER_HAS_NO_RIGHT)
 
             # find out if the decorated function is accessible only by admins
@@ -141,7 +141,7 @@ def check_admin_rights(allow_external=None, allow_role=None):
             elif entity.entity_type == Entity.EXTERNAL_ADMIN:
                 try:
                     ExternalAdminRights.objects.get(entity=entity, right__in=allow_external)
-                except:
+                except Exception:
                     return ErrorResponse(403, AdminRightsError.ENTITY_HAS_NO_RIGHT)
 
             context = {"entity_id": entity_id, "entity": entity}

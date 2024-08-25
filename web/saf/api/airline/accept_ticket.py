@@ -21,7 +21,7 @@ def accept_ticket(request, *args, **kwargs):
     try:
         entity_id = int(request.POST.get("entity_id"))
         ticket_id = int(request.POST.get("ticket_id"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketAcceptError.MALFORMED_PARAMS)
 

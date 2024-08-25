@@ -28,7 +28,7 @@ def update_user_role(request):
 
     try:
         rights_request = UserRightsRequests.objects.get(id=request_id)
-    except:
+    except Exception:
         return ErrorResponse(400, UpdateRoleErrors.RIGHTS_NOT_FOUND)
 
     with transaction.atomic():

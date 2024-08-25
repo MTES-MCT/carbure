@@ -21,5 +21,5 @@ def check_entity_certificate(request):
         )
         background_bulk_scoring(list(slots) + list(plots))
         return JsonResponse({"status": "success"})
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not mark certificate as checked"}, status=500)

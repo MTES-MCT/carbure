@@ -19,7 +19,7 @@ depots = Depot.objects.all()
 for d in depots:
     try:
         code = int(d.postal_code)
-    except:
+    except Exception:
         print("missing zip code for %s" % d.name)
         continue
     if code in df:

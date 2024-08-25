@@ -9,7 +9,7 @@ def enable_entity(entity):
     # get entity admin
     try:
         right_request = UserRightsRequests.objects.get(entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
-    except:
+    except Exception:
         raise Exception("Cette société n'a pas de demande d'inscription en attente")
 
     admin_user = right_request.user

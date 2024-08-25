@@ -35,7 +35,7 @@ def accept_transfer_certificate(request, *args, **kwargs):
         transfer_certificate.status = ElecTransferCertificate.ACCEPTED
         transfer_certificate.save()
         return SuccessResponse()
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, ElecRejectError.ACCEPT_FAILED)
 

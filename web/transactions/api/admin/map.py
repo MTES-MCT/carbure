@@ -47,7 +47,7 @@ def map(request, entity, entity_id):
             slat, slon = v["carbure_production_site__gps_coordinates"].split(",")
             # end coordinates
             elat, elon = v["carbure_delivery_site__gps_coordinates"].split(",")
-        except:
+        except Exception:
             print("Missing start or end gps coordinates")
             print(
                 "Start %s : %s"

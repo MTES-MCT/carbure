@@ -30,7 +30,7 @@ def get_meter_readings_applications_filters(request, *args, **kwargs):
         data = get_filter_values(meter_readings_applications, filter)
 
         return SuccessResponse(list(set(data)))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)
 

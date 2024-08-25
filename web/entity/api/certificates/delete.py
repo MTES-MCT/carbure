@@ -24,6 +24,6 @@ def delete_certificate(request, *args, **kwargs):
             Q(supplier_certificate=certificate_id) | Q(production_site_certificate=certificate_id)
         )
         background_bulk_sanity_checks(lots)
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find certificate"}, status=400)
     return JsonResponse({"status": "success"})

@@ -19,7 +19,7 @@ psites = ProductionSite.objects.all()
 for p in psites:
     try:
         code = int(p.postal_code)
-    except:
+    except Exception:
         print("missing zip code for %s" % p.name)
         continue
     if code in df:

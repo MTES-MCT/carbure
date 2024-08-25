@@ -980,7 +980,7 @@ def make_carbure_lots_sheet(workbook, entity, lots):
         for elem in row:
             try:
                 worksheet_lots.write(index + 1, colid, elem)
-            except:
+            except Exception:
                 traceback.print_exc()
             colid += 1
 

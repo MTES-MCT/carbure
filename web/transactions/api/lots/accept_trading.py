@@ -43,7 +43,7 @@ def accept_trading(request, *args, **kwargs):
     if client_entity_id:
         try:
             client_entity = Entity.objects.get(pk=client_entity_id)
-        except:
+        except Exception:
             return JsonResponse(
                 {"status": "error", "message": "Could not find client entity"},
                 status=400,

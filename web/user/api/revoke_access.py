@@ -9,7 +9,7 @@ def revoke_myself(request, entity, entity_id):
     try:
         right = UserRights.objects.get(user=request.user, entity_id=entity_id)
         right.delete()
-    except:
+    except Exception:
         pass
 
     try:
