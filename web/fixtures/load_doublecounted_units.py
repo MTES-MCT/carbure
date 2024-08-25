@@ -7,7 +7,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from certificates.models import *
+from certificates.models import DoubleCountingRegistration
 
 filename = "%s/web/fixtures/csv/unites_double_compte.csv" % (os.environ["CARBURE_HOME"])
 
