@@ -109,7 +109,7 @@ export const useGetDepotTypeOptions = ({
 
     // If the country selected in the form is France, we have to remove Oil/Biofuel depot
     if (!country || country?.code_pays === "FR") {
-      depotTypeOptions.filter(
+      depotTypeOptions = depotTypeOptions.filter(
         ({ type }) =>
           ![DepotType.OilDepot, DepotType.BiofuelDepot].includes(
             type as DepotType
