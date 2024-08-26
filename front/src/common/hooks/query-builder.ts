@@ -1,22 +1,87 @@
 import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
-import useStore from "common/hooks/store"
-import useTitle from "common/hooks/title"
-import {
-  ElecCPOProvisionCertificateFilterSelection,
-  ElecCPOProvisionCertificateStates,
-  ElecCPOProvisionCertificateStatus,
-  ElecCPOSnapshot,
-} from "elec/types-cpo"
-import { useTranslation } from "react-i18next"
-import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
+import { ElecAdminProvisionCertificateFilter } from "elec-admin/types"
+import { useMemo } from "react"
+import useStore from "./store"
+import { useSearchParams } from "react-router-dom"
 
-export function useProvistionCertificateQueryParamsStore(
+
+/* Types */
+export type CBSnapshot = Record<string, number>
+
+export type CBFilterSelection = Record<string, string[]>
+
+export const CBQUERY_RESET: Partial<CBQueryParams> = {
+  limit: undefined,
+  from_idx: undefined,
+  sort_by: undefined,
+  order: undefined,
+}
+export interface CBQueryStates {
+  entity: Entity
+  year: number
+  filters: CBFilterSelection
+  search?: string
+  status: string
+  selection: number[]
+  page: number
+  limit?: number
+  order?: Order
+  snapshot?: CBSnapshot
+}
+
+export interface CBQueryParams {
+  entity_id: number;
+  year: number;
+  status: string;
+  search?: string;
+  from_idx: number;
+  limit?: number;
+  sort_by?: string;
+  order?: 'asc' | 'desc';
+}
+
+
+/* Hooks */
+
+export function useCBQueryBuilder(params: CBQueryStates): CBQueryParams {
+  const {
+    entity,
+    year,
+    status,
+    search,
+    page = 0,
+    limit,
+    order,
+    filters,
+  } = params;
+
+  return useMemo<CBQueryParams>(
+    () => ({
+      entity_id: entity.id,
+      year,
+      status,
+      search,
+      from_idx: page * (limit ?? 0),
+      limit: limit || undefined,
+      sort_by: order?.column,
+      order: order?.direction,
+      ...filters,
+    } as CBQueryParams),
+    [entity.id, status, search, limit, order, filters, page, year]
+  )
+}
+
+
+
+
+
+export function useCBQueryParamsStore(
   entity: Entity,
   year: number,
-  status: ElecCPOProvisionCertificateStatus,
-  snapshot?: ElecCPOSnapshot
+  status: string,
+  snapshot?: CBSnapshot,
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -35,7 +100,7 @@ export function useProvistionCertificateQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as ElecCPOProvisionCertificateStates,
+    } as CBQueryStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -55,7 +120,7 @@ export function useProvistionCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: ElecCPOSnapshot) => ({
+      setSnapshot: (snapshot: CBSnapshot) => ({
         snapshot,
         filters: filtersParams,
         // invalid: false,
@@ -64,7 +129,7 @@ export function useProvistionCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setStatus: (status: ElecCPOProvisionCertificateStatus) => {
+      setStatus: (status: string) => {
         return {
           status,
           filters: filtersParams,
@@ -75,7 +140,16 @@ export function useProvistionCertificateQueryParamsStore(
         }
       },
 
-      setFilters: (filters: ElecCPOProvisionCertificateFilterSelection) => {
+      // setType: (type: ElecCPOQ) => {
+      //   return {
+      //     type,
+      //     filters: filtersParams,
+      //     selection: [],
+      //     page: 0,
+      //   }
+      // },
+
+      setFilters: (filters: CBFilterSelection) => {
         setTimeout(() => {
           setFiltersParams(filters)
         })
@@ -116,8 +190,6 @@ export function useProvistionCertificateQueryParamsStore(
     }
   )
 
-  // sync tab title with current state
-  usePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
@@ -141,18 +213,20 @@ export function useProvistionCertificateQueryParamsStore(
   return [state, actions] as [typeof state, typeof actions]
 }
 
-export function usePageTitle(state: ElecCPOProvisionCertificateStates) {
-  const { t } = useTranslation()
 
-  const statuses: any = {
-    [ElecCPOProvisionCertificateStatus.Available]:
-      t("Énergie attribuée") + " " + t("disponible"),
-    [ElecCPOProvisionCertificateStatus.History]:
-      t("Énergie attribuée") + " " + t("historique"),
-  }
-  const entity = state.entity.name
-  const year = state.year
-  const status = statuses[state.status.toUpperCase()]
 
-  useTitle(`${entity} ∙ ${status} ${year}`)
+
+
+function useFilterSearchParams() {
+  const [filtersParams, setFiltersParams] = useSearchParams()
+  const filters = useMemo(() => {
+    const filters: CBFilterSelection = {}
+    filtersParams.forEach((value, filter) => {
+      const fkey = filter as string
+      filters[fkey] = filters[fkey] ?? []
+      filters[fkey]!.push(value)
+    })
+    return filters
+  }, [filtersParams])
+  return [filters, setFiltersParams] as [typeof filters, typeof setFiltersParams] // prettier-ignore
 }

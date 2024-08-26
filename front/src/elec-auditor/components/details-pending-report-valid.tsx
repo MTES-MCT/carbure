@@ -57,7 +57,7 @@ const ReportValidSection = ({ applicationId, header, file, fileName, onReportAcc
       <section>
 
         <p><Trans defaults={"Votre fichier d'audit <b>{{ fileName }}</b> ne comporte aucune erreur. Les informations peuvent être transmises à la DGEC."} values={{ fileName }} /></p>
-        {commentCount &&
+        {!!commentCount &&
           <Alert icon={Message} variant="info" >
             <Trans defaults={"Vous avez commentés <b>{{ count }} points de charges </b> dans ce fichier excel. Ils seront transmis à l'administration."} values={{ count: commentCount }} />
           </Alert>
