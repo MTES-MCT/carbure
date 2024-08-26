@@ -1,5 +1,11 @@
 import { useTranslation } from "react-i18next"
-import { Depot, DepotType, EntityDepot, OwnershipType } from "carbure/types"
+import {
+  Depot,
+  DepotType,
+  EntityDepot,
+  EntityType,
+  OwnershipType,
+} from "carbure/types"
 import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
@@ -9,14 +15,16 @@ import {
   useDeliverySiteFlags,
   useGetDepotTypeOptions,
 } from "./delivery-site.hooks"
-import Tooltip from "common/components/tooltip"
+import useEntity from "carbure/hooks/entity"
+import Checkbox from "common/components/checkbox"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
-  onCreate: (values: DeliverySiteFormType) => void
+  onCreate?: (values: DeliverySiteFormType) => void
 
   // Submit button is outside the generic component, we have to pass the same id between form and button
   formId?: string
+  isReadOnly?: boolean
 }
 
 export type DeliverySiteFormType = Partial<
@@ -57,8 +65,10 @@ export const DeliverySiteForm = ({
   deliverySite,
   onCreate,
   formId = "delivery-site",
+  isReadOnly = false,
 }: DeliverySiteFormProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { value, bind } = useForm<DeliverySiteFormType>(
     mapDeliverySiteToForm(deliverySite)
   )
@@ -68,7 +78,7 @@ export const DeliverySiteForm = ({
   const depotTypeOptions = useGetDepotTypeOptions({ country: value.country })
 
   const handleSubmit = (values: DeliverySiteFormType) => {
-    onCreate({
+    onCreate?.({
       name: values.name!,
       city: values.city!,
       country: values.country!,
@@ -94,6 +104,7 @@ export const DeliverySiteForm = ({
         label={t("Nom du site")}
         {...bind("name")}
         required
+        readOnly={isReadOnly}
       />
 
       <TextInput
@@ -103,6 +114,7 @@ export const DeliverySiteForm = ({
         placeholder="Ex: FR1A00000580012"
         {...bind("depot_id")}
         required
+        readOnly={isReadOnly}
       />
 
       <RadioGroup
@@ -110,6 +122,7 @@ export const DeliverySiteForm = ({
         options={depotTypeOptions}
         {...bind("depot_type")}
         required
+        disabled={isReadOnly}
       />
 
       {(isCogenerationPlant || isPowerPlant) && (
@@ -119,6 +132,7 @@ export const DeliverySiteForm = ({
           {...bind("electrical_efficiency")}
           value={value.electrical_efficiency ?? undefined}
           required
+          readOnly={isReadOnly}
         />
       )}
       {(isCogenerationPlant || isHeatPlant) && (
@@ -130,6 +144,7 @@ export const DeliverySiteForm = ({
           {...bind("thermal_efficiency")}
           value={value.thermal_efficiency ?? undefined}
           required
+          readOnly={isReadOnly}
         />
       )}
       {isCogenerationPlant && (
@@ -139,17 +154,58 @@ export const DeliverySiteForm = ({
           {...bind("useful_temperature")}
           value={value.useful_temperature ?? undefined}
           required
+          readOnly={isReadOnly}
         />
       )}
 
-      <TextInput label={t("Adresse")} {...bind("address")} required />
+      <TextInput
+        label={t("Adresse")}
+        {...bind("address")}
+        required
+        readOnly={isReadOnly}
+      />
 
       <Row style={{ gap: "var(--spacing-s)" }}>
-        <TextInput label={t("Ville")} {...bind("city")} required />
-        <TextInput label={t("Code postal")} {...bind("postal_code")} required />
+        <TextInput
+          label={t("Ville")}
+          {...bind("city")}
+          required
+          readOnly={isReadOnly}
+        />
+        <TextInput
+          label={t("Code postal")}
+          {...bind("postal_code")}
+          required
+          readOnly={isReadOnly}
+        />
       </Row>
 
-      <AutoCompleteCountries label={t("Pays")} {...bind("country")} required />
+      <AutoCompleteCountries
+        label={t("Pays")}
+        {...bind("country")}
+        required
+        readOnly={isReadOnly}
+      />
+
+      {entity.entity_type === EntityType.Operator &&
+        deliverySite &&
+        isReadOnly && (
+          <>
+            <Checkbox
+              label={t("L'incorporation est effectuée par un tiers")}
+              value={deliverySite.blending_is_outsourced}
+              disabled
+            />
+
+            {deliverySite.blending_is_outsourced && (
+              <TextInput
+                label={t("Incorporateur Tiers")}
+                value={deliverySite.blender?.name || ""}
+                readOnly
+              />
+            )}
+          </>
+        )}
     </Form>
   )
 }
