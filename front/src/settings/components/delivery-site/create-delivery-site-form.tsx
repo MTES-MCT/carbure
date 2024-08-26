@@ -6,7 +6,7 @@ import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
 import { depotTypeOptions } from "./delivery-site.const"
 import { AutoCompleteCountries } from "carbure/components/autocomplete-countries"
-import { useRef } from "react"
+import { useDeliverySiteFlags } from "./delivery-site.hooks"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -59,8 +59,8 @@ export const DeliverySiteForm = ({
   const { value, bind } = useForm<DeliverySiteFormType>(
     mapDeliverySiteToForm(deliverySite)
   )
-
-  const depotIdRef = useRef<HTMLInputElement>(null)
+  const { isCogenerationPlant, isHeatPlant, isPowerPlant } =
+    useDeliverySiteFlags(value.depot_type)
 
   const handleSubmit = (values: DeliverySiteFormType) => {
     onCreate({
@@ -71,12 +71,15 @@ export const DeliverySiteForm = ({
       depot_type: values.depot_type!,
       address: values.address!,
       postal_code: values.postal_code!,
-      electrical_efficiency: value.depot_type === DepotType.PowerPlant ? values.electrical_efficiency : undefined,
-      thermal_efficiency: value.depot_type === DepotType.HeatPlant ? values.thermal_efficiency : undefined,
-      useful_temperature: value.depot_type === DepotType.CogenerationPlant ? values.useful_temperature : undefined!
+      electrical_efficiency: isPowerPlant
+        ? values.electrical_efficiency
+        : undefined,
+      thermal_efficiency: isHeatPlant ? values.thermal_efficiency : undefined,
+      useful_temperature: isCogenerationPlant
+        ? values.useful_temperature
+        : undefined!,
     })
   }
-
 
   return (
     <Form id={formId} onSubmit={() => handleSubmit(value)}>
@@ -95,7 +98,6 @@ export const DeliverySiteForm = ({
         placeholder="Ex: FR1A00000580012"
         {...bind("depot_id")}
         required
-        inputRef={depotIdRef}
       />
 
       <RadioGroup
@@ -105,18 +107,16 @@ export const DeliverySiteForm = ({
         required
       />
 
-      {value.depot_type === DepotType.PowerPlant && (
+      {(isCogenerationPlant || isPowerPlant) && (
         <NumberInput
           label={t("Rendement électrique (entre 0 et 1)")}
-          min={0}
-          max={1}
-          step={0.1}
+          step={1}
           {...bind("electrical_efficiency")}
           value={value.electrical_efficiency ?? undefined}
           required
         />
       )}
-      {value.depot_type === DepotType.HeatPlant && (
+      {(isCogenerationPlant || isHeatPlant) && (
         <NumberInput
           label={t("Rendement thermique (entre 0 et 1)")}
           min={0}
@@ -127,7 +127,7 @@ export const DeliverySiteForm = ({
           required
         />
       )}
-      {value.depot_type === DepotType.CogenerationPlant && (
+      {isCogenerationPlant && (
         <NumberInput
           label={t("Température utile (°C)")}
           step={0.1}
