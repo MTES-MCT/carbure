@@ -4,20 +4,21 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
 import {
   ElecAdminAuditFilter,
   ElecAdminAuditSnapshot,
-  ElecAdminAuditStatus,
+  ElecAdminAuditStatus
 } from "elec-audit-admin/types"
 import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
 import { ElecMeterReadingsApplication } from "elec/types"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
+import FilterMultiSelect from "../../../common/molecules/filter-select"
 import * as api from "../../api"
 import { StatusSwitcher } from "../status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
-import ElecAdminAuditFilters from "../list-filters"
-import { useElectAdminAuditQuery } from "./list-query"
-import { useElecAdminAuditMeterReadingsQueryParamsStore } from "./list-query-params-store"
+import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -31,14 +32,17 @@ const MeterReadingsApplicationsList = ({
   const entity = useEntity()
   const status = useAutoStatus()
   const location = useLocation()
+  const { t } = useTranslation()
 
-  const [state, actions] = useElecAdminAuditMeterReadingsQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
-    snapshot
+    snapshot,
   )
-  const query = useElectAdminAuditQuery(state)
+  usePageTitle(state)
+  const query = useCBQueryBuilder(state);
+
   const meterReadingsApplicationsResponse = useQuery(
     api.getMeterReadingsApplications,
     {
@@ -63,17 +67,22 @@ const MeterReadingsApplicationsList = ({
     api.downloadMeterReadingsApplication(entity.id, meterReadingApplication.id)
   }
 
-  // const meterReadingsApplicationsData = elecAdminMeterReadingsApplicationsList
   const meterReadingsApplicationsData =
     meterReadingsApplicationsResponse.result?.data.data
 
   const total = meterReadingsApplicationsData?.total ?? 0
   const count = meterReadingsApplicationsData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
+    [ElecAdminAuditFilter.Quarter]: t("Trimestre"),
+  }
+
   return (
     <>
       <Bar>
-        <ElecAdminAuditFilters
-          filters={FILTERS}
+        <FilterMultiSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
@@ -87,10 +96,7 @@ const MeterReadingsApplicationsList = ({
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
-            historyCount={snapshot.meter_readings_applications_history}
-            pendingCount={snapshot.meter_readings_applications_pending}
-            auditDoneCount={snapshot.meter_readings_applications_audit_done}
-            auditInProgressCount={snapshot.meter_readings_applications_audit_in_progress}
+            snapshot={snapshot}
           />
         </ActionBar>
 

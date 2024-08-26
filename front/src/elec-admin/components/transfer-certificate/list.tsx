@@ -4,14 +4,13 @@ import HashRoute from "common/components/hash-route"
 import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
-import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import FilterMultiSelect from "common/molecules/filter-select"
 import {
   ElecAdminSnapshot,
-  ElecAdminTransferCertificateFilter,
+  ElecAdminTransferCertificateFilter
 } from "elec-admin/types"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
@@ -19,7 +18,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ElecAdminTransferDetailsDialog from "./details"
-import TransferCertificateFilters from "./filters"
+import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
 
@@ -34,13 +33,14 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useAdminTransferCertificateQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
-    snapshot
+    snapshot,
   )
-  const query = useAdminTransferCertificatesQuery(state)
+  const query = useCBQueryBuilder(state);
+  usePageTitle(state)
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
     params: [query],
@@ -61,17 +61,26 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
 
   const total = transferCertificatesData?.total ?? 0
   const count = transferCertificatesData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecAdminTransferCertificateFilter.Cpo]: t("Aménageur"),
+    [ElecAdminTransferCertificateFilter.Operator]: t("Redevable"),
+    [ElecAdminTransferCertificateFilter.TransferDate]: t("Date d'émission"),
+    [ElecAdminTransferCertificateFilter.CertificateId]: t("Numéro"),
+  }
+
   return (
     <>
       <Bar>
-        <TransferCertificateFilters
-          filters={FILTERS}
+        <FilterMultiSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getTransferCertificateFilters(filter, query)
+            api.getProvisionCertificateFilters(filter, query)
           }
         />
+
       </Bar>
       <section>
         <ActionBar>

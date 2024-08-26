@@ -120,7 +120,7 @@ test("upload file", async () => {
   //send inscription
   const sendButton = await screen.findByText("Envoyer la demande d'inscription")
   await user.click(sendButton)
-  screen.getByText("Les 90 points de recharge ont été ajoutés !")
+  screen.getByText("La demande d'inscription des 90 points de recharge a été ajoutée !")
 })
 
 test("upload file with error", async () => {

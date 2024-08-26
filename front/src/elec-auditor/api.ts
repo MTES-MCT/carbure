@@ -8,6 +8,7 @@ import {
   ElecAuditorUploadCheckReportInfo,
 } from "./types"
 import { UploadCheckReportInfo } from "carbure/types"
+import { CBQUERY_RESET } from "common/hooks/query-builder"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/auditor/years", {
@@ -35,18 +36,11 @@ export function getApplications(query: ElecAuditorApplicationsQuery) {
   )
 }
 
-const QUERY_RESET: Partial<ElecAuditorApplicationsQuery> = {
-  limit: undefined,
-  from_idx: undefined,
-  sort_by: undefined,
-  order: undefined,
-}
-
 export async function getFilters(
-  field: ElecAuditorApplicationsFilter,
+  field: string,
   query: ElecAuditorApplicationsQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
   const result = await api
     .get<Api<string[]>>("/elec/auditor/filters", { params })
     .then((res) => res.data.data ?? [])

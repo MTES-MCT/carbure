@@ -1,12 +1,11 @@
+import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
-import { ElecOperatorSnapshot } from "./types-operator"
-import { ElecTransferCertificateQuery } from "./types-cpo"
 import {
-  ElecTransferCertificateFilter,
   ElecTransferCertificatesData,
-  ElecTransferCertificatesDetails,
-  QUERY_RESET,
+  ElecTransferCertificatesDetails
 } from "./types"
+import { ElecTransferCertificateQuery } from "./types-cpo"
+import { ElecOperatorSnapshot } from "./types-operator"
 
 export function getOperatorYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/operator/years", {
@@ -49,10 +48,10 @@ export function downloadTransferCertificates(
 }
 
 export async function getTransferCertificateFilters(
-  field: ElecTransferCertificateFilter,
+  field: string,
   query: ElecTransferCertificateQuery
 ) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
 
   return api
     .get<

@@ -45,12 +45,6 @@ export enum ElecTransferCertificateFilter {
   CertificateId = "certificate_id",
 }
 
-export const QUERY_RESET: Partial<ElecCPOProvisionCertificateQuery> = {
-  limit: undefined,
-  from_idx: undefined,
-  sort_by: undefined,
-  order: undefined,
-}
 
 export interface ElecTransferCertificatesDetails
   extends ElecTransferCertificatePreview {

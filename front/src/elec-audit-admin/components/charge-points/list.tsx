@@ -4,22 +4,22 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import * as api from "elec-admin/api"
 import {
   ElecAdminAuditFilter,
   ElecAdminAuditSnapshot,
-  ElecAdminAuditStatus,
+  ElecAdminAuditStatus
 } from "elec-audit-admin/types"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as apiAudit from "../../api"
-import * as api from "elec-admin/api"
-import ElecAdminAuditFilters from "../list-filters"
+import FilterMultiSelect from "../../../common/molecules/filter-select"
 import { StatusSwitcher } from "../status-switcher"
 import ChargePointsApplicationDetailsDialog from "./details"
-import { useElectAdminAuditQuery } from "./list-query"
-import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
+import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -32,16 +32,15 @@ const ChargePointsApplicationsList = ({
 }: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const { t } = useTranslation()
   const location = useLocation()
-
-  const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(
+  const { t } = useTranslation()
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
-    snapshot
-  )
-  const query = useElectAdminAuditQuery(state)
+    snapshot)
+  usePageTitle(state)
+  const query = useCBQueryBuilder(state);
   const chargePointsApplicationsResponse = useQuery(
     apiAudit.getChargePointsApplications,
     {
@@ -75,11 +74,17 @@ const ChargePointsApplicationsList = ({
 
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
+    [ElecAdminAuditFilter.Quarter]: t("Trimestre"),
+  }
+
   return (
     <>
       <Bar>
-        <ElecAdminAuditFilters
-          filters={FILTERS}
+        <FilterMultiSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
@@ -96,10 +101,7 @@ const ChargePointsApplicationsList = ({
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
-            historyCount={snapshot.charge_points_applications_history}
-            pendingCount={snapshot.charge_points_applications_pending}
-            auditDoneCount={snapshot.charge_points_applications_audit_done}
-            auditInProgressCount={snapshot.charge_points_applications_audit_in_progress}
+            snapshot={snapshot}
           />
         </ActionBar>
 
@@ -151,3 +153,4 @@ export function useAutoStatus() {
     matchStatus?.params?.status?.toUpperCase() as ElecAdminAuditStatus
   return status ?? ElecAdminAuditStatus.Pending
 }
+
