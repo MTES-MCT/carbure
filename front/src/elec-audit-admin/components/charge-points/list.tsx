@@ -38,9 +38,8 @@ const ChargePointsApplicationsList = ({
     entity,
     year,
     status,
-    snapshot,
-    usePageTitle
-  )
+    snapshot)
+  usePageTitle(state)
   const query = useCBQueryBuilder(state);
   const chargePointsApplicationsResponse = useQuery(
     apiAudit.getChargePointsApplications,

@@ -13,6 +13,7 @@ import { useCBQueryBuilder, useCBQueryParamsStore } from "../../common/hooks/que
 import ApplicationDetailsDialog from "./details"
 import { StatusSwitcher } from "./status-switcher"
 import ApplicationsTable from "./table"
+import { usePageTitle } from "./page-title"
 
 
 type TransferListProps = {
@@ -29,6 +30,7 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
 
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   const query = useCBQueryBuilder(state);
+  usePageTitle(state)
   const auditApplicationsResponse = useQuery(api.getApplications, {
     key: "elec-audit-applications",
     params: [query],
@@ -110,14 +112,9 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
 }
 export default ElecApplicationList
 
-
-const FILTERS = [
-  ElecAuditorApplicationsFilter.Cpo,
-]
-
-
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-audit/:year/:status/*")
   const status = matchStatus?.params?.status?.toUpperCase() as ElecAuditorApplicationsStatus
   return status ?? ElecAuditorApplicationsStatus.AuditInProgress
 }
+

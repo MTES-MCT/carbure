@@ -39,8 +39,8 @@ const MeterReadingsApplicationsList = ({
     year,
     status,
     snapshot,
-    usePageTitle
   )
+  usePageTitle(state)
   const query = useCBQueryBuilder(state);
 
   const meterReadingsApplicationsResponse = useQuery(

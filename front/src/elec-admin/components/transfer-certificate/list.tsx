@@ -4,14 +4,12 @@ import HashRoute from "common/components/hash-route"
 import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
 import {
   ElecAdminSnapshot,
-  ElecAdminTransferCertificateFilter,
-  ElecAdminTransferCertificateFilterSelection,
+  ElecAdminTransferCertificateFilter
 } from "elec-admin/types"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
@@ -20,10 +18,9 @@ import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ElecAdminTransferDetailsDialog from "./details"
 import TransferCertificateFilters from "./filters"
+import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
-import { useCBQueryBuilder } from "common/hooks/query-builder"
-import { usePageTitle } from "./page-title"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -36,15 +33,14 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useAdminTransferCertificateQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
     snapshot,
-    usePageTitle
   )
   const query = useCBQueryBuilder(state);
-
+  usePageTitle(state)
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
     params: [query],

@@ -82,7 +82,6 @@ export function useCBQueryParamsStore(
   year: number,
   status: string,
   snapshot?: CBSnapshot,
-  onUpdatePageTitle?: (state: CBQueryStates) => void
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -191,8 +190,6 @@ export function useCBQueryParamsStore(
     }
   )
 
-  // sync tab title with current state
-  onUpdatePageTitle && onUpdatePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
