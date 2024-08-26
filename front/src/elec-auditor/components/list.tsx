@@ -4,7 +4,7 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import FilterSelect from "common/molecules/filter-select"
+import FilterMultiSelect from "common/molecules/filter-select"
 import * as api from "elec-auditor/api"
 import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
@@ -57,7 +57,7 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
     <>
 
       <Bar>
-        <FilterSelect
+        <FilterMultiSelect
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}

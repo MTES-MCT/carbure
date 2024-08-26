@@ -1,21 +1,21 @@
-import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
+import { MultiSelect } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold";
 import { CBFilterSelection } from "common/hooks/query-builder";
 import { defaultNormalizer } from "common/utils/normalize";
 
-export interface FiltersProps {
+export interface FilterMultiSelectProps {
   filterLabels: Record<string, string>
   selected: CBFilterSelection
   onSelect: (filters: CBFilterSelection) => void
   getFilterOptions: (filter: string) => Promise<any[]>
 }
 
-export function FilterSelect({
+export function FilterMultiSelect({
   filterLabels,
   selected,
   onSelect,
   getFilterOptions,
-}: FiltersProps) {
+}: FilterMultiSelectProps) {
 
   const filters = Object.keys(filterLabels)
 
@@ -23,15 +23,20 @@ export function FilterSelect({
     <Grid>
       {filters.map((filter) => {
         return (
-          <FilterMultiSelect
+          <MultiSelect
             key={filter}
-            field={filter}
-            placeholder={filterLabels[filter]}
+            clear
+            search
+            variant="solid"
             value={selected[filter]}
+            placeholder={filterLabels[filter]}
+            normalize={defaultNormalizer}
+            sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
             onChange={(value) =>
               onSelect({ ...selected, [filter]: value ?? [] })
             }
             getOptions={() => getFilterOptions(filter)}
+
           />
         )
       })}
@@ -39,27 +44,4 @@ export function FilterSelect({
   )
 }
 
-export type FilterMultiSelectProps = { field: string } & Omit<
-  MultiSelectProps<string>,
-  "options"
->
-
-export default FilterSelect
-
-const FilterMultiSelect = ({
-  field,
-  value = [],
-  onChange,
-  ...props
-}: FilterMultiSelectProps) => (
-  <MultiSelect
-    {...props}
-    clear
-    search
-    variant="solid"
-    value={value}
-    onChange={onChange}
-    normalize={defaultNormalizer}
-    sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
-  />
-)
+export default FilterMultiSelect

@@ -6,7 +6,7 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 
 import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
-import FilterSelect from "common/molecules/filter-select"
+import FilterMultiSelect from "common/molecules/filter-select"
 import {
   ElecAdminProvisionCertificateFilter,
   ElecAdminProvisionCertificateStatus,
@@ -73,7 +73,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   return (
     <>
       <Bar>
-        <FilterSelect
+        <FilterMultiSelect
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
