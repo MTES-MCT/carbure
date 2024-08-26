@@ -6,17 +6,18 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 
 import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import FilterSelect from "common/molecules/filter-select"
 import {
   ElecAdminProvisionCertificateFilter,
   ElecAdminProvisionCertificateStatus,
   ElecAdminSnapshot,
 } from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ProvisionImporButton from "./Import"
 import ElecAdminProvisionDetailsDialog from "./details"
-import ProvisionCertificateFilters from "./filters"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
@@ -38,6 +39,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   usePageTitle(state)
   const query = useCBQueryBuilder(state);
   const location = useLocation()
+  const { t } = useTranslation()
 
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
     key: "elec-admin-provision-certificates",
@@ -56,16 +58,23 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
 
   const provisionCertificatesData =
     provisionCertificatesResponse.result?.data.data
-
-  // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST
-
   const total = provisionCertificatesData?.total ?? 0
   const count = provisionCertificatesData?.returned ?? 0
+
+
+  const filterLabels = {
+    [ElecAdminProvisionCertificateFilter.Cpo]: t("Aménageur"),
+    [ElecAdminProvisionCertificateFilter.Quarter]: t("Trimestre"),
+    [ElecAdminProvisionCertificateFilter.OperatingUnit]: t(
+      "Unité d'exploitation"
+    ),
+  }
+
   return (
     <>
       <Bar>
-        <ProvisionCertificateFilters
-          filters={FILTERS}
+        <FilterSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
@@ -122,11 +131,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
 }
 export default ProvisionList
 
-const FILTERS = [
-  ElecAdminProvisionCertificateFilter.Cpo,
-  ElecAdminProvisionCertificateFilter.Quarter,
-  ElecAdminProvisionCertificateFilter.OperatingUnit,
-]
+
 
 export function useAutoStatus(): ElecAdminProvisionCertificateStatus {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")

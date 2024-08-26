@@ -39,7 +39,7 @@ export function importProvisionCertificates(entity_id: number, file: File) {
 
 
 export async function getProvisionCertificateFilters(
-  field: ElecAdminProvisionCertificateFilter,
+  field: string,
   query: ElecAdminProvisionCertificateQuery
 ) {
   const params = { filter: field, ...query, ...CBQUERY_RESET }
