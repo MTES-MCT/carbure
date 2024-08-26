@@ -28,7 +28,10 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { CreateDeliverySiteDialog } from "./create-delivery-site-dialog"
 import { DeliverySiteDialog } from "./delivery-site-dialog"
-import { depotTypeLabels, ownerShipTypeOptions } from "./delivery-site.const"
+import {
+  useDepotTypeLabels,
+  useOwnerShipTypeOptions,
+} from "./delivery-site.hooks"
 import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
 
 interface DeliverySiteSettingsProps {
@@ -45,6 +48,7 @@ const DeliverySitesSettings = ({
   const { t } = useTranslation()
   const rights = useRights()
   const portal = usePortal()
+  const depotTypeLabels = useDepotTypeLabels()
 
   const deliverySites = useQuery(getDepots, {
     key: "delivery-sites",
@@ -157,6 +161,7 @@ export const DeliverySiteFinderDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const portal = usePortal()
+  const ownerShipTypeOptions = useOwnerShipTypeOptions()
 
   const addDeliverySite = useMutation(api.addDeliverySite, {
     invalidates: ["delivery-sites"],

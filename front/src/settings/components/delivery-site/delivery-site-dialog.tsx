@@ -9,11 +9,10 @@ import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Return } from "common/components/icons"
 import { Dialog } from "common/components/dialog"
-import { formatCelsiusDegree, formatNumber, formatPercentage } from "common/utils/formatters"
-import { DeliverySiteForm } from "./create-delivery-site-form"
+import { formatCelsiusDegree, formatPercentage } from "common/utils/formatters"
 import Form from "common/components/form"
 import { RadioGroup } from "common/components/radio"
-import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
+import { useGetDepotTypeOptions } from "./delivery-site.hooks"
 import useEntity from "carbure/hooks/entity"
 import Checkbox from "common/components/checkbox"
 import { Row } from "common/components/scaffold"
@@ -29,7 +28,7 @@ export const DeliverySiteDialog = ({
 }: DeliverySiteDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-
+  const depotTypeOptions = useGetDepotTypeOptions(deliverySite?.depot?.country)
   const form = {
     name: deliverySite?.depot?.name ?? "",
     city: deliverySite?.depot?.city ?? "",
@@ -45,13 +44,6 @@ export const DeliverySiteDialog = ({
     thermal_efficiency: deliverySite?.depot?.thermal_efficiency,
     useful_temperature: deliverySite?.depot?.useful_temperature,
   }
-
-  const depotType = deliverySite.depot?.depot_type ?? DepotType.Other
-  const isPowerOrHeatPlant = [DepotType.PowerPlant, DepotType.HeatPlant, DepotType.CogenerationPlant].includes(depotType) // prettier-ignore
-
-  const electricalEfficiency = deliverySite.depot?.electrical_efficiency
-  const thermalEfficiency = deliverySite.depot?.thermal_efficiency
-  const usefulTemperature = deliverySite.depot?.useful_temperature
 
   return (
     <Dialog onClose={onClose}>
