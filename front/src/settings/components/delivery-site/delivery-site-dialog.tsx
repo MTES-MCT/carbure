@@ -28,7 +28,9 @@ export const DeliverySiteDialog = ({
 }: DeliverySiteDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const depotTypeOptions = useGetDepotTypeOptions(deliverySite?.depot?.country)
+  const depotTypeOptions = useGetDepotTypeOptions({
+    country: deliverySite?.depot?.country,
+  })
   const form = {
     name: deliverySite?.depot?.name ?? "",
     city: deliverySite?.depot?.city ?? "",

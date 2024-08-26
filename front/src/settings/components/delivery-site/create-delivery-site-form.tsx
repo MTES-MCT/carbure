@@ -9,6 +9,7 @@ import {
   useDeliverySiteFlags,
   useGetDepotTypeOptions,
 } from "./delivery-site.hooks"
+import Tooltip from "common/components/tooltip"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -64,7 +65,7 @@ export const DeliverySiteForm = ({
   const { isCogenerationPlant, isHeatPlant, isPowerPlant } =
     useDeliverySiteFlags(value.depot_type)
 
-  const depotTypeOptions = useGetDepotTypeOptions(value.country)
+  const depotTypeOptions = useGetDepotTypeOptions({ country: value.country })
 
   const handleSubmit = (values: DeliverySiteFormType) => {
     onCreate({
