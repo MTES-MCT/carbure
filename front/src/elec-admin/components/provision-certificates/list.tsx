@@ -4,11 +4,10 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
 
+import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
 import {
   ElecAdminProvisionCertificateFilter,
-  ElecAdminProvisionCertificateFilterSelection,
   ElecAdminProvisionCertificateStatus,
   ElecAdminSnapshot,
 } from "elec-admin/types"
@@ -18,10 +17,9 @@ import * as api from "../../api"
 import ProvisionImporButton from "./Import"
 import ElecAdminProvisionDetailsDialog from "./details"
 import ProvisionCertificateFilters from "./filters"
+import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
-import { useCBQueryBuilder } from "common/hooks/query-builder"
-import { usePageTitle } from "./page-title"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -31,13 +29,13 @@ type ProvisionListProps = {
 const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useProvistionCertificateQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
     status,
     snapshot,
-    // usePageTitle
   )
+  usePageTitle(state)
   const query = useCBQueryBuilder(state);
   const location = useLocation()
 

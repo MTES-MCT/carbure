@@ -1,13 +1,10 @@
+import { CBQueryStates } from "common/hooks/query-builder"
 import useTitle from "common/hooks/title"
-import {
-  ElecAdminTransferCertificateStates
-} from "elec-admin/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
-import { title } from "process"
 import { useTranslation } from "react-i18next"
 
 
-export function usePageTitle(state: ElecAdminTransferCertificateStates) {
+export function usePageTitle(state: CBQueryStates) {
   const { t } = useTranslation()
 
   const title = t("Énergie cédée")
