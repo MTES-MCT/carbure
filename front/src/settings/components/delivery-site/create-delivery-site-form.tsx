@@ -4,9 +4,11 @@ import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
-import { depotTypeOptions } from "./delivery-site.const"
 import { AutoCompleteCountries } from "carbure/components/autocomplete-countries"
-import { useDeliverySiteFlags } from "./delivery-site.hooks"
+import {
+  useDeliverySiteFlags,
+  useGetDepotTypeOptions,
+} from "./delivery-site.hooks"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -61,6 +63,8 @@ export const DeliverySiteForm = ({
   )
   const { isCogenerationPlant, isHeatPlant, isPowerPlant } =
     useDeliverySiteFlags(value.depot_type)
+
+  const depotTypeOptions = useGetDepotTypeOptions(value.country)
 
   const handleSubmit = (values: DeliverySiteFormType) => {
     onCreate({
