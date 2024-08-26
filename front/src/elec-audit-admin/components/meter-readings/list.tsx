@@ -14,7 +14,7 @@ import MeterReadingsApplicationsTable from "elec/components/meter-readings/table
 import { ElecMeterReadingsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
-import FilterSelect from "../../../common/molecules/filter-select"
+import FilterMultiSelect from "../../../common/molecules/filter-select"
 import * as api from "../../api"
 import { StatusSwitcher } from "../status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
@@ -81,7 +81,7 @@ const MeterReadingsApplicationsList = ({
   return (
     <>
       <Bar>
-        <FilterSelect
+        <FilterMultiSelect
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}

@@ -16,7 +16,7 @@ import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as apiAudit from "../../api"
-import FilterSelect from "../../../common/molecules/filter-select"
+import FilterMultiSelect from "../../../common/molecules/filter-select"
 import { StatusSwitcher } from "../status-switcher"
 import ChargePointsApplicationDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
@@ -83,7 +83,7 @@ const ChargePointsApplicationsList = ({
   return (
     <>
       <Bar>
-        <FilterSelect
+        <FilterMultiSelect
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}

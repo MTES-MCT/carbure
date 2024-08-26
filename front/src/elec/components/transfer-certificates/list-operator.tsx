@@ -22,7 +22,7 @@ import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-operator"
 import ElecTransferCertificateTable from "./table"
 import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
-import FilterSelect from "common/molecules/filter-select"
+import FilterMultiSelect from "common/molecules/filter-select"
 
 type OperatorTransferCertificateListProps = {
   snapshot: ElecOperatorSnapshot
@@ -84,7 +84,7 @@ const OperatorTransferCertificateList = ({
       </Bar>
 
       <Bar>
-        <FilterSelect
+        <FilterMultiSelect
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
