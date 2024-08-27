@@ -25,6 +25,7 @@ export interface Control extends Layout {
   disabled?: boolean
   domRef?: React.RefObject<HTMLElement>
   error?: string
+  hideError?: boolean // Temporary prop to display/hide an error, to be removed when DSFR will be implemented
   hasTooltip?: boolean
   icon?: React.FunctionComponent | React.ReactNode
   label?: string
@@ -497,6 +498,7 @@ export const Field = ({
   required,
   type,
   error,
+  hideError = true,
   label,
   icon: Icon,
   rightContent,
@@ -587,7 +589,7 @@ export const Field = ({
         {!!rightContent && rightContent}
       </div>
 
-      {error && <p className={css.error}>{error}</p>}
+      {!hideError && error && <p className={css.error}>{error}</p>}
     </div>
   )
 }
