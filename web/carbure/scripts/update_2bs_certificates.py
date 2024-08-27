@@ -18,8 +18,8 @@ from django.core.mail import get_connection, send_mail
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import GenericCertificate
-from core.utils import bulk_update_or_create
+from core.models import GenericCertificate  # noqa: E402
+from core.utils import bulk_update_or_create  # noqa: E402
 
 DESTINATION_FOLDER = "/tmp"
 

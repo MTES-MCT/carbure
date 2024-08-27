@@ -6,9 +6,9 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model  # noqa: E402
 
-from core.models import Entity, UserRights
+from core.models import Entity, UserRights  # noqa: E402
 
 User = get_user_model()
 

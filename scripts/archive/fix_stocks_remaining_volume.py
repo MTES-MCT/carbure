@@ -8,7 +8,7 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import *
+from core.models import *  # noqa: E402
 
 
 def fix_stocks_remaining_volume():

@@ -55,8 +55,8 @@ class TicketSourceNode(Node):
         return self.data.added_by_id
 
     def get_parent(self):
-        from .lot import LotNode
-        from .ticket import TicketNode
+        from .lot import LotNode  # noqa: E402
+        from .ticket import TicketNode  # noqa: E402
 
         if self.data.parent_lot:
             return LotNode(self.data.parent_lot, child=self)
@@ -64,7 +64,7 @@ class TicketSourceNode(Node):
             return TicketNode(self.data.parent_ticket, child=self)
 
     def get_children(self):
-        from .ticket import TicketNode
+        from .ticket import TicketNode  # noqa: E402
 
         return [TicketNode(ticket, parent=self) for ticket in self.data.saf_tickets.all()]
 

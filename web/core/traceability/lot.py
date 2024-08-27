@@ -174,7 +174,7 @@ class LotNode(Node):
         return self.data.added_by_id
 
     def get_parent(self):
-        from .stock import StockNode
+        from .stock import StockNode  # noqa: E402
 
         if self.data.parent_lot:
             return LotNode(self.data.parent_lot, child=self)
@@ -182,8 +182,8 @@ class LotNode(Node):
             return StockNode(self.data.parent_stock, child=self)
 
     def get_children(self):
-        from .stock import StockNode
-        from .ticket_source import TicketSourceNode
+        from .stock import StockNode  # noqa: E402
+        from .ticket_source import TicketSourceNode  # noqa: E402
 
         children_lot = [LotNode(lot, parent=self) for lot in self.data.carburelot_set.exclude(lot_status=CarbureLot.DELETED)]
         children_stock = [StockNode(stock, parent=self) for stock in self.data.carburestock_set.all()]

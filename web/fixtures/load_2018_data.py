@@ -9,7 +9,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 usermodel = get_user_model()
-from core.models import Biocarburant, Entity, LotTransaction, LotV2, MatierePremiere, Pays
+from core.models import Biocarburant, Entity, LotTransaction, LotV2, MatierePremiere, Pays  # noqa: E402
 
 # load data
 producers = {p.name: p for p in Entity.objects.filter(entity_type="Producteur")}

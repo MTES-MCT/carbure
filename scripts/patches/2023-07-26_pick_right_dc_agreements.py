@@ -6,13 +6,13 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.core.paginator import Paginator
-from django.db import transaction
-from tqdm import tqdm
+from django.core.paginator import Paginator  # noqa: E402
+from django.db import transaction  # noqa: E402
+from tqdm import tqdm  # noqa: E402
 
-from certificates.models import DoubleCountingRegistration
-from core.models import CarbureLot
-from transactions.sanity_checks import bulk_sanity_checks
+from certificates.models import DoubleCountingRegistration  # noqa: E402
+from core.models import CarbureLot  # noqa: E402
+from transactions.sanity_checks import bulk_sanity_checks  # noqa: E402
 
 
 @transaction.atomic

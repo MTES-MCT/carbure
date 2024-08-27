@@ -6,9 +6,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from certificates.models import EntityISCCTradingCertificate, ISCCCertificate, ProductionSiteCertificate
-from core.models import Entity
-from producers.models import ProductionSite
+from certificates.models import EntityISCCTradingCertificate, ISCCCertificate, ProductionSiteCertificate  # noqa: E402
+from core.models import Entity  # noqa: E402
+from producers.models import ProductionSite  # noqa: E402
 
 entity_certs = [
     (58, "EU-ISCC-Cert-DE105-82948108"),

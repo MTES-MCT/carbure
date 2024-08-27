@@ -8,12 +8,12 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from elec.models.elec_meter_reading import ElecMeterReading
-from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.repositories.charge_point_repository import ChargePointRepository
-from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
-from transactions.models.year_config import YearConfig
+from elec.models.elec_meter_reading import ElecMeterReading  # noqa: E402
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication  # noqa: E402
+from elec.repositories.charge_point_repository import ChargePointRepository  # noqa: E402
+from elec.repositories.meter_reading_repository import MeterReadingRepository  # noqa: E402
+from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point  # noqa: E402
+from transactions.models.year_config import YearConfig  # noqa: E402
 
 
 @transaction.atomic

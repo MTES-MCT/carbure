@@ -5,9 +5,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.core import serializers
+from django.core import serializers  # noqa: E402
 
-from core.models import *
+from core.models import *  # noqa: E402
 
 
 def load_feyzin_data():

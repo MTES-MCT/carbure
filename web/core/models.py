@@ -132,7 +132,7 @@ class Entity(models.Model):
         return self.name.replace(" ", "").upper()
 
     def slugify(self):
-        from core.common import normalize
+        from core.common import normalize  # noqa: E402
 
         return normalize(self.name).replace(" ", "_")
 
@@ -443,7 +443,7 @@ class EntityDepot(models.Model):
         verbose_name_plural = "Dépôts Entité"
 
 
-from producers.models import ProductionSite
+from producers.models import ProductionSite  # noqa: E402
 
 
 class SustainabilityDeclaration(models.Model):

@@ -9,23 +9,23 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-import argparse
-import json
-import re
-import shutil
-from datetime import date, datetime  # Pour le nom du fichier sauvegardé
-from os import listdir
-from os.path import isfile
-from typing import Tuple, cast
+import argparse  # noqa: E402
+import json  # noqa: E402
+import re  # noqa: E402
+import shutil  # noqa: E402
+from datetime import date, datetime  # Pour le nom du fichier sauvegardé  # noqa: E402
+from os import listdir  # noqa: E402
+from os.path import isfile  # noqa: E402
+from typing import Tuple, cast  # noqa: E402
 
-import pandas as pd
-import requests
-from bs4 import BeautifulSoup
-from django.conf import settings
-from django.core.mail import get_connection, send_mail
+import pandas as pd  # noqa: E402
+import requests  # noqa: E402
+from bs4 import BeautifulSoup  # noqa: E402
+from django.conf import settings  # noqa: E402
+from django.core.mail import get_connection, send_mail  # noqa: E402
 
-from core.models import GenericCertificate
-from core.utils import bulk_update_or_create
+from core.models import GenericCertificate  # noqa: E402
+from core.utils import bulk_update_or_create  # noqa: E402
 
 ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=2"
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"

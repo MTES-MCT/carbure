@@ -13,7 +13,7 @@ env = environ.Env(
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
-from core.models import Biocarburant, MatierePremiere, Pays
+from core.models import Biocarburant, MatierePremiere, Pays  # noqa: E402
 
 queries = {
     "feedstocks.json": MatierePremiere.objects.all()

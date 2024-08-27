@@ -5,7 +5,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from certificates.models import EntityISCCTradingCertificate, ProductionSiteCertificate
+from certificates.models import EntityISCCTradingCertificate, ProductionSiteCertificate  # noqa: E402
 
 
 def check_entity_certificates():

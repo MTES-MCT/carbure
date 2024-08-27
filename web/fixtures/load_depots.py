@@ -6,7 +6,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import Depot, Pays
+from core.models import Depot, Pays  # noqa: E402
 
 filename = "%s/web/fixtures/csv/depots.csv" % (os.environ["CARBURE_HOME"])
 

@@ -44,7 +44,7 @@ class SafTicketSourceSerializer(serializers.ModelSerializer):
     parent_lot = SafTicketSourceParentLotSerializer(read_only=True)
 
     def get_assigned_tickets(self, obj):
-        from .saf_ticket import SafTicketPreviewSerializer
+        from .saf_ticket import SafTicketPreviewSerializer  # noqa: E402
 
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 
@@ -94,7 +94,7 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
     parent_lot = CarbureLotPublicSerializer()
 
     def get_assigned_tickets(self, obj):
-        from .saf_ticket import SafTicketPreviewSerializer
+        from .saf_ticket import SafTicketPreviewSerializer  # noqa: E402
 
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 

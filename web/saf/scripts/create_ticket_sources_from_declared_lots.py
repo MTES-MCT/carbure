@@ -6,8 +6,8 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot
-from saf.models.saf_ticket_source import create_ticket_sources_from_lots
+from core.models import CarbureLot  # noqa: E402
+from saf.models.saf_ticket_source import create_ticket_sources_from_lots  # noqa: E402
 
 
 def create_ticket_sources_from_declared_lots(year):

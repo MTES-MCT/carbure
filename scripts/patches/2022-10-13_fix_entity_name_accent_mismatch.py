@@ -9,9 +9,9 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, Depot, Entity
-from core.utils import normalize_string
-from producers.models import ProductionSite
+from core.models import CarbureLot, Depot, Entity  # noqa: E402
+from core.utils import normalize_string  # noqa: E402
+from producers.models import ProductionSite  # noqa: E402
 
 
 # bruteforcey script that compares all the unknown lot fields with known objects of the database

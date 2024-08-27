@@ -23,12 +23,12 @@ class StockTransformNode(Node):
         return self.data.entity_id
 
     def get_parent(self):
-        from .stock import StockNode
+        from .stock import StockNode  # noqa: E402
 
         return StockNode(self.data.source_stock, child=self)
 
     def get_children(self):
-        from .stock import StockNode
+        from .stock import StockNode  # noqa: E402
 
         return [StockNode(stock, parent=self) for stock in self.data.carburestock_set.all()]
 

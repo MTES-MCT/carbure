@@ -13,7 +13,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
-from core.models import EmailNotification, Entity, UserRights
+from core.models import EmailNotification, Entity, UserRights  # noqa: E402
 
 MAX_NOTIF_PER_HOUR = 20
 

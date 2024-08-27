@@ -10,7 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 usermodel = get_user_model()
-from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays  # noqa: E402
 
 default_eec_values = {
     "ETHBETTERAVE": 12,

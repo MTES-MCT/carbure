@@ -11,8 +11,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
-from certificates.models import *
-from core.models import *
+from certificates.models import *  # noqa: E402
+from core.models import *  # noqa: E402
 
 # map old id to new id
 TX_ID_MIGRATED = {}

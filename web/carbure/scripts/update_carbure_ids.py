@@ -7,8 +7,8 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, CarbureStock
-from transactions.services.carbure_id import bulk_generate_lot_carbure_id, bulk_generate_stock_carbure_id
+from core.models import CarbureLot, CarbureStock  # noqa: E402
+from transactions.services.carbure_id import bulk_generate_lot_carbure_id, bulk_generate_stock_carbure_id  # noqa: E402
 
 
 def update_carbure_id(apply, lots, stocks):

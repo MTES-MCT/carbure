@@ -5,7 +5,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import Entity, LotTransaction
+from core.models import Entity, LotTransaction  # noqa: E402
 
 
 def try_assign_volumes():
