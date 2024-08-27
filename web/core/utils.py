@@ -98,7 +98,7 @@ def generate_reports(name, entity_lots, include_partners=False):
     for entity_id in lots_by_entity:
         entity = entities_by_id[entity_id]
         location = f"/tmp/reports/{name}_{entity.name}.xlsx"
-        entity_lots = sorted(lots_by_entity[entity_id].values(), key=lambda l: l.delivery_date)
+        entity_lots = sorted(lots_by_entity[entity_id].values(), key=lambda lot: lot.delivery_date)
         entity_users = users_by_entity.get(entity_id, [])
         emails = ", ".join([user.email for user in entity_users])
         print(f"> {len(entity_lots)} lots for {entity.name} ({emails})")
@@ -166,7 +166,8 @@ class Validator(forms.Form):
     def bulk_validate(SpecializedValidator, items, context=None) -> tuple[list, list]:
         """
         Use this method to validate a list of dicts with the current Validator.
-        Ex: If you defined a LotValidator, you can run `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`  # noqa: E501
+        Ex: If you defined a LotValidator, you can run
+        `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`
         """
 
         if context is None:
