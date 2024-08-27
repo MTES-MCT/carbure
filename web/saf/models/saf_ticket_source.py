@@ -18,7 +18,9 @@ class SafTicketSource(models.Model):
 
     carbure_id = models.CharField(max_length=64, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
-    added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner")  # fmt: skip
+    added_by = models.ForeignKey(
+        "core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner"
+    )
 
     year = models.IntegerField(blank=False, null=False)
     delivery_period = models.IntegerField(blank=False, null=False)
@@ -28,14 +30,27 @@ class SafTicketSource(models.Model):
 
     feedstock = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.SET_NULL)
     biofuel = models.ForeignKey("core.Biocarburant", null=True, on_delete=models.SET_NULL)
-    country_of_origin = models.ForeignKey("core.Pays", null=True, on_delete=models.SET_NULL, related_name="saf_source_origin_country")  # fmt: skip
+    country_of_origin = models.ForeignKey(
+        "core.Pays", null=True, on_delete=models.SET_NULL, related_name="saf_source_origin_country"
+    )
 
-    carbure_producer = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_source_producer")  # fmt: skip
+    carbure_producer = models.ForeignKey(
+        "core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_source_producer"
+    )
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
 
-    carbure_production_site = models.ForeignKey("producers.ProductionSite", null=True, blank=True, default=None, on_delete=models.SET_NULL)  # fmt: skip
+    carbure_production_site = models.ForeignKey(
+        "producers.ProductionSite", null=True, blank=True, default=None, on_delete=models.SET_NULL
+    )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
-    production_country = models.ForeignKey("core.Pays", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_source_production_country")  # fmt: skip
+    production_country = models.ForeignKey(
+        "core.Pays",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="saf_source_production_country",
+    )
     production_site_commissioning_date = models.DateField(blank=True, null=True)
 
     eec = models.FloatField(default=0.0)

@@ -32,18 +32,31 @@ class SafTicket(models.Model):
     volume = models.FloatField(blank=False, null=False)
     biofuel = models.ForeignKey("core.Biocarburant", null=True, on_delete=models.SET_NULL)
     feedstock = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.SET_NULL)
-    country_of_origin = models.ForeignKey("core.Pays", null=True, on_delete=models.SET_NULL, related_name="saf_origin_country")  # fmt: skip
+    country_of_origin = models.ForeignKey(
+        "core.Pays", null=True, on_delete=models.SET_NULL, related_name="saf_origin_country"
+    )
 
-    supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")  # fmt: skip
-    client = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL)  # fmt: skip
+    supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")
+    client = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL)
     free_field = models.TextField(null=True, blank=True, default=None)
 
-    carbure_producer = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_producer")  # fmt: skip
+    carbure_producer = models.ForeignKey(
+        "core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_producer"
+    )
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
 
-    carbure_production_site = models.ForeignKey("producers.ProductionSite", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_production_site")  # fmt: skip
+    carbure_production_site = models.ForeignKey(
+        "producers.ProductionSite",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="saf_production_site",
+    )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
-    production_country = models.ForeignKey("core.Pays", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_production_country")  # fmt: skip
+    production_country = models.ForeignKey(
+        "core.Pays", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_production_country"
+    )
     production_site_commissioning_date = models.DateField(blank=True, null=True)
 
     eec = models.FloatField(default=0.0)
@@ -60,7 +73,9 @@ class SafTicket(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     client_comment = models.TextField(blank=True, null=True, default=None)
-    parent_ticket_source = models.ForeignKey("saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_tickets")  # fmt: skip
+    parent_ticket_source = models.ForeignKey(
+        "saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_tickets"
+    )
 
     def generate_carbure_id(self):
         production_country = self.production_country.code_pays if self.production_country else None

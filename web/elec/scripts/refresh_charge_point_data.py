@@ -79,7 +79,7 @@ def extract_charge_point_update(charge_point_data: dict) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Refresh charge point data and meter readings")
-    parser.add_argument("--batch", dest="batch", type=int, action="store", default=10, help="How many operations at a time")  # fmt:skip
+    parser.add_argument("--batch", dest="batch", type=int, action="store", default=10, help="How many operations at a time")
     parser.add_argument("--cpo", dest="cpo", type=str, action="store", help="Focus on one CPO")
     args = parser.parse_args()
 

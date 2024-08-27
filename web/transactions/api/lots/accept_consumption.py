@@ -29,7 +29,9 @@ def accept_consumption(request, entity, entity_id):
             continue
 
         if lot.lot_status != CarbureLot.PENDING:
-            errors.append({"error": AcceptConsumptionError.INVALID_STATUS, "meta": {"lot_id": lot.id, "status": lot.lot_status}})  # fmt: skip
+            errors.append(
+                {"error": AcceptConsumptionError.INVALID_STATUS, "meta": {"lot_id": lot.id, "status": lot.lot_status}}
+            )
             continue
 
         lot.lot_status = CarbureLot.ACCEPTED

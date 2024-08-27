@@ -16,4 +16,6 @@ class ElecMeterReading(models.Model):
     reading_date = models.DateField()
     charge_point = models.ForeignKey(ElecChargePoint, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
-    application = models.ForeignKey(ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")  # fmt:skip
+    application = models.ForeignKey(
+        ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings"
+    )

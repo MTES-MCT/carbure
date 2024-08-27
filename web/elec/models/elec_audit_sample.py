@@ -21,7 +21,13 @@ class ElecAuditSample(models.Model):
     status = models.CharField(max_length=32, default=IN_PROGRESS, choices=STATUSES)
     percentage = models.IntegerField(default=0)
     created_at = models.DateField(auto_now_add=True)
-    charge_point_application = models.ForeignKey(ElecChargePointApplication, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="audit_sample")  # fmt:skip
-    meter_reading_application = models.ForeignKey(ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="audit_sample")  # fmt:skip
-    cpo = models.ForeignKey(Entity, related_name="elec_audited_applications", on_delete=models.deletion.CASCADE, null=True, blank=True)  # fmt:skip
-    auditor = models.ForeignKey(Entity, related_name="elec_audits", on_delete=models.deletion.CASCADE, null=True, blank=True)  # fmt:skip
+    charge_point_application = models.ForeignKey(
+        ElecChargePointApplication, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="audit_sample"
+    )
+    meter_reading_application = models.ForeignKey(
+        ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="audit_sample"
+    )
+    cpo = models.ForeignKey(
+        Entity, related_name="elec_audited_applications", on_delete=models.deletion.CASCADE, null=True, blank=True
+    )
+    auditor = models.ForeignKey(Entity, related_name="elec_audits", on_delete=models.deletion.CASCADE, null=True, blank=True)

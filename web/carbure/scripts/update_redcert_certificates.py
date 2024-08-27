@@ -50,7 +50,7 @@ def download_redcert_certificates() -> None:
 def save_redcert_certificates() -> Tuple[int, list, list]:
     certificates = []
     invalidated = []
-    existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}  # fmt: skip
+    existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}
 
     filename = "%s/REDcert-certificates.xlsx" % (DESTINATION_FOLDER)
     wb = openpyxl.load_workbook(filename, data_only=True)

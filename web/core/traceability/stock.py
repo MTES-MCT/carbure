@@ -86,7 +86,7 @@ class StockNode(Node):
         from .lot import LotNode
         from .stock_transform import StockTransformNode
 
-        children_lot = [LotNode(lot, parent=self) for lot in self.data.carburelot_set.exclude(lot_status=CarbureLot.DELETED)]  # fmt:skip
+        children_lot = [LotNode(lot, parent=self) for lot in self.data.carburelot_set.exclude(lot_status=CarbureLot.DELETED)]
         children_stock_transform = [StockTransformNode(stock, parent=self) for stock in self.data.source_stock.all()]
         return children_lot + children_stock_transform
 

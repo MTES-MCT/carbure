@@ -45,12 +45,16 @@ class SafCreateTicketSourcesTest(TestCase):
         assert SafTicketSource.objects.count() == 0
 
         # declaration of the producer for the period
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period}
+        )
 
         assert SafTicketSource.objects.count() == 0
 
         # declaration of the operator for the period
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         ticket_sources = SafTicketSource.objects.all()
         assert ticket_sources.count() == 10
@@ -65,8 +69,12 @@ class SafCreateTicketSourcesTest(TestCase):
 
     def test_update_ticket_sources_from_redeclaration(self):
         # two-sided declaration
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period})  # fmt:skip
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period}
+        )
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         first_ticket_source = SafTicketSource.objects.first()
 
@@ -95,7 +103,9 @@ class SafCreateTicketSourcesTest(TestCase):
         assert first_ticket_source.assigned_volume == 60000.0
 
         # operator invalidates its declaration
-        self.client.post(reverse("transactions-declarations-invalidate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-invalidate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         # ticket sources still exist
         assert SafTicketSource.objects.count() == 10
@@ -105,7 +115,9 @@ class SafCreateTicketSourcesTest(TestCase):
         assert first_ticket_source.assigned_volume == 60000.0
 
         # operator revalidates its declaration
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         # check that ticket source was not updated
         first_ticket_source.refresh_from_db()

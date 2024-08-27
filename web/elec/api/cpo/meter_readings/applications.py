@@ -64,7 +64,9 @@ def get_applications(request, entity):
     else:
         object_list = applications
     serialized_applications = ElecMeterReadingApplicationSerializer(object_list, many=True).data
-    serialized_current_application = ElecMeterReadingApplicationSerializer(current_application).data if current_application else None  # fmt:skip
+    serialized_current_application = (
+        ElecMeterReadingApplicationSerializer(current_application).data if current_application else None
+    )
 
     return SuccessResponse(
         {

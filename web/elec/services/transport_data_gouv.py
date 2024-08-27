@@ -147,8 +147,14 @@ class TransportDataGouv:
 
     @staticmethod
     def enrich_charge_point_data(charge_point_data: pd.DataFrame, transport_data: pd.DataFrame):
-        longitude = [coord.replace("[", "").replace("]", "").replace(u'\xa0', u'').split(",")[0] for coord in transport_data.coordonneesXY]  # fmt:skip
-        latitude = [coord.replace("[", "").replace("]", "").replace(u'\xa0', u'').split(",")[1] for coord in transport_data.coordonneesXY]  # fmt:skip
+        longitude = [
+            coord.replace("[", "").replace("]", "").replace("\xa0", "").split(",")[0]
+            for coord in transport_data.coordonneesXY
+        ]
+        latitude = [
+            coord.replace("[", "").replace("]", "").replace("\xa0", "").split(",")[1]
+            for coord in transport_data.coordonneesXY
+        ]
 
         transport_data["latitude"] = latitude
         transport_data["longitude"] = longitude
@@ -163,7 +169,7 @@ class TransportDataGouv:
         # check if each charge point is using direct current
         transport_data["prise_type_combo_ccs"] = is_true(transport_data, "prise_type_combo_ccs")
         transport_data["prise_type_chademo"] = is_true(transport_data, "prise_type_chademo")
-        transport_data.insert(0, "DC", transport_data["prise_type_combo_ccs"] | transport_data["prise_type_chademo"])  # fmt:skip
+        transport_data.insert(0, "DC", transport_data["prise_type_combo_ccs"] | transport_data["prise_type_chademo"])
         transport_data["guessed_current_type"] = transport_data["DC"].apply(lambda is_dc: "DC" if is_dc else "AC")
 
         # find all stations that contain at least one DC point
@@ -193,7 +199,9 @@ class TransportDataGouv:
 
         # deal with when a charge point was not found on TDG to compute its guessed_is_article_2 column
         if "guessed_is_article_2" in merged_data.columns:
-            merged_data["guessed_is_article_2"] = merged_data["guessed_is_article_2"].fillna(merged_data["current_type"] != "AC")  # fmt:skip
+            merged_data["guessed_is_article_2"] = merged_data["guessed_is_article_2"].fillna(
+                merged_data["current_type"] != "AC"
+            )
         else:
             merged_data["guessed_is_article_2"] = merged_data["current_type"] != "AC"
 
@@ -203,7 +211,7 @@ class TransportDataGouv:
 
         # clear the mid and prm columns if they contain data that is too short
         # merged_data["mid_id"] = merged_data["mid_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
-        # merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)  # fmt:skip
+        # merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
 
         # find which rows have all data defined for a first meter reading
         merged_data["has_reading"] = (merged_data["current_type"] == "AC") | (

@@ -45,8 +45,10 @@ def cleanup_s3db(args):
 def main():
     parser = argparse.ArgumentParser(description="Delete old database backups")
     parser.add_argument("-b", dest="bucket", action="store", help="bucket name")
-    parser.add_argument("--force", action="store_true", default=False, help="Force check even if not in production environment")  # fmt:skip
-    parser.add_argument("--year", action="store", help="Pick the year to be cleaned")  # fmt:skip
+    parser.add_argument(
+        "--force", action="store_true", default=False, help="Force check even if not in production environment"
+    )
+    parser.add_argument("--year", action="store", help="Pick the year to be cleaned")
     args = parser.parse_args()
 
     env = os.environ["IMAGE_TAG"]

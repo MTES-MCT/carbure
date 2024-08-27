@@ -119,7 +119,9 @@ class TraceabilityTest(TestCase):
         assert stock_node.parent == root_node
         assert lot_node.parent == stock_node
 
-        root_node.update({"transport_document_reference": "ABCD", "biofuel_id": 12, "unknown_delivery_site": "UNKNOWN", "esca": 2.0})  # fmt:skip
+        root_node.update(
+            {"transport_document_reference": "ABCD", "biofuel_id": 12, "unknown_delivery_site": "UNKNOWN", "esca": 2.0}
+        )
         assert root_node.data.transport_document_reference == "ABCD"
         assert root_node.data.biofuel_id == 12
         assert root_node.data.unknown_delivery_site == "UNKNOWN"
@@ -146,7 +148,9 @@ class TraceabilityTest(TestCase):
         )
         source_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity)
         dest_stock = CarbureStockFactory.create(carbure_client=self.entity)
-        parent_transformation = CarbureStockTransformFactory.create(source_stock=source_stock, dest_stock=dest_stock, entity=self.entity)  # fmt:skip
+        parent_transformation = CarbureStockTransformFactory.create(
+            source_stock=source_stock, dest_stock=dest_stock, entity=self.entity
+        )
         dest_stock.parent_transformation = parent_transformation
         dest_stock.save()
         CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=dest_stock, added_by=self.entity)
@@ -163,7 +167,7 @@ class TraceabilityTest(TestCase):
         assert dest_stock_node.get_depth() == 3
         assert child_node.get_depth() == 4
 
-        root_node.update({"transport_document_reference": "ABCD", "carbure_delivery_site_id": 13, "esca": 2.0})  # fmt:skip
+        root_node.update({"transport_document_reference": "ABCD", "carbure_delivery_site_id": 13, "esca": 2.0})
         assert root_node.data.transport_document_reference == "ABCD"
         assert root_node.data.biofuel_id == self.eth
         assert root_node.data.carbure_delivery_site_id == 13
@@ -193,7 +197,7 @@ class TraceabilityTest(TestCase):
         parent_node = LotNode(parent_lot)
         ticket_source_node = parent_node.get_first(Node.TICKET_SOURCE)
 
-        parent_node.update({"biofuel_id": 12, "volume": 123456, "unknown_production_site": "UNKNOWN", "esca": 2.0})  # fmt:skip
+        parent_node.update({"biofuel_id": 12, "volume": 123456, "unknown_production_site": "UNKNOWN", "esca": 2.0})
         assert parent_node.data.biofuel_id == 12
         assert parent_node.data.volume == 123456
         assert parent_node.data.unknown_production_site == "UNKNOWN"
@@ -214,7 +218,7 @@ class TraceabilityTest(TestCase):
         parent_node = LotNode(parent_lot)
         ticket_node = parent_node.get_first(Node.TICKET)
 
-        parent_node.update({"biofuel_id": 12, "volume": 123456, "unknown_production_site": "UNKNOWN", "esca": 2.0})  # fmt:skip
+        parent_node.update({"biofuel_id": 12, "volume": 123456, "unknown_production_site": "UNKNOWN", "esca": 2.0})
         assert parent_node.data.biofuel_id == 12
         assert parent_node.data.volume == 123456
         assert parent_node.data.unknown_production_site == "UNKNOWN"
@@ -256,7 +260,9 @@ class TraceabilityTest(TestCase):
         assert parent_node.data.esca == 2.0
 
     def test_traceability_stock_to_parent_lot(self):
-        root_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site_id=1)  # fmt:skip
+        root_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site_id=1
+        )
         child_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity, depot_id=10)
         child_lot = CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=child_stock, added_by=self.entity)
 
@@ -267,7 +273,9 @@ class TraceabilityTest(TestCase):
         assert root_node.get_depth() == 0
         assert child_node.get_depth() == 2
 
-        child_node.update({"transport_document_reference": "ABCD", "biofuel_id": 12, "carbure_delivery_site_id": 13, "esca": 2.0})  # fmt:skip
+        child_node.update(
+            {"transport_document_reference": "ABCD", "biofuel_id": 12, "carbure_delivery_site_id": 13, "esca": 2.0}
+        )
         assert child_node.data.transport_document_reference == "ABCD"
         assert child_node.data.biofuel_id == 12
         assert child_node.data.carbure_delivery_site_id == 13

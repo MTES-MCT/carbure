@@ -16,8 +16,12 @@ class ElecTransferCertificate(models.Model):
 
     certificate_id = models.CharField(max_length=32)
     status = models.CharField(max_length=16, choices=STATUS, default=PENDING)
-    supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE, related_name="sent_transfer_certificates")  # fmt:skip
-    client = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE, related_name="received_transfer_certificates")  # fmt:skip
+    supplier = models.ForeignKey(
+        "core.Entity", null=True, blank=True, on_delete=models.CASCADE, related_name="sent_transfer_certificates"
+    )
+    client = models.ForeignKey(
+        "core.Entity", null=True, blank=True, on_delete=models.CASCADE, related_name="received_transfer_certificates"
+    )
     transfer_date = models.DateField()
     accepted_date = models.DateField(null=True, blank=True)
     energy_amount = models.FloatField()

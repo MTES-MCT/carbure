@@ -42,7 +42,9 @@ def check_user_rights(role=None, entity_type=None):
         @wraps(view_function)
         def wrap(request, *args, **kwargs):
             if not request.user.is_verified():
-                return ErrorResponse(403, UserRightsError.USER_NOT_VERIFIED, status="forbidden", message="User not OTP verified")  # fmt:skip
+                return ErrorResponse(
+                    403, UserRightsError.USER_NOT_VERIFIED, status="forbidden", message="User not OTP verified"
+                )
 
             entity_id = request.POST.get("entity_id", request.GET.get("entity_id"))
             if entity_id is None:
@@ -58,7 +60,9 @@ def check_user_rights(role=None, entity_type=None):
             request.session["rights"] = rights
 
             if entity_id not in rights:
-                return ErrorResponse(403, UserRightsError.WRONG_USER, status="forbidden", message="User has no rights to the requested entity")  # fmt:skip
+                return ErrorResponse(
+                    403, UserRightsError.WRONG_USER, status="forbidden", message="User has no rights to the requested entity"
+                )
 
             if entity_id != request.session.get("entity_id"):
                 request.session["entity_id"] = entity_id
@@ -67,11 +71,21 @@ def check_user_rights(role=None, entity_type=None):
 
             if isinstance(entity_type, list):
                 if entity.entity_type not in entity_type:
-                    return ErrorResponse(403, UserRightsError.WRONG_ENTITY_TYPE, status="forbidden", message="Operation not allowed for an entity of this type")  # fmt:skip
+                    return ErrorResponse(
+                        403,
+                        UserRightsError.WRONG_ENTITY_TYPE,
+                        status="forbidden",
+                        message="Operation not allowed for an entity of this type",
+                    )
 
             if isinstance(role, list):
                 if user_role not in role:
-                    return ErrorResponse(403, UserRightsError.WRONG_ROLE, status="forbidden", message="Insufficient rights to the requested entity")  # fmt:skip
+                    return ErrorResponse(
+                        403,
+                        UserRightsError.WRONG_ROLE,
+                        status="forbidden",
+                        message="Insufficient rights to the requested entity",
+                    )
 
             context = {"entity_id": entity_id, "entity": entity}
             return call_with_context(view_function, context, request, args, kwargs)

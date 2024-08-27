@@ -41,18 +41,16 @@ def get_certificate_snapshot(request, *args, **kwargs):
 
         return SuccessResponse(
             {
-                "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"]
-                or 0,  # fmt:skip
+                "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,
                 "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))[
                     "remaining_energy_amount__sum"
                 ]
-                or 0,  # fmt:skip
+                or 0,
                 "provision_certificates_available": provision_certificates_of_year.filter(
                     remaining_energy_amount__gt=0
                 ).count(),
                 "provision_certificates_history": provision_certificates_of_year.filter(remaining_energy_amount=0).count(),
-                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"]
-                or 0,  # fmt:skip
+                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,
                 "transfer_certificates_pending": transfer_certificates.filter(
                     status=ElecTransferCertificate.PENDING
                 ).count(),

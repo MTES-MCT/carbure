@@ -22,9 +22,15 @@ class SafGroupedAssignTicketTest(TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicketSource.objects.all().delete()
-        self.ticket_source1 = SafTicketSourceFactory.create(added_by_id=self.entity.id, delivery_period=202202, total_volume=30000, assigned_volume=0)  # fmt:skip
-        self.ticket_source2 = SafTicketSourceFactory.create(added_by_id=self.entity.id, delivery_period=202203, total_volume=20000, assigned_volume=0)  # fmt:skip
-        self.ticket_source3 = SafTicketSourceFactory.create(added_by_id=self.entity.id, delivery_period=202204, total_volume=10000, assigned_volume=5000)  # fmt:skip
+        self.ticket_source1 = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id, delivery_period=202202, total_volume=30000, assigned_volume=0
+        )
+        self.ticket_source2 = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id, delivery_period=202203, total_volume=20000, assigned_volume=0
+        )
+        self.ticket_source3 = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id, delivery_period=202204, total_volume=10000, assigned_volume=5000
+        )
 
         SafTicket.objects.all().delete()
 
@@ -91,7 +97,11 @@ class SafGroupedAssignTicketTest(TestCase):
         assert ticket.agreement_date.isoformat() == "2022-06-01"
         assert ticket.agreement_reference == "AGREF"
         assert ticket.status == "PENDING"
-        assert ticket.carbure_id == "T%d-%s-%d" % (ticket.assignment_period, ticket.parent_ticket_source.production_country.code_pays, ticket.id)  # fmt:skip
+        assert ticket.carbure_id == "T%d-%s-%d" % (
+            ticket.assignment_period,
+            ticket.parent_ticket_source.production_country.code_pays,
+            ticket.id,
+        )
         assert ticket.client_id == self.ticket_client.id
         assert ticket.volume == 30000
         assert ticket.year == 2022
@@ -104,7 +114,7 @@ class SafGroupedAssignTicketTest(TestCase):
         assert ticket.carbure_production_site_id == ticket.parent_ticket_source.carbure_production_site_id
         assert ticket.unknown_production_site == ticket.parent_ticket_source.unknown_production_site
         assert ticket.production_country_id == ticket.parent_ticket_source.production_country_id
-        assert ticket.production_site_commissioning_date == ticket.parent_ticket_source.production_site_commissioning_date  # fmt:skip
+        assert ticket.production_site_commissioning_date == ticket.parent_ticket_source.production_site_commissioning_date
         assert ticket.eec == ticket.parent_ticket_source.eec
         assert ticket.el == ticket.parent_ticket_source.el
         assert ticket.ep == ticket.parent_ticket_source.ep

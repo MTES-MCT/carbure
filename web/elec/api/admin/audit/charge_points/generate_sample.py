@@ -52,7 +52,9 @@ def generate_sample(request):
         percentage=percentage * 100,
     )
 
-    charge_point_audits = [ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample]  # fmt:skip
+    charge_point_audits = [
+        ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample
+    ]
     ElecAuditChargePoint.objects.bulk_create(charge_point_audits)
 
     return SuccessResponse(

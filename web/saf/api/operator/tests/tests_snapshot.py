@@ -24,12 +24,20 @@ class SafSnapshotTest(TestCase):
         SafTicketSource.objects.all().delete()
         SafTicketSourceFactory.create_batch(10, year=2021, added_by_id=self.entity.id, assigned_volume=0)
         SafTicketSourceFactory.create_batch(10, year=2022, added_by_id=self.entity.id, assigned_volume=0)
-        SafTicketSourceFactory.create_batch(20, year=2022, added_by_id=self.entity.id, total_volume=30000, assigned_volume=30000)  # fmt:skip
+        SafTicketSourceFactory.create_batch(
+            20, year=2022, added_by_id=self.entity.id, total_volume=30000, assigned_volume=30000
+        )
 
         SafTicket.objects.all().delete()
-        SafTicketFactory.create_batch(15, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.PENDING)  # fmt:skip
-        SafTicketFactory.create_batch(10, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.ACCEPTED)  # fmt:skip
-        SafTicketFactory.create_batch(5, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.REJECTED)  # fmt:skip
+        SafTicketFactory.create_batch(
+            15, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.PENDING
+        )
+        SafTicketFactory.create_batch(
+            10, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.ACCEPTED
+        )
+        SafTicketFactory.create_batch(
+            5, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.REJECTED
+        )
 
     def test_saf_snapshot_simple(self):
         response = self.client.get(
