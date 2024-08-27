@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import FilterMultiSelect from "../../../common/molecules/filter-select"
 import * as api from "../../api"
-import { StatusSwitcher } from "../status-switcher"
+import { StatusSwitcher } from "./status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
 import { usePageTitle } from "./page-title"
 
