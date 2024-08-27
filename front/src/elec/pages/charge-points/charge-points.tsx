@@ -5,9 +5,10 @@ import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-import * as api from "./api-charge-points"
+import * as api from "../../api-charge-points"
 import { ChargePointsTabs } from "./charge-points-tabs"
-import { ChargePointsSnapshot } from "./types-charge-points"
+import { ChargePointsSnapshot } from "../../types-charge-points"
+import ChargePointsPending from "./charge-points-pending"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -56,7 +57,10 @@ const ChargePoints = () => {
 
         <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} />
 
-        <Route path="pending" element={<div>CHARGE POINTS PENDING</div>} />
+        <Route
+          path="pending"
+          element={<ChargePointsPending year={years.selected} />}
+        />
 
         <Route path="*" element={<Navigate replace to="pending" />} />
       </Routes>
