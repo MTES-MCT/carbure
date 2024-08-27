@@ -11,6 +11,7 @@ import {
   SafOperatorSnapshot,
   SafQuery,
   SafQueryType,
+  SafStates,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
@@ -42,7 +43,7 @@ export const OperatorTickets = ({
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore(
+  const [state, actions] = useCBQueryParamsStore<SafStates>(
     entity,
     year,
     status,

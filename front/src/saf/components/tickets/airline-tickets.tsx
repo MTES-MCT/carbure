@@ -10,6 +10,7 @@ import {
   SafClientSnapshot,
   SafFilter,
   SafQuery,
+  SafStates,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
@@ -34,7 +35,12 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useCBQueryParamsStore<SafStates>(
+    entity,
+    year,
+    status,
+    snapshot
+  )
   const query = useCBQueryBuilder(state)
   const apiGetTickets = (query: SafQuery) => api.getSafAirlineTickets(query)
 
@@ -86,7 +92,6 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
         <TicketsTable
           client
           loading={ticketsResponse.loading}
-          // @ts-ignore
           state={state}
           actions={actions}
           order={state.order}

@@ -5,14 +5,18 @@ import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
-import { SafTicket, SafTicketsResponse, SafTicketStatus } from "saf/types"
+import {
+  SafStates,
+  SafTicket,
+  SafTicketsResponse,
+  SafTicketStatus,
+} from "saf/types"
 import TicketTag from "./tag"
 import NoResult from "common/components/no-result"
-import { CBQueryStates } from "common/hooks/query-builder"
 
 export interface TicketsTableProps {
   loading: boolean
-  state: CBQueryStates // The good type is SafStates, but i can't fix an error type with string and enums
+  state: SafStates // The good type is SafStates, but i can't fix an error type with string and enums
   actions: any
   status: SafTicketStatus
   ticketsData?: SafTicketsResponse

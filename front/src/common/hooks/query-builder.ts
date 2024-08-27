@@ -16,7 +16,8 @@ export const CBQUERY_RESET: Partial<CBQueryParams> = {
   sort_by: undefined,
   order: undefined,
 }
-export interface CBQueryStates {
+
+interface BaseCBQueryStates {
   entity: Entity
   year: number
   filters: CBFilterSelection
@@ -28,6 +29,21 @@ export interface CBQueryStates {
   limit?: number
   order?: Order
   snapshot?: CBSnapshot
+}
+export type CBQueryStates<
+  GenericCBQueryStates extends BaseCBQueryStates = BaseCBQueryStates,
+> = {
+  entity: GenericCBQueryStates["entity"]
+  year: GenericCBQueryStates["year"]
+  filters: GenericCBQueryStates["filters"]
+  search?: GenericCBQueryStates["search"]
+  status: GenericCBQueryStates["status"]
+  type?: GenericCBQueryStates["type"]
+  page: GenericCBQueryStates["page"]
+  selection: GenericCBQueryStates["selection"]
+  limit?: GenericCBQueryStates["limit"]
+  order?: GenericCBQueryStates["order"]
+  snapshot?: GenericCBQueryStates["snapshot"]
 }
 
 export interface CBQueryParams {
@@ -74,7 +90,9 @@ export function useCBQueryBuilder(params: CBQueryStates): CBQueryParams {
   )
 }
 
-export function useCBQueryParamsStore(
+export function useCBQueryParamsStore<
+  GenericCBQueryStates extends BaseCBQueryStates = BaseCBQueryStates,
+>(
   entity: Entity,
   year: number,
   status: string,
@@ -99,7 +117,7 @@ export function useCBQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as CBQueryStates,
+    } as CBQueryStates<GenericCBQueryStates>,
     {
       setEntity: (entity: Entity) => ({
         entity,
