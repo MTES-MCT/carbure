@@ -101,18 +101,18 @@ for i, lot in enumerate(lots):
     else:
         print("Could not load lot %s" % (lot))
     lupscd = lot["production_site_commissioning_date"]
-    if type(lupscd) != type(today) and type(lupscd) != type(now):
+    if type(lupscd) is not type(today) and type(lupscd) is not type(now):
         if lupscd is None:
             lupscd = datetime.datetime(year=2008, month=10, day=5)
         # float and integers
-        elif type(lupscd) == type(0.01) or type(lupscd) == type(2000):
+        elif type(lupscd) is type(0.01) or type(lupscd) is type(2000):
             if lupscd > 1950 and lupscd < 2050:
                 lupscd = datetime.datetime(year=int(lupscd), month=1, day=1)
             else:
                 print("lupscd is an unknown float, ignoring line: %f" % (lupscd))
                 print(dae)
                 continue
-        elif type(lupscd) == type("str"):
+        elif type(lupscd) is type("str"):
             lupscd = lupscd.strip().lower()
             if lupscd.startswith("avant "):
                 lupscd = datetime.datetime.strptime(lupscd[6:].strip(), "%Y-%m-%d") - datetime.timedelta(days=1)
@@ -193,8 +193,8 @@ for i, lot in enumerate(lots):
         print("Could not find country %s" % (lpo))
         continue
     d["pays_origine"] = countries[lpo]
-    d["ep"] = lot["ep"] if type(lot["ep"]) == "float" else 0
-    d["etd"] = lot["etd"] if type(lot["etd"]) == "float" else 0
+    d["ep"] = lot["ep"] if isinstance(lot["ep"], float) else 0
+    d["etd"] = lot["etd"] if isinstance(lot["etd"], float) else 0
     d["ghg_total"] = lot["GES TOTAL"]
     d["ghg_reference"] = 83.8
     if d["ghg_total"] is None:

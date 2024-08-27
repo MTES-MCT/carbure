@@ -151,18 +151,18 @@ def load_lot(lot):
     lupscd = lot["production_site_commissioning_date"]
     if lupscd is None:
         lupscd = datetime.datetime(year=2008, month=10, day=5)
-    elif type(lupscd) == type(today) or type(lupscd) == type(now):
+    elif type(lupscd) is type(today) or type(lupscd) is type(now):
         # do nothing
         pass
     # float and integers
-    elif type(lupscd) == type(0.01) or type(lupscd) == type(2000):
+    elif type(lupscd) is type(0.01) or type(lupscd) is type(2000):
         if lupscd > 1950 and lupscd < 2050:
             lupscd = datetime.datetime(year=int(lupscd), month=1, day=1)
         else:
             print("lupscd is an unknown float, ignoring line: %f" % (lupscd))
             print(dae)
             return
-    elif type(lupscd) == type("str"):
+    elif type(lupscd) is type("str"):
         lupscd = lupscd.strip().lower()
         if lupscd.startswith("avant "):
             lupscd = datetime.datetime.strptime(lupscd[6:].strip(), "%Y-%m-%d") - datetime.timedelta(days=1)
