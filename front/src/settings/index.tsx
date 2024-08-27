@@ -100,7 +100,7 @@ const Settings = () => {
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
         {isProducer && <DoubleCountingSettings />}
-        {isCPO && <ElecChargePointsSettings companyId={entity.id} />}
+        {/* {isCPO && <ElecChargePointsSettings companyId={entity.id} />} */}
         {isCPO && <ElecMeterReadingsSettings companyId={entity.id} />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>

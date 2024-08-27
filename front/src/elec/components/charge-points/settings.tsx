@@ -14,22 +14,17 @@ import {
   ElecChargePointsSnapshot,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as apiCpo from "elec/api-cpo"
 import Metric from "common/components/metric"
 
-import { useMatch } from "react-router-dom"
 import ChargePointsApplicationsTable from "./table"
 
 const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { isCPO } = entity
-  const matchStatus = useMatch("/org/:entity/:view/*")
-
-  const api = matchStatus?.params.view === "entities" ? apiAdmin : apiCpo
   const portal = usePortal()
 
-  const applicationsResponse = useQuery(api.getChargePointsApplications, {
+  const applicationsResponse = useQuery(apiAdmin.getChargePointsApplications, {
     key: "charge-points-applications",
     params: [entity.id, companyId],
   })
@@ -61,13 +56,13 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   }
 
   function downloadChargePoints() {
-    api.downloadChargePoints(entity.id, companyId)
+    apiAdmin.downloadChargePoints(entity.id, companyId)
   }
 
   const downloadChargePointsApplication = (
     application: ElecChargePointsApplication
   ) => {
-    return api.downloadChargePointsApplicationDetails(
+    return apiAdmin.downloadChargePointsApplicationDetails(
       entity.id,
       companyId,
       application.id
