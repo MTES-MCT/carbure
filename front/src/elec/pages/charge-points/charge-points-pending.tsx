@@ -5,6 +5,7 @@ import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import * as api from "elec/api-charge-points"
+import * as apiCpo from "elec/api-cpo"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
 import { ElecChargePointsApplication } from "elec/types"
@@ -19,9 +20,9 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
-  const applicationsResponse = useQuery(api.getChargePointsApplications, {
+  const applicationsResponse = useQuery(apiCpo.getChargePointsApplications, {
     key: "charge-points-applications",
-    params: [entity.id, year],
+    params: [entity.id, entity.id, year],
   })
 
   const applications = applicationsResponse.result?.data.data ?? []
@@ -29,7 +30,10 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   const downloadChargePointsApplication = (
     application: ElecChargePointsApplication
   ) => {
-    return api.downloadChargePointsApplicationDetails(entity.id, application.id)
+    return apiCpo.downloadChargePointsApplicationDetails(
+      entity.id,
+      application.id
+    )
   }
 
   const showUploadDialog = () => {
