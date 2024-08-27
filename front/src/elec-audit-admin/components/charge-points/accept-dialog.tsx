@@ -81,11 +81,11 @@ export const ChargePointsApplicationAcceptDialog = ({
                 applicationDate: formatDate(application.application_date),
               }}
               count={application.charge_point_count}
-              defaults="<b>Valider l'inscription de <b>{{count}} points de recharge</b> importés le <b>{{applicationDate}}</b> ?"
+              defaults="Valider l'inscription de <b>{{count}} points de recharge</b> importés le <b>{{applicationDate}}</b> ?"
             />
           </p>
           {sample && (
-            <Alert icon={AlertCircle} variant="info" >
+            <Alert icon={AlertCircle} variant="info" multiline>
               <Trans defaults={"L'aménageur <b>{{cpo}}</b> sera notifié et pourra visualiser les points de recharge depuis son espace Carbure."} values={{ cpo: application.cpo.name }} />
             </Alert>
           )}

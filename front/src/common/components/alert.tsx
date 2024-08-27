@@ -13,6 +13,7 @@ export interface AlertProps {
   children?: React.ReactNode | CustomRenderer
   style?: React.CSSProperties
   className?: string
+  multiline?: boolean
 }
 
 export const Alert = ({
@@ -23,6 +24,7 @@ export const Alert = ({
   children,
   className,
   style,
+  multiline,
 }: AlertProps) => {
   const [open, setOpen] = useState(true)
 
@@ -43,7 +45,8 @@ export const Alert = ({
         css.alert,
         className,
         loading && css.loading,
-        variant && css[variant]
+        variant && css[variant],
+        multiline && css.multiline
       )}
     >
       <header>

@@ -81,7 +81,7 @@ export const MeterReadingsApplicationAcceptDialog = ({
         </section>
 
         <section>
-          <Alert variant="info" icon={InfoCircle}>
+          <Alert variant="info" icon={InfoCircle} multiline>
             <Trans
               defaults="<b>{{energyTotal}} kWh</b> seront ajoutés à l'énergie disponible de l'aménageur <b>{{cpoName}}</b> sous forme de certificat de fourniture."
               values={{

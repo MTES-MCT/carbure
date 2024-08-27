@@ -1,16 +1,12 @@
-import useEntity from "carbure/hooks/entity"
-import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
-import { Check, Cross, Download, Message } from "common/components/icons"
-import * as api from "elec-audit-admin/api"
+import { Check, Cross } from "common/components/icons"
 import { ElecChargePointsApplicationDetails } from "elec/types"
 import { useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
-import SampleSummary from "../sample/details-sample-summary"
-import ApplicationSummary from "./details-application-summary"
+import { useTranslation } from "react-i18next"
 import SampleDetailsAuditDoneSection from "../sample/details-sample-audit-done-section"
+import ApplicationSummary from "./details-application-summary"
 
 interface ChargePointsApplicationDetailsAuditDoneProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
