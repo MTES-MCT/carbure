@@ -112,7 +112,7 @@ class Node:
     # find the index of a given node in the children of this node
     def get_child_index(self, node: "Node") -> int:
         for i, child in enumerate(self.children):
-            if type(node.data) == type(child.data) and node.data.pk == child.data.pk:
+            if type(node.data) is type(child.data) and node.data.pk == child.data.pk:
                 return i
         return -1
 
