@@ -5,7 +5,6 @@
   background-color: var(--gray-highlight);
   border: 1px solid var(--gray-medium);
   border-radius: var(--border-radius);
-  /* white-space: nowrap; */
   overflow: hidden;
   text-overflow: ellipsis;
   flex-direction: column;
@@ -18,10 +17,10 @@
 .alert [data-icon] {
   flex-shrink: 0;
   color: var(--gray-dark);
+  float: left;
 }
 
 .alert header {
-  /* display: inline-block; */
   display: flex;
   column-gap: var(--spacing-s);
   align-items: center;
@@ -35,8 +34,6 @@
 
 .info [data-icon] {
   color: var(--blue-medium);
-  /* float: left;
-  margin-right: 3px; */
 }
 
 .success {
@@ -64,4 +61,12 @@
 
 .danger [data-icon] {
   color: var(--red-dark);
+}
+
+.multiline header {
+  display: inline-block;
+}
+
+.multiline [data-icon] {
+  margin-right: 3px;
 }
