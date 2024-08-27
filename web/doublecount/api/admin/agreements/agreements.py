@@ -4,7 +4,6 @@ from typing import List
 import xlsxwriter
 from django import forms
 from django.db.models.query_utils import Q
-from django.http import JsonResponse
 from django.http.response import HttpResponse, JsonResponse
 
 from certificates.models import DoubleCountingRegistration

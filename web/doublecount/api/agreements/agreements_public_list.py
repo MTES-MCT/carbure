@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.db.models.query_utils import Q
-from django.http import JsonResponse
 from django.http.response import JsonResponse
 
 from certificates.models import DoubleCountingRegistration

@@ -16,6 +16,6 @@ def get_my_certificates(request, *args, **kwargs):
     certificates = list(links)
     if production_site_id:
         links = ProductionSiteCertificate.objects.filter(entity=entity, production_site_id=production_site_id)
-        certificates = [l.certificate for l in links]
+        certificates = [link.certificate for link in links]
     serializer = EntityCertificateSerializer(certificates, many=True)
     return JsonResponse({"status": "success", "data": serializer.data})

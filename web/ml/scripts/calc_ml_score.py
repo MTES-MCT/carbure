@@ -32,44 +32,44 @@ def calc_ml_score(year=None, period=None):
     if period:
         lots = lots.filter(period=period)
 
-    for l in tqdm(lots.iterator()):
+    for lot in tqdm(lots.iterator()):
         score = 0
         # eec penalisation
-        if l.feedstock and l.country_of_origin:
-            key = l.feedstock.code + l.country_of_origin.code_pays
+        if lot.feedstock and lot.country_of_origin:
+            key = lot.feedstock.code + lot.country_of_origin.code_pays
             if key in eec:
                 entry = eec[key]
-                if l.eec < 0.8 * min(entry.default_value, entry.average):
+                if lot.eec < 0.8 * min(entry.default_value, entry.average):
                     score += (
-                        (min(entry.default_value, entry.average) - l.eec) / min(entry.default_value, entry.average)
+                        (min(entry.default_value, entry.average) - lot.eec) / min(entry.default_value, entry.average)
                     ) ** 2
-                if l.eec > 1.2 * max(entry.default_value, entry.average):
+                if lot.eec > 1.2 * max(entry.default_value, entry.average):
                     score += (
-                        (l.eec - max(entry.default_value, entry.average)) / max(entry.default_value, entry.average)
+                        (lot.eec - max(entry.default_value, entry.average)) / max(entry.default_value, entry.average)
                     ) ** 2
         # ep penalisation
-        key = l.feedstock.code + l.biofuel.code
+        key = lot.feedstock.code + lot.biofuel.code
         if key in ep:
             entry = ep[key]
-            if l.ep < 0.8 * entry.average:
-                score += ((entry.average - l.ep) / entry.average) ** 2
-            if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
-                score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep) ** 2
+            if lot.ep < 0.8 * entry.average:
+                score += ((entry.average - lot.ep) / entry.average) ** 2
+            if entry.default_value_max_ep > 0 and lot.ep > 1.2 * entry.default_value_max_ep:
+                score += ((lot.ep - entry.default_value_max_ep) / entry.default_value_max_ep) ** 2
 
         # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check  # noqa: E501
-        # if l.feedstock in etd:
-        #    default_value = etd[l.feedstock]
-        #    if l.etd > 2 * default_value and l.etd > 5:
+        # if lot.feedstock in etd:
+        #    default_value = etd[lot.feedstock]
+        #    if lot.etd > 2 * default_value and lot.etd > 5:
         #        score += 1 # louche - ETD trop gros
-        #    if l.country_of_origin:
-        #        if not l.country_of_origin.is_in_europe and l.etd <= default_value:
+        #    if lot.country_of_origin:
+        #        if not lot.country_of_origin.is_in_europe and lot.etd <= default_value:
         #            score += 1 # valeur ETD par defaut sur un lot qui vient de loin
-        #        if l.country_of_origin.is_in_europe and l.etd == default_value:
+        #        if lot.country_of_origin.is_in_europe and lot.etd == default_value:
         #            score += 0.5 # lot ne vient pas de loin, pas d'effort de calcul
-        l.ml_scoring = score
+        lot.ml_scoring = score
         if score > 0:
-            l.ml_control_requested = True
-        l.save()
+            lot.ml_control_requested = True
+        lot.save()
 
 
 def main():

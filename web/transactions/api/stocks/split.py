@@ -180,4 +180,4 @@ def stock_split(request, *args, **kwargs):
         e.save()
     background_bulk_sanity_checks(new_lots, prefetched_data)
     background_bulk_scoring(new_lots, prefetched_data)
-    return JsonResponse({"status": "success", "data": [l.id for l in new_lots]})
+    return JsonResponse({"status": "success", "data": [lot.id for lot in new_lots]})

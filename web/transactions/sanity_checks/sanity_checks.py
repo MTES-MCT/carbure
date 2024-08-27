@@ -126,7 +126,7 @@ def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
 
     # cleanup previous errors
     if not dry_run:
-        GenericError.objects.filter(lot_id__in=[l.id for l in lots]).delete()
+        GenericError.objects.filter(lot_id__in=[lot.id for lot in lots]).delete()
 
     for lot in lots:
         try:
@@ -149,14 +149,14 @@ def bulk_scoring(lots, prefetched_data=None):
         lots = annotate_lots(lots)
 
     # delete scoring entries for the lots
-    lotids = [l.id for l in lots]
+    lotids = [lot.id for lot in lots]
     CarbureLotReliabilityScore.objects.filter(lot_id__in=lotids).delete()
     # recalc score
     clrs = []
     # bulk update lots
     with transaction.atomic():
-        for l in lots:
-            clrs_entries = l.recalc_reliability_score(prefetched_data)
+        for lot in lots:
+            clrs_entries = lot.recalc_reliability_score(prefetched_data)
             clrs += clrs_entries
         CarbureLot.objects.bulk_update(lots, ["data_reliability_score"])
         CarbureLotReliabilityScore.objects.bulk_create(clrs)

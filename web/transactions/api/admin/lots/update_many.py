@@ -181,7 +181,7 @@ def group_errors_by_lot(errors) -> dict[int, list[dict]]:
         if error.lot_id not in errors_by_lot:
             errors_by_lot[error.lot_id] = []
         errors_by_lot[error.lot_id].append(error)
-    for lot_id, errors in errors_by_lot.items():
+    for lot_id in errors_by_lot:
         errors_by_lot[lot_id] = GenericErrorSerializer(errors_by_lot[lot_id], many=True).data
     return errors_by_lot
 
