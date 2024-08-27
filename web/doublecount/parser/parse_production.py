@@ -63,7 +63,7 @@ def parse_production_data(
     other_name: str,  # column to get data like "max_production_capacity" or "estimated_production" or "requested_quota"
     other_index: int,  # index of the column in the excel file
     other_required: bool = False,  # if the other value is required
-    other_alternative_index: int = None,  # alternative index of the other_column in the excel file to allow the first one is zero (ex : outside of france production)
+    other_alternative_index: int = None,  # alternative index of the other_column in the excel file to allow the first one is zero (ex : outside of france production)  # noqa: E501
 ) -> List[Any]:
     data_rows = []
     current_year = -1

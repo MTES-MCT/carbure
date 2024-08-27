@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb
+# test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb  # noqa: E501
 from datetime import date
 
 from django.contrib.auth import get_user_model

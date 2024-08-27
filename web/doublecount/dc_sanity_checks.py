@@ -109,7 +109,7 @@ def check_dc_globally(
     errors: List[DcError] = []
 
     errors += check_sourcing_vs_production(sourcing, production)
-    # errors += check_pome_excess(production) TODO : decommenter ça et les tests POME_GT_2000 quand l'outil sera mis à disposition de producteur, pour l'instant ça empeche Emilien de valider les dossiers rapidement (sinon doit contacter le producteur)
+    # errors += check_pome_excess(production) TODO : decommenter ça et les tests POME_GT_2000 quand l'outil sera mis à disposition de producteur, pour l'instant ça empeche Emilien de valider les dossiers rapidement (sinon doit contacter le producteur)  # noqa: E501
 
     return errors
 
@@ -159,7 +159,7 @@ def check_sourcing_vs_production(
     return errors
 
 
-# check that biofuels made with POME (EFFLUENTS_HUILERIES_PALME_RAFLE) aren't requested in the quota for more than 2000 tonnes / year
+# check that biofuels made with POME (EFFLUENTS_HUILERIES_PALME_RAFLE) aren't requested in the quota for more than 2000 tonnes / year  # noqa: E501
 def check_pome_excess(production: list[DoubleCountingProduction]) -> List[DcError]:
     errors: List[DcError] = []
 

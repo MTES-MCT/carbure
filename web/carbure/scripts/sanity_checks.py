@@ -28,7 +28,7 @@ def cleanup_sanity_checks(year, batch, apply):
     previous_errors = previous_errors.filter(is_blocking=True)
 
     print(
-        f"> Before the modification, there are {previous_errors.count()} errors and {previous_warnings.count()} warnings detected"
+        f"> Before the modification, there are {previous_errors.count()} errors and {previous_warnings.count()} warnings detected"  # noqa: E501
     )
 
     show_error_details(previous_errors, "error")

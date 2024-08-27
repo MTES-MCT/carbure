@@ -166,7 +166,7 @@ class Validator(forms.Form):
     def bulk_validate(SpecializedValidator, items, context=None) -> tuple[list, list]:
         """
         Use this method to validate a list of dicts with the current Validator.
-        Ex: If you defined a LotValidator, you can run `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`
+        Ex: If you defined a LotValidator, you can run `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`  # noqa: E501
         """
 
         if context is None:

@@ -263,10 +263,10 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
                         )
                         lot.volume = c.lot.volume
                         lot.biofuel = c.lot.biocarburant
-                        # print('CHILD ETBE %d ADD %s %s %f to %s' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))
+                        # print('CHILD ETBE %d ADD %s %s %f to %s' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))  # noqa: E501
                         lot.save()
                         # print("Debiting stock %d - volume %f" % (etbe_stock.id, lot.volume))
-                        # print("Previous stock %f - New stock %f" % (etbe_stock.remaining_volume, round(etbe_stock.remaining_volume - lot.volume)))
+                        # print("Previous stock %f - New stock %f" % (etbe_stock.remaining_volume, round(etbe_stock.remaining_volume - lot.volume)))  # noqa: E501
                         etbe_stock.remaining_volume = round(etbe_stock.remaining_volume - lot.volume)
                         etbe_stock.remaining_weight = etbe_stock.get_weight()
                         etbe_stock.remaining_lhv_amount = etbe_stock.get_lhv_amount()
@@ -275,7 +275,7 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
 
         # convert initial stock to ETBE
         stock_transformations = ETBETransformation.objects.filter(previous_stock=tx)
-        # print('Stock transaction %d %s %d is transformed? %s' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, stock_transformations))
+        # print('Stock transaction %d %s %d is transformed? %s' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, stock_transformations))  # noqa: E501
         # print('This stock has been transformed %d times' % (stock_transformations.count()))
         for t in stock_transformations:
             # print('Adjusting volume: remove ethanol %d, add etbe [%d]' % (t.volume_ethanol, t.volume_etbe))
@@ -292,7 +292,7 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
                 transformation = ETBETransformation.objects.get(new_stock=c)
                 child_sum_volume -= c.lot.volume
                 child_sum_volume += transformation.volume_ethanol
-                # print('parent: %d %s %f child %d %s %f of which ethanol %f' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, c.id, c.lot.biocarburant.name, c.lot.volume, transformation.volume_ethanol))
+                # print('parent: %d %s %f child %d %s %f of which ethanol %f' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, c.id, c.lot.biocarburant.name, c.lot.volume, transformation.volume_ethanol))  # noqa: E501
             create_new_tx_and_child(c, stock.id)
             # #print('Child total accumulated sum %d' % (child_sum_volume))
             # lot.pk = None # breaks the link with stock.parent_lot
@@ -312,10 +312,10 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
             # lot.delivery_date = c.delivery_date
             # lot.carbure_delivery_site = c.carbure_delivery_site
             # lot.unknown_delivery_site = c.unknown_delivery_site
-            # lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
+            # lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country  # noqa: E501
             # lot.volume = c.lot.volume
             # lot.biofuel = c.lot.biocarburant
-            # #print('CHILD ADD [tx id %d] %s %s %f to %s. Parent stock initial volume %d - remaining %d' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type, stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination, stock.remaining_volume))
+            # #print('CHILD ADD [tx id %d] %s %s %f to %s. Parent stock initial volume %d - remaining %d' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type, stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination, stock.remaining_volume))  # noqa: E501
             # lot.save()
             # TX_ID_MIGRATED[c.id] = lot.id
 
@@ -324,7 +324,7 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
         diff = remaining - theo_remaining
         if abs(diff) > 0.1:
             print(
-                "%s - %d VOLUME DISCREPANCY!!! Initial stock [%d] Child Sum Volume [%d] Theo remaining [%f] remaining [%f]. %s %s %s %s %s"
+                "%s - %d VOLUME DISCREPANCY!!! Initial stock [%d] Child Sum Volume [%d] Theo remaining [%f] remaining [%f]. %s %s %s %s %s"  # noqa: E501
                 % (
                     stock.carbure_client.name,
                     stock.id,

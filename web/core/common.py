@@ -186,7 +186,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             continue
         # TEMPLATE COLUMNS
         # 'champ_libre',
-        # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
+        # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',  # noqa: E501
         # 'supplier', 'supplier_certificate', ('vendor_certificate') removed,
         # 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
         # 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
@@ -194,9 +194,9 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
         # TARGET COLUMNS
         # free_field, carbure_producer, unknown_producer, carbure_production_site, unknown_production_site
-        # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate
+        # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate  # noqa: E501
         # carbure_supplier, unknown_supplier, supplier_certificate
-        # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country
+        # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country  # noqa: E501
         # biofuel, feedstock, country_of_origin
 
         lot["carbure_stock_id"] = lot_row.get("carbure_stock_id", "").strip()

@@ -49,7 +49,7 @@ def send_email_to_user(entity, depot_name, user):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
         subject="[CarbuRe][Demande d’ajout de dépôt enregistrée]",
@@ -78,7 +78,7 @@ def send_email_to_dgec(entity, depot_name, user):
 
     Bien à vous,
     CarbuRe
-    """
+    """  # noqa: E501
     send_mail(
         subject="[CarbuRe][Nouvelle demande d’ajout de dépôt enregistrée]",
         message=text_message,

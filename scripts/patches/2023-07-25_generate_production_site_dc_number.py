@@ -15,7 +15,7 @@ from core.models import ProductionSite
 def generate_dc_number():
     # recuperer tous les sites de productions
     production_sites = ProductionSite.objects.all()
-    # pour chaque site de production, recuperer le numéro d'agrement s'il existe (dc reference) et créer le dc_number à partir de l'int apres FR_ et avant l'année
+    # pour chaque site de production, recuperer le numéro d'agrement s'il existe (dc reference) et créer le dc_number à partir de l'int apres FR_ et avant l'année  # noqa: E501
     for production_site in production_sites:
         # si le site de prod est null ou vide
         if not production_site.dc_reference:

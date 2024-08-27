@@ -211,7 +211,7 @@ class TransportDataGouv:
 
         # clear the mid and prm columns if they contain data that is too short
         # merged_data["mid_id"] = merged_data["mid_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
-        # merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
+        # merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)  # noqa: E501
 
         # find which rows have all data defined for a first meter reading
         merged_data["has_reading"] = (merged_data["current_type"] == "AC") | (

@@ -31,7 +31,7 @@ ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"
 DESTINATION_FOLDER = "/tmp"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"  # noqa: E501
 }
 PAGELENGTH = 3000
 

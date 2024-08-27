@@ -42,7 +42,7 @@ def enable_entity(entity):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
         subject=subject,

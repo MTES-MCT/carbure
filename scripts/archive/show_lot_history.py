@@ -12,7 +12,7 @@ from core.models import *
 
 def pretty_print(tx):
     print(
-        "Tx [%d] Parent Tx [%s] Lot [%d] Parent Lot [%s] %s %s %d (remaining %d) From %s To %s [Period %s - %s] Forwarded: %s Stock: %s"
+        "Tx [%d] Parent Tx [%s] Lot [%d] Parent Lot [%s] %s %s %d (remaining %d) From %s To %s [Period %s - %s] Forwarded: %s Stock: %s"  # noqa: E501
         % (
             tx.id,
             tx.parent_tx_id,

@@ -69,7 +69,7 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
     i = 0
     for row in reader:
         i += 1
-        # valid: Nom,Coordonnées,Pays,Type de certification,Numéro de Certificat 2BS,Date de début de validité du certificat,Date de fin de validité du certificat,Certificat
+        # valid: Nom,Coordonnées,Pays,Type de certification,Numéro de Certificat 2BS,Date de début de validité du certificat,Date de fin de validité du certificat,Certificat  # noqa: E501
         # create certificate
         try:
             vf = row[DBS_VALID_FROM_KEY].split("/")

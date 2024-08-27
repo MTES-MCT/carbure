@@ -1,4 +1,4 @@
-# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb
+# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb  # noqa: E501
 
 import datetime
 

@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
+# test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb  # noqa: E501
 import json
 import os
 from datetime import date

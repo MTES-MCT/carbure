@@ -132,7 +132,7 @@ class ElecCharginPointsTest(TestCase):
                         "line": 38,
                         "meta": {
                             "charge_point_id": [
-                                "Le point de recharge FRBBBB222205 n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                                "Le point de recharge FRBBBB222205 n'est pas listé dans les données consolidées de transport.data.gouv.fr"  # noqa: E501
                             ]
                         },
                     },
@@ -141,7 +141,7 @@ class ElecCharginPointsTest(TestCase):
                         "line": 39,
                         "meta": {
                             "charge_point_id": [
-                                "Le point de recharge FRBBBB222206 n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                                "Le point de recharge FRBBBB222206 n'est pas listé dans les données consolidées de transport.data.gouv.fr"  # noqa: E501
                             ]
                         },
                     },
@@ -150,7 +150,7 @@ class ElecCharginPointsTest(TestCase):
                         "line": 40,
                         "meta": {
                             "charge_point_id": [
-                                "Le point de recharge FRBBBB222207 n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                                "Le point de recharge FRBBBB222207 n'est pas listé dans les données consolidées de transport.data.gouv.fr"  # noqa: E501
                             ]
                         },
                     },
