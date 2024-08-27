@@ -1,4 +1,4 @@
-# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb
+# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb  # noqa: E501
 
 import datetime
 import os
@@ -179,7 +179,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
     def test_import_charge_point_audit_report_excel(self):
         # 48.7566	2.2522	ABCD	ABCD01	[MID] 123-456	[MID] 123-456	OUI	OUI	AC	1/6/24	1000,1234
         # 48.8566	2.3522	ABCD	ABCD02	[MID] 123-456	[MID] 123-457	OUI	NON	CC	2/6/24	1002
-        # 48.9566	2.4522	ABCD	ABCD03	[MID] 123-456							                        CHARGE POINT NOT FOUND
+        # 48.9566	2.4522	ABCD	ABCD03	[MID] 123-456							                        CHARGE POINT NOT FOUND  # noqa: E501
         filepath = f"{os.environ['CARBURE_HOME']}/web/elec/fixtures/charge_point_audit_sample.xlsx"
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("charge_point_audit_sample.xlsx", reader.read())

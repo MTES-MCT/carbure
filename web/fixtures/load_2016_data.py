@@ -98,7 +98,7 @@ for i, row in enumerate(lots_sheet):
         lots.append(lot)
 
 for i, lot in enumerate(lots):
-    # {'Opérateur': 'UDP', 'producer': None, 'production_site': None, 'production_site_country': 'NL', 'production_site_reference': 'EU-ISCC-Cert-DE100-17452019', 'production_site_commissioning_date': datetime.datetime(2008, 11, 29, 0, 0), 'double_counting_registration': None, 'vendor': None, 'volume': 2242.0, 'biocarburant_code': 'EMHV', 'matiere_premiere_code': 'COLZA', 'pays_origine_code': 'UA', 'eec': None, 'el': None, 'ep': 38.9, 'etd': 1.0, 'eu': None, 'esca': None, 'eccs': None, 'eccr': None, 'eee': None, 'dae': '19BEK4AP7G7V00EGNBHL4', 'champ_libre': None, 'delivery_date': datetime.datetime(2019, 12, 18, 0, 0), 'delivery_site': None, 'Total des émissions de GES': 39.9}
+    # {'Opérateur': 'UDP', 'producer': None, 'production_site': None, 'production_site_country': 'NL', 'production_site_reference': 'EU-ISCC-Cert-DE100-17452019', 'production_site_commissioning_date': datetime.datetime(2008, 11, 29, 0, 0), 'double_counting_registration': None, 'vendor': None, 'volume': 2242.0, 'biocarburant_code': 'EMHV', 'matiere_premiere_code': 'COLZA', 'pays_origine_code': 'UA', 'eec': None, 'el': None, 'ep': 38.9, 'etd': 1.0, 'eu': None, 'esca': None, 'eccs': None, 'eccr': None, 'eee': None, 'dae': '19BEK4AP7G7V00EGNBHL4', 'champ_libre': None, 'delivery_date': datetime.datetime(2019, 12, 18, 0, 0), 'delivery_site': None, 'Total des émissions de GES': 39.9}  # noqa: E501
     if lot["dae"] is None:
         dae = "UNKNOWN"
     dae = str(lot["dae"])

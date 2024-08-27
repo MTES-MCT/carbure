@@ -109,7 +109,7 @@ def send_email_to_cpo(application: ElecMeterReadingApplication):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
         subject=f"[CarbuRe] Relevés {quarter} validés",

@@ -37,7 +37,7 @@ def handle_complex_stock(tx, child_tx):
         if tx.lot.biocarburant.code == "ETH":
             return
         print(
-            "Parent remaining_volume != initial volume - child volume: Lot initial volume [%f] Sum of child [%f] Remaining [%f] Theo Remaining [%f] Diff [%f]"
+            "Parent remaining_volume != initial volume - child volume: Lot initial volume [%f] Sum of child [%f] Remaining [%f] Theo Remaining [%f] Diff [%f]"  # noqa: E501
             % (tx.lot.volume, sum_volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, diff)
         )
         print(

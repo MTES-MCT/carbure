@@ -31,7 +31,7 @@ class ExcelChargePointError:
 
 def import_charge_point_excel(excel_file: UploadedFile):
     try:
-        # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
+        # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only  # noqa: E501
         original_charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
         merged_charge_point_data = TransportDataGouv.merge_charge_point_data(original_charge_point_data)
@@ -141,7 +141,7 @@ class ExcelChargePointValidator(Validator):
             self.add_error(
                 "charge_point_id",
                 _(
-                    "Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                    "Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr"  # noqa: E501
                 ).format(charge_point_id=charge_point_id),
             )
         else:
@@ -150,7 +150,7 @@ class ExcelChargePointValidator(Validator):
                     self.add_error(
                         "measure_reference_point_id",
                         _(
-                            "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu."
+                            "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu."  # noqa: E501
                         ),
                     )
             else:

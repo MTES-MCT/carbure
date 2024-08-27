@@ -1,4 +1,4 @@
-# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb
+# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb  # noqa: E501
 from datetime import date
 
 from django.test import TestCase

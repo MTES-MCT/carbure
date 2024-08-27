@@ -14,7 +14,7 @@ transformed_in = [e.previous_stock_id for e in transformations]
 
 def pretty_print(tx):
     print(
-        "Tx [%d] Parent Tx [%s] Lot [%d] Parent Lot [%s] %s %s %d (remaining %d) From %s To %s [Period %s - %s] Forwarded: %s Stock: %s"
+        "Tx [%d] Parent Tx [%s] Lot [%d] Parent Lot [%s] %s %s %d (remaining %d) From %s To %s [Period %s - %s] Forwarded: %s Stock: %s"  # noqa: E501
         % (
             tx.id,
             tx.parent_tx_id,
@@ -88,7 +88,7 @@ def handle_complex_stock(tx, child_tx):
         )
         print("Tx id [%d] Lot Id [%d]" % (tx.id, tx.lot.id))
         print(
-            "Parent remaining_volume != initial volume - child volume: Lot initial volume [%f] Sum of child [%f] Remaining [%f] Theo Remaining [%f] Diff [%f]"
+            "Parent remaining_volume != initial volume - child volume: Lot initial volume [%f] Sum of child [%f] Remaining [%f] Theo Remaining [%f] Diff [%f]"  # noqa: E501
             % (tx.lot.volume, sum_volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, diff)
         )
         print(

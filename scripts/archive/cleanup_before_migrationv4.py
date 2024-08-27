@@ -14,7 +14,7 @@ def cleanup_tables():
     cursor = connection.cursor()
     sql1 = "SET FOREIGN_KEY_CHECKS = 0;"
     cursor.execute(sql1)
-    sql2 = "DROP TABLE IF EXISTS carbure_certificates, carbure_entity_certificates, carbure_lots, carbure_lots_comments, carbure_lots_events, carbure_notifications, carbure_stock, carbure_stock_events, carbure_stock_transformations;"
+    sql2 = "DROP TABLE IF EXISTS carbure_certificates, carbure_entity_certificates, carbure_lots, carbure_lots_comments, carbure_lots_events, carbure_notifications, carbure_stock, carbure_stock_events, carbure_stock_transformations;"  # noqa: E501
     cursor.execute(sql2)
     sql3 = "SET FOREIGN_KEY_CHECKS = 1;"
     cursor.execute(sql3)

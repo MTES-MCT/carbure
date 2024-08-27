@@ -100,8 +100,8 @@ def fill_production_info(lot, data, entity, prefetched_data):
     errors = []
     # possibilities:
     # Case 1: I have a parent_lot or parent_stock -> copy production info
-    # Case 2: I am a producer and this is my own production (unknown_producer is None) -> I am the producer, ensure production_site is known
-    # Case 3: all other cases (unknown producer / unknown production site) -> fill unknown_producer and unknown_production_site
+    # Case 2: I am a producer and this is my own production (unknown_producer is None) -> I am the producer, ensure production_site is known  # noqa: E501
+    # Case 3: all other cases (unknown producer / unknown production site) -> fill unknown_producer and unknown_production_site  # noqa: E501
 
     # CASE 1
     if lot.parent_lot or lot.parent_stock:
@@ -140,7 +140,7 @@ def fill_production_info(lot, data, entity, prefetched_data):
                 lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else None
             )
 
-            # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production
+            # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production  # noqa: E501
             from doublecount.helpers import get_lot_dc_agreement
 
             dc_agreement = get_lot_dc_agreement(lot.feedstock, lot.delivery_date, lot.carbure_production_site)
@@ -395,7 +395,7 @@ def fill_supplier_info(lot, data, entity):
 def fill_vendor_data(lot, data, entity):
     # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING - OVERRIDE SOME FIELDS
     if entity != lot.carbure_supplier and entity != lot.carbure_client:
-        lot.carbure_vendor = entity  # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
+        lot.carbure_vendor = entity  # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)  # noqa: E501
         lot.vendor_certificate = data.get("vendor_certificate", entity.default_certificate)
     else:
         lot.vendor_certificate = None

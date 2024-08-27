@@ -11,7 +11,7 @@ from core.models import *
 
 def pretty_print_oldlot(tx):
     print(
-        "OLD txid {id} (parent_tx_id {parent_tx_id}) lot_id {lot_id} (parent lot_id {parent_lot_id}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} [Supplier {supplier}] [Client {client}]".format(
+        "OLD txid {id} (parent_tx_id {parent_tx_id}) lot_id {lot_id} (parent lot_id {parent_lot_id}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} [Supplier {supplier}] [Client {client}]".format(  # noqa: E501
             id=tx.id,
             parent_tx_id=tx.parent_tx.id if tx.parent_tx else None,
             lot_id=tx.lot.id,
@@ -31,7 +31,7 @@ def pretty_print_oldlot(tx):
 
 def pretty_print_lot(lot):
     print(
-        "NEW [added by {added_by}] id {id} (parent lot {parent_lot}) (parent_stock {parent_stock}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} {delivery_type} {status} Supplier {supplier} Client {client}".format(
+        "NEW [added by {added_by}] id {id} (parent lot {parent_lot}) (parent_stock {parent_stock}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} {delivery_type} {status} Supplier {supplier} Client {client}".format(  # noqa: E501
             added_by=lot.added_by.name,
             id=lot.id,
             parent_lot=lot.parent_lot.id if lot.parent_lot else None,
@@ -91,7 +91,7 @@ def compare():
     #         new_lot = CarbureLot.objects.get(transport_document_reference=s.dae, volume=s.lot.volume)
     #         if new_lot.lot_status == CarbureLot.REJECTED:
     #             continue
-    #         new_stock = CarbureStock.objects.get(parent_lot__transport_document_reference=s.dae, parent_lot__volume=s.lot.volume)
+    #         new_stock = CarbureStock.objects.get(parent_lot__transport_document_reference=s.dae, parent_lot__volume=s.lot.volume)  # noqa: E501
     #         #pretty_print_oldlot(s)
     #         #pretty_print_stock(new_stock)
     #     except Exception as e:

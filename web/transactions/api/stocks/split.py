@@ -30,8 +30,8 @@ def stock_split(request, *args, **kwargs):
 
     try:
         unserialized = json.loads(payload)
-        # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'
-        # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,
+        # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'  # noqa: E501
+        # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,  # noqa: E501
         # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None, supplier_certificate: "MON_CERTIFICAT"}]
     except Exception:
         return JsonResponse({"status": "error", "message": "Cannot parse payload into JSON"}, status=400)

@@ -56,7 +56,7 @@ def calc_ml_score(year=None, period=None):
             if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
                 score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep) ** 2
 
-        # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check
+        # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check  # noqa: E501
         # if l.feedstock in etd:
         #    default_value = etd[l.feedstock]
         #    if l.etd > 2 * default_value and l.etd > 5:

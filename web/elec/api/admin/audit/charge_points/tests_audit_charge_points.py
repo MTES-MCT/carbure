@@ -1,4 +1,4 @@
-# test with : python web/manage.py test elec.api.admin.audit.charge_points.tests_audit_charge_points.ElecAdminAuditChargePointsTest --keepdb
+# test with : python web/manage.py test elec.api.admin.audit.charge_points.tests_audit_charge_points.ElecAdminAuditChargePointsTest --keepdb  # noqa: E501
 
 import datetime
 

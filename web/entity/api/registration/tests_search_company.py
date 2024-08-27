@@ -1,4 +1,4 @@
-# test with : python web/manage.py test entity.api.registration.tests_search_company.EntityRegistrationSearchCompanyTest --keepdb
+# test with : python web/manage.py test entity.api.registration.tests_search_company.EntityRegistrationSearchCompanyTest --keepdb  # noqa: E501
 
 from django.test import TestCase
 from django.urls import reverse

@@ -128,7 +128,7 @@ def send_email_to_dgec(audit_sample: ElecAuditSample):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
         subject="[CarbuRe] Nouveau résultat d'audit élec disponible",

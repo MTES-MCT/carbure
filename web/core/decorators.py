@@ -106,7 +106,7 @@ class AdminRightsError:
     USER_HAS_NO_RIGHT = "USER_HAS_NO_RIGHT"
 
 
-# TODO sur les endpoints accessibles par des external admin, il faut en plus verifier qu'il n'agissent que sur les types d'entités autorisées (ex : DGAC sur companies aeriennes uniquement, cf get_entities)
+# TODO sur les endpoints accessibles par des external admin, il faut en plus verifier qu'il n'agissent que sur les types d'entités autorisées (ex : DGAC sur companies aeriennes uniquement, cf get_entities)  # noqa: E501
 def check_admin_rights(allow_external=None, allow_role=None):
     if allow_external is None:
         allow_external = []

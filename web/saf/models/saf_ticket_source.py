@@ -123,7 +123,7 @@ def create_ticket_sources_from_lots(lots):
             }
         )
 
-    # update ticket sources that were already created for some of the given lots (happens when a lot was declared then undeclared then declared again)
+    # update ticket sources that were already created for some of the given lots (happens when a lot was declared then undeclared then declared again)  # noqa: E501
     # and create new ones for lots that were not already declared
     updated, created = bulk_update_or_create(SafTicketSource, "parent_lot_id", ticket_source_data)
 

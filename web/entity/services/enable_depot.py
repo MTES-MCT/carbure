@@ -41,7 +41,7 @@ def send_email_to_admin_users(entity, depot, admins):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
         subject=subject,

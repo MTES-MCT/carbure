@@ -12,7 +12,7 @@ from core.models import *
 
 def pretty_print_stock(stock):
     print(
-        "STOCK {period} [{client}] {id} {carbure_id} {initial_volume} remaining {remaining_volume} {biofuel} {feedstock}".format(
+        "STOCK {period} [{client}] {id} {carbure_id} {initial_volume} remaining {remaining_volume} {biofuel} {feedstock}".format(  # noqa: E501
             period=stock.parent_lot.period
             if stock.parent_lot
             else stock.parent_transformation.source_stock.parent_lot.period,
@@ -29,7 +29,7 @@ def pretty_print_stock(stock):
 
 def pretty_print_lot(lot):
     print(
-        "LOT [added by {added_by}] id {id} (parent lot {parent_lot}) (parent_stock {parent_stock}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} {delivery_type} {status} [Supplier {supplier}] [Client {client}]".format(
+        "LOT [added by {added_by}] id {id} (parent lot {parent_lot}) (parent_stock {parent_stock}) {carbure_id} {period} {dae} {feedstock} {biofuel} {volume} {delivery_date} {delivery_type} {status} [Supplier {supplier}] [Client {client}]".format(  # noqa: E501
             added_by=lot.added_by.name,
             id=lot.id,
             parent_lot=lot.parent_lot.id if lot.parent_lot else None,
