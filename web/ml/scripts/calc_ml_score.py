@@ -8,8 +8,8 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot
-from transactions.sanity_checks.helpers import get_prefetched_data
+from core.models import CarbureLot  # noqa: E402
+from transactions.sanity_checks.helpers import get_prefetched_data  # noqa: E402
 
 DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540)  # approx 18 months
 

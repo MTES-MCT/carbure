@@ -17,8 +17,8 @@ from pandas._typing import Scalar
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import GenericCertificate
-from core.utils import bulk_update_or_create
+from core.models import GenericCertificate  # noqa: E402
+from core.utils import bulk_update_or_create  # noqa: E402
 
 today = datetime.date.today()
 REDCERT_CERT_PAGE = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"
@@ -161,7 +161,7 @@ def get_sheet_data(sheet: Worksheet, convert_float: bool) -> List[List[Scalar]]:
 
 
 def convert_cell(cell: Cell, convert_float: bool) -> Scalar:
-    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
+    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC  # noqa: E402
 
     if cell.is_date:
         return cell.value

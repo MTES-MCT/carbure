@@ -8,9 +8,9 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
-from elec.models.elec_charge_point import ElecChargePoint
-from elec.services.transport_data_gouv import TransportDataGouv
+from core.utils import bulk_update_or_create  # noqa: E402
+from elec.models.elec_charge_point import ElecChargePoint  # noqa: E402
+from elec.services.transport_data_gouv import TransportDataGouv  # noqa: E402
 
 
 @transaction.atomic

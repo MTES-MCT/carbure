@@ -7,7 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
-from core.models import *
+from core.models import *  # noqa: E402
 
 
 def pretty_print_stock(stock):

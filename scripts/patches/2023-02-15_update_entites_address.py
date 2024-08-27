@@ -5,9 +5,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.db import transaction
+from django.db import transaction  # noqa: E402
 
-from core.models import Entity
+from core.models import Entity  # noqa: E402
 
 
 @transaction.atomic

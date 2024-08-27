@@ -8,8 +8,8 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.excel import export_to_excel
-from elec.models.elec_charge_point import ElecChargePoint
+from core.excel import export_to_excel  # noqa: E402
+from elec.models.elec_charge_point import ElecChargePoint  # noqa: E402
 
 
 @transaction.atomic

@@ -7,8 +7,8 @@ from django.db.models.aggregates import StdDev
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, MatierePremiere
-from ml.models import EECStats, EPStats, ETDStats
+from core.models import CarbureLot, MatierePremiere  # noqa: E402
+from ml.models import EECStats, EPStats, ETDStats  # noqa: E402
 
 
 def load_eec_data():

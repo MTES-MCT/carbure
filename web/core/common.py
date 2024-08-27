@@ -104,7 +104,7 @@ def calculate_ghg(lot, tx=None):
 
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
-    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
+    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC  # noqa: E402
 
     if cell.is_date:
         return cell.value

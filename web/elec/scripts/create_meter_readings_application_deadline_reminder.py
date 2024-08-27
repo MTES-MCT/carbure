@@ -6,9 +6,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureNotification
-from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.services.meter_readings_application_quarter import (
+from core.models import CarbureNotification  # noqa: E402
+from elec.repositories.meter_reading_repository import MeterReadingRepository  # noqa: E402
+from elec.services.meter_readings_application_quarter import (  # noqa: E402
     get_application_quarter,
 )
 

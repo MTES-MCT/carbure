@@ -9,8 +9,8 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot
-from core.traceability import get_traceability_nodes
+from core.models import CarbureLot  # noqa: E402
+from core.traceability import get_traceability_nodes  # noqa: E402
 
 
 def check_integrity(year, batch=1000):

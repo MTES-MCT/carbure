@@ -74,8 +74,8 @@ class StockNode(Node):
         return self.data.carbure_client_id
 
     def get_parent(self):
-        from .lot import LotNode
-        from .stock_transform import StockTransformNode
+        from .lot import LotNode  # noqa: E402
+        from .stock_transform import StockTransformNode  # noqa: E402
 
         if self.data.parent_lot:
             return LotNode(self.data.parent_lot, child=self)
@@ -83,8 +83,8 @@ class StockNode(Node):
             return StockTransformNode(self.data.parent_transformation, child=self)
 
     def get_children(self):
-        from .lot import LotNode
-        from .stock_transform import StockTransformNode
+        from .lot import LotNode  # noqa: E402
+        from .stock_transform import StockTransformNode  # noqa: E402
 
         children_lot = [LotNode(lot, parent=self) for lot in self.data.carburelot_set.exclude(lot_status=CarbureLot.DELETED)]
         children_stock_transform = [StockTransformNode(stock, parent=self) for stock in self.data.source_stock.all()]

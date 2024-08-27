@@ -9,12 +9,12 @@ from transactions.sanity_checks.helpers import get_prefetched_data
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.core.paginator import Paginator
-from django.db import transaction
-from tqdm import tqdm
+from django.core.paginator import Paginator  # noqa: E402
+from django.db import transaction  # noqa: E402
+from tqdm import tqdm  # noqa: E402
 
-from core.models import CarbureLot, GenericError
-from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
+from core.models import CarbureLot, GenericError  # noqa: E402
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks  # noqa: E402
 
 
 @transaction.atomic

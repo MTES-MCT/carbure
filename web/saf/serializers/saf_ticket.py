@@ -42,7 +42,7 @@ class SafTicketSerializer(serializers.ModelSerializer):
 
 
 class SafTicketDetailsSerializer(serializers.ModelSerializer):
-    from .saf_ticket_source import SafTicketSourcePreviewSerializer
+    from .saf_ticket_source import SafTicketSourcePreviewSerializer  # noqa: E402
 
     class Meta:
         model = SafTicket

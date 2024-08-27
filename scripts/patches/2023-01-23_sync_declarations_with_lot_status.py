@@ -5,11 +5,11 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.core.paginator import Paginator
-from django.db import transaction
-from tqdm import tqdm
+from django.core.paginator import Paginator  # noqa: E402
+from django.db import transaction  # noqa: E402
+from tqdm import tqdm  # noqa: E402
 
-from core.models import CarbureLot, SustainabilityDeclaration
+from core.models import CarbureLot, SustainabilityDeclaration  # noqa: E402
 
 
 @transaction.atomic

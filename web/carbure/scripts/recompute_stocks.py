@@ -9,7 +9,7 @@ from django.db.models import Sum
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent
+from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent  # noqa: E402
 
 
 @transaction.atomic

@@ -141,7 +141,7 @@ def fill_production_info(lot, data, entity, prefetched_data):
             )
 
             # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production  # noqa: E501
-            from doublecount.helpers import get_lot_dc_agreement
+            from doublecount.helpers import get_lot_dc_agreement  # noqa: E402
 
             dc_agreement = get_lot_dc_agreement(lot.feedstock, lot.delivery_date, lot.carbure_production_site)
             if dc_agreement:
