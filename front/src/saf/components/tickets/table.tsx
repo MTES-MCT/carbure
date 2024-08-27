@@ -1,23 +1,18 @@
-import useEntity from "carbure/hooks/entity"
 import Pagination from "common/components/pagination"
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
+import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
-import {
-  SafStates,
-  SafTicket,
-  SafTicketsResponse,
-  SafTicketStatus,
-} from "saf/types"
+import { SafTicket, SafTicketsResponse, SafTicketStatus } from "saf/types"
 import TicketTag from "./tag"
 import NoResult from "common/components/no-result"
+import { CBQueryStates } from "common/hooks/query-builder"
 
 export interface TicketsTableProps {
   loading: boolean
-  state: SafStates
+  state: CBQueryStates // The good type is SafStates, but i can't fix an error type with string and enums
   actions: any
   status: SafTicketStatus
   ticketsData?: SafTicketsResponse

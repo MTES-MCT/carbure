@@ -8,8 +8,6 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
-import { useQueryParamsStore } from "saf/hooks/query-params-store"
-import { useSafQuery } from "saf/hooks/saf-query"
 import {
   SafFilter,
   SafOperatorSnapshot,
@@ -27,6 +25,10 @@ import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
 import { ExportButton } from "../export"
 import NoResult from "common/components/no-result"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 
 export interface TicketSourcesProps {
   year: number
@@ -38,9 +40,9 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
 
-  const query = useSafQuery(state)
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
+  const query = useCBQueryBuilder(state)
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",

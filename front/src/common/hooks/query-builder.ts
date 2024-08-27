@@ -1,11 +1,9 @@
 import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
-import { ElecAdminProvisionCertificateFilter } from "elec-admin/types"
 import { useMemo } from "react"
 import useStore from "./store"
 import { useSearchParams } from "react-router-dom"
-
 
 /* Types */
 export type CBSnapshot = Record<string, number>
@@ -24,6 +22,7 @@ export interface CBQueryStates {
   filters: CBFilterSelection
   search?: string
   status: string
+  type?: string // Extra info used when we have to call the same endpoint for two different views (See saf operator page)
   selection: number[]
   page: number
   limit?: number
@@ -32,16 +31,16 @@ export interface CBQueryStates {
 }
 
 export interface CBQueryParams {
-  entity_id: number;
-  year: number;
-  status: string;
-  search?: string;
-  from_idx: number;
-  limit?: number;
-  sort_by?: string;
-  order?: 'asc' | 'desc';
+  entity_id: number
+  year: number
+  status: string
+  type?: string
+  search?: string
+  from_idx: number
+  limit?: number
+  sort_by?: string
+  order?: "asc" | "desc"
 }
-
 
 /* Hooks */
 
@@ -50,38 +49,37 @@ export function useCBQueryBuilder(params: CBQueryStates): CBQueryParams {
     entity,
     year,
     status,
+    type,
     search,
     page = 0,
     limit,
     order,
     filters,
-  } = params;
+  } = params
 
   return useMemo<CBQueryParams>(
     () => ({
       entity_id: entity.id,
       year,
       status,
+      type,
       search,
       from_idx: page * (limit ?? 0),
       limit: limit || undefined,
       sort_by: order?.column,
       order: order?.direction,
       ...filters,
-    } as CBQueryParams),
-    [entity.id, status, search, limit, order, filters, page, year]
+    }),
+    [entity.id, status, type, search, limit, order, filters, page, year]
   )
 }
-
-
-
-
 
 export function useCBQueryParamsStore(
   entity: Entity,
   year: number,
   status: string,
   snapshot?: CBSnapshot,
+  type?: string
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
@@ -92,6 +90,7 @@ export function useCBQueryParamsStore(
       year,
       snapshot,
       status,
+      type,
       filters: filtersParams,
       // search: undefined,
       // invalid: false,
@@ -140,14 +139,14 @@ export function useCBQueryParamsStore(
         }
       },
 
-      // setType: (type: ElecCPOQ) => {
-      //   return {
-      //     type,
-      //     filters: filtersParams,
-      //     selection: [],
-      //     page: 0,
-      //   }
-      // },
+      setType: (type: string) => {
+        return {
+          type,
+          filters: filtersParams,
+          selection: [],
+          page: 0,
+        }
+      },
 
       setFilters: (filters: CBFilterSelection) => {
         setTimeout(() => {
@@ -190,7 +189,6 @@ export function useCBQueryParamsStore(
     }
   )
 
-
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
     actions.setEntity(entity)
@@ -210,12 +208,12 @@ export function useCBQueryParamsStore(
     actions.setSnapshot(snapshot)
   }
 
+  if (type && state.type !== type) {
+    actions.setType(type)
+  }
+
   return [state, actions] as [typeof state, typeof actions]
 }
-
-
-
-
 
 function useFilterSearchParams() {
   const [filtersParams, setFiltersParams] = useSearchParams()
