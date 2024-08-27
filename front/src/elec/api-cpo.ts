@@ -9,14 +9,14 @@ import {
   ElecMeterReadingsApplicationCheckInfo,
   ElecMeterReadingsApplicationsResponse,
   ElecProvisionCertificatesDetails,
-  ElecTransferCertificatesDetails
+  ElecTransferCertificatesDetails,
 } from "./types"
 import {
   ElecCPOProvisionCertificateQuery,
   ElecCPOSnapshot,
   ElecProvisionCertificatesData,
   ElecTransferCertificateQuery,
-  ElecTransferCertificatesData
+  ElecTransferCertificatesData,
 } from "./types-cpo"
 
 export function getYears(entity_id: number) {
