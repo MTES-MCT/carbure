@@ -117,6 +117,13 @@ export const DeliverySiteForm = ({
         readOnly={isReadOnly}
       />
 
+      <AutoCompleteCountries
+        label={t("Pays")}
+        {...bind("country")}
+        required
+        readOnly={isReadOnly}
+      />
+
       <RadioGroup
         label={t("Type de dépôt")}
         options={depotTypeOptions}
@@ -180,12 +187,7 @@ export const DeliverySiteForm = ({
         />
       </Row>
 
-      <AutoCompleteCountries
-        label={t("Pays")}
-        {...bind("country")}
-        required
-        readOnly={isReadOnly}
-      />
+
 
       {entity.entity_type === EntityType.Operator &&
         deliverySite &&
