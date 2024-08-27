@@ -74,6 +74,7 @@ export const AddUserDialog = ({
               icon={Mail}
               type="email"
               label={t("Adresse email")}
+              hideError={false}
               {...bind("email")}
             />
             <RadioGroup
