@@ -223,6 +223,7 @@ export enum NotificationType {
 export enum DepotType {
   EFS = "EFS",
   EFPE = "EFPE",
+  EFCA = "EFCA",
   Other = "OTHER",
   BiofuelDepot = "BIOFUEL DEPOT",
   OilDepot = "OIL DEPOT",
