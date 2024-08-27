@@ -123,7 +123,9 @@ def get_dc_number(certificate_id: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fix lots that have the wrong dc agreement selected")
-    parser.add_argument("--from-year", dest="from_year", action="store", default=2021, help="From which year to start checking")  # fmt:skip
+    parser.add_argument(
+        "--from-year", dest="from_year", action="store", default=2021, help="From which year to start checking"
+    )
     parser.add_argument("--batch", dest="batch", action="store", default=1000, help="How many lots processed at once")
     args = parser.parse_args()
     pick_right_dc_agreements(args.from_year, args.batch)

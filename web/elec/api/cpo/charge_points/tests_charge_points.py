@@ -20,7 +20,7 @@ class ElecCharginPointsTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         # mock call to TransportDataGouv not to depend on the dynamic CSV and have predictable "allowed" charge points
-        cls.mocked_download_csv = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv").start()  # fmt:skip
+        cls.mocked_download_csv = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv").start()
         cls.mocked_download_csv.return_value = "%s/web/elec/fixtures/transport_data_gouv.csv" % (os.environ["CARBURE_HOME"])
 
     @classmethod

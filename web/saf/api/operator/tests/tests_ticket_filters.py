@@ -27,9 +27,30 @@ class SafTicketFiltersTest(TestCase):
 
         SafTicket.objects.all().delete()
 
-        SafTicketFactory.create(year=2022, assignment_period=202201, supplier_id=self.entity.id, client_id=self.client1.id, feedstock=self.hau, status=SafTicket.PENDING)  # fmt:skip
-        SafTicketFactory.create(year=2022, assignment_period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hau, status=SafTicket.ACCEPTED)  # fmt:skip
-        SafTicketFactory.create(year=2022, assignment_period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hga, status=SafTicket.PENDING)  # fmt:skip
+        SafTicketFactory.create(
+            year=2022,
+            assignment_period=202201,
+            supplier_id=self.entity.id,
+            client_id=self.client1.id,
+            feedstock=self.hau,
+            status=SafTicket.PENDING,
+        )
+        SafTicketFactory.create(
+            year=2022,
+            assignment_period=202202,
+            supplier_id=self.entity.id,
+            client_id=self.client2.id,
+            feedstock=self.hau,
+            status=SafTicket.ACCEPTED,
+        )
+        SafTicketFactory.create(
+            year=2022,
+            assignment_period=202202,
+            supplier_id=self.entity.id,
+            client_id=self.client2.id,
+            feedstock=self.hga,
+            status=SafTicket.PENDING,
+        )
 
     def test_empty_ticket_filters(self):
         query = {

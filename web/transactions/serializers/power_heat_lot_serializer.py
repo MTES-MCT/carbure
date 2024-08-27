@@ -65,7 +65,9 @@ class CarbureLotPowerOrHeatSerializer(serializers.ModelSerializer):
         C_elec = 1  # Fraction de l'exergie dans l'électricité (100%)
 
         R_chaleur = plant.thermal_efficiency or 0  # Rendement thermique
-        C_chaleur = plant.useful_temperature / (plant.useful_temperature + 273.15) if plant.useful_temperature else 0  # Fraction de l'exergie dans la chaleur utile # fmt:skip
+        C_chaleur = (
+            plant.useful_temperature / (plant.useful_temperature + 273.15) if plant.useful_temperature else 0
+        )  # Fraction de l'exergie dans la chaleur utile
 
         return plant, E_total, R_elec, C_elec, R_chaleur, C_chaleur
 

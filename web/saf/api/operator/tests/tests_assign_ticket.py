@@ -24,7 +24,9 @@ class SafAssignTicketTest(TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicketSource.objects.all().delete()
-        self.ticket_source = SafTicketSourceFactory.create(added_by_id=self.entity.id, delivery_period=202202, total_volume=30000, assigned_volume=0)  # fmt:skip
+        self.ticket_source = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id, delivery_period=202202, total_volume=30000, assigned_volume=0
+        )
 
         SafTicket.objects.all().delete()
 
@@ -54,7 +56,11 @@ class SafAssignTicketTest(TestCase):
         assert ticket.agreement_date.isoformat() == "2022-06-01"
         assert ticket.agreement_reference == "AGREF"
         assert ticket.status == "PENDING"
-        assert ticket.carbure_id == "T%d-%s-%d" % (ticket.assignment_period, self.ticket_source.production_country.code_pays, ticket.id)  # fmt:skip
+        assert ticket.carbure_id == "T%d-%s-%d" % (
+            ticket.assignment_period,
+            self.ticket_source.production_country.code_pays,
+            ticket.id,
+        )
         assert ticket.client_id == self.ticket_client.id
         assert ticket.volume == 10000
         assert ticket.year == 2022
@@ -67,7 +73,7 @@ class SafAssignTicketTest(TestCase):
         assert ticket.carbure_production_site_id == self.ticket_source.carbure_production_site_id
         assert ticket.unknown_production_site == self.ticket_source.unknown_production_site
         assert ticket.production_country_id == self.ticket_source.production_country_id
-        assert ticket.production_site_commissioning_date == self.ticket_source.production_site_commissioning_date  # fmt:skip
+        assert ticket.production_site_commissioning_date == self.ticket_source.production_site_commissioning_date
         assert ticket.eec == self.ticket_source.eec
         assert ticket.el == self.ticket_source.el
         assert ticket.ep == self.ticket_source.ep

@@ -35,7 +35,9 @@ def grouped_assign_ticket(request, *args, **kwargs):
         return ErrorResponse(400, SafTicketGroupedAssignError.MALFORMED_PARAMS)
 
     try:
-        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by("created_at")  # fmt:skip
+        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
+            "created_at"
+        )
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketGroupedAssignError.TICKET_SOURCE_NOT_FOUND)

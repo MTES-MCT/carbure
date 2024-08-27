@@ -15,7 +15,9 @@ class ElecChargePoint(models.Model):
     CURRENT_TYPES = [(AC, "Courant alternatif"), (DC, "Courant continu")]
 
     # related
-    application = models.ForeignKey(ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")  # fmt:skip
+    application = models.ForeignKey(
+        ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points"
+    )
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")
 
     # cpo excel data

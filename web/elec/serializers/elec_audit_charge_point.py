@@ -35,5 +35,7 @@ class ElecAuditChargePointSerializer(serializers.ModelSerializer):
     longitude = serializers.SlugRelatedField(source="charge_point", slug_field="longitude", read_only=True)
     station_id = serializers.SlugRelatedField(source="charge_point", slug_field="station_id", read_only=True)
     is_article_2 = serializers.SlugRelatedField(source="charge_point", slug_field="is_article_2", read_only=True)
-    measure_reference_point_id = serializers.SlugRelatedField(source="charge_point", slug_field="measure_reference_point_id", read_only=True)  # fmt:skip
+    measure_reference_point_id = serializers.SlugRelatedField(
+        source="charge_point", slug_field="measure_reference_point_id", read_only=True
+    )
     mid_id = serializers.SlugRelatedField(source="charge_point", slug_field="mid_id", read_only=True)

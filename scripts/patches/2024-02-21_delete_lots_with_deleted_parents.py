@@ -13,10 +13,14 @@ from core.utils import generate_reports
 
 @transaction.atomic
 def delete_lots_with_deleted_parents(apply, batch):
-    lots_to_delete = CarbureLot.objects.exclude(lot_status=CarbureLot.DELETED).filter(parent_lot__lot_status=CarbureLot.DELETED)  # fmt:skip
+    lots_to_delete = CarbureLot.objects.exclude(lot_status=CarbureLot.DELETED).filter(
+        parent_lot__lot_status=CarbureLot.DELETED
+    )
 
     comment = "Ces lots auraient déjà dû être supprimés, étant donné que leurs parents l'avaient été."
-    deletion_events = [CarbureLotEvent(event_type=CarbureLotEvent.DELETED_BY_ADMIN, lot=lot, metadata=comment) for lot in lots_to_delete]  # fmt:skip
+    deletion_events = [
+        CarbureLotEvent(event_type=CarbureLotEvent.DELETED_BY_ADMIN, lot=lot, metadata=comment) for lot in lots_to_delete
+    ]
 
     generate_reports("lots à supprimer", lots_to_delete)
 

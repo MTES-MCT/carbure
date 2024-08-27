@@ -53,4 +53,4 @@ class SafTicketFactory(factory.django.DjangoModelFactory):
     ghg_reference = 60
     ghg_reduction = factory.Faker("random_number", digits=2)
 
-    # parent_ticket_source = factory.Iterator(SafTicketSource.objects.all())  # fmt: skip
+    # parent_ticket_source = factory.Iterator(SafTicketSource.objects.all())

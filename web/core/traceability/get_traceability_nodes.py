@@ -93,8 +93,8 @@ def connect_traceability_nodes(rows, models_by_type):
     # create individual nodes based on the results of the previous queries and index them by their type and id
     lot_nodes = {lot.id: LotNode(lot) for lot in lots}
     stock_nodes = {stock.id: StockNode(stock) for stock in stocks}
-    stock_transform_nodes = {stock_transform.id: StockTransformNode(stock_transform) for stock_transform in stock_transforms}  # fmt:skip
-    ticket_source_nodes = {ticket_source.id: TicketSourceNode(ticket_source) for ticket_source in ticket_sources}  # fmt:skip
+    stock_transform_nodes = {stock_transform.id: StockTransformNode(stock_transform) for stock_transform in stock_transforms}
+    ticket_source_nodes = {ticket_source.id: TicketSourceNode(ticket_source) for ticket_source in ticket_sources}
     ticket_nodes = {ticket.id: TicketNode(ticket) for ticket in tickets}
 
     # connect these nodes together by referencing their parents and children

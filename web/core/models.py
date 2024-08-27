@@ -358,8 +358,20 @@ class Depot(models.Model):
     accise = models.CharField(max_length=32, blank=True, null=True, default=None)
     private = models.BooleanField(default=False)
 
-    electrical_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
-    thermal_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
+    electrical_efficiency = models.FloatField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Entre 0 et 1",
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
+    thermal_efficiency = models.FloatField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Entre 0 et 1",
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
     useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
     is_enabled = models.BooleanField(default=True)

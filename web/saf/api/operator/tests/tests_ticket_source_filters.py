@@ -71,8 +71,20 @@ class SafTicketSourceFiltersTest(TestCase):
         first_id = self.ticket_sources[0].id
 
         SafTicket.objects.all().delete()
-        SafTicketFactory.create(year=2022, supplier_id=self.entity.id, client_id=self.client1.id, status=SafTicket.PENDING, parent_ticket_source_id=first_id)  # fmt:skip
-        SafTicketFactory.create(year=2022, supplier_id=self.entity.id, client_id=self.client2.id, status=SafTicket.PENDING, parent_ticket_source_id=first_id)  # fmt:skip
+        SafTicketFactory.create(
+            year=2022,
+            supplier_id=self.entity.id,
+            client_id=self.client1.id,
+            status=SafTicket.PENDING,
+            parent_ticket_source_id=first_id,
+        )
+        SafTicketFactory.create(
+            year=2022,
+            supplier_id=self.entity.id,
+            client_id=self.client2.id,
+            status=SafTicket.PENDING,
+            parent_ticket_source_id=first_id,
+        )
 
     def test_empty_ticket_source_filters(self):
         query = {

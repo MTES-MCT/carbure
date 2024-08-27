@@ -52,7 +52,7 @@ class ExcelChargePoints:
         "measure_energy": ["Energie active totale soutirée à la date du relevé"],
         "measure_reference_point_id": [
             "Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station"
-        ],  # fmt:skip
+        ],
         "_": [""],
         "current_type": ["Type de courant électrique associé au point de recharge"],
         "is_article_2": ["La station du point de recharge est soumise à l'article 2 du décret n°2022-1330"],
@@ -79,7 +79,9 @@ class ExcelChargePoints:
         #         raise Exception("Invalid template")
 
         # rename columns with actual names
-        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(columns)}, inplace=True)  # fmt: skip
+        charge_point_data.rename(
+            columns={charge_point_data.columns[i]: column for i, column in enumerate(columns)}, inplace=True
+        )
 
         charge_point_data["measure_energy"] = charge_point_data["measure_energy"].fillna(0)
         charge_point_data = charge_point_data.fillna("")
@@ -136,15 +138,25 @@ class ExcelChargePointValidator(Validator):
         charge_point_id = charge_point.get("charge_point_id")
 
         if not self.data.get("is_in_tdg"):
-            self.add_error("charge_point_id", _("Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr").format(charge_point_id=charge_point_id))  # fmt:skip
+            self.add_error(
+                "charge_point_id",
+                _(
+                    "Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                ).format(charge_point_id=charge_point_id),
+            )
         else:
             if charge_point.get("is_article_2"):
                 if not charge_point.get("measure_reference_point_id"):
-                    self.add_error("measure_reference_point_id", _("L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu."))  # fmt:skip
+                    self.add_error(
+                        "measure_reference_point_id",
+                        _(
+                            "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu."
+                        ),
+                    )
             else:
                 if not charge_point.get("mid_id"):
                     self.add_error("mid_id", _("Le numéro MID est obligatoire."))
                 if not charge_point.get("measure_date"):
                     self.add_error("measure_date", _("La date du dernier relevé est obligatoire."))
                 if not isinstance(charge_point.get("measure_energy"), float):
-                    self.add_error("measure_energy", _("L'énergie mesurée lors du dernier relevé est obligatoire."))  # fmt:skip
+                    self.add_error("measure_energy", _("L'énergie mesurée lors du dernier relevé est obligatoire."))
