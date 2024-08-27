@@ -107,7 +107,9 @@ def add_company(request, *args, **kwargs):
 def send_email_to_user(entity, user):
     # send email to user
     today = datetime.now().strftime("%d/%m/%Y")
-    recipient_list = [user.email]
+    subject = "Demande d'inscription de société enregistrée"
+    subject = subject if CarbureEnv.is_prod else "TEST " + subject
+    recipient_list = [user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
     text_message = f"""
     Bonjour,
 
@@ -119,7 +121,7 @@ def send_email_to_user(entity, user):
     """
 
     send_mail(
-        subject="Demande d'inscription de société enregistrée",
+        subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
@@ -129,6 +131,9 @@ def send_email_to_user(entity, user):
 
 def send_email_to_dgec(entity, user):
     today = datetime.now().strftime("%d/%m/%Y")
+    subject = "Demande d'inscription de la société " + entity.name
+    subject = subject if CarbureEnv.is_prod else "TEST " + subject
+
     recipient_list = ["carbure@beta.gouv.fr"]  # send to current user to avoid spam all the carbure team
     admin_link = f"{CarbureEnv.get_base_url()}/admin/core/entity/?is_enabled=False"
     text_message = f"""
@@ -145,7 +150,7 @@ def send_email_to_dgec(entity, user):
     Bonne journée
     """
     send_mail(
-        subject="Demande d'inscription de la société " + entity.name,
+        subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
