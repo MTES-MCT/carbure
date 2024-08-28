@@ -5,10 +5,14 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
 import {
   ElecAdminProvisionCertificateFilter,
+  ElecAdminProvisionCertificateStates,
   ElecAdminProvisionCertificateStatus,
   ElecAdminSnapshot,
 } from "elec-admin/types"
@@ -30,14 +34,15 @@ type ProvisionListProps = {
 const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot,
-  )
+  const [state, actions] =
+    useCBQueryParamsStore<ElecAdminProvisionCertificateStates>(
+      entity,
+      year,
+      status,
+      snapshot
+    )
   usePageTitle(state)
-  const query = useCBQueryBuilder(state);
+  const query = useCBQueryBuilder(state)
   const location = useLocation()
   const { t } = useTranslation()
 
@@ -60,7 +65,6 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     provisionCertificatesResponse.result?.data.data
   const total = provisionCertificatesData?.total ?? 0
   const count = provisionCertificatesData?.returned ?? 0
-
 
   const filterLabels = {
     [ElecAdminProvisionCertificateFilter.Cpo]: t("Aménageur"),
@@ -130,8 +134,6 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   )
 }
 export default ProvisionList
-
-
 
 export function useAutoStatus(): ElecAdminProvisionCertificateStatus {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
