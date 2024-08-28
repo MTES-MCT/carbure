@@ -1,7 +1,6 @@
 import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
-import { ElecAdminProvisionCertificateFilter } from "elec-admin/types"
 import { useMemo } from "react"
 import useStore from "./store"
 import { useSearchParams } from "react-router-dom"

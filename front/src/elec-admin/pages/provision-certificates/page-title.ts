@@ -2,7 +2,7 @@ import { CBQueryStates } from "common/hooks/query-builder"
 import useTitle from "common/hooks/title"
 import {
   ElecAdminProvisionCertificateStatus
-} from "elec-admin/types"
+} from "./types"
 import { useTranslation } from "react-i18next"
 
 export function usePageTitle(state: CBQueryStates) {

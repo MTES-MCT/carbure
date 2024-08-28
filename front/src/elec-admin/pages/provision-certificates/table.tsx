@@ -1,6 +1,6 @@
 import Table, { Cell, Order } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
-import { ElecAdminProvisionCertificateStatus } from "elec-admin/types"
+import { ElecAdminProvisionCertificateStatus } from "./types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
