@@ -10,7 +10,7 @@ import { formatDate } from "common/utils/formatters"
 import TransferCertificateTag from "elec/components/transfer-certificates/tag"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
+import * as api from "./api"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
 import Alert from "common/components/alert"
 
@@ -77,10 +77,10 @@ export const ElecAdminTransferDetailsDialog = () => {
 
             {transferCertificate?.status ===
               ElecTransferCertificateStatus.Rejected && (
-              <Alert variant="info" icon={Message}>
-                {transferCertificate.comment}
-              </Alert>
-            )}
+                <Alert variant="info" icon={Message}>
+                  {transferCertificate.comment}
+                </Alert>
+              )}
           </section>
         </main>
 

@@ -10,13 +10,15 @@ import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-bui
 import FilterMultiSelect from "common/molecules/filter-select"
 import {
   ElecAdminSnapshot,
-  ElecAdminTransferCertificateFilter
 } from "elec-admin/types"
+import {
+  ElecAdminTransferCertificateFilter
+} from "./types"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
-import * as api from "../../api"
+import * as api from "./api"
 import ElecAdminTransferDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
@@ -77,7 +79,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getProvisionCertificateFilters(filter, query)
+            api.getTransferCertificateFilters(filter, query)
           }
         />
 

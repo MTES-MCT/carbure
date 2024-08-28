@@ -8,7 +8,7 @@ import Portal from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
+import * as api from "./api"
 import { formatNumber } from "common/utils/formatters"
 
 export const ElecAdminProvisionDetailsDialog = () => {
