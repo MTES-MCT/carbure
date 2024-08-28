@@ -45,7 +45,6 @@ export type CBQueryStates<
   order?: GenericCBQueryStates["order"]
   snapshot?: GenericCBQueryStates["snapshot"]
 }
-
 export interface CBQueryParams {
   entity_id: number
   year: number
@@ -232,6 +231,28 @@ export function useCBQueryParamsStore<
 
   return [state, actions] as [typeof state, typeof actions]
 }
+
+// export function customQueryParams(
+//   entity: Entity,
+//   year: number,
+//   status: string,
+//   category?: string,
+//   snapshot?: Snapshot | undefined
+// ) {
+//   const [state, actions] = useCBQueryParamsStore(entity)
+
+//   const [state2, actions2] = useStore({
+//     ...state,
+//     category: ''
+//   }, {
+//     ...actions,
+//     setCategory: (category) => {
+
+//     }
+//   })
+
+//   return [state2, actions2]
+// }
 
 function useFilterSearchParams() {
   const [filtersParams, setFiltersParams] = useSearchParams()

@@ -41,6 +41,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
     status,
     snapshot
   )
+
   const query = useCBQueryBuilder(state)
   const apiGetTickets = (query: SafQuery) => api.getSafAirlineTickets(query)
 
