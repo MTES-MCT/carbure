@@ -4,8 +4,12 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
+import { ElecAdminProvisionCertificateStates } from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import {
   ElecCPOProvisionCertificateFilter,
@@ -33,12 +37,13 @@ const ProvisionCertificateList = ({
   const status = useAutoStatus()
   const { t } = useTranslation()
 
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot
-  )
+  const [state, actions] =
+    useCBQueryParamsStore<ElecAdminProvisionCertificateStates>(
+      entity,
+      year,
+      status,
+      snapshot
+    )
   const query = useCBQueryBuilder(state)
   const location = useLocation()
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {

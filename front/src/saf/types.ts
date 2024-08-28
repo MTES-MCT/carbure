@@ -6,8 +6,13 @@ import {
   ProductionSite,
 } from "carbure/types"
 import { Order } from "common/components/table"
+import {
+  CBQueryParams,
+  CBQueryStates,
+  CBSnapshot,
+} from "common/hooks/query-builder"
 
-export interface SafOperatorSnapshot {
+export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
   tickets: number
@@ -20,7 +25,7 @@ export interface SafOperatorSnapshot {
   tickets_received_pending: number
 }
 
-export interface SafClientSnapshot {
+export interface SafClientSnapshot extends CBSnapshot {
   tickets_pending: number
   tickets_accepted: number
 }
@@ -174,17 +179,11 @@ export enum SafTicketSourceStatus {
   History = "HISTORY",
 }
 
-export interface SafStates {
+export interface SafStates extends CBQueryStates {
   //old QueryParams
-  entity: Entity
-  year: number
+
   status: SafTicketSourceStatus | SafTicketStatus
   filters: SafFilterSelection
-  search?: string
-  selection: number[]
-  page: number
-  limit?: number
-  order?: Order
   snapshot?: SafOperatorSnapshot | SafClientSnapshot
   type?: SafQueryType
 }
@@ -209,16 +208,7 @@ export enum SafFilter {
 
 export type SafQueryType = "assigned" | "received"
 
-export interface SafQuery {
-  entity_id: number
-  type?: SafQueryType
-  status?: string
-  year?: number
-  search?: string
-  order_by?: string
-  direction?: string
-  from_idx?: number
-  limit?: number
+export interface SafQuery extends CBQueryParams {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: string[]
   [SafFilter.Clients]?: string[]
