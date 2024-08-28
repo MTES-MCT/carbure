@@ -14,13 +14,15 @@ import {
   ElecAdminProvisionCertificateFilter,
   ElecAdminProvisionCertificateStates,
   ElecAdminProvisionCertificateStatus,
+} from "./types"
+import {
   ElecAdminSnapshot,
 } from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
-import * as api from "../../api"
-import ProvisionImporButton from "./Import"
+import * as api from "./api"
+import ProvisionImportButton from "./Import"
 import ElecAdminProvisionDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
@@ -94,7 +96,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
             snapshot={snapshot}
           />
 
-          <ProvisionImporButton />
+          <ProvisionImportButton />
         </ActionBar>
 
         {count > 0 && provisionCertificatesData ? (

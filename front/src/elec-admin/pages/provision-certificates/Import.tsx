@@ -17,9 +17,9 @@ import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../../api"
+import * as api from "./api"
 
-const ProvisionImporButton = () => {
+const ProvisionImportButton = () => {
   const portal = usePortal()
   const { t } = useTranslation()
 
@@ -164,4 +164,4 @@ const ProvisionImportDialog = ({ onClose }: ProvisionImportDialogProps) => {
   )
 }
 
-export default ProvisionImporButton
+export default ProvisionImportButton
