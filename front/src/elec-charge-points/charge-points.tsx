@@ -7,9 +7,10 @@ import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import { ChargePointsTabs } from "./charge-points-tabs"
-import { ChargePointsSnapshot } from "./types"
-import ChargePointsPending from "./pages/charge-points-pending"
-import ElecMeterReadingsSettings from "./pages/meter-readings"
+import { ChargePointsSnapshot } from "../../types-charge-points"
+import ChargePointsPending from "./charge-points-pending"
+import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
+import ChargePointsList from "./charge-points-list"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -61,7 +62,10 @@ const ChargePoints = () => {
           }
         />
 
-        {/* <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} /> */}
+        <Route
+          path="list"
+          element={<ChargePointsList year={years.selected} />}
+        />
 
         <Route
           path="pending"
