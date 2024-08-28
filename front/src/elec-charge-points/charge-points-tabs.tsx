@@ -39,6 +39,17 @@ export const ChargePointsTabs = ({
             />
           ),
         },
+        {
+          key: "list",
+          path: "list",
+          label: (
+            <TabItem
+              title={t("Points de recharge")}
+              subtitle={snapshot.charge_points}
+              loading={loading}
+            />
+          ),
+        },
         // {
         //   key: "list",
         //   path: "list",
