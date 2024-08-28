@@ -10,13 +10,11 @@ import {
   ElecTransferCertificatesData,
 } from "elec/types-cpo"
 import {
-  ElecAdminProvisionCertificateFilter,
-  ElecAdminProvisionCertificateQuery,
   ElecAdminSnapshot,
-  ElecAdminTransferCertificateFilter,
-  ElecAdminTransferCertificateQuery,
 } from "./types"
 import { CBQUERY_RESET } from "common/hooks/query-builder"
+import { ElecAdminProvisionCertificateQuery } from "./pages/provision-certificates/types"
+import { ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./pages/transfer-certificates/types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/years", {
@@ -116,7 +114,8 @@ export async function getTransferCertificateFilters(
     .then((res) => res.data.data?.filter_values ?? [])
 }
 
-//Charge points applications
+
+//TO MOVE WHEN  /elec-charge-points created by Benjamin
 export function downloadChargePointsApplicationDetails(
   entityId: number,
   companyId: number,
@@ -138,6 +137,7 @@ export function downloadChargePoints(entityId: number, companyId: number) {
   })
 }
 
+
 export function getChargePointsApplications(
   entityId: number,
   companyId: number
@@ -150,7 +150,6 @@ export function getChargePointsApplications(
   )
 }
 
-//METER READINGS
 
 export function getMeterReadingsApplications(
   entityId: number,
@@ -174,29 +173,5 @@ export function downloadMeterReadingsApplicationDetails(
     company_id: companyId,
     application_id: applicationId,
     export: true,
-  })
-}
-
-export function acceptMeterReadingsApplication(
-  entityId: number,
-  companyId: number,
-  applicationId: number
-) {
-  return api.post("/elec/admin/meter-readings/accept-application", {
-    entity_id: entityId,
-    company_id: companyId,
-    application_id: applicationId,
-  })
-}
-
-export function rejectMeterReadingsApplication(
-  entityId: number,
-  companyId: number,
-  applicationId: number
-) {
-  return api.post("/elec/admin/meter-readings/reject-application", {
-    entity_id: entityId,
-    company_id: companyId,
-    application_id: applicationId,
   })
 }
