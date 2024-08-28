@@ -16,7 +16,7 @@ async function enableMocking() {
     console.info(
       "MOCKING ENABLED: to enable/disable the mocked api, comment/uncomment the line below in the file 'index.tsx'"
     )
-    return worker.start()
+    // return worker.start()
   }
 }
 

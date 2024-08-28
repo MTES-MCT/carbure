@@ -6,7 +6,7 @@ import { usePortal } from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import * as apiCpo from "elec/api-cpo"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
-import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
+import ElecChargePointsFileUpload from "./upload-dialog"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 
