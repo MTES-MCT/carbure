@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { CBSnapshot } from "common/hooks/query-builder"
+import { CBQueryStates, CBSnapshot } from "common/hooks/query-builder"
 
 export interface ElecAdminSnapshot extends CBSnapshot {
   provision_certificates: number
@@ -19,21 +19,13 @@ export enum ElecAdminProvisionCertificateStatus {
   History = "HISTORY",
 }
 
-
 export type ElecAdminProvisionCertificateFilterSelection = Partial<
   Record<ElecAdminProvisionCertificateFilter, string[]>
 >
 
-export interface ElecAdminProvisionCertificateStates {
-  entity: Entity
-  year: number
+export interface ElecAdminProvisionCertificateStates extends CBQueryStates {
   status: ElecAdminProvisionCertificateStatus
   filters: ElecAdminProvisionCertificateFilterSelection
-  search?: string
-  selection: number[]
-  page: number
-  limit?: number
-  order?: Order
   snapshot?: ElecAdminSnapshot
 }
 

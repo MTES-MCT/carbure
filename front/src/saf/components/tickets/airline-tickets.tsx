@@ -6,12 +6,11 @@ import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useQueryParamsStore } from "saf/hooks/query-params-store"
-import { useSafQuery } from "saf/hooks/saf-query"
 import {
   SafClientSnapshot,
   SafFilter,
   SafQuery,
+  SafStates,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
@@ -21,6 +20,10 @@ import { useAutoStatus } from "../client-tabs"
 import { ClientTicketDetails } from "../ticket-details/airline-details"
 import TicketsTable from "./table"
 import { ExportButton } from "../export"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 
 export interface AirlineTicketsProps {
   year: number
@@ -32,9 +35,14 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
-  const query = useSafQuery(state)
+  const [state, actions] = useCBQueryParamsStore<SafStates>(
+    entity,
+    year,
+    status,
+    snapshot
+  )
 
+  const query = useCBQueryBuilder(state)
   const apiGetTickets = (query: SafQuery) => api.getSafAirlineTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {

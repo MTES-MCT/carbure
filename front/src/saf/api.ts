@@ -1,5 +1,6 @@
 import { extract } from "carbure/api"
 import { EntityPreview } from "carbure/types"
+import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
 import {
   SafClientSnapshot,
@@ -11,13 +12,6 @@ import {
   SafTicketSourcesResponse,
   SafTicketsResponse,
 } from "./types"
-
-const QUERY_RESET: Partial<SafQuery> = {
-  limit: undefined,
-  from_idx: undefined,
-  order_by: undefined,
-  direction: undefined,
-}
 
 //AIRLINE
 
@@ -34,7 +28,7 @@ export function getAirlineSnapshot(entity_id: number, year: number) {
 }
 
 export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
   return api
     .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
     .then((res) => res.data.data ?? [])
@@ -70,7 +64,7 @@ export function getOperatorSnapshot(entity_id: number, year: number) {
 }
 
 export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
 
   // TO TEST without data
   // return new Promise<any[]>((resolve) => {
@@ -106,7 +100,7 @@ export function getOperatorTicketSourceDetails(
 }
 
 export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...QUERY_RESET }
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
   return api
     .get<Api<string[]>>("/saf/operator/tickets/filters", { params })
     .then((res) => res.data.data ?? [])
