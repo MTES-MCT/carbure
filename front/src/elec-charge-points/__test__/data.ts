@@ -1,4 +1,4 @@
-import { ChargePointsSnapshot } from "elec/types-charge-points"
+import { ChargePointsSnapshot } from "../types"
 
 export const elecChargePointsYears = [2023, 2024]
 

@@ -11,7 +11,7 @@ import AgreementPublicList from "double-counting/components/agreement-public-lis
 import ElecAdmin from "elec-admin"
 import ElecAdminAudit from "elec-audit-admin"
 import ElecCPO from "elec/cpo"
-import ChargePoints from "elec/pages/charge-points/charge-points"
+import ChargePoints from "elec-charge-points/charge-points"
 import { ElecOperator } from "elec/operator"
 import { Navigate, Route, Routes } from "react-router-dom"
 import Registry from "registry"

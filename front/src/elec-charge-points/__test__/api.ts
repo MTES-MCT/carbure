@@ -1,8 +1,5 @@
 import { mockGetWithResponseData } from "carbure/__test__/helpers"
-import {
-  elecChargePointsYears,
-  elecChargePointsSnapshot,
-} from "./data-charge-points"
+import { elecChargePointsYears, elecChargePointsSnapshot } from "./data"
 
 export const okChargePointsYears = mockGetWithResponseData(
   "/elec/charge-points/years",

@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ChargePointsSnapshot } from "./types-charge-points"
+import { ChargePointsSnapshot } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/charge-points/years", {

@@ -15,11 +15,9 @@ import CompanyInfo from "./components/company-info"
 import CompanyOptions from "./components/company-options"
 import DoubleCountingSettings from "../double-counting/components/settings"
 import { EntityUserRights } from "./components/user-rights"
-import ElecChargePointsSettings from "../elec/components/charge-points/settings"
 import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
 import HashRoute from "common/components/hash-route"
 import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
-import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 import useScrollToHash from "common/hooks/scroll-to-hash"
 
 const Settings = () => {
@@ -28,7 +26,7 @@ const Settings = () => {
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
 
-  const { isProducer, isPowerOrHeatProducer, isCPO, isIndustry } = entity
+  const { isProducer, isPowerOrHeatProducer, isIndustry } = entity
 
   const hasCertificates = isIndustry
   const hasDepot = isIndustry || isPowerOrHeatProducer

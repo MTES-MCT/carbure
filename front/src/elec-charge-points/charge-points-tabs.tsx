@@ -1,6 +1,6 @@
 import Tabs, { TabItem } from "common/components/tabs"
 import { useTranslation } from "react-i18next"
-import { ChargePointsSnapshot } from "../../types-charge-points"
+import { ChargePointsSnapshot } from "./types"
 
 type ChargePointsTabsProps = {
   loading: boolean
