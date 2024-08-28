@@ -1,11 +1,11 @@
-import { CBQueryStates } from "common/hooks/query-builder"
 import useTitle from "common/hooks/title"
 import {
-  ElecAdminProvisionCertificateStatus
+  ElecAdminProvisionCertificateStates,
+  ElecAdminProvisionCertificateStatus,
 } from "elec-admin/types"
 import { useTranslation } from "react-i18next"
 
-export function usePageTitle(state: CBQueryStates) {
+export function usePageTitle(state: ElecAdminProvisionCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
