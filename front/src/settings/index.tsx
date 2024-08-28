@@ -76,16 +76,6 @@ const Settings = () => {
             key: "double-counting",
             label: t("Double comptage"),
           },
-          isCPO && {
-            path: "#elec-charge-points",
-            key: "elec-charge-points",
-            label: t("Points de recharge"),
-          },
-          isCPO && {
-            path: "#elec-meter-readings",
-            key: "elec-meter-readings",
-            label: t("Relevés trimestriels"),
-          },
           entity.hasRights(UserRole.Admin) && {
             path: "#users",
             key: "users",
@@ -100,8 +90,6 @@ const Settings = () => {
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
         {isProducer && <DoubleCountingSettings />}
-        {/* {isCPO && <ElecChargePointsSettings companyId={entity.id} />} */}
-        {isCPO && <ElecMeterReadingsSettings companyId={entity.id} />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>
       <HashRoute

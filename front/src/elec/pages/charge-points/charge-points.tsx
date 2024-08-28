@@ -9,6 +9,7 @@ import * as api from "../../api-charge-points"
 import { ChargePointsTabs } from "./charge-points-tabs"
 import { ChargePointsSnapshot } from "../../types-charge-points"
 import ChargePointsPending from "./charge-points-pending"
+import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -53,7 +54,12 @@ const ChargePoints = () => {
       </header>
 
       <Routes>
-        <Route path="meter-readings" element={<div>METER READINGS PAGE</div>} />
+        <Route
+          path="meter-readings"
+          element={
+            <ElecMeterReadingsSettings companyId={entity.id} contentOnly />
+          }
+        />
 
         <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} />
 

@@ -22,7 +22,7 @@ export const ChargePointsTabs = ({
           path: "pending",
           label: (
             <TabItem
-              title={t("Inscriptions de points de recharge")}
+              title={t("Inscriptions")}
               subtitle={snapshot.charge_points_pending}
               loading={loading}
             />
@@ -44,7 +44,7 @@ export const ChargePointsTabs = ({
           path: "list",
           label: (
             <TabItem
-              title={t("Points de recharge inscrits")}
+              title={t("Points de recharge")}
               subtitle={snapshot.charge_points_pending}
               loading={loading}
             />

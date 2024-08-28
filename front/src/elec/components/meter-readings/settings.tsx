@@ -11,36 +11,35 @@ import {
   ElecMeterReadingsApplication,
   MeterReadingsApplicationUrgencyStatus,
 } from "elec/types"
+import { Fragment, PropsWithChildren, useMemo } from "react"
 import { Trans, useTranslation } from "react-i18next"
+import { useElecMeterReadingsSettings } from "./settings.hooks"
 import MeterReadingsApplicationsTable from "./table"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
 
-const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
+type ElecMeterReadingsSettingsProps = {
+  companyId: number
+  contentOnly?: boolean
+}
+const ElecMeterReadingsSettings = ({
+  companyId,
+  contentOnly = false,
+}: ElecMeterReadingsSettingsProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
   const portal = usePortal()
 
-  const applicationsQuery = useQuery(api.getMeterReadingsApplications, {
-    key: "meter-readings-applications",
-    params: [entity.id, companyId],
-  })
-
-  const applicationsResponse = applicationsQuery.result?.data.data
-
-  const applications = applicationsResponse?.applications ?? []
-  const currentApplicationPeriod =
-    applicationsResponse?.current_application_period
-  const chargePointCount = currentApplicationPeriod?.charge_point_count
-  const currentApplication = applicationsResponse?.current_application
-
-  const isEmpty = applications.length === 0
-
-  const urgencyStatus = currentApplicationPeriod?.urgency_status
-  const quarterString = t("T{{quarter}} {{year}}", {
-    quarter: currentApplicationPeriod?.quarter,
-    year: currentApplicationPeriod?.year,
-  })
+  const {
+    applications,
+    applicationsQuery,
+    chargePointCount,
+    currentApplication,
+    quarterString,
+    urgencyStatus,
+    currentApplicationPeriod,
+    isApplicationsEmpty,
+  } = useElecMeterReadingsSettings({ entityId: entity.id, companyId })
 
   function showUploadDialog() {
     portal((resolve) => (
@@ -61,10 +60,16 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
       application.id
     )
   }
+
+  // This component is currently used across two pages with minor UI differences.
+  // In the future, the UI should be unified across both pages to maintain consistency.
+  const Wrapper = contentOnly ? Fragment : Panel
+  const HeaderOrSection = contentOnly ? "section" : "header"
+
   return (
-    <Panel id="elec-meter-readings">
-      <header>
-        <h1>{t("Relevés trimestriels")}</h1>
+    <Wrapper id="elec-meter-readings">
+      <HeaderOrSection>
+        {!contentOnly && <h1>{t("Relevés trimestriels")}</h1>}
 
         {chargePointCount === 0 && (
           <p>
@@ -95,9 +100,9 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
             })}
           />
         )}
-      </header>
+      </HeaderOrSection>
 
-      {isEmpty && (
+      {isApplicationsEmpty && (
         <>
           <section>
             <Alert icon={AlertCircle} variant="warning">
@@ -108,7 +113,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
         </>
       )}
 
-      {!isEmpty && (
+      {!isApplicationsEmpty && (
         <>
           <MeterReadingsApplicationsTable
             applications={applications}
@@ -120,7 +125,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
       )}
 
       {applicationsQuery.loading && <LoaderOverlay />}
-    </Panel>
+    </Wrapper>
   )
 }
 
