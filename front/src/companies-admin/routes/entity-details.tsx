@@ -61,16 +61,6 @@ const EntityDetails = () => {
             label: t("Informations"),
           },
           !isAirline && { key: "depot", path: "#depot", label: "Depots" },
-          isCPO && {
-            path: "#elec-charge-points",
-            key: "elec-charge-points",
-            label: t("Points de recharge"),
-          },
-          isCPO && {
-            path: "#elec-meter-readings",
-            key: "elec-meter-readings",
-            label: t("Relevés trimestriels"),
-          },
           isProducer && { key: "production", path: "#production", label: t("Sites de production") }, // prettier-ignore
           !isAirline && {
             key: "certificates",
@@ -99,8 +89,6 @@ const EntityDetails = () => {
             }
           />
         )}
-        {isCPO && <ElecChargePointsSettings companyId={companyId} />}
-        {isCPO && <ElecAdminMeterReadingsSettings companyId={companyId} />}
         {!isAirline && <Certificates entity_id={companyId} />}
       </section>
     </Main>

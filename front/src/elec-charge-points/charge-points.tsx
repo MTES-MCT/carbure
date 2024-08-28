@@ -8,8 +8,8 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import { ChargePointsTabs } from "./charge-points-tabs"
 import { ChargePointsSnapshot } from "./types"
-import ChargePointsPending from "./charge-points-pending"
-import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
+import ChargePointsPending from "./pages/charge-points-pending"
+import ElecMeterReadingsSettings from "./pages/meter-readings"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
