@@ -64,25 +64,23 @@ def add_application(request: HttpRequest, entity: Entity):
     if len(meter_reading_data) == 0:
         return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
 
-    # charge_points_by_id = [item["charge_point_id"] for item in meter_reading_data]
-    # meter_readings = ElecMeterReading.objects.filter(
-    #     cpo=entity, meter__charge_point__charge_point_id__in=charge_points_by_id
-    # )
+    charge_points_by_id = [item["meter"].charge_point.charge_point_id for item in meter_reading_data]
+    meter_readings = ElecMeterReading.objects.filter(cpo=entity, meter__charge_point__charge_point_id__in=charge_points_by_id)
 
-    # previous_date = {}
-    # for item in meter_readings:
-    #     previous_date[item.charge_point_id] = item.reading_date
+    previous_date = {}
+    for item in meter_readings:
+        previous_date[item.charge_point.charge_point_id] = item.reading_date
 
-    # duplicate = False
-    # for row in original:
-    #     reading_date = row["reading_date"]
-    #     reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
-    #     if previous_date.get(row["charge_point_id"]) == reading_date:
-    #         duplicate = True
-    #         break
+    duplicate = False
+    for row in original:
+        reading_date = row["reading_date"]
+        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
+        if previous_date.get(row["charge_point_id"]) == reading_date:
+            duplicate = True
+            break
 
-    # if duplicate:
-    #     return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
+    if duplicate:
+        return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
 
     with transaction.atomic():
         application = ElecMeterReadingApplication(cpo=entity, quarter=quarter, year=year)
