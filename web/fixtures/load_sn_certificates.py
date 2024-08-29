@@ -3,6 +3,7 @@ import os
 from typing import List
 
 import django
+import numpy as np
 import openpyxl
 import pandas as pd
 from pandas._typing import Scalar
