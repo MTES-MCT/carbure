@@ -503,6 +503,9 @@ class ElecCharginPointsTest(TestCase):
             cpo_siren="67890",
         )
 
+        self.meter.charge_point = charge_point
+        self.meter.save()
+
         meter_reading_application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
             quarter=2,
@@ -521,6 +524,7 @@ class ElecCharginPointsTest(TestCase):
             extracted_energy=40,
             renewable_energy=20,
             reading_date=datetime.date(2024, 9, 30),
+            meter=self.meter,
             cpo=self.cpo,
             application=meter_reading_application,
         )
@@ -529,6 +533,7 @@ class ElecCharginPointsTest(TestCase):
             extracted_energy=4,
             renewable_energy=2,
             reading_date=datetime.date(2024, 9, 29),
+            meter=self.meter,
             cpo=self.cpo,
             application=meter_reading_application,
         )
@@ -659,21 +664,21 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(data["data"][0]["charge_point_id"], "ABCDE")
 
         # With last_extracted_energy filter
-        # response = self.client.get(
-        #     reverse("elec-cpo-charge-points-get-charge-points"),
-        #     {"entity_id": self.cpo.id, "last_extracted_energy": "4"},
-        # )
-        # data = response.json()
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(len(data["data"]), 0)
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "last_extracted_energy": "4"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 0)
 
-        # response = self.client.get(
-        #     reverse("elec-cpo-charge-points-get-charge-points"),
-        #     {"entity_id": self.cpo.id, "last_extracted_energy": "40"},
-        # )
-        # data = response.json()
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(len(data["data"]), 1)
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "last_extracted_energy": "40"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]), 1)
 
         # With is_article_2 filter
         response = self.client.get(
