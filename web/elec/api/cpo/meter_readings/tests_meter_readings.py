@@ -16,9 +16,9 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.models.elec_meter import ElecMeter
 from elec.services.create_meter_reading_excel import create_meter_readings_excel
 from transactions.models.year_config import YearConfig
 
@@ -253,34 +253,25 @@ class ElecMeterReadingsTest(TestCase):
         data = response.json()
         assert response.status_code == 400
 
-        self.assertEqual(
-            data,
-            {
-                "status": "error",
-                "error": "VALIDATION_FAILED",
-                "data": {
-                    "file_name": "readings.xlsx",
-                    "quarter": 3,
-                    "year": 2024,
-                    "meter_reading_count": 2,
-                    "error_count": 2,
-                    "errors": [
-                        {
-                            "error": "INVALID_DATA",
-                            "line": 3,
-                            "meta": {
-                                "extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]
-                            },
-                        },
-                        {
-                            "error": "INVALID_DATA",
-                            "line": 4,
-                            "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
-                        },
-                    ],
-                },
+        assert data == {
+            "status": "error",
+            "error": "VALIDATION_FAILED",
+            "data": {
+                "file_name": "readings.xlsx",
+                "quarter": 3,
+                "year": 2024,
+                "meter_reading_count": 2,
+                "error_count": 2,
+                "errors": [
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 3,
+                        "meta": {"extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]},
+                    },
+                    {"error": "INVALID_DATA", "line": 4, "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]}},
+                ],
             },
-        )
+        }
 
     def test_check_application_ok(self):
         excel_file = create_meter_readings_excel(

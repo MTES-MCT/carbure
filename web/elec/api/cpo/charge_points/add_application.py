@@ -52,7 +52,8 @@ def add_application(request: HttpRequest, entity: Entity):
         application = ElecChargePointApplication(cpo=entity)
         application.save()
 
-        # We can't use a bulk_create here because we need the ID of each meter created to associate it to the right charge point
+        # We can't use a bulk_create here because we need the ID of each meter created
+        # to associate it to the right charge point
         meters = []
         for data in charge_point_data:
             meter = ElecMeter(

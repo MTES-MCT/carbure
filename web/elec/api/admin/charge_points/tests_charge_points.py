@@ -5,13 +5,7 @@ from django.urls import reverse
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
-from elec.models import ElecChargePoint, ElecChargePointApplication
-import copy
-from core.tests_utils import setup_current_user
-from core.models import Entity
-from django.test import TestCase
-from django.urls import reverse
-from elec.models import ElecChargePointApplication, ElecChargePoint, ElecMeter
+from elec.models import ElecChargePoint, ElecChargePointApplication, ElecMeter
 
 
 class ElecCharginPointsTest(TestCase):
@@ -36,12 +30,12 @@ class ElecCharginPointsTest(TestCase):
             [(self.cpo, "RW"), (self.admin, "ADMIN")],
         )
 
-        meter_data = dict(
-            mid_certificate="123-456",
-            initial_index=1000.123,
-            initial_index_date=datetime.date(2023, 6, 29),
-            charge_point=None,
-        )
+        meter_data = {
+            "mid_certificate": "123-456",
+            "initial_index": 1000.123,
+            "initial_index_date": datetime.date(2023, 6, 29),
+            "charge_point": None,
+        }
 
         self.meter = ElecMeter.objects.create(**meter_data)
         self.meter2 = ElecMeter.objects.create(**meter_data)

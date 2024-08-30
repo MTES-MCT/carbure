@@ -672,24 +672,24 @@ class ElecCharginPointsTest(TestCase):
             {"entity_id": self.cpo.id, "latest_extracted_energy": "4"},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]), 0)
+        assert response.status_code == 200
+        assert len(data["data"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
             {"entity_id": self.cpo.id, "latest_extracted_energy": "40"},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]), 1)
+        assert response.status_code == 200
+        assert len(data["data"]) == 1
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
             {"entity_id": self.cpo.id, "latest_extracted_energy": "0"},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]), 1)
+        assert response.status_code == 200
+        assert len(data["data"]) == 1
 
         # With is_article_2 filter
         response = self.client.get(

@@ -1,11 +1,11 @@
-from django import forms
 from django.views.decorators.http import require_POST
+
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from elec.models import ElecChargePointApplication
 from core.models import Entity
+from elec.models import ElecChargePointApplication
 from elec.serializers.elec_charge_point import ElecChargePointUpdateSerializer
-from core.carburetypes import CarbureError
 
 
 class ChargePointUpdateError:

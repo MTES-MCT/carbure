@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("elec", "0039_alter_elecauditchargepoint_observed_energy_reading"),
     ]

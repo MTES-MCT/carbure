@@ -58,7 +58,9 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_application_charge_points(cpo: Entity, application: ElecMeterReadingApplication):
-        charge_point_ids = ElecMeterReading.objects.filter(cpo=cpo, application=application).values_list("meter__charge_point_id", flat=True)  # fmt:skip
+        charge_point_ids = ElecMeterReading.objects.filter(cpo=cpo, application=application).values_list(
+            "meter__charge_point_id", flat=True
+        )
         return ElecChargePoint.objects.filter(pk__in=charge_point_ids)
 
     @staticmethod
