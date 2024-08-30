@@ -1,4 +1,3 @@
-import pytest
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
@@ -118,8 +117,7 @@ class LotsFlowTest(TestCase):
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
-        with pytest.raises(Exception):
-            CarbureLot.objects.get(id=lot.id)
+        assert not CarbureLot.objects.filter(id=lot.id).exists()
 
         lot = self.send_lot(self.create_draft())
         response = self.client.post(

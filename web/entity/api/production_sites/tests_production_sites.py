@@ -10,7 +10,7 @@ from core.models import (
     UserRights,
 )
 from core.tests_utils import setup_current_user
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from producers.models import ProductionSiteInput, ProductionSiteOutput
 
 
 class EntityProductionSiteTest(TestCase):

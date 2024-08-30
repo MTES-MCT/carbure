@@ -206,8 +206,8 @@ class TransportDataGouv:
             merged_data["guessed_is_article_2"] = merged_data["current_type"] != "AC"
 
         # tag the origin of the data
-        merged_data["is_in_tdg"] = merged_data["is_in_tdg"] is True
-        merged_data["is_in_application"] = merged_data["is_in_application"] is True
+        merged_data["is_in_tdg"] = merged_data["is_in_tdg"] == True  # noqa: E712
+        merged_data["is_in_application"] = merged_data["is_in_application"] == True  # noqa: E712
 
         # clear the mid and prm columns if they contain data that is too short
         # merged_data["mid_id"] = merged_data["mid_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
@@ -225,7 +225,7 @@ class TransportDataGouv:
         # in that case, they won't be considered for article 2, even if there are DC charge points
         merged_data["whole_station_has_readings"] = (
             merged_data.groupby("station_id")["has_reading"]
-            .transform(lambda x: all(x is not False))
+            .transform(lambda x: all(x != False))  # noqa: E712
             .reset_index()["has_reading"]
         )
 
@@ -239,4 +239,4 @@ class TransportDataGouv:
         merged_data["is_article_2"] = is_true(merged_data, "is_article_2")
 
         # remove the charge points that were not listed in the original imported excel file
-        return merged_data[merged_data["is_in_application"] is True][TransportDataGouv.DB_COLUMNS]
+        return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]  # noqa: E712
