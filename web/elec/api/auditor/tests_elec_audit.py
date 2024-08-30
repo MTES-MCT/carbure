@@ -191,47 +191,38 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         assert len(charge_point_audits) == 3
         assert len(errors) == 0
 
-        self.assertDictEqual(
-            charge_point_audits[0],
-            {
-                "charge_point_id": "ABCD01",
-                "observed_mid_or_prm_id": "[MID] 123-456",
-                "is_auditable": True,
-                "has_dedicated_pdl": True,
-                "current_type": "AC",
-                "audit_date": datetime.date(2024, 6, 1),
-                "observed_energy_reading": 1000.1234,
-                "comment": "",
-            },
-        )
+        assert charge_point_audits[0] == {
+            "charge_point_id": "ABCD01",
+            "observed_mid_or_prm_id": "[MID] 123-456",
+            "is_auditable": True,
+            "has_dedicated_pdl": True,
+            "current_type": "AC",
+            "audit_date": datetime.date(2024, 6, 1),
+            "observed_energy_reading": 1000.1234,
+            "comment": "",
+        }
 
-        self.assertDictEqual(
-            charge_point_audits[1],
-            {
-                "charge_point_id": "ABCD02",
-                "observed_mid_or_prm_id": "[MID] 123-457",
-                "is_auditable": True,
-                "has_dedicated_pdl": False,
-                "current_type": "DC",
-                "audit_date": datetime.date(2024, 6, 2),
-                "observed_energy_reading": 1002,
-                "comment": "",
-            },
-        )
+        assert charge_point_audits[1] == {
+            "charge_point_id": "ABCD02",
+            "observed_mid_or_prm_id": "[MID] 123-457",
+            "is_auditable": True,
+            "has_dedicated_pdl": False,
+            "current_type": "DC",
+            "audit_date": datetime.date(2024, 6, 2),
+            "observed_energy_reading": 1002,
+            "comment": "",
+        }
 
-        self.assertDictEqual(
-            charge_point_audits[2],
-            {
-                "charge_point_id": "ABCD03",
-                "observed_mid_or_prm_id": "",
-                "is_auditable": False,
-                "has_dedicated_pdl": False,
-                "current_type": "",
-                "audit_date": None,
-                "observed_energy_reading": 0,
-                "comment": "Charge point was not found",
-            },
-        )
+        assert charge_point_audits[2] == {
+            "charge_point_id": "ABCD03",
+            "observed_mid_or_prm_id": "",
+            "is_auditable": False,
+            "has_dedicated_pdl": False,
+            "current_type": "",
+            "audit_date": None,
+            "observed_energy_reading": 0,
+            "comment": "Charge point was not found",
+        }
 
     def test_check_report(self):
         charge_point_audit_sample, _ = self.create_audit_samples()
