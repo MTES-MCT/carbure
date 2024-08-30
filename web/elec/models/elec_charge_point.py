@@ -19,7 +19,9 @@ class ElecChargePoint(models.Model):
         ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points"
     )
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")
-    current_meter = models.ForeignKey("ElecMeter", on_delete=models.SET_NULL, null=True, blank=True, related_name="elec_charge_points")  # fmt:skip
+    current_meter = models.ForeignKey(
+        "ElecMeter", on_delete=models.SET_NULL, null=True, blank=True, related_name="elec_charge_points"
+    )
 
     # cpo excel data
     charge_point_id = models.CharField(max_length=64)

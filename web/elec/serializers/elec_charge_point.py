@@ -60,7 +60,6 @@ class ElecChargePointSampleSerializer(serializers.ModelSerializer):
 
 
 class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = ElecChargePoint
         fields = [

@@ -1,7 +1,7 @@
 from django.views.decorators.http import require_GET
-from core.common import SuccessResponse
-from core.common import ErrorResponse, SuccessResponse
+
 from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
 from elec.models import ElecMeter

@@ -2,9 +2,6 @@
 
 import datetime
 
-import copy
-from core.tests_utils import setup_current_user
-from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
 
@@ -13,10 +10,10 @@ from core.tests_utils import setup_current_user
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
-from elec.models.elec_meter import ElecMeter
 
 
 class ElecAdminAuditMeterReadingsTest(TestCase):
@@ -41,12 +38,12 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             [(self.cpo, "RW"), (self.admin, "ADMIN")],
         )
 
-        meter_data = dict(
-            mid_certificate="123-456",
-            initial_index=1000.123,
-            initial_index_date=datetime.date(2023, 6, 29),
-            charge_point=None,
-        )
+        meter_data = {
+            "mid_certificate": "123-456",
+            "initial_index": 1000.123,
+            "initial_index_date": datetime.date(2023, 6, 29),
+            "charge_point": None,
+        }
 
         self.meter = ElecMeter.objects.create(**meter_data)
         self.meter2 = ElecMeter.objects.create(**meter_data)

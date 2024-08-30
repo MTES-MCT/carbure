@@ -8,9 +8,9 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.models.elec_meter import ElecMeter
 from transactions.models.year_config import YearConfig
 
 OK_METER_READINGS = [

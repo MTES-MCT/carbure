@@ -1,11 +1,9 @@
 from math import floor
 
-from django.db.models import FloatField, OuterRef, Subquery, F, Value
-from django.db.models.functions import Coalesce
-from django.views.decorators.http import require_GET
 from django import forms
 from django.core.paginator import Paginator
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import FloatField, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.views.decorators.http import require_GET
 
 from core.carburetypes import CarbureError
@@ -35,7 +33,9 @@ class ChargePointSortForm(forms.Form):
 
 def annotate_with_latest_extracted_energy(queryset):
     latest_extracted_energy_subquery = (
-        ElecMeterReading.objects.filter(meter__charge_point=OuterRef("pk")).order_by("-reading_date").values("extracted_energy")[:1]
+        ElecMeterReading.objects.filter(meter__charge_point=OuterRef("pk"))
+        .order_by("-reading_date")
+        .values("extracted_energy")[:1]
     )
     return queryset.annotate(
         latest_extracted_energy=Coalesce(Subquery(latest_extracted_energy_subquery), Value(0), output_field=FloatField())

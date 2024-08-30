@@ -42,7 +42,6 @@ def reverse_migration(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("elec", "0040_elecmeter_elecchargepoint_current_meter_and_more"),
     ]

@@ -65,7 +65,9 @@ def add_application(request: HttpRequest, entity: Entity):
         return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
 
     charge_points_by_id = [item["meter"].charge_point.charge_point_id for item in meter_reading_data]
-    meter_readings = ElecMeterReading.objects.filter(cpo=entity, meter__charge_point__charge_point_id__in=charge_points_by_id)
+    meter_readings = ElecMeterReading.objects.filter(
+        cpo=entity, meter__charge_point__charge_point_id__in=charge_points_by_id
+    )
 
     previous_date = {}
     for item in meter_readings:

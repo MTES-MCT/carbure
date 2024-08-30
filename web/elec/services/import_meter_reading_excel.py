@@ -7,9 +7,9 @@ from django.utils.translation import gettext_lazy as _
 
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
-from elec.models.elec_meter import ElecMeter
 
 
 def import_meter_reading_excel(
@@ -22,7 +22,7 @@ def import_meter_reading_excel(
     meter_readings_data = ExcelMeterReadings.validate_meter_readings(
         original_meter_readings_data, existing_charge_points, previous_application, renewable_share
     )
-    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data  # fmt:skip
+    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data
 
 
 class ExcelMeterReadings:
@@ -87,7 +87,7 @@ class ExcelMeterReadingValidator(Validator):
         self.context["previous_extracted_energy"] = previous_extracted_energy
 
         meter_reading["meter"] = charge_point.current_meter if charge_point else None
-        meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share  # fmt:skip
+        meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share
 
         return meter_reading
 
