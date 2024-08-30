@@ -10,6 +10,7 @@ from elec.models import (
 )
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample
+from elec.models.elec_meter import ElecMeter
 
 
 @admin.register(ElecProvisionCertificate)
@@ -158,4 +159,20 @@ class ElecAuditChargePointAdmin(admin.ModelAdmin):
 
     search_fields = [
         "id",
+    ]
+
+
+@admin.register(ElecMeter)
+class ElecMeterAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "mid_certificate",
+        "initial_index",
+        "initial_index_date",
+    ]
+
+    search_fields = [
+        "id",
+        "mid_certificate",
+        "charge_point__charge_point_id",
     ]
