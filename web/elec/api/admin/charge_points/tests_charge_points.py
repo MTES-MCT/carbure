@@ -127,7 +127,11 @@ class ElecCharginPointsTest(TestCase):
 
     def test_get_charge_points_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.save()
         application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application2.created_at = datetime.date(2023, 12, 28)
+        application2.save()
 
         charge_point = ElecChargePoint.objects.create(
             application=application,
@@ -178,7 +182,7 @@ class ElecCharginPointsTest(TestCase):
                     "cpo": self.cpo.name,
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
-                    "application_date": "2024-08-21",
+                    "application_date": "2023-12-28",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
@@ -198,7 +202,7 @@ class ElecCharginPointsTest(TestCase):
                     "cpo": self.cpo.name,
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
-                    "application_date": "2024-08-21",
+                    "application_date": "2023-12-28",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
@@ -222,6 +226,8 @@ class ElecCharginPointsTest(TestCase):
 
     def test_get_application_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.save()
 
         charge_point = ElecChargePoint.objects.create(
             application=application,
@@ -254,7 +260,7 @@ class ElecCharginPointsTest(TestCase):
                     "cpo": self.cpo.name,
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
-                    "application_date": "2024-08-21",
+                    "application_date": "2023-12-28",
                     "installation_date": "2023-02-15",
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
