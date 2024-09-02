@@ -11,7 +11,7 @@ import {
   setEntity,
   waitWhileLoading,
 } from "carbure/__test__/helpers"
-import { Saf } from "../operator"
+import { SafOperator } from "../pages/operator"
 import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -22,7 +22,7 @@ const SafWithRouter = ({ entity, view }: { entity: Entity; view: string }) => {
   setEntity(entity)
   return (
     <TestRoot url={`/org/${entity.id}/saf/2021/${view}`}>
-      <Route path={`/org/${entity.id}/saf/:year/*`} element={<Saf />} />
+      <Route path={`/org/${entity.id}/saf/:year/*`} element={<SafOperator />} />
     </TestRoot>
   )
 }

@@ -1,6 +1,5 @@
 import { rest } from "msw"
 import { setupServer } from "msw/node"
-
 import { okSettings } from "settings/__test__/api"
 import * as data from "./data"
 

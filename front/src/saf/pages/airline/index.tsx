@@ -6,9 +6,9 @@ import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import ClientTabs from "./components/client-tabs"
-import AirlineTickets from "./components/tickets/airline-tickets"
-import { SafTicketStatus } from "./types"
+import ClientTabs from "../../components/client-tabs"
+import AirlineTickets from "../../components/tickets/airline-tickets"
+import { SafTicketStatus } from "../../types"
 
 export const SafClient = () => {
   const { t } = useTranslation()

@@ -15,7 +15,7 @@ import {
   SafTicketSourceStatus,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
-import * as api from "../../api"
+import * as api from "../../pages/operator/api"
 import { Filters } from "../filters"
 import { useAutoStatus } from "../operator-tabs"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"

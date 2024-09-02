@@ -14,8 +14,8 @@ import ElecCPO from "elec/cpo"
 import { ElecOperator } from "elec/operator"
 import { Navigate, Route, Routes } from "react-router-dom"
 import Registry from "registry"
-import SafClient from "saf/airline"
-import Saf from "saf/operator"
+import SafClient from "saf/pages/airline"
+import SafOperator from "saf/pages/operator"
 import Settings from "settings"
 import Stats from "stats"
 import Transactions from "transactions"
@@ -117,7 +117,7 @@ const Org = () => {
         )}
 
       {has_saf && isOperator && (<>
-        <Route path="saf/:year/*" element={<Saf />} />
+        <Route path="saf/:year/*" element={<SafOperator />} />
         <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
         <Route path="*" element={<Navigate replace to={`saf/${currentYear}/tickets-sources`} />} />
 

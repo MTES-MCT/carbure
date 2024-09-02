@@ -14,7 +14,7 @@ import {
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
-import * as api from "../../api"
+import * as api from "../../pages/airline/api"
 import { Filters } from "../filters"
 import { useAutoStatus } from "../client-tabs"
 import { ClientTicketDetails } from "../ticket-details/airline-details"

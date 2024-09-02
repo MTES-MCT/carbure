@@ -6,12 +6,12 @@ import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import OperatorTabs from "./components/operator-tabs"
-import TicketSources from "./components/ticket-sources"
-import OperatorTickets from "./components/tickets/operator-tickets"
-import { SafTicketSourceStatus } from "./types"
+import OperatorTabs from "../../components/operator-tabs"
+import TicketSources from "../../components/ticket-sources"
+import OperatorTickets from "../../components/tickets/operator-tickets"
+import { SafTicketSourceStatus } from "../../types"
 
-export const Saf = () => {
+export const SafOperator = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
@@ -100,4 +100,4 @@ export const Saf = () => {
   )
 }
 
-export default Saf
+export default SafOperator

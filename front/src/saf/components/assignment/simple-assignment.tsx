@@ -12,7 +12,7 @@ import { useMutation } from "common/hooks/async"
 import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/types"
-import * as api from "../../api"
+import * as api from "../../pages/operator/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 

@@ -11,12 +11,12 @@ import useScrollToRef from "common/hooks/scroll-to-ref"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import NavigationButtons from "transaction-details/components/lots/navigation"
-import * as api from "../../api"
+import * as api from "../../pages/operator/api"
+import TicketAssignment from "../assignment/simple-assignment"
+import ParentLot from "../parent-lot"
 import TicketSourceTag from "../ticket-sources/tag"
 import AssignedTickets from "./assigned-tickets"
-import TicketAssignment from "../assignment/simple-assignment"
 import TicketSourceFields from "./fields"
-import ParentLot from "../parent-lot"
 
 export interface TicketSourceDetailsProps {
   neighbors?: number[]
