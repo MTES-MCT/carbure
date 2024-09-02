@@ -60,40 +60,38 @@ const ElecMeterReadingsSettings = ({
   }
 
   return (
-    <>
-      <section>
-        {!contentOnly && <h1>{t("Relevés trimestriels")}</h1>}
+    <section>
+      {!contentOnly && <h1>{t("Relevés trimestriels")}</h1>}
 
-        {chargePointCount === 0 && (
-          <p>
-            <Trans>Vous n'avez aucun relevé à déclarer</Trans>
-          </p>
-        )}
-        {!!chargePointCount && chargePointCount > 1 && (
-          <Button
-            asideX={true}
-            variant={
-              currentApplication
-                ? "primary"
-                : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High
-                  ? "warning"
-                  : urgencyStatus ===
-                      MeterReadingsApplicationUrgencyStatus.Critical
-                    ? "danger"
-                    : "primary"
-            }
-            icon={Plus}
-            disabled={
-              currentApplication &&
-              currentApplication.status !== ElecAuditApplicationStatus.Pending
-            }
-            action={showUploadDialog}
-            label={t("Transmettre mes relevés trimestriels {{quarter}}", {
-              quarter: quarterString,
-            })}
-          />
-        )}
-      </section>
+      {chargePointCount === 0 && (
+        <p>
+          <Trans>Vous n'avez aucun relevé à déclarer</Trans>
+        </p>
+      )}
+      {!!chargePointCount && chargePointCount > 1 && (
+        <Button
+          asideX={true}
+          variant={
+            currentApplication
+              ? "primary"
+              : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High
+                ? "warning"
+                : urgencyStatus ===
+                    MeterReadingsApplicationUrgencyStatus.Critical
+                  ? "danger"
+                  : "primary"
+          }
+          icon={Plus}
+          disabled={
+            currentApplication &&
+            currentApplication.status !== ElecAuditApplicationStatus.Pending
+          }
+          action={showUploadDialog}
+          label={t("Transmettre mes relevés trimestriels {{quarter}}", {
+            quarter: quarterString,
+          })}
+        />
+      )}
 
       {isApplicationsEmpty && (
         <>
@@ -118,7 +116,7 @@ const ElecMeterReadingsSettings = ({
       )}
 
       {applicationsQuery.loading && <LoaderOverlay />}
-    </>
+    </section>
   )
 }
 

@@ -40,16 +40,14 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   }
 
   return (
-    <>
-      <section>
-        <Button
-          asideX={true}
-          variant="primary"
-          icon={Plus}
-          action={showUploadDialog}
-          label={t("Inscrire des points de recharge")}
-        />
-      </section>
+    <section>
+      <Button
+        asideX={true}
+        variant="primary"
+        icon={Plus}
+        action={showUploadDialog}
+        label={t("Inscrire des points de recharge")}
+      />
 
       {applications.length === 0 ? (
         <section>
@@ -63,7 +61,7 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
           onDownloadChargePointsApplication={downloadChargePointsApplication}
         />
       )}
-    </>
+    </section>
   )
 }
 
