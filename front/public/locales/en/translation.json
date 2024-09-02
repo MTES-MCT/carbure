@@ -1489,6 +1489,6 @@
   "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user",
   "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password..",
   "Identifiant PDC": "Charge point identifier",
-  "Dernier index - kWh": "Last index - kWh",
+  "Identifiant station": "Station identifier",
   "Relevé trimestriel": "Quarterly reading meter"
 }

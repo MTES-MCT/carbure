@@ -1,5 +1,5 @@
 import useEntity from "carbure/hooks/entity"
-import { Bar } from "common/components/scaffold"
+import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   useCBQueryBuilder,
@@ -9,6 +9,8 @@ import FilterMultiSelect from "common/molecules/filter-select"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
+import { useStatus } from "./index.hooks"
+import { StatusSwitcher } from "./status-switcher"
 import { ChargePointFilter } from "./types"
 
 type ChargePointsListProps = {
@@ -18,12 +20,13 @@ type ChargePointsListProps = {
 const ChargePointsList = ({ year }: ChargePointsListProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
+  const status = useStatus()
 
   // Check snapshot is useless (used anywhere)
   const [state, actions] = useCBQueryParamsStore(
     entity,
     year,
-    "status mock",
+    status,
     undefined
   )
 
@@ -39,7 +42,7 @@ const ChargePointsList = ({ year }: ChargePointsListProps) => {
     () => ({
       [ChargePointFilter.ValidationDate]: t("Date d'ajout"),
       [ChargePointFilter.ChargePointId]: t("Identifiant PDC"),
-      [ChargePointFilter.LastMeasureEnergy]: t("Dernier index - kWh"),
+      [ChargePointFilter.StationId]: t("Dernier index - kWh"),
       [ChargePointFilter.ConcernedByReadingMeter]: t("Relevé trimestriel"),
     }),
     [t]
@@ -56,7 +59,11 @@ const ChargePointsList = ({ year }: ChargePointsListProps) => {
           }
         />
       </Bar>
-      <section>MY SECTION</section>
+      <section>
+        <ActionBar>
+          <StatusSwitcher status={status} onSwitch={actions.setStatus} />
+        </ActionBar>
+      </section>
     </>
   )
 }
