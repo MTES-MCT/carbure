@@ -151,6 +151,13 @@ export const okAddDeliverySite = rest.post(
   }
 )
 
+export const okCreateNewDeliverySite = rest.post(
+  "/entity/depots/create",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
 export const okDeleteDeliverySite = rest.post(
   "/api/entity/depots/delete",
   (req, res, ctx) => {

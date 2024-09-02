@@ -1,7 +1,7 @@
 import datetime
 
 from core.excel import export_to_excel
-from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer, ElecChargePointSerializer
+from elec.serializers.elec_charge_point import ElecChargePointSerializer
 
 
 def export_charge_points_to_excel(charge_points, entity):
@@ -40,44 +40,3 @@ def export_charge_points_to_excel(charge_points, entity):
             }
         ],
     )
-
-
-def export_charge_points_sample_to_excel(charge_points, entity):
-    today = datetime.date.today()
-    file = "/tmp/charge_points_%s_sample_%s.xlsx" % (entity.slugify(), today.strftime("%Y-%m-%d_%H%M"))
-
-    return export_to_excel(
-        file,
-        [
-            {
-                "label": "Points de recharge à auditer",
-                "rows": ElecChargePointSampleSerializer(charge_points, many=True).data,
-                "columns": [
-                    {"label": "Latitude", "value": "latitude"},
-                    {"label": "Longitude", "value": "longitude"},
-                    # {"label": "Nom de la station", "value": "station_name"},
-                    {"label": "Identifiant de la station", "value": "station_id"},
-                    {"label": "Identifiant du point de recharge", "value": "charge_point_id"},
-                    {"label": "Identifiant PRM ou MID", "value": get_prm_or_mid},
-                    {"label": "Identifiant PRM ou MID constaté (si différent)", "value": ""},
-                    {"label": "Infrastructure de recharge installée à la localisation renseignée", "value": ""},
-                    {"label": "Identifiant renseigné visible à proximité immédiate de l'infrastructure", "value": ""},
-                    {"label": "Point de contrôle type de courant", "value": ""},
-                    {"label": "Date du relevé par l'intervenant", "value": ""},
-                    {"label": "Énergie active totale relevée", "value": ""},
-                    {"label": "Limite dans la mission de contrôle", "value": ""},
-                ],
-            }
-        ],
-        {"bold": True, "text_wrap": True, "align": "top"},
-        column_width=13,
-        header_height=60,
-    )
-
-
-def get_prm_or_mid(charge_point):
-    charge_point = dict(charge_point)
-    if charge_point.get("is_article_2"):
-        return f"[PRM] {charge_point.get('measure_reference_point_id', 'N/A')}"
-    else:
-        return f"[MID] {charge_point.get('mid_id', 'N/A')}"

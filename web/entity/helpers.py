@@ -29,7 +29,7 @@ def enable_entity(entity):
     entity.save()
 
     # send email to user
-    subject = "Demande d'inscription de société enregistrée"
+    subject = "Demande d'inscription de société validée"
     subject = subject if CarbureEnv.is_prod else "TEST " + subject
     recipient_list = [admin_user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
     text_message = f"""

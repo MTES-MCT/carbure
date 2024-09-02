@@ -153,6 +153,18 @@ export interface EntityCertificate {
   rejected_by_admin: boolean
 }
 
+export interface UploadCheckError {
+  line: number
+  error: string
+  meta?: null | any
+}
+
+export interface UploadCheckReportInfo {
+  errors?: UploadCheckError[]
+  file_name: string
+  error_count: number
+}
+
 export type Unit = "l" | "kg" | "MJ"
 
 export type ExternalAdminPages = "DCA" | "TIRIB" | "AIRLINE" | "ELEC"
@@ -211,6 +223,7 @@ export enum NotificationType {
 export enum DepotType {
   EFS = "EFS",
   EFPE = "EFPE",
+  EFCA = "EFCA",
   Other = "OTHER",
   BiofuelDepot = "BIOFUEL DEPOT",
   OilDepot = "OIL DEPOT",

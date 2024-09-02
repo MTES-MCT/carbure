@@ -2,6 +2,7 @@ import traceback
 from django import forms
 import pandas as pd
 from django.core.files.uploadedfile import UploadedFile
+from django.utils.translation import gettext_lazy as _
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
@@ -30,14 +31,15 @@ class ExcelChargePointError:
 def import_charge_point_excel(excel_file: UploadedFile):
     try:
         # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
-        charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
+        original_charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
-        charge_point_data = TransportDataGouv.merge_charge_point_data(charge_point_data)
+        merged_charge_point_data = TransportDataGouv.merge_charge_point_data(original_charge_point_data)
         # parse the data and validate errors
-        return ExcelChargePoints.validate_charge_points(charge_point_data)
+        charge_point_data = ExcelChargePoints.validate_charge_points(merged_charge_point_data)
+        return charge_point_data[0], charge_point_data[1], original_charge_point_data
     except:
         traceback.print_exc()
-        return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
+        return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}], []
 
 
 class ExcelChargePoints:
@@ -131,15 +133,15 @@ class ExcelChargePointValidator(Validator):
         charge_point_id = charge_point.get("charge_point_id")
 
         if not self.data.get("is_in_tdg"):
-            self.add_error("charge_point_id", f"Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr")  # fmt:skip
+            self.add_error("charge_point_id", _("Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr").format(charge_point_id=charge_point_id))  # fmt:skip
         else:
             if charge_point.get("is_article_2"):
                 if not charge_point.get("measure_reference_point_id"):
-                    self.add_error("measure_reference_point_id", "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu.")  # fmt:skip
+                    self.add_error("measure_reference_point_id", _("L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu."))  # fmt:skip
             else:
                 if not charge_point.get("mid_id"):
-                    self.add_error("mid_id", "Le numéro MID est obligatoire.")
+                    self.add_error("mid_id", _("Le numéro MID est obligatoire."))
                 if not charge_point.get("measure_date"):
-                    self.add_error("measure_date", "La date du dernier relevé est obligatoire.")
+                    self.add_error("measure_date", _("La date du dernier relevé est obligatoire."))
                 if not isinstance(charge_point.get("measure_energy"), float):
-                    self.add_error("measure_energy", "L'énergie mesurée lors du dernier relevé est obligatoire.")  # fmt:skip
+                    self.add_error("measure_energy", _("L'énergie mesurée lors du dernier relevé est obligatoire."))  # fmt:skip

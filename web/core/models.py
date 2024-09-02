@@ -361,6 +361,9 @@ class Depot(models.Model):
     thermal_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
     useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
+    is_enabled = models.BooleanField(default=True)
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+
     def __str__(self):
         return self.name
 
@@ -377,6 +380,19 @@ class Depot(models.Model):
             "thermal_efficiency": self.thermal_efficiency,
             "useful_temperature": self.useful_temperature,
         }
+
+    def clean(self):
+        fields_to_clear = {
+            "POWER PLANT": ["thermal_efficiency", "useful_temperature"],
+            "HEAT PLANT": ["electrical_efficiency", "useful_temperature"],
+            "COGENERATION PLANT": ["electrical_efficiency", "thermal_efficiency"],
+        }
+
+        fields = fields_to_clear.get(self.depot_type, [])
+        for field in fields:
+            setattr(self, field, None)
+
+        super().clean()
 
     class Meta:
         db_table = "depots"

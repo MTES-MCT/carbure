@@ -5,11 +5,11 @@ from core.helpers import (
     get_all_stock,
     get_stocks_summary_data,
 )
-from core.decorators import is_admin
+from core.decorators import check_admin_rights
 from django.http.response import JsonResponse
 
 
-@is_admin
+@check_admin_rights()
 def get_stocks_summary(request, *args, **kwargs):
     short = request.GET.get("short", False)
     try:
@@ -19,6 +19,4 @@ def get_stocks_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get stock summary"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get stock summary"}, status=400)

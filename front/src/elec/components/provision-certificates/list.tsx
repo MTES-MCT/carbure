@@ -4,21 +4,25 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useProvistionCertificateQueryParamsStore } from "elec/hooks/provision-certificate-query-params-store"
-import { useProvisionCertificatesQuery } from "elec/hooks/provision-certificates-query"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
+import FilterMultiSelect from "common/molecules/filter-select"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import {
   ElecCPOProvisionCertificateFilter,
   ElecCPOProvisionCertificateStatus,
   ElecCPOSnapshot,
 } from "elec/types-cpo"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-cpo"
 import ElecProvisionDetailsDialog from "./details"
-import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import { ElecCPOProvisionCertificateTable } from "./table"
 import { EnergyTransferSummary } from "./transfer-summary"
+import { ElecAdminProvisionCertificateStates } from "elec-admin/pages/provision-certificates/types"
 
 type ProvisionCertificateListProps = {
   snapshot: ElecCPOSnapshot
@@ -31,13 +35,16 @@ const ProvisionCertificateList = ({
 }: ProvisionCertificateListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useProvistionCertificateQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot
-  )
-  const query = useProvisionCertificatesQuery(state)
+  const { t } = useTranslation()
+
+  const [state, actions] =
+    useCBQueryParamsStore<ElecAdminProvisionCertificateStates>(
+      entity,
+      year,
+      status,
+      snapshot
+    )
+  const query = useCBQueryBuilder(state)
   const location = useLocation()
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
     key: "elec-provision-certificates",
@@ -56,17 +63,21 @@ const ProvisionCertificateList = ({
 
   const provisionCertificatesData =
     provisionCertificatesResponse.result?.data.data
-  // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST
-
-  // const ids = provisionCertificatesData?.ids ?? []
 
   const total = provisionCertificatesData?.total ?? 0
   const count = provisionCertificatesData?.returned ?? 0
+
+  const filterLabels = {
+    [ElecCPOProvisionCertificateFilter.Quarter]: t("Trimestre"),
+    [ElecCPOProvisionCertificateFilter.OperatingUnit]: t(
+      "Unité d'exploitation"
+    ),
+  }
   return (
     <>
       <Bar>
-        <ProvisionCertificateFilters
-          filters={FILTERS}
+        <FilterMultiSelect
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>

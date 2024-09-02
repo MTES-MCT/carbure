@@ -1,21 +1,27 @@
-import { Entity } from "carbure/types"
-import { Order } from "common/components/table"
+import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import {
   ElecChargePointsApplication,
   ElecMeterReadingsApplication,
 } from "elec/types"
 
-export interface ElecAdminAuditSnapshot {
+export interface ElecAdminAuditSnapshot extends CBSnapshot {
   charge_points_applications_audit_done: number
   charge_points_applications_audit_in_progress: number
   charge_points_applications_history: number
   charge_points_applications_pending: number
   charge_points_applications: number
   meter_readings_applications_history: number
+  meter_readings_applications_audit_done: number
   meter_readings_applications_pending: number
   meter_readings_applications_audit_in_progress: number
   meter_readings_applications: number
 }
+
+
+export interface ElecAdminAuditQuery extends CBQueryParams {
+  [ElecAdminAuditFilter.Cpo]?: string[]
+}
+
 
 export enum ElecAdminAuditFilter {
   Quarter = "quarter",
@@ -29,9 +35,6 @@ export enum ElecAdminAuditStatus {
   History = "HISTORY",
 }
 
-export type ElecAdminAuditFilterSelection = Partial<
-  Record<ElecAdminAuditFilter, string[]>
->
 
 export interface ElecChargePointsApplicationsData {
   charge_points_applications: ElecChargePointsApplication[]
@@ -50,6 +53,8 @@ export interface ElecApplicationSample {
   application_id: number
   percentage: number
   charge_points: ElecChargePointPreview[]
+  comment_count?: number
+  auditor_name?: string
 }
 
 export interface ElecMeterReadingsApplicationsData {
@@ -60,28 +65,3 @@ export interface ElecMeterReadingsApplicationsData {
   total: number
 }
 
-export interface ElecAdminAuditQuery {
-  entity_id: number
-  status?: string
-  year?: number
-  search?: string
-  sort_by?: string
-  order?: string
-  from_idx?: number
-  limit?: number
-  [ElecAdminAuditFilter.Cpo]?: string[]
-  // [ElecAdminAuditFilter.Period]?: string[]
-}
-
-export interface ElecAdminAuditStates {
-  entity: Entity
-  year: number
-  filters: ElecAdminAuditFilterSelection
-  search?: string
-  status: string
-  selection: number[]
-  page: number
-  limit?: number
-  order?: Order
-  snapshot?: ElecAdminAuditSnapshot
-}
