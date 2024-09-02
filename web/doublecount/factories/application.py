@@ -1,11 +1,10 @@
-import factory
 import random
-from datetime import datetime, date
+from datetime import date, datetime
 
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
+import factory
+
 from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
-from saf.models import SafTicket
 
 
 class DoubleCountingApplicationFactory(factory.django.DjangoModelFactory):

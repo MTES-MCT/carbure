@@ -1,10 +1,11 @@
 from typing import List
+
 from openpyxl import Workbook
 from pyparsing import Any
-from doublecount.parser.helpers import extract_year
 
-from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow
 from doublecount.parser.excel_to_carbure_convertor import get_biofuel_from_dc_biofuel, get_feedstock_from_dc_feedstock
+from doublecount.parser.helpers import extract_year
+from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow
 
 
 def parse_production_max(excel_file: Workbook, start_year) -> List[ProductionMaxRow]:
@@ -62,7 +63,7 @@ def parse_production_data(
     other_name: str,  # column to get data like "max_production_capacity" or "estimated_production" or "requested_quota"
     other_index: int,  # index of the column in the excel file
     other_required: bool = False,  # if the other value is required
-    other_alternative_index: int = None,  # alternative index of the other_column in the excel file to allow the first one is zero (ex : outside of france production)
+    other_alternative_index: int = None,  # alternative index of the other_column in the excel file to allow the first one is zero (ex : outside of france production)  # noqa: E501
 ) -> List[Any]:
     data_rows = []
     current_year = -1
@@ -102,5 +103,5 @@ def parse_production_data(
 def intOrZero(value):
     try:
         return int(value)
-    except:
+    except Exception:
         return 0

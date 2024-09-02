@@ -1,19 +1,20 @@
 import argparse
-from typing import Iterable
-import django
 import os
+from typing import Iterable
+
+import django
 
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.core.paginator import Paginator
-from django.db import transaction
-from tqdm import tqdm
+from django.core.paginator import Paginator  # noqa: E402
+from django.db import transaction  # noqa: E402
+from tqdm import tqdm  # noqa: E402
 
-from core.models import CarbureLot, GenericError
-from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
+from core.models import CarbureLot, GenericError  # noqa: E402
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks  # noqa: E402
 
 
 @transaction.atomic
@@ -27,7 +28,7 @@ def cleanup_sanity_checks(year, batch, apply):
     previous_errors = previous_errors.filter(is_blocking=True)
 
     print(
-        f"> Before the modification, there are {previous_errors.count()} errors and {previous_warnings.count()} warnings detected"
+        f"> Before the modification, there are {previous_errors.count()} errors and {previous_warnings.count()} warnings detected"  # noqa: E501
     )
 
     show_error_details(previous_errors, "error")

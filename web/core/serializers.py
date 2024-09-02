@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 from core.models import (
     CarbureLot,
-    CarbureLotEvent,
     CarbureLotComment,
+    CarbureLotEvent,
     CarbureLotReliabilityScore,
     CarbureNotification,
     CarbureStock,

@@ -1,10 +1,12 @@
 import datetime
+
 import openpyxl
 import pandas as pd
 from django.http import JsonResponse
-from core.models import Pays, Biocarburant, MatierePremiere
-from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
+
 from core.common import get_sheet_data
+from core.models import Biocarburant, MatierePremiere, Pays
+from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 
 today = datetime.date.today()
 
@@ -35,7 +37,7 @@ def load_dc_sourcing_data(dca, sourcing_data):
     countries = {f.code_pays: f for f in Pays.objects.all()}
 
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
-    for idx, row in sourcing_data.iterrows():
+    for _idx, row in sourcing_data.iterrows():
         feedstock = feedstocks.get(row.feedstock, None)
         origin_country = countries.get(row.origin_country, None)
         supply_country = countries.get(row.supply_country, None)
@@ -55,7 +57,7 @@ def load_dc_production_data(dca, production_data):
     biofuels = {f.code: f for f in Biocarburant.objects.all()}
 
     DoubleCountingProduction.objects.filter(dca=dca).delete()
-    for idx, row in production_data.iterrows():
+    for _idx, row in production_data.iterrows():
         feedstock = feedstocks.get(row.feedstock, None)
         biofuel = biofuels.get(row.biofuel, None)
         dcs = DoubleCountingProduction(dca=dca)

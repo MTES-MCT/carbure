@@ -1,11 +1,12 @@
 # /api/saf/airline/tickets
 
-from math import floor
 import traceback
+from math import floor
+
 from django.core.paginator import Paginator
 from django.db.models import Q
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from saf.models import SafTicket
@@ -27,7 +28,7 @@ def get_tickets(request, *args, **kwargs):
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
         export = "export" in request.GET
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
 
@@ -91,19 +92,19 @@ def find_tickets(**filters):
         "supplier",
     )
 
-    if filters["entity_id"] != None:
+    if filters["entity_id"] is not None:
         tickets = tickets.filter(client_id=filters["entity_id"])
 
-    if filters["year"] != None:
+    if filters["year"] is not None:
         tickets = tickets.filter(year=filters["year"])
 
-    if filters["periods"] != None:
+    if filters["periods"] is not None:
         tickets = tickets.filter(assignment_period__in=filters["periods"])
 
-    if filters["feedstocks"] != None:
+    if filters["feedstocks"] is not None:
         tickets = tickets.filter(feedstock__code__in=filters["feedstocks"])
 
-    if filters["suppliers"] != None:
+    if filters["suppliers"] is not None:
         tickets = tickets.filter(supplier__name__in=filters["suppliers"])
 
     if filters["status"] == SafTicket.PENDING:
@@ -113,7 +114,7 @@ def find_tickets(**filters):
     else:
         raise Exception("Status '%s' does not exist for tickets" % filters["status"])
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         tickets = tickets.filter(
             Q(carbure_id__icontains=filters["search"])
             | Q(supplier__name__icontains=filters["search"])

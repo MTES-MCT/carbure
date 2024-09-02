@@ -1,10 +1,13 @@
-import pandas as pd
 from typing import Iterable
+
+import pandas as pd
+from django import forms
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.translation import gettext_lazy as _
-from django import forms
+
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
 
@@ -16,8 +19,10 @@ def import_meter_reading_excel(
     renewable_share: int = 1,
 ):
     original_meter_readings_data = ExcelMeterReadings.parse_meter_reading_excel(excel_file)
-    meter_readings_data = ExcelMeterReadings.validate_meter_readings(original_meter_readings_data, existing_charge_points, previous_application, renewable_share)
-    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data  # fmt:skip
+    meter_readings_data = ExcelMeterReadings.validate_meter_readings(
+        original_meter_readings_data, existing_charge_points, previous_application, renewable_share
+    )
+    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data
 
 
 class ExcelMeterReadings:
@@ -32,7 +37,10 @@ class ExcelMeterReadings:
     def parse_meter_reading_excel(excel_file: UploadedFile):
         meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 4)))
         meter_readings_data["line"] = meter_readings_data.index + 2  # add a line number to locate data in the excel file
-        meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelMeterReadings.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+        meter_readings_data.rename(
+            columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelMeterReadings.EXCEL_COLUMNS)},
+            inplace=True,
+        )
         meter_readings_data = meter_readings_data.drop_duplicates("charge_point_id")
         meter_readings_data.dropna(inplace=True)
 
@@ -46,7 +54,9 @@ class ExcelMeterReadings:
         renewable_share: int = 1,
     ):
         charge_point_by_id = {cp.charge_point_id: cp for cp in registered_charge_points}
-        previous_readings_by_charge_point = get_previous_readings_by_charge_point(registered_charge_points, previous_application)  # fmt:skip
+        previous_readings_by_charge_point = get_previous_readings_by_charge_point(
+            registered_charge_points, previous_application
+        )
 
         context = {
             "renewable_share": renewable_share,
@@ -58,7 +68,7 @@ class ExcelMeterReadings:
 
 
 class ExcelMeterReadingValidator(Validator):
-    charge_point_id = forms.CharField()
+    meter = forms.ModelChoiceField(queryset=ElecMeter.objects.all())
     extracted_energy = forms.FloatField(min_value=0)
     reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     renewable_energy = forms.FloatField()
@@ -76,8 +86,8 @@ class ExcelMeterReadingValidator(Validator):
         self.context["charge_point"] = charge_point
         self.context["previous_extracted_energy"] = previous_extracted_energy
 
-        meter_reading["charge_point_id"] = charge_point.pk if charge_point else None
-        meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share  # fmt:skip
+        meter_reading["meter"] = charge_point.current_meter if charge_point else None
+        meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share
 
         return meter_reading
 

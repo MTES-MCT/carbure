@@ -1,5 +1,6 @@
-from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
+from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.helpers import get_auditor_stock
 from core.models import CarbureLot, Entity

@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Biocarburant, MatierePremiere, Pays
 
+
 class EECStats(models.Model):
     feedstock = models.ForeignKey(MatierePremiere, null=False, blank=False, on_delete=models.CASCADE)
     origin = models.ForeignKey(Pays, null=False, blank=False, on_delete=models.CASCADE)
@@ -11,9 +12,9 @@ class EECStats(models.Model):
     average = models.FloatField(null=False, blank=False)
 
     class Meta:
-        db_table = 'ml_eec_stats'
-        verbose_name = 'ML EEC Stat'
-        verbose_name_plural = 'ML EEC Stats'
+        db_table = "ml_eec_stats"
+        verbose_name = "ML EEC Stat"
+        verbose_name_plural = "ML EEC Stats"
 
 
 class EPStats(models.Model):
@@ -26,9 +27,9 @@ class EPStats(models.Model):
     average = models.FloatField(null=False, blank=False)
 
     class Meta:
-        db_table = 'ml_ep_stats'
-        verbose_name = 'ML EP Stat'
-        verbose_name_plural = 'ML EP Stats'
+        db_table = "ml_ep_stats"
+        verbose_name = "ML EP Stat"
+        verbose_name_plural = "ML EP Stats"
 
 
 class ETDStats(models.Model):
@@ -36,8 +37,6 @@ class ETDStats(models.Model):
     default_value = models.FloatField(null=False, blank=False, default=0.0)
 
     class Meta:
-        db_table = 'ml_etd_stats'
-        verbose_name = 'ML ETD Stat'
-        verbose_name_plural = 'ML ETD Stats'
-
-
+        db_table = "ml_etd_stats"
+        verbose_name = "ML ETD Stat"
+        verbose_name_plural = "ML ETD Stats"

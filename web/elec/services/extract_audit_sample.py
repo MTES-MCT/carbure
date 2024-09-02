@@ -1,6 +1,8 @@
 import random
 from collections import defaultdict
+
 from django.db.models import QuerySet
+
 from elec.models import ElecChargePoint
 
 
@@ -45,7 +47,7 @@ def extract_audit_sample(charge_points: QuerySet[ElecChargePoint], percentage: f
 
 # copypasta https://stackoverflow.com/a/72621718
 def distance(a: ElecChargePoint, b: ElecChargePoint):
-    import math
+    import math  # noqa: E402
 
     # Convert all angles to radians
     lat1_r = math.radians(a.latitude or 0)

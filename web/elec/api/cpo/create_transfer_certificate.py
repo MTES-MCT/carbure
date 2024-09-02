@@ -1,18 +1,18 @@
 # /api/elec/provision-certificate/snapshot
 
-import traceback
 import datetime
+import traceback
 
 from django import forms
-from django.db.models import Sum
 from django.db import transaction
+from django.db.models import Sum
 from django.views.decorators.http import require_POST
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
 from core.notifications import notify_elec_transfer_certificate
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 
@@ -87,6 +87,6 @@ def create_transfer_certificate(request, *args, **kwargs):
             transfer_certificate.save()
             notify_elec_transfer_certificate(transfer_certificate)
             return SuccessResponse(ElecTransferCertificateSerializer(transfer_certificate).data)
-        except:
+        except Exception:
             traceback.print_exc()
             return ErrorResponse(400, ElecTransferError.CREATION_FAILED)

@@ -38,7 +38,6 @@ whitenoise = "6.6.0"
 xlsxwriter = "3.2.0"
 
 [dev-packages]
-black = "*"
 django-stubs = "*"
 types-python-dateutil = "*"
 types-pytz = "*"
@@ -49,6 +48,8 @@ types-factory-boy = "*"
 types-pyjwt = "*"
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
 types-six = "*"
+pre-commit = "*"
+ruff = "*"
 
 [requires]
 python_version = "3"

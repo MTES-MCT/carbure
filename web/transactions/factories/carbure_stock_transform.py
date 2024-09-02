@@ -1,7 +1,7 @@
 import factory
-
 from django.contrib.auth import get_user_model
-from core.models import CarbureStockTransformation, CarbureStock, Entity
+
+from core.models import CarbureStockTransformation, Entity
 
 User = get_user_model()
 

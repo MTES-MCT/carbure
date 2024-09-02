@@ -1,8 +1,9 @@
-import traceback
 import os
-from django.conf import settings
-from core.carburetypes import CarbureError
+import traceback
 
+from django.conf import settings
+
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse
 
 

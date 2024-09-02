@@ -1,31 +1,45 @@
-from django.db.models import OuterRef, Subquery, F
-from django.views.decorators.http import require_GET
+from math import floor
+
 from django import forms
 from django.core.paginator import Paginator
-from math import floor
+from django.db.models import FloatField, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
+from django.views.decorators.http import require_GET
+
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import Entity
 from elec.models import ElecChargePoint, ElecMeterReading
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
-from elec.services.export_charge_point_excel import export_charge_points_to_excel
 from elec.serializers.elec_charge_point_application import ElecChargePointApplication
-from core.carburetypes import CarbureError
+from elec.services.export_charge_point_excel import export_charge_points_to_excel
 
 
 class ChargePointFilterForm(forms.Form):
     year = forms.IntegerField(required=False)
     status = forms.CharField(required=False)
-    created_at = forms.DateField(required=False)
+    application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
-    last_extracted_energy = forms.FloatField(required=False)
+    latest_extracted_energy = forms.FloatField(required=False)
     is_article_2 = forms.BooleanField(required=False)
 
 
 class ChargePointSortForm(forms.Form):
     from_idx = forms.IntegerField(required=False)
     limit = forms.IntegerField(required=False)
+
+
+def annotate_with_latest_extracted_energy(queryset):
+    latest_extracted_energy_subquery = (
+        ElecMeterReading.objects.filter(meter__charge_point=OuterRef("pk"))
+        .order_by("-reading_date")
+        .values("extracted_energy")[:1]
+    )
+    return queryset.annotate(
+        latest_extracted_energy=Coalesce(Subquery(latest_extracted_energy_subquery), Value(0), output_field=FloatField())
+    )
 
 
 @require_GET
@@ -45,7 +59,8 @@ def get_charge_points(request, entity):
     limit = charge_points_sort_form.cleaned_data["limit"] or 25
 
     charge_points = ElecChargePoint.objects.filter(cpo=entity)
-
+    charge_points = charge_points.select_related("application")
+    charge_points = annotate_with_latest_extracted_energy(charge_points)
     charge_points = filter_charge_points(charge_points, **charge_points_filter_form.cleaned_data)
 
     if charge_points_sort_form.cleaned_data["from_idx"] is not None:
@@ -65,9 +80,7 @@ def get_charge_points(request, entity):
 
 
 def filter_charge_points(charge_points, **filters):
-    charge_points = charge_points.prefetch_related(
-        "elec_meter_readings",
-    )
+    charge_points = charge_points.prefetch_related("elec_meters")
 
     if filters["year"]:
         charge_points = charge_points.filter(application__created_at__year=filters["year"])
@@ -81,22 +94,14 @@ def filter_charge_points(charge_points, **filters):
         }
         charge_points = charge_points.filter(application__status__in=status_mapping[filters["status"]])
 
-    if filters["created_at"]:
-        charge_points = charge_points.filter(application__created_at=filters["created_at"])
+    if filters["application_date"]:
+        charge_points = charge_points.filter(application__created_at=filters["application_date"])
 
     if filters["charge_point_id"]:
         charge_points = charge_points.filter(charge_point_id=filters["charge_point_id"])
 
-    if filters["last_extracted_energy"] is not None:
-        latest_reading_subquery = (
-            ElecMeterReading.objects.filter(charge_point=OuterRef("pk")).order_by("-reading_date").values("pk")[:1]
-        )
-        charge_points = charge_points.annotate(latest_reading_id=Subquery(latest_reading_subquery))
-        charge_points = charge_points.filter(
-            elec_meter_readings__pk=F("latest_reading_id"),
-            elec_meter_readings__extracted_energy=filters["last_extracted_energy"],
-        )
-        charge_points = charge_points.filter(elec_meter_readings__extracted_energy=filters["last_extracted_energy"])
+    if filters["latest_extracted_energy"] is not None:
+        charge_points = charge_points.filter(latest_extracted_energy=filters["latest_extracted_energy"])
 
     if filters["is_article_2"]:
         charge_points = charge_points.filter(is_article_2=filters["is_article_2"])

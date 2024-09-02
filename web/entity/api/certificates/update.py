@@ -1,7 +1,8 @@
+from django.http.response import JsonResponse
+
 from certificates.models import ProductionSiteCertificate
 from core.decorators import check_user_rights
 from core.models import Entity, EntityCertificate, GenericCertificate, UserRights
-from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -27,11 +28,11 @@ def update_certificate(request, *args, **kwargs):
         new_certificate = GenericCertificate.objects.get(
             certificate_type=new_certificate_type, certificate_id=new_certificate_id
         )
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find new certificate"}, status=400)
     try:
         old_certificate = EntityCertificate.objects.get(entity=entity, certificate__certificate_id=old_certificate_id)
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find old certificate"}, status=400)
     obj, created = EntityCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
     ProductionSiteCertificate.objects.filter(entity=entity, certificate=old_certificate).update(certificate=obj)

@@ -1,4 +1,5 @@
 import traceback
+
 from openpyxl import Workbook
 
 
@@ -17,7 +18,7 @@ def parse_info(excel_file: Workbook):
                 if row[6].value == "Première année de reconnaissance":
                     break
             start_year = int(application[year_row_index + 2][6].value)
-        except:
+        except Exception:
             start_year = 0
 
         return {
@@ -25,6 +26,6 @@ def parse_info(excel_file: Workbook):
             "producer_email": producer_email,
             "start_year": start_year,
         }
-    except:
+    except Exception:
         traceback.print_exc()
         return {"production_site": None, "producer_email": None, "start_year": 0}

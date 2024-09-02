@@ -1,16 +1,16 @@
-# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb
+# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb  # noqa: E501
 from datetime import date
 
-from core.tests_utils import setup_current_user
-from core.models import CarbureLot, Entity, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import CarbureLot, Entity, Pays, UserRights
+from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
 from doublecount.factories.sourcing import DoubleCountingSourcingFactory
 from doublecount.models import DoubleCountingApplication
-
 from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
 
@@ -114,17 +114,17 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.create_agreement()
 
         response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "year": 2023})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
         active_agreements = data["active"]
-        self.assertEqual(len(active_agreements), 2)
+        assert len(active_agreements) == 2
 
         active_agreement1 = active_agreements[0]
-        self.assertEqual(active_agreement1["certificate_id"], agreement1.certificate_id)
+        assert active_agreement1["certificate_id"] == agreement1.certificate_id
 
         # quotas
         total_progression = (prod3_progression + prod1_progression) / 2
-        self.assertEqual(active_agreement1["quotas_progression"], round(total_progression, 2))
+        assert active_agreement1["quotas_progression"] == round(total_progression, 2)
 
     def test_get_agreements_excel(self):
         self.create_agreement()
@@ -133,8 +133,8 @@ class AdminDoubleCountAgreementsTest(TestCase):
         response = self.client.get(
             reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "as_excel_file": "true", "year": 2023}
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     def test_get_agreement_details(self):
         agreement, app, production1, production2, production3 = self.create_agreement()
@@ -150,23 +150,23 @@ class AdminDoubleCountAgreementsTest(TestCase):
             reverse("admin-double-counting-agreements-details"),
             {"entity_id": self.admin.id, "agreement_id": agreement_id},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
         application = data["application"]
         quotas = data["quotas"]
 
-        self.assertEqual(application["id"], app.id)
-        self.assertEqual(len(quotas), 2)  # production 1 +production 3
+        assert application["id"] == app.id
+        assert len(quotas) == 2  # production 1 +production 3
 
         quota_line_1 = quotas[0]
-        self.assertEqual(quota_line_1["year"], start_year)
-        self.assertEqual(quota_line_1["feedstock"]["name"], lot2.feedstock.name)
-        self.assertEqual(quota_line_1["production_tonnes"], round(prod1_tonnes))
-        self.assertEqual(quota_line_1["lot_count"], 2)  # 2 lots created in create_lots()
-        self.assertEqual(quota_line_1["quotas_progression"], round(prod1_progression, 2))
+        assert quota_line_1["year"] == start_year
+        assert quota_line_1["feedstock"]["name"] == lot2.feedstock.name
+        assert quota_line_1["production_tonnes"] == round(prod1_tonnes)
+        assert quota_line_1["lot_count"] == 2  # 2 lots created in create_lots()
+        assert quota_line_1["quotas_progression"] == round(prod1_progression, 2)
 
         quota_line_2 = quotas[1]
-        self.assertEqual(quota_line_2["production_tonnes"], round(lot3.weight / 1000))
+        assert quota_line_2["production_tonnes"] == round(lot3.weight / 1000)
         # without
         agreement.application = None
         agreement.save()
@@ -174,8 +174,8 @@ class AdminDoubleCountAgreementsTest(TestCase):
             reverse("admin-double-counting-agreements-details"),
             {"entity_id": self.admin.id, "agreement_id": agreement_id},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
 
-        self.assertEqual(data["application"], None)
-        self.assertEqual(data["quotas"], None)
+        assert data["application"] is None
+        assert data["quotas"] is None

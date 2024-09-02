@@ -1,5 +1,6 @@
-from core.models import Entity
 from django.http import JsonResponse
+
+from core.models import Entity
 
 
 def get_entities(request):

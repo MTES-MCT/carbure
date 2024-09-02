@@ -1,25 +1,25 @@
+import argparse
+import datetime
 import os
 from typing import cast
+
 import django
-import datetime
-import argparse
-from django.utils import timezone
-from django.template import loader
-from django.db.models import Count, Min, Max
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.conf import settings
 import pytz
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.db.models import Count, Max, Min
+from django.template import loader
+from django.utils import timezone
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureNotification, Entity, UserRights
+from core.models import CarbureNotification, Entity, UserRights  # noqa: E402
 
 MAX_NOTIF_PER_HOUR = 20
 
 
 def send_notification_emails(test: bool = False) -> None:
-
     entities = Entity.objects.annotate(num_notifs=Count("carburenotification")).order_by("-num_notifs")
     domain = os.environ["ALLOWED_HOSTS"]
     one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
@@ -36,7 +36,6 @@ def send_notification_emails(test: bool = False) -> None:
         return
 
     for entity in entities:
-
         all_notifs = CarbureNotification.objects.filter(
             dest=entity,
             send_by_email=True,

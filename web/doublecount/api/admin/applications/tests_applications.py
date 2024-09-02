@@ -1,18 +1,18 @@
-# test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
-from datetime import date
+# test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb  # noqa: E501
 import json
 import os
-from pprint import pprint
-from doublecount.api.admin.applications.add import DoubleCountingAddError
-from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
-from certificates.models import DoubleCountingRegistration
+from datetime import date
 
-from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, UserRights
-from django.test import TestCase
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
+from django.urls import reverse
+
+from certificates.models import DoubleCountingRegistration
+from core.models import Entity, Pays, UserRights
+from core.tests_utils import setup_current_user
+from doublecount.api.admin.applications.add import DoubleCountingAddError
+from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
 from doublecount.factories import (
     DoubleCountingApplicationFactory,
     DoubleCountingProductionFactory,
@@ -20,7 +20,6 @@ from doublecount.factories import (
 )
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.doc_file import DoubleCountingDocFileFactory
-
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
 
@@ -105,67 +104,64 @@ class AdminDoubleCountApplicationsTest(TestCase):
     def test_add_application(self):
         # 1 - test add file
         response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
         created_at = application.created_at
 
         # 1.1 - status should be PENDING
-        self.assertEqual(application.status, DoubleCountingApplication.PENDING)
+        assert application.status == DoubleCountingApplication.PENDING
 
         # 1.2 - test production requested
         productions = DoubleCountingProduction.objects.filter(dca_id=application.id, year=2023)
-        self.assertEqual(productions[0].requested_quota, 20500)
-        self.assertEqual(productions[1].requested_quota, 10000)
+        assert productions[0].requested_quota == 20500
+        assert productions[1].requested_quota == 10000
 
         # 1.3  test_dc_number_generation
-        self.assertEqual(application.production_site.dc_number, str(1000 + int(application.production_site.id)))
-        self.assertEqual(
-            application.certificate_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year}"
-        )
-        self.assertEqual(application.production_site.dc_reference, application.certificate_id)
+        assert application.production_site.dc_number == str(1000 + int(application.production_site.id))
+        assert application.certificate_id == f"FR_{application.production_site.dc_number}_{self.requested_start_year}"
+        assert application.production_site.dc_reference == application.certificate_id
 
         # 1.2 - check period_start and period_end
-        self.assertEqual(application.period_start, date(self.requested_start_year, 1, 1))
-        self.assertEqual(application.period_end, date(self.requested_start_year + 1, 12, 31))
+        assert application.period_start == date(self.requested_start_year, 1, 1)
+        assert application.period_end == date(self.requested_start_year + 1, 12, 31)
 
         # 2 - test if file uploaded
         DoubleCountingDocFileFactory.create(certificate_id=application.certificate_id, file_name="dca.xlsx")
-        pprint(DoubleCountingDocFile.objects.all())
         docFile = DoubleCountingDocFile.objects.filter(certificate_id=application.certificate_id).first()
-        self.assertEqual(docFile.file_name, "dca.xlsx")
-        self.assertEqual(docFile.certificate_id, application.certificate_id)
+        assert docFile.file_name == "dca.xlsx"
+        assert docFile.certificate_id == application.certificate_id
 
         # 3 - test upload twice
         response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
+        assert error == DoubleCountingAddError.APPLICATION_ALREADY_EXISTS
 
         # 4 - test should replace
         response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
-        self.assertNotEqual(application.created_at, created_at)
+        assert application.created_at != created_at
 
         # 5 - cannot be replaced if already accepted
         application.status = DoubleCountingApplication.ACCEPTED
         application.save()
         response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
+        assert error == DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED
 
     def test_add_application_to_existing_agreement(self):
         certificate_id = "FR_28_2023"
         # agreement not existing
         response = self.add_file("dc_agreement_application_valid.xlsx", {"certificate_id": certificate_id})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
+        assert error == DoubleCountingAddError.AGREEMENT_NOT_FOUND
 
         # agreement existing
         _ = DoubleCountingRegistrationFactory.create(
@@ -175,29 +171,29 @@ class AdminDoubleCountApplicationsTest(TestCase):
         )
 
         response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
+        assert error == DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS
 
         response = self.add_file("dc_agreement_application_valid.xlsx", {"certificate_id": certificate_id})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # agreement should be linked to the application
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
-        self.assertEqual(application.certificate_id, certificate_id)
+        assert application.certificate_id == certificate_id
         agreement = DoubleCountingRegistration.objects.get(certificate_id=certificate_id)
-        self.assertEqual(agreement.application.id, application.id)
+        assert agreement.application.id == application.id
 
     def test_production_site_address_mandatory(self):
         self.production_site.address = ""
         self.production_site.save()
         response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
+        assert error == DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED
 
     def test_list_applications(self):
         self.create_application()
@@ -211,7 +207,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         pending = data["pending"]
         application = pending[0]
 
-        self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
+        assert application["producer"]["id"] == self.production_site.producer.id
 
     def test_application_details(self):
         app, sourcing, production, _, _ = self.create_application()
@@ -223,13 +219,13 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         application = response.json()["data"]
 
-        self.assertEqual(application["sourcing"][0]["id"], sourcing.id)
-        self.assertEqual(application["production"][0]["id"], production.id)
+        assert application["sourcing"][0]["id"] == sourcing.id
+        assert application["production"][0]["id"] == production.id
 
         production_site = application["production_site"]
-        self.assertEqual(production_site["id"], self.production_site.id)
-        self.assertEqual(production_site["inputs"], [])
-        self.assertEqual(production_site["certificates"], [])
+        assert production_site["id"] == self.production_site.id
+        assert production_site["inputs"] == []
+        assert production_site["certificates"] == []
 
     def test_approve_application(self):
         application, sourcing1, production1, sourcing2, production2 = self.create_application()
@@ -237,9 +233,9 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # test approve without quotas
         params = {"dca_id": application.id, "entity_id": self.admin.id}
         response = self.client.post(reverse("admin-double-counting-application-approve"), params)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["error"], DoubleCountingApplicationApproveError.QUOTAS_NOT_APPROVED)
-        self.assertEqual(application.status, DoubleCountingApplication.PENDING)
+        assert response.status_code == 400
+        assert response.json()["error"] == DoubleCountingApplicationApproveError.QUOTAS_NOT_APPROVED
+        assert application.status == DoubleCountingApplication.PENDING
 
         # update quotas
         updated_quotas = [[production1.id, 20500], [production2.id, 10000]]
@@ -247,11 +243,11 @@ class AdminDoubleCountApplicationsTest(TestCase):
             reverse("admin-double-counting-application-update-approved-quotas"),
             {"entity_id": self.admin.id, "approved_quotas": json.dumps(updated_quotas), "dca_id": application.id},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         productions = DoubleCountingProduction.objects.filter(dca_id=application.id)
-        self.assertEqual(productions[0].approved_quota, 20500)
-        self.assertEqual(productions[1].approved_quota, 10000)
+        assert productions[0].approved_quota == 20500
+        assert productions[1].approved_quota == 10000
 
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
@@ -259,16 +255,16 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         # test approve with quotas
         response = self.client.post(reverse("admin-double-counting-application-approve"), params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
-        self.assertEqual(application.status, DoubleCountingApplication.ACCEPTED)
+        assert application.status == DoubleCountingApplication.ACCEPTED
 
         # test agreement generation
         agreement = DoubleCountingRegistration.objects.get(certificate_id=application.certificate_id)
-        self.assertEqual(agreement.valid_from, date(2023, 1, 1))
-        self.assertEqual(agreement.valid_until, date(2024, 12, 31))
-        self.assertEqual(agreement.production_site, application.production_site)
-        self.assertEqual(agreement.certificate_id, application.certificate_id)
-        self.assertEqual(agreement.application.id, application.id)
+        assert agreement.valid_from == date(2023, 1, 1)
+        assert agreement.valid_until == date(2024, 12, 31)
+        assert agreement.production_site == application.production_site
+        assert agreement.certificate_id == application.certificate_id
+        assert agreement.application.id == application.id

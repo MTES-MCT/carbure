@@ -4,14 +4,13 @@ import traceback
 
 from django import forms
 from django.views.decorators.http import require_GET
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from elec.models import ElecChargePointApplication
-from elec.models import ElecChargePoint
-from elec.models import ElecMeterReadingApplication
-from elec.api.cpo.charge_points.charge_points import filter_charge_points
 from elec.api.cpo.charge_points.applications import filter_charge_point_applications
+from elec.api.cpo.charge_points.charge_points import filter_charge_points
 from elec.api.cpo.meter_readings.applications import filter_meter_readings_applications
+from elec.models import ElecChargePoint, ElecChargePointApplication, ElecMeterReadingApplication
 
 
 class ElecSnapshotError:
@@ -23,9 +22,9 @@ class ElecSnapshotForm(forms.Form):
     entity_id = forms.IntegerField()
     category = forms.CharField()
     year = forms.IntegerField()
-    created_at = forms.DateField(required=False)
+    application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
-    last_extracted_energy = forms.FloatField(required=False)
+    latest_extracted_energy = forms.FloatField(required=False)
     is_article_2 = forms.BooleanField(required=False)
 
 

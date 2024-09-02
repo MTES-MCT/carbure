@@ -1,7 +1,8 @@
+from django.http.response import JsonResponse
+
+from core.decorators import check_user_rights
 from core.models import CarbureNotification
 from core.serializers import CarbureNotificationSerializer
-from django.http.response import JsonResponse
-from core.decorators import check_user_rights
 
 
 @check_user_rights()

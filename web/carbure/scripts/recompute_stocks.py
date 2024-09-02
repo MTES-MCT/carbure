@@ -1,20 +1,19 @@
 import argparse
 import os
+
 import django
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Sum
-from django.core.paginator import Paginator
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent
+from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent  # noqa: E402
 
 
 @transaction.atomic
 def recompute_stocks(apply, batch):
-
     all_stocks = (
         CarbureStock.objects.all()
         .order_by("id")
@@ -72,12 +71,14 @@ def recompute_stocks(apply, batch):
                 update_events.append(update_event)
 
         if apply:
-            CarbureStock.objects.bulk_update(stocks_to_update, ["remaining_volume", "remaining_weight", "remaining_lhv_amount"])  # fmt:skip
+            CarbureStock.objects.bulk_update(
+                stocks_to_update, ["remaining_volume", "remaining_weight", "remaining_lhv_amount"]
+            )
             CarbureStockEvent.objects.bulk_create(update_events)
 
     print(f"> {bad_count} stocks with wrong remaining volumes were updated")
 
-    print(f"> Done")
+    print("> Done")
 
 
 if __name__ == "__main__":

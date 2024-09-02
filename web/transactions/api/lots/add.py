@@ -1,13 +1,13 @@
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from core.common import ErrorResponse, SuccessResponse
-from core.models import CarbureLotEvent, UserRights
-from core.decorators import check_user_rights
-from transactions.sanity_checks.helpers import get_prefetched_data
-from transactions.helpers import construct_carbure_lot, bulk_insert_lots
 from carbure.tasks import background_bulk_scoring
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_user_rights
+from core.models import CarbureLotEvent, UserRights
 from core.serializers import CarbureLotPublicSerializer
+from transactions.helpers import bulk_insert_lots, construct_carbure_lot
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 class AddLotError:

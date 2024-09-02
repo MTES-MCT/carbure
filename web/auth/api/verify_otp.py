@@ -1,12 +1,13 @@
 from django import forms
-from django.core.validators import RegexValidator
 from django.contrib.auth.decorators import login_required
+from django.core.validators import RegexValidator
 from django.utils import timezone
-from django_otp import user_has_device, login as login_with_device
+from django_otp import login as login_with_device
+from django_otp import user_has_device
 from django_otp.plugins.otp_email.models import EmailDevice
 
-from core.common import ErrorResponse, SuccessResponse
 from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 
 
 @login_required
@@ -55,7 +56,7 @@ class OTPForm(forms.Form):
         max_length=6,
         min_length=6,
         validators=[RegexValidator(r"^\d{6}$")],
-        label=f"Entrez le code à 6 chiffres reçu par email",
+        label="Entrez le code à 6 chiffres reçu par email",
         widget=forms.TextInput(attrs={"autocomplete": "off"}),
     )
 

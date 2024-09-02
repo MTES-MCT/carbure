@@ -4,49 +4,47 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='DoubleCountingRegistration',
+            name="DoubleCountingRegistration",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('certificate_id', models.CharField(max_length=64)),
-                ('certificate_holder', models.CharField(max_length=256)),
-                ('registered_address', models.TextField()),
-                ('valid_from', models.DateField()),
-                ('valid_until', models.DateField()),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("certificate_id", models.CharField(max_length=64)),
+                ("certificate_holder", models.CharField(max_length=256)),
+                ("registered_address", models.TextField()),
+                ("valid_from", models.DateField()),
+                ("valid_until", models.DateField()),
             ],
             options={
-                'verbose_name': 'Certificat Double Compte',
-                'verbose_name_plural': 'Certificats Double Compte',
-                'db_table': 'double_counting_registrations',
+                "verbose_name": "Certificat Double Compte",
+                "verbose_name_plural": "Certificats Double Compte",
+                "db_table": "double_counting_registrations",
             },
         ),
         migrations.CreateModel(
-            name='DoubleCountingRegistrationInputOutput',
+            name="DoubleCountingRegistrationInputOutput",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
             ],
             options={
-                'verbose_name': 'Périmètre Certificat Double Compte',
-                'verbose_name_plural': 'Périmètres Certificats Double Compte',
-                'db_table': 'double_counting_registrations_scope',
+                "verbose_name": "Périmètre Certificat Double Compte",
+                "verbose_name_plural": "Périmètres Certificats Double Compte",
+                "db_table": "double_counting_registrations_scope",
             },
         ),
         migrations.CreateModel(
-            name='ProductionSiteCertificate',
+            name="ProductionSiteCertificate",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
             ],
             options={
-                'verbose_name': 'Certificat de site de production',
-                'verbose_name_plural': 'Certificats de sites de productions',
-                'db_table': 'production_sites_certificates',
+                "verbose_name": "Certificat de site de production",
+                "verbose_name_plural": "Certificats de sites de productions",
+                "db_table": "production_sites_certificates",
             },
         ),
     ]

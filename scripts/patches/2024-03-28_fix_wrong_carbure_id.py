@@ -1,16 +1,14 @@
 import argparse
 import os
+
 import django
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import F, Value, CharField
-from django.db.models.functions import Concat, Coalesce
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, CarbureLotEvent
+from core.models import CarbureLot, CarbureLotEvent  # noqa: E402
 
 
 @transaction.atomic
@@ -54,7 +52,7 @@ def fix_wrong_carbure_id(apply, batch):
 
     print(f"> {bad_count} lots with wrong carbure_id were updated")
 
-    print(f"> Done")
+    print("> Done")
 
 
 if __name__ == "__main__":

@@ -1,12 +1,14 @@
 # /api/saf/operator/snapshot
 
 import traceback
+from datetime import datetime
+
+from django.db.models.query_utils import Q
+
 from certificates.models import DoubleCountingRegistration
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from doublecount.models import DoubleCountingApplication
-from django.db.models.query_utils import Q
-from datetime import datetime
 
 
 class SafSnapshotError:
@@ -34,7 +36,7 @@ def get_snapshot(request, *args, **kwargs):
             Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
         )
         agreements_expired = DoubleCountingRegistration.objects.filter(Q(valid_until__year__lt=current_year))
-        # agreements_active = DoubleCountingRegistration.objects.filter((Q(period_start__year=year) | Q(period_end__year=year)))
+        # agreements_active = DoubleCountingRegistration.objects.filter((Q(period_start__year=year) | Q(period_end__year=year)))  # noqa: E501
         # TODO  agreements_torenew
 
         return SuccessResponse(

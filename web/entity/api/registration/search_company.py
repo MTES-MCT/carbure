@@ -1,11 +1,12 @@
 from math import e
+
+import requests
 from django import forms
 
 from core.carburetypes import CarbureError
-from core.decorators import check_user_rights, otp_or_403
-from core.models import Pays, UserRights, Entity
-from core.common import SuccessResponse, ErrorResponse
-import requests
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import otp_or_403
+from core.models import Entity
 
 
 class SeachCompanyFormError:
@@ -27,7 +28,7 @@ def search_company(request, *args, **kwargs):
     registration_id = form.cleaned_data["registration_id"]
     try:
         company_found = search_company_gouv_fr(registration_id)
-    except:
+    except Exception:
         return ErrorResponse(400, SeachCompanyFormError.NO_COMPANY_FOUND)
 
     company_siege = company_found["siege"]
@@ -56,7 +57,7 @@ def search_company(request, *args, **kwargs):
             "meta": {"company_name": entity.name},
         }
         print("company_preview: ", company_preview)
-    except:
+    except Exception:
         print("no registred company wit same siret")
 
     return SuccessResponse(response)

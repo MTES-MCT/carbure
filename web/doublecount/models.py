@@ -1,10 +1,10 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from core.models import Entity, MatierePremiere, Pays, Biocarburant
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
-from django.db.models.signals import pre_save
 
 usermodel = get_user_model()
 

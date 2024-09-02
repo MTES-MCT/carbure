@@ -1,13 +1,14 @@
 # /api/saf/operator/ticket-sources
 
-from math import floor
 import traceback
+from math import floor
+
 from django import forms
 from django.core.paginator import Paginator
-from django.db.models.expressions import F
 from django.db.models import Q
+from django.db.models.expressions import F
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.utils import MultipleValueField
@@ -138,7 +139,7 @@ def find_ticket_sources(**filters):
     else:
         raise Exception("Status '%s' does not exist for ticket sources" % filters["status"])
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         ticket_sources = ticket_sources.filter(
             Q(carbure_id__icontains=filters["search"])
             | Q(saf_tickets__client__name__icontains=filters["search"])

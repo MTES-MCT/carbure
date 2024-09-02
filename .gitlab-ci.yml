@@ -63,6 +63,8 @@ check-backend:
     - export CARBURE_HOME=$(pwd)
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/$MYSQL_DATABASE
     - export REDIS_URL=redis://redis:6379
+    - pipenv run ruff check
+    - pipenv run ruff format --check
     - TEST=1 pipenv run python web/manage.py test web
   only:
     refs:

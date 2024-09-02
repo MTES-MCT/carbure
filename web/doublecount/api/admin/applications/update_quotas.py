@@ -1,8 +1,8 @@
 import json
 
 from django.http import JsonResponse
-from core.decorators import check_admin_rights
 
+from core.decorators import check_admin_rights
 from doublecount.models import (
     DoubleCountingProduction,
 )
@@ -20,6 +20,6 @@ def update_approved_quotas(request):
             to_update = DoubleCountingProduction.objects.get(id=dca_production_id)
             to_update.approved_quota = approved_quota
             to_update.save()
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find Production Line"}, status=400)
     return JsonResponse({"status": "success"})

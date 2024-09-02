@@ -1,11 +1,12 @@
 import os
+
 import django
 from django.db import transaction
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import *
+from core.models import *  # noqa: E402
 
 
 def fix_lots_with_two_parents():

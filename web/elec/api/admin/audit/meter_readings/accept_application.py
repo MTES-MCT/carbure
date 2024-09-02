@@ -1,10 +1,11 @@
-from django.conf import settings
 import pandas as pd
 from django import forms
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Sum
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
@@ -94,7 +95,7 @@ def accept_application(request: HttpRequest):
 
 def send_email_to_cpo(application: ElecMeterReadingApplication):
     quarter = f"T{application.quarter} {application.year}"
-    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum('renewable_energy'))['total_energy'], 2)
+    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec/{application.year}/provisioned"
 
@@ -108,7 +109,7 @@ def send_email_to_cpo(application: ElecMeterReadingApplication):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
         subject=f"[CarbuRe] Relevés {quarter} validés",

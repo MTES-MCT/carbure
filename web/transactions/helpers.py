@@ -1,14 +1,14 @@
-import pandas as pd
-from transactions.models import YearConfig
-
 import datetime
 import traceback
-import dateutil
 from typing import List
+
+import dateutil
+import pandas as pd
 from django.db.models.query import QuerySet
-from django.forms import model_to_dict
-from core.carburetypes import CarbureUnit, CarbureStockErrors
+
+from core.carburetypes import CarbureStockErrors, CarbureUnit
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
+from transactions.models import YearConfig
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
 
@@ -18,7 +18,7 @@ def check_locked_year(current_year: int):
     try:
         YearConfig.objects.get(year=current_year, locked=True)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -100,8 +100,8 @@ def fill_production_info(lot, data, entity, prefetched_data):
     errors = []
     # possibilities:
     # Case 1: I have a parent_lot or parent_stock -> copy production info
-    # Case 2: I am a producer and this is my own production (unknown_producer is None) -> I am the producer, ensure production_site is known
-    # Case 3: all other cases (unknown producer / unknown production site) -> fill unknown_producer and unknown_production_site
+    # Case 2: I am a producer and this is my own production (unknown_producer is None) -> I am the producer, ensure production_site is known  # noqa: E501
+    # Case 3: all other cases (unknown producer / unknown production site) -> fill unknown_producer and unknown_production_site  # noqa: E501
 
     # CASE 1
     if lot.parent_lot or lot.parent_stock:
@@ -140,8 +140,8 @@ def fill_production_info(lot, data, entity, prefetched_data):
                 lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else None
             )
 
-            # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production
-            from doublecount.helpers import get_lot_dc_agreement
+            # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production  # noqa: E501
+            from doublecount.helpers import get_lot_dc_agreement  # noqa: E402
 
             dc_agreement = get_lot_dc_agreement(lot.feedstock, lot.delivery_date, lot.carbure_production_site)
             if dc_agreement:
@@ -345,7 +345,7 @@ def fill_volume_info(lot, data):
             lot.volume = quantity["volume"]
             lot.weight = quantity["weight"]
             lot.lhv_amount = quantity["lhv_amount"]
-        except:
+        except Exception:
             traceback.print_exc()
             errors.append(
                 GenericError(
@@ -395,7 +395,7 @@ def fill_supplier_info(lot, data, entity):
 def fill_vendor_data(lot, data, entity):
     # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING - OVERRIDE SOME FIELDS
     if entity != lot.carbure_supplier and entity != lot.carbure_client:
-        lot.carbure_vendor = entity  # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
+        lot.carbure_vendor = entity  # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)  # noqa: E501
         lot.vendor_certificate = data.get("vendor_certificate", entity.default_certificate)
     else:
         lot.vendor_certificate = None
@@ -410,39 +410,39 @@ def fill_ghg_info(lot, data):
     errors = []
     try:
         lot.eec = abs(float(data.get("eec", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eec", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.el = float(data.get("el", 0))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="el", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.ep = abs(float(data.get("ep", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="ep", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.etd = abs(float(data.get("etd", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="etd", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eu = abs(float(data.get("eu", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eu", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.esca = abs(float(data.get("esca", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="esca", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccs = abs(float(data.get("eccs", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eccs", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccr = abs(float(data.get("eccr", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eccr", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eee = abs(float(data.get("eee", 0)))
-    except:
+    except Exception:
         errors.append(GenericError(lot=lot, field="eee", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     lot.update_ghg()
     return errors
@@ -545,7 +545,7 @@ def fill_client_data(lot, data, entity, prefetched_data):
                         display_to_creator=True,
                     )
                 )
-    except:
+    except Exception:
         pass
     lot.unknown_client = data.get("unknown_client", None)
     return errors
@@ -571,7 +571,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         else:
             try:
                 parent_stock = CarbureStock.objects.get(carbure_id=carbure_stock_id)
-            except Exception as e:
+            except Exception:
                 # traceback.print_exc()
                 print("Could not find stock %s" % (carbure_stock_id))
                 return None, []
@@ -604,7 +604,7 @@ def bulk_insert_lots(
     errors: List[GenericError],
     prefetched_data: dict,
 ) -> QuerySet:
-    created = CarbureLot.objects.bulk_create(lots, batch_size=100)
+    CarbureLot.objects.bulk_create(lots, batch_size=100)
     inserted_lots = (
         CarbureLot.objects.select_related(
             "carbure_producer",
