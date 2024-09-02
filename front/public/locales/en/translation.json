@@ -810,7 +810,7 @@
   "Remplacer la demande d'inscription ?": "Replace the application request?",
   "Souhaitez-vous confirmer le remplacement de la précédente demande d'inscription par celle-ci ?": "Would you like to confirm the replacement of the previous application request by it?",
   "Confirmer le remplacement": "Confirm the replacement",
-  "Aucun relevé trimestriel trouvé": "No quarterly meter readingsfound",
+  "Aucun relevé trimestriel trouvé": "No quarterly meter readings found",
   "Relevés trimestriels T{{quarter}} {{year}}": "Quarterly meter readings T{{quarter}} {{year}}",
   "Transmettre mes relevés trimestriels": "Send my quarterly meter readings",
   "Énergie active totale soutirée": "Total active energy",
@@ -1487,5 +1487,8 @@
   "Veuillez remplir les informations suivantes:": "Please complete the following information:",
   "L'utilisateur {{email}} a bien été ajouté !": "The user {{email}} has been successfully added!",
   "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user",
-  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password.."
+  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password..",
+  "Identifiant PDC": "Charge point identifier",
+  "Dernier index - kWh": "Last index - kWh",
+  "Relevé trimestriel": "Quarterly reading meter"
 }
