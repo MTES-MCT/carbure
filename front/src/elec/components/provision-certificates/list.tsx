@@ -9,7 +9,6 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
-import { ElecAdminProvisionCertificateStates } from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import {
   ElecCPOProvisionCertificateFilter,
@@ -23,6 +22,7 @@ import ElecProvisionDetailsDialog from "./details"
 import { StatusSwitcher } from "./status-switcher"
 import { ElecCPOProvisionCertificateTable } from "./table"
 import { EnergyTransferSummary } from "./transfer-summary"
+import { ElecAdminProvisionCertificateStates } from "elec-admin/pages/provision-certificates/types"
 
 type ProvisionCertificateListProps = {
   snapshot: ElecCPOSnapshot
