@@ -7,15 +7,18 @@ import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import { ChargePointsTabs } from "./charge-points-tabs"
-import { ChargePointsSnapshot } from "../../types-charge-points"
-import ChargePointsPending from "./charge-points-pending"
+import { ChargePointsSnapshot } from "./types"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import ChargePointsList from "./charge-points-list"
+import ChargePointsList from "./pages/charge-points-list"
+import ChargePointsPending from "./pages/charge-points-pending"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
   charge_point_applications: 0,
   meter_reading_applications: 0,
+  charge_points_accepted: 0,
+  charge_points_audit_in_progress: 0,
+  charge_points_pending: 0,
 }
 
 const ChargePoints = () => {
