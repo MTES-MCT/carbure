@@ -66,7 +66,7 @@ const ChargePoints = () => {
         />
 
         <Route
-          path="list"
+          path="list/*"
           element={<ChargePointsList year={years.selected} />}
         />
 

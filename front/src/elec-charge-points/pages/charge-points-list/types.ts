@@ -29,6 +29,6 @@ export type ChargePoint = {
 export enum ChargePointFilter {
   ValidationDate = "validation_date",
   ChargePointId = "charge_point_id",
-  LastMeasureEnergy = "last_measure_energy",
+  StationId = "Identifiant station",
   ConcernedByReadingMeter = "concerned_by_reading_meter",
 }
