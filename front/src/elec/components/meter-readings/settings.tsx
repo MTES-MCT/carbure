@@ -43,17 +43,9 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   })
 
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists =
-      currentApplication?.status === ElecAuditApplicationStatus.Pending
-    if (
-      currentApplication &&
-      currentApplication.status !== ElecAuditApplicationStatus.Pending
-    )
-      return
     portal((resolve) => (
       <ElecMeterReadingsFileUpload
         onClose={resolve}
-        pendingApplicationAlreadyExists={pendingApplicationAlreadyExists}
         companyId={companyId}
         currentApplicationPeriod={currentApplicationPeriod!}
       />
@@ -69,7 +61,6 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
       application.id
     )
   }
-  console.log("charge point count", chargePointCount)
   return (
     <Panel id="elec-meter-readings">
       <header>

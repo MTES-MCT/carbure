@@ -1,16 +1,11 @@
 import traceback
 from django import forms
-from django.db.models import Sum
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
-from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
-from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.models.elec_provision_certificate import ElecProvisionCertificate
-from elec.models.elec_transfer_certificate import ElecTransferCertificate
 
 
 class ElecAuditSnapshotForm(forms.Form):
@@ -39,6 +34,9 @@ def get_snapshot(request):
                 "charge_points_applications_audit_in_progress": charge_points_applications.filter(
                     status=ElecChargePointApplication.AUDIT_IN_PROGRESS
                 ).count(),
+                "charge_points_applications_audit_done": charge_points_applications.filter(
+                    status=ElecChargePointApplication.AUDIT_DONE
+                ).count(),
                 "charge_points_applications_history": charge_points_applications.filter(
                     status__in=[ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED]
                 ).count(),
@@ -48,6 +46,9 @@ def get_snapshot(request):
                 ).count(),
                 "meter_readings_applications_audit_in_progress": meter_readings_applications.filter(
                     status=ElecMeterReadingApplication.AUDIT_IN_PROGRESS
+                ).count(),
+                "meter_readings_applications_audit_done": meter_readings_applications.filter(
+                    status=ElecMeterReadingApplication.AUDIT_DONE
                 ).count(),
                 "meter_readings_applications_history": meter_readings_applications.filter(
                     status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]

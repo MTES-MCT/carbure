@@ -1,13 +1,14 @@
 import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
-import { Check, Cross, Download } from "common/components/icons"
+import { AlertCircle, Check, Cross, Download } from "common/components/icons"
 import { ElecMeterReadingsApplicationDetails } from "elec/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import SampleSummary from "../sample/details-sample-summary"
 import ChargePointsSampleMap from "../sample/sample-map"
 import ApplicationSummary from "./details-application-summary"
+import Alert from "common/components/alert"
 
 interface MeterReadingsApplicationDetailsInProgressProps {
   meterReadingsApplication: ElecMeterReadingsApplicationDetails | undefined
@@ -34,29 +35,18 @@ export const MeterReadingsApplicationDetailsInProgress = ({
         {meterReadingsApplication?.sample && (
           <section>
             <SampleSummary sample={meterReadingsApplication?.sample} />
-            <ChargePointsSampleMap
-              chargePoints={meterReadingsApplication?.sample?.charge_points}
-            />
-            <Button
-              icon={Download}
-              label={t("Télécharger l'échantillon")}
-              variant="secondary"
-              action={onDownloadSample}
-              style={{ width: "min-content" }}
-            />
+            <ChargePointsSampleMap chargePoints={meterReadingsApplication?.sample?.charge_points} />
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} />
           </section>
         )}
+        <section>
+          <Alert icon={AlertCircle} variant="warning" multiline label={t("L'échantillon a été reçu par l'auditeur. Vous serez informé par email lorsque ce dernier aura complété le rapport d'audit sur son espace sur Carbure.")} />
+        </section>
         <section>
           <Checkbox
             value={confirmCheckbox}
             onChange={setConfirmCheckbox}
-            label={t(
-              "Je confirme avoir reçu le résultat d'audit de la part de l'auditeur par e-mail afin de valider ou refuser le relevé T{{quarter}} {{year}}.",
-              {
-                quarter: meterReadingsApplication?.quarter,
-                year: meterReadingsApplication?.year,
-              }
-            )}
+            label={t("Je confirme avoir reçu le résultat d'audit ou souhaite valider sans audit.")}
           />
         </section>
       </main>

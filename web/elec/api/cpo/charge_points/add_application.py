@@ -1,3 +1,4 @@
+from pandas.core.frame import DataFrame
 from django.http import HttpRequest
 from django.db import transaction
 from django.views.decorators.http import require_POST
@@ -24,7 +25,7 @@ def add_application(request: HttpRequest, entity: Entity):
     if not excel_file:
         return ErrorResponse(400, AddChargePointApplicationError.MISSING_FILE)
 
-    charge_point_data, errors = import_charge_point_excel(excel_file)
+    charge_point_data, errors, original = import_charge_point_excel(excel_file)
 
     if len(errors) > 0:
         return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)
@@ -34,16 +35,20 @@ def add_application(request: HttpRequest, entity: Entity):
 
     new_charge_points = [cp["charge_point_id"] for cp in charge_point_data]
     replaced_charge_points = ChargePointRepository.get_replaced_charge_points(entity, new_charge_points)
-    replaced_charge_points_by_id = {cp.charge_point_id: cp for cp in replaced_charge_points}
+    replaced_charge_points_by_id = replaced_charge_points.values_list("charge_point_id", flat=True)
+
+    duplicate = False
+    if isinstance(original, DataFrame):
+        for _, row in original.iterrows():
+            charge_point_id = row["charge_point_id"]
+            if charge_point_id in replaced_charge_points_by_id:
+                duplicate = True
+                break
+
+    if duplicate:
+        return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)
 
     with transaction.atomic():
-        replaced_applications = ElecChargePointApplication.objects.filter(
-            cpo=entity, status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED]
-        )
-
-        # delete older pending applications
-        replaced_applications.delete()
-
         application = ElecChargePointApplication(cpo=entity)
 
         charge_points = [
@@ -51,7 +56,6 @@ def add_application(request: HttpRequest, entity: Entity):
                 **data,
                 application=application,
                 cpo=entity,
-                previous_version=replaced_charge_points_by_id.get(data["charge_point_id"])
             )
             for data in charge_point_data
         ]

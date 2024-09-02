@@ -5,7 +5,6 @@
   background-color: var(--gray-highlight);
   border: 1px solid var(--gray-medium);
   border-radius: var(--border-radius);
-  /* white-space: nowrap; */
   overflow: hidden;
   text-overflow: ellipsis;
   flex-direction: column;
@@ -18,12 +17,14 @@
 .alert [data-icon] {
   flex-shrink: 0;
   color: var(--gray-dark);
+  float: left;
 }
 
 .alert header {
   display: flex;
-  gap: var(--spacing-s);
+  column-gap: var(--spacing-s);
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .info {
@@ -60,4 +61,12 @@
 
 .danger [data-icon] {
   color: var(--red-dark);
+}
+
+.multiline header {
+  display: inline-block;
+}
+
+.multiline [data-icon] {
+  margin-right: 3px;
 }

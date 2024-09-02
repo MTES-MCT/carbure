@@ -36,6 +36,7 @@ RUN pipenv install --dev --deploy
 # Copy the rest of your application code
 COPY web web
 COPY scripts scripts
+COPY bin bin
 
 # Set the default command to execute the application
 CMD ["pipenv", "run", "sh", "./web/entrypoint.sh"]

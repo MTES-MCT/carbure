@@ -23,7 +23,6 @@ import {
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import MeterReadingsErrorsDetailsDialog from "./errors-dialog"
-import { ReplaceAlert } from "./replace-alert"
 import MeterReadingsValidDetailsDialog from "./valid-dialog"
 import Alert from "common/components/alert"
 import { formatDate } from "common/utils/formatters"
@@ -31,7 +30,6 @@ import { formatDate } from "common/utils/formatters"
 type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
   companyId: number
-  pendingApplicationAlreadyExists: boolean
   currentApplicationPeriod: ElecMeterReadingsCurrentApplicationsPeriod
 }
 
@@ -39,7 +37,6 @@ const ElecMeterReadingsFileUpload = ({
   onClose,
   currentApplicationPeriod,
   companyId,
-  pendingApplicationAlreadyExists,
 }: ElecMeterReadingsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -137,36 +134,32 @@ const ElecMeterReadingsFileUpload = ({
       <main>
         <section>
           <Form id="dc-checker">
-            {!pendingApplicationAlreadyExists && (
-              <>
-                {currentApplicationPeriod.urgency_status ===
-                  MeterReadingsApplicationUrgencyStatus.Low && (
-                  <Alert icon={AlertCircle} variant="info">
-                    <Trans>
-                      A transmettre avant le{" "}
-                      {formatDate(currentApplicationPeriod.deadline)}
-                    </Trans>
-                  </Alert>
-                )}
-                {currentApplicationPeriod.urgency_status ===
-                  MeterReadingsApplicationUrgencyStatus.High && (
-                  <Alert icon={AlertCircle} variant="warning">
-                    <Trans>
-                      A transmettre avant le{" "}
-                      {formatDate(currentApplicationPeriod.deadline)}
-                    </Trans>
-                  </Alert>
-                )}
-                {currentApplicationPeriod.urgency_status ===
-                  MeterReadingsApplicationUrgencyStatus.Critical && (
-                  <Alert icon={AlertCircle} variant="danger">
-                    <Trans>
-                      Le délai de déclaration a été dépassé, l'administration se
-                      réserve le droit de la refuser.
-                    </Trans>
-                  </Alert>
-                )}
-              </>
+            {currentApplicationPeriod.urgency_status ===
+              MeterReadingsApplicationUrgencyStatus.Low && (
+              <Alert icon={AlertCircle} variant="info">
+                <Trans>
+                  A transmettre avant le{" "}
+                  {formatDate(currentApplicationPeriod.deadline)}
+                </Trans>
+              </Alert>
+            )}
+            {currentApplicationPeriod.urgency_status ===
+              MeterReadingsApplicationUrgencyStatus.High && (
+              <Alert icon={AlertCircle} variant="warning">
+                <Trans>
+                  A transmettre avant le{" "}
+                  {formatDate(currentApplicationPeriod.deadline)}
+                </Trans>
+              </Alert>
+            )}
+            {currentApplicationPeriod.urgency_status ===
+              MeterReadingsApplicationUrgencyStatus.Critical && (
+              <Alert icon={AlertCircle} variant="danger">
+                <Trans>
+                  Le délai de déclaration a été dépassé, l'administration se
+                  réserve le droit de la refuser.
+                </Trans>
+              </Alert>
             )}
             <p>
               {t(
@@ -213,7 +206,6 @@ const ElecMeterReadingsFileUpload = ({
               {...bind("meterReadingsFile")}
             />
           </Form>
-          {pendingApplicationAlreadyExists && <ReplaceAlert />}
         </section>
       </main>
 

@@ -14,6 +14,7 @@ from django_admin_listfilter_dropdown.filters import (
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
 from django.db import transaction
+from django.contrib import messages
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
@@ -40,6 +41,7 @@ from core.models import TransactionDistance
 from core.models import CarbureNotification
 from entity.helpers import enable_entity
 from transactions.sanity_checks.helpers import get_prefetched_data
+from entity.services import enable_depot
 
 
 def custom_titled_filter(title):
@@ -130,16 +132,18 @@ class PaysAdmin(admin.ModelAdmin):
 
 
 class DepotAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "depot_id",
-        "city",
-        "depot_type",
-        "gps_coordinates",
-        "private",
-    )
+    list_display = ("name", "depot_id", "city", "depot_type", "gps_coordinates", "private", "is_enabled")
     search_fields = ("name", "city", "depot_id")
     list_filter = ("depot_type",)
+    readonly_fields = ("is_enabled",)
+    actions = ["enable_depot"]
+
+    def enable_depot(self, request, queryset):
+        for depot in queryset:
+            response = enable_depot.enable_depot(depot)
+            messages.add_message(request, messages.SUCCESS, response)
+
+    enable_depot.short_description = "Valider les dépôts sélectionnés"
 
 
 class GenericErrorAdmin(admin.ModelAdmin):
@@ -325,7 +329,7 @@ class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
     def choices(self, changelist):
         data = list(super(RelatedOnlyDropdownFilter, self).choices(changelist))
         # all elements except select-all
-        tosort = [x for x in data if x["display"] != _("All")]
+        tosort = [x for x in data if x["display"] != _("Tous")]
         sortedlist = sorted(tosort, key=lambda x: x["display"])
         selectall = data[0]
         sortedlist.insert(0, selectall)

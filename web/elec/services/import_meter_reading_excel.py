@@ -1,17 +1,12 @@
 import pandas as pd
 from typing import Iterable
 from django.core.files.uploadedfile import UploadedFile
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
-
-
-class ExcelMeterReadingError:
-    INVALID_METER_READING_DATA = "INVALID_METER_READING_DATA"
-    CHARGE_POINT_NOT_REGISTERED = "CHARGE_POINT_NOT_REGISTERED"
-    EXTRACTED_ENERGY_LOWER_THAN_BEFORE = "EXTRACTED_ENERGY_LOWER_THAN_BEFORE"
 
 
 def import_meter_reading_excel(
@@ -20,8 +15,9 @@ def import_meter_reading_excel(
     previous_application: ElecMeterReadingApplication = None,
     renewable_share: int = 1,
 ):
-    meter_readings_data = ExcelMeterReadings.parse_meter_reading_excel(excel_file)
-    return ExcelMeterReadings.validate_meter_readings(meter_readings_data, existing_charge_points, previous_application, renewable_share)  # fmt:skip
+    original_meter_readings_data = ExcelMeterReadings.parse_meter_reading_excel(excel_file)
+    meter_readings_data = ExcelMeterReadings.validate_meter_readings(original_meter_readings_data, existing_charge_points, previous_application, renewable_share)
+    return meter_readings_data[0], meter_readings_data[1], original_meter_readings_data  # fmt:skip
 
 
 class ExcelMeterReadings:
@@ -90,6 +86,6 @@ class ExcelMeterReadingValidator(Validator):
         previous_extracted_energy = self.context.get("previous_extracted_energy")
 
         if charge_point is None:
-            self.add_error("charge_point_id", "Le point de recharge n'a pas encore été inscrit sur la plateforme.")
+            self.add_error("charge_point_id", _("Le point de recharge n'a pas encore été inscrit sur la plateforme."))
         elif meter_reading.get("extracted_energy", 0) < previous_extracted_energy:
-            self.add_error("extracted_energy", "La quantité d'énergie soutirée est inférieure au précédent relevé.")
+            self.add_error("extracted_energy", _("La quantité d'énergie soutirée est inférieure au précédent relevé."))

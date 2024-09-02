@@ -105,7 +105,7 @@ def get_dc_biofuel_feedstock_incompatibilities(
     if (
         biofuel.is_graisse
         and feedstock.compatible_graisse
-        and not biofuel.code in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV"]
+        and not biofuel.code in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV", "EEAG"]
     ):
         return None
 

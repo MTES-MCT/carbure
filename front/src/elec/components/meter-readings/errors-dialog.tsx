@@ -5,10 +5,10 @@ import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
 import {
   ElecMeterReadingsApplicationCheckInfo,
-  MeterReadingsApplicationError,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
+import { UploadCheckError } from "carbure/types"
 
 export type MeterReadingsErrorsDetailsDialogProps = {
   fileData: ElecMeterReadingsApplicationCheckInfo
@@ -70,7 +70,7 @@ export const MeterReadingsErrorsDetailsDialog = ({
 }
 
 type ErrorsTableProps = {
-  errors: MeterReadingsApplicationError[]
+  errors: UploadCheckError[]
 }
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
@@ -102,7 +102,7 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   )
 }
 
-export function getErrorText(error: MeterReadingsApplicationError) {
+export function getErrorText(error: UploadCheckError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
       return t(

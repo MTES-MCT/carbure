@@ -71,6 +71,7 @@ export interface PortalManager {
   portals: PortalInstance[]
   portal: PortalRegister
   close: (key: string) => void
+  closeAll: () => void
 }
 
 export function usePortalManager(): PortalManager {
@@ -94,7 +95,9 @@ export function usePortalManager(): PortalManager {
     [closeKey]
   )
 
-  return { portals, portal, close: closeKey }
+  const closeAll = () => setPortals([])
+
+  return { portals, portal, close: closeKey, closeAll }
 }
 
 export function usePortal(defaultRoot?: HTMLElement): PortalRegister {
@@ -105,6 +108,18 @@ export function usePortal(defaultRoot?: HTMLElement): PortalRegister {
     (render, root = defaultRoot) => portal(render, root),
     [defaultRoot, portal]
   )
+}
+
+/**
+ * To avoid refactor usePortal hook by exposing a closeAll function,
+ * a new hook was created
+ * @returns the closeAll portals function
+ */
+export function useCloseAllPortals(): PortalManager["closeAll"] {
+  const manager = useContext(PortalContext)
+  if (manager === undefined) throw new Error("Portal context is not defined")
+
+  return useCallback(manager.closeAll, [manager.closeAll])
 }
 
 export const PortalContext = createContext<PortalManager | undefined>(undefined)

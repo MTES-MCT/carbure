@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# collect static
+python3 ./web/manage.py collectstatic --noinput
+
+# compile translations
+python3 ./web/manage.py compilemessages

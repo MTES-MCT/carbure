@@ -1,14 +1,11 @@
-import { Entity } from "carbure/types"
-import { Order } from "common/components/table"
+import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import {
   ElecProvisionCertificatePreview,
-  ElecTransferCertificate,
   ElecTransferCertificateFilter,
-  ElecTransferCertificatePreview,
+  ElecTransferCertificatePreview
 } from "./types"
-import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
 
-export interface ElecCPOSnapshot {
+export interface ElecCPOSnapshot extends CBSnapshot {
   provisioned_energy: number
   remaining_energy: number
   provision_certificates_available: number
@@ -24,37 +21,12 @@ export enum ElecCPOProvisionCertificateStatus {
   History = "HISTORY",
 }
 
-export type ElecCPOProvisionCertificateFilterSelection = Partial<
-  Record<ElecCPOProvisionCertificateFilter, string[]>
->
-
-export interface ElecCPOProvisionCertificateStates {
-  entity: Entity
-  year: number
-  status: ElecCPOProvisionCertificateStatus
-  filters: ElecCPOProvisionCertificateFilterSelection
-  search?: string
-  selection: number[]
-  page: number
-  limit?: number
-  order?: Order
-  snapshot?: ElecCPOSnapshot
-}
-
 export enum ElecCPOProvisionCertificateFilter {
   Quarter = "quarter",
   OperatingUnit = "operating_unit",
 }
 
-export interface ElecCPOProvisionCertificateQuery {
-  entity_id: number
-  status?: string
-  year?: number
-  search?: string
-  sort_by?: string
-  order?: string
-  from_idx?: number
-  limit?: number
+export interface ElecCPOProvisionCertificateQuery extends CBQueryParams {
   [ElecCPOProvisionCertificateFilter.OperatingUnit]?: string[]
   [ElecCPOProvisionCertificateFilter.Quarter]?: string[]
 }
@@ -80,32 +52,11 @@ export enum ElecTransferCertificateStatus {
   Rejected = "REJECTED",
 }
 
-export type ElecTransferCertificateFilterSelection = Partial<
-  Record<ElecTransferCertificateFilter, string[]>
->
 
-export interface ElecTransferCertificateStates {
-  entity: Entity
-  year: number
-  status: ElecTransferCertificateStatus | ElecOperatorStatus
-  filters: ElecTransferCertificateFilterSelection
-  search?: string
-  selection: number[]
-  page: number
-  limit?: number
-  order?: Order
-  snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot
-}
+export interface ElecTransferCertificateQuery extends CBQueryParams {
+  [ElecTransferCertificateFilter.Operator]?: string[],
+  [ElecTransferCertificateFilter.Cpo]?: string[],
+  [ElecTransferCertificateFilter.TransferDate]?: string[],
+  [ElecTransferCertificateFilter.CertificateId]?: string[],
 
-export interface ElecTransferCertificateQuery {
-  entity_id: number
-  status?: string
-  year?: number
-  search?: string
-  sort_by?: string
-  order?: string
-  from_idx?: number
-  limit?: number
-  // [ElecCPOTransferCertificateFilter.CertificateId]?: string[]
-  // [ElecTransferCertificateFilter.CertificateId]?: string[]
 }

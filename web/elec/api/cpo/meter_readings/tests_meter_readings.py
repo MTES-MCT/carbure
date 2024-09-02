@@ -4,6 +4,7 @@
 import io
 import datetime
 from unittest.mock import patch
+from unittest import mock
 import openpyxl
 from decimal import Decimal
 from core.tests_utils import setup_current_user
@@ -51,6 +52,12 @@ ERROR_METER_READINGS = [
         "charge_point_id": "FR00IJKL",
         "previous_reading": 500,
         "current_reading": 600,
+        "reading_date": datetime.date(2024, 9, 29),
+    },
+    {
+        "charge_point_id": "FR00IJKL",
+        "previous_reading": 500,
+        "current_reading": 800,
         "reading_date": datetime.date(2024, 9, 29),
     },
 ]
@@ -150,11 +157,27 @@ class ElecMeterReadingsTest(TestCase):
             cpo=self.cpo,
         )
 
+        ElecMeterReadingApplication.objects.create(
+            status=ElecMeterReadingApplication.PENDING,
+            quarter=3,
+            year=2024,
+            cpo=self.cpo,
+        )
+
         self.meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=800,
             renewable_energy=24.92,
             reading_date=datetime.date(2024, 5, 21),
             charge_point=self.charge_point_2,
+            cpo=self.cpo,
+            application=self.meter_reading_application,
+        )
+
+        self.meter_reading_3 = ElecMeterReading.objects.create(
+            extracted_energy=4,
+            renewable_energy=2,
+            reading_date=datetime.date(2024, 9, 29),
+            charge_point=self.charge_point_3,
             cpo=self.cpo,
             application=self.meter_reading_application,
         )
@@ -213,9 +236,8 @@ class ElecMeterReadingsTest(TestCase):
                     "file_name": "readings.xlsx",
                     "quarter": 3,
                     "year": 2024,
-                    "pending_application_already_exists": False,
                     "meter_reading_count": 2,
-                    "error_count": 1,
+                    "error_count": 2,
                     "errors": [
                         {
                             "error": "INVALID_DATA",
@@ -223,6 +245,11 @@ class ElecMeterReadingsTest(TestCase):
                             "meta": {
                                 "extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]
                             },
+                        },
+                        {
+                            "error": "INVALID_DATA",
+                            "line": 4,
+                            "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
                         },
                     ],
                 },
@@ -260,7 +287,6 @@ class ElecMeterReadingsTest(TestCase):
                     "year": 2024,
                     "errors": [],
                     "error_count": 0,
-                    "pending_application_already_exists": False,
                 },
             },
         )
@@ -349,34 +375,88 @@ class ElecMeterReadingsTest(TestCase):
         self.maxDiff = None
         data = response.json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            {
-                "data": {
-                    "applications": [
-                        {
-                            "application_date": application_date,
-                            "charge_point_count": 1,
-                            "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                            "energy_total": 24.92,
-                            "id": application.id,
-                            "quarter": 2,
-                            "status": "ACCEPTED",
-                            "year": 2024,
-                        }
-                    ],
-                    "current_application": None,
-                    "current_application_period": {
-                        "deadline": "2024-10-15",
-                        "quarter": 3,
-                        "urgency_status": "HIGH",
-                        "year": 2024,
+        expected = {
+            "data": {
+                "applications": [
+                    {
+                        "application_date": application_date,
                         "charge_point_count": 2,
+                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                        "energy_total": 26.92,
+                        "id": mock.ANY,
+                        "quarter": 2,
+                        "status": "ACCEPTED",
+                        "year": 2024,
                     },
+                    {
+                        "application_date": application_date,
+                        "charge_point_count": 0,
+                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                        "energy_total": 0,
+                        "id": application.id,
+                        "quarter": 3,
+                        "status": "PENDING",
+                        "year": 2024,
+                    },
+                ],
+                "current_application": mock.ANY,
+                "current_application_period": {
+                    "deadline": "2024-10-15",
+                    "quarter": 3,
+                    "urgency_status": "HIGH",
+                    "year": 2024,
+                    "charge_point_count": 2,
                 },
-                "status": "success",
             },
+            "status": "success",
+        }
+
+        self.assertEqual(data, expected)
+
+        # With year filter
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "year": 2023},
         )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "year": 2024},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 2)
+        self.assertEqual(data["data"]["applications"][0]["year"], 2024)
+
+        # With status
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "status": "PENDING"},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 1)
+        self.assertEqual(data["data"]["applications"][0]["status"], "PENDING")
+
+        # With pagination
+        response = self.client.get(
+            reverse("elec-cpo-meter-readings-get-applications"),
+            {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
+        )
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data["data"]["applications"]), 1)
 
     def test_get_application_details(self):
         response = self.client.get(

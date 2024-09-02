@@ -1,3 +1,4 @@
+from datetime import date, datetime
 import xlsxwriter
 import pandas as pd
 from io import BufferedReader
@@ -81,6 +82,15 @@ def get_nested_value(obj: Any, path: str):
                 current_obj = current_obj.get(attr, None)
             else:
                 current_obj = getattr(current_obj, attr)
+
+    if isinstance(current_obj, bool):
+        return "OUI" if current_obj else "NON"
+
+    if isinstance(current_obj, date) or isinstance(current_obj, datetime):
+        return current_obj.strftime("%d/%m/%Y")
+
+    if current_obj is None:
+        return ""
 
     return current_obj
 

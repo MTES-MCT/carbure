@@ -1,12 +1,12 @@
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
-from core.decorators import check_rights
+from core.decorators import check_user_rights
 from core.models import Biocarburant, CarbureLot, GenericError, UserRights
 from django.http import JsonResponse
 from producers.models import ProductionSite, ProductionSiteOutput
 
 
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def set_production_site_biofuels(request, *args, **kwargs):
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def set_production_site_biofuels(request, entity, entity_id):
     site = request.POST.get("production_site_id")
     bc_list = request.POST.getlist("biocarburant_codes")
 
