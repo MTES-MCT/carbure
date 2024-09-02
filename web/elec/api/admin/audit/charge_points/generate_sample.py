@@ -1,6 +1,7 @@
 from django import forms
 from django.db import transaction
 from django.views.decorators.http import require_POST
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
@@ -51,7 +52,9 @@ def generate_sample(request):
         percentage=percentage * 100,
     )
 
-    charge_point_audits = [ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample]  # fmt:skip
+    charge_point_audits = [
+        ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample
+    ]
     ElecAuditChargePoint.objects.bulk_create(charge_point_audits)
 
     return SuccessResponse(

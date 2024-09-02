@@ -1,7 +1,8 @@
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests
-from django.http import JsonResponse
-from django.contrib.auth import get_user_model
 
 
 @check_user_rights(role=[UserRights.ADMIN])
@@ -11,18 +12,18 @@ def revoke_user(request, entity, entity_id):
 
     try:
         user = user_model.objects.get(email=email)
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find user"}, status=400)
 
     try:
         UserRights.objects.filter(user=user, entity=entity).delete()
-    except:
+    except Exception:
         pass
     try:
         rr = UserRightsRequests.objects.get(user=user, entity=entity)
         rr.status = "REVOKED"
         rr.save()
-    except:
+    except Exception:
         pass
 
     return JsonResponse({"status": "success"})

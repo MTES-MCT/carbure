@@ -1,6 +1,7 @@
+from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.helpers import get_entity_stock, get_stock_filters_data
-from django.http.response import JsonResponse
 
 
 @check_user_rights()

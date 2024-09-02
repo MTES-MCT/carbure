@@ -1,9 +1,9 @@
 from django import forms
 from django.db import transaction
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import UserRights, CarbureLot, CarbureLotEvent
+from core.models import CarbureLot, CarbureLotEvent, UserRights
 
 
 class ApproveFixError:

@@ -1,6 +1,7 @@
+from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent, UserRights
-from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -15,7 +16,7 @@ def stock_flush(request, *args, **kwargs):
     for stock_id in stock_ids:
         try:
             stock = CarbureStock.objects.get(pk=stock_id)
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find stock"}, status=400)
 
         if stock.carbure_client_id != entity_id:

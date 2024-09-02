@@ -1,18 +1,17 @@
 from django.http.response import JsonResponse
+
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.decorators import check_user_rights
 from core.helpers import (
     filter_lots,
     get_entity_lots_by_status,
 )
-
-
 from core.models import (
     CarbureLot,
     CarbureLotEvent,
     Entity,
     UserRights,
 )
-from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
@@ -44,7 +43,7 @@ def accept_trading(request, *args, **kwargs):
     if client_entity_id:
         try:
             client_entity = Entity.objects.get(pk=client_entity_id)
-        except:
+        except Exception:
             return JsonResponse(
                 {"status": "error", "message": "Could not find client entity"},
                 status=400,

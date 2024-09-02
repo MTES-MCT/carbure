@@ -3,7 +3,6 @@ from core.common import (
     SuccessResponse,
 )
 from core.decorators import check_user_rights
-
 from core.models import (
     CarbureLot,
     CarbureLotEvent,

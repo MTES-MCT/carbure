@@ -1,5 +1,6 @@
-import factory
 from datetime import datetime
+
+import factory
 
 from core.models import MatierePremiere, Pays
 from doublecount.models import DoubleCountingApplication, DoubleCountingSourcing

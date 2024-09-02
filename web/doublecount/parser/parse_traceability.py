@@ -1,4 +1,5 @@
 import traceback
+
 from openpyxl import Workbook
 
 
@@ -15,7 +16,7 @@ def parse_traceability(excel_file: Workbook):
             "on_site": on_site,
             "after": after,
         }
-    except:
+    except Exception:
         traceback.print_exc()
         return {
             "before": None,

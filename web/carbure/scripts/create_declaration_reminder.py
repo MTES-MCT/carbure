@@ -1,11 +1,12 @@
 import os
-import django
 from datetime import datetime
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureNotification, Entity
+from core.models import CarbureNotification, Entity  # noqa: E402
 
 
 def create_declaration_reminder() -> None:

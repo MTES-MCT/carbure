@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("saf", "0006_alter_safticket_agreement_reference"),
     ]

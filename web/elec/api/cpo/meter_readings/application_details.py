@@ -1,5 +1,6 @@
 from django import forms
 from django.views.decorators.http import require_GET
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
@@ -40,7 +41,9 @@ def get_application_details(request, entity: Entity):
 
     if "export" in request.GET:
         file_name = f"meter_readings_{entity.slugify()}_Q{application.quarter}_{application.year}"
-        excel_file = create_meter_readings_excel(file_name, application.quarter, application.year, meter_readings_data, extended=True)  # fmt:skip
+        excel_file = create_meter_readings_excel(
+            file_name, application.quarter, application.year, meter_readings_data, extended=True
+        )
         return ExcelResponse(excel_file)
 
     return SuccessResponse(meter_readings_data)

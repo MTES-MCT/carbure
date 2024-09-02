@@ -1,22 +1,17 @@
-import sys, os
+import os
+
 import django
-import csv
-import calendar
-import datetime
-import re
-import argparse
-import openpyxl
-import pandas as pd
-from typing import TYPE_CHECKING, Dict, List, Optional
-from pandas._typing import FilePathOrBuffer, Scalar
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from certificates.models import SNCategory, SNCertificate, SNCertificateScope, EntitySNTradingCertificate
-from core.models import Entity
+from certificates.models import EntitySNTradingCertificate, SNCertificate  # noqa: E402
+from core.models import Entity  # noqa: E402
 
-user_said_yes = lambda q: input(q).lower().strip()[0] == "y"
+
+def user_said_yes(q):
+    return input(q).lower().strip()[0] == "y"
+
 
 def try_assign_sn_certificates():
     certificates = SNCertificate.objects.all()
@@ -32,19 +27,21 @@ def try_assign_sn_certificates():
                 # try approximate match
                 approx_matching = Entity.objects.filter(name__icontains=cert.certificate_holder[0:6])
                 if approx_matching.count() > 0:
-                    print('Found approx matching for %s:' % (cert.certificate_holder))
+                    print("Found approx matching for %s:" % (cert.certificate_holder))
                     for m in approx_matching:
                         print(m)
-                        if user_said_yes('Confirm match?'):
-                            print('YES')
+                        if user_said_yes("Confirm match?"):
+                            print("YES")
                             EntitySNTradingCertificate.objects.create(entity=m, certificate=cert)
                         else:
-                            print('NO')
+                            print("NO")
                 else:
-                    print('Could not find match for %s' % (cert.certificate_holder))
-        
+                    print("Could not find match for %s" % (cert.certificate_holder))
+
+
 def main():
     try_assign_sn_certificates()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

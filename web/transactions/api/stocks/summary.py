@@ -1,7 +1,9 @@
-from core.decorators import check_user_rights
-from django.http.response import JsonResponse
-from core.helpers import get_entity_stock, filter_stock, get_stocks_summary_data
 import traceback
+
+from django.http.response import JsonResponse
+
+from core.decorators import check_user_rights
+from core.helpers import filter_stock, get_entity_stock, get_stocks_summary_data
 
 
 @check_user_rights()
@@ -16,6 +18,4 @@ def get_stocks_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get stock summary"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get stock summary"}, status=400)

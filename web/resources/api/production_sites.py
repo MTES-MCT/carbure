@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
@@ -17,7 +18,7 @@ def get_production_sites(request):
         psites = psites.filter(producer__id=pid)
 
     psitesbyid = {p.id: p for p in psites}
-    for k, v in psitesbyid.items():
+    for _k, v in psitesbyid.items():
         v.inputs = []
         v.outputs = []
 

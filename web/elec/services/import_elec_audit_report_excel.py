@@ -1,7 +1,7 @@
 import pandas as pd
 from django import forms
-from django.db.models import QuerySet
 from django.core.files.uploadedfile import UploadedFile
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from core.utils import Validator, is_true
@@ -12,7 +12,7 @@ from elec.models.elec_charge_point import ElecChargePoint
 def import_elec_audit_report_excel(excel_file: UploadedFile, audited_charge_points: QuerySet[ElecAuditChargePoint]):
     report_data = ExcelElecAuditReport.parse_audit_report_excel(excel_file)
     audited_charge_point_ids = audited_charge_points.values_list("charge_point__charge_point_id", flat=True)
-    return ExcelElecAuditReportValidator.bulk_validate(report_data, {"audited_charge_point_ids": audited_charge_point_ids})  # fmt:skip
+    return ExcelElecAuditReportValidator.bulk_validate(report_data, {"audited_charge_point_ids": audited_charge_point_ids})
 
 
 class ExcelElecAuditReport:
@@ -32,7 +32,10 @@ class ExcelElecAuditReport:
     def parse_audit_report_excel(excel_file: UploadedFile):
         meter_readings_data = pd.read_excel(excel_file, usecols=list(range(3, 12)))
         meter_readings_data["line"] = meter_readings_data.index + 2  # add a line number to locate data in the excel file
-        meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelElecAuditReport.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+        meter_readings_data.rename(
+            columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelElecAuditReport.EXCEL_COLUMNS)},
+            inplace=True,
+        )
         meter_readings_data = meter_readings_data.drop_duplicates("charge_point_id")
         meter_readings_data.dropna(inplace=True, how="all")
         meter_readings_data.fillna("", inplace=True)

@@ -1,10 +1,9 @@
-import traceback
+from django.test import TestCase
+from django.urls import reverse
 
 from core.carburetypes import CarbureError
 from core.models import CarbureLot, Entity
 from core.tests_utils import setup_current_user
-from django.test import TestCase
-from django.urls import reverse
 from transactions.factories import CarbureLotFactory
 from transactions.models import YearConfig
 
@@ -66,8 +65,8 @@ class ValidateDeclarationTest(TestCase):
 
         response = self.client.post(reverse("transactions-declarations-validate"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
 
         sent_lots, received_lots = self.get_entity_lots()
 
@@ -77,7 +76,7 @@ class ValidateDeclarationTest(TestCase):
             declared_by_client=True,
         )
 
-        self.assertEqual(declared_sent_lots.count(), 50)
+        assert declared_sent_lots.count() == 50
 
         declared_received_lots = received_lots.filter(
             lot_status=CarbureLot.FROZEN,
@@ -85,7 +84,7 @@ class ValidateDeclarationTest(TestCase):
             declared_by_client=True,
         )
 
-        self.assertEqual(declared_received_lots.count(), 50)
+        assert declared_received_lots.count() == 50
 
     def test_validate_declaration_on_locked_year(self):
         YearConfig.objects.create(year=2022, locked=True)
@@ -97,6 +96,6 @@ class ValidateDeclarationTest(TestCase):
 
         response = self.client.post(reverse("transactions-declarations-validate"), query)
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["status"], "error")
-        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
+        assert response.status_code == 400
+        assert response.json()["status"] == "error"
+        assert response.json()["error"] == CarbureError.YEAR_LOCKED

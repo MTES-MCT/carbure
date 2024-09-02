@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('saf', '0011_alter_safticket_carbure_id'),
+        ("saf", "0011_alter_safticket_carbure_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='safticket',
-            name='agreement_reference',
+            model_name="safticket",
+            name="agreement_reference",
             field=models.CharField(max_length=64, null=True),
         ),
     ]

@@ -1,8 +1,7 @@
 from django.http.response import JsonResponse
 
 from core.decorators import check_user_rights
-from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates
-from core.helpers import get_transaction_distance
+from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_transaction_distance
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from core.serializers import CarbureLotAdminSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
 from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
@@ -20,7 +19,6 @@ def get_lot_details(request, entity_id):
     client_id = str(lot.carbure_client_id)
     supplier_id = str(lot.carbure_supplier_id)
 
-    has_right_to_audit_owner = False
     has_right_to_audit_client = False
     has_right_to_audit_supplier = False
     if owner_id in request.session["rights"] and request.session["rights"][owner_id] == UserRights.AUDITOR:

@@ -1,11 +1,13 @@
 # /api/saf/operator/assign-ticket
 
 import traceback
+
 from django.db import transaction
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.models import CarbureNotification, UserRights
 from saf.models import SafTicketSource, create_ticket_from_source
-from core.models import UserRights, CarbureNotification
 
 
 class SafTicketAssignError:
@@ -27,7 +29,7 @@ def assign_ticket(request, *args, **kwargs):
         agreement_date = request.POST.get("agreement_date")
         free_field = request.POST.get("free_field")
         assignment_period = int(request.POST.get("assignment_period"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketAssignError.MALFORMED_PARAMS)
 

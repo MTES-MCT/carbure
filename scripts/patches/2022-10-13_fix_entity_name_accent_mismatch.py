@@ -1,16 +1,17 @@
-import os
-import django
 import argparse
-from django.db.models import Q
+import os
+
+import django
 from django.core.paginator import Paginator
+from django.db.models import Q
 from tqdm import tqdm
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import normalize_string
-from core.models import CarbureLot, Entity, Depot
-from producers.models import ProductionSite
+from core.models import CarbureLot, Depot, Entity  # noqa: E402
+from core.utils import normalize_string  # noqa: E402
+from producers.models import ProductionSite  # noqa: E402
 
 
 # bruteforcey script that compares all the unknown lot fields with known objects of the database
@@ -95,7 +96,9 @@ def fix_entity_name_accent_mismatch(year, batch=1000):
         lots = lots_with_known_psite[psite]
         lot_ids = [lot.id for lot in lots]
         print("Production site lots of %s: %d" % (production_site.name, len(lots)))
-        CarbureLot.objects.filter(id__in=lot_ids).update(carbure_production_site_id=production_site.id, unknown_production_site=None)  # fmt: skip
+        CarbureLot.objects.filter(id__in=lot_ids).update(
+            carbure_production_site_id=production_site.id, unknown_production_site=None
+        )
 
     for depot_name in lots_with_known_depot:
         depot = depots.get(depot_name)

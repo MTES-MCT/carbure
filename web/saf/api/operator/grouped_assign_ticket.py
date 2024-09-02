@@ -1,12 +1,14 @@
 # /api/saf/operator/assign-ticket
 
 import traceback
+
 from django.db import transaction
-from django.db.models.aggregates import Sum, Max
-from core.common import SuccessResponse, ErrorResponse
+from django.db.models.aggregates import Max, Sum
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.models import CarbureNotification, UserRights
 from saf.models import SafTicketSource, create_ticket_from_source
-from core.models import UserRights, CarbureNotification
 
 
 class SafTicketGroupedAssignError:
@@ -28,12 +30,14 @@ def grouped_assign_ticket(request, *args, **kwargs):
         agreement_date = request.POST.get("agreement_date")
         free_field = request.POST.get("free_field")
         assignment_period = int(request.POST.get("assignment_period"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketGroupedAssignError.MALFORMED_PARAMS)
 
     try:
-        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by("created_at")  # fmt:skip
+        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
+            "created_at"
+        )
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketGroupedAssignError.TICKET_SOURCE_NOT_FOUND)

@@ -1,12 +1,10 @@
-from datetime import datetime
 from django.test import TestCase
 from django.urls import reverse
 
-
-from core.tests_utils import setup_current_user
 from core.models import Entity
-from saf.factories import SafTicketSourceFactory, SafTicketFactory
-from saf.models import SafTicketSource, SafTicket
+from core.tests_utils import setup_current_user
+from saf.factories import SafTicketFactory, SafTicketSourceFactory
+from saf.models import SafTicket, SafTicketSource
 
 
 class SafCancelTicketTest(TestCase):
@@ -21,12 +19,12 @@ class SafCancelTicketTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.ticket_client = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicket.objects.all().delete()
-        self.ticket_source = SafTicketSourceFactory.create(added_by_id=self.entity.id, total_volume=30000, assigned_volume=10000)  # fmt:skip
+        self.ticket_source = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id, total_volume=30000, assigned_volume=10000
+        )
 
         SafTicket.objects.all().delete()
         self.ticket = SafTicketFactory.create(
@@ -44,10 +42,10 @@ class SafCancelTicketTest(TestCase):
 
         response = self.client.post(reverse("saf-operator-cancel-ticket"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
 
-        self.assertEqual(SafTicket.objects.count(), 0)
+        assert SafTicket.objects.count() == 0
 
         ticket_source = SafTicketSource.objects.get(id=self.ticket_source.id)
-        self.assertEqual(ticket_source.assigned_volume, 0)
+        assert ticket_source.assigned_volume == 0

@@ -1,47 +1,47 @@
 # https://django-authtools.readthedocs.io/en/latest/how-to/invitation-email.html
 # allows a manual user creation by an admin, without setting a password
 
-from django.contrib import admin
-from django.db.models import Q
+from authtools.admin import NamedUserAdmin
+from authtools.forms import UserCreationForm
 from django import forms
+from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
+from django.db import transaction
+from django.db.models import Q, Sum
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext_lazy as _
 from django_admin_listfilter_dropdown.filters import (
     DropdownFilter,
     RelatedOnlyDropdownFilter,
 )
-from django.utils.translation import gettext_lazy as _
-from django.db.models import Sum
-from django.db import transaction
-from django.contrib import messages
 
-from authtools.admin import NamedUserAdmin
-from authtools.forms import UserCreationForm
 from core.models import (
+    Biocarburant,
     CarbureLot,
     CarbureLotComment,
     CarbureLotEvent,
+    CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
+    Depot,
     Entity,
     EntityCertificate,
+    EntityDepot,
     ExternalAdminRights,
     GenericCertificate,
-    UserRights,
-    UserPreferences,
-    Biocarburant,
+    GenericError,
     MatierePremiere,
     Pays,
+    SustainabilityDeclaration,
+    TransactionDistance,
+    UserPreferences,
+    UserRights,
     UserRightsRequests,
 )
-from core.models import Depot, GenericError
-from core.models import SustainabilityDeclaration, EntityDepot
-from core.models import TransactionDistance
-from core.models import CarbureNotification
 from entity.helpers import enable_entity
-from transactions.sanity_checks.helpers import get_prefetched_data
 from entity.services import enable_depot
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 def custom_titled_filter(title):

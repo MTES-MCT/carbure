@@ -2,13 +2,13 @@ import math
 import random
 
 import folium
-from core.helpers import filter_lots
-from core.decorators import check_admin_rights
 from csp.decorators import csp_exempt
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 
+from core.decorators import check_admin_rights
+from core.helpers import filter_lots
 from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
@@ -47,7 +47,7 @@ def map(request, entity, entity_id):
             slat, slon = v["carbure_production_site__gps_coordinates"].split(",")
             # end coordinates
             elat, elon = v["carbure_delivery_site__gps_coordinates"].split(",")
-        except:
+        except Exception:
             print("Missing start or end gps coordinates")
             print(
                 "Start %s : %s"
@@ -103,8 +103,7 @@ def map(request, entity, entity_id):
 
     print(m._repr_html_()[0:50])
 
-    html = (
-        """
+    html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,9 +115,7 @@ def map(request, entity, entity_id):
 %s
 </body>
 </html>
-    """
-        % m._repr_html_()
-    )
+    """ % m._repr_html_()
 
     return HttpResponse(html)
 

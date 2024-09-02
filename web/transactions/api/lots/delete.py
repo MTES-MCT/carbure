@@ -1,12 +1,12 @@
 from django.db import transaction
-from transactions.api.admin.lots.update_many import group_lots_by_entity, serialize_node
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.helpers import filter_lots, get_entity_lots_by_status
-
 from core.models import CarbureLot, CarbureLotEvent, CarbureNotification, UserRights
 from core.traceability import bulk_delete_traceability_nodes, bulk_update_traceability_nodes, get_traceability_nodes
 from core.traceability.lot import LotNode
+from transactions.api.admin.lots.update_many import group_lots_by_entity, serialize_node
 
 
 class DeleteLotsError:
@@ -39,7 +39,7 @@ def lots_delete(request, entity):
             deleted, updated = node.delete(entity.id)
             deleted_nodes += deleted
             updated_nodes += updated
-        except:
+        except Exception:
             delete_error_lots.append(node.data)
 
     if len(delete_error_lots) > 0:

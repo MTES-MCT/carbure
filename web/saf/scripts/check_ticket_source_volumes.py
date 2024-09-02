@@ -1,5 +1,6 @@
 import argparse
 import os
+
 import django
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -7,7 +8,7 @@ from django.db.models.functions import Coalesce
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from saf.models.saf_ticket_source import SafTicketSource, create_ticket_sources_from_lots
+from saf.models.saf_ticket_source import SafTicketSource  # noqa: E402
 
 
 def check_ticket_source_volumes(year, fix):

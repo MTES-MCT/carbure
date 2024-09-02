@@ -1,12 +1,13 @@
 import traceback
 
+from django.http.response import JsonResponse
+
+from core.decorators import check_admin_rights
 from core.helpers import (
     filter_stock,
     get_all_stock,
     get_stocks_summary_data,
 )
-from core.decorators import check_admin_rights
-from django.http.response import JsonResponse
 
 
 @check_admin_rights()

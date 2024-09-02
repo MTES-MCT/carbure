@@ -1,20 +1,22 @@
 # Test : python web/manage.py test elec.api.cpo.meter_readings.tests_meter_readings.ElecMeterReadingsTest --keepdb
 
 
-import io
 import datetime
-from unittest.mock import patch
-from unittest import mock
-import openpyxl
+import io
 from decimal import Decimal
-from core.tests_utils import setup_current_user
-from core.models import Entity
+from unittest import mock
+from unittest.mock import patch
+
+import openpyxl
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from elec.models.elec_charge_point import ElecChargePoint
 
+from core.models import Entity
+from core.tests_utils import setup_current_user
+from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import create_meter_readings_excel
@@ -92,15 +94,34 @@ class ElecMeterReadingsTest(TestCase):
             cpo=self.cpo,
         )
 
+        self.meter1 = ElecMeter.objects.create(
+            mid_certificate="MID_ABCD",
+            initial_index=1000,
+            initial_index_date=datetime.date(2022, 10, 1),
+            charge_point=None,
+        )
+
+        self.meter2 = ElecMeter.objects.create(
+            mid_certificate="MID_EFGH",
+            initial_index=700,
+            initial_index_date=datetime.date(2022, 10, 1),
+            charge_point=None,
+        )
+
+        self.meter3 = ElecMeter.objects.create(
+            mid_certificate="MID_IJKL",
+            initial_index=500,
+            initial_index_date=datetime.date(2022, 10, 1),
+            charge_point=None,
+        )
+
         self.charge_point_1 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
             cpo=self.cpo,
             charge_point_id="FR00ABCD",
             current_type="AC",
             installation_date=datetime.date(2021, 6, 2),
-            mid_id="MID_ABCD",
-            measure_date=datetime.date(2022, 10, 1),
-            measure_energy=1000,
+            current_meter=self.meter1,
             measure_reference_point_id="PRM_ABCD",
             station_name="Station",
             station_id="FR00",
@@ -111,15 +132,16 @@ class ElecMeterReadingsTest(TestCase):
             longitude=Decimal(5.0),
         )
 
+        self.meter1.charge_point = self.charge_point_1
+        self.meter1.save()
+
         self.charge_point_2 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
             cpo=self.cpo,
             charge_point_id="FR00EFGH",
             current_type="AC",
             installation_date=datetime.date(2021, 6, 2),
-            mid_id="MID_EFGH",
-            measure_date=datetime.date(2022, 10, 1),
-            measure_energy=700,
+            current_meter=self.meter2,
             measure_reference_point_id="PRM_EFGH",
             station_name="Station",
             station_id="FR00",
@@ -130,15 +152,16 @@ class ElecMeterReadingsTest(TestCase):
             longitude=Decimal(5.0),
         )
 
+        self.meter2.charge_point = self.charge_point_2
+        self.meter2.save()
+
         self.charge_point_3 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
             cpo=self.cpo,
             charge_point_id="FR00IJKL",
             current_type="AC",
             installation_date=datetime.date(2021, 6, 2),
-            mid_id="MID_IJKL",
-            measure_date=datetime.date(2022, 10, 1),
-            measure_energy=500,
+            current_meter=self.meter3,
             measure_reference_point_id="PRM_IJKL",
             station_name="Station",
             station_id="FR00",
@@ -149,6 +172,9 @@ class ElecMeterReadingsTest(TestCase):
             longitude=Decimal(5.0),
             is_article_2=True,
         )
+
+        self.meter3.charge_point = self.charge_point_3
+        self.meter3.save()
 
         self.meter_reading_application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
@@ -168,7 +194,7 @@ class ElecMeterReadingsTest(TestCase):
             extracted_energy=800,
             renewable_energy=24.92,
             reading_date=datetime.date(2024, 5, 21),
-            charge_point=self.charge_point_2,
+            meter=self.meter2,
             cpo=self.cpo,
             application=self.meter_reading_application,
         )
@@ -177,7 +203,7 @@ class ElecMeterReadingsTest(TestCase):
             extracted_energy=4,
             renewable_energy=2,
             reading_date=datetime.date(2024, 9, 29),
-            charge_point=self.charge_point_3,
+            meter=self.meter3,
             cpo=self.cpo,
             application=self.meter_reading_application,
         )
@@ -188,23 +214,23 @@ class ElecMeterReadingsTest(TestCase):
             {"entity_id": self.cpo.id, "quarter": 3, "year": 2024},
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         file = io.BytesIO(response.content)
         workbook = openpyxl.load_workbook(file)
         sheet = workbook.active
 
-        self.assertEqual(sheet["A2"].value, self.charge_point_1.charge_point_id)
-        self.assertEqual(sheet["B2"].value, self.charge_point_1.measure_energy)
-        self.assertEqual(sheet["C2"].value, None)
-        self.assertEqual(sheet["D2"].value, None)
+        assert sheet["A2"].value == self.charge_point_1.charge_point_id
+        assert sheet["B2"].value == self.charge_point_1.measure_energy
+        assert sheet["C2"].value is None
+        assert sheet["D2"].value is None
 
-        self.assertEqual(sheet["A3"].value, self.charge_point_2.charge_point_id)
-        self.assertEqual(sheet["B3"].value, self.meter_reading_2.extracted_energy)
-        self.assertEqual(sheet["C3"].value, None)
-        self.assertEqual(sheet["D3"].value, None)
+        assert sheet["A3"].value == self.charge_point_2.charge_point_id
+        assert sheet["B3"].value == self.meter_reading_2.extracted_energy
+        assert sheet["C3"].value is None
+        assert sheet["D3"].value is None
 
-        self.assertEqual(sheet["A4"].value, None)
+        assert sheet["A4"].value is None
 
     def test_check_application_error(self):
         excel_file = create_meter_readings_excel(
@@ -225,36 +251,27 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         data = response.json()
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
-        self.assertEqual(
-            data,
-            {
-                "status": "error",
-                "error": "VALIDATION_FAILED",
-                "data": {
-                    "file_name": "readings.xlsx",
-                    "quarter": 3,
-                    "year": 2024,
-                    "meter_reading_count": 2,
-                    "error_count": 2,
-                    "errors": [
-                        {
-                            "error": "INVALID_DATA",
-                            "line": 3,
-                            "meta": {
-                                "extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]
-                            },
-                        },
-                        {
-                            "error": "INVALID_DATA",
-                            "line": 4,
-                            "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
-                        },
-                    ],
-                },
+        assert data == {
+            "status": "error",
+            "error": "VALIDATION_FAILED",
+            "data": {
+                "file_name": "readings.xlsx",
+                "quarter": 3,
+                "year": 2024,
+                "meter_reading_count": 2,
+                "error_count": 2,
+                "errors": [
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 3,
+                        "meta": {"extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]},
+                    },
+                    {"error": "INVALID_DATA", "line": 4, "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]}},
+                ],
             },
-        )
+        }
 
     def test_check_application_ok(self):
         excel_file = create_meter_readings_excel(
@@ -275,21 +292,18 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            {
-                "status": "success",
-                "data": {
-                    "file_name": "readings.xlsx",
-                    "meter_reading_count": 2,
-                    "quarter": 3,
-                    "year": 2024,
-                    "errors": [],
-                    "error_count": 0,
-                },
+        assert response.status_code == 200
+        assert data == {
+            "status": "success",
+            "data": {
+                "file_name": "readings.xlsx",
+                "meter_reading_count": 2,
+                "quarter": 3,
+                "year": 2024,
+                "errors": [],
+                "error_count": 0,
             },
-        )
+        }
 
     def test_add_application_error(self):
         excel_file = create_meter_readings_excel(
@@ -310,14 +324,8 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         data = response.json()
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            data,
-            {
-                "status": "error",
-                "error": "VALIDATION_FAILED",
-            },
-        )
+        assert response.status_code == 400
+        assert data == {"status": "error", "error": "VALIDATION_FAILED"}
 
     def test_add_application_ok(self):
         excel_file = create_meter_readings_excel(
@@ -339,29 +347,33 @@ class ElecMeterReadingsTest(TestCase):
 
         data = response.json()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, {"status": "success"})
+        assert response.status_code == 200
+        assert data == {"status": "success"}
 
         last_application = ElecMeterReadingApplication.objects.last()
 
-        self.assertEqual(last_application.quarter, 3)
-        self.assertEqual(last_application.year, 2024)
-        self.assertEqual(last_application.elec_meter_readings.count(), 2)
+        assert last_application.quarter == 3
+        assert last_application.year == 2024
+        assert last_application.elec_meter_readings.count() == 2
 
         readings = last_application.elec_meter_readings.all()
         reading_1 = readings[0]
         reading_2 = readings[1]
 
-        self.assertEqual(reading_1.extracted_energy, 1100)
-        self.assertEqual(reading_1.reading_date, datetime.date(2024, 9, 25))
-        self.assertEqual(reading_2.extracted_energy, 800)
-        self.assertEqual(reading_2.reading_date, datetime.date(2024, 9, 28))
+        assert reading_1.extracted_energy == 1100
+        assert reading_1.reading_date == datetime.date(2024, 9, 25)
+        assert reading_2.extracted_energy == 800
+        assert reading_2.reading_date == datetime.date(2024, 9, 28)
 
     def test_get_applications(self):
-        mocked_get_application_quarter = patch("elec.services.meter_readings_application_quarter.get_application_quarter").start()  # fmt:skip
+        mocked_get_application_quarter = patch(
+            "elec.services.meter_readings_application_quarter.get_application_quarter"
+        ).start()
         mocked_get_application_quarter.return_value = (2024, 3)
 
-        mocked_get_application_deadline = patch("elec.services.meter_readings_application_quarter.get_application_deadline").start()  # fmt:skip
+        mocked_get_application_deadline = patch(
+            "elec.services.meter_readings_application_quarter.get_application_deadline"
+        ).start()
         mocked_get_application_deadline.return_value = (datetime.date(2024, 10, 15), "HIGH")
 
         response = self.client.get(
@@ -372,9 +384,8 @@ class ElecMeterReadingsTest(TestCase):
         application = ElecMeterReadingApplication.objects.last()
         application_date = application.created_at.isoformat()
 
-        self.maxDiff = None
         data = response.json()
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = {
             "data": {
                 "applications": [
@@ -411,7 +422,7 @@ class ElecMeterReadingsTest(TestCase):
             "status": "success",
         }
 
-        self.assertEqual(data, expected)
+        assert data == expected
 
         # With year filter
         response = self.client.get(
@@ -419,17 +430,17 @@ class ElecMeterReadingsTest(TestCase):
             {"entity_id": self.cpo.id, "year": 2023},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]["applications"]), 0)
+        assert response.status_code == 200
+        assert len(data["data"]["applications"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-applications"),
             {"entity_id": self.cpo.id, "year": 2024},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]["applications"]), 2)
-        self.assertEqual(data["data"]["applications"][0]["year"], 2024)
+        assert response.status_code == 200
+        assert len(data["data"]["applications"]) == 2
+        assert data["data"]["applications"][0]["year"] == 2024
 
         # With status
         response = self.client.get(
@@ -437,17 +448,17 @@ class ElecMeterReadingsTest(TestCase):
             {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]["applications"]), 0)
+        assert response.status_code == 200
+        assert len(data["data"]["applications"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-applications"),
             {"entity_id": self.cpo.id, "status": "PENDING"},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]["applications"]), 1)
-        self.assertEqual(data["data"]["applications"][0]["status"], "PENDING")
+        assert response.status_code == 200
+        assert len(data["data"]["applications"]) == 1
+        assert data["data"]["applications"][0]["status"] == "PENDING"
 
         # With pagination
         response = self.client.get(
@@ -455,8 +466,8 @@ class ElecMeterReadingsTest(TestCase):
             {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
         )
         data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data["data"]["applications"]), 1)
+        assert response.status_code == 200
+        assert len(data["data"]["applications"]) == 1
 
     def test_get_application_details(self):
         response = self.client.get(
@@ -466,18 +477,15 @@ class ElecMeterReadingsTest(TestCase):
 
         data = response.json()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            {
-                "status": "success",
-                "data": [
-                    {
-                        "charge_point_id": "FR00EFGH",
-                        "previous_reading": 700.0,
-                        "current_reading": 800.0,
-                        "reading_date": "2024-05-21",
-                    },
-                ],
-            },
-        )
+        assert response.status_code == 200
+        assert data == {
+            "status": "success",
+            "data": [
+                {
+                    "charge_point_id": "FR00EFGH",
+                    "previous_reading": 700.0,
+                    "current_reading": 800.0,
+                    "reading_date": "2024-05-21",
+                }
+            ],
+        }

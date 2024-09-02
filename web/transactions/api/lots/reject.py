@@ -2,14 +2,13 @@ from django.http.response import JsonResponse
 
 from core.decorators import check_user_rights
 from core.helpers import filter_lots, get_entity_lots_by_status
-from core.notifications import notify_lots_rejected
-
 from core.models import (
     CarbureLot,
     CarbureLotEvent,
     Entity,
     UserRights,
 )
+from core.notifications import notify_lots_rejected
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

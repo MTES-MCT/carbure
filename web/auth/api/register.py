@@ -1,7 +1,4 @@
-from auth.tokens import account_activation_token
 from authtools.forms import UserCreationForm
-from core.carburetypes import CarbureError
-from core.common import ErrorResponse, SuccessResponse
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
@@ -9,6 +6,10 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django_otp.plugins.otp_email.models import EmailDevice
+
+from auth.tokens import account_activation_token
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 
 
 def register(request):
@@ -22,12 +23,14 @@ def register(request):
         send_email(user, request, subject)
         return SuccessResponse()
     else:
-        errors = {key: e for key, e in form.errors.items()}
+        errors = dict(form.errors.items())
         # return JsonResponse({'status': 'error', 'message': 'Invalid Form', 'errors': errors}, status=400)
         return ErrorResponse(400, CarbureError.INVALID_REGISTRATION_FORM, data=errors)
 
 
-def send_email(user, request, subject, email_type="account_activation_email", extra_context={}):
+def send_email(user, request, subject, email_type="account_activation_email", extra_context=None):
+    if extra_context is None:
+        extra_context = {}
     current_site = get_current_site(request)
     email_subject = subject
     email_context = {

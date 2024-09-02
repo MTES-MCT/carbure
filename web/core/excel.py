@@ -1,9 +1,11 @@
 from datetime import date, datetime
-import xlsxwriter
-import pandas as pd
 from io import BufferedReader
-from django.http import HttpResponse
 from typing import Any, Callable, Iterable, TypedDict
+
+import pandas as pd
+import xlsxwriter
+from django.http import HttpResponse
+
 from transactions.helpers import try_get_date
 
 
@@ -22,8 +24,10 @@ ExcelConfig = list[SheetConfig]
 
 
 def export_to_excel(
-    location: str, config: ExcelConfig, format: dict = {"bold": True}, column_width: int = 10, header_height: int = 20
+    location: str, config: ExcelConfig, format: dict = None, column_width: int = 10, header_height: int = 20
 ):
+    if format is None:
+        format = {"bold": True}
     workbook = xlsxwriter.Workbook(location)
 
     bold_and_wrap_format = workbook.add_format(format)
@@ -103,7 +107,7 @@ class TableParser:
             for column, parser in column_parsers.items():
                 try:
                     df.at[i, column] = parser(row[column])
-                except:
+                except Exception:
                     errors.append({"row": i, "column": column})
         return df, errors
 
@@ -111,7 +115,7 @@ class TableParser:
     def bool(cell):
         if isinstance(cell, str):
             cell = cell.lower()
-        if cell == "oui" or cell == "yes" or cell == "x" or cell == 1 or cell == True or cell == "true":
+        if cell == "oui" or cell == "yes" or cell == "x" or cell == 1 or cell is True or cell == "true":
             return True
         elif not cell or pd.isna(cell) or cell == "non" or cell == "no" or cell == "false":
             return False
@@ -122,7 +126,7 @@ class TableParser:
     def id(cell):
         try:
             return str(int(float(cell))).strip().upper()
-        except:
+        except Exception:
             return TableParser.str(cell).strip().upper()
 
     @staticmethod

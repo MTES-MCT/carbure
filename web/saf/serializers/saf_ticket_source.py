@@ -1,11 +1,12 @@
 import datetime
-from rest_framework import serializers
-from core.excel import export_to_excel, get_nested_value
 
-from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
-from core.serializers import CarbureLotPublicSerializer, ProductionSiteSerializer, EntityPreviewSerializer
-from saf.models import SafTicketSource
+from rest_framework import serializers
+
+from core.excel import export_to_excel
 from core.models import CarbureLot
+from core.serializers import CarbureLotPublicSerializer, EntityPreviewSerializer, ProductionSiteSerializer
+from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
+from saf.models import SafTicketSource
 
 
 class SafTicketSourceParentLotSerializer(serializers.ModelSerializer):
@@ -43,7 +44,7 @@ class SafTicketSourceSerializer(serializers.ModelSerializer):
     parent_lot = SafTicketSourceParentLotSerializer(read_only=True)
 
     def get_assigned_tickets(self, obj):
-        from .saf_ticket import SafTicketPreviewSerializer
+        from .saf_ticket import SafTicketPreviewSerializer  # noqa: E402
 
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 
@@ -93,7 +94,7 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
     parent_lot = CarbureLotPublicSerializer()
 
     def get_assigned_tickets(self, obj):
-        from .saf_ticket import SafTicketPreviewSerializer
+        from .saf_ticket import SafTicketPreviewSerializer  # noqa: E402
 
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 

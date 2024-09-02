@@ -2,7 +2,7 @@
 
 import traceback
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicket
 from saf.serializers import SafTicketDetailsSerializer
@@ -18,7 +18,7 @@ def get_ticket_details(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_id = int(request.GET.get("ticket_id"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
 

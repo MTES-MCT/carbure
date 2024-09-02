@@ -1,14 +1,15 @@
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from django.db import transaction
-from django.db.models import Q
-from core.models import ProductionSite, CarbureLot
-from certificates.models import DoubleCountingRegistration
-from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
+from django.db import transaction  # noqa: E402
+
+from certificates.models import DoubleCountingRegistration  # noqa: E402
+from core.models import CarbureLot, ProductionSite  # noqa: E402
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks  # noqa: E402
 
 
 @transaction.atomic

@@ -1,6 +1,7 @@
 from core.common import compute_quantities
 from core.models import CarbureLot
-from .node import Node, GHG_FIELDS
+
+from .node import GHG_FIELDS, Node
 
 
 class LotNode(Node):
@@ -173,7 +174,7 @@ class LotNode(Node):
         return self.data.added_by_id
 
     def get_parent(self):
-        from .stock import StockNode
+        from .stock import StockNode  # noqa: E402
 
         if self.data.parent_lot:
             return LotNode(self.data.parent_lot, child=self)
@@ -181,12 +182,14 @@ class LotNode(Node):
             return StockNode(self.data.parent_stock, child=self)
 
     def get_children(self):
-        from .stock import StockNode
-        from .ticket_source import TicketSourceNode
+        from .stock import StockNode  # noqa: E402
+        from .ticket_source import TicketSourceNode  # noqa: E402
 
-        children_lot = [LotNode(lot, parent=self) for lot in self.data.carburelot_set.exclude(lot_status=CarbureLot.DELETED)]  # fmt:skip
+        children_lot = [LotNode(lot, parent=self) for lot in self.data.carburelot_set.exclude(lot_status=CarbureLot.DELETED)]
         children_stock = [StockNode(stock, parent=self) for stock in self.data.carburestock_set.all()]
-        children_ticket_source = [TicketSourceNode(ticket_source, parent=self) for ticket_source in self.data.safticketsource_set.all()]  # fmt:skip
+        children_ticket_source = [
+            TicketSourceNode(ticket_source, parent=self) for ticket_source in self.data.safticketsource_set.all()
+        ]
         return children_lot + children_stock + children_ticket_source
 
     def get_allowed_fields(self, entity_id) -> list:
@@ -196,7 +199,9 @@ class LotNode(Node):
 
         # if the lot has no parent, allow all fields
         if self.parent is None:
-            return LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS  # fmt:skip
+            return (
+                LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
+            )
 
         # find the first lot of the current traceability chain
         sustainability_root = self.get_root()
@@ -224,7 +229,9 @@ class LotNode(Node):
         return allowed_fields
 
     def get_disabled_fields(self, entity_id) -> tuple[bool, list[str]]:
-        all_fields = LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS  # fmt:skip
+        all_fields = (
+            LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
+        )
 
         allowed_fields = self.get_allowed_fields(entity_id)
         disabled_fields = list(set(all_fields) - set(allowed_fields))
@@ -277,7 +284,7 @@ class LotNode(Node):
             biofuel = self.parent.data.biofuel
             remaining_volume = self.parent.data.remaining_volume + self.data.volume
             volume, weight, lhv_amount = compute_quantities(biofuel, volume=remaining_volume)
-            self.parent.update({"remaining_volume": volume, "remaining_weight": weight, "remaining_lhv_amount": lhv_amount})  # fmt:skip
+            self.parent.update({"remaining_volume": volume, "remaining_weight": weight, "remaining_lhv_amount": lhv_amount})
             return [self.parent]
 
         return []

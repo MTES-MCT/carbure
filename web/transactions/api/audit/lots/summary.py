@@ -1,9 +1,11 @@
 import traceback
+
 from django.http.response import JsonResponse
-from transactions.api.admin.helpers import get_admin_summary_data
+
 from core.decorators import check_user_rights
 from core.helpers import filter_lots
 from core.models import Entity
+from transactions.api.admin.helpers import get_admin_summary_data
 from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 

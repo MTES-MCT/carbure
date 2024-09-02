@@ -1,12 +1,12 @@
-import datetime
 from django import forms
 from django.views.decorators.http import require_GET
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.excel import ExcelResponse
 from core.models import Entity, ExternalAdminRights
-from elec.models import ElecChargePoint
-from elec.models import ElecChargePointApplication
+from elec.api.cpo.charge_points.charge_points import annotate_with_latest_extracted_energy
+from elec.models import ElecChargePoint, ElecChargePointApplication
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
 from elec.services.export_charge_point_excel import export_charge_points_to_excel
 
@@ -36,6 +36,7 @@ def get_application_details(request):
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
     charge_points = ElecChargePoint.objects.filter(cpo=company, application=application)
+    charge_points = annotate_with_latest_extracted_energy(charge_points)
 
     if "export" in request.GET:
         excel_file = export_charge_points_to_excel(charge_points, company)

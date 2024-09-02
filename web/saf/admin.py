@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import SafTicketSource, SafTicket
+
+from .models import SafTicket, SafTicketSource
 
 
 @admin.register(SafTicketSource)

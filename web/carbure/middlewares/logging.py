@@ -2,7 +2,7 @@ import logging
 import re
 
 from django.conf import settings
-from django.urls import resolve, Resolver404
+from django.urls import Resolver404, resolve
 
 DEFAULT_LOG_LEVEL = logging.DEBUG
 DEFAULT_HTTP_4XX_LOG_LEVEL = logging.ERROR
@@ -144,9 +144,7 @@ class LoggingMiddleware(object):
         skip_logging, because = self._should_log_route(request)
         if skip_logging:
             if because is not None:
-                self.logger.log_error(
-                    logging.INFO, resp_log, {"args": {}, "kwargs": {"extra": {"no_logging": because}}}
-                )
+                self.logger.log_error(logging.INFO, resp_log, {"args": {}, "kwargs": {"extra": {"no_logging": because}}})
             return response
         logging_context = self._get_logging_context(request, response)
 
@@ -195,7 +193,7 @@ class LoggingMiddleware(object):
         for i, part in enumerate(parts):
             if "Content-Type:" in part:
                 match = BINARY_REGEX.search(part)
-                if match and match.group(2) in BINARY_TYPES and not match.group(4) in ("", "\r\n"):
+                if match and match.group(2) in BINARY_TYPES and match.group(4) not in ("", "\r\n"):
                     part = match.expand(r"\1\2/\3\r\n\r\n(binary data)\r\n")
 
             if i != last:
@@ -220,4 +218,4 @@ class LoggingMiddleware(object):
                 self.logger.log(level, self._chunked_to_max(response.content), logging_context)
 
     def _chunked_to_max(self, msg):
-        return msg[0:self.max_body_length]
+        return msg[0 : self.max_body_length]

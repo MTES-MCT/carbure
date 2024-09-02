@@ -1,9 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
-
-from core.tests_utils import setup_current_user
 from core.models import Entity, MatierePremiere
+from core.tests_utils import setup_current_user
 from saf.factories import SafTicketFactory
 from saf.models import SafTicket
 
@@ -21,20 +20,37 @@ class SafTicketFiltersTest(TestCase):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.client1 = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
         self.client2 = Entity.objects.filter(entity_type=Entity.OPERATOR)[2]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         self.hau = MatierePremiere.objects.get(code="HUILE_ALIMENTAIRE_USAGEE")
-        self.hga = MatierePremiere.objects.get(
-            code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"
-        )
+        self.hga = MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2")
 
         SafTicket.objects.all().delete()
 
-        SafTicketFactory.create(year=2022, assignment_period=202201, supplier_id=self.entity.id, client_id=self.client1.id, feedstock=self.hau, status=SafTicket.PENDING)  # fmt:skip
-        SafTicketFactory.create(year=2022, assignment_period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hau, status=SafTicket.ACCEPTED)  # fmt:skip
-        SafTicketFactory.create(year=2022, assignment_period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hga, status=SafTicket.PENDING)  # fmt:skip
+        SafTicketFactory.create(
+            year=2022,
+            assignment_period=202201,
+            supplier_id=self.entity.id,
+            client_id=self.client1.id,
+            feedstock=self.hau,
+            status=SafTicket.PENDING,
+        )
+        SafTicketFactory.create(
+            year=2022,
+            assignment_period=202202,
+            supplier_id=self.entity.id,
+            client_id=self.client2.id,
+            feedstock=self.hau,
+            status=SafTicket.ACCEPTED,
+        )
+        SafTicketFactory.create(
+            year=2022,
+            assignment_period=202202,
+            supplier_id=self.entity.id,
+            client_id=self.client2.id,
+            feedstock=self.hga,
+            status=SafTicket.PENDING,
+        )
 
     def test_empty_ticket_filters(self):
         query = {
@@ -45,8 +61,8 @@ class SafTicketFiltersTest(TestCase):
             "filter": "feedstocks",
         }
         response = self.client.get(reverse("saf-operator-ticket-filters"), query)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"], [])
+        assert response.status_code == 200
+        assert response.json()["data"] == []
 
     def test_ticket_filters_feedstock(self):
         query = {
@@ -58,12 +74,9 @@ class SafTicketFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted(
-                ["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"]
-            ),
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted(
+            ["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"]
         )
 
     def test_ticket_filters_period_feedstock(self):
@@ -77,11 +90,8 @@ class SafTicketFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted(["HUILE_ALIMENTAIRE_USAGEE"]),
-        )
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted(["HUILE_ALIMENTAIRE_USAGEE"])
 
     def test_ticket_filters_period(self):
         query = {
@@ -93,11 +103,8 @@ class SafTicketFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted([202201, 202202]),
-        )
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted([202201, 202202])
 
     def test_ticket_filters_client(self):
         query = {
@@ -109,8 +116,5 @@ class SafTicketFiltersTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            sorted(response.json()["data"]),
-            sorted([self.client1.name, self.client2.name]),
-        )
+        assert response.status_code == 200
+        assert sorted(response.json()["data"]) == sorted([self.client1.name, self.client2.name])

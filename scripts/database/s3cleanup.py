@@ -1,8 +1,8 @@
-import sys
-import os
-import boto3
-import datetime
 import argparse
+import os
+import sys
+
+import boto3
 
 
 def cleanup_s3db(args):
@@ -39,14 +39,16 @@ def cleanup_s3db(args):
         bucket.delete_objects(Delete={"Objects": to_delete})
         print(f"> Deleted {len(to_delete)} backups from the bucket")
     else:
-        print(f"> Backups are already cleaned")
+        print("> Backups are already cleaned")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Delete old database backups")
     parser.add_argument("-b", dest="bucket", action="store", help="bucket name")
-    parser.add_argument("--force", action="store_true", default=False, help="Force check even if not in production environment")  # fmt:skip
-    parser.add_argument("--year", action="store", help="Pick the year to be cleaned")  # fmt:skip
+    parser.add_argument(
+        "--force", action="store_true", default=False, help="Force check even if not in production environment"
+    )
+    parser.add_argument("--year", action="store", help="Pick the year to be cleaned")
     args = parser.parse_args()
 
     env = os.environ["IMAGE_TAG"]

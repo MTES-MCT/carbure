@@ -1,17 +1,18 @@
 import argparse
 import os
-import django
 
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from tqdm import tqdm
-from django.db import transaction
-from django.core.paginator import Paginator
-from core.models import CarbureLot
-from certificates.models import DoubleCountingRegistration
-from transactions.sanity_checks import bulk_sanity_checks, get_prefetched_data
+from django.core.paginator import Paginator  # noqa: E402
+from django.db import transaction  # noqa: E402
+from tqdm import tqdm  # noqa: E402
+
+from certificates.models import DoubleCountingRegistration  # noqa: E402
+from core.models import CarbureLot  # noqa: E402
+from transactions.sanity_checks import bulk_sanity_checks  # noqa: E402
 
 
 @transaction.atomic
@@ -122,7 +123,9 @@ def get_dc_number(certificate_id: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fix lots that have the wrong dc agreement selected")
-    parser.add_argument("--from-year", dest="from_year", action="store", default=2021, help="From which year to start checking")  # fmt:skip
+    parser.add_argument(
+        "--from-year", dest="from_year", action="store", default=2021, help="From which year to start checking"
+    )
     parser.add_argument("--batch", dest="batch", action="store", default=1000, help="How many lots processed at once")
     args = parser.parse_args()
     pick_right_dc_agreements(args.from_year, args.batch)

@@ -1,7 +1,8 @@
 from datetime import date, timedelta
 from typing import Iterable, Optional, TypedDict
+
 from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, PatternFill, Side, Border
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 from elec.models import ElecChargePoint, ElecMeterReadingApplication
 from elec.repositories.meter_reading_repository import MeterReadingRepository
@@ -124,8 +125,10 @@ def create_meter_readings_excel(
 def create_meter_readings_data(
     charge_points: Iterable[ElecChargePoint],
     previous_application: ElecMeterReadingApplication,
-    current_readings: list[dict] = [],
+    current_readings: list[dict] = None,
 ):
+    if current_readings is None:
+        current_readings = []
     previous_readings_by_charge_point = get_previous_readings_by_charge_point(charge_points, previous_application)
     current_readings_by_charge_point = get_current_readings_by_charge_point(current_readings)
 
@@ -165,7 +168,8 @@ def get_previous_readings_by_charge_point(
     # then if there was a previous registration, use its data to specify the previous reading latest value
     if previous_application:
         for reading in previous_application.elec_meter_readings.all():
-            previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
+            if reading.charge_point:
+                previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
 
     return previous_readings_by_charge_point
 

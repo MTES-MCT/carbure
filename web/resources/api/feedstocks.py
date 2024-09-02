@@ -1,8 +1,7 @@
-from core.models import Biocarburant, Depot, Entity, MatierePremiere, Pays
 from django.db.models import Q
 from django.http import JsonResponse
-from django_otp.decorators import otp_required
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+
+from core.models import MatierePremiere
 
 
 def get_feedstocks(request):

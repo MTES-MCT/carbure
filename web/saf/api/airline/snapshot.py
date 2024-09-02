@@ -1,7 +1,8 @@
 # /api/saf/airline/snapshot
 
 import traceback
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicket
 
@@ -16,7 +17,7 @@ def get_snapshot(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
-    except:
+    except Exception:
         return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMED)
     try:
         tickets = SafTicket.objects.filter(year=year, client_id=entity_id)

@@ -1,8 +1,9 @@
+from django.db.models.query_utils import Q
+from django.http.response import JsonResponse
+
 from carbure.tasks import background_bulk_sanity_checks
 from core.decorators import check_user_rights
 from core.models import CarbureLot, Entity, EntityCertificate, GenericCertificate, UserRights
-from django.db.models.query_utils import Q
-from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -23,6 +24,6 @@ def delete_certificate(request, *args, **kwargs):
             Q(supplier_certificate=certificate_id) | Q(production_site_certificate=certificate_id)
         )
         background_bulk_sanity_checks(lots)
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find certificate"}, status=400)
     return JsonResponse({"status": "success"})

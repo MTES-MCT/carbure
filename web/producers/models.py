@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 
 
 class ProductionSite(models.Model):

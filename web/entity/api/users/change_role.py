@@ -1,5 +1,6 @@
-from django.contrib.auth import get_user_model
 from django import forms
+from django.contrib.auth import get_user_model
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests
@@ -23,7 +24,7 @@ def change_user_role(request, entity, entity_id):
     form = ChangeRoleForm(request.POST)
 
     if not form.is_valid():
-        errors = {key: e for key, e in form.errors.items()}
+        errors = dict(form.errors.items())
         return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED, data=errors)
 
     email = form.cleaned_data["email"]
@@ -31,7 +32,7 @@ def change_user_role(request, entity, entity_id):
 
     try:
         user = User.objects.get(email=email)
-    except:
+    except Exception:
         return ErrorResponse(400, ChangeUserRoleError.MISSING_USER)
 
     rights = UserRights.objects.filter(user=user, entity_id=entity_id).first()
@@ -47,7 +48,7 @@ def change_user_role(request, entity, entity_id):
         if rights_request:
             rights_request.role = role
             rights_request.save()
-    except:
+    except Exception:
         return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED)
 
     return SuccessResponse()

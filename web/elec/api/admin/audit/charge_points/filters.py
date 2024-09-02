@@ -1,10 +1,9 @@
 # /api/saf/operator/ticket-sources/filters
 
 import traceback
-from django import forms
-from django.db.models.functions import Coalesce
+
 from core.carburetypes import CarbureError
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from elec.api.admin.audit.charge_points.applications import AuditApplicationsFilterForm, filter_charge_point_applications
 from elec.repositories.charge_point_repository import ChargePointRepository
@@ -30,7 +29,7 @@ def get_charge_points_applications_filters(request, *args, **kwargs):
         data = get_filter_values(charge_points_applications, filter)
 
         return SuccessResponse(list(set(data)))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)
 

@@ -1,9 +1,10 @@
 import inspect
-from core.models import UserRights, Entity, ExternalAdminRights
-from django.http import JsonResponse
-from django.db.models import Q
-from core.common import ErrorResponse
 from functools import wraps
+
+from django.http import JsonResponse
+
+from core.common import ErrorResponse
+from core.models import Entity, ExternalAdminRights, UserRights
 
 
 def otp_or_403(function):
@@ -41,7 +42,9 @@ def check_user_rights(role=None, entity_type=None):
         @wraps(view_function)
         def wrap(request, *args, **kwargs):
             if not request.user.is_verified():
-                return ErrorResponse(403, UserRightsError.USER_NOT_VERIFIED, status="forbidden", message="User not OTP verified")  # fmt:skip
+                return ErrorResponse(
+                    403, UserRightsError.USER_NOT_VERIFIED, status="forbidden", message="User not OTP verified"
+                )
 
             entity_id = request.POST.get("entity_id", request.GET.get("entity_id"))
             if entity_id is None:
@@ -49,7 +52,7 @@ def check_user_rights(role=None, entity_type=None):
 
             try:
                 entity = Entity.objects.get(pk=entity_id)
-            except:
+            except Exception:
                 return ErrorResponse(400, UserRightsError.ENTITY_NOT_FOUND, message="Entity was not found")
 
             # store user current rights in session
@@ -57,7 +60,9 @@ def check_user_rights(role=None, entity_type=None):
             request.session["rights"] = rights
 
             if entity_id not in rights:
-                return ErrorResponse(403, UserRightsError.WRONG_USER, status="forbidden", message="User has no rights to the requested entity")  # fmt:skip
+                return ErrorResponse(
+                    403, UserRightsError.WRONG_USER, status="forbidden", message="User has no rights to the requested entity"
+                )
 
             if entity_id != request.session.get("entity_id"):
                 request.session["entity_id"] = entity_id
@@ -66,11 +71,21 @@ def check_user_rights(role=None, entity_type=None):
 
             if isinstance(entity_type, list):
                 if entity.entity_type not in entity_type:
-                    return ErrorResponse(403, UserRightsError.WRONG_ENTITY_TYPE, status="forbidden", message="Operation not allowed for an entity of this type")  # fmt:skip
+                    return ErrorResponse(
+                        403,
+                        UserRightsError.WRONG_ENTITY_TYPE,
+                        status="forbidden",
+                        message="Operation not allowed for an entity of this type",
+                    )
 
             if isinstance(role, list):
                 if user_role not in role:
-                    return ErrorResponse(403, UserRightsError.WRONG_ROLE, status="forbidden", message="Insufficient rights to the requested entity")  # fmt:skip
+                    return ErrorResponse(
+                        403,
+                        UserRightsError.WRONG_ROLE,
+                        status="forbidden",
+                        message="Insufficient rights to the requested entity",
+                    )
 
             context = {"entity_id": entity_id, "entity": entity}
             return call_with_context(view_function, context, request, args, kwargs)
@@ -91,8 +106,11 @@ class AdminRightsError:
     USER_HAS_NO_RIGHT = "USER_HAS_NO_RIGHT"
 
 
-# TODO sur les endpoints accessibles par des external admin, il faut en plus verifier qu'il n'agissent que sur les types d'entités autorisées (ex : DGAC sur companies aeriennes uniquement, cf get_entities)
-def check_admin_rights(allow_external=[], allow_role=None):
+# TODO sur les endpoints accessibles par des external admin, il faut en plus verifier qu'il n'agissent que sur les types d'entités autorisées (ex : DGAC sur companies aeriennes uniquement, cf get_entities)  # noqa: E501
+def check_admin_rights(allow_external=None, allow_role=None):
+    if allow_external is None:
+        allow_external = []
+
     def decorator(view_function):
         @wraps(view_function)
         def wrap(request, *args, **kwargs):
@@ -109,7 +127,7 @@ def check_admin_rights(allow_external=[], allow_role=None):
             try:
                 # check that entity exists and is admin
                 entity = Entity.objects.get(id=entity_id, entity_type__in=[Entity.ADMIN, Entity.EXTERNAL_ADMIN])
-            except:
+            except Exception:
                 return ErrorResponse(404, AdminRightsError.ENTITY_NOT_FOUND)
 
             try:
@@ -118,7 +136,7 @@ def check_admin_rights(allow_external=[], allow_role=None):
                     UserRights.objects.get(entity=entity, user=request.user, role__in=allow_role)
                 else:
                     UserRights.objects.get(entity=entity, user=request.user)
-            except:
+            except Exception:
                 return ErrorResponse(403, AdminRightsError.USER_HAS_NO_RIGHT)
 
             # find out if the decorated function is accessible only by admins
@@ -137,7 +155,7 @@ def check_admin_rights(allow_external=[], allow_role=None):
             elif entity.entity_type == Entity.EXTERNAL_ADMIN:
                 try:
                     ExternalAdminRights.objects.get(entity=entity, right__in=allow_external)
-                except:
+                except Exception:
                     return ErrorResponse(403, AdminRightsError.ENTITY_HAS_NO_RIGHT)
 
             context = {"entity_id": entity_id, "entity": entity}

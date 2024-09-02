@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from core.tests_utils import setup_current_user
 from core.models import Entity
+from core.tests_utils import setup_current_user
 
 
 class SettingUpdateEntityTest(TestCase):
@@ -33,19 +33,16 @@ class SettingUpdateEntityTest(TestCase):
 
         response = self.client.post(reverse("entity-update-info"), query)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        assert response.status_code == 200
+        assert response.json()["status"] == "success"
 
         updated_entity = Entity.objects.all()[0]
 
-        self.assertEqual(updated_entity.legal_name, query["legal_name"])
-        self.assertEqual(updated_entity.registration_id, query["registration_id"])
-        self.assertEqual(
-            updated_entity.sustainability_officer_phone_number,
-            query["sustainability_officer_phone_number"],
-        )
-        self.assertEqual(updated_entity.sustainability_officer, query["sustainability_officer"])
-        self.assertEqual(updated_entity.registered_address, query["registered_address"])
-        self.assertEqual(updated_entity.registered_zipcode, query["registered_zipcode"])
-        self.assertEqual(updated_entity.registered_city, query["registered_city"])
-        self.assertEqual(updated_entity.registered_country.code_pays, query["registered_country_code"])
+        assert updated_entity.legal_name == query["legal_name"]
+        assert updated_entity.registration_id == query["registration_id"]
+        assert updated_entity.sustainability_officer_phone_number == query["sustainability_officer_phone_number"]
+        assert updated_entity.sustainability_officer == query["sustainability_officer"]
+        assert updated_entity.registered_address == query["registered_address"]
+        assert updated_entity.registered_zipcode == query["registered_zipcode"]
+        assert updated_entity.registered_city == query["registered_city"]
+        assert updated_entity.registered_country.code_pays == query["registered_country_code"]
