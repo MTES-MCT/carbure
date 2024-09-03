@@ -7,6 +7,9 @@ from core.decorators import check_user_rights
 from core.models import Entity
 from elec.models import ElecChargePoint
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
+from elec.api.cpo.charge_points.charge_points import (
+    annotate_with_latest_extracted_energy,
+)
 
 
 class ChargePointDetailForm(forms.Form):
@@ -26,6 +29,9 @@ def get_charge_point_details(request, entity, entity_id):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     cp = form.cleaned_data["charge_point_id"]
+    charge_point_id = form.cleaned_data["charge_point_id"].id
+    annotated_qs = annotate_with_latest_extracted_energy(ElecChargePoint.objects.filter(id=charge_point_id))
+    cp = annotated_qs.get()
 
     if cp.cpo != entity:
         return ErrorResponse(400, ChargePointDetailError.CP_NOT_FOUND_ON_CPO)

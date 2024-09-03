@@ -383,7 +383,11 @@ class ElecCharginPointsTest(TestCase):
 
         data = response.json()
 
-        cpo = {"id": self.cpo.id, "entity_type": self.cpo.entity_type, "name": self.cpo.name}
+        cpo = {
+            "id": self.cpo.id,
+            "entity_type": self.cpo.entity_type,
+            "name": self.cpo.name,
+        }
 
         expected = {
             "status": "success",
@@ -717,6 +721,87 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert response.status_code == 200
         assert len(data["data"]) == 1
+
+    def test_get_charge_points_details_ok(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 1, 5)
+        application.save()
+
+        charge_point = ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="ABCDE",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            current_meter=self.meter,
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+            cpo_name="Alice",
+            cpo_siren="12345",
+        )
+
+        self.meter.charge_point = charge_point
+        self.meter.save()
+
+        meter_reading_application = ElecMeterReadingApplication.objects.create(
+            status=ElecMeterReadingApplication.ACCEPTED,
+            quarter=2,
+            year=2024,
+            cpo=self.cpo,
+        )
+
+        ElecMeterReading.objects.create(
+            extracted_energy=40,
+            renewable_energy=20,
+            reading_date=datetime.date(2024, 9, 30),
+            meter=self.meter,
+            cpo=self.cpo,
+            application=meter_reading_application,
+        )
+
+        ElecMeterReading.objects.create(
+            extracted_energy=4,
+            renewable_energy=2,
+            reading_date=datetime.date(2024, 9, 29),
+            meter=self.meter,
+            cpo=self.cpo,
+            application=meter_reading_application,
+        )
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-point-details"),
+            {"entity_id": self.cpo.id, "charge_point_id": charge_point.id},
+        )
+
+        expected = {
+            "status": "success",
+            "data": {
+                "id": charge_point.id,
+                "cpo": self.cpo.name,
+                "charge_point_id": "ABCDE",
+                "current_type": "AC",
+                "application_date": "2023-01-05",
+                "installation_date": "2023-02-15",
+                "mid_id": "123-456",
+                "measure_date": "2023-06-29",
+                "measure_energy": 1000.123,
+                "latest_extracted_energy": 40,
+                "is_article_2": False,
+                "measure_reference_point_id": "123456",
+                "station_name": "Station",
+                "station_id": "FGHIJ",
+                "nominal_power": 150.0,
+                "cpo_name": "Alice",
+                "cpo_siren": "12345",
+                "status": "PENDING",
+            },
+        }
+
+        data = response.json()
+        assert response.status_code == 200
+        assert data == expected
 
     def test_get_application_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)

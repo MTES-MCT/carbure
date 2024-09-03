@@ -1,4 +1,4 @@
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_POST
 
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
@@ -13,20 +13,22 @@ class MetersError:
     CP_NOT_FOUND_ON_CPO = "CP_NOT_FOUND_ON_CPO"
 
 
-@require_GET
+@require_POST
 @check_user_rights(entity_type=[Entity.CPO])
-def get_meters(request, entity):
-    serializer = ElecChargePointIdSerializer(data=request.GET)
+def add_elec_meter(request, entity, entity_id):
+    serializer = ElecMeterSerializer(data=request.POST)
 
     if not serializer.is_valid():
-        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, serializer.errors)
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=serializer.errors)
 
-    cp = serializer.validated_data["charge_point_id"]
-
-    if cp.cpo != entity:
+    if serializer.validated_data["charge_point"].cpo != entity:
         return ErrorResponse(400, MetersError.CP_NOT_FOUND_ON_CPO)
 
-    meters = ElecMeter.objects.filter(charge_point=cp)
+    meter = serializer.save()
 
-    serialized = ElecMeterSerializer(meters, many=True).data
-    return SuccessResponse(serialized)
+    # Update the current meter of the charge point
+    cp = meter.charge_point
+    cp.current_meter = meter
+    cp.save()
+
+    return SuccessResponse()
