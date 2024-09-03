@@ -4,8 +4,6 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
-from elec.models import ElecMeter
-from elec.serializers.elec_charge_point import ElecChargePointIdSerializer
 from elec.serializers.elec_meter import ElecMeterSerializer
 
 

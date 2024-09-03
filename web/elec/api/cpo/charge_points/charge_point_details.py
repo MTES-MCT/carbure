@@ -5,11 +5,11 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
-from elec.models import ElecChargePoint
-from elec.serializers.elec_charge_point import ElecChargePointSerializer
 from elec.api.cpo.charge_points.charge_points import (
     annotate_with_latest_extracted_energy,
 )
+from elec.models import ElecChargePoint
+from elec.serializers.elec_charge_point import ElecChargePointSerializer
 
 
 class ChargePointDetailForm(forms.Form):
