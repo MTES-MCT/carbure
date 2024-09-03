@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import css from "./dialog.module.css"
@@ -41,7 +41,7 @@ export const Dialog = ({
 
 export interface ConfirmProps {
   title: string
-  description: string
+  description: ReactNode
   confirm: string
   variant: ButtonVariant
   icon?: React.ComponentType | React.ElementType
