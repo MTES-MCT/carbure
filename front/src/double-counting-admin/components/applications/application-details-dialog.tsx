@@ -3,7 +3,7 @@ import { EntityType } from "carbure/types"
 import { Button } from "common/components/button"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross, Return, Save } from "common/components/icons"
+import { Check, Cross, Download, Return, Save } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -118,11 +118,27 @@ export const ApplicationDetailsDialog = () => {
   async function submitAccept() {
     portal((close) => (
       <Confirm
-        variant="success"
+        variant="primary"
         title={t("Accepter la demande d'agrément")}
-        description={t("Voulez-vous vraiment accepter cette demande d'agrément double comptage ? Une fois accepté, vous retrouverez l'agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
-        confirm={t("Accepter")}
-        icon={Check}
+        description={
+          <>
+            <p>
+              {t(
+                "Voulez-vous vraiment accepter cette demande d'agrément double comptage ?"
+              )}
+            </p>
+            <p>
+              {t(
+                "Une fois accepté, vous retrouverez l'agrément correspondant dans la liste des agréments actifs."
+              )}
+            </p>
+            <p>
+              {t("La décision sera directement téléchargée au format word.")}
+            </p>
+          </>
+        }
+        confirm={t("Générer la décision")}
+        icon={Download}
         onClose={close}
         onConfirm={async () => {
           if (application) {
