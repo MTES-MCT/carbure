@@ -6,6 +6,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
+import { ChargePointsSnapshot } from "elec-charge-points/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
@@ -15,9 +16,10 @@ import { ChargePointFilter } from "./types"
 
 type ChargePointsListProps = {
   year: number
+  snapshot: ChargePointsSnapshot
 }
 
-const ChargePointsList = ({ year }: ChargePointsListProps) => {
+const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
   const status = useStatus()
@@ -61,7 +63,11 @@ const ChargePointsList = ({ year }: ChargePointsListProps) => {
       </Bar>
       <section>
         <ActionBar>
-          <StatusSwitcher status={status} onSwitch={actions.setStatus} />
+          <StatusSwitcher
+            status={status}
+            onSwitch={actions.setStatus}
+            snapshot={snapshot}
+          />
         </ActionBar>
       </section>
     </>

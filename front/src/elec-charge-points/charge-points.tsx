@@ -16,9 +16,9 @@ const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
   charge_point_applications: 0,
   meter_reading_applications: 0,
-  charge_points_accepted: 0,
-  charge_points_audit_in_progress: 0,
-  charge_points_pending: 0,
+  accepted: 0,
+  audit_in_progress: 0,
+  pending: 0,
 }
 
 const ChargePoints = () => {
@@ -67,7 +67,9 @@ const ChargePoints = () => {
 
         <Route
           path="list/*"
-          element={<ChargePointsList year={years.selected} />}
+          element={
+            <ChargePointsList year={years.selected} snapshot={snapshot} />
+          }
         />
 
         <Route
