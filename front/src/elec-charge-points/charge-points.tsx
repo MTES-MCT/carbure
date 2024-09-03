@@ -13,8 +13,8 @@ import ElecMeterReadingsSettings from "./pages/meter-readings"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
-  charge_points_pending: 0,
-  meter_reading: 0,
+  charge_point_applications: 0,
+  meter_reading_applications: 0,
 }
 
 const ChargePoints = () => {
@@ -61,7 +61,7 @@ const ChargePoints = () => {
           }
         />
 
-        <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} />
+        {/* <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} /> */}
 
         <Route
           path="pending"

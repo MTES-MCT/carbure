@@ -23,7 +23,7 @@ export const ChargePointsTabs = ({
           label: (
             <TabItem
               title={t("Inscriptions")}
-              subtitle={snapshot.charge_points_pending}
+              subtitle={snapshot.charge_point_applications}
               loading={loading}
             />
           ),
@@ -34,22 +34,22 @@ export const ChargePointsTabs = ({
           label: (
             <TabItem
               title={t("Relevés trimestriels")}
-              subtitle={snapshot.meter_reading}
+              subtitle={snapshot.meter_reading_applications}
               loading={loading}
             />
           ),
         },
-        {
-          key: "list",
-          path: "list",
-          label: (
-            <TabItem
-              title={t("Points de recharge")}
-              subtitle={snapshot.charge_points_pending}
-              loading={loading}
-            />
-          ),
-        },
+        // {
+        //   key: "list",
+        //   path: "list",
+        //   label: (
+        //     <TabItem
+        //       title={t("Points de recharge")}
+        //       subtitle={snapshot.charge_points}
+        //       loading={loading}
+        //     />
+        //   ),
+        // },
       ]}
     />
   )

@@ -1,5 +1,5 @@
 export type ChargePointsSnapshot = {
-  charge_points_pending: number
-  meter_reading: number
+  charge_point_applications: number
+  meter_reading_applications: number
   charge_points: number
 }
