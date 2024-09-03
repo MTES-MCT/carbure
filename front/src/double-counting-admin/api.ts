@@ -90,7 +90,6 @@ export function approveDoubleCountingApplication(
     entity_id,
     dca_id,
     industrial_wastes,
-    export: true,
   })
 }
 
