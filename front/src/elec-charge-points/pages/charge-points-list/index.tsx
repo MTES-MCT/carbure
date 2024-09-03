@@ -1,4 +1,7 @@
 import useEntity from "carbure/hooks/entity"
+import Button from "common/components/button"
+import { Download } from "common/components/icons"
+import { SearchInput } from "common/components/input"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
@@ -12,6 +15,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import { useStatus } from "./index.hooks"
 import { StatusSwitcher } from "./status-switcher"
+import { ChargePointsListTable } from "./table"
 import { ChargePointFilter } from "./types"
 
 type ChargePointsListProps = {
@@ -33,12 +37,15 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   )
 
   const query = useCBQueryBuilder(state)
-  const applicationsResponse = useQuery(api.getChargePointsList, {
+  const chargePointsListResponse = useQuery(api.getChargePointsList, {
     key: "charge-points-list",
     params: [query],
   })
 
-  const applications = applicationsResponse.result?.data.data ?? []
+  const chargePointsListPagination = chargePointsListResponse.result?.data.data
+  const chargePointsCount = chargePointsListPagination?.charge_points_list
+    ? chargePointsListPagination?.charge_points_list.length
+    : 0
 
   const filterLabels = useMemo(
     () => ({
@@ -49,6 +56,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
     }),
     [t]
   )
+
   return (
     <>
       <Bar>
@@ -68,7 +76,37 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
             onSwitch={actions.setStatus}
             snapshot={snapshot}
           />
+          <SearchInput
+            clear
+            asideX
+            debounce={250}
+            value={state.search}
+            onChange={actions.setSearch}
+          />
+          {chargePointsCount > 0 && (
+            <Button
+              icon={Download}
+              label={t("Exporter")}
+              action={() => {}}
+              asideX
+            />
+          )}
         </ActionBar>
+        {chargePointsListPagination?.charge_points_list && (
+          <ChargePointsListTable
+            chargePoints={chargePointsListPagination?.charge_points_list}
+            loading={chargePointsListResponse.loading}
+            onOrder={actions.setOrder}
+            order={state.order}
+            onSelect={actions.setSelection}
+            selected={state.selection}
+            rowLink={() => ({
+              pathname: "",
+              search: "",
+              hash: "",
+            })}
+          />
+        )}
       </section>
     </>
   )
