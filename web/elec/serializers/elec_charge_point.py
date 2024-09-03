@@ -65,6 +65,7 @@ class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "charge_point_id",
+            "measure_reference_point_id",
         ]
 
 

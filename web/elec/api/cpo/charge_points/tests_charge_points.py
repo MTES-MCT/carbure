@@ -790,3 +790,34 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert response.status_code == 200
         assert data == expected
+
+    def test_update_charge_point(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.save()
+
+        charge_point = ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="FRBBBB222203",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+        )
+
+        response = self.client.post(
+            reverse("elec-cpo-charge-points-update-charge-point"),
+            {
+                "entity_id": self.cpo.id,
+                "id": str(charge_point.id),
+                "charge_point_id": "FRBBBB222204",
+                "measure_reference_point_id": "654321",
+            },
+        )
+        assert response.status_code == 200
+        charge_point.refresh_from_db()
+        assert charge_point.charge_point_id == "FRBBBB222204"
+        assert charge_point.measure_reference_point_id == "654321"
