@@ -20,7 +20,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { DoubleCountingFileInfo } from "../types"
 import { DechetIndustrielAlert } from "./application-checker/industrial-waste-alert"
 import { ReplaceApplicationDialog } from "./application-checker/replace-application-dialog"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 
 export type SendApplicationProducerDialogProps = {

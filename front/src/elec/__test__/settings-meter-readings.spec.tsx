@@ -135,7 +135,6 @@ test("upload valid file", async () => {
 })
 
 test("upload file with error", async () => {
-  const user = userEvent.setup()
   setEntity(cpo)
 
   render(<SettingsWithHooks />)

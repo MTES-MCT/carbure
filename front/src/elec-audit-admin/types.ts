@@ -17,15 +17,12 @@ export interface ElecAdminAuditSnapshot extends CBSnapshot {
   meter_readings_applications: number
 }
 
-
-export interface ElecAdminAuditQuery extends CBQueryParams {
-  [ElecAdminAuditFilter.Cpo]?: string[]
-}
-
-
 export enum ElecAdminAuditFilter {
   Quarter = "quarter",
   Cpo = "cpo",
+}
+export interface ElecAdminAuditQuery extends CBQueryParams {
+  [ElecAdminAuditFilter.Cpo]?: string[]
 }
 
 export enum ElecAdminAuditStatus {
@@ -34,7 +31,6 @@ export enum ElecAdminAuditStatus {
   AuditDone = "AUDIT_DONE",
   History = "HISTORY",
 }
-
 
 export interface ElecChargePointsApplicationsData {
   charge_points_applications: ElecChargePointsApplication[]
@@ -64,4 +60,3 @@ export interface ElecMeterReadingsApplicationsData {
   returned: number
   total: number
 }
-

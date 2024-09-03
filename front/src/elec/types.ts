@@ -1,8 +1,5 @@
 import { EntityPreview, UploadCheckReportInfo } from "carbure/types"
-import {
-  ElecCPOProvisionCertificateQuery,
-  ElecTransferCertificateStatus,
-} from "./types-cpo"
+import { ElecTransferCertificateStatus } from "./types-cpo"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 
 export interface ElecProvisionCertificatePreview {
@@ -45,7 +42,6 @@ export enum ElecTransferCertificateFilter {
   CertificateId = "certificate_id",
 }
 
-
 export interface ElecTransferCertificatesDetails
   extends ElecTransferCertificatePreview {
   comment: string
@@ -72,7 +68,8 @@ export interface ElecChargePointsApplication {
   // audit_order_date?: string
 }
 
-export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
+export interface ElecChargePointsApplicationDetails
+  extends ElecChargePointsApplication {
   email_contacts: string[]
   sample?: ElecApplicationSample
 }

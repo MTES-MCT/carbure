@@ -1,4 +1,3 @@
-import useEntity from "carbure/hooks/entity"
 import cl from "clsx"
 import { Bell, Loader } from "common/components/icons"
 import { Col, Row } from "common/components/scaffold"
@@ -24,7 +23,6 @@ export const OperatorTabs = ({
   loading,
   count = defaultCount,
 }: StatusTabsProps) => {
-  const entity = useEntity()
   const { t } = useTranslation()
 
   return (

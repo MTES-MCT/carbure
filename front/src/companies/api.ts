@@ -1,6 +1,6 @@
 import api, { Api } from "common/services/api"
-import { SearchCompanyPreview, SearchCompanyResult } from "./types"
-import { Certificate, EntityType } from "carbure/types"
+import { SearchCompanyResult } from "./types"
+import { EntityType } from "carbure/types"
 
 export function searchCompanyDataBySiren(registration_id: string) {
   return api.post<Api<SearchCompanyResult>>(

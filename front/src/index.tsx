@@ -11,6 +11,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 
 async function enableMocking() {
   if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { worker } = await import("./mocks")
     console.info(
       "MOCKING ENABLED: to enable/disable the mocked api, comment/uncomment the line below in the file 'index.tsx'"

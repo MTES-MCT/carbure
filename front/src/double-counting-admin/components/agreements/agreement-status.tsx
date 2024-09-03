@@ -1,8 +1,5 @@
 import { useTranslation } from "react-i18next"
-import {
-  AgreementStatus,
-  DoubleCountingStatus as DCStatus,
-} from "../../../double-counting/types"
+import { AgreementStatus } from "../../../double-counting/types"
 import Tag, { TagVariant } from "common/components/tag"
 
 const statusToVariant: Record<AgreementStatus, TagVariant> = {

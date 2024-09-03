@@ -18,7 +18,6 @@ import {
   normalizeEntityType,
 } from "carbure/utils/normalizers"
 import useEntity from "carbure/hooks/entity"
-import { companiesSummary } from "companies-admin/__test__/data"
 
 type EntitySummaryProps = {
   search?: string

@@ -1,4 +1,3 @@
-import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import { Entity, UserRole } from "carbure/types"
 import Alert from "common/components/alert"
@@ -95,6 +94,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     } else {
       form.setDisabledFields([])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lotData])
 
   return (

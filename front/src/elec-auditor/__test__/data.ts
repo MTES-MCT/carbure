@@ -1,10 +1,14 @@
-import { cpo } from "carbure/__test__/data";
-import { UploadCheckError, UploadCheckReportInfo } from "carbure/types";
-import { ElecAdminAuditSnapshot, ElecApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
-import { ElecAuditorApplication, ElecAuditorApplicationDetails, ElecAuditorApplicationsData, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus, ElecAuditorUploadCheckReportInfo } from "elec-auditor/types";
-import { elecAuditApplicationSample, elecChargePointApplicationAuditDone, elecChargePointApplicationAuditInProgress, elecChargePointsApplications, elecMeterReadingsApplications } from "elec/__test__/data";
-import { ElecChargePointsApplication } from "elec/types";
-
+import { cpo } from "carbure/__test__/data"
+import { UploadCheckError } from "carbure/types"
+import {
+  ElecAuditorApplication,
+  ElecAuditorApplicationDetails,
+  ElecAuditorApplicationsData,
+  ElecAuditorApplicationsSnapshot,
+  ElecAuditorApplicationsStatus,
+  ElecAuditorUploadCheckReportInfo,
+} from "elec-auditor/types"
+import { elecAuditApplicationSample } from "elec/__test__/data"
 
 export const elecAuditYears = [2024, 2023, 2020]
 export const elecAuditSnapshot: ElecAuditorApplicationsSnapshot = {
@@ -13,8 +17,6 @@ export const elecAuditSnapshot: ElecAuditorApplicationsSnapshot = {
 }
 
 export const elecAuditCPOFilters = ["Aménageur 1", "Aménageur 2", "Aménageur 3"]
-
-
 
 export const elecAuditorApplicationAuditInProgress: ElecAuditorApplication = {
   id: 3,
@@ -35,10 +37,9 @@ export const elecAuditorApplicationAuditDone: ElecAuditorApplication = {
   audit_order_date: "2023-09-26",
 }
 
-
 export const elecAuditChargePointsApplications: ElecAuditorApplication[] = [
   elecAuditorApplicationAuditInProgress,
-  elecAuditorApplicationAuditDone
+  elecAuditorApplicationAuditDone,
 ]
 
 export const elecAuditApplicationsList: ElecAuditorApplicationsData = {
@@ -46,27 +47,28 @@ export const elecAuditApplicationsList: ElecAuditorApplicationsData = {
   from: 0,
   ids: [1, 2, 3, 4, 13, 14, 15, 22, 23, 24, 25],
   returned: 10,
-  total: 11
+  total: 11,
 }
 
-
-export const elecAuditorApplicationDetailsInProgress: ElecAuditorApplicationDetails = {
-  ...elecAuditorApplicationAuditInProgress,
-  sample: elecAuditApplicationSample
-}
-
+export const elecAuditorApplicationDetailsInProgress: ElecAuditorApplicationDetails =
+  {
+    ...elecAuditorApplicationAuditInProgress,
+    sample: elecAuditApplicationSample,
+  }
 
 const error: UploadCheckError = {
   line: 1,
-  error: 'NO_CHARGE_POINT_DETECTED'
+  error: "NO_CHARGE_POINT_DETECTED",
 }
 
-export const elecAuditApplicationCheckReportError: ElecAuditorUploadCheckReportInfo = {
-  errors: [error],
-  file_name: "auditreport.xlsx",
-  error_count: 1
-}
-export const elecAuditApplicationCheckReportSuccess: ElecAuditorUploadCheckReportInfo = {
-  file_name: "auditreport.xlsx",
-  error_count: 0
-}
+export const elecAuditApplicationCheckReportError: ElecAuditorUploadCheckReportInfo =
+  {
+    errors: [error],
+    file_name: "auditreport.xlsx",
+    error_count: 1,
+  }
+export const elecAuditApplicationCheckReportSuccess: ElecAuditorUploadCheckReportInfo =
+  {
+    file_name: "auditreport.xlsx",
+    error_count: 0,
+  }

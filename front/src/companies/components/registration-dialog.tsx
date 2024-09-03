@@ -9,12 +9,7 @@ import Autocomplete from "common/components/autocomplete"
 import { Button, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
-import {
-  AlertCircle,
-  ExternalLink,
-  Plus,
-  Return,
-} from "common/components/icons"
+import { AlertCircle, Plus } from "common/components/icons"
 import { TextArea, TextInput } from "common/components/input"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import Portal from "common/components/portal"
