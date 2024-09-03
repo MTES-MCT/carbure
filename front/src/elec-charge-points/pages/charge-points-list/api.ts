@@ -3,7 +3,7 @@ import api, { Api } from "common/services/api"
 import { ChargePointsListData, ChargePointsListQuery } from "./types"
 
 export function getChargePointsList(query: ChargePointsListQuery) {
-  return api.get<Api<ChargePointsListData>>("elec/charge-points/list", {
+  return api.get<Api<ChargePointsListData>>("elec/cpo/charge-points", {
     params: query,
   })
 }

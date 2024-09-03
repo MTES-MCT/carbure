@@ -6,7 +6,7 @@ export type ChargePointsListData = CBQueryResult & {
   charge_points_list: ChargePoint[]
 }
 
-export enum ChargePointsStatus {
+export enum ChargePointStatus {
   Pending = "PENDING",
   AuditInProgress = "AUDIT_IN_PROGRESS",
   Accepted = "ACCEPTED",
@@ -25,6 +25,7 @@ export type ChargePoint = {
   current_type?: ChargePointType
   last_measure_energy: number
   concerned_by_reading_meter?: boolean // Revoir le naming
+  status: ChargePointStatus
 }
 export enum ChargePointFilter {
   ValidationDate = "validation_date",

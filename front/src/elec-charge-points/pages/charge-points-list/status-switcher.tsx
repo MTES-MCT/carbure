@@ -3,7 +3,7 @@ import { compact } from "common/utils/collection"
 import { ChargePointsSnapshot } from "elec-charge-points/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { ChargePointsStatus } from "./types"
+import { ChargePointStatus } from "./types"
 
 interface StatusSwitcherProps {
   status: any
@@ -20,15 +20,15 @@ export const StatusSwitcher = ({
   const displayedStatuses = useMemo(
     () => [
       {
-        key: ChargePointsStatus.Pending,
+        key: ChargePointStatus.Pending,
         label: `${t("En attente")} (${snapshot.pending})`,
       },
       {
-        key: ChargePointsStatus.AuditInProgress,
+        key: ChargePointStatus.AuditInProgress,
         label: `${t("En cours d'audit")} (${snapshot.audit_in_progress})`,
       },
       {
-        key: ChargePointsStatus.Accepted,
+        key: ChargePointStatus.Accepted,
         label: `${t("Accepté")} (${snapshot.accepted})`,
       },
     ],
