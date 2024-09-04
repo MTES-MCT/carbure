@@ -8,7 +8,7 @@ repos:
   - repo: local
     hooks:
       - id: run-npm-script
-        name: Run NPM Script
+        name: Eslint/Prettier
         entry: cd front && npm run lint
         language: system
         files: ^front/
