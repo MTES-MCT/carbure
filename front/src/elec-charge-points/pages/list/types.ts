@@ -30,7 +30,7 @@ export type ChargePoint = {
   is_article_2: boolean // If a charge point is NOT concerned by a reading meter
 }
 export enum ChargePointFilter {
-  MeasureDate = "measure_date",
+  MeasureDate = "latest_meter_reading_month",
   ChargePointId = "charge_point_id",
   StationId = "station_id",
   ConcernedByReadingMeter = "is_article_2",
