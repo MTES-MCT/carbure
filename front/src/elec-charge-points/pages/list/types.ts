@@ -26,13 +26,13 @@ export type ChargePoint = {
   measure_date: string | null
   measure_energy: number
   installation_date: string
-  concerned_by_reading_meter?: boolean // Revoir le naming
   status: ChargePointStatus
+  is_article_2: boolean // If a charge point is NOT concerned by a reading meter
 }
 export enum ChargePointFilter {
   // Status = "status",
   MeasureDate = "measure_date",
   ChargePointId = "charge_point_id",
   StationId = "station_id",
-  ConcernedByReadingMeter = "concerned_by_reading_meter",
+  ConcernedByReadingMeter = "is_article_2",
 }

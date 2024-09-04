@@ -34,6 +34,7 @@ export const ChargePointsListTable = ({
         columns.station_id,
         columns.current_type,
         columns.measure_energy,
+        columns.is_article_2,
       ])}
     />
   )
