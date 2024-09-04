@@ -78,7 +78,6 @@ const MeterReadingsApplicationsList = ({
 
   return (
     <>
-      LA LISTEEEE
       <Bar>
         <FilterMultiSelect
           filterLabels={filterLabels}

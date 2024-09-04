@@ -4,14 +4,12 @@ import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
-import { useQuery } from "common/hooks/async"
 import * as api from "elec/api-cpo"
 import {
   ElecAuditApplicationStatus,
   ElecMeterReadingsApplication,
   MeterReadingsApplicationUrgencyStatus,
 } from "elec/types"
-import { Fragment, PropsWithChildren, useMemo } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useElecMeterReadingsSettings } from "./settings.hooks"
 import MeterReadingsApplicationsTable from "./table"
@@ -61,15 +59,10 @@ const ElecMeterReadingsSettings = ({
     )
   }
 
-  // This component is currently used across two pages with minor UI differences.
-  // In the future, the UI should be unified across both pages to maintain consistency.
-  const Wrapper = contentOnly ? Fragment : Panel
-  const HeaderOrSection = contentOnly ? "section" : "header"
-
   return (
-    <Wrapper id="elec-meter-readings">
-      <HeaderOrSection>
-        {!contentOnly && <h1>{t("Relevés trimestriels")}</h1>}
+    <Panel id="elec-meter-readings">
+      <header>
+        <h1>{t("Relevés trimestriels")}</h1>
 
         {chargePointCount === 0 && (
           <p>
@@ -100,7 +93,7 @@ const ElecMeterReadingsSettings = ({
             })}
           />
         )}
-      </HeaderOrSection>
+      </header>
 
       {isApplicationsEmpty && (
         <>
@@ -125,7 +118,7 @@ const ElecMeterReadingsSettings = ({
       )}
 
       {applicationsQuery.loading && <LoaderOverlay />}
-    </Wrapper>
+    </Panel>
   )
 }
 

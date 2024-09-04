@@ -14,8 +14,6 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
-import ElecChargePointsSettings from "elec/components/charge-points/settings"
-import ElecAdminMeterReadingsSettings from "elec/components/meter-readings/admin-settings"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -34,7 +32,6 @@ const EntityDetails = () => {
   }
 
   const entityData = company.result?.data.data
-  const isCPO = entityData?.entity_type === EntityType.CPO
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
 
