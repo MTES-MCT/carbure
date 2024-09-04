@@ -75,8 +75,18 @@ def get_charge_points(request, entity):
         excel_file = export_charge_points_to_excel(object_list, entity)
         return ExcelResponse(excel_file)
 
-    serialized = ElecChargePointSerializer(object_list, many=True).data
-    return SuccessResponse(serialized)
+    ids = charge_points.values_list("id", flat=True)
+    serialized = ElecChargePointSerializer(object_list, many=True)
+
+    return SuccessResponse(
+        {
+            "charge_points_list": serialized.data,
+            "ids": list(ids),
+            "from": from_idx,
+            "returned": len(serialized.data),
+            "total": len(ids),
+        }
+    )
 
 
 def filter_charge_points(charge_points, **filters):
@@ -90,7 +100,7 @@ def filter_charge_points(charge_points, **filters):
             "PENDING": [ElecChargePointApplication.PENDING],
             "AUDIT_IN_PROGRESS": [ElecChargePointApplication.AUDIT_IN_PROGRESS],
             "AUDIT_DONE": [ElecChargePointApplication.AUDIT_DONE],
-            "HISTORY": [ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED],
+            "ACCEPTED": [ElecChargePointApplication.ACCEPTED],
         }
         charge_points = charge_points.filter(application__status__in=status_mapping[filters["status"]])
 
