@@ -71,9 +71,7 @@ def get_charge_point_snapshot(request, *args, **kwargs):
                 "charge_points": charge_points_count,
                 "pending": filter_method(items, status="PENDING", **snapshot_form.cleaned_data).count(),
                 "audit_in_progress": filter_method(items, status="AUDIT_IN_PROGRESS", **snapshot_form.cleaned_data).count(),
-                "accepted": filter_method(
-                    items, status="HISTORY", **snapshot_form.cleaned_data
-                ).count(),  # TODO AUDIT_DONE ?
+                "accepted": filter_method(items, status="ACCEPTED", **snapshot_form.cleaned_data).count(),
             }
         )
     except Exception:

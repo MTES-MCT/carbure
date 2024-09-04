@@ -627,7 +627,7 @@ class ElecCharginPointsTest(TestCase):
         # With status
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
+            {"entity_id": self.cpo.id, "status": "ACCEPTED"},
         )
         data = response.json()
         assert response.status_code == 200

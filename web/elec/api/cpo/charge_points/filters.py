@@ -19,7 +19,7 @@ def get_charge_points_filters(request, entity):
         return ErrorResponse(400, ChargePointFilterError.BAD_FILTER, filters.errors)
 
     if current_filter == "status":
-        return SuccessResponse({"filter_values": ["AVAILABLE", "HISTORY"]})
+        return SuccessResponse({"filter_values": ["PENDING", "AUDIT_IN_PROGRESS", "ACCEPTED"]})
 
     filters.cleaned_data[current_filter] = None
 
