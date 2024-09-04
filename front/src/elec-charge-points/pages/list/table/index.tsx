@@ -27,7 +27,6 @@ export const ChargePointsListTable = ({
       onOrder={onOrder}
       rows={chargePoints}
       columns={compact([
-        // selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
         columns.status,
         columns.measure_date,
         columns.charge_point_id,
