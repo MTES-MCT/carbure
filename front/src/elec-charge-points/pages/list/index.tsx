@@ -39,7 +39,6 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   )
 
   const query = useCBQueryBuilder(state)
-  console.log("le status", { query, status })
   const chargePointsListQuery = useQuery(api.getChargePointsList, {
     key: "charge-points-list",
     params: [query],
@@ -61,6 +60,10 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
     }),
     [t]
   )
+
+  const downloadChargePointsList = () => {
+    api.downloadChargePointsList(query, chargePointsListPagination?.ids || [])
+  }
 
   return (
     <>
@@ -89,7 +92,11 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
             onChange={actions.setSearch}
           />
           {chargePointsCount > 0 && (
-            <Button icon={Download} label={t("Exporter")} action={() => {}} />
+            <Button
+              icon={Download}
+              label={t("Exporter")}
+              action={downloadChargePointsList}
+            />
           )}
         </ActionBar>
         {chargePointsList.length > 0 && (
