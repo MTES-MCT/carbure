@@ -3,6 +3,7 @@ import Alert from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Download, Loader } from "common/components/icons"
 import { SearchInput } from "common/components/input"
+import Pagination from "common/components/pagination"
 import { ActionBar, Bar, LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
@@ -92,14 +93,23 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
           )}
         </ActionBar>
         {chargePointsList.length > 0 && (
-          <ChargePointsListTable
-            chargePoints={chargePointsList}
-            loading={chargePointsListQuery.loading}
-            onOrder={actions.setOrder}
-            order={state.order}
-            onSelect={actions.setSelection}
-            selected={state.selection}
-          />
+          <>
+            <ChargePointsListTable
+              chargePoints={chargePointsList}
+              loading={chargePointsListQuery.loading}
+              onOrder={actions.setOrder}
+              order={state.order}
+              onSelect={actions.setSelection}
+              selected={state.selection}
+            />
+            <Pagination
+              page={state.page}
+              limit={state.limit}
+              total={chargePointsListPagination?.total || 0}
+              onPage={actions.setPage}
+              onLimit={actions.setLimit}
+            />
+          </>
         )}
 
         {chargePointsListQuery.loading && chargePointsCount === 0 && (
