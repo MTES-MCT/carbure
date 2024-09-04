@@ -80,7 +80,7 @@ def get_charge_points(request, entity):
 
     return SuccessResponse(
         {
-            "charge_points_list": serialized.data,
+            "elec_charge_points": serialized.data,
             "ids": list(ids),
             "from": from_idx,
             "returned": len(serialized.data),

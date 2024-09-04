@@ -43,8 +43,8 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   })
 
   const chargePointsListPagination = chargePointsListResponse.result?.data.data
-  const chargePointsCount = chargePointsListPagination?.charge_points_list
-    ? chargePointsListPagination?.charge_points_list.length
+  const chargePointsCount = chargePointsListPagination?.elec_charge_points
+    ? chargePointsListPagination?.elec_charge_points.length
     : 0
 
   const filterLabels = useMemo(
@@ -92,9 +92,9 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
             />
           )}
         </ActionBar>
-        {chargePointsListPagination?.charge_points_list && (
+        {chargePointsListPagination?.elec_charge_points && (
           <ChargePointsListTable
-            chargePoints={chargePointsListPagination?.charge_points_list}
+            chargePoints={chargePointsListPagination?.elec_charge_points}
             loading={chargePointsListResponse.loading}
             onOrder={actions.setOrder}
             order={state.order}
