@@ -3,8 +3,9 @@ import Alert from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Download, Loader } from "common/components/icons"
 import { SearchInput } from "common/components/input"
+import MultiSelect from "common/components/multi-select"
 import Pagination from "common/components/pagination"
-import { ActionBar, Bar, LoaderOverlay } from "common/components/scaffold"
+import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   useCBQueryBuilder,
@@ -15,15 +16,17 @@ import { ChargePointsSnapshot } from "elec-charge-points/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
-import { useStatus } from "./index.hooks"
+import { useArticle2Options, useStatus } from "./index.hooks"
 import { StatusSwitcher } from "./status-switcher"
 import { ChargePointsListTable } from "./table"
-import { ChargePointFilter, ChargePointStatus } from "./types"
+import { ChargePointFilter } from "./types"
 
 type ChargePointsListProps = {
   year: number
   snapshot: ChargePointsSnapshot
 }
+
+const loadOptions = <T,>(data: T) => new Promise<T>((resolve) => resolve(data))
 
 const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   const entity = useEntity()
@@ -52,7 +55,6 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
 
   const filterLabels = useMemo(
     () => ({
-      // [ChargePointFilter.Status]: t("Status"),
       [ChargePointFilter.MeasureDate]: t("Date du dernier relevé"),
       [ChargePointFilter.ChargePointId]: t("Identifiant PDC"),
       [ChargePointFilter.StationId]: t("Identifiant station"),
@@ -65,6 +67,8 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
     api.downloadChargePointsList(query, chargePointsListPagination?.ids || [])
   }
 
+  const article2Options = useArticle2Options()
+
   return (
     <>
       <Bar>
@@ -72,9 +76,12 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={(filter) =>
-            api.getChargePointsFilters(filter, query)
-          }
+          getFilterOptions={(filter) => {
+            if (filter === ChargePointFilter.ConcernedByReadingMeter) {
+              return loadOptions(article2Options)
+            }
+            return api.getChargePointsFilters(filter, query)
+          }}
         />
       </Bar>
       <section>
