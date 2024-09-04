@@ -60,6 +60,8 @@ class ElecChargePointSampleSerializer(serializers.ModelSerializer):
 
 
 class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=ElecChargePoint.objects.all(), required=True)
+
     class Meta:
         model = ElecChargePoint
         fields = [
