@@ -3,7 +3,7 @@ import { CBQueryParams, CBQueryResult } from "common/hooks/query-builder"
 export type ChargePointsListQuery = CBQueryParams
 
 export type ChargePointsListData = CBQueryResult & {
-  charge_points_list: ChargePoint[]
+  elec_charge_points: ChargePoint[]
 }
 
 export enum ChargePointStatus {
