@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom"
 import Button from "common/components/button"
 import { ChevronLeft, ChevronRight, Return } from "common/components/icons"
 import { useHashMatch } from "common/components/hash-route"
-import { layout } from "common/components/scaffold"
 import cl from "clsx"
 import css from "./navigation.module.css"
 

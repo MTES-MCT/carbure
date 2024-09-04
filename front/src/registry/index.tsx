@@ -1,8 +1,6 @@
 import { Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs"
 import useTitle from "common/hooks/title"
-import { compact } from "common/utils/collection"
-import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import Biofuels from "./components/biofuels"
 import Companies from "./components/companies"

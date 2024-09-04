@@ -37,6 +37,7 @@ export const useMissingCompanyInfoModal = () => {
       displayMissingCompanyInfoModal()
       functionCalled.current = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return

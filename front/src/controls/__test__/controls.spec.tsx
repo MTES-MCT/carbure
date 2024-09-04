@@ -8,7 +8,6 @@ import Controls from "../index"
 
 import useEntity from "carbure/hooks/entity"
 import server from "./api"
-import { waitWhileLoading } from "carbure/__test__/helpers"
 
 const ControlsWithUser = () => {
   const entity = useEntity()

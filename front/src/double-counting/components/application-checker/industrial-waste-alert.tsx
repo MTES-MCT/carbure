@@ -61,7 +61,7 @@ const MailtoButton = ({
 
   return (
     <Button
-      icon={variant != "link" ? Send : undefined}
+      icon={variant !== "link" ? Send : undefined}
       label={t("Envoyer le formulaire par email")}
       variant={variant}
       href={mailto}

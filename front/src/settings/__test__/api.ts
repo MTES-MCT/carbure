@@ -307,7 +307,7 @@ export const koDoubleCountUploadApplication = rest.post(
   }
 )
 
-export default {
+const mockedEndpoints = {
   okSettings,
   okEnableMac,
   okDisableMac,
@@ -328,3 +328,5 @@ export default {
   okDoubleCountApplications,
   okDoubleCountUploadAgreements,
 }
+
+export default mockedEndpoints

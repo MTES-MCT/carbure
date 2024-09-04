@@ -14,8 +14,6 @@ import {
   DoubleCountingStatus,
 } from "../../../double-counting/types"
 import AgreementStatusTag from "./agreement-status"
-import { ApplicationDownloadButton } from "../applications/application-download-button"
-import ApplicationTabs from "../applications/application-tabs"
 import { QuotasTable } from "../../../double-counting/components/quotas-table"
 import { useState } from "react"
 import { compact } from "common/utils/collection"
@@ -81,7 +79,7 @@ export const AgreementDetailsDialog = () => {
             </section>
           )}
           {application &&
-            application.status != DoubleCountingStatus.Accepted && (
+            application.status !== DoubleCountingStatus.Accepted && (
               <section>
                 <p>La demande est en cours de traitement...</p>
                 <Button

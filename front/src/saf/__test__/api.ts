@@ -1,8 +1,6 @@
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
-import { Data } from "carbure/__test__/helpers"
-
 import { okSettings } from "settings/__test__/api"
 import * as data from "./data"
 

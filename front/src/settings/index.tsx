@@ -20,8 +20,6 @@ import { ApplicationDetailsDialog } from "double-counting/components/application
 import HashRoute from "common/components/hash-route"
 import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import { useEffect } from "react"
-import { useLocation } from "react-router-dom"
 import useScrollToHash from "common/hooks/scroll-to-hash"
 
 const Settings = () => {
