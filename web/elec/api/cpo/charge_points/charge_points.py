@@ -99,7 +99,6 @@ def filter_charge_points(charge_points, **filters):
         status_mapping = {
             "PENDING": [ElecChargePointApplication.PENDING],
             "AUDIT_IN_PROGRESS": [ElecChargePointApplication.AUDIT_IN_PROGRESS],
-            "AUDIT_DONE": [ElecChargePointApplication.AUDIT_DONE],
             "ACCEPTED": [ElecChargePointApplication.ACCEPTED],
         }
         charge_points = charge_points.filter(application__status__in=status_mapping[filters["status"]])
