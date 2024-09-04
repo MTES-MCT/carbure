@@ -551,7 +551,7 @@ class ElecCharginPointsTest(TestCase):
         expected = {
             "status": "success",
             "data": {
-                "charge_points_list": [
+                "elec_charge_points": [
                     {
                         "id": charge_point.id,
                         "cpo": self.cpo.name,
@@ -611,7 +611,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -619,9 +619,9 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 2
+        assert len(data["data"]["elec_charge_points"]) == 2
         assert (
-            ElecChargePoint.objects.get(id=data["data"]["charge_points_list"][0]["id"]).application.created_at.year == 2023
+            ElecChargePoint.objects.get(id=data["data"]["elec_charge_points"][0]["id"]).application.created_at.year == 2023
         )
 
         # With status
@@ -631,7 +631,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -639,8 +639,8 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 2
-        assert ElecChargePoint.objects.get(id=data["data"]["charge_points_list"][0]["id"]).application.status == "PENDING"
+        assert len(data["data"]["elec_charge_points"]) == 2
+        assert ElecChargePoint.objects.get(id=data["data"]["elec_charge_points"][0]["id"]).application.status == "PENDING"
 
         # With application_date filter
         response = self.client.get(
@@ -649,7 +649,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -657,9 +657,9 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
         assert ElecChargePoint.objects.get(
-            id=data["data"]["charge_points_list"][0]["id"]
+            id=data["data"]["elec_charge_points"][0]["id"]
         ).application.created_at == datetime.date(2023, 1, 5)
 
         # With charge_point_id filter
@@ -669,7 +669,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -677,8 +677,8 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 1
-        assert data["data"]["charge_points_list"][0]["charge_point_id"] == "ABCDE"
+        assert len(data["data"]["elec_charge_points"]) == 1
+        assert data["data"]["elec_charge_points"][0]["charge_point_id"] == "ABCDE"
 
         # With latest_extracted_energy filter
         response = self.client.get(
@@ -687,7 +687,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -695,7 +695,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -703,7 +703,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
 
         # With is_article_2 filter
         response = self.client.get(
@@ -712,7 +712,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -720,8 +720,8 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 2
-        assert ElecChargePoint.objects.get(id=data["data"]["charge_points_list"][0]["id"]).is_article_2 is False
+        assert len(data["data"]["elec_charge_points"]) == 2
+        assert ElecChargePoint.objects.get(id=data["data"]["elec_charge_points"][0]["id"]).is_article_2 is False
 
         # With pagination
         response = self.client.get(
@@ -730,7 +730,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]["charge_points_list"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
 
     def test_get_charge_points_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
