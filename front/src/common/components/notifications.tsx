@@ -37,7 +37,7 @@ export function useNotifyError() {
       t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
     if (errorCode) {
       const customErrorText = t(errorCode, { ns: "errors" })
-      if (customErrorText != errorCode) errorText = customErrorText
+      if (customErrorText !== errorCode) errorText = customErrorText
     }
 
     return errorText
@@ -45,6 +45,7 @@ export function useNotifyError() {
 
   const notifyError = useCallback((error: Error, defaultMessage?: string) => {
     return notify(getErrorText(error, defaultMessage), { variant: "danger" })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return notifyError

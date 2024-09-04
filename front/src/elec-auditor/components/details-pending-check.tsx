@@ -1,6 +1,6 @@
 import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
-import { UploadCheckError, UploadCheckReportInfo } from "carbure/types"
+import { UploadCheckReportInfo } from "carbure/types"
 import Button from "common/components/button"
 import Form, { useForm } from "common/components/form"
 import { Check, ChevronLeft, Send, Upload } from "common/components/icons"
@@ -11,11 +11,14 @@ import * as api from "elec-auditor/api"
 import { ElecAuditorApplicationDetails } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 
-
-
-const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
-  application: ElecAuditorApplicationDetails,
-  header: JSX.Element,
+const CheckReportSection = ({
+  application,
+  header,
+  onReportChecked,
+  onPrev,
+}: {
+  application: ElecAuditorApplicationDetails
+  header: JSX.Element
   onReportChecked: (file: File, checkData: UploadCheckReportInfo) => void
   onPrev: () => void
 }) => {
@@ -27,7 +30,6 @@ const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
     file: undefined as File | undefined,
   })
 
-
   const checkAuditReport = useMutation(api.checkAuditReport, {
     onSuccess: (res) => {
       const checkedData = res.data.data
@@ -35,12 +37,20 @@ const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
       onReportChecked(value.file, checkedData)
     },
     onError: (err) => {
-      const response = (err as AxiosError<{ status: string, error: string, data: UploadCheckReportInfo }>).response
+      const response = (
+        err as AxiosError<{
+          status: string
+          error: string
+          data: UploadCheckReportInfo
+        }>
+      ).response
 
-      if (response?.status === 400 && response.data.error === "VALIDATION_FAILED") {
+      if (
+        response?.status === 400 &&
+        response.data.error === "VALIDATION_FAILED"
+      ) {
         const checkedData = response!.data.data
         onReportChecked(value.file!, checkedData)
-
       } else if (response?.status === 413) {
         notify(
           t(
@@ -60,41 +70,61 @@ const CheckReportSection = ({ application, header, onReportChecked, onPrev }: {
           }
         )
       }
-    }
+    },
   })
-
 
   const uploadFile = () => {
     if (!application?.sample) return
-    checkAuditReport.execute(entity.id, application.sample.application_id, value.file!)
+    checkAuditReport.execute(
+      entity.id,
+      application.sample.application_id,
+      value.file!
+    )
   }
 
-  return <>
-    <main>
-      {header}
-      <section>
-        <Form id="audit-checker">
+  return (
+    <>
+      <main>
+        {header}
+        <section>
+          <Form id="audit-checker">
+            <p>
+              {t(
+                "Cet outil vous permet de vérifier votre résultat d'audit avant de l'envoyer à la DGEC."
+              )}
+            </p>
 
-          <p>{t("Cet outil vous permet de vérifier votre résultat d'audit avant de l'envoyer à la DGEC.")}</p>
-
-          <FileInput
-            loading={checkAuditReport.loading}
-            icon={value.file ? Check : Upload}
-            label={t("Importer le fichier excel à analyser")}
-            placeholder={value.file ? value.file.name : t("Choisir un fichier")}
-            {...bind("file")}
-          />
-
-        </Form>
-      </section>
-    </main>
-    <footer>
-      <Button icon={Send} label={t("Vérifier le fichier")} variant="primary" action={uploadFile} disabled={!value.file} loading={checkAuditReport.loading} />
-      <Button icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={onPrev} asideX />
-
-    </footer>
-  </>
+            <FileInput
+              loading={checkAuditReport.loading}
+              icon={value.file ? Check : Upload}
+              label={t("Importer le fichier excel à analyser")}
+              placeholder={
+                value.file ? value.file.name : t("Choisir un fichier")
+              }
+              {...bind("file")}
+            />
+          </Form>
+        </section>
+      </main>
+      <footer>
+        <Button
+          icon={Send}
+          label={t("Vérifier le fichier")}
+          variant="primary"
+          action={uploadFile}
+          disabled={!value.file}
+          loading={checkAuditReport.loading}
+        />
+        <Button
+          icon={ChevronLeft}
+          label={t("Précédent")}
+          variant="secondary"
+          action={onPrev}
+          asideX
+        />
+      </footer>
+    </>
+  )
 }
-
 
 export default CheckReportSection

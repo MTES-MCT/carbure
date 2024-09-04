@@ -211,6 +211,6 @@ export const getLotsEntitiesToNotify = (lots: Lot[]) => {
     }
   })
   return entities_to_notify
-    .filter((e, i) => entities_to_notify.indexOf(e) == i)
+    .filter((e, i) => entities_to_notify.indexOf(e) === i)
     .join(", ")
 }

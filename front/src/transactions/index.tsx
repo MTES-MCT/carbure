@@ -1,13 +1,5 @@
-import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-  useParams,
-  useLocation,
-} from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import HashRoute from "common/components/hash-route"
 import { UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"

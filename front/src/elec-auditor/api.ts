@@ -2,12 +2,10 @@ import { api, Api, download } from "common/services/api"
 import {
   ElecAuditorApplicationDetails,
   ElecAuditorApplicationsData,
-  ElecAuditorApplicationsFilter,
   ElecAuditorApplicationsQuery,
   ElecAuditorApplicationsSnapshot,
   ElecAuditorUploadCheckReportInfo,
 } from "./types"
-import { UploadCheckReportInfo } from "carbure/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 
 export function getYears(entity_id: number) {
@@ -69,11 +67,14 @@ export function checkAuditReport(
   auditSampleId: number,
   file: File
 ) {
-  return api.post<Api<ElecAuditorUploadCheckReportInfo>>("/elec/auditor/check-report", {
-    entity_id: entityId,
-    audit_sample_id: auditSampleId,
-    file,
-  })
+  return api.post<Api<ElecAuditorUploadCheckReportInfo>>(
+    "/elec/auditor/check-report",
+    {
+      entity_id: entityId,
+      audit_sample_id: auditSampleId,
+      file,
+    }
+  )
 }
 
 export function acceptAuditReport(

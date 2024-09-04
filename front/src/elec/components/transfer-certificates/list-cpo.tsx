@@ -4,7 +4,10 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
 import {
   ElecTransferCertificateFilter,
@@ -29,12 +32,7 @@ const CPOTransferCertificateList = ({
 }: CPOTransferCertificateListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot
-  )
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   const { t } = useTranslation()
 
   const query = useCBQueryBuilder(state)
@@ -125,11 +123,11 @@ const CPOTransferCertificateList = ({
 }
 export default CPOTransferCertificateList
 
-const FILTERS = [
-  ElecTransferCertificateFilter.Operator,
-  ElecTransferCertificateFilter.TransferDate,
-  ElecTransferCertificateFilter.CertificateId,
-]
+// const FILTERS = [
+//   ElecTransferCertificateFilter.Operator,
+//   ElecTransferCertificateFilter.TransferDate,
+//   ElecTransferCertificateFilter.CertificateId,
+// ]
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec/:year/:view/:status/*")

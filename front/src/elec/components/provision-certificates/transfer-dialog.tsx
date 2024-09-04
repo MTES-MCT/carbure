@@ -7,13 +7,7 @@ import Autocomplete from "common/components/autocomplete"
 import Button, { MailTo } from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
-import {
-  AlertTriangle,
-  ExternalLink,
-  Message,
-  Return,
-  Send,
-} from "common/components/icons"
+import { AlertTriangle, Message, Return, Send } from "common/components/icons"
 import { NumberInput } from "common/components/input"
 import { useMutation } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"

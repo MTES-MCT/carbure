@@ -18,16 +18,10 @@ import {
   getEntityTypeLabel,
   getUserRoleLabel,
 } from "carbure/utils/normalizers"
-import { Button, MailTo } from "common/components/button"
+import { Button } from "common/components/button"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import { Alert } from "common/components/alert"
-import {
-  AlertTriangle,
-  Cross,
-  Plus,
-  Return,
-  ExternalLink,
-} from "common/components/icons"
+import { AlertTriangle, Cross, Plus, Return } from "common/components/icons"
 import Table, { actionColumn, Cell } from "common/components/table"
 import Dialog, { Confirm } from "common/components/dialog"
 import Autocomplete from "common/components/autocomplete"

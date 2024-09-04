@@ -1,5 +1,4 @@
-import { Entity, EntityPreview, UploadCheckReportInfo } from "carbure/types"
-import { Order } from "common/components/table"
+import { EntityPreview, UploadCheckReportInfo } from "carbure/types"
 import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 
@@ -17,10 +16,10 @@ export enum ElecAuditorApplicationsStatus {
   AuditDone = "AUDITED",
 }
 
-export interface ElecAuditorUploadCheckReportInfo extends UploadCheckReportInfo {
+export interface ElecAuditorUploadCheckReportInfo
+  extends UploadCheckReportInfo {
   comment_count?: number
 }
-
 
 export interface ElecAuditorApplicationsData {
   audit_applications: ElecAuditorApplication[]
@@ -45,9 +44,6 @@ export interface ElecAuditorApplication {
   audit_order_date?: string
 }
 
-
 export interface ElecAuditorApplicationDetails extends ElecAuditorApplication {
   sample?: ElecApplicationSample
 }
-
-

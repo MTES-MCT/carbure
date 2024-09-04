@@ -1,16 +1,12 @@
-import { AxiosError } from "axios"
 import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { AlertCircle, Plus } from "common/components/icons"
-import { useNotify, useNotifyError } from "common/components/notifications"
+import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
-import { useMutation } from "common/hooks/async"
-import * as api from "companies/api"
 import { SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
 import { SirenPicker } from "../../companies/components/siren-picker"
 
 interface CompanyInfoSirenDialogProps {

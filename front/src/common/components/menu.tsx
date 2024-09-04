@@ -1,7 +1,7 @@
 import { useRef } from "react"
 import { Link } from "react-router-dom"
 import cl from "clsx"
-import Dropdown, { Anchor } from "./dropdown"
+import Dropdown from "./dropdown"
 import { ChevronDown } from "./icons"
 import Button, { ButtonProps } from "./button"
 import List from "./list"

@@ -68,9 +68,9 @@ export function Table<T>({
             >
               {column.key && (
                 <span
-                  className={cl(column.key != order?.column && css.sortable)}
+                  className={cl(column.key !== order?.column && css.sortable)}
                 >
-                  {column.key != order?.column || order?.direction === "asc"
+                  {column.key !== order?.column || order?.direction === "asc"
                     ? " ▲"
                     : " ▼"}
                 </span>

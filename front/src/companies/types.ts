@@ -1,4 +1,4 @@
-import { Certificate, Country, Entity, EntityType } from "carbure/types"
+import { Certificate, Country, EntityType } from "carbure/types"
 
 export interface SearchCompanyResult {
   company_preview: SearchCompanyPreview

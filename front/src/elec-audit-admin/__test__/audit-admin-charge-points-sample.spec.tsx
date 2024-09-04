@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"

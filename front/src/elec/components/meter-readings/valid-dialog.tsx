@@ -3,7 +3,6 @@ import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { Return, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
-import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import * as api from "elec/api-cpo"
@@ -25,7 +24,6 @@ export const MeterReadingsValidDetailsDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const portal = usePortal()
 
   const meterReadingsApplication = useMutation(api.addMeterReadings, {
     invalidates: ["meter-readings-applications"],

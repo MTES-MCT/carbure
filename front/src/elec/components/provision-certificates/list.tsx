@@ -134,10 +134,10 @@ const ProvisionCertificateList = ({
 }
 export default ProvisionCertificateList
 
-const FILTERS = [
-  ElecCPOProvisionCertificateFilter.Quarter,
-  ElecCPOProvisionCertificateFilter.OperatingUnit,
-]
+// const FILTERS = [
+//   ElecCPOProvisionCertificateFilter.Quarter,
+//   ElecCPOProvisionCertificateFilter.OperatingUnit,
+// ]
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec/:year/:view/:status/*")
