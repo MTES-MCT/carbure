@@ -2,7 +2,7 @@ from math import floor
 
 from django import forms
 from django.core.paginator import Paginator
-from django.db.models import FloatField, OuterRef, Subquery, Value
+from django.db.models import DateField, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce
 from django.views.decorators.http import require_GET
 
@@ -22,7 +22,8 @@ class ChargePointFilterForm(forms.Form):
     status = forms.CharField(required=False)
     application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
-    latest_extracted_energy = forms.FloatField(required=False)
+    station_id = forms.CharField(required=False)
+    latest_meter_reading_month = forms.IntegerField(required=False)
     is_article_2 = forms.BooleanField(required=False)
 
 
@@ -31,14 +32,14 @@ class ChargePointSortForm(forms.Form):
     limit = forms.IntegerField(required=False)
 
 
-def annotate_with_latest_extracted_energy(queryset):
-    latest_extracted_energy_subquery = (
+def annotate_with_latest_meter_reading_date(queryset):
+    latest_meter_reading_date = (
         ElecMeterReading.objects.filter(meter__charge_point=OuterRef("pk"))
         .order_by("-reading_date")
-        .values("extracted_energy")[:1]
+        .values("reading_date")[:1]
     )
     return queryset.annotate(
-        latest_extracted_energy=Coalesce(Subquery(latest_extracted_energy_subquery), Value(0), output_field=FloatField())
+        latest_meter_reading_date=Coalesce(Subquery(latest_meter_reading_date), Value(None), output_field=DateField())
     )
 
 
@@ -60,7 +61,7 @@ def get_charge_points(request, entity):
 
     charge_points = ElecChargePoint.objects.filter(cpo=entity, is_deleted=False)
     charge_points = charge_points.select_related("application")
-    charge_points = annotate_with_latest_extracted_energy(charge_points)
+    charge_points = annotate_with_latest_meter_reading_date(charge_points)
     charge_points = filter_charge_points(charge_points, **charge_points_filter_form.cleaned_data)
 
     if charge_points_sort_form.cleaned_data["from_idx"] is not None:
@@ -109,8 +110,15 @@ def filter_charge_points(charge_points, **filters):
     if filters["charge_point_id"]:
         charge_points = charge_points.filter(charge_point_id=filters["charge_point_id"])
 
-    if filters["latest_extracted_energy"] is not None:
-        charge_points = charge_points.filter(latest_extracted_energy=filters["latest_extracted_energy"])
+    if filters["station_id"]:
+        charge_points = charge_points.filter(station_id=filters["station_id"])
+
+    if filters["latest_meter_reading_month"] is not None:
+        month = filters["latest_meter_reading_month"]
+        if month == 0:
+            charge_points = charge_points.filter(latest_meter_reading_date=None)
+        else:
+            charge_points = charge_points.filter(latest_meter_reading_date__month=filters["latest_meter_reading_month"])
 
     if filters["is_article_2"]:
         charge_points = charge_points.filter(is_article_2=filters["is_article_2"])
