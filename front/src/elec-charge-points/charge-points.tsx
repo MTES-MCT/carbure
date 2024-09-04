@@ -9,8 +9,8 @@ import * as api from "./api"
 import { ChargePointsTabs } from "./charge-points-tabs"
 import { ChargePointsSnapshot } from "./types"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import ChargePointsList from "./pages/charge-points-list"
-import ChargePointsPending from "./pages/charge-points-pending"
+import ChargePointsList from "./pages/list"
+import ChargePointsPending from "./pages/pending"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
