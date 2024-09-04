@@ -502,7 +502,7 @@ class ElecCharginPointsTest(TestCase):
             current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
-            station_id="FGHIJ",
+            station_id="GHIJK",
             nominal_power=40,
             cpo_name="Bob",
             cpo_siren="67890",
@@ -537,7 +537,7 @@ class ElecCharginPointsTest(TestCase):
         ElecMeterReading.objects.create(
             extracted_energy=4,
             renewable_energy=2,
-            reading_date=datetime.date(2024, 9, 29),
+            reading_date=datetime.date(2024, 8, 29),
             meter=self.meter,
             cpo=self.cpo,
             application=meter_reading_application,
@@ -562,7 +562,7 @@ class ElecCharginPointsTest(TestCase):
                         "mid_id": "123-456",
                         "measure_date": "2023-06-29",
                         "measure_energy": 1000.123,
-                        "latest_extracted_energy": 40.0,
+                        "latest_meter_reading_date": "2024-09-30",
                         "is_article_2": False,
                         "measure_reference_point_id": "123456",
                         "station_name": "Station",
@@ -582,11 +582,11 @@ class ElecCharginPointsTest(TestCase):
                         "mid_id": "123-456",
                         "measure_date": "2023-06-29",
                         "measure_energy": 1000.123,
-                        "latest_extracted_energy": 0.0,
+                        "latest_meter_reading_date": None,
                         "is_article_2": False,
                         "measure_reference_point_id": "123456",
                         "station_name": "Station",
-                        "station_id": "FGHIJ",
+                        "station_id": "GHIJK",
                         "nominal_power": 40.0,
                         "cpo_name": "Bob",
                         "cpo_siren": "67890",
@@ -680,10 +680,10 @@ class ElecCharginPointsTest(TestCase):
         assert len(data["data"]["elec_charge_points"]) == 1
         assert data["data"]["elec_charge_points"][0]["charge_point_id"] == "ABCDE"
 
-        # With latest_extracted_energy filter
+        # With station_id filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_extracted_energy": "4"},
+            {"entity_id": self.cpo.id, "station_id": "AAAAA"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -691,7 +691,25 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_extracted_energy": "40"},
+            {"entity_id": self.cpo.id, "station_id": "FGHIJ"},
+        )
+        data = response.json()
+        assert response.status_code == 200
+        assert len(data["data"]["elec_charge_points"]) == 1
+        assert data["data"]["elec_charge_points"][0]["station_id"] == "FGHIJ"
+
+        # With latest_meter_reading_month filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": 8},
+        )
+        data = response.json()
+        assert response.status_code == 200
+        assert len(data["data"]["elec_charge_points"]) == 0
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": 9},
         )
         data = response.json()
         assert response.status_code == 200
@@ -699,7 +717,7 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_extracted_energy": "0"},
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": 0},
         )
         data = response.json()
         assert response.status_code == 200
@@ -869,7 +887,7 @@ class ElecCharginPointsTest(TestCase):
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.123,
-                    "latest_extracted_energy": 0.0,
+                    "latest_meter_reading_date": None,
                     "is_article_2": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
