@@ -80,7 +80,6 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
             onSwitch={actions.setStatus}
             snapshot={snapshot}
           />
-          <ActionBar></ActionBar>
           <SearchInput
             clear
             asideX
