@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { ChargePoint } from "../types"
 import { ChargePointsListTableStatus } from "./status"
 import { formatDate } from "common/utils/formatters"
+import IsArticle2 from "./is-article-2"
 
 export const useChargePointsColumns = () => {
   const { t } = useTranslation()
@@ -13,7 +14,8 @@ export const useChargePointsColumns = () => {
     | "charge_point_id"
     | "station_id"
     | "current_type"
-    | "measure_energy",
+    | "measure_energy"
+    | "is_article_2",
     Column<ChargePoint>
   > = {
     status: {
@@ -43,6 +45,12 @@ export const useChargePointsColumns = () => {
     measure_energy: {
       header: t("Dernier index - kWh"),
       cell: (chargePoint) => <Cell text={chargePoint.measure_energy} />,
+    },
+    is_article_2: {
+      header: t("Relevé trimestriel"),
+      cell: (chargePoint) => (
+        <IsArticle2 is_article_2={chargePoint.is_article_2} />
+      ),
     },
   }
 

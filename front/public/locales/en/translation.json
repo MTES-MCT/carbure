@@ -1494,5 +1494,7 @@
   "Date du dernier relevé": "Last statement date",
   "Relevé trimestriel": "Quarterly reading meter",
   "CA/CC": "AC/DC",
-  "Dernier index - kWh": "Last index - kWh"
+  "Dernier index - kWh": "Last index - kWh",
+  "Concerné": "Concerned",
+  "Pas concerné": "Not concerned"
 }

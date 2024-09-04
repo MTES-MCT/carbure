@@ -1581,5 +1581,7 @@
   "Date du dernier relevé": "Date du dernier relevé",
   "Relevé trimestriel": "Relevé trimestriel",
   "CA/CC": "CA/CC",
-  "Dernier index - kWh": "Dernier index - kWh"
+  "Dernier index - kWh": "Dernier index - kWh",
+  "Concerné": "Concerné",
+  "Pas concerné": "Pas concerné"
 }
