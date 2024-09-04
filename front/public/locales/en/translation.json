@@ -788,6 +788,7 @@
   "Inscrire des points de recharge": "Register charge points",
   "Exporter les points de recharge": "Exporter les points de recharge",
   "Aucun point de recharge trouvé": "No charge point found",
+  "Aucun dossier d'inscription trouvé": "No registration files found",
   "Kw cumulés": "Cumulative kw",
   "Date d'ajout": "Date Added",
   "Puissance cumulée": "Cumulative power",
@@ -1498,5 +1499,8 @@
   "Merci de recharger la page ou nous contacter si le problème persiste.": "Please reload the page or contact us if the problem persists.",
   "Identifiant PDC": "Charge point identifier",
   "Identifiant station": "Station identifier",
-  "Relevé trimestriel": "Quarterly reading meter"
+  "Date du dernier relevé": "Last statement date",
+  "Relevé trimestriel": "Quarterly reading meter",
+  "CA/CC": "AC/DC",
+  "Dernier index - kWh": "Last index - kWh"
 }

@@ -17,6 +17,6 @@ export function getChargePointsFilters(
   return api
     .get<
       Api<{ filter_values: string[] }>
-    >("/elec/charge-points-filters", { params })
+    >("/elec/cpo/charge-points/filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
 }

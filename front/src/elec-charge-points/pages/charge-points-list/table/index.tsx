@@ -1,6 +1,5 @@
 import Table, { Order } from "common/components/table"
 import { compact } from "common/utils/collection"
-import { To } from "react-router-dom"
 import { ChargePoint } from "../types"
 import { useChargePointsColumns } from "./index.hooks"
 
@@ -11,14 +10,12 @@ type ChargePointsListTableProps = {
   selected: number[]
   onSelect: (selected: number[]) => void
   onOrder: (order: Order | undefined) => void
-  rowLink: (stock: ChargePoint) => To
 }
 
 export const ChargePointsListTable = ({
   loading,
   order,
   onOrder,
-  rowLink,
   chargePoints,
 }: ChargePointsListTableProps) => {
   const columns = useChargePointsColumns()
@@ -28,11 +25,15 @@ export const ChargePointsListTable = ({
       loading={loading}
       order={order}
       onOrder={onOrder}
-      rowLink={rowLink}
       rows={chargePoints}
       columns={compact([
         // selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
         columns.status,
+        columns.measure_date,
+        columns.charge_point_id,
+        columns.station_id,
+        columns.current_type,
+        columns.measure_energy,
       ])}
     />
   )
