@@ -24,7 +24,8 @@ class ElecSnapshotForm(forms.Form):
     year = forms.IntegerField()
     application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
-    latest_extracted_energy = forms.FloatField(required=False)
+    station_id = forms.CharField(required=False)
+    latest_meter_reading_month = forms.IntegerField(required=False)
     is_article_2 = forms.BooleanField(required=False)
 
 
