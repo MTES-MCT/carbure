@@ -843,6 +843,7 @@
   "Inscrire des points de recharge": "Inscrire des points de recharge",
   "Exporter les points de recharge": "Exporter les points de recharge",
   "Aucun point de recharge trouvé": "Aucun point de recharge trouvé",
+  "Aucun dossier d'inscription trouvé": "Aucun dossier d'inscription trouvé",
   "Kw cumulés": "Kw cumulés",
   "Date d'ajout": "Date d'ajout",
   "Puissance cumulée": "Puissance cumulée",
@@ -1577,5 +1578,8 @@
   "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.",
   "Identifiant PDC": "Identifiant PDC",
   "Identifiant station": "Identifiant station",
-  "Relevé trimestriel": "Relevé trimestriel"
+  "Date du dernier relevé": "Date du dernier relevé",
+  "Relevé trimestriel": "Relevé trimestriel",
+  "CA/CC": "CA/CC",
+  "Dernier index - kWh": "Dernier index - kWh"
 }

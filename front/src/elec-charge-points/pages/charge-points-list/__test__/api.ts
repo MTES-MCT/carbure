@@ -1,6 +1,6 @@
 import { mockGetWithResponseData } from "carbure/__test__/helpers"
 import { rest } from "msw"
-import { ChargePointFilter } from "../types"
+import { ChargePointFilter, ChargePointStatus } from "../types"
 import { chargePointsList } from "./data"
 
 export const okChargePointsList = mockGetWithResponseData(
@@ -13,7 +13,8 @@ export const okChargePointsFilters = rest.get<
   { filter: ChargePointFilter }
 >("/api/elec/charge-points-filters", (req, res, ctx) => {
   const mappingFilters: Record<ChargePointFilter, (string | number)[]> = {
-    [ChargePointFilter.ValidationDate]: ["2024-08", "2024-07"],
+    // [ChargePointFilter.Status]: Object.values(ChargePointStatus),
+    [ChargePointFilter.MeasureDate]: ["2024-08", "2024-07"],
     [ChargePointFilter.ChargePointId]: [
       "Charge point id mock 1",
       "Charge point id mock 2",

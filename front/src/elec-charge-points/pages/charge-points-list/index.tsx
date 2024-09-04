@@ -1,8 +1,9 @@
 import useEntity from "carbure/hooks/entity"
+import Alert from "common/components/alert"
 import Button from "common/components/button"
-import { Download } from "common/components/icons"
+import { AlertCircle, Download, Loader } from "common/components/icons"
 import { SearchInput } from "common/components/input"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { ActionBar, Bar, LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   useCBQueryBuilder,
@@ -16,7 +17,7 @@ import * as api from "./api"
 import { useStatus } from "./index.hooks"
 import { StatusSwitcher } from "./status-switcher"
 import { ChargePointsListTable } from "./table"
-import { ChargePointFilter } from "./types"
+import { ChargePointFilter, ChargePointStatus } from "./types"
 
 type ChargePointsListProps = {
   year: number
@@ -37,21 +38,24 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   )
 
   const query = useCBQueryBuilder(state)
-  const chargePointsListResponse = useQuery(api.getChargePointsList, {
+  console.log("le status", { query, status })
+  const chargePointsListQuery = useQuery(api.getChargePointsList, {
     key: "charge-points-list",
     params: [query],
   })
 
-  const chargePointsListPagination = chargePointsListResponse.result?.data.data
+  const chargePointsListPagination = chargePointsListQuery.result?.data.data
+  const chargePointsList = chargePointsListPagination?.elec_charge_points || []
   const chargePointsCount = chargePointsListPagination?.elec_charge_points
     ? chargePointsListPagination?.elec_charge_points.length
     : 0
 
   const filterLabels = useMemo(
     () => ({
-      [ChargePointFilter.ValidationDate]: t("Date d'ajout"),
+      // [ChargePointFilter.Status]: t("Status"),
+      [ChargePointFilter.MeasureDate]: t("Date du dernier relevé"),
       [ChargePointFilter.ChargePointId]: t("Identifiant PDC"),
-      [ChargePointFilter.StationId]: t("Dernier index - kWh"),
+      [ChargePointFilter.StationId]: t("Identifiant station"),
       [ChargePointFilter.ConcernedByReadingMeter]: t("Relevé trimestriel"),
     }),
     [t]
@@ -76,6 +80,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
             onSwitch={actions.setStatus}
             snapshot={snapshot}
           />
+          <ActionBar></ActionBar>
           <SearchInput
             clear
             asideX
@@ -84,28 +89,33 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
             onChange={actions.setSearch}
           />
           {chargePointsCount > 0 && (
-            <Button
-              icon={Download}
-              label={t("Exporter")}
-              action={() => {}}
-              asideX
-            />
+            <Button icon={Download} label={t("Exporter")} action={() => {}} />
           )}
         </ActionBar>
-        {chargePointsListPagination?.elec_charge_points && (
+        {chargePointsList.length > 0 && (
           <ChargePointsListTable
-            chargePoints={chargePointsListPagination?.elec_charge_points}
-            loading={chargePointsListResponse.loading}
+            chargePoints={chargePointsList}
+            loading={chargePointsListQuery.loading}
             onOrder={actions.setOrder}
             order={state.order}
             onSelect={actions.setSelection}
             selected={state.selection}
-            rowLink={() => ({
-              pathname: "",
-              search: "",
-              hash: "",
-            })}
           />
+        )}
+
+        {chargePointsListQuery.loading && chargePointsCount === 0 && (
+          <Loader color="var(--black)" size={32} />
+        )}
+
+        {!chargePointsListQuery.loading && chargePointsCount === 0 && (
+          <>
+            <section>
+              <Alert icon={AlertCircle} variant="warning">
+                {t("Aucun point de recharge trouvé")}
+              </Alert>
+            </section>
+            <footer />
+          </>
         )}
       </section>
     </>
