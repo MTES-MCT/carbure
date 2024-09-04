@@ -19,17 +19,20 @@ export enum ChargePointType {
 
 export type ChargePoint = {
   id: number
-  validation_date?: string
+  application_date?: string
   charge_point_id: number
   station_id: number
   current_type?: ChargePointType
-  last_measure_energy: number
+  measure_date: string | null
+  measure_energy: number
+  installation_date: string
   concerned_by_reading_meter?: boolean // Revoir le naming
   status: ChargePointStatus
 }
 export enum ChargePointFilter {
-  ValidationDate = "validation_date",
+  // Status = "status",
+  MeasureDate = "measure_date",
   ChargePointId = "charge_point_id",
-  StationId = "Identifiant station",
+  StationId = "station_id",
   ConcernedByReadingMeter = "concerned_by_reading_meter",
 }
