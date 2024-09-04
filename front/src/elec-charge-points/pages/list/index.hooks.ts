@@ -26,3 +26,21 @@ export const useStatusLabels = () => {
 
   return statuses
 }
+
+export const useArticle2Options = () => {
+  const { t } = useTranslation()
+
+  return useMemo(
+    () => [
+      {
+        label: t("Concerné"),
+        value: "false",
+      },
+      {
+        label: t("Pas concerné"),
+        value: "true",
+      },
+    ],
+    [t]
+  )
+}

@@ -1,6 +1,7 @@
 import Tag, { TagVariant } from "common/components/tag"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { useStatusLabels } from "../index.hooks"
 import { ChargePointStatus } from "../types"
 
 type ChargePointsListTableStatusProps = {
@@ -18,14 +19,7 @@ export const ChargePointsListTableStatus = ({
 }: ChargePointsListTableStatusProps) => {
   const { t } = useTranslation()
 
-  const statusLabels = useMemo(
-    () => ({
-      [ChargePointStatus.Pending]: t("En attente"),
-      [ChargePointStatus.AuditInProgress]: t("En cours d'audit"),
-      [ChargePointStatus.Accepted]: t("Accepté"),
-    }),
-    [t]
-  )
+  const statusLabels = useStatusLabels()
 
   return (
     <Tag big variant={!status ? "none" : statusToVariant[status]}>
