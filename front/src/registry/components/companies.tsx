@@ -1,13 +1,11 @@
 import { findEntities } from "carbure/api"
 import { getEntityTypeLabel } from "carbure/utils/normalizers"
-import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
 import { SearchInput } from "common/components/input"
 import NoResult from "common/components/no-result"
 import Table from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { Fragment, useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 
 const Companies = () => {
   const { t } = useTranslation()

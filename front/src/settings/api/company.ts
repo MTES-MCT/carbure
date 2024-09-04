@@ -1,6 +1,5 @@
-import { EntityType, Unit } from "carbure/types"
+import { Unit } from "carbure/types"
 import { api } from "common/services/api"
-import { Certificate } from "crypto"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/entity/options/release-for-consumption"

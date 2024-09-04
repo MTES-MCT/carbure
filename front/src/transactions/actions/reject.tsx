@@ -12,7 +12,6 @@ import Dialog from "common/components/dialog"
 import { Cross, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
-import { useMatomo } from "matomo"
 import Form from "common/components/form"
 
 export interface RejectManyButtonProps {
@@ -96,7 +95,6 @@ const RejectDialog = ({
 }: RejectDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
-  const matomo = useMatomo()
 
   const v = variations(selection.length)
 

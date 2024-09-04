@@ -1,7 +1,8 @@
-import { mockGetWithResponseData, mockPostWithResponseData } from "carbure/__test__/helpers"
-import { elecChargePointApplicationDetailsInProgress } from "elec/__test__/data"
 import {
-  elecAuditApplicationCheckReportError,
+  mockGetWithResponseData,
+  mockPostWithResponseData,
+} from "carbure/__test__/helpers"
+import {
   elecAuditApplicationCheckReportSuccess,
   elecAuditCPOFilters,
   elecAuditApplicationsList,
@@ -33,8 +34,13 @@ export const okGetChargePointsApplicationDetails = mockGetWithResponseData(
   elecAuditorApplicationDetailsInProgress
 )
 
-
 // export const okCheckAuditReportError = mockPostWithResponseData("/elec/auditor/check-report", elecAuditApplicationCheckReportError)
-export const okCheckAuditReportSuccess = mockPostWithResponseData("/elec/auditor/check-report", elecAuditApplicationCheckReportSuccess)
+export const okCheckAuditReportSuccess = mockPostWithResponseData(
+  "/elec/auditor/check-report",
+  elecAuditApplicationCheckReportSuccess
+)
 
-export const okAcceptAuditReport = mockPostWithResponseData("/elec/auditor/accept-report", elecAuditApplicationCheckReportSuccess)
+export const okAcceptAuditReport = mockPostWithResponseData(
+  "/elec/auditor/accept-report",
+  elecAuditApplicationCheckReportSuccess
+)

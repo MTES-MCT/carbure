@@ -1,14 +1,11 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { CBSnapshot } from "common/hooks/query-builder"
 import { ElecAdminSnapshot } from "elec-admin/types"
-
 
 export enum ElecAdminProvisionCertificateStatus {
   Available = "AVAILABLE",
   History = "HISTORY",
 }
-
 
 export type ElecAdminProvisionCertificateFilterSelection = Partial<
   Record<ElecAdminProvisionCertificateFilter, string[]>
