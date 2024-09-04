@@ -246,7 +246,6 @@ class ElecCharginPointsTest(TestCase):
 
         self.meter.charge_point = charge_point
         self.meter.save()
-
         response = self.client.get(
             reverse("elec-admin-charge-points-get-application-details"),
             {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},

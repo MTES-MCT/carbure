@@ -23,7 +23,7 @@ def get_charge_points_filters(request, entity):
 
     filters.cleaned_data[current_filter] = None
 
-    charge_points = ElecChargePoint.objects.filter(cpo=entity)
+    charge_points = ElecChargePoint.objects.filter(cpo=entity, is_deleted=False)
     charge_points = filter_charge_points(charge_points, **filters.cleaned_data)
     charge_points = charge_points.select_related("application")
 
