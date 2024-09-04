@@ -4,11 +4,9 @@ import Dialog from "common/components/dialog"
 import { Check, Cross, Message, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { formatDate } from "common/utils/formatters"
-import { ElecTransferCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
 import TransferCertificateTag from "./tag"
 import { ElecCancelTransferButton } from "./cancel"
-import { ElecOperatorStatus } from "elec/types-operator"
 import { RejectTransfer } from "./reject"
 import Portal, { usePortal } from "common/components/portal"
 import { AcceptTransfer } from "./accept"
@@ -145,7 +143,7 @@ export const ElecTransferDetailsDialog = ({
               </>
             )}
           {entity.id === transferCertificate?.supplier.id &&
-            transferCertificate?.status !=
+            transferCertificate?.status !==
               ElecTransferCertificateStatus.Accepted && (
               <ElecCancelTransferButton
                 transferCertificate={transferCertificate}

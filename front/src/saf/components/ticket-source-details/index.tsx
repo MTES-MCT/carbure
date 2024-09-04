@@ -17,7 +17,6 @@ import AssignedTickets from "./assigned-tickets"
 import TicketAssignment from "../assignment/simple-assignment"
 import TicketSourceFields from "./fields"
 import ParentLot from "../parent-lot"
-import { safTicketSourceDetails } from "saf/__test__/data"
 
 export interface TicketSourceDetailsProps {
   neighbors?: number[]

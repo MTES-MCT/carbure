@@ -9,6 +9,7 @@ const useScrollToRef = (enabled?: boolean) => {
         block: "end",
         behavior: "smooth",
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref?.current, enabled])
 
   return {

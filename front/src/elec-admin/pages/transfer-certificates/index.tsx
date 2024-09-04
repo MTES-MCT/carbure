@@ -6,14 +6,13 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
-import {
-  ElecAdminSnapshot,
-} from "elec-admin/types"
-import {
-  ElecAdminTransferCertificateFilter
-} from "./types"
+import { ElecAdminSnapshot } from "elec-admin/types"
+import { ElecAdminTransferCertificateFilter } from "./types"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
@@ -35,13 +34,8 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot,
-  )
-  const query = useCBQueryBuilder(state);
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
+  const query = useCBQueryBuilder(state)
   usePageTitle(state)
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
@@ -82,7 +76,6 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
             api.getTransferCertificateFilters(filter, query)
           }
         />
-
       </Bar>
       <section>
         <ActionBar>
@@ -140,12 +133,12 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
 }
 export default TransferList
 
-const FILTERS = [
-  ElecAdminTransferCertificateFilter.Cpo,
-  ElecAdminTransferCertificateFilter.Operator,
-  ElecAdminTransferCertificateFilter.TransferDate,
-  ElecAdminTransferCertificateFilter.CertificateId,
-]
+// const FILTERS = [
+//   ElecAdminTransferCertificateFilter.Cpo,
+//   ElecAdminTransferCertificateFilter.Operator,
+//   ElecAdminTransferCertificateFilter.TransferDate,
+//   ElecAdminTransferCertificateFilter.CertificateId,
+// ]
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")

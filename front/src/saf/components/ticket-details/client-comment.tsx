@@ -1,5 +1,5 @@
 import Collapse from "common/components/collapse"
-import { Edit, Message } from "common/components/icons"
+import { Message } from "common/components/icons"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 import { useTranslation } from "react-i18next"
 import { SafTicketDetails } from "saf/types"

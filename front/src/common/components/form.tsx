@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
+import React, { useCallback, useContext, useState } from "react"
 import cl from "clsx"
 import css from "./form.module.css"
 
@@ -119,6 +119,7 @@ export function useForm<T>(
       setValue((form) => mutate({ ...form, [name]: value }, form))
       setFieldError(name, undefined)
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [mutate]
   )
 

@@ -5,12 +5,9 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import Dialog from "common/components/dialog"
-import Button from "common/components/button"
-import { Return } from "common/components/icons"
 import StockTag from "transactions/components/stocks/stock-tag"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 
-import { invalidate } from "common/hooks/invalidate"
 import StockForm from "transaction-details/components/stocks/stock-form"
 import StockTraceability, {
   hasTraceability,

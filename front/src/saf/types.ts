@@ -5,7 +5,6 @@ import {
   Feedstock,
   ProductionSite,
 } from "carbure/types"
-import { Order } from "common/components/table"
 import {
   CBQueryParams,
   CBQueryStates,

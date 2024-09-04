@@ -8,9 +8,7 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
-import {
-  ElecTransferDetailsDialog,
-} from "elec/components/transfer-certificates/details"
+import { ElecTransferDetailsDialog } from "elec/components/transfer-certificates/details"
 
 import {
   ElecTransferCertificateFilter,
@@ -21,7 +19,10 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-operator"
 import ElecTransferCertificateTable from "./table"
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
 
 type OperatorTransferCertificateListProps = {
@@ -35,12 +36,7 @@ const OperatorTransferCertificateList = ({
 }: OperatorTransferCertificateListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot
-  )
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   const query = useCBQueryBuilder(state)
   const { t } = useTranslation()
   const location = useLocation()
@@ -143,11 +139,11 @@ const OperatorTransferCertificateList = ({
 }
 export default OperatorTransferCertificateList
 
-const FILTERS = [
-  ElecTransferCertificateFilter.TransferDate,
-  ElecTransferCertificateFilter.Cpo,
-  ElecTransferCertificateFilter.CertificateId,
-]
+// const FILTERS = [
+//   ElecTransferCertificateFilter.TransferDate,
+//   ElecTransferCertificateFilter.Cpo,
+//   ElecTransferCertificateFilter.CertificateId,
+// ]
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec/:year/:status/*")

@@ -76,7 +76,7 @@ export const AgreementDetailsDialog = () => {
             </section>
           )}
           {application &&
-            application.status != DoubleCountingStatus.Accepted && (
+            application.status !== DoubleCountingStatus.Accepted && (
               <section>
                 <p>La demande est en cours de traitement...</p>
                 <Button

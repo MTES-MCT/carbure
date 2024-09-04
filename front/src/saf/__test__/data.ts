@@ -1,13 +1,7 @@
 import { Biofuel, Country, Feedstock } from "carbure/types"
-import {
-  company,
-  operator,
-  producer,
-  productionSite,
-} from "carbure/__test__/data"
+import { operator, producer, productionSite } from "carbure/__test__/data"
 import {
   SafTicketSource,
-  SafTicketSourceStatus,
   SafOperatorSnapshot,
   SafTicketSourcesResponse,
   SafTicketsResponse,
@@ -18,7 +12,6 @@ import {
   SafTicketStatus,
   SafTicketDetails,
   SafClientSnapshot,
-  SafTicketSourceSummaryItem,
 } from "saf/types"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -214,15 +207,15 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   ghg_total: 23.5,
 }
 
-const safTicketSourceSummaryItem: SafTicketSourceSummaryItem = {
-  id: 123,
-  carbure_id: "1E2E2",
-  year: 2022,
-  delivery_period: 202202,
-  total_volume: 3000,
-  feedstock: feedstock1,
-  biofuel: bioduel1,
-}
+// const safTicketSourceSummaryItem: SafTicketSourceSummaryItem = {
+//   id: 123,
+//   carbure_id: "1E2E2",
+//   year: 2022,
+//   delivery_period: 202202,
+//   total_volume: 3000,
+//   feedstock: feedstock1,
+//   biofuel: bioduel1,
+// }
 
 export const safTicketReceivedDetails: SafTicketDetails = {
   ...safTicketAssignedDetails,
