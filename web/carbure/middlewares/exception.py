@@ -17,9 +17,11 @@ class ExceptionMiddleware(object):
         return self.get_response(request)
 
     def process_exception(self, request, exception):
+        if not os.getenv("TEST") and os.getenv("IMAGE_TAG") in ("dev", "staging", "prod"):
+            sentry_sdk.capture_exception(exception)
+
         if settings.DEBUG or os.getenv("TEST"):
             traceback.print_exc()
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR, message=str(exception))
         else:
-            sentry_sdk.capture_exception(exception)
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR)
