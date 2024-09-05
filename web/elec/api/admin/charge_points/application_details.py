@@ -35,7 +35,7 @@ def get_application_details(request):
     if application.cpo != company:
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
-    charge_points = ElecChargePoint.objects.filter(cpo=company, application=application)
+    charge_points = ElecChargePoint.objects.filter(cpo=company, application=application, is_deleted=False)
     charge_points = annotate_with_latest_extracted_energy(charge_points)
 
     if "export" in request.GET:

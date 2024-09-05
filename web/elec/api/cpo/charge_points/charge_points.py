@@ -58,7 +58,7 @@ def get_charge_points(request, entity):
     from_idx = charge_points_sort_form.cleaned_data["from_idx"] or 0
     limit = charge_points_sort_form.cleaned_data["limit"] or 25
 
-    charge_points = ElecChargePoint.objects.filter(cpo=entity)
+    charge_points = ElecChargePoint.objects.filter(cpo=entity, is_deleted=False)
     charge_points = charge_points.select_related("application")
     charge_points = annotate_with_latest_extracted_energy(charge_points)
     charge_points = filter_charge_points(charge_points, **charge_points_filter_form.cleaned_data)
