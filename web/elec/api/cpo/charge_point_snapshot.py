@@ -58,7 +58,9 @@ def get_charge_point_snapshot(request, *args, **kwargs):
     meter_reading_appplications_count = ElecMeterReadingApplication.objects.filter(
         cpo_id=entity_id, created_at__year=year
     ).count()
-    charge_points_count = ElecChargePoint.objects.filter(cpo_id=entity_id, application__created_at__year=year).count()
+    charge_points_count = ElecChargePoint.objects.filter(
+        cpo_id=entity_id, application__created_at__year=year, is_deleted=False
+    ).count()
     try:
         items = model_class.objects.filter(cpo_id=entity_id)
 

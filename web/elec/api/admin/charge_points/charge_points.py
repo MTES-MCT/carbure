@@ -28,7 +28,7 @@ def get_charge_points(request, entity):
         return ErrorResponse(400, ChargePointsError.MALFORMED_PARAMS, form.errors)
 
     company = form.cleaned_data["company_id"]
-    charge_points = ElecChargePoint.objects.filter(cpo=company)
+    charge_points = ElecChargePoint.objects.filter(cpo=company, is_deleted=False)
     charge_points = charge_points.select_related("application")
     charge_points = annotate_with_latest_extracted_energy(charge_points)
 
