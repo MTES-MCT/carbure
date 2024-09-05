@@ -39,7 +39,6 @@ env = environ.Env(
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(str, ""),
     METABASE_SECRET_KEY=(str, ""),
-    SENTRY_ENV=(str, "local"),
 )
 
 # False if not in os.environ
@@ -50,14 +49,14 @@ SECRET_KEY = env("SECRET_KEY")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_DIRS = (os.path.join(BASE_DIR, "fixtures"),)
 
-if env("TEST") is False and DEBUG is False:
+if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
-        environment=env("SENTRY_ENV"),
+        environment=f"carbure-{env("IMAGE_TAG")}",
     )
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
