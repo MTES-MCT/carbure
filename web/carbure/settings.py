@@ -50,7 +50,7 @@ SECRET_KEY = env("SECRET_KEY")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_DIRS = (os.path.join(BASE_DIR, "fixtures"),)
 
-if env("TEST") is False:
+if env("TEST") is False and DEBUG is False:
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
