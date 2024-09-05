@@ -1,5 +1,6 @@
 import traceback
 import os
+import sentry_sdk
 from django.conf import settings
 from core.carburetypes import CarbureError
 
@@ -19,4 +20,5 @@ class ExceptionMiddleware(object):
             traceback.print_exc()
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR, message=str(exception))
         else:
+            sentry_sdk.capture_exception(exception)
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR)
