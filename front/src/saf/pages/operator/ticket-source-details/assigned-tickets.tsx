@@ -5,7 +5,7 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketPreview, SafTicketSource } from "saf/types"
-import TicketTag from "../tickets/tag"
+import TicketTag from "../../../components/tickets/tag"
 
 const AssignedTickets = ({
   ticketSource,

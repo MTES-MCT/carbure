@@ -14,12 +14,12 @@ import {
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
-import * as api from "../../pages/airline/api"
-import { Filters } from "../filters"
-import { useAutoStatus } from "../client-tabs"
-import { ClientTicketDetails } from "../ticket-details/airline-details"
-import TicketsTable from "./table"
-import { ExportButton } from "../export"
+import * as api from "./api"
+import { Filters } from "../../components/filters"
+import { useAutoStatus } from "./airline-tabs"
+import { ClientTicketDetails } from "./airline-details"
+import TicketsTable from "../../components/tickets/table"
+import { ExportButton } from "../../components/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,

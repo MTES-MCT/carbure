@@ -16,13 +16,13 @@ import {
   SafTicketStatus,
 } from "saf/types"
 import * as api from "../../pages/operator/api"
-import { Filters } from "../filters"
-import { useAutoStatus } from "../operator-tabs"
-import { OperatorTicketDetails } from "../ticket-details/operator-details"
-import { StatusSwitcher } from "./status-switcher"
-import TicketsTable from "./table"
-import TicketSourceDetails from "../ticket-source-details"
-import { ExportButton } from "../export"
+import { Filters } from "../../components/filters"
+import { useAutoStatus } from "../../pages/operator/operator-tabs"
+import { OperatorTicketDetails } from "./operator-details"
+import { StatusSwitcher } from "../../components/tickets/status-switcher"
+import TicketsTable from "../../components/tickets/table"
+import TicketSourceDetails from "./ticket-source-details"
+import { ExportButton } from "../../components/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,

@@ -6,9 +6,9 @@ import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import OperatorTabs from "../../components/operator-tabs"
-import TicketSources from "../../components/ticket-sources"
-import OperatorTickets from "../../components/tickets/operator-tickets"
+import OperatorTabs from "./operator-tabs"
+import TicketSources from "./ticket-sources"
+import OperatorTickets from "./operator-tickets"
 import { SafTicketSourceStatus } from "../../types"
 
 export const SafOperator = () => {

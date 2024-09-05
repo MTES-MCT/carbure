@@ -5,7 +5,7 @@ import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
-import css from "./tabs.module.css"
+import css from "../../components/tabs.module.css"
 
 import { SafClientSnapshot, SafTicketStatus } from "saf/types"
 
@@ -14,7 +14,7 @@ export interface StatusTabsProps {
   count?: SafClientSnapshot
 }
 
-export const ClientTabs = ({
+export const AirlineTabs = ({
   loading,
   count = defaultCount,
 }: StatusTabsProps) => {
@@ -83,4 +83,4 @@ export function useAutoStatus() {
   return (status.toUpperCase() as SafTicketStatus) ?? SafTicketStatus.Pending
 }
 
-export default ClientTabs
+export default AirlineTabs

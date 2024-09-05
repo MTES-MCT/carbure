@@ -15,15 +15,15 @@ import {
   SafTicketSourceStatus,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
-import * as api from "../../pages/operator/api"
-import { Filters } from "../filters"
+import * as api from "../api"
+import { Filters } from "../../../components/filters"
 import { useAutoStatus } from "../operator-tabs"
-import { OperatorTicketDetails } from "../ticket-details/operator-details"
+import { OperatorTicketDetails } from "../operator-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
-import { ExportButton } from "../export"
+import { ExportButton } from "../../../components/export"
 import NoResult from "common/components/no-result"
 import {
   useCBQueryBuilder,

@@ -6,11 +6,11 @@ import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import ClientTabs from "../../components/client-tabs"
-import AirlineTickets from "../../components/tickets/airline-tickets"
+import AirlineTabs from "./airline-tabs"
+import AirlineTickets from "./airline-tickets"
 import { SafTicketStatus } from "../../types"
 
-export const SafClient = () => {
+export const SafAirline = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
@@ -42,7 +42,7 @@ export const SafClient = () => {
         </section>
 
         <section>
-          <ClientTabs loading={snapshot.loading} count={snapshotData} />
+          <AirlineTabs loading={snapshot.loading} count={snapshotData} />
         </section>
       </header>
 
@@ -75,4 +75,4 @@ export const SafClient = () => {
   )
 }
 
-export default SafClient
+export default SafAirline

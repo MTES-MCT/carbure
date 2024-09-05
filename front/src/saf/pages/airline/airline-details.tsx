@@ -11,11 +11,11 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
 import NavigationButtons from "transaction-details/components/lots/navigation"
-import * as api from "../../pages/airline/api"
-import TicketTag from "../tickets/tag"
-import ClientComment from "./client-comment"
-import { TicketFields } from "./fields"
-import RejectAssignment from "./reject-assignment"
+import * as api from "./api"
+import TicketTag from "../../components/tickets/tag"
+import ClientComment from "../../components/ticket-details/client-comment"
+import { TicketFields } from "../../components/ticket-details/fields"
+import RejectAssignment from "../../components/ticket-details/reject-assignment"
 
 export interface TicketDetailsProps {
   neighbors: number[]

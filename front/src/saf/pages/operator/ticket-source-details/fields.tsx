@@ -4,9 +4,9 @@ import { Fieldset } from "common/components/form"
 import { DateInput, TextInput } from "common/components/input"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import css from "../../../common/components/form.module.css"
-import { SafTicketSourceDetails } from "../../types"
-import DurabilityFields from "../durability-fields"
+import css from "common/components/form.module.css"
+import { SafTicketSourceDetails } from "../../../types"
+import DurabilityFields from "../../../components/durability-fields"
 
 interface TicketSourceFieldsProps {
   ticketSource: SafTicketSourceDetails | undefined
