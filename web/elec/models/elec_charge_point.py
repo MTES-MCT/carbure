@@ -39,6 +39,8 @@ class ElecChargePoint(models.Model):
     latitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
     longitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
 
+    is_deleted = models.BooleanField(default=False)
+
     @property
     def mid_id(self):
         return self.current_meter.mid_certificate if self.current_meter else None

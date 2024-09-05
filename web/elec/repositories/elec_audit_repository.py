@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from core.models import Entity, UserRights
 from elec.models.elec_audit_sample import ElecAuditSample
@@ -18,14 +18,20 @@ class ElecAuditRepository:
     @staticmethod
     def get_audited_applications(audit_user, **filters):
         cpos = ElecAuditRepository.get_audited_cpos(audit_user)
-
         audits = (
             ElecAuditSample.objects.select_related("cpo", "charge_point_application", "meter_reading_application")
             .filter(cpo__in=cpos)
             .order_by("created_at")
             .annotate(
-                station_count=Count("audited_charge_points__charge_point__station_id", distinct=True),
-                charge_point_count=Count("audited_charge_points__id"),
+                station_count=Count(
+                    "audited_charge_points__charge_point__station_id",
+                    filter=Q(audited_charge_points__charge_point__is_deleted=False),
+                    distinct=True,
+                ),
+                charge_point_count=Count(
+                    "audited_charge_points__id",
+                    filter=Q(audited_charge_points__charge_point__is_deleted=False),
+                ),
             )
         )
 
