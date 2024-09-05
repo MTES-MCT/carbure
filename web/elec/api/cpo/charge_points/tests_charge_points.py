@@ -790,3 +790,91 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert response.status_code == 200
         assert data == expected
+
+    def test_update_charge_point_id(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.status = ElecChargePointApplication.PENDING
+        application.save()
+
+        charge_point = ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="FRBBBB222203",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+        )
+
+        # Bad extra field (measure_reference_point_id)
+        payload = {
+            "entity_id": self.cpo.id,
+            "id": str(charge_point.id),
+            "charge_point_id": "FRBBBB222204",
+            "measure_reference_point_id": "654321",
+        }
+        url = reverse("elec-cpo-charge-points-update-charge-point")
+        response = self.client.post(url, payload)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error"] == "CP_CANNOT_BE_UPDATED"
+
+        # Working
+        del payload["measure_reference_point_id"]
+        response = self.client.post(url, payload)
+        assert response.status_code == 200
+        charge_point.refresh_from_db()
+        assert charge_point.charge_point_id == "FRBBBB222204"
+
+        # Bad ACCEPTED application status
+        application.status = ElecChargePointApplication.ACCEPTED
+        application.save()
+        response = self.client.post(url, payload)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error"] == "CP_CANNOT_BE_UPDATED"
+
+    def test_update_charge_point_prm(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.status = ElecChargePointApplication.ACCEPTED
+        application.save()
+
+        charge_point = ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="FRBBBB222203",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+        )
+
+        # Bad extra field (charge_point_id)
+        payload = {
+            "entity_id": self.cpo.id,
+            "id": str(charge_point.id),
+            "": "654321",
+            "charge_point_id": "FRBBBB222204",
+            "measure_reference_point_id": "654321",
+        }
+        url = reverse("elec-cpo-charge-points-update-prm")
+        response = self.client.post(url, payload)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error"] == "CP_CANNOT_BE_UPDATED"
+
+        # Working for both PENDING and ACCEPTED application status
+        del payload["charge_point_id"]
+        for status in [ElecChargePointApplication.ACCEPTED, ElecChargePointApplication.PENDING]:
+            application.status = status
+            application.save()
+        response = self.client.post(url, payload)
+        assert response.status_code == 200
+        charge_point.refresh_from_db()
+        assert charge_point.measure_reference_point_id == "654321"
