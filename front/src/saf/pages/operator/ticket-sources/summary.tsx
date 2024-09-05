@@ -6,7 +6,7 @@ import { usePortal } from "common/components/portal"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SafTicketSource } from "saf/types"
-import TicketsGroupedAssignment from "../../../components/assignment/grouped-assignment"
+import TicketsGroupedAssignment from "../assignment/grouped-assignment"
 
 export interface TicketSourcesSummaryProps {
   ticketSources: SafTicketSource[]

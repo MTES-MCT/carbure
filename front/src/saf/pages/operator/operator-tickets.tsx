@@ -18,7 +18,7 @@ import {
 import * as api from "../../pages/operator/api"
 import { Filters } from "../../components/filters"
 import { useAutoStatus } from "../../pages/operator/operator-tabs"
-import { OperatorTicketDetails } from "./operator-details"
+import { OperatorTicketDetails } from "./operator-ticket-details"
 import { StatusSwitcher } from "../../components/tickets/status-switcher"
 import TicketsTable from "../../components/tickets/table"
 import TicketSourceDetails from "./ticket-source-details"

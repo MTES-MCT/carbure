@@ -17,7 +17,7 @@ import {
 import * as api from "./api"
 import { Filters } from "../../components/filters"
 import { useAutoStatus } from "./airline-tabs"
-import { ClientTicketDetails } from "./airline-details"
+import { ClientTicketDetails } from "./airline-ticket-details"
 import TicketsTable from "../../components/tickets/table"
 import { ExportButton } from "../../components/export"
 import {
