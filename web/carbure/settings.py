@@ -39,6 +39,7 @@ env = environ.Env(
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(str, ""),
     METABASE_SECRET_KEY=(str, ""),
+    SENTRY_ENV=(str, "local"),
 )
 
 # False if not in os.environ
@@ -56,6 +57,7 @@ if env("TEST") is False:
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
+        environment=env("SENTRY_ENV"),
     )
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
@@ -148,7 +150,10 @@ DATABASES["default"]["OPTIONS"] = {
 
 if env("TEST") == 1:
     print("DB TESTING MODE")
-    DATABASES["default"]["OPTIONS"] = {**DATABASES["default"]["OPTIONS"], "auth_plugin": "mysql_native_password"}
+    DATABASES["default"]["OPTIONS"] = {
+        **DATABASES["default"]["OPTIONS"],
+        "auth_plugin": "mysql_native_password",
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -236,7 +241,10 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {"format": "[%(asctime)s] %(levelname)s %(message)s", "datefmt": "%d/%b/%Y %H:%M:%S"},
+        "verbose": {
+            "format": "[%(asctime)s] %(levelname)s %(message)s",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+        },
     },
     "handlers": {
         "console": {
