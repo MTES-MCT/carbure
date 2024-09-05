@@ -6,10 +6,10 @@ import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import OperatorTabs from "./operator-tabs"
+import OperatorTabs from "./tabs"
 import TicketSources from "./ticket-sources"
-import OperatorTickets from "./operator-tickets"
-import { SafTicketSourceStatus } from "../../types"
+import OperatorTickets from "./tickets"
+import { SafTicketSourceStatus } from "saf/pages/operator/types"
 
 export const SafOperator = () => {
   const { t } = useTranslation()

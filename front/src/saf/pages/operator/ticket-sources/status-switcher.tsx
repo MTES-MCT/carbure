@@ -1,6 +1,7 @@
 import Tabs from "common/components/tabs"
 import { useTranslation } from "react-i18next"
-import { SafOperatorSnapshot, SafTicketSourceStatus } from "saf/types"
+import { SafOperatorSnapshot } from "saf/types"
+import { SafTicketSourceStatus } from "../types"
 
 interface StatusSwitcherProps {
   status: SafTicketSourceStatus

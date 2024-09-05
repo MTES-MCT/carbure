@@ -1,6 +1,6 @@
 import { Tag, TagProps, TagVariant } from "common/components/tag"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource } from "saf/types"
+import { SafTicketSource } from "saf/pages/operator/types"
 
 export interface TicketSourceTagProps extends TagProps {
   ticketSource: SafTicketSource | undefined

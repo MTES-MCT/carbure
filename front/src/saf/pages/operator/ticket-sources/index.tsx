@@ -11,24 +11,23 @@ import { compact } from "common/utils/collection"
 import {
   SafFilter,
   SafOperatorSnapshot,
-  SafTicketSource,
-  SafTicketSourceStatus,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../api"
-import { Filters } from "../../../components/filters"
-import { useAutoStatus } from "../operator-tabs"
-import { OperatorTicketDetails } from "../operator-ticket-details"
+import { SafFilters } from "../../../components/filters"
+import { useAutoStatus } from "../tabs"
+import { OperatorTicketDetails } from "../ticket-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
-import { ExportButton } from "../../../components/export"
+import { ExportButton } from "../ticket-source-details/export"
 import NoResult from "common/components/no-result"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder"
+import { SafTicketSource, SafTicketSourceStatus } from "../types"
 
 export interface TicketSourcesProps {
   year: number
@@ -74,7 +73,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   return (
     <>
       <Bar>
-        <Filters
+        <SafFilters
           filters={FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}

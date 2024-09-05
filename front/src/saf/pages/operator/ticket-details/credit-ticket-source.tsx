@@ -7,7 +7,7 @@ import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { SafTicket } from "saf/types"
-import * as api from "../../pages/operator/api"
+import * as api from "../api"
 
 interface CreditTicketSourceProps {
   ticket: SafTicket

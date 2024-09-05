@@ -11,7 +11,7 @@ import {
   setEntity,
   waitWhileLoading,
 } from "carbure/__test__/helpers"
-import { SafOperator } from "../pages/operator"
+import { SafOperator } from ".."
 import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

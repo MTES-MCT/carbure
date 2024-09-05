@@ -15,11 +15,11 @@ import {
   SafTicketStatus,
 } from "saf/types"
 import * as api from "./api"
-import { Filters } from "../../components/filters"
-import { useAutoStatus } from "./airline-tabs"
-import { ClientTicketDetails } from "./airline-ticket-details"
+import { SafFilters } from "../../components/filters"
+import { useAutoStatus } from "./tabs"
+import { ClientTicketDetails } from "./ticket-details"
 import TicketsTable from "../../components/tickets/table"
-import { ExportButton } from "../../components/export"
+import { ExportButton } from "../operator/ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
@@ -68,7 +68,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
   return (
     <>
       <Bar>
-        <Filters
+        <SafFilters
           filters={CLIENT_FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}

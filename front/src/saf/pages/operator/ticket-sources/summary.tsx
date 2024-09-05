@@ -5,8 +5,8 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource } from "saf/types"
-import TicketsGroupedAssignment from "../assignment/grouped-assignment"
+import TicketsGroupedAssignment from "../../../components/assignment/grouped-assignment"
+import { SafTicketSource } from "../types"
 
 export interface TicketSourcesSummaryProps {
   ticketSources: SafTicketSource[]

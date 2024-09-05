@@ -2,7 +2,7 @@ import { Fieldset } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
 import { formatGHG, formatPercentage } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafDurability } from "../types"
+import { SafDurability } from "../../../../types"
 
 const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
   const { t } = useTranslation()

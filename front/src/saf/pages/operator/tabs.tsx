@@ -10,9 +10,9 @@ import css from "../../components/tabs.module.css"
 
 import {
   SafOperatorSnapshot,
-  SafTicketSourceStatus,
   SafTicketStatus,
 } from "saf/types"
+import { SafTicketSourceStatus } from "./types"
 
 export interface StatusTabsProps {
   loading: boolean

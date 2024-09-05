@@ -2,7 +2,7 @@ import Button from "common/components/button"
 import Collapse from "common/components/collapse"
 import { Split } from "common/components/icons"
 import { useLocation, useNavigate } from "react-router-dom"
-import { SafTicketSourcePreview } from "saf/types"
+import { SafTicketSourcePreview } from "saf/pages/operator/types"
 
 const LinkedTicketSource = ({
   ticket_source,

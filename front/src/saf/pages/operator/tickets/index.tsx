@@ -15,14 +15,14 @@ import {
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
-import * as api from "../../pages/operator/api"
-import { Filters } from "../../components/filters"
-import { useAutoStatus } from "../../pages/operator/operator-tabs"
-import { OperatorTicketDetails } from "./operator-ticket-details"
-import { StatusSwitcher } from "../../components/tickets/status-switcher"
-import TicketsTable from "../../components/tickets/table"
-import TicketSourceDetails from "./ticket-source-details"
-import { ExportButton } from "../../components/export"
+import * as api from "../api"
+import { SafFilters } from "../../../components/filters"
+import { useAutoStatus } from "../tabs"
+import { OperatorTicketDetails } from "../ticket-details"
+import { SafStatusSwitcher } from "./status-switcher"
+import TicketsTable from "../../../components/tickets/table"
+import TicketSourceDetails from "../ticket-source-details"
+import { ExportButton } from "../ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
@@ -80,7 +80,7 @@ export const OperatorTickets = ({
   return (
     <>
       <Bar>
-        <Filters
+        <SafFilters
           filters={filters}
           selected={state.filters}
           onSelect={actions.setFilters}
@@ -89,7 +89,7 @@ export const OperatorTickets = ({
       </Bar>
       <section>
         <ActionBar>
-          <StatusSwitcher
+          <SafStatusSwitcher
             onSwitch={actions.setStatus}
             type={type}
             count={snapshot as SafOperatorSnapshot}

@@ -7,10 +7,9 @@ import {
   SafOperatorSnapshot,
   SafQuery,
   SafTicketDetails,
-  SafTicketSourceDetails,
-  SafTicketSourcesResponse,
   SafTicketsResponse
 } from "../../types"
+import { SafTicketSourceDetails, SafTicketSourcesResponse } from "./types"
 
 
 export function getOperatorYears(entity_id: number) {

@@ -9,7 +9,7 @@ interface StatusSwitcherProps {
   type: SafQueryType
   onSwitch: (status: SafTicketStatus) => void
 }
-export const StatusSwitcher = ({
+export const SafStatusSwitcher = ({
   status,
   count,
   type,

@@ -4,8 +4,9 @@ import { Send } from "common/components/icons"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import { SafTicketPreview, SafTicketSource } from "saf/types"
+import { SafTicketPreview } from "saf/types"
 import TicketTag from "../../../components/tickets/tag"
+import { SafTicketSource } from "../types"
 
 const AssignedTickets = ({
   ticketSource,

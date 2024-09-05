@@ -7,13 +7,16 @@ import {
   SafTicket,
   SafTicketDetails,
   SafTicketPreview,
+  SafTicketsResponse,
+  SafTicketStatus,
+} from "saf/types"
+
+import {
   SafTicketSource,
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
   SafTicketSourceSummaryItem,
-  SafTicketsResponse,
-  SafTicketStatus,
-} from "saf/types"
+} from "saf/pages/operator/types"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,
