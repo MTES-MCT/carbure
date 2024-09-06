@@ -50,13 +50,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_DIRS = (os.path.join(BASE_DIR, "fixtures"),)
 
 if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
+    image_tag = env("IMAGE_TAG")
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
-        environment=f"carbure-{env("IMAGE_TAG")}",
+        environment=f"carbure-{image_tag}",
     )
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
