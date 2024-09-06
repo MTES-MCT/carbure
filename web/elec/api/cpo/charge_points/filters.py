@@ -32,6 +32,9 @@ def get_charge_points_filters(request, entity):
 
     remaining_filter_values = charge_points.values_list(filter_to_column[current_filter], flat=True).distinct()
 
+    if current_filter == "latest_meter_reading_month":
+        remaining_filter_values = {date.month if date else 0 for date in remaining_filter_values}
+
     return SuccessResponse({"filter_values": list(remaining_filter_values)})
 
 
