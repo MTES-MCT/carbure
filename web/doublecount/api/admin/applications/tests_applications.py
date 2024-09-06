@@ -2,17 +2,24 @@
 import json
 import os
 from datetime import date
+from io import BytesIO
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from docx import Document
 
 from certificates.models import DoubleCountingRegistration
-from core.models import Entity, Pays, UserRights
+from core.models import Entity, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
 from doublecount.api.admin.applications.add import DoubleCountingAddError
 from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
+from doublecount.api.admin.applications.export_application import (
+    DoubleCountingApplicationExportError,
+    application_to_json,
+    check_has_dechets_industriels,
+)
 from doublecount.factories import (
     DoubleCountingApplicationFactory,
     DoubleCountingProductionFactory,
@@ -268,3 +275,119 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert agreement.production_site == application.production_site
         assert agreement.certificate_id == application.certificate_id
         assert agreement.application.id == application.id
+
+    def test_export_application(self):
+        application, sourcing1, production1, sourcing2, production2 = self.create_application()
+
+        assert application.status != DoubleCountingApplication.ACCEPTED
+
+        # Malformed params
+        response = self.client.post(reverse("admin-double-counting-application-export"), {"entity_id": self.admin.id})
+        assert response.status_code == 400
+        assert response.json()["error"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
+
+        # Application not found
+        response = self.client.post(
+            reverse("admin-double-counting-application-export"), {"dca_id": application.id + 200, "entity_id": self.admin.id}
+        )
+        assert response.status_code == 400
+        assert response.json()["error"] == DoubleCountingApplicationExportError.APPLICATION_NOT_FOUND
+
+        # Application not accepted
+        response = self.client.post(
+            reverse("admin-double-counting-application-export"), {"dca_id": application.id, "entity_id": self.admin.id}
+        )
+        assert response.status_code == 400
+        assert response.json()["error"] == DoubleCountingApplicationExportError.APPLICATION_NOT_ACCEPTED
+
+        application.status = DoubleCountingApplication.ACCEPTED
+        application.save()
+
+        assert application.status == DoubleCountingApplication.ACCEPTED
+
+        # Di without di in application
+        response = self.client.post(
+            reverse("admin-double-counting-application-export"),
+            {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
+        )
+        assert response.status_code == 400
+        assert response.json()["error"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
+
+        # Export without di
+        assert not check_has_dechets_industriels(application)
+        response = self.client.post(
+            reverse("admin-double-counting-application-export"), {"dca_id": application.id, "entity_id": self.admin.id}
+        )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+        # ... check doc content
+        application_data = application_to_json(application)
+
+        file_stream = BytesIO(response.content)
+        doc = Document(file_stream)
+
+        full_text = []
+        for paragraph in doc.paragraphs:
+            full_text.append(paragraph.text)
+        full_text = "\n".join(full_text)
+
+        # ... footer
+        section = doc.sections[0]
+        footer = section.footer
+
+        footer_text = []
+        for paragraph in footer.paragraphs:
+            footer_text.append(paragraph.text)
+
+        footer_text = "\n".join(footer_text)
+        footer = "{}_{}".format(application_data["id"], application_data["year_n"])
+        assert footer in footer_text
+
+        # ... content
+        del application_data["has_dechets_industriels"]
+        del application_data["id"]
+        del application_data["dechets_industriels"]
+
+        for _, value in application_data.items():
+            assert str(value) in full_text
+
+        assert "Article 5" not in full_text
+        assert full_text.count("Article 3") == 1
+
+        # Export with di
+        feedstock = MatierePremiere.objects.get(code="DECHETS_INDUSTRIELS")
+        assert production1.feedstock.code != "DECHETS_INDUSTRIELS"
+        production1.feedstock = feedstock
+        production1.save()
+
+        production1.refresh_from_db()
+
+        assert check_has_dechets_industriels(application)
+
+        response = self.client.post(
+            reverse("admin-double-counting-application-export"),
+            {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
+        )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+        application_data = application_to_json(application)
+
+        file_stream = BytesIO(response.content)
+        doc = Document(file_stream)
+
+        full_text = []
+        for paragraph in doc.paragraphs:
+            full_text.append(paragraph.text)
+        full_text = "\n".join(full_text)
+
+        # ... content
+        del application_data["has_dechets_industriels"]
+        del application_data["id"]
+
+        for _, value in application_data.items():
+            assert str(value) in full_text
+
+        assert "Article 5" in full_text
+        assert full_text.count("Article 3") == 1
