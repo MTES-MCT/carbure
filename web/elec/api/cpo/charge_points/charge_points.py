@@ -2,7 +2,7 @@ from math import floor
 
 from django import forms
 from django.core.paginator import Paginator
-from django.db.models import DateField, OuterRef, Subquery, Value
+from django.db.models import DateField, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce
 from django.views.decorators.http import require_GET
 
@@ -25,6 +25,7 @@ class ChargePointFilterForm(forms.Form):
     station_id = forms.CharField(required=False)
     latest_meter_reading_month = forms.IntegerField(required=False)
     is_article_2 = forms.BooleanField(required=False)
+    search = forms.CharField(required=False)
 
 
 class ChargePointSortForm(forms.Form):
@@ -48,6 +49,7 @@ def annotate_with_latest_meter_reading_date(queryset):
 def get_charge_points(request, entity):
     charge_points_filter_form = ChargePointFilterForm(request.GET)
     charge_points_sort_form = ChargePointSortForm(request.GET)
+    selection = request.GET.getlist("selection", [])
 
     if not charge_points_filter_form.is_valid() or not charge_points_sort_form.is_valid():
         return ErrorResponse(
@@ -61,6 +63,8 @@ def get_charge_points(request, entity):
 
     charge_points = ElecChargePoint.objects.filter(cpo=entity, is_deleted=False)
     charge_points = charge_points.select_related("application")
+    if selection:
+        charge_points = charge_points.filter(id__in=selection)
     charge_points = annotate_with_latest_meter_reading_date(charge_points)
     charge_points = filter_charge_points(charge_points, **charge_points_filter_form.cleaned_data)
 
@@ -122,5 +126,9 @@ def filter_charge_points(charge_points, **filters):
 
     if filters["is_article_2"]:
         charge_points = charge_points.filter(is_article_2=filters["is_article_2"])
+
+    if filters["search"]:
+        search = filters["search"]
+        charge_points = charge_points.filter(Q(charge_point_id__icontains=search) | Q(station_id__icontains=search))
 
     return charge_points
