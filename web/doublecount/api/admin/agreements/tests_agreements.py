@@ -154,6 +154,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         data = response.json()["data"]
         application = data["application"]
         quotas = data["quotas"]
+        assert not data["has_dechets_industriels"]
 
         assert application["id"] == app.id
         assert len(quotas) == 2  # production 1 +production 3
@@ -179,3 +180,4 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         assert data["application"] is None
         assert data["quotas"] is None
+        assert not data["has_dechets_industriels"]
