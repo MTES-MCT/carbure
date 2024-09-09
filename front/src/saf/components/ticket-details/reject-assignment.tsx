@@ -11,8 +11,9 @@ import { useMutation } from "common/hooks/async"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SafTicket } from "saf/types"
-import * as api from "../../api"
 import TicketTag from "../tickets/tag"
+import { rejectSafAirlineTicket } from "saf/pages/airline/api"
+import { rejectSafOperatorTicket } from "saf/pages/operator/api"
 
 interface RejectAssignmentProps {
   ticket: SafTicket
@@ -30,8 +31,8 @@ export const RejectAssignment = ({
 
   const rejectSafTicket = useMutation(
     entity.entity_type === EntityType.Airline
-      ? api.rejectSafAirlineTicket
-      : api.rejectSafOperatorTicket,
+      ? rejectSafAirlineTicket
+      : rejectSafOperatorTicket,
     {
       invalidates: [
         "ticket-details",
