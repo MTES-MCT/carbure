@@ -16,8 +16,8 @@ import {
   formatPeriodFromDate,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource } from "saf/types"
-import * as api from "../../api"
+import { SafTicketSource } from "saf/pages/operator/types"
+import * as api from "../../pages/operator/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 
@@ -116,7 +116,7 @@ const TicketsGroupedAssignment = ({
                         {t("{{volume}} L - {{period}} - {{feedstock}}", {
                           volume: formatNumber(
                             ticketSource.total_volume -
-                              ticketSource.assigned_volume
+                            ticketSource.assigned_volume
                           ),
                           period: formatPeriod(ticketSource.delivery_period),
                           feedstock: t(ticketSource.feedstock?.code ?? "", {
