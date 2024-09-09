@@ -15,7 +15,6 @@ import {
   SafTicketSource,
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
-  SafTicketSourceSummaryItem,
 } from "saf/pages/operator/types"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
