@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import cl from "clsx"
 import {
   NavLink,
@@ -8,6 +8,7 @@ import {
 } from "react-router-dom"
 import css from "./tabs.module.css"
 import { Layout, layout } from "./scaffold"
+import { Loader } from "./icons"
 
 export type TabVariant = "header" | "main" | "section" | "sticky" | "switcher"
 
@@ -114,6 +115,29 @@ export function useMatcher() {
       return currentPath === tabPath || startsWithPath
     }
   }
+}
+
+interface TabItemProps {
+  title: ReactNode
+  subtitle: ReactNode
+  loading?: boolean
+}
+/**
+ * Default renderer for tab, with a title and a subtitle
+ */
+export const TabItem = ({ title, subtitle, loading = false }: TabItemProps) => {
+  return (
+    <div>
+      <p
+        style={{
+          fontWeight: "normal",
+        }}
+      >
+        {loading ? <Loader size={20} /> : subtitle}
+      </p>
+      <strong>{title}</strong>
+    </div>
+  )
 }
 
 export default Tabs

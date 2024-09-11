@@ -9,7 +9,6 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
 import { ElecTransferDetailsDialog } from "elec/components/transfer-certificates/details"
-
 import {
   ElecTransferCertificateFilter,
   ElecTransferCertificatePreview,
