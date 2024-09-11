@@ -94,14 +94,6 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               value: "double-counting",
               label: t("Demandes d'agrément double comptage"),
             },
-            entity.isAdmin && {
-              value: "charge-points",
-              label: t("Inscriptions de points de recharge"),
-            },
-            entity.isAdmin && {
-              value: "meter-readings",
-              label: t("Validation des relevés trimestriels"),
-            },
           ])}
         />
       </Grid>

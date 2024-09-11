@@ -107,6 +107,7 @@ const Navigation = ({ entity }: NavigationProps) => {
     isCPO,
     has_elec,
   } = entity
+
   return (
     <Routes>
       <Route
@@ -149,6 +150,12 @@ const Navigation = ({ entity }: NavigationProps) => {
                 key: "elec",
                 path: "elec",
                 label: t("Électricité"),
+              },
+
+              ((has_elec && isOperator) || isCPO) && {
+                key: "charge-points",
+                path: "charge-points",
+                label: t("PDC"),
               },
 
               (isAdmin || entity.hasAdminRight("ELEC")) && {

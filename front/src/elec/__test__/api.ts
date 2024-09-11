@@ -13,11 +13,29 @@ import {
   meterReadingsApplicationCheckResponseFailed,
   meterReadingsApplicationCheckResponseSuccess,
 } from "elec/__test__/data"
+import { rest } from "msw"
 
-export const okChargePointsApplications = mockGetWithResponseData(
-  "/elec/cpo/charge-points/applications",
-  elecChargePointsApplications
+export const okChargePointsApplications = rest.get(
+  "/api/elec/cpo/charge-points/applications",
+  (req, res, ctx) => {
+    let data = elecChargePointsApplications
+    const year = req.url.searchParams.get("year")
+
+    if (year) {
+      data = data.filter((chargePointApplication) =>
+        chargePointApplication.application_date.includes(year)
+      )
+    }
+
+    return res(
+      ctx.json({
+        status: "success",
+        data,
+      })
+    )
+  }
 )
+
 export const okCPOSnapshot = mockGetWithResponseData(
   "/elec/cpo/snapshot",
   elecSnapshot
