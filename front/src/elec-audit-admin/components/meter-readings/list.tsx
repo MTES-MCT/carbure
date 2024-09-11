@@ -88,7 +88,6 @@ const MeterReadingsApplicationsList = ({
           }
         />
       </Bar>
-
       <section>
         <ActionBar>
           <StatusSwitcher
@@ -111,7 +110,6 @@ const MeterReadingsApplicationsList = ({
               rowLink={showMeterReadingsApplicationDetails}
               displayCpo={true}
             />
-
             {(state.limit || 0) < total && (
               <Pagination
                 page={state.page}
@@ -126,7 +124,6 @@ const MeterReadingsApplicationsList = ({
           <NoResult loading={meterReadingsApplicationsResponse.loading} />
         )}
       </section>
-
       <HashRoute
         path="application/:id"
         element={<MeterReadingsApplicationDetailsDialog />}
