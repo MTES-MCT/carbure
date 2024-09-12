@@ -1,4 +1,4 @@
-import React, { useMemo, useState, Fragment } from "react"
+import React, { useState, Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
 import useEntity, { useRights } from "carbure/hooks/entity"

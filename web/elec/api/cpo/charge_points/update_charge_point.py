@@ -16,8 +16,7 @@ class ChargePointUpdateError:
 @require_POST
 @check_user_rights(entity_type=[Entity.CPO])
 def update_charge_point(request, entity, entity_id):
-    serializer = ElecChargePointUpdateSerializer(data=request.POST)
-
+    serializer = ElecChargePointUpdateSerializer(data=request.POST, partial=True)
     if not serializer.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, serializer.errors)
 
@@ -26,10 +25,17 @@ def update_charge_point(request, entity, entity_id):
     if cp.cpo != entity:
         return ErrorResponse(400, ChargePointUpdateError.CP_NOT_FOUND_ON_CPO)
 
-    if cp.application.status != ElecChargePointApplication.PENDING:
+    validated_data = serializer.validated_data
+
+    if "measure_reference_point_id" in validated_data:
         return ErrorResponse(400, ChargePointUpdateError.CP_CANNOT_BE_UPDATED)
 
-    cp.charge_point_id = serializer.validated_data["charge_point_id"]
+    if "charge_point_id" in validated_data and cp.application.status != ElecChargePointApplication.PENDING:
+        return ErrorResponse(400, ChargePointUpdateError.CP_CANNOT_BE_UPDATED)
+
+    if "charge_point_id" in validated_data:
+        cp.charge_point_id = validated_data["charge_point_id"]
+
     cp.save()
 
     return SuccessResponse()

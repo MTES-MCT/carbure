@@ -12,7 +12,7 @@ export interface FiltersProps {
   getFilterOptions: (filter: SafFilter) => Promise<any[]>
 }
 
-export function Filters({
+export function SafFilters({
   filters,
   selected,
   onSelect,
@@ -69,7 +69,7 @@ export const FilterSelect = ({
   />
 )
 
-type FilterNormalizers= Partial<Record<SafFilter, Normalizer<any>>> // prettier-ignore
+type FilterNormalizers = Partial<Record<SafFilter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
   [SafFilter.Feedstocks]: norm.normalizeFeedstockFilter,
   [SafFilter.Periods]: norm.normalizePeriodFilter,
@@ -80,4 +80,4 @@ const filterNormalizers: FilterNormalizers = {
   [SafFilter.DeliverySites]: norm.normalizeUnknownFilter,
 }
 
-export default Filters
+export default SafFilters

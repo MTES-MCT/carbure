@@ -1,5 +1,4 @@
 import useEntity from "carbure/hooks/entity"
-import { Entity } from "carbure/types"
 import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
@@ -23,18 +22,6 @@ export const CompanyInfoMissingSirenDialog = ({
     onClose()
     navigate(`/org/${entity.id}/settings#info`)
   }
-
-  const mandotoryFields = [
-    entity.registration_id,
-    entity.registered_address,
-    entity.registered_city,
-    entity.registered_country,
-    entity.registered_zipcode,
-    entity.sustainability_officer_email,
-    entity.sustainability_officer_phone_number,
-    entity.sustainability_officer,
-    entity.activity_description,
-  ]
 
   return (
     <Portal onClose={onClose}>

@@ -52,20 +52,22 @@ def get_charge_point_snapshot(request, *args, **kwargs):
     else:
         return ErrorResponse(400, ElecSnapshotError.MALFORMED_PARAMS, "Wrong category")
 
-    charge_point_appplications_count = ElecChargePointApplication.objects.filter(
+    charge_point_applications_count = ElecChargePointApplication.objects.filter(
         cpo_id=entity_id, created_at__year=year
     ).count()
-    meter_reading_appplications_count = ElecMeterReadingApplication.objects.filter(
+    meter_reading_applications_count = ElecMeterReadingApplication.objects.filter(
         cpo_id=entity_id, created_at__year=year
     ).count()
-    charge_points_count = ElecChargePoint.objects.filter(cpo_id=entity_id, application__created_at__year=year).count()
+    charge_points_count = ElecChargePoint.objects.filter(
+        cpo_id=entity_id, application__created_at__year=year, is_deleted=False
+    ).count()
     try:
         items = model_class.objects.filter(cpo_id=entity_id)
 
         return SuccessResponse(
             {
-                "charge_point_appplications": charge_point_appplications_count,
-                "meter_reading_appplications": meter_reading_appplications_count,
+                "charge_point_applications": charge_point_applications_count,
+                "meter_reading_applications": meter_reading_applications_count,
                 "charge_points": charge_points_count,
                 "pending": filter_method(items, status="PENDING", **snapshot_form.cleaned_data).count(),
                 "audit_in_progress": filter_method(items, status="AUDIT_IN_PROGRESS", **snapshot_form.cleaned_data).count(),

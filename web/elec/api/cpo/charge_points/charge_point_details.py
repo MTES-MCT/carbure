@@ -13,7 +13,7 @@ from elec.serializers.elec_charge_point import ElecChargePointSerializer
 
 
 class ChargePointDetailForm(forms.Form):
-    charge_point_id = forms.ModelChoiceField(queryset=ElecChargePoint.objects.all())
+    charge_point_id = forms.ModelChoiceField(queryset=ElecChargePoint.objects.filter(is_deleted=False))
 
 
 class ChargePointDetailError:

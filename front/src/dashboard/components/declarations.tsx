@@ -3,12 +3,7 @@ import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Panel, Row } from "common/components/scaffold"
-import {
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight,
-  Square,
-} from "common/components/icons"
+import { ChevronLeft, ChevronRight, Square } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import Table, { Cell, Column } from "common/components/table"
 import Select from "common/components/select"
@@ -17,7 +12,6 @@ import * as api from "../api"
 import { DashboardDeclaration } from "dashboard/types"
 import { groupBy, sortBy } from "common/utils/collection"
 import { EntityType } from "carbure/types"
-import Alert from "common/components/alert"
 import { formatPeriod } from "common/utils/formatters"
 import i18next from "i18next"
 import { Link } from "react-router-dom"

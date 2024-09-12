@@ -119,6 +119,7 @@ export function useCloseAllPortals(): PortalManager["closeAll"] {
   const manager = useContext(PortalContext)
   if (manager === undefined) throw new Error("Portal context is not defined")
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(manager.closeAll, [manager.closeAll])
 }
 

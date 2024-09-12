@@ -4,7 +4,7 @@ import { Dialog } from "common/components/dialog"
 import { Check, InfoCircle, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
 import { ElecMeterReadingsApplication } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
@@ -30,24 +30,37 @@ export const MeterReadingsApplicationAcceptDialog = ({
 
   const energyTotal = formatNumber(application.energy_total)
   const cpoName = application.cpo.name
-  const acceptMeterReadingsApplication = useMutation(api.acceptMeterReadingsApplication, {
-    invalidates: ["audit-meter-readings-applications", "elec-admin-audit-snapshot"],
-    onSuccess() {
-      onClose()
-      onValidated()
-      notify(t("Les relevés T{{quarter}} {{year}} de {{cpoName}} ont été validés et {{energyTotal}} kWh leur ont été versés !", {
-        quarter: application.quarter,
-        year: application.year,
-        cpoName,
-        energyTotal,
-      }), { variant: "success" })
-
-    },
-    onError(err) {
-      notifyError(err, t("Impossible d'accepter les relevés des points de recharge."))
-    },
-  })
-
+  const acceptMeterReadingsApplication = useMutation(
+    api.acceptMeterReadingsApplication,
+    {
+      invalidates: [
+        "audit-meter-readings-applications",
+        "elec-admin-audit-snapshot",
+      ],
+      onSuccess() {
+        onClose()
+        onValidated()
+        notify(
+          t(
+            "Les relevés T{{quarter}} {{year}} de {{cpoName}} ont été validés et {{energyTotal}} kWh leur ont été versés !",
+            {
+              quarter: application.quarter,
+              year: application.year,
+              cpoName,
+              energyTotal,
+            }
+          ),
+          { variant: "success" }
+        )
+      },
+      onError(err) {
+        notifyError(
+          err,
+          t("Impossible d'accepter les relevés des points de recharge.")
+        )
+      },
+    }
+  )
 
   const acceptApplication = (forceValidation: boolean) => {
     acceptMeterReadingsApplication.execute(
@@ -77,7 +90,6 @@ export const MeterReadingsApplicationAcceptDialog = ({
               defaults="Valider les relevés trimestriels de <b>{{count}} points de recharge</b> pour <b>T{{quarter}} {{year}}</b> et verser le certificat de fourniture correspondants ?</b>"
             />
           </p>
-
         </section>
 
         <section>

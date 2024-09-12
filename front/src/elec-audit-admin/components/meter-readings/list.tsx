@@ -4,11 +4,14 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import {
   ElecAdminAuditFilter,
   ElecAdminAuditSnapshot,
-  ElecAdminAuditStatus
+  ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
 import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
 import { ElecMeterReadingsApplication } from "elec/types"
@@ -34,14 +37,9 @@ const MeterReadingsApplicationsList = ({
   const location = useLocation()
   const { t } = useTranslation()
 
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot,
-  )
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   usePageTitle(state)
-  const query = useCBQueryBuilder(state);
+  const query = useCBQueryBuilder(state)
 
   const meterReadingsApplicationsResponse = useQuery(
     api.getMeterReadingsApplications,
@@ -90,7 +88,6 @@ const MeterReadingsApplicationsList = ({
           }
         />
       </Bar>
-
       <section>
         <ActionBar>
           <StatusSwitcher
@@ -113,7 +110,6 @@ const MeterReadingsApplicationsList = ({
               rowLink={showMeterReadingsApplicationDetails}
               displayCpo={true}
             />
-
             {(state.limit || 0) < total && (
               <Pagination
                 page={state.page}
@@ -128,7 +124,6 @@ const MeterReadingsApplicationsList = ({
           <NoResult loading={meterReadingsApplicationsResponse.loading} />
         )}
       </section>
-
       <HashRoute
         path="application/:id"
         element={<MeterReadingsApplicationDetailsDialog />}
@@ -138,7 +133,7 @@ const MeterReadingsApplicationsList = ({
 }
 export default MeterReadingsApplicationsList
 
-const FILTERS = [ElecAdminAuditFilter.Cpo, ElecAdminAuditFilter.Quarter]
+// const FILTERS = [ElecAdminAuditFilter.Cpo, ElecAdminAuditFilter.Quarter]
 
 export function useAutoStatus() {
   const matchStatus = useMatch(

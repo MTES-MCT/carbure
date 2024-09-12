@@ -40,6 +40,8 @@ export const PeriodSelect = ({
       }
     }
     setPeriodList(list)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

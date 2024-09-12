@@ -1,22 +1,12 @@
-import { Fieldset } from "common/components/form"
-import { DateInput, NumberInput, TextInput } from "common/components/input"
-import {
-  formatDate,
-  formatGHG,
-  formatNumber,
-  formatPercentage,
-  formatPeriod,
-} from "common/utils/formatters"
-import { useTranslation } from "react-i18next"
-import {
-  SafDurability,
-  SafTicketDetails,
-  SafTicketSourceDetails,
-} from "../../types"
-import cl from "clsx"
-import css from "../../../common/components/form.module.css"
 import * as norm from "carbure/utils/normalizers"
-import DurabilityFields from "../durability-fields"
+import cl from "clsx"
+import { Fieldset } from "common/components/form"
+import { DateInput, TextInput } from "common/components/input"
+import { formatNumber, formatPeriod } from "common/utils/formatters"
+import { useTranslation } from "react-i18next"
+import css from "common/components/form.module.css"
+import DurabilityFields from "saf/pages/operator/ticket-source-details/parent-lot/durability-fields"
+import { SafTicketDetails } from "../../types"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
