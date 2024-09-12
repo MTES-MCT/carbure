@@ -110,7 +110,7 @@ class ElecMeterTest(TestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert data["error"] == "CP_NOT_FOUND_ON_CPO"
 
-    def test_get_meters_success(self):
+    def test_get_elec_meters_success(self):
         url = reverse("elec-cpo-meters-get-meters")
         data = {
             "charge_point_id": self.charge_point.id,
@@ -142,7 +142,7 @@ class ElecMeterTest(TestCase):
         assert response.status_code == status.HTTP_200_OK
         assert data == expected
 
-    def test_get_meters_invalid_params(self):
+    def test_get_elec_meters_invalid_params(self):
         url = reverse("elec-cpo-meters-get-meters")
         data = {
             "charge_point_id": 999999999,
@@ -153,11 +153,20 @@ class ElecMeterTest(TestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert data["error"] == "MALFORMED_PARAMS"
 
-    def test_get_meters_cp_not_found_on_cpo(self):
-        url = reverse("get-meters")
+    def test_get_elec_meters_cp_not_found_on_cpo(self):
+        url = reverse("elec-cpo-meters-get-meters")
         data = {
-            "charge_point_id": "INVALID_CP_ID",
+            "charge_point_id": self.charge_point.id,
+            "entity_id": self.cpo.id,
         }
+        cpo2 = Entity.objects.create(
+            name="CPO2",
+            entity_type=Entity.CPO,
+            has_elec=True,
+        )
+        self.charge_point.cpo = cpo2
+        self.charge_point.save()
         response = self.client.get(url, data)
+        data = response.json()
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["error"] == "CP_NOT_FOUND_ON_CPO"
+        assert data["error"] == "CP_NOT_FOUND_ON_CPO"
