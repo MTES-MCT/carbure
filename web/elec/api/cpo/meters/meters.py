@@ -6,7 +6,7 @@ from core.decorators import check_user_rights
 from core.models import Entity
 from elec.models import ElecMeter
 from elec.serializers.elec_charge_point import ElecChargePointIdSerializer
-from elec.serializers.elec_meter import MeterSerializer
+from elec.serializers.elec_meter import ElecMeterSerializer
 
 
 class MetersError:
@@ -28,5 +28,5 @@ def get_meters(request, entity):
 
     meters = ElecMeter.objects.filter(charge_point=cp)
 
-    serialized = MeterSerializer(meters, many=True).data
+    serialized = ElecMeterSerializer(meters, many=True).data
     return SuccessResponse(serialized)
