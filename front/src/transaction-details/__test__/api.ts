@@ -1,4 +1,4 @@
-import { rest } from "msw"
+import { http } from "msw"
 import { setupServer } from "msw/node"
 import { Data } from "carbure/__test__/helpers"
 import { LotDetails } from "../types"
@@ -14,7 +14,7 @@ import {
 } from "carbure/__test__/api"
 import { producer } from "carbure/__test__/data"
 
-export const okLotDetails = rest.get(
+export const okLotDetails = http.get(
   "/api/transactions/lots/details",
   (req, res, ctx) => {
     return res(
@@ -26,7 +26,7 @@ export const okLotDetails = rest.get(
   }
 )
 
-export const okUpdateLot = rest.post(
+export const okUpdateLot = http.post(
   "/api/transactions/lots/update",
   (req, res, ctx) => {
     const details = Data.get("lot-details")
@@ -36,7 +36,7 @@ export const okUpdateLot = rest.post(
   }
 )
 
-export const okSendLot = rest.post(
+export const okSendLot = http.post(
   "/api/transactions/lots/send",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
@@ -46,14 +46,14 @@ export const okSendLot = rest.post(
   }
 )
 
-export const okDeleteLot = rest.post(
+export const okDeleteLot = http.post(
   "/api/transactions/lots/delete",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success" }))
   }
 )
 
-export const okRequestFix = rest.post(
+export const okRequestFix = http.post(
   "/api/transactions/lots/request-fix",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
@@ -63,7 +63,7 @@ export const okRequestFix = rest.post(
   }
 )
 
-export const okMarkAsFixed = rest.post(
+export const okMarkAsFixed = http.post(
   "/api/transactions/lots/submit-fix",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
@@ -73,7 +73,7 @@ export const okMarkAsFixed = rest.post(
   }
 )
 
-export const okRejectLot = rest.post(
+export const okRejectLot = http.post(
   "/api/transactions/lots/reject",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
@@ -84,7 +84,7 @@ export const okRejectLot = rest.post(
   }
 )
 
-export const okAcceptBlending = rest.post(
+export const okAcceptBlending = http.post(
   "/api/transactions/lots/accept-blending",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
@@ -95,7 +95,7 @@ export const okAcceptBlending = rest.post(
   }
 )
 
-export const okCommentLot = rest.post(
+export const okCommentLot = http.post(
   "/api/transactions/lots/comment",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {

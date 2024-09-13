@@ -13,9 +13,9 @@ import {
   meterReadingsApplicationCheckResponseFailed,
   meterReadingsApplicationCheckResponseSuccess,
 } from "elec/__test__/data"
-import { rest } from "msw"
+import { http } from "msw"
 
-export const okChargePointsApplications = rest.get(
+export const okChargePointsApplications = http.get(
   "/api/elec/cpo/charge-points/applications",
   (req, res, ctx) => {
     let data = elecChargePointsApplications

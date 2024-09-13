@@ -1,4 +1,4 @@
-import { setupWorker } from "msw"
+import { setupWorker } from "msw/browser"
 
 import * as elecAdminAuditMocks from "elec-audit-admin/__test__/api"
 import * as elecAuditMocks from "elec-auditor/__test__/api"

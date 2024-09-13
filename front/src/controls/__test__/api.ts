@@ -1,5 +1,5 @@
 import { admin, entityRight } from "carbure/__test__/data"
-import { rest } from "msw"
+import { http } from "msw"
 import { setupServer } from "msw/node"
 
 import {
@@ -12,7 +12,7 @@ import { getFilter } from "transactions/__test__/data"
 import { lotSummary } from "./data"
 import { lots } from "./data"
 
-export const okAdminSettings = rest.get("/api/user", (req, res, ctx) => {
+export const okAdminSettings = http.get("/api/user", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -25,14 +25,14 @@ export const okAdminSettings = rest.get("/api/user", (req, res, ctx) => {
   )
 })
 
-export const okLotsSummary = rest.get(
+export const okLotsSummary = http.get(
   "/api/transactions/admin/lots/summary",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: lotSummary }))
   }
 )
 
-export const okFilters = rest.get(
+export const okFilters = http.get(
   "/api/transactions/admin/lots/filters",
   (req, res, ctx) => {
     return res(
@@ -44,7 +44,7 @@ export const okFilters = rest.get(
   }
 )
 
-export const okSnapshot = rest.get(
+export const okSnapshot = http.get(
   "/api/transactions/admin/snapshot",
   (req, res, ctx) => {
     return res(
@@ -62,7 +62,7 @@ export const okSnapshot = rest.get(
   }
 )
 
-export const okLots = rest.get(
+export const okLots = http.get(
   "/api/transactions/admin/lots",
   (req, res, ctx) => {
     return res(
@@ -82,7 +82,7 @@ export const okLots = rest.get(
   }
 )
 
-export const okStocks = rest.get(
+export const okStocks = http.get(
   "/api/transactions/admin/stocks",
   (req, res, ctx) => {
     return res(
@@ -93,7 +93,7 @@ export const okStocks = rest.get(
   }
 )
 
-export const okYears = rest.get(
+export const okYears = http.get(
   "/api/transactions/admin/years",
   (req, res, ctx) => {
     return res(
