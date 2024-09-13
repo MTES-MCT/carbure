@@ -1,4 +1,4 @@
-import { rest } from "msw"
+import { http } from "msw"
 import { OwnershipType } from "carbure/types"
 
 import {
@@ -35,7 +35,7 @@ export function setProductionSites(nextProductionSites: any[]) {
   productionSites = clone(nextProductionSites)
 }
 
-export const okSettings = rest.get("/api/user", (req, res, ctx) => {
+export const okSettings = http.get("/api/user", (req, res, ctx) => {
   const entity = Data.get("entity")
   return res(
     ctx.json({
@@ -55,7 +55,7 @@ export const okSettings = rest.get("/api/user", (req, res, ctx) => {
   )
 })
 
-export const okEmptySettings = rest.get("/api/user", (req, res, ctx) => {
+export const okEmptySettings = http.get("/api/user", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -68,7 +68,7 @@ export const okEmptySettings = rest.get("/api/user", (req, res, ctx) => {
   )
 })
 
-export const okDynamicSettings = rest.get("/api/user", (req, res, ctx) => {
+export const okDynamicSettings = http.get("/api/user", (req, res, ctx) => {
   const entity = Data.get("entity")
 
   return res(
@@ -83,7 +83,7 @@ export const okDynamicSettings = rest.get("/api/user", (req, res, ctx) => {
   )
 })
 
-export const okEnableMac = rest.post(
+export const okEnableMac = http.post(
   "/api/entity/options/release-for-consumption",
   (req, res, ctx) => {
     const entity = Data.get("entity")
@@ -95,7 +95,7 @@ export const okEnableMac = rest.post(
   }
 )
 
-export const okDisableMac = rest.post(
+export const okDisableMac = http.post(
   "/api/entity/options/release-for-consumption",
   (req, res, ctx) => {
     const entity = Data.get("entity")
@@ -107,7 +107,7 @@ export const okDisableMac = rest.post(
   }
 )
 
-export const okEnableTrading = rest.post(
+export const okEnableTrading = http.post(
   "/api/entity/options/trading",
   (req, res, ctx) => {
     const entity = Data.get("entity")
@@ -119,7 +119,7 @@ export const okEnableTrading = rest.post(
   }
 )
 
-export const okDisableTrading = rest.post(
+export const okDisableTrading = http.post(
   "/api/entity/options/trading",
   (req, res, ctx) => {
     const entity = Data.get("entity")
@@ -131,7 +131,7 @@ export const okDisableTrading = rest.post(
   }
 )
 
-export const okDeliverySites = rest.get(
+export const okDeliverySites = http.get(
   "/api/entity/depots",
   (req, res, ctx) => {
     return res(
@@ -143,7 +143,7 @@ export const okDeliverySites = rest.get(
   }
 )
 
-export const okAddDeliverySite = rest.post(
+export const okAddDeliverySite = http.post(
   "/api/entity/depots/add",
   (req, res, ctx) => {
     setDeliverySites([deliverySite])
@@ -151,14 +151,14 @@ export const okAddDeliverySite = rest.post(
   }
 )
 
-export const okCreateNewDeliverySite = rest.post(
+export const okCreateNewDeliverySite = http.post(
   "/entity/depots/create",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success" }))
   }
 )
 
-export const okDeleteDeliverySite = rest.post(
+export const okDeleteDeliverySite = http.post(
   "/api/entity/depots/delete",
   (req, res, ctx) => {
     setDeliverySites([])
@@ -166,7 +166,7 @@ export const okDeleteDeliverySite = rest.post(
   }
 )
 
-export const okProductionSites = rest.get(
+export const okProductionSites = http.get(
   "/api/entity/production-sites",
   (req, res, ctx) => {
     return res(
@@ -178,7 +178,7 @@ export const okProductionSites = rest.get(
   }
 )
 
-export const okAddProductionSite = rest.post(
+export const okAddProductionSite = http.post(
   "/api/entity/production-sites/add",
   (req, res, ctx) => {
     // @ts-ignore Find a way to not use _body
@@ -197,7 +197,7 @@ export const okAddProductionSite = rest.post(
   }
 )
 
-export const okUpdateProductionSite = rest.post(
+export const okUpdateProductionSite = http.post(
   "/api/entity/production-sites/update",
   (req, res, ctx) => {
     // @ts-ignore Find a way to not use _body
@@ -214,7 +214,7 @@ export const okUpdateProductionSite = rest.post(
   }
 )
 
-export const okDeleteProductionSite = rest.post(
+export const okDeleteProductionSite = http.post(
   "/api/entity/production-sites/delete",
   (req, res, ctx) => {
     setProductionSites([])
@@ -222,22 +222,22 @@ export const okDeleteProductionSite = rest.post(
   }
 )
 
-export const okSetBiocarburant = rest.post(
+export const okSetBiocarburant = http.post(
   "/api/entity/production-sites/set-biofuels",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
-export const okSetMatierePremiere = rest.post(
+export const okSetMatierePremiere = http.post(
   "/api/entity/production-sites/set-feedstocks",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
-export const okSetCertificates = rest.post(
+export const okSetCertificates = http.post(
   "/api/entity/production-sites/set-certificates",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
-export const okEntityRights = rest.get(
+export const okEntityRights = http.get(
   "http://localhost/api/entity/users",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: entityRights }))
@@ -250,21 +250,21 @@ export const okInviteUser = mockPostWithResponseData("/entity/users/invite", {
   requests: [],
 })
 
-export const okSelfCertificates = rest.get(
+export const okSelfCertificates = http.get(
   "/api/entity/certificates",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
 )
 
-export const okDoubleCountApplications = rest.get(
+export const okDoubleCountApplications = http.get(
   "/api/double-counting/agreements",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
 )
 
-export const okDoubleCountUploadApplication = rest.post(
+export const okDoubleCountUploadApplication = http.post(
   "/api/v3/doublecount/upload",
   (req, res, ctx) => {
     return res(
@@ -281,7 +281,7 @@ export const okDoubleCountUploadAgreements = mockGetWithResponseData(
   []
 )
 
-export const okDoubleCountUploadDocumentation = rest.post(
+export const okDoubleCountUploadDocumentation = http.post(
   "/api/v3/doublecount/upload-documentation",
   (req, res, ctx) => {
     return res(
@@ -293,7 +293,7 @@ export const okDoubleCountUploadDocumentation = rest.post(
   }
 )
 
-export const koDoubleCountUploadApplication = rest.post(
+export const koDoubleCountUploadApplication = http.post(
   "/api/v3/doublecount/upload",
   (req, res, ctx) => {
     return res(

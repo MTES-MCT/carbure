@@ -1,5 +1,5 @@
 import { producer } from "carbure/__test__/data"
-import { rest } from "msw"
+import { http } from "msw"
 import { setupServer } from "msw/node"
 
 import { Data } from "carbure/__test__/helpers"
@@ -27,7 +27,7 @@ import { Snapshot, LotList } from "transactions/types"
 Data.set("snapshot", data.emptySnapshot)
 Data.set("lots", data.lots)
 
-export const okSnapshot = rest.get(
+export const okSnapshot = http.get(
   "/api/transactions/snapshot",
   (req, res, ctx) => {
     return res(
@@ -39,7 +39,7 @@ export const okSnapshot = rest.get(
   }
 )
 
-export const okLots = rest.get("/api/transactions/lots", (req, res, ctx) => {
+export const okLots = http.get("/api/transactions/lots", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -48,7 +48,7 @@ export const okLots = rest.get("/api/transactions/lots", (req, res, ctx) => {
   )
 })
 
-export const okYears = rest.get("/api/transactions/years", (req, res, ctx) => {
+export const okYears = http.get("/api/transactions/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -57,7 +57,7 @@ export const okYears = rest.get("/api/transactions/years", (req, res, ctx) => {
   )
 })
 
-export const okDeclarations = rest.get(
+export const okDeclarations = http.get(
   "/api/transactions/declarations",
   (req, res, ctx) => {
     return res(
@@ -86,7 +86,7 @@ export const okDeclarations = rest.get(
   }
 )
 
-export const okFilters = rest.get(
+export const okFilters = http.get(
   "/api/transactions/lots/filters",
   (req, res, ctx) => {
     return res(
@@ -98,7 +98,7 @@ export const okFilters = rest.get(
   }
 )
 
-export const okSummary = rest.get(
+export const okSummary = http.get(
   "/api/transactions/lots/summary",
   (req, res, ctx) => {
     return res(
@@ -110,7 +110,7 @@ export const okSummary = rest.get(
   }
 )
 
-export const okSendLot = rest.post(
+export const okSendLot = http.post(
   "/api/transactions/lots/send",
   (req, res, ctx) => {
     Data.set("lots", (lots: LotList) => {

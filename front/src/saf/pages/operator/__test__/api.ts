@@ -1,9 +1,9 @@
-import { rest } from "msw"
+import { http } from "msw"
 import { setupServer } from "msw/node"
 import { okSettings } from "settings/__test__/api"
 import * as data from "./data"
 
-export const okYears = rest.get("/api/saf/operator/years", (req, res, ctx) => {
+export const okYears = http.get("/api/saf/operator/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -12,7 +12,7 @@ export const okYears = rest.get("/api/saf/operator/years", (req, res, ctx) => {
   )
 })
 
-export const okSnapshot = rest.get(
+export const okSnapshot = http.get(
   "/api/saf/operator/snapshot",
   (req, res, ctx) => {
     return res(
@@ -24,7 +24,7 @@ export const okSnapshot = rest.get(
   }
 )
 
-export const okFilter = rest.get(
+export const okFilter = http.get(
   "/api/saf/operator/ticket-sources/filters",
   (req, res, ctx) => {
     return res(
@@ -36,7 +36,7 @@ export const okFilter = rest.get(
   }
 )
 
-export const okSafTicketSources = rest.get(
+export const okSafTicketSources = http.get(
   "/api/saf/operator/ticket-sources",
   (req, res, ctx) => {
     return res(
@@ -48,7 +48,7 @@ export const okSafTicketSources = rest.get(
   }
 )
 
-export const okSafTickets = rest.get(
+export const okSafTickets = http.get(
   "/api/saf/operator/tickets",
   (req, res, ctx) => {
     return res(
