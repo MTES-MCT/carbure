@@ -167,9 +167,6 @@ export const ApplicationDetailsDialog = () => {
           </main>
 
           <footer>
-            {/* {application &&
-            <ApplicationDownloadButton application={application} />
-          } */}
             {!applicationResponse.loading && (
               <>
                 {isAdmin && (
