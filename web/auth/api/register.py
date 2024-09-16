@@ -1,7 +1,6 @@
 from authtools.forms import UserCreationForm
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -10,6 +9,7 @@ from django_otp.plugins.otp_email.models import EmailDevice
 from auth.tokens import account_activation_token
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
+from core.helpers import send_mail
 
 
 def register(request):
@@ -42,6 +42,7 @@ def send_email(user, request, subject, email_type="account_activation_email", ex
     html_message = loader.render_to_string(f"emails/{email_type}.html", email_context)
     text_message = loader.render_to_string(f"emails/{email_type}.txt", email_context)
     send_mail(
+        request=request,
         subject=email_subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,

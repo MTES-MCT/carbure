@@ -2,12 +2,12 @@ from datetime import datetime
 
 from django import forms
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db import transaction
 
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import otp_or_403
+from core.helpers import send_mail
 from core.models import Entity, EntityCertificate, GenericCertificate, Pays, UserRightsRequests
 from core.utils import CarbureEnv
 
@@ -94,18 +94,18 @@ def add_company(request, *args, **kwargs):
         # add right request
         UserRightsRequests.objects.create(user=request.user, entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
 
-        send_email_to_user(entity, request.user)
-        send_email_to_dgec(entity, request.user)
+        send_email_to_user(entity, request)
+        send_email_to_dgec(entity, request)
 
         return SuccessResponse()
 
 
-def send_email_to_user(entity, user):
+def send_email_to_user(entity, request):
     # send email to user
     today = datetime.now().strftime("%d/%m/%Y")
     subject = "Demande d'inscription de société enregistrée"
     subject = subject if CarbureEnv.is_prod else "TEST " + subject
-    recipient_list = [user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
+    recipient_list = [request.user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
     text_message = f"""
     Bonjour,
 
@@ -117,6 +117,7 @@ def send_email_to_user(entity, user):
     """
 
     send_mail(
+        request=request,
         subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
@@ -125,7 +126,7 @@ def send_email_to_user(entity, user):
     )
 
 
-def send_email_to_dgec(entity, user):
+def send_email_to_dgec(entity, request):
     today = datetime.now().strftime("%d/%m/%Y")
     subject = "Demande d'inscription de la société " + entity.name
     subject = subject if CarbureEnv.is_prod else "TEST " + subject
@@ -135,7 +136,7 @@ def send_email_to_dgec(entity, user):
     text_message = f"""
     Bonjour,
 
-    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {user.email}.
+    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {request.user.email}.
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
 
     1 - Visualisez la liste des sociétés à valider sur ce lien : {admin_link}.
@@ -146,6 +147,7 @@ def send_email_to_dgec(entity, user):
     Bonne journée
     """
     send_mail(
+        request=request,
         subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,

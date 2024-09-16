@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db import transaction
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
@@ -8,6 +7,7 @@ from django.views.decorators.http import require_POST
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.helpers import send_mail
 from core.models import Entity
 from core.utils import CarbureEnv
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
@@ -104,7 +104,7 @@ def accept_report(request: HttpRequest, entity: Entity):
     return SuccessResponse(data)
 
 
-def send_email_to_dgec(audit_sample: ElecAuditSample):
+def send_email_to_dgec(audit_sample: ElecAuditSample, request: HttpRequest):
     auditor = audit_sample.auditor.name
     cpo = audit_sample.cpo.name
     year = audit_sample.created_at.year
@@ -131,6 +131,7 @@ def send_email_to_dgec(audit_sample: ElecAuditSample):
     """  # noqa: E501
 
     send_mail(
+        request=request,
         subject="[CarbuRe] Nouveau résultat d'audit élec disponible",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,

@@ -1,8 +1,8 @@
 from django.conf import settings
-from django.core.mail import send_mail
 from django.http import JsonResponse
 
 from core.decorators import otp_or_403
+from core.helpers import send_mail
 from core.models import Entity, UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
@@ -59,6 +59,7 @@ def request_entity_access(request):
         recipient_list.append("carbure@beta.gouv.fr")
 
         send_mail(
+            request=request,
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,

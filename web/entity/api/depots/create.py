@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.helpers import send_mail
 from core.models import UserRights
 from core.utils import CarbureEnv
 from entity.serializers.depot import DepotSerializer
@@ -26,8 +26,8 @@ def create_depot(request, entity, entity_id):
     depot.gps_coordinates = get_gps_coordinates(depot)
     depot.save()
 
-    send_email_to_user(entity, depot.name, request.user)
-    send_email_to_dgec(entity, depot.name, request.user)
+    send_email_to_user(entity, depot.name, request)
+    send_email_to_dgec(entity, depot.name, request)
 
     return SuccessResponse()
 
@@ -38,9 +38,9 @@ def get_gps_coordinates(depot):
     return f"{xy[0]},{xy[1]}" if xy else None
 
 
-def send_email_to_user(entity, depot_name, user):
+def send_email_to_user(entity, depot_name, request):
     today = datetime.now().strftime("%d/%m/%Y")
-    recipient_list = [user.email]
+    recipient_list = [request.user.email]
     text_message = f"""
     Bonjour,
 
@@ -52,6 +52,7 @@ def send_email_to_user(entity, depot_name, user):
     """  # noqa: E501
 
     send_mail(
+        request=request,
         subject="[CarbuRe][Demande d’ajout de dépôt enregistrée]",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
@@ -60,14 +61,14 @@ def send_email_to_user(entity, depot_name, user):
     )
 
 
-def send_email_to_dgec(entity, depot_name, user):
+def send_email_to_dgec(entity, depot_name, request):
     today = datetime.now().strftime("%d/%m/%Y")
     recipient_list = ["carbure@beta.gouv.fr"]
     admin_link = f"{CarbureEnv.get_base_url()}/admin/core/depot/?is_enabled=False"
     text_message = f"""
     Bonjour,
 
-    Une demande de création de dépôt {depot_name} pour la société {entity.name} a été déposé le {today} par l’utilisateur {user.email}.
+    Une demande de création de dépôt {depot_name} pour la société {entity.name} a été déposé le {today} par l’utilisateur {request.user.email}.
 
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
 
@@ -80,6 +81,7 @@ def send_email_to_dgec(entity, depot_name, user):
     CarbuRe
     """  # noqa: E501
     send_mail(
+        request=request,
         subject="[CarbuRe][Nouvelle demande d’ajout de dépôt enregistrée]",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
