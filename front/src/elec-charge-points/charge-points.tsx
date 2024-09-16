@@ -27,7 +27,7 @@ const ChargePoints = () => {
   const years = useYears("charge-points", api.getYears)
   const snapshotResponse = useQuery(api.getChargePointsSnapshot, {
     key: "charge-points-snapshot",
-    params: [entity.id, years.selected],
+    params: [entity.id],
   })
 
   const snapshot = snapshotResponse.result?.data.data ?? defaultSnapshot
@@ -37,16 +37,6 @@ const ChargePoints = () => {
       <header>
         <section>
           <h1>{t("Points de recharge")}</h1>
-
-          <Select
-            loading={years.loading}
-            variant="inline"
-            placeholder={t("Choisir une année")}
-            value={years.selected}
-            onChange={years.setYear}
-            options={years.options}
-            sort={(year) => -year.value}
-          />
         </section>
 
         <section>
