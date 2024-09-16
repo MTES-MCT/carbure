@@ -89,7 +89,7 @@ export function downloadDoubleCountingApplication(
   return download("/double-counting/admin/applications/export", {
     entity_id,
     dca_id,
-    industrial_wastes,
+    ...(industrial_wastes ? { di: industrial_wastes } : {}),
   })
 }
 

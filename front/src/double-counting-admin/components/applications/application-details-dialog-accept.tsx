@@ -6,6 +6,7 @@ import { Input } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { PortalInstance } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
+import { hasIndustrialWastes } from "double-counting-admin/utils"
 import { DoubleCountingApplicationDetails } from "double-counting/types"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -27,7 +28,6 @@ const ApplicationDetailsDialogAccept = ({
   const notify = useNotify()
   const navigate = useNavigate()
   const entity = useEntity()
-
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
     invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
     onSuccess: () => {
@@ -37,7 +37,8 @@ const ApplicationDetailsDialogAccept = ({
         industrialWastes
       )
       notify(t("La décision a bien été générée."), { variant: "success" })
-      //navigate("/org/9/double-counting/agreements")
+      onChangeIndustrialWastes("")
+      navigate("/org/9/double-counting/agreements")
     },
   })
 
@@ -47,34 +48,31 @@ const ApplicationDetailsDialogAccept = ({
       title={t("Accepter la demande d'agrément")}
       description={
         <>
-          {
-            // @ts-ignore
-            application.has_dechets_industriels && (
-              <div style={{ marginBottom: "8px" }}>
-                <Alert
-                  variant="info"
-                  icon={AlertTriangle}
-                  style={{ marginBottom: "8px" }}
-                >
-                  <p>
-                    {t(
-                      "La demande d’agrément du producteur comporte des déchets industriels. Afin de les incorporer dans la décision, veuillez les noter ci-dessous."
-                    )}
-                  </p>
-                </Alert>
-                <Input
-                  value={industrialWastes}
-                  onChange={(e) => onChangeIndustrialWastes(e.target.value)}
-                  label={t(
-                    "Lister ici les déchets industriels - séparés par une virgule :"
+          {hasIndustrialWastes(application) && (
+            <div style={{ marginBottom: "8px" }}>
+              <Alert
+                variant="info"
+                icon={AlertTriangle}
+                style={{ marginBottom: "8px" }}
+              >
+                <p>
+                  {t(
+                    "La demande d’agrément du producteur comporte des déchets industriels. Afin de les incorporer dans la décision, veuillez les noter ci-dessous."
                   )}
-                  placeholder={t(
-                    "Ex: huile de blanchiment, huile acide contaminée par du souffre"
-                  )}
-                />
-              </div>
-            )
-          }
+                </p>
+              </Alert>
+              <Input
+                value={industrialWastes}
+                onChange={(e) => onChangeIndustrialWastes(e.target.value)}
+                label={t(
+                  "Lister ici les déchets industriels - séparés par une virgule :"
+                )}
+                placeholder={t(
+                  "Ex: huile de blanchiment, huile acide contaminée par du souffre"
+                )}
+              />
+            </div>
+          )}
           <p>
             {t(
               "Voulez-vous vraiment accepter cette demande d'agrément double comptage ?"
