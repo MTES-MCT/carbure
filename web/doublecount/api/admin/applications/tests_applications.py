@@ -282,19 +282,19 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert application.status != DoubleCountingApplication.ACCEPTED
 
         # Malformed params
-        response = self.client.post(reverse("admin-double-counting-application-export"), {"entity_id": self.admin.id})
+        response = self.client.get(reverse("admin-double-counting-application-export"), {"entity_id": self.admin.id})
         assert response.status_code == 400
         assert response.json()["error"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
 
         # Application not found
-        response = self.client.post(
+        response = self.client.get(
             reverse("admin-double-counting-application-export"), {"dca_id": application.id + 200, "entity_id": self.admin.id}
         )
         assert response.status_code == 400
         assert response.json()["error"] == DoubleCountingApplicationExportError.APPLICATION_NOT_FOUND
 
         # Application not accepted
-        response = self.client.post(
+        response = self.client.get(
             reverse("admin-double-counting-application-export"), {"dca_id": application.id, "entity_id": self.admin.id}
         )
         assert response.status_code == 400
@@ -306,7 +306,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert application.status == DoubleCountingApplication.ACCEPTED
 
         # Di without di in application
-        response = self.client.post(
+        response = self.client.get(
             reverse("admin-double-counting-application-export"),
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
@@ -315,7 +315,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         # Export without di
         assert not check_has_dechets_industriels(application)
-        response = self.client.post(
+        response = self.client.get(
             reverse("admin-double-counting-application-export"), {"dca_id": application.id, "entity_id": self.admin.id}
         )
         assert response.status_code == 200
@@ -365,7 +365,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         assert check_has_dechets_industriels(application)
 
-        response = self.client.post(
+        response = self.client.get(
             reverse("admin-double-counting-application-export"),
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
