@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom"
 import * as api from "../../api"
 
 type ApplicationDetailsDialogAcceptProps = {
-  application?: DoubleCountingApplicationDetails
+  application: DoubleCountingApplicationDetails
   onClose: PortalInstance["close"]
   onChangeIndustrialWastes: (value: string) => void
   industrialWastes: string
@@ -31,10 +31,13 @@ const ApplicationDetailsDialogAccept = ({
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
     invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
     onSuccess: () => {
-      //navigate("/org/9/double-counting/agreements")
+      api.downloadDoubleCountingApplication(
+        entity.id,
+        application.id,
+        industrialWastes
+      )
       notify(t("La décision a bien été générée."), { variant: "success" })
-
-      // TODO download file
+      //navigate("/org/9/double-counting/agreements")
     },
   })
 
@@ -90,11 +93,7 @@ const ApplicationDetailsDialogAccept = ({
       onClose={onClose}
       onConfirm={async () => {
         if (application) {
-          await approveApplication.execute(
-            entity.id,
-            application.id,
-            industrialWastes
-          )
+          await approveApplication.execute(entity.id, application.id)
         }
       }}
     />
