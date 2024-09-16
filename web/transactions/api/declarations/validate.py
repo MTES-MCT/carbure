@@ -105,6 +105,6 @@ def validate_declaration(request, *args, **kwargs):
 
         # Send confirmation email and notification
         notify_declaration_validated(declaration)
-        send_email_declaration_validated(declaration)
+        send_email_declaration_validated(declaration, request)
 
     return SuccessResponse()
