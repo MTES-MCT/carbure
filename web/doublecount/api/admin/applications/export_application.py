@@ -92,8 +92,8 @@ def check_has_dechets_industriels(application):
 
 @check_admin_rights()
 def export_dca(request):
-    application_id = request.POST.get("dca_id", False)
-    dechets_industriels = request.POST.get("di", "")
+    application_id = request.GET.get("dca_id", False)
+    dechets_industriels = request.GET.get("di", "")
 
     if not application_id:
         return ErrorResponse(400, DoubleCountingApplicationExportError.MALFORMED_PARAMS)
