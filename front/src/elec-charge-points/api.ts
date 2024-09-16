@@ -7,8 +7,8 @@ export function getYears(entity_id: number) {
   })
 }
 
-export function getChargePointsSnapshot(entity_id: number, year: number) {
+export function getChargePointsSnapshot(entity_id: number) {
   return api.get<Api<ChargePointsSnapshot>>("/elec/cpo/charge-point-snapshot", {
-    params: { entity_id, year, category: "charge_point" },
+    params: { entity_id, category: "charge_point" },
   })
 }

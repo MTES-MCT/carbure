@@ -27,6 +27,7 @@ class ElecSnapshotForm(forms.Form):
     station_id = forms.CharField(required=False)
     latest_meter_reading_month = forms.IntegerField(required=False)
     is_article_2 = forms.BooleanField(required=False)
+    search = forms.CharField(required=False)
 
 
 @require_GET
