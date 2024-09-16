@@ -81,15 +81,25 @@ export function approveDoubleCountingQuotas(
   )
 }
 
-export function approveDoubleCountingApplication(
+export function downloadDoubleCountingApplication(
   entity_id: number | undefined,
   dca_id: number,
   industrial_wastes?: string
 ) {
-  return api.post("/double-counting/admin/applications/approve", {
+  return download("/double-counting/admin/applications/export", {
     entity_id,
     dca_id,
     industrial_wastes,
+  })
+}
+
+export function approveDoubleCountingApplication(
+  entity_id: number | undefined,
+  dca_id: number
+) {
+  return api.post("/double-counting/admin/applications/approve", {
+    entity_id,
+    dca_id,
   })
 }
 

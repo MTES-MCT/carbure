@@ -139,6 +139,10 @@ export const ApplicationDetailsDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
+  if (!application) {
+    return null
+  }
+
   return (
     <>
       <Portal onClose={closeDialog}>
