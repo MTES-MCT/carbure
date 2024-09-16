@@ -64,7 +64,7 @@ class EntityAdmin(admin.ModelAdmin):
 
     def enable_entity(self, request, queryset):
         for entity in queryset:
-            enable_entity(entity)
+            enable_entity(entity, request)
 
     enable_entity.short_description = "Activer les sociétés sélectionnées"
 
@@ -140,7 +140,7 @@ class DepotAdmin(admin.ModelAdmin):
 
     def enable_depot(self, request, queryset):
         for depot in queryset:
-            response = enable_depot.enable_depot(depot)
+            response = enable_depot.enable_depot(depot, request)
             messages.add_message(request, messages.SUCCESS, response)
 
     enable_depot.short_description = "Valider les dépôts sélectionnés"

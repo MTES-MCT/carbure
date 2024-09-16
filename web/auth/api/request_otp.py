@@ -2,13 +2,13 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.template import loader
 from django.utils import timezone
 from django_otp import user_has_device
 from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.common import SuccessResponse
+from core.helpers import send_mail
 
 
 @login_required
@@ -48,6 +48,7 @@ def send_new_token(request):
     html_message = loader.render_to_string("emails/otp_token_email.html", email_context)
     text_message = loader.render_to_string("emails/otp_token_email.txt", email_context)
     send_mail(
+        request=request,
         subject=email_subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,

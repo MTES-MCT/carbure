@@ -1,11 +1,11 @@
 from django.conf import settings
-from django.core.mail import send_mail
 
+from core.helpers import send_mail
 from core.models import UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
 
-def enable_entity(entity):
+def enable_entity(entity, request):
     # get entity admin
     try:
         right_request = UserRightsRequests.objects.get(entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
@@ -45,6 +45,7 @@ def enable_entity(entity):
     """  # noqa: E501
 
     send_mail(
+        request=request,
         subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,

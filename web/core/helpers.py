@@ -5,6 +5,7 @@ from multiprocessing.context import Process
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F, OuterRef, Subquery
@@ -915,6 +916,22 @@ def send_email_declaration_invalidated(declaration):
         to=recipients,
     )
     msg.send()
+
+
+def send_mail(request, subject, message, from_email, recipient_list, **kwargs):
+    if not CarbureEnv.is_prod:
+        if request.user.is_authenticated:
+            if request.user.email in recipient_list:
+                recipient_list = [request.user.email]
+            else:
+                recipient_list = ["carbure@beta.gouv.fr"]
+        else:
+            # If user not authenticated, we are in registration process we keep recipient_list
+            pass
+
+        subject = f"[TEST] {subject}"
+
+    mail.send_mail(subject, message, from_email, recipient_list, **kwargs)
 
 
 def get_lots_summary_data(lots, entity, short=False):

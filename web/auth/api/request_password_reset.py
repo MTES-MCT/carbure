@@ -2,13 +2,13 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
+from core.helpers import send_mail
 
 
 def request_password_reset(request):
@@ -32,6 +32,7 @@ def request_password_reset(request):
     html_message = loader.render_to_string("emails/password_reset_email.html", email_context)
     text_message = loader.render_to_string("emails/password_reset_email.txt", email_context)
     send_mail(
+        request=request,
         subject=email_subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
