@@ -6,6 +6,7 @@ from django.db.models import Sum
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from docx import Document
+from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt
 
@@ -27,6 +28,19 @@ def set_bold_text(paragraph, text):
     paragraph.clear()
     run = paragraph.add_run(text)
     run.bold = True
+
+
+def set_cell_border(cell, border_color="000000", border_size="4"):
+    tc_pr = cell._element.get_or_add_tcPr()
+    borders = OxmlElement("w:tcBorders")
+    for border_name in ["top", "bottom", "left", "right"]:
+        border = OxmlElement(f"w:{border_name}")
+        border.set(qn("w:val"), "single")
+        border.set(qn("w:sz"), border_size)
+        border.set(qn("w:space"), "0")
+        border.set(qn("w:color"), border_color)
+        borders.append(border)
+    tc_pr.append(borders)
 
 
 class DoubleCountingApplicationExportError:
@@ -186,6 +200,7 @@ def export_dca(request):
 
         for c in cell:
             set_font(c.paragraphs[0])
+            set_cell_border(c)
 
     # Content
     for paragraph in doc.paragraphs:
