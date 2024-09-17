@@ -6,12 +6,27 @@ from django.db.models import Sum
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from docx import Document
+from docx.oxml.ns import qn
+from docx.shared import Pt
 
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights
 from doublecount.models import (
     DoubleCountingApplication,
 )
+
+
+def set_font(paragraph, font_name="Times New Roman", font_size=12):
+    for run in paragraph.runs:
+        run.font.name = font_name
+        run._element.rPr.rFonts.set(qn("w:eastAsia"), font_name)
+        run.font.size = Pt(font_size)
+
+
+def set_bold_text(paragraph, text):
+    paragraph.clear()
+    run = paragraph.add_run(text)
+    run.bold = True
 
 
 class DoubleCountingApplicationExportError:
@@ -158,6 +173,9 @@ def export_dca(request):
     cell[2].text = to_word.get(WordKey.YEAR_N)
     cell[3].text = to_word.get(WordKey.YEAR_N_1)
 
+    for cell in table.rows[0].cells:
+        set_font(cell.paragraphs[0])
+
     # ... row
     for item in table_data:
         cell = table.add_row().cells
@@ -166,11 +184,16 @@ def export_dca(request):
         cell[2].text = str(item.get("approved_quota_year_n"))
         cell[3].text = str(item.get("approved_quota_year_n_1"))
 
+        for c in cell:
+            set_font(c.paragraphs[0])
+
     # Content
     for paragraph in doc.paragraphs:
         for k, v in to_word.items():
             if k in paragraph.text:
                 paragraph.text = paragraph.text.replace(k, v)
+
+        set_font(paragraph)
 
     # Footer
     section = doc.sections[0]
@@ -179,6 +202,8 @@ def export_dca(request):
         for k, v in to_word.items():
             if k in paragraph.text:
                 paragraph.text = paragraph.text.replace(k, v)
+
+        set_font(paragraph)
 
     # Articles
     found_first_article_3 = False
@@ -198,11 +223,14 @@ def export_dca(request):
                     found_first_article_3 = True
                     i += 1
                 else:
-                    paragraph.text = f"Article {current_article_number}"
+                    set_bold_text(paragraph, f"Article {current_article_number}")
                     current_article_number += 1
             else:
-                paragraph.text = f"Article {current_article_number}"
+                set_bold_text(paragraph, f"Article {current_article_number}")
                 current_article_number += 1
+
+        set_font(paragraph)
+
         i += 1
 
     response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
