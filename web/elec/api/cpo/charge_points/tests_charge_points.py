@@ -701,7 +701,7 @@ class ElecCharginPointsTest(TestCase):
         # With latest_meter_reading_month filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_meter_reading_month": 8},
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": "08/2024"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -709,7 +709,7 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_meter_reading_month": 9},
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": "09/2024"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -717,7 +717,7 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_meter_reading_month": 0},
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": "null"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -815,7 +815,7 @@ class ElecCharginPointsTest(TestCase):
                 "mid_id": "123-456",
                 "measure_date": "2023-06-29",
                 "measure_energy": 1000.123,
-                "latest_extracted_energy": 40,
+                "latest_meter_reading_date": "2024-09-30",
                 "is_article_2": False,
                 "measure_reference_point_id": "123456",
                 "station_name": "Station",
@@ -826,7 +826,6 @@ class ElecCharginPointsTest(TestCase):
                 "status": "PENDING",
             },
         }
-
         data = response.json()
         assert response.status_code == 200
         assert data == expected
