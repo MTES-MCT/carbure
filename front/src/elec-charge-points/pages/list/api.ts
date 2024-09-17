@@ -1,5 +1,6 @@
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 import api, { Api, download } from "common/services/api"
+import { selectionOrQuery } from "common/utils/pagination"
 import { ChargePointsListData, ChargePointsListQuery } from "./types"
 
 export function getChargePointsList(query: ChargePointsListQuery) {
@@ -16,17 +17,9 @@ export function getChargePointsFilters(
 
   return api
     .get<
-      Api<{ filter_values: string[] }>
+      Api<{ filter_values: (string | boolean)[] }>
     >("/elec/cpo/charge-points/filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
-}
-
-export function selectionOrQuery(
-  query: Partial<ChargePointsListQuery>,
-  selection?: number[]
-) {
-  if (!selection || selection.length === 0) return query
-  else return { entity_id: query.entity_id, selection }
 }
 
 export function downloadChargePointsList(
