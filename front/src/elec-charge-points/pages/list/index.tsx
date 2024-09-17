@@ -6,6 +6,7 @@ import { SearchInput } from "common/components/input"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { HashRoute } from "common/components/hash-route"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
@@ -14,11 +15,13 @@ import FilterMultiSelect from "common/molecules/filter-select"
 import { ChargePointsSnapshot } from "elec-charge-points/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { useLocation } from "react-router-dom"
 import * as api from "./api"
 import { useGetFilterOptions, useStatus } from "./index.hooks"
 import { StatusSwitcher } from "./status-switcher"
-import { ChargePointsListTable } from "./table"
+import { ChargePointsListTable, ChargePointsListTableProps } from "./table"
 import { ChargePointFilter } from "./types"
+import { UpdateChargePointDialog } from "./[id]/update"
 
 type ChargePointsListProps = {
   year: number
@@ -29,6 +32,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
   const status = useStatus()
+  const location = useLocation()
 
   // Check snapshot is useless (used anywhere)
   const [state, actions] = useCBQueryParamsStore(
@@ -64,6 +68,14 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   const downloadChargePointsList = () => {
     api.downloadChargePointsList(query, chargePointsListPagination?.ids || [])
   }
+
+  const openUpdateChargePointModal: ChargePointsListTableProps["rowLink"] = (
+    chargePoint
+  ) => ({
+    pathname: location.pathname,
+    search: location.search,
+    hash: `charge-point/${chargePoint.id}`,
+  })
 
   return (
     <>
@@ -106,6 +118,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
               order={state.order}
               onSelect={actions.setSelection}
               selected={state.selection}
+              rowLink={openUpdateChargePointModal}
             />
             <Pagination
               page={state.page}
@@ -132,6 +145,10 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
           </>
         )}
       </section>
+      <HashRoute
+        path="charge-point/:id"
+        element={<UpdateChargePointDialog />}
+      />
     </>
   )
 }
