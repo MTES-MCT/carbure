@@ -50,5 +50,4 @@ def enable_entity(entity, request):
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
-        fail_silently=False,
     )

@@ -58,5 +58,5 @@ def approve_dca(request, *args, **kwargs):
         except Exception:
             return ErrorResponse(400, "Error while creating Agreement")
 
-    # send_dca_status_email(application) TODO: uncomment when email is ready
+    # send_dca_status_email(application, request) TODO: uncomment when email is ready
     return SuccessResponse()

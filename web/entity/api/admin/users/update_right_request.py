@@ -45,7 +45,6 @@ def update_right_request(request):
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipient_list,
-            fail_silently=False,
         )
     else:
         UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()

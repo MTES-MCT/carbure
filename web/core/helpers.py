@@ -4,7 +4,7 @@ from multiprocessing.context import Process
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core import mail
+from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F, OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
@@ -870,7 +870,6 @@ def send_email_declaration_validated(declaration, request):
         message=text_message % (period),
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipients,
-        fail_silently=False,
     )
 
 
@@ -901,12 +900,11 @@ def send_email_declaration_invalidated(declaration, request):
         message=text_message % (period),
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipients,
-        fail_silently=False,
     )
 
 
-def send_mail(request, subject, message, from_email, recipient_list, **kwargs):
-    if not CarbureEnv.is_prod:
+def send_mail(request, subject, message, from_email, recipient_list, html_message=None, **kwargs):
+    if not CarbureEnv.is_prod and not CarbureEnv.is_local:
         if request.user.is_authenticated:
             if request.user.email in recipient_list:
                 recipient_list = [request.user.email]
@@ -917,8 +915,14 @@ def send_mail(request, subject, message, from_email, recipient_list, **kwargs):
             pass
 
         subject = f"[TEST] {subject}"
+        kwargs["cc"] = None
 
-    mail.send_mail(subject, message, from_email, recipient_list, **kwargs)
+    email = EmailMultiAlternatives(subject, message, from_email, recipient_list, **kwargs)
+
+    if html_message:
+        email.attach_alternative(html_message, "text/html")
+
+    email.send(fail_silently=False)
 
 
 def get_lots_summary_data(lots, entity, short=False):

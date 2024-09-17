@@ -37,7 +37,6 @@ def request_activation_link(request):
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 html_message=html_message,
                 recipient_list=[user.email],
-                fail_silently=False,
             )
             # return JsonResponse({'status': 'success'})
             return SuccessResponse()

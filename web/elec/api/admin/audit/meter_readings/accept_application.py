@@ -117,5 +117,4 @@ def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpReq
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=["carbure@beta.gouv.fr"],
-        fail_silently=False,
     )
