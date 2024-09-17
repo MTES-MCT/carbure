@@ -7,7 +7,7 @@ import * as api from "./api"
 import { CBQueryParams } from "common/hooks/query-builder"
 
 export const useStatus = () => {
-  const matchStatus = useMatch("/org/:entity/charge-points/:year/list/:status")
+  const matchStatus = useMatch("/org/:entity/charge-points/list/:status")
 
   const status =
     (matchStatus?.params?.status?.toUpperCase() as ChargePointStatus) ||
