@@ -42,7 +42,7 @@ class WordKey:
     OPERATOR_NAME = "«Nom_Opérateur»"
     ADDRESS = "«Adresse»"
     POSTAL_CODE = "«Code_Postal»"
-    SITE_ID = "«Numéro_valide»"
+    CERTIFICATE_ID = "«Numéro_valide»"
     YEAR_N = "«Année n»"
     YEAR_N_1 = "«Année n+1»"
     ID = "«ID»"
@@ -63,7 +63,7 @@ def application_to_json(application, dechets_industriels="-"):
         "city": application.production_site.city,
         "country": application.production_site.country.name,
         "name": application.production_site.name,
-        "site_id": application.production_site.site_id,
+        "certificate_id": application.certificate_id,
         "addresse": application.production_site.address,
         "postal_code": str(application.production_site.postal_code),
         "year_n": str(application.period_start.year),
@@ -81,7 +81,7 @@ def format_to_word(data):
         WordKey.OPERATOR_NAME: data.get("name"),
         WordKey.ADDRESS: data.get("addresse"),
         WordKey.POSTAL_CODE: data.get("postal_code"),
-        WordKey.SITE_ID: data.get("site_id"),
+        WordKey.CERTIFICATE_ID: data.get("certificate_id"),
         WordKey.YEAR_N: data.get("year_n"),
         WordKey.YEAR_N_1: data.get("year_n_1"),
         WordKey.ID: data.get("id"),
