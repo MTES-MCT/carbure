@@ -1,5 +1,4 @@
 import datetime
-import os
 import re
 import traceback
 import unicodedata
@@ -7,13 +6,13 @@ from typing import List
 
 import pandas as pd
 from django.conf import settings
-from django.core.mail import EmailMessage
 from django.db import transaction
 from django.db.models.aggregates import Count, Sum
 from django.http import JsonResponse
 
 from certificates.models import DoubleCountingRegistration
 from core.common import CarbureException
+from core.helpers import send_mail
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays, UserRights
 from doublecount.dc_sanity_checks import (
     check_dc_globally,
@@ -41,7 +40,7 @@ from producers.models import ProductionSite
 today = datetime.date.today()
 
 
-def send_dca_confirmation_email(dca):
+def send_dca_confirmation_email(dca, request):
     text_message = """
     Bonjour,
 
@@ -51,24 +50,23 @@ def send_dca_confirmation_email(dca):
     L'équipe CarbuRe
     """
     email_subject = "Carbure - Dossier Double Comptage"
-    cc = None
-    if os.getenv("IMAGE_TAG", "dev") != "prod":
-        # send only to staff / superuser
-        recipients = ["carbure@beta.gouv.fr"]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
-        ]
-        cc = "carbure@beta.gouv.fr"
 
-    email = EmailMessage(
-        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+            role__in=[UserRights.AUDITOR, UserRights.RO]
+        )
+    ]
+    cc = ["carbure@beta.gouv.fr"]
+
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        bcc=cc,
     )
-    email.send(fail_silently=False)
 
 
 def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[SourcingRow]):
@@ -427,7 +425,7 @@ def get_lot_dc_agreement(feedstock, delivery_date, production_site):
     return dc_certificate
 
 
-def send_dca_status_email(dca):
+def send_dca_status_email(dca, request):
     if dca.status == DoubleCountingApplication.ACCEPTED:
         text_message = """
         Bonjour,
@@ -449,24 +447,26 @@ def send_dca_status_email(dca):
     else:
         # no mail to send
         return
+
     email_subject = "Carbure - Dossier Double Comptage"
-    cc = None
-    if os.getenv("IMAGE_TAG", "dev") != "prod":
-        # send only to staff / superuser
-        recipients = ["carbure@beta.gouv.fr"]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
-        ]
-        cc = "carbure@beta.gouv.fr"
-    email = EmailMessage(
-        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
+
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+            role__in=[UserRights.AUDITOR, UserRights.RO]
+        )
+    ]
+
+    cc = ["carbure@beta.gouv.fr"]
+
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        bcc=cc,
     )
-    email.send(fail_silently=False)
 
 
 def get_quotas(year: int, producer_id: int = None):
