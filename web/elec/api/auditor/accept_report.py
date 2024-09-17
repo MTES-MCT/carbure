@@ -100,7 +100,7 @@ def accept_report(request: HttpRequest, entity: Entity):
         data["error_count"] = 1
         return ErrorResponse(400, AcceptReportError.NO_CHARGE_POINT_DETECTED, data)
 
-    send_email_to_dgec(audit_sample)
+    send_email_to_dgec(audit_sample, request)
     return SuccessResponse(data)
 
 
