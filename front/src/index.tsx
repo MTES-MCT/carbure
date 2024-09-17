@@ -8,6 +8,7 @@ import "./carbure/assets/css/index.css"
 import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
+import { SentryProvider } from "./sentry"
 
 async function enableMocking() {
   if (process.env.NODE_ENV === "development") {
@@ -22,14 +23,16 @@ async function enableMocking() {
 
 enableMocking().then(() =>
   createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-      <BrowserRouter>
-        <MatomoProvider>
-          <Suspense fallback={<LoaderOverlay />}>
-            <Carbure />
-          </Suspense>
-        </MatomoProvider>
-      </BrowserRouter>
-    </React.StrictMode>
+    <SentryProvider>
+      <React.StrictMode>
+        <BrowserRouter>
+          <MatomoProvider>
+            <Suspense fallback={<LoaderOverlay />}>
+              <Carbure />
+            </Suspense>
+          </MatomoProvider>
+        </BrowserRouter>
+      </React.StrictMode>
+    </SentryProvider>
   )
 )
