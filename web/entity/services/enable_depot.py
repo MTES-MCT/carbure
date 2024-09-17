@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.core.mail import send_mail
 
+from core.helpers import send_mail
 from core.models import UserRights
 from core.utils import CarbureEnv
 
 
-def enable_depot(depot):
+def enable_depot(depot, request):
     if depot.is_enabled:
         return f"Le dépôt {depot.name} est déjà activé"
 
@@ -21,12 +21,12 @@ def enable_depot(depot):
     except Exception:
         raise Exception("Cette société n'a pas d'admin actif")
 
-    send_email_to_admin_users(entity, depot, admins)
+    send_email_to_admin_users(entity, depot, admins, request)
 
     return f"Le dépôt {depot.name} est activé et les administrateurs de {entity.name} ont été notifiés"
 
 
-def send_email_to_admin_users(entity, depot, admins):
+def send_email_to_admin_users(entity, depot, admins, request):
     today = datetime.now().strftime("%d/%m/%Y")
     subject = f"[CarbuRe][Votre demande de création du dépôt {depot.name}  a été acceptée]"
     subject = subject if CarbureEnv.is_prod else "TEST " + subject
@@ -44,9 +44,9 @@ def send_email_to_admin_users(entity, depot, admins):
     """  # noqa: E501
 
     send_mail(
+        request=request,
         subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
-        fail_silently=False,
     )
