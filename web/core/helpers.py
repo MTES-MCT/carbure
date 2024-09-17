@@ -1,6 +1,5 @@
 import calendar
 import datetime
-import os
 from multiprocessing.context import Process
 
 from dateutil.relativedelta import relativedelta
@@ -844,9 +843,8 @@ def get_transaction_distance(lot):
         return res
 
 
-def send_email_declaration_validated(declaration):
+def send_email_declaration_validated(declaration, request):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
-    email_subject = email_subject if CarbureEnv.is_prod else "TEST " + email_subject
     text_message = """
     Bonjour,
 
@@ -855,34 +853,28 @@ def send_email_declaration_validated(declaration):
     Merci,
     L'équipe CarbuRe
     """
-    env = os.getenv("IMAGE_TAG", False)
-    if env != "prod":
-        # send only to staff / superuser
-        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(
-                entity=declaration.entity,
-                user__is_staff=False,
-                user__is_superuser=False,
-            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
-        ]
+
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(
+            entity=declaration.entity,
+            user__is_staff=False,
+            user__is_superuser=False,
+        ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
+    ]
 
     period = declaration.period.strftime("%Y-%m")
-    msg = EmailMultiAlternatives(
+    send_mail(
+        request=request,
         subject=email_subject,
-        body=text_message % (period),
+        message=text_message % (period),
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=recipients,
+        recipient_list=recipients,
     )
-    msg.send()
 
 
-def send_email_declaration_invalidated(declaration):
+def send_email_declaration_invalidated(declaration, request):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
-    email_subject = email_subject if CarbureEnv.is_prod else "TEST " + email_subject
     text_message = """
     Bonjour,
 
@@ -892,29 +884,45 @@ def send_email_declaration_invalidated(declaration):
     Merci,
     L'équipe CarbuRe
     """
-    env = os.getenv("IMAGE_TAG", False)
-    if env != "prod":
-        # send only to staff / superuser
-        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(
-                entity=declaration.entity,
-                user__is_staff=False,
-                user__is_superuser=False,
-            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
-        ]
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(
+            entity=declaration.entity,
+            user__is_staff=False,
+            user__is_superuser=False,
+        ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
+    ]
 
     period = declaration.period.strftime("%Y-%m")
-    msg = EmailMultiAlternatives(
+    send_mail(
+        request=request,
         subject=email_subject,
-        body=text_message % (period),
+        message=text_message % (period),
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=recipients,
+        recipient_list=recipients,
     )
-    msg.send()
+
+
+def send_mail(request, subject, message, from_email, recipient_list, html_message=None, **kwargs):
+    if not CarbureEnv.is_prod and not CarbureEnv.is_local:
+        if request.user.is_authenticated:
+            if request.user.email in recipient_list:
+                recipient_list = [request.user.email]
+            else:
+                recipient_list = ["carbure@beta.gouv.fr"]
+        else:
+            # If user not authenticated, we are in registration process we keep recipient_list
+            pass
+
+        subject = f"[TEST] {subject}"
+        kwargs["cc"] = None
+
+    email = EmailMultiAlternatives(subject, message, from_email, recipient_list, **kwargs)
+
+    if html_message:
+        email.attach_alternative(html_message, "text/html")
+
+    email.send(fail_silently=False)
 
 
 def get_lots_summary_data(lots, entity, short=False):
