@@ -48,7 +48,6 @@ def send_email(user, request, subject, email_type="account_activation_email", ex
         from_email=settings.DEFAULT_FROM_EMAIL,
         html_message=html_message,
         recipient_list=[user.email],
-        fail_silently=False,
     )
     email_otp = EmailDevice()
     email_otp.user = user

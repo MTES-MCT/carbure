@@ -54,5 +54,4 @@ def send_new_token(request):
         from_email=settings.DEFAULT_FROM_EMAIL,
         html_message=html_message,
         recipient_list=[request.user.email],
-        fail_silently=False,
     )

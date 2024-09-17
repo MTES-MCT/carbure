@@ -64,6 +64,5 @@ def request_entity_access(request):
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipient_list,
-            fail_silently=False,
         )
     return JsonResponse({"status": "success"})

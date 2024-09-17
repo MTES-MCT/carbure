@@ -57,7 +57,6 @@ def send_email_to_user(entity, depot_name, request):
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
-        fail_silently=False,
     )
 
 
@@ -86,5 +85,4 @@ def send_email_to_dgec(entity, depot_name, request):
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
-        fail_silently=False,
     )
