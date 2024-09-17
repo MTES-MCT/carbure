@@ -29,6 +29,9 @@ services:
   carbure-frontend:
     image: carbure_frontend:local
     container_name: carbure_frontend
+    environment:
+      REACT_APP_SENTRY_DSN: ${SENTRY_DSN}
+      REACT_APP_SENTRY_ENV: ${SENTRY_ENV}
     build:
       context: ./front
     volumes:
