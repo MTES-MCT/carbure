@@ -1487,5 +1487,7 @@
   "Veuillez remplir les informations suivantes:": "Please complete the following information:",
   "L'utilisateur {{email}} a bien été ajouté !": "The user {{email}} has been successfully added!",
   "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user",
-  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password.."
+  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password..",
+  "Nous sommes désolé, une erreur technique est survenue.": "We're sorry, a technical error has occurred.",
+  "Merci de recharger la page ou nous contacter si le problème persiste.": "Please reload the page or contact us if the problem persists."
 }
