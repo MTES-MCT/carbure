@@ -51,7 +51,7 @@ def accept_application(request: HttpRequest):
         audit_sample.status = ElecAuditSample.AUDITED
         audit_sample.save()
 
-    send_email_to_cpo(application)
+    send_email_to_cpo(application, request)
 
     return SuccessResponse()
 
