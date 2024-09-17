@@ -16,7 +16,7 @@ import { ChargePointsSnapshot } from "elec-charge-points/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
-import { useArticle2Options, useStatus } from "./index.hooks"
+import { useGetFilterOptions, useStatus } from "./index.hooks"
 import { StatusSwitcher } from "./status-switcher"
 import { ChargePointsListTable } from "./table"
 import { ChargePointFilter } from "./types"
@@ -25,8 +25,6 @@ type ChargePointsListProps = {
   year: number
   snapshot: ChargePointsSnapshot
 }
-
-const loadOptions = <T,>(data: T) => new Promise<T>((resolve) => resolve(data))
 
 const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   const entity = useEntity()
@@ -42,6 +40,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   )
 
   const query = useCBQueryBuilder(state)
+  const getFilterOptions = useGetFilterOptions(query)
   const chargePointsListQuery = useQuery(api.getChargePointsList, {
     key: "charge-points-list",
     params: [query],
@@ -67,8 +66,6 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
     api.downloadChargePointsList(query, chargePointsListPagination?.ids || [])
   }
 
-  const article2Options = useArticle2Options()
-
   return (
     <>
       <Bar>
@@ -76,12 +73,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={(filter) => {
-            if (filter === ChargePointFilter.ConcernedByReadingMeter) {
-              return loadOptions(article2Options)
-            }
-            return api.getChargePointsFilters(filter, query)
-          }}
+          getFilterOptions={getFilterOptions}
         />
       </Bar>
       <section>

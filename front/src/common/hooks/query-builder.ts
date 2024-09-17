@@ -215,35 +215,24 @@ export function useCBQueryParamsStore<
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
-    console.log("entity", { a: state.entity.id, b: entity.id })
     actions.setEntity(entity)
   }
 
   // sync store state with year set from above
   if (state.year !== year) {
-    console.log("year", {
-      a: state.year,
-      year,
-    })
     actions.setYear(year)
   }
 
   // // sync store state with status set in the route
   if (state.status !== status) {
-    console.log("status", {
-      a: state.status,
-      status,
-    })
     actions.setStatus(status)
   }
 
   if (snapshot && state.snapshot !== snapshot) {
-    console.log("snap", { a: state.snapshot, snapshot })
     actions.setSnapshot(snapshot)
   }
 
   if (type && state.type !== type) {
-    console.log("type", { a: state.type, type })
     actions.setType(type)
   }
 
