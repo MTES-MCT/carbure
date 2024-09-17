@@ -153,14 +153,14 @@ def export_ticket_sources_to_excel(tickets):
 
 
 def get_producer(obj):
-    if "carbure_producer" in obj and obj["carbure_producer"]:
+    if "carbure_producer" in obj:
         return obj["carbure_producer"]["name"]
-    elif "unknown_producer" in obj and obj["unknown_producer"]:
+    elif "unknown_producer" in obj:
         return obj["unknown_producer"]
 
 
 def get_production_site(obj):
-    if "carbure_production_site" in obj and obj["carbure_production_site"]:
+    if "carbure_production_site" in obj:
         return obj["carbure_production_site"]["name"]
-    elif "unknown_production_site" in obj and obj["unknown_production_site"]:
+    elif "unknown_production_site" in obj:
         return obj["unknown_production_site"]
