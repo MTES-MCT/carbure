@@ -14,7 +14,6 @@ class ChargePointFilterError:
 def get_charge_points_filters(request, entity):
     filters = ChargePointFilterForm(request.GET)
     current_filter = request.GET.get("filter")
-
     if not filters.is_valid():
         return ErrorResponse(400, ChargePointFilterError.BAD_FILTER, filters.errors)
 
@@ -44,5 +43,5 @@ filter_to_column = {
     "charge_point_id": "charge_point_id",
     "station_id": "station_id",
     "latest_meter_reading_month": "latest_meter_reading_date",
-    "is_article_2": "application__is_article_2",
+    "is_article_2": "is_article_2",
 }
