@@ -16,8 +16,11 @@ def parse_dc_excel(
     info = parse_info(excel_file)
     requested_quota_rows = parse_requested_quota(excel_file)
 
+    start_year = info.get("start_year")
+
     years = [production_row["year"] for production_row in requested_quota_rows]
-    start_year = max(years) - 1 if len(years) > 0 else info["start_year"] + 1 if info["start_year"] else 0
+    if not start_year and len(years) > 0:
+        start_year = max(years) - 1
 
     # tracability = parse_traceability(excel_file)
     sourcing_forecast_rows = parse_sourcing_forecast(excel_file, start_year=start_year)
