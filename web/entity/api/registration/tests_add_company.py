@@ -2,6 +2,7 @@
 
 import datetime
 
+from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -77,7 +78,9 @@ class EntityRegistrationAddCompanyTest(TestCase):
 
         # # When entity is enabled
         assert entity.is_enabled is False
-        enable_entity(entity)
+        fake_request = HttpRequest()
+        fake_request.user = self.user
+        enable_entity(entity, fake_request)
 
         ## right request should be accepted
         right_request.refresh_from_db()

@@ -1,8 +1,8 @@
 from django.conf import settings
-from django.core.mail import send_mail
 from django.http import JsonResponse
 
 from core.decorators import check_admin_rights
+from core.helpers import send_mail
 from core.models import ExternalAdminRights, UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
@@ -40,11 +40,11 @@ def update_right_request(request):
         """ % (right_request.entity.name)
         recipient_list = [right_request.user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
         send_mail(
+            request=request,
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipient_list,
-            fail_silently=False,
         )
     else:
         UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()

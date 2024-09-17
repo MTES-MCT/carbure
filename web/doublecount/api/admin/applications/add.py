@@ -141,7 +141,7 @@ def add_application_by_type(request, entity_type):
         production.save()
 
     try:
-        send_dca_confirmation_email(dca)
+        send_dca_confirmation_email(dca, request)
     except Exception:
         print("email send error")
         traceback.print_exc()

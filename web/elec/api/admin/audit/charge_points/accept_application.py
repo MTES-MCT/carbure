@@ -1,12 +1,12 @@
 from django import forms
 from django.conf import settings
-from django.core.mail import send_mail
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
 
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+from core.helpers import send_mail
 from core.models import ExternalAdminRights
 from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
@@ -56,7 +56,7 @@ def accept_application(request: HttpRequest):
     return SuccessResponse()
 
 
-def send_email_to_cpo(application: ElecChargePointApplication):
+def send_email_to_cpo(application: ElecChargePointApplication, request: HttpRequest):
     charge_point_count = application.elec_charge_points.count()
     charge_point_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/settings#elec-charge-points"
 
@@ -73,9 +73,9 @@ def send_email_to_cpo(application: ElecChargePointApplication):
     """
 
     send_mail(
+        request=request,
         subject=f"[CarbuRe] Inscription de {charge_point_count} points de recharge validée",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=["carbure@beta.gouv.fr"],
-        fail_silently=False,
     )

@@ -89,6 +89,6 @@ def invalidate_declaration(request, *args, **kwargs):
 
         # Send confirmation email
         notify_declaration_cancelled(declaration)
-        send_email_declaration_invalidated(declaration)
+        send_email_declaration_invalidated(declaration, request)
 
     return SuccessResponse()
