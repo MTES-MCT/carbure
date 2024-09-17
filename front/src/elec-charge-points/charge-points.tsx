@@ -21,10 +21,11 @@ const defaultSnapshot: ChargePointsSnapshot = {
   pending: 0,
 }
 
+const currentYear = new Date().getFullYear()
+
 const ChargePoints = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const years = useYears("charge-points", api.getYears)
   const snapshotResponse = useQuery(api.getChargePointsSnapshot, {
     key: "charge-points-snapshot",
     params: [entity.id],
@@ -57,14 +58,12 @@ const ChargePoints = () => {
 
         <Route
           path="list/*"
-          element={
-            <ChargePointsList year={years.selected} snapshot={snapshot} />
-          }
+          element={<ChargePointsList year={currentYear} snapshot={snapshot} />}
         />
 
         <Route
           path="pending"
-          element={<ChargePointsPending year={years.selected} />}
+          element={<ChargePointsPending year={currentYear} />}
         />
 
         <Route path="*" element={<Navigate replace to="pending" />} />
