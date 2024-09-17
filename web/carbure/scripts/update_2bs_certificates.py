@@ -7,6 +7,7 @@ import os
 import unicodedata
 from datetime import date
 from typing import Tuple
+from io import StringIO
 
 import django
 import pandas as pd
@@ -32,7 +33,7 @@ DBS_ADDRESS_KEY = "Adresse"
 DBS_COUNTRY_KEY = "Pays"
 DBS_VALID_FROM_KEY = "Date de début de validité du certificat"
 DBS_VALID_UNTIL_KEY = "Date de fin de validité du certificat"
-
+DBS_TYPE_KEY = "Type d'activité"
 
 def update_2bs_certificates(email: bool = False) -> None:
     # download certificates from 2bs website
@@ -49,7 +50,8 @@ def download_certificates(url: str, valid: bool = True) -> None:
     html_content = requests.get(url).text.replace("<br/>", " ").replace("<br />", " ")
     soup = BeautifulSoup(html_content, "lxml")
     table = soup.find_all("table")
-    df = pd.read_html(str(table))[0]
+    html_io = StringIO(str(table))
+    df = pd.read_html(html_io)[0]
     df = df[~df[DBS_NUMBER_KEY].isnull()]  # Pour une raison inconnue, la ligne de coordonnées est dupliquée
     if valid:
         pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
@@ -94,7 +96,7 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
                 "valid_until": valid_until,
                 "download_link": "https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s"
                 % (row[DBS_NUMBER_KEY]),
-                "scope": "%s" % (row["Type de certification"]),
+                "scope": "%s" % (row[DBS_TYPE_KEY]),
                 "input": None,
                 "output": None,
             }
