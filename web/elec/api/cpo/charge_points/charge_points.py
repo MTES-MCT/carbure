@@ -1,3 +1,4 @@
+from datetime import datetime
 from math import floor
 
 from django import forms
@@ -23,7 +24,7 @@ class ChargePointFilterForm(forms.Form):
     application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
     station_id = forms.CharField(required=False)
-    latest_meter_reading_month = forms.IntegerField(required=False)
+    latest_meter_reading_month = forms.CharField(required=False)
     is_article_2 = forms.BooleanField(required=False)
     search = forms.CharField(required=False)
 
@@ -117,12 +118,17 @@ def filter_charge_points(charge_points, **filters):
     if filters["station_id"]:
         charge_points = charge_points.filter(station_id=filters["station_id"])
 
-    if filters["latest_meter_reading_month"] is not None:
-        month = filters["latest_meter_reading_month"]
-        if month == 0:
+    if filters["latest_meter_reading_month"]:
+        date = filters["latest_meter_reading_month"]
+        if date == "null":
             charge_points = charge_points.filter(latest_meter_reading_date=None)
         else:
-            charge_points = charge_points.filter(latest_meter_reading_date__month=filters["latest_meter_reading_month"])
+            date_obj = datetime.strptime(date, "%m/%Y")
+            month = date_obj.month
+            year = date_obj.year
+            charge_points = charge_points.filter(
+                latest_meter_reading_date__month=month, latest_meter_reading_date__year=year
+            )
 
     if filters["is_article_2"]:
         charge_points = charge_points.filter(is_article_2=filters["is_article_2"])
