@@ -36,6 +36,7 @@ tqdm = "4.66.4"
 tzdata = "2024.1"
 whitenoise = "6.6.0"
 xlsxwriter = "3.2.0"
+python-docx = "*"
 
 [dev-packages]
 django-stubs = "*"
