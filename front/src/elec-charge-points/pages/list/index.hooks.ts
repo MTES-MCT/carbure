@@ -37,11 +37,11 @@ const useArticle2Options = () => {
     () => [
       {
         label: t("Concerné"),
-        value: "false",
+        value: false,
       },
       {
         label: t("Pas concerné"),
-        value: "true",
+        value: true,
       },
     ],
     [t]
@@ -61,13 +61,16 @@ export const useGetFilterOptions = (query: CBQueryParams) => {
   const getFilterOptions: FilterMultiSelectProps["getFilterOptions"] = async (
     filter
   ) => {
+    const data = await api.getChargePointsFilters(filter, query)
+
     if (filter === ChargePointFilter.ConcernedByReadingMeter) {
-      return loadOptions(article2Options)
+      const transformedData = article2Options.filter(({ value }) =>
+        data.includes(value)
+      )
+      return loadOptions(transformedData)
     }
 
     if (filter === ChargePointFilter.MeasureDate) {
-      const data = await api.getChargePointsFilters(filter, query)
-
       // Measure date can be null, so we have to translate this specific case
       const transformedData = data.map((value) =>
         value === "null"
@@ -77,7 +80,7 @@ export const useGetFilterOptions = (query: CBQueryParams) => {
 
       return loadOptions(transformedData)
     }
-    return api.getChargePointsFilters(filter, query)
+    return loadOptions(data)
   }
 
   return getFilterOptions
