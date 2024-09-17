@@ -21,7 +21,7 @@ class ElecSnapshotError:
 class ElecSnapshotForm(forms.Form):
     entity_id = forms.IntegerField()
     category = forms.CharField()
-    year = forms.IntegerField()
+    year = forms.IntegerField(required=False)
     application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
     station_id = forms.CharField(required=False)
@@ -41,7 +41,7 @@ def get_charge_point_snapshot(request, *args, **kwargs):
     entity_id = snapshot_form.cleaned_data["entity_id"]
 
     category = snapshot_form.cleaned_data["category"]
-    year = snapshot_form.cleaned_data["year"]
+
     if category == "charge_point_application":
         model_class = ElecChargePointApplication
         filter_method = filter_charge_point_applications
@@ -54,15 +54,9 @@ def get_charge_point_snapshot(request, *args, **kwargs):
     else:
         return ErrorResponse(400, ElecSnapshotError.MALFORMED_PARAMS, "Wrong category")
 
-    charge_point_applications_count = ElecChargePointApplication.objects.filter(
-        cpo_id=entity_id, created_at__year=year
-    ).count()
-    meter_reading_applications_count = ElecMeterReadingApplication.objects.filter(
-        cpo_id=entity_id, created_at__year=year
-    ).count()
-    charge_points_count = ElecChargePoint.objects.filter(
-        cpo_id=entity_id, application__created_at__year=year, is_deleted=False
-    ).count()
+    charge_point_applications_count = ElecChargePointApplication.objects.filter(cpo_id=entity_id).count()
+    meter_reading_applications_count = ElecMeterReadingApplication.objects.filter(cpo_id=entity_id).count()
+    charge_points_count = ElecChargePoint.objects.filter(cpo_id=entity_id, is_deleted=False).count()
     try:
         items = model_class.objects.filter(cpo_id=entity_id)
 

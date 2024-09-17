@@ -1,7 +1,10 @@
+import { FilterMultiSelectProps } from "common/molecules/filter-select"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
-import { ChargePointStatus } from "./types"
+import { ChargePointFilter, ChargePointStatus } from "./types"
+import * as api from "./api"
+import { CBQueryParams } from "common/hooks/query-builder"
 
 export const useStatus = () => {
   const matchStatus = useMatch("/org/:entity/charge-points/:year/list/:status")
@@ -27,7 +30,7 @@ export const useStatusLabels = () => {
   return statuses
 }
 
-export const useArticle2Options = () => {
+const useArticle2Options = () => {
   const { t } = useTranslation()
 
   return useMemo(
@@ -43,4 +46,39 @@ export const useArticle2Options = () => {
     ],
     [t]
   )
+}
+
+/**
+ * Prepare the data for all filters
+ * @param query
+ * @returns Function
+ */
+export const useGetFilterOptions = (query: CBQueryParams) => {
+  const { t } = useTranslation()
+  const article2Options = useArticle2Options()
+  const loadOptions = <T>(data: T) => new Promise<T>((resolve) => resolve(data))
+
+  const getFilterOptions: FilterMultiSelectProps["getFilterOptions"] = async (
+    filter
+  ) => {
+    if (filter === ChargePointFilter.ConcernedByReadingMeter) {
+      return loadOptions(article2Options)
+    }
+
+    if (filter === ChargePointFilter.MeasureDate) {
+      const data = await api.getChargePointsFilters(filter, query)
+
+      // Measure date can be null, so we have to translate this specific case
+      const transformedData = data.map((value) =>
+        value === "null"
+          ? { label: t("Inconnu"), value }
+          : { label: value, value }
+      )
+
+      return loadOptions(transformedData)
+    }
+    return api.getChargePointsFilters(filter, query)
+  }
+
+  return getFilterOptions
 }
