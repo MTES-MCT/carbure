@@ -21,7 +21,7 @@ type ChangeMeterProps = {
 
 export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
+
   const portal = usePortal()
 
   const { value, bind } = useForm<AddMeterQuery>({
@@ -31,12 +31,14 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
     charge_point_id,
   })
 
-  const mutation = useMutation(api.addMeter, {
-    onSuccess: () => {},
-  })
-
   const openAcceptChangeMeter = () =>
-    portal((close) => <AcceptChangeMeter onClose={close} />)
+    portal((close) => (
+      <AcceptChangeMeter
+        onClose={close}
+        data={value}
+        onMeterChanged={() => onClose()}
+      />
+    ))
 
   return (
     <Dialog onClose={onClose}>
@@ -45,10 +47,7 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
       </header>
       <main>
         <section>
-          <Form
-            id={FORM_ID}
-            onSubmit={() => mutation.execute(entity.id, value)}
-          >
+          <Form id={FORM_ID} onSubmit={openAcceptChangeMeter}>
             <DateInput
               label={t("Date d'installation")}
               required
@@ -65,6 +64,7 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
                 label={t("Energie active totale relevée kWh (Index)")}
                 required
                 {...bind("initial_index")}
+                min={0}
               />
             </Fieldset>
           </Form>
@@ -77,7 +77,6 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
           icon={Plus}
           label={t("Remplacer l'ancien compteur")}
           asideX
-          action={openAcceptChangeMeter}
         />
       </footer>
     </Dialog>
