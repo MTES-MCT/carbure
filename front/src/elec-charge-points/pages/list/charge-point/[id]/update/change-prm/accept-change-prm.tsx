@@ -7,34 +7,34 @@ import { PortalInstance } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api"
-import { AddMeterQuery } from "../types"
+import { ChangeMeasureReferencePointQuery } from "../types"
 
-type AcceptChangeMeterProps = {
+type AcceptChangeMeasureReferencePointProps = {
   onClose: PortalInstance["close"]
-  data: AddMeterQuery
-  onMeterChanged: () => void
+  data: ChangeMeasureReferencePointQuery
+  onMeasureReferencePointChanged: () => void
 }
 
-export const AcceptChangeMeter = ({
+export const AcceptChangeMeasureReferencePoint = ({
   onClose,
   data,
-  onMeterChanged,
-}: AcceptChangeMeterProps) => {
+  onMeasureReferencePointChanged,
+}: AcceptChangeMeasureReferencePointProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
 
-  const mutation = useMutation(api.addMeter, {
+  const mutation = useMutation(api.changeMeasureReferencePoint, {
     invalidates: ["charge-points-details"],
     onSuccess: () => {
-      notify("Le changement de compteur MID a bien été pris en compte.", {
+      notify(t("Le changement de PRM a bien été pris en compte."), {
         variant: "success",
       })
       onClose()
-      onMeterChanged()
+      onMeasureReferencePointChanged()
     },
     onError: () => {
-      notify("Une erreur est survenue lors du changement de compteur MID.", {
+      notify(t("Une erreur est survenue lors du changement de PRM."), {
         variant: "danger",
       })
     },
@@ -43,15 +43,16 @@ export const AcceptChangeMeter = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Déclarer un changement de compteur")}</h1>
+        <h1>{t("Déclarer un changement de PRM")}</h1>
       </header>
       <main>
         <section>
           <p>
-            Souhaitez-vous confirmer le remplacement du N° de compteur MID pour
-            ce point de recharge ? <br />
-            <br /> L’ancien n° MID sera sauvegardé dans notre base de données,
-            mais ne sera plus visible dans votre espace CarbuRe.
+            Souhaitez-vous confirmer le remplacement du PRM pour ce point de
+            recharge ? <br />
+            <br />
+            L’ancien PRM sera sauvegardé dans notre base de données, mais ne
+            sera plus visible dans votre espace CarbuRe.
           </p>
         </section>
       </main>

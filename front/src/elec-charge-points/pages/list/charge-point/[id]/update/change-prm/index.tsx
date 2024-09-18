@@ -1,13 +1,13 @@
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
-import { useForm } from "common/components/form"
+import Form, { useForm } from "common/components/form"
 import { Plus } from "common/components/icons"
 import { DateInput, TextInput } from "common/components/input"
 import { PortalInstance, usePortal } from "common/components/portal"
 import { ChargePoint } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
-import { Form } from "react-router-dom"
 import { ChangeMeasureReferencePointQuery } from "../types"
+import { AcceptChangeMeasureReferencePoint } from "./accept-change-prm"
 
 const FORM_ID = "change-measure-reference-point"
 
@@ -30,7 +30,13 @@ export const ChangeMeasureReferencePoint = ({
   })
 
   const openAcceptChangeMeasureReferencePoint = () =>
-    portal((close) => <div>div</div>)
+    portal((close) => (
+      <AcceptChangeMeasureReferencePoint
+        onClose={close}
+        onMeasureReferencePointChanged={() => onClose()}
+        data={value}
+      />
+    ))
 
   return (
     <Dialog onClose={onClose}>
