@@ -13,7 +13,7 @@ import { ChargePoint, ChargePointStatus } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
-import { UpdateMeter } from "./update-meter"
+import { ChangeMeter } from "./change-meter"
 
 const UpdateChargePointDialog = () => {
   const entity = useEntity()
@@ -25,7 +25,7 @@ const UpdateChargePointDialog = () => {
   const match = useHashMatch("charge-point/:id/update")
   const { value, bind, setValue } = useForm<Partial<ChargePoint>>({})
 
-  useQuery(api.getChargePointDetail, {
+  const chargePointDetailQuery = useQuery(api.getChargePointDetail, {
     key: "charge-points-details",
     params: [entity.id, parseInt(match?.params.id || "")],
     onSuccess: (response) => {
@@ -34,13 +34,16 @@ const UpdateChargePointDialog = () => {
       }
     },
   })
+  const chargePointDetail = chargePointDetailQuery?.result?.data.data
 
-  if (!value) {
+  if (!value || !chargePointDetail) {
     return null
   }
 
   const openChangeMeterDialog = () => {
-    portal((close) => <UpdateMeter onClose={close} />)
+    portal((close) => (
+      <ChangeMeter onClose={close} charge_point_id={chargePointDetail.id} />
+    ))
   }
 
   return (
