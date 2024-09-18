@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
 import { ChangeMeter } from "./change-meter"
+import { ChangeMeasureReferencePoint } from "./change-prm"
 
 const UpdateChargePointDialog = () => {
   const entity = useEntity()
@@ -43,6 +44,15 @@ const UpdateChargePointDialog = () => {
   const openChangeMeterDialog = () => {
     portal((close) => (
       <ChangeMeter onClose={close} charge_point_id={chargePointDetail.id} />
+    ))
+  }
+
+  const openChangeMeasureReferencePointDialog = () => {
+    portal((close) => (
+      <ChangeMeasureReferencePoint
+        onClose={close}
+        charge_point_id={chargePointDetail.id}
+      />
     ))
   }
 
@@ -99,6 +109,20 @@ const UpdateChargePointDialog = () => {
                 />
                 <Button variant="link" action={openChangeMeterDialog}>
                   {t("Mon compteur MID a changé ?")}
+                </Button>
+              </Fieldset>
+
+              <Fieldset label={t("PRM")}>
+                <TextInput
+                  label={t("Numéro de PRM")}
+                  readOnly
+                  {...bind("measure_reference_point_id")}
+                />
+                <Button
+                  variant="link"
+                  action={openChangeMeasureReferencePointDialog}
+                >
+                  {t("Mon PRM a changé ?")}
                 </Button>
               </Fieldset>
             </Form>
