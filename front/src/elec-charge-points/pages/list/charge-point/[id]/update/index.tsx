@@ -70,7 +70,7 @@ const UpdateChargePointDialog = () => {
                   {...bind("charge_point_id")}
                 />
                 <NumberInput
-                  label={`${t("Dernier index en kWh")}${value.measure_date ? `- ${formatDate(value.measure_date)}` : ""}`}
+                  label={`${t("Dernier index en kWh")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
                   readOnly
                   {...bind("measure_energy")}
                 />
@@ -94,6 +94,7 @@ const UpdateChargePointDialog = () => {
               <Fieldset label={t("Compteur MID")}>
                 <TextInput
                   label={t("Numéro du certificat (MID)")}
+                  readOnly
                   {...bind("mid_id")}
                 />
                 <Button variant="link" action={openChangeMeterDialog}>

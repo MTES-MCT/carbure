@@ -1597,5 +1597,7 @@
   "Numéro du certificat (MID)": "Numéro du certificat (MID)",
   "Compteur MID": "Compteur MID",
   "Mon compteur MID a changé ?": "Mon compteur MID a changé ?",
-  "Déclarer un changement de compteur": "Déclarer un changement de compteur"
+  "Déclarer un changement de compteur": "Déclarer un changement de compteur",
+  "Le champ de compteur MID a bien été pris en compte.": "Le champ de compteur MID a bien été pris en compte.",
+  "Une erreur est survenue lors du changement de compteur MID": "Une erreur est survenue lors du changement de compteur MID"
 }
