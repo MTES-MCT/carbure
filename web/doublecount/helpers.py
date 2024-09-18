@@ -41,6 +41,7 @@ today = datetime.date.today()
 
 
 def send_dca_confirmation_email(dca, request):
+    # To the user
     text_message = """
     Bonjour,
 
@@ -58,6 +59,31 @@ def send_dca_confirmation_email(dca, request):
         )
     ]
     cc = ["carbure@beta.gouv.fr"]
+
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        bcc=cc,
+    )
+
+    # To the manager
+    dca_created_at = dca.created_at.strftime("%d/%m/%Y")
+    text_message = f"""
+    Bonjour Émilien,
+
+    Une nouvelle demande d'agrément double comptage vient d'être déposée par le producteur {dca.producer.name}
+    à la date du {dca_created_at}.
+
+    Le dossier est disponible ici https://carbure.beta.gouv.fr/org/{dca.producer_id}/double-counting/applications.
+
+    Bonne journée,
+    CarbuRe intelligence
+    """
+    if os.getenv("IMAGE_TAG", "dev") == "prod":
+        recipients = ["emilien.baudet@developpement-durable.gouv.fr"]
 
     send_mail(
         request=request,
