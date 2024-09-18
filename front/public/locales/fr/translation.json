@@ -1589,7 +1589,12 @@
   "Date du dernier relevé": "Date du dernier relevé",
   "Relevé trimestriel": "Relevé trimestriel",
   "CA/CC": "CA/CC",
-  "Dernier index - kWh": "Dernier index - kWh",
+  "Dernier index en kWh": "Dernier index en kWh",
   "Concerné": "Concerné",
-  "Pas concerné": "Pas concerné"
+  "Pas concerné": "Pas concerné",
+  "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur": "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur",
+  "Puissance nominale - kW": "Puissance nominale - kW",
+  "Numéro du certificat (MID)": "Numéro du certificat (MID)",
+  "Compteur MID": "Compteur MID",
+  "Mon compteur MID a changé ?": "Mon compteur MID a changé ?"
 }

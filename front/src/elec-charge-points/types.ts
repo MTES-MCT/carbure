@@ -23,12 +23,16 @@ export enum ChargePointType {
 export type ChargePoint = {
   id: number
   application_date?: string
-  charge_point_id: number
+  charge_point_id: string
   station_id: number
+  mid_id: string
   current_type?: ChargePointType
   measure_date: string | null
   measure_energy: number
   installation_date: string
   status: ChargePointStatus
   is_article_2: boolean // If a charge point is NOT concerned by a reading meter
+  latitude: number
+  longitude: number
+  nominal_power: number
 }

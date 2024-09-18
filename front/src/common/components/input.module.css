@@ -90,6 +90,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--gray-dark);
+  padding-left: var(--spacing-xs);
 }
 
 .field[data-error] .label {

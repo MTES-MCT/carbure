@@ -42,7 +42,7 @@ export const useChargePointsColumns = () => {
       cell: (chargePoint) => <Cell text={chargePoint.current_type} />,
     },
     measure_energy: {
-      header: t("Dernier index - kWh"),
+      header: t("Dernier index en kWh"),
       cell: (chargePoint) => <Cell text={chargePoint.measure_energy} />,
     },
     is_article_2: {
