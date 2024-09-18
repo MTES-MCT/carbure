@@ -977,9 +977,14 @@ def make_carbure_lots_sheet(workbook, entity, lots):
     # content
     for index, row in df.iterrows():
         colid = 0
+        date_format = workbook.add_format({"num_format": "dd/mm/yyyy"})
         for elem in row:
             try:
-                worksheet_lots.write(index + 1, colid, elem)
+                try:
+                    date = datetime.datetime.strptime(elem, "%d/%m/%Y").date()
+                    worksheet_lots.write_datetime(index + 1, colid, date, date_format)
+                except Exception:
+                    worksheet_lots.write(index + 1, colid, elem)
             except Exception:
                 traceback.print_exc()
             colid += 1
