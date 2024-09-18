@@ -165,6 +165,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
     delivery_date = serializers.SerializerMethodField()
     delivery_site = serializers.SerializerMethodField()
     delivery_site_country = serializers.SerializerMethodField()
+    delivery_site_name = serializers.SerializerMethodField()
     country_of_origin = serializers.SerializerMethodField()
     biofuel = serializers.SerializerMethodField()
     feedstock = serializers.SerializerMethodField()
@@ -214,6 +215,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
             "ghg_reduction_red_ii",
             "free_field",
             "data_reliability_score",
+            "delivery_site_name",
         ]
 
     def get_production_site_double_counting_certificate(self, obj):
@@ -242,6 +244,9 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
     def get_delivery_site_country(self, obj):
         return obj.delivery_site_country.code_pays if obj.delivery_site_country else ""
+
+    def get_delivery_site_name(self, obj):
+        return obj.carbure_delivery_site.name if obj.carbure_delivery_site else obj.unknown_delivery_site
 
     def get_feedstock(self, obj):
         return obj.feedstock.code if obj.feedstock else ""
