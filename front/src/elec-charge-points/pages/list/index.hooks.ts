@@ -2,9 +2,10 @@ import { FilterMultiSelectProps } from "common/molecules/filter-select"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
-import { ChargePointFilter, ChargePointStatus } from "./types"
+import { ChargePointFilter } from "./types"
 import * as api from "./api"
 import { CBQueryParams } from "common/hooks/query-builder"
+import { ChargePointStatus } from "elec-charge-points/types"
 
 export const useStatus = () => {
   const matchStatus = useMatch("/org/:entity/charge-points/list/:status")
@@ -14,20 +15,6 @@ export const useStatus = () => {
     ChargePointStatus.Pending
 
   return status
-}
-
-export const useStatusLabels = () => {
-  const { t } = useTranslation()
-  const statuses = useMemo(
-    () => ({
-      [ChargePointStatus.Pending]: t("En attente"),
-      [ChargePointStatus.AuditInProgress]: t("En cours d'audit"),
-      [ChargePointStatus.Accepted]: t("Accepté"),
-    }),
-    [t]
-  )
-
-  return statuses
 }
 
 const useArticle2Options = () => {

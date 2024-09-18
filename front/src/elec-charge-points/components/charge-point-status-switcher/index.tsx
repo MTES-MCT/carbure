@@ -1,19 +1,21 @@
 import Tabs from "common/components/tabs"
-import { ChargePointsSnapshot } from "elec-charge-points/types"
+import { useStatusLabels } from "elec-charge-points/hooks/charge-point-status.hooks"
+import {
+  ChargePointsSnapshot,
+  ChargePointStatus,
+} from "elec-charge-points/types"
 import { useMemo } from "react"
-import { useStatusLabels } from "./index.hooks"
-import { ChargePointStatus } from "./types"
 
-interface StatusSwitcherProps {
+interface ChargePointStatusSwitcherProps {
   status: any
   snapshot: ChargePointsSnapshot
   onSwitch: (status: any) => void
 }
-export const StatusSwitcher = ({
+export const ChargePointStatusSwitcher = ({
   status,
   snapshot,
   onSwitch,
-}: StatusSwitcherProps) => {
+}: ChargePointStatusSwitcherProps) => {
   const statuses = useStatusLabels()
 
   const displayedStatuses = useMemo(

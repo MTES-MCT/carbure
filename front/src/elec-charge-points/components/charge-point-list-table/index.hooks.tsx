@@ -1,8 +1,8 @@
 import { Cell, Column } from "common/components/table"
 import { useTranslation } from "react-i18next"
-import { ChargePoint } from "../types"
-import { ChargePointsListTableStatus } from "./status"
 import IsArticle2 from "./is-article-2"
+import { ChargePoint } from "elec-charge-points/types"
+import { ChargePointStatusTag } from "../charge-point-status-tag"
 
 export const useChargePointsColumns = () => {
   const { t } = useTranslation()
@@ -20,7 +20,7 @@ export const useChargePointsColumns = () => {
     status: {
       header: t("Statut"),
       cell: (chargePoint) => (
-        <ChargePointsListTableStatus status={chargePoint.status} />
+        <ChargePointStatusTag status={chargePoint.status} />
       ),
     },
     latest_meter_reading_date: {

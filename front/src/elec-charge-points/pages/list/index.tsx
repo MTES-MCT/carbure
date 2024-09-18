@@ -13,15 +13,19 @@ import {
 } from "common/hooks/query-builder"
 import FilterMultiSelect from "common/molecules/filter-select"
 import { ChargePointsSnapshot } from "elec-charge-points/types"
-import { useMemo } from "react"
+import { lazy, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 import * as api from "./api"
 import { useGetFilterOptions, useStatus } from "./index.hooks"
-import { StatusSwitcher } from "./status-switcher"
-import { ChargePointsListTable, ChargePointsListTableProps } from "./table"
 import { ChargePointFilter } from "./types"
-import { UpdateChargePointDialog } from "./[id]/update"
+import {
+  ChargePointsListTable,
+  ChargePointsListTableProps,
+} from "elec-charge-points/components/charge-point-list-table"
+import { ChargePointStatusSwitcher } from "elec-charge-points/components/charge-point-status-switcher"
+
+const UpdateChargePointDialog = lazy(() => import("./charge-point/[id]/update"))
 
 type ChargePointsListProps = {
   year: number
@@ -74,7 +78,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   ) => ({
     pathname: location.pathname,
     search: location.search,
-    hash: `charge-point/${chargePoint.id}`,
+    hash: `charge-point/${chargePoint.id}/update`,
   })
 
   return (
@@ -89,7 +93,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
       </Bar>
       <section>
         <ActionBar>
-          <StatusSwitcher
+          <ChargePointStatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
             snapshot={snapshot}
@@ -146,7 +150,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
         )}
       </section>
       <HashRoute
-        path="charge-point/:id"
+        path="charge-point/:id/update"
         element={<UpdateChargePointDialog />}
       />
     </>
