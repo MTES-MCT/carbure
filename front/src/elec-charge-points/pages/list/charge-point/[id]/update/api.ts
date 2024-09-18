@@ -1,6 +1,6 @@
 import api, { Api } from "common/services/api"
 import { ChargePoint } from "elec-charge-points/types"
-import { AddMeterQuery } from "./types"
+import { AddMeterQuery, ChangeMeasureReferencePointQuery } from "./types"
 
 export function getChargePointDetail(
   entity_id: number,
@@ -18,6 +18,20 @@ export function addMeter(entity_id: number, query: AddMeterQuery) {
     ...{
       ...params,
       charge_point: charge_point_id,
+    },
+  })
+}
+
+export function changeMeasureReferencePoint(
+  entity_id: number,
+  query: ChangeMeasureReferencePointQuery
+) {
+  const { charge_point_id, ...params } = query
+  return api.post<Api<undefined>>("elec/cpo/charge-points/update-prm", {
+    entity_id,
+    ...{
+      ...params,
+      id: charge_point_id,
     },
   })
 }
