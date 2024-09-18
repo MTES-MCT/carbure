@@ -9,22 +9,24 @@ import {
   ElecMeterReadingsApplicationCheckInfo,
   ElecMeterReadingsApplicationsResponse,
   ElecProvisionCertificatesDetails,
-  ElecTransferCertificatesDetails
+  ElecTransferCertificatesDetails,
 } from "./types"
 import {
   ElecCPOProvisionCertificateQuery,
   ElecCPOSnapshot,
   ElecProvisionCertificatesData,
   ElecTransferCertificateQuery,
-  ElecTransferCertificatesData
+  ElecTransferCertificatesData,
 } from "./types-cpo"
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/elec/cpo/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/elec/cpo/certificate-years", {
+    params: { entity_id },
+  })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<ElecCPOSnapshot>>("/elec/cpo/snapshot", {
+  return api.get<Api<ElecCPOSnapshot>>("/elec/cpo/certificate-snapshot", {
     params: { entity_id, year },
   })
 }

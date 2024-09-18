@@ -19,7 +19,7 @@ export const okChargePointsApplications = mockGetWithResponseData(
   elecChargePointsApplications
 )
 export const okCPOSnapshot = mockGetWithResponseData(
-  "/elec/cpo/snapshot",
+  "/elec/cpo/certificate-snapshot",
   elecSnapshot
 )
 
