@@ -97,12 +97,13 @@ check-frontend:
 
 deploy-dev:
   stage: deploy
-  extends: .scalingo
+  # extends: .scalingo
   only:
     - dev
     - preview
   script:
-    - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
+    - echo "execution deploy dev"
+    # - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
 deploy-staging:
   stage: deploy
