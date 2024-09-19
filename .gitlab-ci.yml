@@ -40,23 +40,41 @@ build-ci-image:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
-  only:
-    changes:
-      - ci/Dockerfile
-      - Pipfile
-      - Pipfile.lock
-      - front/package.json
-      - front/package-lock.json
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest    
   rules:
     - if: $CI_MERGE_REQUEST_ID
+      changes: 
+        - ci/Dockerfile
+        - Pipfile
+        - Pipfile.lock
+        - front/package.json
+        - front/package-lock.json
       when: manual
     - if: $CI_COMMIT_BRANCH == "dev"
+      changes: 
+        - ci/Dockerfile
+        - Pipfile
+        - Pipfile.lock
+        - front/package.json
+        - front/package-lock.json
       when: always
     - if: $CI_COMMIT_BRANCH == "preview"
+      changes: 
+        - ci/Dockerfile
+        - Pipfile
+        - Pipfile.lock
+        - front/package.json
+        - front/package-lock.json
       when: always
     - if: $CI_COMMIT_BRANCH == "master"
+      changes: 
+        - ci/Dockerfile
+        - Pipfile
+        - Pipfile.lock
+        - front/package.json
+        - front/package-lock.json
       when: always
+    
 
 check-backend:
   stage: check
@@ -72,17 +90,25 @@ check-backend:
     # - pipenv run ruff format --check
     # - TEST=1 pipenv run python web/manage.py test web
     - echo "execution check backend"
-  only:
-    changes:
-      - web/**/*
   rules:
+    - changes:
+      - web/**/*
+      when: always
     - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - web/**/*
       when: manual
     - if: $CI_COMMIT_BRANCH == "dev"
+      changes:
+        - web/**/*
       when: always
     - if: $CI_COMMIT_BRANCH == "preview"
+      changes:
+        - web/**/*
       when: always
     - if: $CI_COMMIT_BRANCH == "master"
+      changes:
+        - web/**/*
       when: always
 
 check-frontend:
@@ -93,17 +119,22 @@ check-frontend:
     # - npx eslint --ext .ts,.tsx src/
     # - npm test
     - echo "execution check frontend"
-  only:
-    changes:
-      - front/**/*
   rules:
     - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - front/**/*
       when: manual
     - if: $CI_COMMIT_BRANCH == "dev"
+      changes:
+        - front/**/*
       when: always
     - if: $CI_COMMIT_BRANCH == "preview"
+      changes:
+        - front/**/*
       when: always
     - if: $CI_COMMIT_BRANCH == "master"
+      changes:
+        - front/**/*
       when: always
 
 deploy-dev:
