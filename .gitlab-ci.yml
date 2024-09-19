@@ -41,6 +41,13 @@ build-ci-image:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
+  only:
+    changes:
+      - ci/Dockerfile
+      - Pipfile
+      - Pipfile.lock
+      - front/package.json
+      - front/package-lock.json
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: manual
@@ -50,12 +57,6 @@ build-ci-image:
       when: always
     - if: $CI_COMMIT_BRANCH == "master"
       when: always
-    - changes:
-      - ci/Dockerfile
-      - Pipfile
-      - Pipfile.lock
-      - front/package.json
-      - front/package-lock.json
 
 check-backend:
   stage: check
@@ -71,6 +72,9 @@ check-backend:
     # - pipenv run ruff format --check
     # - TEST=1 pipenv run python web/manage.py test web
     - echo "execution check backend"
+  only:
+    changes:
+      - web/**/*
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: manual
@@ -80,8 +84,6 @@ check-backend:
       when: always
     - if: $CI_COMMIT_BRANCH == "master"
       when: always
-    - changes:
-      - web/**/*
 
 check-frontend:
   stage: check
@@ -90,7 +92,10 @@ check-frontend:
     # - cd front
     # - npx eslint --ext .ts,.tsx src/
     # - npm test
-    - echo "execution check backend"
+    - echo "execution check frontend"
+  only:
+    changes:
+      - front/**/*
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: manual
@@ -100,8 +105,6 @@ check-frontend:
       when: always
     - if: $CI_COMMIT_BRANCH == "master"
       when: always
-    - changes:
-      - front/**/*
 
 deploy-dev:
   stage: deploy
