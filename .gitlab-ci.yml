@@ -43,6 +43,7 @@ build-ci-image:
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
   only:
     refs:
+      - merge_requests
       - dev
       - preview
       - master
@@ -52,6 +53,7 @@ build-ci-image:
       - Pipfile.lock
       - front/package.json
       - front/package-lock.json
+  when: manual
 
 check-backend:
   stage: check
@@ -68,11 +70,13 @@ check-backend:
     - TEST=1 pipenv run python web/manage.py test web
   only:
     refs:
+      - merge_requests
       - dev
       - preview
       - master
     changes:
       - web/**/*
+  when: manual
 
 check-frontend:
   stage: check
@@ -83,11 +87,13 @@ check-frontend:
     - npm test
   only:
     refs:
+      - merge_requests
       - dev
       - preview
       - master
     changes:
       - front/**/*
+  when: manual
 
 deploy-dev:
   stage: deploy
