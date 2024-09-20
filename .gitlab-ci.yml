@@ -42,14 +42,20 @@ build-ci-image:
     - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest    
   rules:
-    - if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
       changes: 
         - ci/Dockerfile
         - Pipfile
         - Pipfile.lock
         - front/package.json
         - front/package-lock.json
-      when: always
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+      changes: 
+        - ci/Dockerfile
+        - Pipfile
+        - Pipfile.lock
+        - front/package.json
+        - front/package-lock.json
 
 check-backend:
   stage: check
@@ -66,10 +72,12 @@ check-backend:
     # - TEST=1 pipenv run python web/manage.py test web
     - echo "execution check backend"
   rules:
-    - if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
       changes:
         - web/**/*
-      when: always
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+      changes:
+        - web/**/*
 
 check-frontend:
   stage: check
@@ -80,10 +88,12 @@ check-frontend:
     # - npm test
     - echo "execution check frontend"
   rules:
-    - if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
       changes:
         - front/**/*
-      when: always
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+      changes:
+        - front/**/*
 
 deploy-dev:
   stage: deploy
