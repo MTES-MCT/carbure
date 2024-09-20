@@ -48,7 +48,8 @@ build-ci-image:
         - Pipfile
         - Pipfile.lock
         - front/package.json
-        - front/package-lock.json   
+        - front/package-lock.json
+      when: always
 
 check-backend:
   stage: check
@@ -68,6 +69,7 @@ check-backend:
     - if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
       changes:
         - web/**/*
+      when: always
 
 check-frontend:
   stage: check
@@ -81,6 +83,7 @@ check-frontend:
     - if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
       changes:
         - front/**/*
+      when: always
 
 deploy-dev:
   stage: deploy
