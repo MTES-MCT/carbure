@@ -68,7 +68,7 @@ build-ci-image:
 
 check-backend:
   stage: check
-  # extends: .checks
+  extends: .checks
   services:
     - mysql:8.0
     - redis:latest
@@ -76,35 +76,32 @@ check-backend:
     - export CARBURE_HOME=$(pwd)
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/$MYSQL_DATABASE
     - export REDIS_URL=redis://redis:6379
-    # - pipenv run ruff check
-    # - pipenv run ruff format --check
-    # - TEST=1 pipenv run python web/manage.py test web
-    - echo "execution check backend"
+    - pipenv run ruff check
+    - pipenv run ruff format --check
+    - TEST=1 pipenv run python web/manage.py test web
   rules:
     - changes:
       - web/**/*
     
 check-frontend:
   stage: check
-  # extends: .checks
+  extends: .checks
   script:
-    # - cd front
-    # - npx eslint --ext .ts,.tsx src/
-    # - npm test
-    - echo "execution check frontend"
+    - cd front
+    - npx eslint --ext .ts,.tsx src/
+    - npm test
   rules:
     - changes:
       - front/**/*
 
 deploy-dev:
   stage: deploy
-  # extends: .scalingo
+  extends: .scalingo
   only:
     - dev
     - preview
   script:
-    - echo "execution deploy dev"
-    # - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
+    - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
 deploy-staging:
   stage: deploy
