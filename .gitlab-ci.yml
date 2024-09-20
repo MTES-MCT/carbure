@@ -3,6 +3,13 @@ stages:
   - check
   - deploy
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^(\[Draft\]|\(Draft\)|Draft:)/
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+
 variables:
   MYSQL_DATABASE: carbure_mysql_test_db
   MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
@@ -42,20 +49,12 @@ build-ci-image:
     - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest    
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
-      changes: 
-        - ci/Dockerfile
-        - Pipfile
-        - Pipfile.lock
-        - front/package.json
-        - front/package-lock.json
-    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
-      changes: 
-        - ci/Dockerfile
-        - Pipfile
-        - Pipfile.lock
-        - front/package.json
-        - front/package-lock.json
+    - changes: 
+      - ci/Dockerfile
+      - Pipfile
+      - Pipfile.lock
+      - front/package.json
+      - front/package-lock.json
 
 check-backend:
   stage: check
@@ -72,13 +71,9 @@ check-backend:
     # - TEST=1 pipenv run python web/manage.py test web
     - echo "execution check backend"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
-      changes:
-        - web/**/*
-    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
-      changes:
-        - web/**/*
-
+    - changes:
+      - web/**/*
+    
 check-frontend:
   stage: check
   # extends: .checks
@@ -88,12 +83,8 @@ check-frontend:
     # - npm test
     - echo "execution check frontend"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
-      changes:
-        - front/**/*
-    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
-      changes:
-        - front/**/*
+    - changes:
+      - front/**/*
 
 deploy-dev:
   stage: deploy
