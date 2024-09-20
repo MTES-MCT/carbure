@@ -5,10 +5,20 @@ stages:
 
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^(\[Draft\]|\(Draft\)|Draft:)/
+  # 1. Don't run pipelines for MR drafts.
+  # 2. Don't run branch pipelines when there's an open MR for the branch (run the MR pipeline instead).
+  # 3. Run all other MR pipelines
+  # 4. Run branch pipelines for dev, preview and master
+  # 5. Else, don't run it
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^Draft:/ # 1
       when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS # 2
+      when: never
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # 3
+      when: always
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master" # 4
+      when: always
+    - when: never # 5
 
 variables:
   MYSQL_DATABASE: carbure_mysql_test_db
