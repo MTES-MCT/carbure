@@ -59,7 +59,7 @@ build-ci-image:
 
 check-backend:
   stage: check
-  extends: .checks
+  # extends: .checks
   services:
     - mysql:8.0
     - redis:latest
@@ -72,7 +72,7 @@ check-backend:
     # - TEST=1 pipenv run python web/manage.py test web
     - echo "execution check backend"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
       changes:
         - web/**/*
     - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
@@ -81,14 +81,14 @@ check-backend:
 
 check-frontend:
   stage: check
-  extends: .checks
+  # extends: .checks
   script:
     # - cd front
     # - npx eslint --ext .ts,.tsx src/
     # - npm test
     - echo "execution check frontend"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "false"
       changes:
         - front/**/*
     - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master"
