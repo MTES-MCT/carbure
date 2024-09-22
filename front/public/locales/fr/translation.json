@@ -1610,5 +1610,8 @@
   "L’ancien PRM sera sauvegardé dans notre base de données, mais ne sera plus visible dans votre espace CarbuRe.": "L’ancien PRM sera sauvegardé dans notre base de données, mais ne sera plus visible dans votre espace CarbuRe.",
   "Le changement de PRM a bien été pris en compte.": "Le changement de PRM a bien été pris en compte.",
   "Une erreur est survenue lors du changement de PRM.": "Une erreur est survenue lors du changement de PRM.",
-  "Historique des numéros de compteur associés": "Historique des numéros de compteur associés"
+  "Historique des numéros de compteur associés": "Historique des numéros de compteur associés",
+  "Supprimer un point de recharge": "Supprimer un point de recharge",
+  "Veuillez confirmer la suppression du point de recharge.": "Veuillez confirmer la suppression du point de recharge.",
+  "Point de recharge non trouvé.": "Point de recharge non trouvé."
 }
