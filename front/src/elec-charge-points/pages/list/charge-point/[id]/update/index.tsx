@@ -3,8 +3,10 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm, Fieldset } from "common/components/form"
 import { useHashMatch } from "common/components/hash-route"
+import { Cross, Return } from "common/components/icons"
 import { TextInput, NumberInput } from "common/components/input"
 import Portal, { usePortal } from "common/components/portal"
+import { LoaderOverlay } from "common/components/scaffold"
 import { CONTACT_US_EMAIL } from "common/globals"
 import { useQuery } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
@@ -15,6 +17,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
 import { ChangeMeter } from "./change-meter"
 import { ChangeMeasureReferencePoint } from "./change-prm"
+import { DeleteChargePointDialog } from "./delete-charge-point-dialog"
 import { MetersHistory } from "./meters-history"
 
 const UpdateChargePointDialog = () => {
@@ -38,23 +41,27 @@ const UpdateChargePointDialog = () => {
   })
   const chargePointDetail = chargePointDetailQuery?.result?.data.data
 
-  if (!value || !chargePointDetail) {
-    return null
-  }
-
   const openChangeMeterDialog = () => {
+    if (!chargePointDetail) return
+
     portal((close) => (
       <ChangeMeter onClose={close} charge_point_id={chargePointDetail.id} />
     ))
   }
 
   const openChangeMeasureReferencePointDialog = () => {
+    if (!chargePointDetail) return
+
     portal((close) => (
       <ChangeMeasureReferencePoint
         onClose={close}
         charge_point_id={chargePointDetail.id}
       />
     ))
+  }
+
+  if (chargePointDetailQuery.loading) {
+    return <LoaderOverlay />
   }
 
   return (
@@ -67,69 +74,101 @@ const UpdateChargePointDialog = () => {
           </h1>
         </header>
 
-        <main>
-          <section>
-            <Form>
-              <Fieldset label={t("Informations")}>
-                <TextInput
-                  label={t("Identifiant du point de recharge")}
-                  readOnly={value.status !== ChargePointStatus.Pending}
-                  hasTooltip
-                  title={`${t(
-                    "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur"
-                  )} ${CONTACT_US_EMAIL}`}
-                  {...bind("charge_point_id")}
-                />
-                <NumberInput
-                  label={`${t("Dernier index en kWh")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
-                  readOnly
-                  {...bind("measure_energy")}
-                />
-                <NumberInput
-                  label={t("Longitude")}
-                  readOnly
-                  {...bind("longitude")}
-                />
-                <NumberInput
-                  label={t("Latitude")}
-                  readOnly
-                  {...bind("latitude")}
-                />
-                <NumberInput
-                  label={t("Puissance nominale - kW")}
-                  readOnly
-                  {...bind("nominal_power")}
-                />
-              </Fieldset>
+        {!chargePointDetail ? (
+          <main>
+            <section>{t("Point de recharge non trouvé.")}</section>
+          </main>
+        ) : (
+          <>
+            {" "}
+            <main>
+              <section>
+                <Form>
+                  <Fieldset label={t("Informations")}>
+                    <TextInput
+                      label={t("Identifiant du point de recharge")}
+                      readOnly={value.status !== ChargePointStatus.Pending}
+                      hasTooltip
+                      title={`${t(
+                        "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur"
+                      )} ${CONTACT_US_EMAIL}`}
+                      {...bind("charge_point_id")}
+                    />
+                    <NumberInput
+                      label={`${t("Dernier index en kWh")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
+                      readOnly
+                      {...bind("measure_energy")}
+                    />
+                    <NumberInput
+                      label={t("Longitude")}
+                      readOnly
+                      {...bind("longitude")}
+                    />
+                    <NumberInput
+                      label={t("Latitude")}
+                      readOnly
+                      {...bind("latitude")}
+                    />
+                    <NumberInput
+                      label={t("Puissance nominale - kW")}
+                      readOnly
+                      {...bind("nominal_power")}
+                    />
+                  </Fieldset>
 
-              <Fieldset label={t("Compteur MID")}>
-                <TextInput
-                  label={t("Numéro du certificat (MID)")}
-                  readOnly
-                  {...bind("mid_id")}
-                />
-                <Button variant="link" action={openChangeMeterDialog}>
-                  {t("Mon compteur MID a changé ?")}
-                </Button>
-              </Fieldset>
+                  <Fieldset label={t("Compteur MID")}>
+                    <TextInput
+                      label={t("Numéro du certificat (MID)")}
+                      readOnly
+                      {...bind("mid_id")}
+                    />
+                    <Button variant="link" action={openChangeMeterDialog}>
+                      {t("Mon compteur MID a changé ?")}
+                    </Button>
+                  </Fieldset>
 
-              <Fieldset label={t("PRM")}>
-                <TextInput
-                  label={t("Numéro de PRM")}
-                  readOnly
-                  {...bind("measure_reference_point_id")}
-                />
-                <Button
-                  variant="link"
-                  action={openChangeMeasureReferencePointDialog}
-                >
-                  {t("Mon PRM a changé ?")}
-                </Button>
-              </Fieldset>
-              <MetersHistory charge_point_id={chargePointDetail.id} />
-            </Form>
-          </section>
-        </main>
+                  <Fieldset label={t("PRM")}>
+                    <TextInput
+                      label={t("Numéro de PRM")}
+                      readOnly
+                      {...bind("measure_reference_point_id")}
+                    />
+                    <Button
+                      variant="link"
+                      action={openChangeMeasureReferencePointDialog}
+                    >
+                      {t("Mon PRM a changé ?")}
+                    </Button>
+                  </Fieldset>
+                  {/* @ts-ignore */}
+                  <MetersHistory charge_point_id={chargePointDetail.id} />
+                </Form>
+              </section>
+            </main>
+            <footer>
+              <Button
+                variant="danger"
+                label={t("Supprimer")}
+                icon={Cross}
+                action={() =>
+                  portal((close) => (
+                    <DeleteChargePointDialog
+                      charge_point_id={chargePointDetail.id}
+                      onClose={close}
+                    />
+                  ))
+                }
+              />
+              <Button
+                variant="secondary"
+                icon={Return}
+                label={t("Retour")}
+                action={closeDialog}
+                asideX
+              />
+            </footer>
+          </>
+        )}
       </Dialog>
     </Portal>
   )

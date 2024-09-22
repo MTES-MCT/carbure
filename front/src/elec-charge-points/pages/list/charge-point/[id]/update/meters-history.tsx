@@ -34,7 +34,7 @@ export const MetersHistory = ({ charge_point_id }: MetersHistoryProps) => {
     >
       <ul>
         {metersHistory.map((meter) => (
-          <li>
+          <li key={meter.id}>
             {formatDate(meter.initial_index_date)} : {meter.mid_certificate}
           </li>
         ))}

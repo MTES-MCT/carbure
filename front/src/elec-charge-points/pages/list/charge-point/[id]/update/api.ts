@@ -47,3 +47,13 @@ export function getMetersHistory(
     },
   })
 }
+
+export function deleteChargePoint(
+  entity_id: number,
+  charge_point_id: ChargePoint["id"]
+) {
+  return api.post("elec/cpo/charge-points/delete", {
+    entity_id,
+    id: charge_point_id,
+  })
+}
