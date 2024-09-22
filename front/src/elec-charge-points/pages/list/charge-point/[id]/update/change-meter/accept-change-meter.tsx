@@ -48,10 +48,14 @@ export const AcceptChangeMeter = ({
       <main>
         <section>
           <p>
-            Souhaitez-vous confirmer le remplacement du N° de compteur MID pour
-            ce point de recharge ? <br />
-            <br /> L’ancien n° MID sera sauvegardé dans notre base de données,
-            mais ne sera plus visible dans votre espace CarbuRe.
+            {t(
+              "Souhaitez-vous confirmer le remplacement du N° de compteur MID pour ce point de recharge ?"
+            )}
+            <br />
+            <br />
+            {t(
+              "L’ancien n° MID sera sauvegardé dans notre base de données, mais ne sera plus visible dans votre espace CarbuRe."
+            )}
           </p>
         </section>
       </main>
