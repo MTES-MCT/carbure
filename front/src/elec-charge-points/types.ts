@@ -37,3 +37,11 @@ export type ChargePoint = {
   nominal_power: number
   measure_reference_point_id: string // See more https://particulier.edf.fr/fr/accueil/aide-contact/faq/compteur/numero-prm.html
 }
+
+export type ElecMeter = {
+  id: number
+  charge_point: number
+  initial_index: number
+  initial_index_date: string
+  mid_certificate: string
+}

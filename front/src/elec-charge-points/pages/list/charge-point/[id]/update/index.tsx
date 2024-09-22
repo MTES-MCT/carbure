@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
 import { ChangeMeter } from "./change-meter"
 import { ChangeMeasureReferencePoint } from "./change-prm"
+import { MetersHistory } from "./meters-history"
 
 const UpdateChargePointDialog = () => {
   const entity = useEntity()
@@ -125,6 +126,7 @@ const UpdateChargePointDialog = () => {
                   {t("Mon PRM a changé ?")}
                 </Button>
               </Fieldset>
+              <MetersHistory charge_point_id={chargePointDetail.id} />
             </Form>
           </section>
         </main>

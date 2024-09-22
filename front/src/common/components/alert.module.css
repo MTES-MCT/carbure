@@ -24,7 +24,6 @@
   display: flex;
   column-gap: var(--spacing-s);
   align-items: center;
-  flex-wrap: wrap;
 }
 
 .info {

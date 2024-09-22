@@ -1,5 +1,5 @@
 import api, { Api } from "common/services/api"
-import { ChargePoint } from "elec-charge-points/types"
+import { ChargePoint, ElecMeter } from "elec-charge-points/types"
 import { AddMeterQuery, ChangeMeasureReferencePointQuery } from "./types"
 
 export function getChargePointDetail(
@@ -32,6 +32,18 @@ export function changeMeasureReferencePoint(
     ...{
       ...params,
       id: charge_point_id,
+    },
+  })
+}
+
+export function getMetersHistory(
+  entity_id: number,
+  charge_point_id: ChargePoint["id"]
+) {
+  return api.get<Api<ElecMeter[]>>("elec/cpo/meters", {
+    params: {
+      entity_id,
+      charge_point_id,
     },
   })
 }

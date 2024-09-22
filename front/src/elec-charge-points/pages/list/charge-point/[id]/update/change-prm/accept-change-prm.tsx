@@ -48,11 +48,14 @@ export const AcceptChangeMeasureReferencePoint = ({
       <main>
         <section>
           <p>
-            Souhaitez-vous confirmer le remplacement du PRM pour ce point de
-            recharge ? <br />
+            {t(
+              "Souhaitez-vous confirmer le remplacement du PRM pour ce point de recharge ?"
+            )}
             <br />
-            L’ancien PRM sera sauvegardé dans notre base de données, mais ne
-            sera plus visible dans votre espace CarbuRe.
+            <br />
+            {t(
+              "L’ancien PRM sera sauvegardé dans notre base de données, mais ne sera plus visible dans votre espace CarbuRe."
+            )}
           </p>
         </section>
       </main>
