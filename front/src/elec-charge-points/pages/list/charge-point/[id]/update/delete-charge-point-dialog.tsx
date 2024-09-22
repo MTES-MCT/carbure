@@ -11,11 +11,11 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
 
 type DeleteChargePointDialogProps = {
-  charge_point_id: ChargePoint["id"]
+  id: ChargePoint["id"]
   onClose: PortalInstance["close"]
 }
 export const DeleteChargePointDialog = ({
-  charge_point_id,
+  id,
   onClose,
 }: DeleteChargePointDialogProps) => {
   const { t } = useTranslation()
@@ -58,7 +58,7 @@ export const DeleteChargePointDialog = ({
         <Button
           variant="primary"
           label={t("Confirmer")}
-          action={() => mutation.execute(entity.id, charge_point_id)}
+          action={() => mutation.execute(entity.id, id)}
           icon={Check}
           asideX
           loading={mutation.loading}

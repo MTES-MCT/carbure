@@ -1613,5 +1613,7 @@
   "Historique des numéros de compteur associés": "Historique des numéros de compteur associés",
   "Supprimer un point de recharge": "Supprimer un point de recharge",
   "Veuillez confirmer la suppression du point de recharge.": "Veuillez confirmer la suppression du point de recharge.",
-  "Point de recharge non trouvé.": "Point de recharge non trouvé."
+  "Point de recharge non trouvé.": "Point de recharge non trouvé.",
+  "Le point de recharge a bien été mis à jour.": "Le point de recharge a bien été mis à jour.",
+  "Une erreur est survenue lors de la mise à jour du point de recharge.": "Une erreur est survenue lors de la mise à jour du point de recharge."
 }

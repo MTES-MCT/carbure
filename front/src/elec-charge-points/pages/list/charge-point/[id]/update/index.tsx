@@ -3,12 +3,13 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm, Fieldset } from "common/components/form"
 import { useHashMatch } from "common/components/hash-route"
-import { Cross, Return } from "common/components/icons"
+import { Check, Cross, Return } from "common/components/icons"
 import { TextInput, NumberInput } from "common/components/input"
+import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { CONTACT_US_EMAIL } from "common/globals"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import { ChargePointStatusTag } from "elec-charge-points/components/charge-point-status-tag"
 import { ChargePoint, ChargePointStatus } from "elec-charge-points/types"
@@ -26,6 +27,7 @@ const UpdateChargePointDialog = () => {
   const location = useLocation()
   const { t } = useTranslation()
   const portal = usePortal()
+  const notify = useNotify()
   const closeDialog = () => navigate({ search: location.search, hash: "#" })
   const match = useHashMatch("charge-point/:id/update")
   const { value, bind, setValue } = useForm<Partial<ChargePoint>>({})
@@ -39,7 +41,25 @@ const UpdateChargePointDialog = () => {
       }
     },
   })
+  const chargePointUpdate = useMutation(api.updateChargePoint, {
+    invalidates: ["charge-points-list"],
+    onSuccess: () => {
+      closeDialog()
+      notify(t("Le point de recharge a bien été mis à jour."), {
+        variant: "success",
+      })
+    },
+    onError: () => {
+      notify(
+        t(
+          "Une erreur est survenue lors de la mise à jour du point de recharge."
+        ),
+        { variant: "danger" }
+      )
+    },
+  })
   const chargePointDetail = chargePointDetailQuery?.result?.data.data
+  const isReadOnly = value.status !== ChargePointStatus.Pending
 
   const openChangeMeterDialog = () => {
     if (!chargePointDetail) return
@@ -70,7 +90,7 @@ const UpdateChargePointDialog = () => {
         <header>
           {value.status && <ChargePointStatusTag status={value.status} />}
           <h1>
-            {t("PDC")} - {value.charge_point_id}
+            {t("PDC")} - {chargePointDetail?.charge_point_id}
           </h1>
         </header>
 
@@ -80,14 +100,13 @@ const UpdateChargePointDialog = () => {
           </main>
         ) : (
           <>
-            {" "}
             <main>
               <section>
                 <Form>
                   <Fieldset label={t("Informations")}>
                     <TextInput
                       label={t("Identifiant du point de recharge")}
-                      readOnly={value.status !== ChargePointStatus.Pending}
+                      readOnly={isReadOnly}
                       hasTooltip
                       title={`${t(
                         "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur"
@@ -140,7 +159,6 @@ const UpdateChargePointDialog = () => {
                       {t("Mon PRM a changé ?")}
                     </Button>
                   </Fieldset>
-                  {/* @ts-ignore */}
                   <MetersHistory charge_point_id={chargePointDetail.id} />
                 </Form>
               </section>
@@ -153,19 +171,34 @@ const UpdateChargePointDialog = () => {
                 action={() =>
                   portal((close) => (
                     <DeleteChargePointDialog
-                      charge_point_id={chargePointDetail.id}
+                      id={chargePointDetail.id}
                       onClose={close}
                     />
                   ))
                 }
               />
-              <Button
-                variant="secondary"
-                icon={Return}
-                label={t("Retour")}
-                action={closeDialog}
-                asideX
-              />
+              {isReadOnly ? (
+                <Button
+                  variant="secondary"
+                  icon={Return}
+                  label={t("Retour")}
+                  action={closeDialog}
+                  asideX
+                />
+              ) : (
+                <Button
+                  variant="primary"
+                  icon={Check}
+                  label={t("Sauvegarder")}
+                  action={() =>
+                    chargePointUpdate.execute(entity.id, chargePointDetail.id, {
+                      charge_point_id: value.charge_point_id || "",
+                    })
+                  }
+                  loading={chargePointUpdate.loading}
+                  asideX
+                />
+              )}
             </footer>
           </>
         )}
