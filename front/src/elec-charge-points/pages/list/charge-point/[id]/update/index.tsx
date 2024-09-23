@@ -102,7 +102,7 @@ const UpdateChargePointDialog = () => {
           <>
             <main>
               <section>
-                <Form>
+                <Form style={{ gap: "var(--spacing-l)" }}>
                   <Fieldset label={t("Informations")}>
                     <TextInput
                       label={t("Identifiant du point de recharge")}
