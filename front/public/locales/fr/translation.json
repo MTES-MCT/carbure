@@ -1598,7 +1598,12 @@
   "Numéro de PRM": "Numéro de PRM",
   "Compteur MID": "Compteur MID",
   "PRM": "PRM",
+  "Nouveau numéro de certificat MID": "Nouveau numéro de certificat MID",
+  "Relevé du nouveau compteur": "Relevé du nouveau compteur",
+  "Energie active totale relevée kWh (Index)": "Energie active totale relevée kWh (Index)",
+  "Remplacer l'ancien compteur": "Remplacer l'ancien compteur",
   "Mon compteur MID a changé ?": "Mon compteur MID a changé ?",
+  "Mon PRM a changé ?": "Mon PRM a changé ?",
   "Déclarer un changement de compteur": "Déclarer un changement de compteur",
   "Souhaitez-vous confirmer le remplacement du N° de compteur MID pour ce point de recharge ?": "Souhaitez-vous confirmer le remplacement du N° de compteur MID pour ce point de recharge ?",
   "L’ancien n° MID sera sauvegardé dans notre base de données, mais ne sera plus visible dans votre espace CarbuRe.": "L’ancien n° MID sera sauvegardé dans notre base de données, mais ne sera plus visible dans votre espace CarbuRe.",
@@ -1615,5 +1620,6 @@
   "Veuillez confirmer la suppression du point de recharge.": "Veuillez confirmer la suppression du point de recharge.",
   "Point de recharge non trouvé.": "Point de recharge non trouvé.",
   "Le point de recharge a bien été mis à jour.": "Le point de recharge a bien été mis à jour.",
-  "Une erreur est survenue lors de la mise à jour du point de recharge.": "Une erreur est survenue lors de la mise à jour du point de recharge."
+  "Une erreur est survenue lors de la mise à jour du point de recharge.": "Une erreur est survenue lors de la mise à jour du point de recharge.",
+  "Confirmer": "Confirmer"
 }

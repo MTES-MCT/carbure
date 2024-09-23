@@ -51,7 +51,7 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
               {...bind("initial_index_date")}
             />
             <TextInput
-              label={t("Nouveau numéro du certificat (MID)")}
+              label={t("Nouveau numéro de certificat MID")}
               required
               {...bind("mid_certificate")}
             />
