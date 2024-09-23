@@ -7,9 +7,9 @@ import { To } from "react-router-dom"
 import ApplicationStatus from "./application-status"
 
 interface ApplicationsTableProps {
-  applications: ElecAuditorApplication[];
+  applications: ElecAuditorApplication[]
   rowLink?: (row: ElecAuditorApplication) => To
-  loading?: boolean;
+  loading?: boolean
 }
 
 const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
@@ -17,7 +17,6 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
   rowLink,
   loading,
 }) => {
-
   const { t } = useTranslation()
 
   return (
@@ -28,52 +27,44 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
       columns={[
         {
           header: t("Statut"),
-          cell: (application) => <ApplicationStatus status={application.status} />,
+          cell: (application) => (
+            <ApplicationStatus status={application.status} />
+          ),
         },
         {
           header: t("Ordre de côntrole"),
           cell: (application) => (
-            <Cell
-              text={`${formatDate(application.audit_order_date!)}`}
-            />
+            <Cell text={`${formatDate(application.audit_order_date!)}`} />
           ),
         },
         {
           header: t("Aménageur"),
-          cell: (application) => (
-            <Cell
-              text={`${application.cpo.name}`}
-            />
-          ),
+          cell: (application) => <Cell text={`${application.cpo.name}`} />,
         },
         {
           header: t("Stations"),
           cell: (application) => (
-            <Cell
-              text={`${formatNumber(application.station_count)}`}
-            />
+            <Cell text={`${formatNumber(application.station_count)}`} />
           ),
         },
         {
           header: t("Points de recharge"),
           cell: (application) => (
-            <Cell
-              text={`${formatNumber(application.charge_point_count)}`}
-            />
+            <Cell text={`${formatNumber(application.charge_point_count)}`} />
           ),
         },
         {
-          header: t("Date limité"),
+          header: t("Date limite"),
           cell: (application) => {
-            let limitDate = getApplicationAuditLimitDate(application.audit_order_date!)
-            return <Cell
-              text={`${formatDate(limitDate)}`}
-            />
+            let limitDate = getApplicationAuditLimitDate(
+              application.audit_order_date!
+            )
+            return <Cell text={`${formatDate(limitDate)}`} />
           },
         },
       ]}
     />
-  );
-};
+  )
+}
 
-export default ApplicationsTable;
+export default ApplicationsTable
