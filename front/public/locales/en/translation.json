@@ -764,7 +764,7 @@
   "Audit terminé ({{count}})_one": "Audit finished ({{count}})",
   "Audit terminé ({{count}})_other": "Audit finished ({{count}})",
   "Ordre de côntrole": "Control order",
-  "Date limité": "Deadline",
+  "Date limite": "Deadline",
   "Année": "Year",
   "En cours d'audit": "Audit in progress",
   "Audit réalisé": "Audit done",
