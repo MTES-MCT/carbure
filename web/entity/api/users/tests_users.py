@@ -3,6 +3,7 @@ from core.models import Entity, UserRights, UserRightsRequests
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django_otp.plugins.otp_email.models import EmailDevice
 
 
 class Endpoint:
@@ -155,14 +156,22 @@ class EntityUserTest(TestCase):
         }
         res = self.client.post(Endpoint.invite_user, params)
         self.assertEqual(res.status_code, 200)
-        new_user = User.objects.get(email=self.user2.email)
-        self.assertIsNotNone(new_user)
         self.assertEqual(
             UserRightsRequests.objects.filter(
-                user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"
+                user_id=self.user2.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"
             ).count(),
             1,
         )
         self.assertEqual(
-            UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count(), 1
+            UserRights.objects.filter(user_id=self.user2.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count(), 1
         )
+        self.assertEqual(User.objects.filter(email=self.user2.email).count(), 1)
+        self.assertEqual(EmailDevice.objects.filter(user=self.user2).count(), 1)
+
+        params = {
+            "entity_id": self.trader.id,
+            "email": self.user2.email,
+            "role": UserRights.ADMIN,
+        }
+        res = self.client.post(Endpoint.invite_user, params)
+        self.assertEqual(EmailDevice.objects.filter(user=self.user2).count(), 1)
