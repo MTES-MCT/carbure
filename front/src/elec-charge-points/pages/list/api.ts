@@ -13,7 +13,7 @@ export function getChargePointsFilters(
   field: string,
   query: ChargePointsListQuery
 ) {
-  const params = { filter: field, ...query, ...CBQUERY_RESET }
+  const { year, ...params } = { filter: field, ...query, ...CBQUERY_RESET }
 
   return api
     .get<
