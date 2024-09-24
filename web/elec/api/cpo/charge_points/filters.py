@@ -23,11 +23,9 @@ def get_charge_points_filters(request, entity):
     filters.cleaned_data[current_filter] = None
 
     charge_points = ElecChargePoint.objects.filter(cpo=entity, is_deleted=False)
+    charge_points = annotate_with_latest_meter_reading_date(charge_points)
     charge_points = filter_charge_points(charge_points, **filters.cleaned_data)
     charge_points = charge_points.select_related("application")
-
-    if current_filter == "latest_meter_reading_month":
-        charge_points = annotate_with_latest_meter_reading_date(charge_points)
 
     remaining_filter_values = charge_points.values_list(filter_to_column[current_filter], flat=True).distinct()
 
