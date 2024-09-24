@@ -12,6 +12,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import Entity
+from core.utils import MultipleValueField
 from elec.models import ElecChargePoint, ElecMeterReading
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
 from elec.serializers.elec_charge_point_application import ElecChargePointApplication
@@ -21,8 +22,8 @@ from elec.services.export_charge_point_excel import export_charge_points_to_exce
 class ChargePointFilterForm(forms.Form):
     status = forms.CharField(required=False)
     application_date = forms.DateField(required=False)
-    charge_point_id = forms.CharField(required=False)
-    station_id = forms.CharField(required=False)
+    charge_point_id = MultipleValueField(coerce=str, required=False)
+    station_id = MultipleValueField(coerce=str, required=False)
     latest_meter_reading_month = forms.CharField(required=False)
     is_article_2 = forms.BooleanField(required=False)
     search = forms.CharField(required=False)
@@ -109,10 +110,10 @@ def filter_charge_points(charge_points, **filters):
         charge_points = charge_points.filter(application__created_at=filters["application_date"])
 
     if filters["charge_point_id"]:
-        charge_points = charge_points.filter(charge_point_id=filters["charge_point_id"])
+        charge_points = charge_points.filter(charge_point_id__in=filters["charge_point_id"])
 
     if filters["station_id"]:
-        charge_points = charge_points.filter(station_id=filters["station_id"])
+        charge_points = charge_points.filter(station_id__in=filters["station_id"])
 
     if filters["latest_meter_reading_month"]:
         date = filters["latest_meter_reading_month"]
