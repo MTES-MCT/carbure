@@ -38,7 +38,6 @@
     }
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.24.7",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.57.0",
@@ -47,11 +46,8 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "i18next-parser": "^7.7.0",
     "jest-environment-jsdom": "^29.2.5",
-    "jest-transformer-svg": "^2.0.2",
     "prettier": "^3.3.3",
-    "ts-jest": "^29.2.5",
-    "typescript-plugin-css-modules": "^5.1.0",
-    "undici": "^6.19.8"
+    "typescript-plugin-css-modules": "^5.1.0"
   },
   "scripts": {
     "start-server": "cd ../ && docker-compose up -d && cd front && npm run open",
@@ -59,7 +55,7 @@
     "stop-server": "docker-compose down",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "DEBUG=0 jest",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
