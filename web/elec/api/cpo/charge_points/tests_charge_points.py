@@ -717,7 +717,7 @@ class ElecCharginPointsTest(TestCase):
         # With is_article_2 filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "is_article_2": True},
+            {"entity_id": self.cpo.id, "is_article_2": "true"},
         )
         data = response.json()
         assert response.status_code == 200
@@ -725,7 +725,7 @@ class ElecCharginPointsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "is_article_2": False},
+            {"entity_id": self.cpo.id, "is_article_2": "false"},
         )
         data = response.json()
         assert response.status_code == 200
