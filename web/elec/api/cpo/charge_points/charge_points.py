@@ -24,8 +24,8 @@ class ChargePointFilterForm(forms.Form):
     application_date = forms.DateField(required=False)
     charge_point_id = MultipleValueField(coerce=str, required=False)
     station_id = MultipleValueField(coerce=str, required=False)
-    latest_meter_reading_month = forms.CharField(required=False)
-    is_article_2 = forms.CharField(required=False)
+    latest_meter_reading_month = MultipleValueField(required=False)
+    is_article_2 = MultipleValueField(required=False)
     search = forms.CharField(required=False)
 
 
@@ -116,19 +116,20 @@ def filter_charge_points(charge_points, **filters):
         charge_points = charge_points.filter(station_id__in=filters["station_id"])
 
     if filters["latest_meter_reading_month"]:
-        date = filters["latest_meter_reading_month"]
-        if date == "null":
-            charge_points = charge_points.filter(latest_meter_reading_date=None)
-        else:
-            date_obj = datetime.strptime(date, "%m/%Y")
-            month = date_obj.month
-            year = date_obj.year
-            charge_points = charge_points.filter(
-                latest_meter_reading_date__month=month, latest_meter_reading_date__year=year
-            )
+        dates = filters["latest_meter_reading_month"]
+        date_filter = Q()
+        for date in dates:
+            if date == "null":
+                date_filter |= Q(latest_meter_reading_date=None)
+            else:
+                date_obj = datetime.strptime(date, "%m/%Y")
+                month = date_obj.month
+                year = date_obj.year
+                date_filter |= Q(latest_meter_reading_date__month=month, latest_meter_reading_date__year=year)
+        charge_points = charge_points.filter(date_filter)
 
     if filters["is_article_2"]:
-        charge_points = charge_points.filter(is_article_2=filters["is_article_2"] == "true")
+        charge_points = charge_points.filter(is_article_2__in=[item == "true" for item in filters["is_article_2"]])
 
     if filters["search"]:
         search = filters["search"]
