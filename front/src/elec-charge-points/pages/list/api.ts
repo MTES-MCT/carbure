@@ -4,8 +4,9 @@ import { selectionOrQuery } from "common/utils/pagination"
 import { ChargePointsListData, ChargePointsListQuery } from "./types"
 
 export function getChargePointsList(query: ChargePointsListQuery) {
+  const { year, ...params } = query
   return api.get<Api<ChargePointsListData>>("elec/cpo/charge-points", {
-    params: query,
+    params,
   })
 }
 
@@ -23,12 +24,12 @@ export function getChargePointsFilters(
 }
 
 export function downloadChargePointsList(
-  query: ChargePointsListQuery,
+  { year, ...params }: ChargePointsListQuery,
   selection: number[]
 ) {
   return download("/elec/cpo/charge-points", {
     ...selectionOrQuery(
-      { ...query, from_idx: undefined, limit: undefined },
+      { ...params, from_idx: undefined, limit: undefined },
       selection
     ),
     export: true,
