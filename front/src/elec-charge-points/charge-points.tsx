@@ -1,29 +1,32 @@
 import useEntity from "carbure/hooks/entity"
 import { Main } from "common/components/scaffold"
-import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
-import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import { ChargePointsTabs } from "./charge-points-tabs"
 import { ChargePointsSnapshot } from "./types"
-import ChargePointsPending from "./pages/charge-points-pending"
 import ElecMeterReadingsSettings from "./pages/meter-readings"
+import ChargePointsList from "./pages/list"
+import ChargePointsPending from "./pages/pending"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
   charge_point_applications: 0,
   meter_reading_applications: 0,
+  accepted: 0,
+  audit_in_progress: 0,
+  pending: 0,
 }
+
+const currentYear = new Date().getFullYear()
 
 const ChargePoints = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const years = useYears("charge-points", api.getYears)
   const snapshotResponse = useQuery(api.getChargePointsSnapshot, {
     key: "charge-points-snapshot",
-    params: [entity.id, years.selected],
+    params: [entity.id],
   })
 
   const snapshot = snapshotResponse.result?.data.data ?? defaultSnapshot
@@ -33,16 +36,6 @@ const ChargePoints = () => {
       <header>
         <section>
           <h1>{t("Points de recharge")}</h1>
-
-          <Select
-            loading={years.loading}
-            variant="inline"
-            placeholder={t("Choisir une année")}
-            value={years.selected}
-            onChange={years.setYear}
-            options={years.options}
-            sort={(year) => -year.value}
-          />
         </section>
 
         <section>
@@ -61,11 +54,14 @@ const ChargePoints = () => {
           }
         />
 
-        {/* <Route path="list" element={<div>CHARGE POINTS LIST PAGE</div>} /> */}
+        <Route
+          path="list/*"
+          element={<ChargePointsList year={currentYear} snapshot={snapshot} />}
+        />
 
         <Route
           path="pending"
-          element={<ChargePointsPending year={years.selected} />}
+          element={<ChargePointsPending year={currentYear} />}
         />
 
         <Route path="*" element={<Navigate replace to="pending" />} />

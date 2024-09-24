@@ -5,8 +5,6 @@ from django.urls import reverse
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
-from elec.models.elec_charge_point_application import ElecChargePointApplication
-from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 
@@ -162,28 +160,6 @@ class ElecCPOTest(TestCase):
     def test_certificate_years(self):
         response = self.client.get(
             reverse("elec-cpo-certificate-years"),
-            {
-                "entity_id": self.cpo.id,
-            },
-        )
-
-        json = response.json()
-        assert json["data"] == [2022, 2023]
-
-    def test_charge_point_years(self):
-        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-        application.created_at = datetime.date(2022, 12, 28)
-        application.save()
-
-        ElecMeterReadingApplication.objects.create(
-            status=ElecMeterReadingApplication.ACCEPTED,
-            quarter=2,
-            year=2023,
-            cpo=self.cpo,
-        )
-
-        response = self.client.get(
-            reverse("elec-cpo-charge-point-years"),
             {
                 "entity_id": self.cpo.id,
             },

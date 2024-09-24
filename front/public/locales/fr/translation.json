@@ -849,6 +849,7 @@
   "Inscrire des points de recharge": "Inscrire des points de recharge",
   "Exporter les points de recharge": "Exporter les points de recharge",
   "Aucun point de recharge trouvé": "Aucun point de recharge trouvé",
+  "Aucun dossier d'inscription trouvé": "Aucun dossier d'inscription trouvé",
   "Kw cumulés": "Kw cumulés",
   "Date d'ajout": "Date d'ajout",
   "Puissance cumulée": "Puissance cumulée",
@@ -1582,5 +1583,13 @@
   "Une erreur est survenue lors de l'ajout de l'utilisateur": "Une erreur est survenue lors de l'ajout de l'utilisateur",
   "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.",
   "Nous sommes désolé, une erreur technique est survenue.": "Nous sommes désolé, une erreur technique est survenue.",
-  "Merci de recharger la page ou nous contacter si le problème persiste.": "Merci de recharger la page ou nous contacter si le problème persiste."
+  "Merci de recharger la page ou nous contacter si le problème persiste.": "Merci de recharger la page ou nous contacter si le problème persiste.",
+  "Identifiant PDC": "Identifiant PDC",
+  "Identifiant station": "Identifiant station",
+  "Date du dernier relevé": "Date du dernier relevé",
+  "Relevé trimestriel": "Relevé trimestriel",
+  "CA/CC": "CA/CC",
+  "Dernier index - kWh": "Dernier index - kWh",
+  "Concerné": "Concerné",
+  "Pas concerné": "Pas concerné"
 }
