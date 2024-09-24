@@ -38,7 +38,10 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
         return round(instance.measure_energy or 0, 3)
 
     def get_latest_meter_reading_date(self, instance):
-        return serializers.DateField().to_representation(instance.latest_meter_reading_date)
+        if instance.latest_meter_reading_date:
+            month = str(instance.latest_meter_reading_date.month)
+            year = instance.latest_meter_reading_date.year
+            return f"{month.zfill(2)}/{year}"
 
     def get_nominal_power(self, instance):
         return round(instance.nominal_power or 0, 3)
