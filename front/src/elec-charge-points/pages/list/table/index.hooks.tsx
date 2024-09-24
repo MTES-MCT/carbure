@@ -10,7 +10,7 @@ export const useChargePointsColumns = () => {
 
   const columns: Record<
     | "status"
-    | "measure_date"
+    | "latest_meter_reading_date"
     | "charge_point_id"
     | "station_id"
     | "current_type"
@@ -24,10 +24,10 @@ export const useChargePointsColumns = () => {
         <ChargePointsListTableStatus status={chargePoint.status} />
       ),
     },
-    measure_date: {
+    latest_meter_reading_date: {
       header: t("Date du dernier relevé"),
       cell: (chargePoint) => (
-        <Cell text={formatDate(chargePoint.measure_date)} />
+        <Cell text={chargePoint.latest_meter_reading_date} />
       ),
     },
     charge_point_id: {

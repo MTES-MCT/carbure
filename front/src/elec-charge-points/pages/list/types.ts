@@ -24,6 +24,7 @@ export type ChargePoint = {
   station_id: number
   current_type?: ChargePointType
   measure_date: string | null
+  latest_meter_reading_date: string | null
   measure_energy: number
   installation_date: string
   status: ChargePointStatus
