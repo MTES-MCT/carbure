@@ -28,7 +28,7 @@ export const ChargePointsListTable = ({
       rows={chargePoints}
       columns={compact([
         columns.status,
-        columns.measure_date,
+        columns.latest_meter_reading_date,
         columns.charge_point_id,
         columns.station_id,
         columns.current_type,
