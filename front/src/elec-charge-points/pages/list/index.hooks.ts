@@ -37,11 +37,11 @@ const useArticle2Options = () => {
     () => [
       {
         label: t("Concerné"),
-        value: false,
+        value: "false",
       },
       {
         label: t("Pas concerné"),
-        value: true,
+        value: "true",
       },
     ],
     [t]
