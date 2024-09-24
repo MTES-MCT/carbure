@@ -157,7 +157,7 @@ test("edit transaction details", async () => {
 
   const dd = getField("Date de livraison")
   await user.clear(dd)
-  await user.type(dd, "2021-31-01")
+  await user.type(dd, "2021-01-31")
 
   screen.getAllByDisplayValue("Producteur Test")
 
@@ -257,9 +257,8 @@ test("check transaction errors", async () => {
   await user.click(screen.getByText("Retour"))
 })
 
-test.only("check transaction comments", async () => {
+test("check transaction comments", async () => {
   const user = userEvent.setup()
-
   Data.set("lot-details", tofixDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
