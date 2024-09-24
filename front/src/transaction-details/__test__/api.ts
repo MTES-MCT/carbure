@@ -95,9 +95,9 @@ export const okAcceptBlending = http.post(
 
 export const okCommentLot = http.post(
   "/api/transactions/lots/comment",
-  ({ request }) => {
-    Data.set("lot-details", async (details: LotDetails) => {
-      const body = (await request.json()) as FormData
+  async ({ request }) => {
+    const body = await request.formData()
+    Data.set("lot-details", (details: LotDetails) => {
       details.comments.push({
         entity: producer,
         user: "producer@test.com",
