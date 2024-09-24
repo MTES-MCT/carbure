@@ -25,7 +25,7 @@ class ChargePointFilterForm(forms.Form):
     charge_point_id = MultipleValueField(coerce=str, required=False)
     station_id = MultipleValueField(coerce=str, required=False)
     latest_meter_reading_month = forms.CharField(required=False)
-    is_article_2 = forms.BooleanField(required=False)
+    is_article_2 = forms.CharField(required=False)
     search = forms.CharField(required=False)
 
 
@@ -128,7 +128,7 @@ def filter_charge_points(charge_points, **filters):
             )
 
     if filters["is_article_2"]:
-        charge_points = charge_points.filter(is_article_2=filters["is_article_2"])
+        charge_points = charge_points.filter(is_article_2=filters["is_article_2"] == "true")
 
     if filters["search"]:
         search = filters["search"]
