@@ -137,7 +137,9 @@ export function useTagAutocomplete<T, V>({
   function filterOptions(query: string): T[] {
     const options = suggestions
     const includesQuery = createQueryFilter(query)
-    return denormalizeItems(normalizeItems(options, normalize, includesQuery))
+    return denormalizeItems(
+      normalizeItems<T, V>(options, normalize, includesQuery)
+    )
   }
 
   async function onQueryChange(query: string | undefined = "") {
