@@ -562,7 +562,7 @@ class ElecCharginPointsTest(TestCase):
                         "mid_id": "123-456",
                         "measure_date": "2023-06-29",
                         "measure_energy": 1000.123,
-                        "latest_meter_reading_date": "2024-09-30",
+                        "latest_meter_reading_date": "09/2024",
                         "is_article_2": False,
                         "measure_reference_point_id": "123456",
                         "station_name": "Station",
@@ -603,15 +603,6 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert response.status_code == 200
         assert data == expected
-
-        # With year filter
-        response = self.client.get(
-            reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "year": 2022},
-        )
-        data = response.json()
-        assert response.status_code == 200
-        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -815,7 +806,7 @@ class ElecCharginPointsTest(TestCase):
                 "mid_id": "123-456",
                 "measure_date": "2023-06-29",
                 "measure_energy": 1000.123,
-                "latest_meter_reading_date": "2024-09-30",
+                "latest_meter_reading_date": "09/2024",
                 "is_article_2": False,
                 "measure_reference_point_id": "123456",
                 "station_name": "Station",

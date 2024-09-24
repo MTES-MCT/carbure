@@ -19,7 +19,6 @@ from elec.services.export_charge_point_excel import export_charge_points_to_exce
 
 
 class ChargePointFilterForm(forms.Form):
-    year = forms.IntegerField(required=False)
     status = forms.CharField(required=False)
     application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
@@ -97,9 +96,6 @@ def get_charge_points(request, entity):
 
 def filter_charge_points(charge_points, **filters):
     charge_points = charge_points.prefetch_related("elec_meters")
-
-    if filters["year"]:
-        charge_points = charge_points.filter(application__created_at__year=filters["year"])
 
     if filters["status"]:
         status_mapping = {
