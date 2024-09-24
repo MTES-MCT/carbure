@@ -1,4 +1,4 @@
-import { http } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { Data } from "carbure/__test__/helpers"
 import { LotDetails } from "../types"
@@ -14,101 +14,101 @@ import {
 } from "carbure/__test__/api"
 import { producer } from "carbure/__test__/data"
 
-export const okLotDetails = http.get(
-  "/api/transactions/lots/details",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: Data.get("lot-details"),
-      })
-    )
-  }
-)
+export const okLotDetails = http.get("/api/transactions/lots/details", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: Data.get("lot-details"),
+  })
+})
 
-export const okUpdateLot = http.post(
-  "/api/transactions/lots/update",
-  (req, res, ctx) => {
-    const details = Data.get("lot-details")
-    details.lot.transport_document_reference = "DAETEST UPDATED"
-    Data.set("lot-details", details)
-    return res(ctx.json({ status: "success" }))
-  }
-)
+export const okUpdateLot = http.post("/api/transactions/lots/update", () => {
+  const details = Data.get("lot-details")
+  details.lot.transport_document_reference = "DAETEST UPDATED"
+  Data.set("lot-details", details)
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
-export const okSendLot = http.post(
-  "/api/transactions/lots/send",
-  (req, res, ctx) => {
-    Data.set("lot-details", (details: LotDetails) => {
-      details.lot.lot_status = LotStatus.Pending
-    })
-    return res(ctx.json({ status: "success" }))
-  }
-)
+export const okSendLot = http.post("/api/transactions/lots/send", () => {
+  Data.set("lot-details", (details: LotDetails) => {
+    details.lot.lot_status = LotStatus.Pending
+  })
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
-export const okDeleteLot = http.post(
-  "/api/transactions/lots/delete",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success" }))
-  }
-)
+export const okDeleteLot = http.post("/api/transactions/lots/delete", () => {
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
 export const okRequestFix = http.post(
   "/api/transactions/lots/request-fix",
-  (req, res, ctx) => {
+  () => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.InCorrection
     })
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
 export const okMarkAsFixed = http.post(
   "/api/transactions/lots/submit-fix",
-  (req, res, ctx) => {
+  () => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.Fixed
     })
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
-export const okRejectLot = http.post(
-  "/api/transactions/lots/reject",
-  (req, res, ctx) => {
-    Data.set("lot-details", (details: LotDetails) => {
-      details.lot.lot_status = LotStatus.Rejected
-      details.lot.correction_status = CorrectionStatus.NoProblem
-    })
-    return res(ctx.json({ status: "success" }))
-  }
-)
+export const okRejectLot = http.post("/api/transactions/lots/reject", () => {
+  Data.set("lot-details", (details: LotDetails) => {
+    details.lot.lot_status = LotStatus.Rejected
+    details.lot.correction_status = CorrectionStatus.NoProblem
+  })
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
 export const okAcceptBlending = http.post(
   "/api/transactions/lots/accept-blending",
-  (req, res, ctx) => {
+  () => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.lot_status = LotStatus.Accepted
       details.lot.delivery_type = DeliveryType.Blending
     })
-    return res(ctx.json({ status: "success" }))
+
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
 export const okCommentLot = http.post(
   "/api/transactions/lots/comment",
-  (req, res, ctx) => {
-    Data.set("lot-details", (details: LotDetails) => {
+  ({ request }) => {
+    Data.set("lot-details", async (details: LotDetails) => {
+      const body = (await request.json()) as FormData
       details.comments.push({
         entity: producer,
         user: "producer@test.com",
         comment_type: "REGULAR",
         comment_dt: "2021-11-30T16:02:45.832791+01:00",
-        // @ts-ignore used for tests
-        comment: (req._body as FormData).get("comment")?.toString() ?? "error",
+        comment: body.get("comment")?.toString() ?? "error",
       })
     })
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 

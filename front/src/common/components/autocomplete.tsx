@@ -121,7 +121,7 @@ export function useAutocomplete<T, V>({
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
 
-  const asyncOptions = useAsyncList({
+  const asyncOptions = useAsyncList<T, V>({
     selectedValue: value,
     items: options,
     defaultItems: defaultOptions,
@@ -144,7 +144,9 @@ export function useAutocomplete<T, V>({
   function filterOptions(query: string): T[] {
     const options = asyncOptions.items
     const includesQuery = createQueryFilter(query)
-    return denormalizeItems(normalizeItems(options, normalize, includesQuery))
+    return denormalizeItems(
+      normalizeItems<T, V>(options, normalize, includesQuery)
+    )
   }
 
   function matchQuery(
