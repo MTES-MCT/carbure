@@ -16,7 +16,7 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "mid_id",
             "measure_date",
             "measure_energy",
-            "latest_extracted_energy",
+            "latest_meter_reading_date",
             "is_article_2",
             "measure_reference_point_id",
             "station_name",
@@ -30,15 +30,18 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
     application_date = serializers.DateField(source="application.created_at")
     measure_energy = serializers.SerializerMethodField()
-    latest_extracted_energy = serializers.SerializerMethodField()
+    latest_meter_reading_date = serializers.SerializerMethodField()
     nominal_power = serializers.SerializerMethodField()
     status = serializers.CharField(source="application.status", read_only=True)
 
     def get_measure_energy(self, instance):
         return round(instance.measure_energy or 0, 3)
 
-    def get_latest_extracted_energy(self, instance):
-        return instance.latest_extracted_energy
+    def get_latest_meter_reading_date(self, instance):
+        if instance.latest_meter_reading_date:
+            month = str(instance.latest_meter_reading_date.month)
+            year = instance.latest_meter_reading_date.year
+            return f"{month.zfill(2)}/{year}"
 
     def get_nominal_power(self, instance):
         return round(instance.nominal_power or 0, 3)

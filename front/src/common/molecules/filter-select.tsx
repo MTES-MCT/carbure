@@ -1,7 +1,7 @@
 import { MultiSelect } from "common/components/multi-select"; // prettier-ignore
-import { Grid } from "common/components/scaffold";
-import { CBFilterSelection } from "common/hooks/query-builder";
-import { defaultNormalizer } from "common/utils/normalize";
+import { Grid } from "common/components/scaffold"
+import { CBFilterSelection } from "common/hooks/query-builder"
+import { defaultNormalizer } from "common/utils/normalize"
 
 export interface FilterMultiSelectProps {
   filterLabels: Record<string, string>
@@ -16,7 +16,6 @@ export function FilterMultiSelect({
   onSelect,
   getFilterOptions,
 }: FilterMultiSelectProps) {
-
   const filters = Object.keys(filterLabels)
 
   return (
@@ -36,7 +35,6 @@ export function FilterMultiSelect({
               onSelect({ ...selected, [filter]: value ?? [] })
             }
             getOptions={() => getFilterOptions(filter)}
-
           />
         )
       })}

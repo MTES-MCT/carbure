@@ -502,7 +502,7 @@ class ElecCharginPointsTest(TestCase):
             current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
-            station_id="FGHIJ",
+            station_id="GHIJK",
             nominal_power=40,
             cpo_name="Bob",
             cpo_siren="67890",
@@ -537,7 +537,7 @@ class ElecCharginPointsTest(TestCase):
         ElecMeterReading.objects.create(
             extracted_energy=4,
             renewable_energy=2,
-            reading_date=datetime.date(2024, 9, 29),
+            reading_date=datetime.date(2024, 8, 29),
             meter=self.meter,
             cpo=self.cpo,
             application=meter_reading_application,
@@ -550,62 +550,59 @@ class ElecCharginPointsTest(TestCase):
 
         expected = {
             "status": "success",
-            "data": [
-                {
-                    "id": charge_point.id,
-                    "cpo": self.cpo.name,
-                    "charge_point_id": "ABCDE",
-                    "current_type": "AC",
-                    "application_date": "2023-01-05",
-                    "installation_date": "2023-02-15",
-                    "mid_id": "123-456",
-                    "measure_date": "2023-06-29",
-                    "measure_energy": 1000.123,
-                    "latest_extracted_energy": 40,
-                    "is_article_2": False,
-                    "measure_reference_point_id": "123456",
-                    "station_name": "Station",
-                    "station_id": "FGHIJ",
-                    "nominal_power": 150.0,
-                    "cpo_name": "Alice",
-                    "cpo_siren": "12345",
-                    "status": "PENDING",
-                },
-                {
-                    "id": charge_point2.id,
-                    "cpo": self.cpo.name,
-                    "charge_point_id": "BCDEF",
-                    "current_type": "AC",
-                    "application_date": "2023-01-06",
-                    "installation_date": "2023-02-15",
-                    "mid_id": "123-456",
-                    "measure_date": "2023-06-29",
-                    "measure_energy": 1000.123,
-                    "latest_extracted_energy": 0,
-                    "is_article_2": False,
-                    "measure_reference_point_id": "123456",
-                    "station_name": "Station",
-                    "station_id": "FGHIJ",
-                    "nominal_power": 40.0,
-                    "cpo_name": "Bob",
-                    "cpo_siren": "67890",
-                    "status": "PENDING",
-                },
-            ],
+            "data": {
+                "elec_charge_points": [
+                    {
+                        "id": charge_point.id,
+                        "cpo": self.cpo.name,
+                        "charge_point_id": "ABCDE",
+                        "current_type": "AC",
+                        "application_date": "2023-01-05",
+                        "installation_date": "2023-02-15",
+                        "mid_id": "123-456",
+                        "measure_date": "2023-06-29",
+                        "measure_energy": 1000.123,
+                        "latest_meter_reading_date": "09/2024",
+                        "is_article_2": False,
+                        "measure_reference_point_id": "123456",
+                        "station_name": "Station",
+                        "station_id": "FGHIJ",
+                        "nominal_power": 150.0,
+                        "cpo_name": "Alice",
+                        "cpo_siren": "12345",
+                        "status": "PENDING",
+                    },
+                    {
+                        "id": charge_point2.id,
+                        "cpo": self.cpo.name,
+                        "charge_point_id": "BCDEF",
+                        "current_type": "AC",
+                        "application_date": "2023-01-06",
+                        "installation_date": "2023-02-15",
+                        "mid_id": "123-456",
+                        "measure_date": "2023-06-29",
+                        "measure_energy": 1000.123,
+                        "latest_meter_reading_date": None,
+                        "is_article_2": False,
+                        "measure_reference_point_id": "123456",
+                        "station_name": "Station",
+                        "station_id": "GHIJK",
+                        "nominal_power": 40.0,
+                        "cpo_name": "Bob",
+                        "cpo_siren": "67890",
+                        "status": "PENDING",
+                    },
+                ],
+                "ids": [charge_point.id, charge_point2.id],
+                "from": 0,
+                "returned": 2,
+                "total": 2,
+            },
         }
 
         data = response.json()
         assert response.status_code == 200
         assert data == expected
-
-        # With year filter
-        response = self.client.get(
-            reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "year": 2022},
-        )
-        data = response.json()
-        assert response.status_code == 200
-        assert len(data["data"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -613,17 +610,19 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 2
-        assert ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.created_at.year == 2023
+        assert len(data["data"]["elec_charge_points"]) == 2
+        assert (
+            ElecChargePoint.objects.get(id=data["data"]["elec_charge_points"][0]["id"]).application.created_at.year == 2023
+        )
 
         # With status
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "status": "AUDIT_DONE"},
+            {"entity_id": self.cpo.id, "status": "ACCEPTED"},
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -631,8 +630,8 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 2
-        assert ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.status == "PENDING"
+        assert len(data["data"]["elec_charge_points"]) == 2
+        assert ElecChargePoint.objects.get(id=data["data"]["elec_charge_points"][0]["id"]).application.status == "PENDING"
 
         # With application_date filter
         response = self.client.get(
@@ -641,7 +640,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -649,8 +648,10 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 1
-        assert ElecChargePoint.objects.get(id=data["data"][0]["id"]).application.created_at == datetime.date(2023, 1, 5)
+        assert len(data["data"]["elec_charge_points"]) == 1
+        assert ElecChargePoint.objects.get(
+            id=data["data"]["elec_charge_points"][0]["id"]
+        ).application.created_at == datetime.date(2023, 1, 5)
 
         # With charge_point_id filter
         response = self.client.get(
@@ -659,7 +660,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
@@ -667,51 +668,69 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 1
-        assert data["data"][0]["charge_point_id"] == "ABCDE"
+        assert len(data["data"]["elec_charge_points"]) == 1
+        assert data["data"]["elec_charge_points"][0]["charge_point_id"] == "ABCDE"
 
-        # With latest_extracted_energy filter
+        # With station_id filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_extracted_energy": "4"},
+            {"entity_id": self.cpo.id, "station_id": "AAAAA"},
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_extracted_energy": "40"},
+            {"entity_id": self.cpo.id, "station_id": "FGHIJ"},
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
+        assert data["data"]["elec_charge_points"][0]["station_id"] == "FGHIJ"
+
+        # With latest_meter_reading_month filter
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": "08/2024"},
+        )
+        data = response.json()
+        assert response.status_code == 200
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "latest_extracted_energy": "0"},
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": "09/2024"},
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
+
+        response = self.client.get(
+            reverse("elec-cpo-charge-points-get-charge-points"),
+            {"entity_id": self.cpo.id, "latest_meter_reading_month": "null"},
+        )
+        data = response.json()
+        assert response.status_code == 200
+        assert len(data["data"]["elec_charge_points"]) == 1
 
         # With is_article_2 filter
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "is_article_2": True},
+            {"entity_id": self.cpo.id, "is_article_2": "true"},
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 0
+        assert len(data["data"]["elec_charge_points"]) == 0
 
         response = self.client.get(
             reverse("elec-cpo-charge-points-get-charge-points"),
-            {"entity_id": self.cpo.id, "is_article_2": False},
+            {"entity_id": self.cpo.id, "is_article_2": "false"},
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 2
-        assert ElecChargePoint.objects.get(id=data["data"][0]["id"]).is_article_2 is False
+        assert len(data["data"]["elec_charge_points"]) == 2
+        assert ElecChargePoint.objects.get(id=data["data"]["elec_charge_points"][0]["id"]).is_article_2 is False
 
         # With pagination
         response = self.client.get(
@@ -720,7 +739,7 @@ class ElecCharginPointsTest(TestCase):
         )
         data = response.json()
         assert response.status_code == 200
-        assert len(data["data"]) == 1
+        assert len(data["data"]["elec_charge_points"]) == 1
 
     def test_get_charge_points_details_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -787,7 +806,7 @@ class ElecCharginPointsTest(TestCase):
                 "mid_id": "123-456",
                 "measure_date": "2023-06-29",
                 "measure_energy": 1000.123,
-                "latest_extracted_energy": 40,
+                "latest_meter_reading_date": "09/2024",
                 "is_article_2": False,
                 "measure_reference_point_id": "123456",
                 "station_name": "Station",
@@ -798,7 +817,6 @@ class ElecCharginPointsTest(TestCase):
                 "status": "PENDING",
             },
         }
-
         data = response.json()
         assert response.status_code == 200
         assert data == expected
@@ -859,7 +877,7 @@ class ElecCharginPointsTest(TestCase):
                     "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.123,
-                    "latest_extracted_energy": 0.0,
+                    "latest_meter_reading_date": None,
                     "is_article_2": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",

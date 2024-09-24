@@ -115,7 +115,7 @@ const ChargePointsApplicationsList = ({
                 downloadChargePointsApplication
               }
               rowLink={showChargePointsApplicationDetails}
-              displayCpo={true}
+              displayCpo
             />
 
             {(state.limit || 0) < total && (
