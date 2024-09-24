@@ -13,13 +13,14 @@ import {
   meterReadingsApplicationCheckResponseFailed,
   meterReadingsApplicationCheckResponseSuccess,
 } from "elec/__test__/data"
-import { http } from "msw"
+import { http, HttpResponse } from "msw"
 
 export const okChargePointsApplications = http.get(
   "/api/elec/cpo/charge-points/applications",
-  (req, res, ctx) => {
+  ({ request }) => {
     let data = elecChargePointsApplications
-    const year = req.url.searchParams.get("year")
+    const searchParams = new URLSearchParams(request.url)
+    const year = searchParams.get("year")
 
     if (year) {
       data = data.filter((chargePointApplication) =>
@@ -27,12 +28,10 @@ export const okChargePointsApplications = http.get(
       )
     }
 
-    return res(
-      ctx.json({
-        status: "success",
-        data,
-      })
-    )
+    return HttpResponse.json({
+      status: "success",
+      data,
+    })
   }
 )
 
