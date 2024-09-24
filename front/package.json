@@ -58,7 +58,7 @@
     "stop-server": "docker-compose down",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
+    "test": "DEBUG=0 jest",
     "eject": "react-scripts eject",
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
