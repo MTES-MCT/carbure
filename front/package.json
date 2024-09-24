@@ -15,6 +15,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^4.3.1",
     "axios": "^1.7.7",
     "clsx": "^1.2.1",
     "date-fns": "^2.29.3",
@@ -29,13 +30,10 @@
     "react-i18next": "^12.2.0",
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.8.2",
-    "react-scripts": "^5.0.1",
-    "typescript": "^5.6.2"
-  },
-  "overrides": {
-    "react-scripts": {
-      "typescript": "^5"
-    }
+    "typescript": "^5.6.2",
+    "vite": "^5.4.7",
+    "vite-plugin-svgr": "^4.2.0",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -53,10 +51,9 @@
     "start-server": "cd ../ && docker-compose up -d && cd front && npm run open",
     "open": "open http://carbure.local:8090/",
     "stop-server": "docker-compose down",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "vite --port 8090",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",

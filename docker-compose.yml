@@ -36,6 +36,7 @@ services:
       context: ./front
     volumes:
       - ./front:/app
+      - /app/node_modules
     networks:
       - carbure
 
