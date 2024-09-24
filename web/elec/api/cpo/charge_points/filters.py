@@ -34,6 +34,9 @@ def get_charge_points_filters(request, entity):
             f"{str(date.month).zfill(2)}/{date.year}" if date else "null" for date in remaining_filter_values
         }
 
+    if current_filter == "is_article_2":
+        remaining_filter_values = [str(item).lower() for item in remaining_filter_values]
+
     return SuccessResponse({"filter_values": list(remaining_filter_values)})
 
 
