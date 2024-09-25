@@ -2,7 +2,7 @@ import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
 import {
   ElecTransferCertificatesData,
-  ElecTransferCertificatesDetails
+  ElecTransferCertificatesDetails,
 } from "./types"
 import { ElecTransferCertificateQuery } from "./types-cpo"
 import { ElecOperatorSnapshot } from "./types-operator"

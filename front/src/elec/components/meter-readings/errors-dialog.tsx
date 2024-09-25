@@ -3,9 +3,7 @@ import Collapse from "common/components/collapse"
 import { Dialog } from "common/components/dialog"
 import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
-import {
-  ElecMeterReadingsApplicationCheckInfo,
-} from "elec/types"
+import { ElecMeterReadingsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
 import { UploadCheckError } from "carbure/types"

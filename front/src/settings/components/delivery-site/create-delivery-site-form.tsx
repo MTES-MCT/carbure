@@ -187,8 +187,6 @@ export const DeliverySiteForm = ({
         />
       </Row>
 
-
-
       {entity.entity_type === EntityType.Operator &&
         deliverySite &&
         isReadOnly && (

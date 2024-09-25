@@ -46,14 +46,14 @@ export const ProductionTable = ({
     },
   ]
 
-  hasAgreement &&
+  if (hasAgreement) {
     productionColumns?.push({
       header: t("Quota approuvé"),
       cell: (p) => <Cell text={formatNumber(p.approved_quota)} />,
     })
+  }
 
-  quotas &&
-    setQuotas &&
+  if (quotas && setQuotas) {
     productionColumns?.push({
       header: t("Quota approuvé"),
       cell: (p) => (
@@ -64,6 +64,8 @@ export const ProductionTable = ({
         />
       ),
     })
+  }
+
   return <YearTable columns={productionColumns} rows={production} />
 }
 

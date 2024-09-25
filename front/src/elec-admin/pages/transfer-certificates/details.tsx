@@ -77,10 +77,10 @@ export const ElecAdminTransferDetailsDialog = () => {
 
             {transferCertificate?.status ===
               ElecTransferCertificateStatus.Rejected && (
-                <Alert variant="info" icon={Message}>
-                  {transferCertificate.comment}
-                </Alert>
-              )}
+              <Alert variant="info" icon={Message}>
+                {transferCertificate.comment}
+              </Alert>
+            )}
           </section>
         </main>
 

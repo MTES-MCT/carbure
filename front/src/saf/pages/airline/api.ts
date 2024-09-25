@@ -5,7 +5,7 @@ import {
   SafFilter,
   SafQuery,
   SafTicketDetails,
-  SafTicketsResponse
+  SafTicketsResponse,
 } from "../../types"
 
 //AIRLINE
@@ -44,7 +44,6 @@ export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
     params: { entity_id, ticket_id },
   })
 }
-
 
 export function acceptSafTicket(entity_id: number, ticket_id: number) {
   return api.post("/saf/airline/accept-ticket", {

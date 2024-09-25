@@ -40,10 +40,7 @@ const DoubleCountingFilesChecker = () => {
     ))
   }
 
-  function showFileValidDialog(
-    fileData: DoubleCountingFileInfo,
-    index: number
-  ) {
+  function showFileValidDialog(fileData: DoubleCountingFileInfo) {
     const file = Array.from(files).find(
       (f) =>
         f.name.replace(/[^a-zA-Z0-9-]/g, "") ===

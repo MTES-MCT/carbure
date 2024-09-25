@@ -82,7 +82,7 @@ export const mockPostWithResponseData = (
   withError = false,
   error?: string
 ) => {
-  return http.post("/api" + url, ({ request }) => {
+  return http.post("/api" + url, () => {
     return HttpResponse.json(
       {
         status: withError ? "error" : "success",

@@ -86,7 +86,7 @@ const Notifications = () => {
               normalize={normalizeNotification}
               onSelectValue={(item) => {
                 if (!item) return
-                !item.acked && ackNotifications.execute(entity.id, [item.id])
+                if (!item.acked) ackNotifications.execute(entity.id, [item.id])
                 navigate(getNotificationLink(item))
                 close()
               }}

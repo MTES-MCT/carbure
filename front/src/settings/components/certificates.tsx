@@ -441,6 +441,7 @@ export function isExpired(date: string) {
     const now = new Date()
     const valid_until = new Date(date)
     return isBefore(valid_until, now)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return false
   }

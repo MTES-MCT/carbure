@@ -17,11 +17,9 @@ import ElecMeterReadingsFileUpload from "./upload-dialog"
 
 type ElecMeterReadingsSettingsProps = {
   companyId: number
-  contentOnly?: boolean
 }
 const ElecMeterReadingsSettings = ({
   companyId,
-  contentOnly = false,
 }: ElecMeterReadingsSettingsProps) => {
   const { t } = useTranslation()
   const entity = useEntity()

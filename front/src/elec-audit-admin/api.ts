@@ -3,14 +3,14 @@ import { api, Api, download } from "common/services/api"
 import {
   ElecChargePointsApplication,
   ElecChargePointsApplicationDetails,
-  ElecMeterReadingsApplicationDetails
+  ElecMeterReadingsApplicationDetails,
 } from "elec/types"
 import {
   ElecAdminAuditQuery,
   ElecAdminAuditSnapshot,
   ElecApplicationSample,
   ElecChargePointsApplicationsData,
-  ElecMeterReadingsApplicationsData
+  ElecMeterReadingsApplicationsData,
 } from "./types"
 
 export function getYears(entity_id: number) {
@@ -46,8 +46,6 @@ export function getChargePointsApplications(query: ElecAdminAuditQuery) {
     }
   )
 }
-
-
 
 export async function getElecAdminAuditChargePointsApplicationsFilters(
   field: string,
@@ -238,12 +236,7 @@ export function rejectMeterReadingsApplication(
   })
 }
 
-
-
-export function downloadAuditReport(
-  entityId: number,
-  sampleId: number
-) {
+export function downloadAuditReport(entityId: number, sampleId: number) {
   return download("/elec/admin/audit/get-report", {
     entity_id: entityId,
     audit_sample_id: sampleId,

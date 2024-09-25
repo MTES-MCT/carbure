@@ -48,7 +48,6 @@ export const Grid = (props: JSX.IntrinsicElements["div"]) => (
 export const Col = ({
   asideX,
   asideY,
-  spread,
   className,
   ...props
 }: JSX.IntrinsicElements["div"] & Layout) => (
@@ -63,7 +62,6 @@ export const Col = ({
 export const Row = ({
   asideX,
   asideY,
-  spread,
   className,
   ...props
 }: JSX.IntrinsicElements["div"] & Layout) => (

@@ -3,7 +3,6 @@ import { Order } from "common/components/table"
 import { ElecAdminSnapshot } from "elec-admin/types"
 import { ElecAdminProvisionCertificateFilter } from "../provision-certificates/types"
 
-
 export enum ElecAdminTransferCertificateFilter {
   TransferDate = "transfer_date",
   Cpo = "cpo",
