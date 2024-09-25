@@ -58,9 +58,8 @@
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
-    "predev": "only-include-used-icons",
-    "prebuild": "only-include-used-icons",
-    "postinstall": "copy-dsfr-to-public"
+    "predev": "react-dsfr update-icons",
+    "prebuild": "react-dsfr update-icons"
   },
   "browserslist": {
     "production": [
