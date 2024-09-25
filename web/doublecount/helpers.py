@@ -15,6 +15,7 @@ from certificates.models import DoubleCountingRegistration
 from core.common import CarbureException
 from core.helpers import send_mail
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays, UserRights
+from core.utils import CarbureEnv
 from doublecount.dc_sanity_checks import (
     check_dc_globally,
     check_production_row,
@@ -78,7 +79,7 @@ def send_dca_confirmation_email(dca, request):
     Une nouvelle demande d'agrément double comptage vient d'être déposée par le producteur {dca.producer.name}
     à la date du {dca_created_at}.
 
-    Le dossier est disponible ici https://carbure.beta.gouv.fr/org/{dca.producer_id}/double-counting/applications.
+    Le dossier est disponible ici {CarbureEnv.get_base_url()}/org/{dca.producer_id}/double-counting/applications.
 
     Bonne journée,
     CarbuRe intelligence
