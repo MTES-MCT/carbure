@@ -1,4 +1,5 @@
 import { Country, DepotType, OwnershipType } from "carbure/types"
+import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
 import { ReactNode, useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -40,10 +41,6 @@ const useDepotTypeTranslations = () => {
         tooltip: t("Entrepôt fiscal de carburants d'aviation"),
       },
       {
-        type: DepotType.Other,
-        label: t("Autre"),
-      },
-      {
         type: DepotType.BiofuelDepot,
         label: t("Biofuel Depot"),
         tooltip: t(
@@ -78,6 +75,10 @@ const useDepotTypeTranslations = () => {
           "Centrale de production d'électricité et de chaleur qui utilise des biocarburants"
         ),
       },
+      {
+        type: DepotType.Other,
+        label: t("Autre"),
+      },
     ],
     [t]
   )
@@ -108,17 +109,45 @@ export const useGetDepotTypeOptions = ({
     let depotTypeOptions = depotTypeTranslations
 
     // If the country selected in the form is France, we have to remove Oil/Biofuel depot
-    if (!country || country?.code_pays === "FR") {
+    if (country?.code_pays === "FR") {
       depotTypeOptions = depotTypeOptions.filter(
         ({ type }) =>
-          ![DepotType.OilDepot, DepotType.BiofuelDepot].includes(
-            type as DepotType
-          )
+          ![DepotType.OilDepot, DepotType.BiofuelDepot].includes(type)
+      )
+    }
+
+    // if the country selected in the form is not France, we have to remove EFS/EFPE/EFCA/Cogeneration/Heat/PowerPlant
+    if (country && country.code_pays !== "FR") {
+      depotTypeOptions = depotTypeOptions.filter(
+        ({ type }) =>
+          ![
+            DepotType.EFS,
+            DepotType.EFCA,
+            DepotType.EFPE,
+            DepotType.CogenerationPlant,
+            DepotType.HeatPlant,
+            DepotType.PowerPlant,
+          ].includes(type)
       )
     }
 
     return depotTypeOptions.map(({ label, tooltip, type }) => ({
-      label: tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label,
+      label: tooltip ? (
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            columnGap: "var(--spacing-xs)",
+          }}
+        >
+          {label}
+          <Tooltip title={tooltip} style={{ display: "flex" }}>
+            <InfoCircle color="#a4a4a4" size={16} />
+          </Tooltip>
+        </span>
+      ) : (
+        label
+      ),
       value: type,
     }))
   }, [country, depotTypeTranslations])
