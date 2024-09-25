@@ -43,6 +43,9 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             year = instance.latest_meter_reading_date.year
             return f"{month.zfill(2)}/{year}"
 
+    def get_latest_extracted_energy(self, instance):
+        return instance.latest_extracted_energy
+
     def get_nominal_power(self, instance):
         return round(instance.nominal_power or 0, 3)
 
