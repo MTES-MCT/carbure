@@ -86,6 +86,9 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_email",
     "django_admin_listfilter_dropdown",
+    "rest_framework",
+    "django_filters",
+    "drf_spectacular",
     "authtools",
     "huey.contrib.djhuey",
     "core",
@@ -306,3 +309,23 @@ SILKY_AUTHORISATION = True
 SILKY_PYTHON_PROFILER = False
 SILKY_PYTHON_PROFILER_BINARY = True
 SILKY_PYTHON_PROFILER_RESULT_PATH = "/tmp"
+
+
+# DRF
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Carbure API",
+    "DESCRIPTION": "Carbure",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # OTHER SETTINGS
+}
