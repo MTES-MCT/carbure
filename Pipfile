@@ -37,6 +37,9 @@ tzdata = "2024.1"
 whitenoise = "6.6.0"
 xlsxwriter = "3.2.0"
 python-docx = "*"
+django-filter = "*"
+drf-spectacular = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 django-stubs = "*"
