@@ -2,6 +2,7 @@
   "name": "carbure-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@codegouvfr/react-dsfr": "^1.9.8",
     "@sentry/react": "^8.30.0",
