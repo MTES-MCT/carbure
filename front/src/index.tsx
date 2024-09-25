@@ -11,7 +11,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { SentryProvider } from "./sentry"
 
 async function enableMocking() {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.NODE_ENV === "development") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { worker } = await import("./mocks")
     console.info(
