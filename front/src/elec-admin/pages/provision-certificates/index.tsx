@@ -15,9 +15,7 @@ import {
   ElecAdminProvisionCertificateStates,
   ElecAdminProvisionCertificateStatus,
 } from "./types"
-import {
-  ElecAdminSnapshot,
-} from "elec-admin/types"
+import { ElecAdminSnapshot } from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"

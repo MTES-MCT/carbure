@@ -20,7 +20,7 @@ export const ApplicationDetailsDialog = () => {
 
   const applicationResponse = useQuery(api.getApplicationDetails, {
     key: "elec-auditor-application-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
   const application = applicationResponse.result?.data.data
 

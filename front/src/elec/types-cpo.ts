@@ -2,7 +2,7 @@ import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import {
   ElecProvisionCertificatePreview,
   ElecTransferCertificateFilter,
-  ElecTransferCertificatePreview
+  ElecTransferCertificatePreview,
 } from "./types"
 
 export interface ElecCPOSnapshot extends CBSnapshot {
@@ -52,11 +52,9 @@ export enum ElecTransferCertificateStatus {
   Rejected = "REJECTED",
 }
 
-
 export interface ElecTransferCertificateQuery extends CBQueryParams {
-  [ElecTransferCertificateFilter.Operator]?: string[],
-  [ElecTransferCertificateFilter.Cpo]?: string[],
-  [ElecTransferCertificateFilter.TransferDate]?: string[],
-  [ElecTransferCertificateFilter.CertificateId]?: string[],
-
+  [ElecTransferCertificateFilter.Operator]?: string[]
+  [ElecTransferCertificateFilter.Cpo]?: string[]
+  [ElecTransferCertificateFilter.TransferDate]?: string[]
+  [ElecTransferCertificateFilter.CertificateId]?: string[]
 }

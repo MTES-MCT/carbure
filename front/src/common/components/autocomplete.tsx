@@ -87,7 +87,7 @@ function Autocomplete<T, V>({
             onFocus={onChange}
             onSelectValue={(key: V | undefined) => {
               autocomplete.onSelect(key)
-              onSelect && onSelect(key)
+              onSelect?.(key)
             }}
             sort={sort}
           />

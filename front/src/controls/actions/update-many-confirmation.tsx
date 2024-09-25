@@ -65,7 +65,9 @@ const UpdateManyConfirmationDialog = ({
     onError: (err) => {
       const errors = (err as AxiosError<LotsUpdateResponse>).response?.data
         .errors
-      errors && showErrors()
+      if (errors) {
+        showErrors()
+      }
     },
   })
 

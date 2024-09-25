@@ -1,15 +1,8 @@
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
-import {
-  ElecTransferCertificatesDetails
-} from "elec/types"
+import { ElecTransferCertificatesDetails } from "elec/types"
 import { ElecTransferCertificatesData } from "elec/types-cpo"
-import {
-  ElecAdminTransferCertificateQuery
-} from "./types"
-
-
-
+import { ElecAdminTransferCertificateQuery } from "./types"
 
 export function getTransferCertificates(
   query: ElecAdminTransferCertificateQuery
@@ -21,7 +14,6 @@ export function getTransferCertificates(
     }
   )
 }
-
 
 export function getTransferCertificateDetails(
   entity_id: number,

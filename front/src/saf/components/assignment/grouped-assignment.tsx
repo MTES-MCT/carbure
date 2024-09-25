@@ -116,7 +116,7 @@ const TicketsGroupedAssignment = ({
                         {t("{{volume}} L - {{period}} - {{feedstock}}", {
                           volume: formatNumber(
                             ticketSource.total_volume -
-                            ticketSource.assigned_volume
+                              ticketSource.assigned_volume
                           ),
                           period: formatPeriod(ticketSource.delivery_period),
                           feedstock: t(ticketSource.feedstock?.code ?? "", {

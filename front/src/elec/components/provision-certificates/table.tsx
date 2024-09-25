@@ -24,9 +24,6 @@ export const ElecCPOProvisionCertificateTable = memo(
     order,
     rowLink,
     onOrder,
-    selected,
-    onSelect,
-    status,
   }: ElecCPOProvisionCertificateTableProps) => {
     const columns = useColumns()
     return (

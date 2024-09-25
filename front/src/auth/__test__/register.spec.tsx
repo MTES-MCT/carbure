@@ -11,7 +11,7 @@ beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const AuthWithRouter = ({ children }: { children?: React.ReactNode }) => {
+const AuthWithRouter = () => {
   return (
     <TestRoot url={`/auth/register`}>
       <Route path="/auth/*" element={<Auth />} />

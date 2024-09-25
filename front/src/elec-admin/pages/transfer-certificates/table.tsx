@@ -24,8 +24,6 @@ export const ElecAdminTransferCertificateTable = memo(
     order,
     onOrder,
     rowLink,
-    selected,
-    onSelect,
   }: ElecAdminTransferCertificateTableProps) => {
     const columns = useColumns()
     return (

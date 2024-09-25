@@ -50,7 +50,7 @@ export function Menu({
             items={items}
             normalize={normalizeMenu}
             onSelectValue={(item) => {
-              item !== undefined && onAction?.(item)
+              if (item !== undefined) onAction?.(item)
               close()
             }}
           >

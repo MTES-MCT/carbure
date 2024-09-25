@@ -30,9 +30,12 @@ export const ValidDetailsDialog = ({
     onSuccess() {
       onClose()
       notify(
-        t("La demande d'inscription des {{count}} points de recharge a été ajoutée !", {
-          count: fileData.charge_point_count,
-        }),
+        t(
+          "La demande d'inscription des {{count}} points de recharge a été ajoutée !",
+          {
+            count: fileData.charge_point_count,
+          }
+        ),
         { variant: "success" }
       )
     },

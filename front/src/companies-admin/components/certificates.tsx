@@ -161,7 +161,7 @@ const CheckCertificate = ({ certificate }: ActionProps) => {
 
   const checkCertificate = useMutation(api.checkEntityCertificate, {
     invalidates: ["entity-certificates"],
-    onSuccess(err) {
+    onSuccess() {
       notify(t("Le certificat a été validé !"), { variant: "success" })
     },
     onError() {
@@ -201,7 +201,7 @@ const RejectCertificate = ({ certificate }: ActionProps) => {
 
   const rejectCertificate = useMutation(api.rejectEntityCertificate, {
     invalidates: ["entity-certificates"],
-    onSuccess(err) {
+    onSuccess() {
       notify(t("Le certificat a été refusé !"), { variant: "success" })
     },
     onError() {
