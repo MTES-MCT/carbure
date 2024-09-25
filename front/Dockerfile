@@ -8,6 +8,7 @@ WORKDIR /app
 
 COPY package.json ./
 COPY package-lock.json ./
+COPY index.html ./
 RUN npm install
 COPY tsconfig.json ./
 COPY public ./

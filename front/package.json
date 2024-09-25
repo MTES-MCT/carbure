@@ -51,15 +51,15 @@
     "start-server": "cd ../ && docker-compose up -d && cd front && npm run open",
     "open": "open http://carbure.local:8090/",
     "stop-server": "docker-compose down",
-    "start": "vite --port 8090",
-    "build": "tsc && vite build",
+    "start": "vite",
+    "build": "vite build",
     "serve": "vite preview",
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
-    "postinstall": "copy-dsfr-to-public --publicDir ./public",
     "predev": "only-include-used-icons",
-    "prebuild": "only-include-used-icons"
+    "prebuild": "only-include-used-icons",
+    "postinstall": "copy-dsfr-to-public --publicDir ./public"
   },
   "eslintConfig": {
     "extends": "react-app"
