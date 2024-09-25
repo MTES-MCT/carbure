@@ -25,7 +25,7 @@ def export_charge_points_to_excel(charge_points, entity):
                     {"label": "Identifiant MID", "value": "mid_id"},
                     {"label": "Date du dernier relevé", "value": "measure_date"},
                     {"label": "Énergie mesurée lors du dernier relevé", "value": "measure_energy"},
-                    {"label": "Énergie extraite mesurée lors du dernier relevé", "value": "latest_extracted_energy"},
+                    {"label": "Date du dernier relevé", "value": "latest_meter_reading_date"},
                     # {"label": "is_article_2", "value": "is_article_2"},
                     # {"label": "is_auto_consumption", "value": "is_auto_consumption"},
                     # {"label": "is_article_4", "value": "is_article_4"},
