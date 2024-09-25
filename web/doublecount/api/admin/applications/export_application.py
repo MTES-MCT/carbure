@@ -137,6 +137,9 @@ def export_dca(request):
 
     has_dechets_industriels = check_has_dechets_industriels(application)
     dechets_industriels = dechets_industriels.strip()
+    if "," in dechets_industriels:
+        part_1, part_2 = dechets_industriels.rsplit(",", 1)
+        dechets_industriels = f"{part_1} et{part_2}"
     if has_dechets_industriels and not dechets_industriels:
         return ErrorResponse(400, DoubleCountingApplicationExportError.DECHETS_INDUSTRIELS_NOT_FOUND)
 
