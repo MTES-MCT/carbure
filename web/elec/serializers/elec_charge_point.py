@@ -25,8 +25,6 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "cpo_name",
             "cpo_siren",
             "status",
-            "latitude",
-            "longitude",
         ]
 
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
@@ -44,6 +42,9 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             month = str(instance.latest_meter_reading_date.month)
             year = instance.latest_meter_reading_date.year
             return f"{month.zfill(2)}/{year}"
+
+    def get_latest_extracted_energy(self, instance):
+        return instance.latest_extracted_energy
 
     def get_nominal_power(self, instance):
         return round(instance.nominal_power or 0, 3)

@@ -303,9 +303,9 @@ class ElecCharginPointsTest(TestCase):
         assert charge_points[0].charge_point_id == "FRBBBB222201"
         assert charge_points[0].current_type == "DC"
         assert str(charge_points[0].installation_date) == "2022-05-10"
-        assert charge_points[0].mid_id is None
+        assert charge_points[0].mid_id == ""
         assert charge_points[0].measure_date is None
-        assert charge_points[0].measure_energy is None
+        assert charge_points[0].measure_energy == 0
         assert charge_points[0].is_article_2 is True
         assert charge_points[0].measure_reference_point_id == "1234561"
         assert charge_points[0].cpo == self.cpo
@@ -571,8 +571,6 @@ class ElecCharginPointsTest(TestCase):
                         "cpo_name": "Alice",
                         "cpo_siren": "12345",
                         "status": "PENDING",
-                        "latitude": None,
-                        "longitude": None,
                     },
                     {
                         "id": charge_point2.id,
@@ -593,8 +591,6 @@ class ElecCharginPointsTest(TestCase):
                         "cpo_name": "Bob",
                         "cpo_siren": "67890",
                         "status": "PENDING",
-                        "latitude": None,
-                        "longitude": None,
                     },
                 ],
                 "ids": [charge_point.id, charge_point2.id],
@@ -819,8 +815,6 @@ class ElecCharginPointsTest(TestCase):
                 "cpo_name": "Alice",
                 "cpo_siren": "12345",
                 "status": "PENDING",
-                "latitude": None,
-                "longitude": None,
             },
         }
         data = response.json()
@@ -892,8 +886,6 @@ class ElecCharginPointsTest(TestCase):
                     "cpo_name": "Alice",
                     "cpo_siren": "12345",
                     "status": "PENDING",
-                    "latitude": None,
-                    "longitude": None,
                 }
             ],
         }
@@ -933,35 +925,20 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert data["error"] == "CP_CANNOT_BE_UPDATED"
 
-        # charge_point_id not in TDG
-        del payload["measure_reference_point_id"]
-        response = self.client.post(url, payload)
-        assert response.status_code == 400
-        data = response.json()
-        assert data["error"] == "CP_ID_NOT_IN_TGD"
-
         # Working
-        payload["charge_point_id"] = "FRCCCC333302"
+        del payload["measure_reference_point_id"]
         response = self.client.post(url, payload)
         assert response.status_code == 200
         charge_point.refresh_from_db()
-        assert charge_point.charge_point_id == "FRCCCC333302"
+        assert charge_point.charge_point_id == "FRBBBB222204"
 
-        # Bad AUDIT_IN_PROGRESS application status
-        application.status = ElecChargePointApplication.AUDIT_IN_PROGRESS
+        # Bad ACCEPTED application status
+        application.status = ElecChargePointApplication.ACCEPTED
         application.save()
         response = self.client.post(url, payload)
         assert response.status_code == 400
         data = response.json()
-        assert data["error"] == "AUDIT_IN_PROGRESS"
-
-        # charge_point_id already exists
-        application.status = ElecChargePointApplication.PENDING
-        application.save()
-        response = self.client.post(url, payload)
-        assert response.status_code == 400
-        data = response.json()
-        assert data["error"] == "CP_ID_ALREADY_EXISTS"
+        assert data["error"] == "CP_CANNOT_BE_UPDATED"
 
     def test_update_charge_point_prm(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)

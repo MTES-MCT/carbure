@@ -240,11 +240,3 @@ class TransportDataGouv:
 
         # remove the charge points that were not listed in the original imported excel file
         return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]  # noqa: E712
-
-    @staticmethod
-    def is_check_point_in_tdg(charge_point_id: str) -> bool:
-        file_path = TransportDataGouv.download_csv()
-        for chunk in TransportDataGouv.read_transport_data_chunks(file_path):
-            if charge_point_id in chunk["id_pdc_itinerance"].values:
-                return True
-        return False

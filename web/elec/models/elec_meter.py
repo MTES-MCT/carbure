@@ -8,7 +8,7 @@ class ElecMeter(models.Model):
     initial_index = models.FloatField(null=True, blank=False)
     initial_index_date = models.DateField(null=True, blank=False)
     charge_point = models.ForeignKey(
-        ElecChargePoint, null=True, blank=False, on_delete=models.CASCADE, related_name="elec_meters"
+        ElecChargePoint, null=True, blank=False, on_delete=models.SET_NULL, related_name="elec_meters"
     )
 
     class Meta:

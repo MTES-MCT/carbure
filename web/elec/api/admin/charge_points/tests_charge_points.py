@@ -196,8 +196,6 @@ class ElecCharginPointsTest(TestCase):
                     "cpo_name": "Alice",
                     "cpo_siren": "12345",
                     "status": "PENDING",
-                    "latitude": None,
-                    "longitude": None,
                 },
                 {
                     "id": charge_point2.id,
@@ -218,8 +216,6 @@ class ElecCharginPointsTest(TestCase):
                     "cpo_name": "Bob",
                     "cpo_siren": "67890",
                     "status": "PENDING",
-                    "latitude": None,
-                    "longitude": None,
                 },
             ],
         }
@@ -278,8 +274,6 @@ class ElecCharginPointsTest(TestCase):
                     "cpo_name": "Alice",
                     "cpo_siren": "12345",
                     "status": "PENDING",
-                    "latitude": None,
-                    "longitude": None,
                 }
             ],
         }

@@ -99,7 +99,6 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "cpo__name",
         "current_meter__mid_certificate",
     ]
-    autocomplete_fields = ["current_meter"]
 
 
 @admin.register(ElecMeterReadingApplication)
@@ -137,7 +136,6 @@ class ElecMeterReadingAdmin(admin.ModelAdmin):
         "meter__charge_point__station_id",
         "meter__charge_point__station_name",
     ]
-    autocomplete_fields = ["meter"]
 
 
 @admin.register(ElecAuditSample)
@@ -162,10 +160,6 @@ class ElecAuditChargePointAdmin(admin.ModelAdmin):
     search_fields = [
         "id",
     ]
-    autocomplete_fields = [
-        "charge_point",
-        "meter_reading",
-    ]
 
 
 @admin.register(ElecMeter)
@@ -182,7 +176,3 @@ class ElecMeterAdmin(admin.ModelAdmin):
         "mid_certificate",
         "charge_point__charge_point_id",
     ]
-    list_filter = [
-        "charge_point__cpo_name",
-    ]
-    autocomplete_fields = ["charge_point"]
