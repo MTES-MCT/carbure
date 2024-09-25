@@ -9,6 +9,6 @@ urlpatterns = [
     path("resources/", include("resources.api")),
     path("transactions/", include("transactions.api")),
     path("user/", include("user.api")),
-    path("elec/", include("elec.api")),
+    path("elec/", include("elec.urls")),
     path("home-stats", get_home_stats, name="carbure-home-stats"),
 ]
