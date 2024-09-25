@@ -10,8 +10,10 @@ fi
 
 if [ "$SOURCE_ENV" = "carbure-prod" ]; then
   SCALINGO_MYSQL_UUID="ad-5fac8322-ec5b-4fe3-89ed-468e9895f180"
+  SCALINGO_MYSQL_DB="carbure_pro_"
 elif [ "$SOURCE_ENV" = "carbure-dev" ]; then
   SCALINGO_MYSQL_UUID="ad-60b35da0-a857-4ca0-a779-9419088dc724"
+  SCALINGO_MYSQL_DB="carbure_dev_"
 fi
 
 # setup scalingo on servers
@@ -37,7 +39,7 @@ tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
 
 # remove lines mentionning production database
 echo "> Cleaning SQL..."
-grep -vE "(carbure_pro_)" /tmp/backups/*.sql > /tmp/backups/backup.sql
+grep -vE "(${SCALINGO_MYSQL_DB})" /tmp/backups/*.sql > /tmp/backups/backup.sql
 
 # extract DATABASE_URL parts
 export MYSQL_DATABASE=$(echo $DATABASE_URL | cut -d'/' -f4 | cut -d'?' -f1)
