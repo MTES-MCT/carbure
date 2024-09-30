@@ -11,7 +11,7 @@ const ApplicationSummary = ({
   application: ElecAuditorApplicationDetails | undefined
 }) => {
   const { t } = useTranslation()
-  let limitDate = application?.audit_order_date
+  const limitDate = application?.audit_order_date
     ? getApplicationAuditLimitDate(application.audit_order_date)
     : "..."
 

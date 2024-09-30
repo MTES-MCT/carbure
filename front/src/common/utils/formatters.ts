@@ -68,6 +68,7 @@ export function formatDate(date: Date | string | null, format = "dd/MM/yyyy") {
     )
 
     return formatted
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return "N/A"
   }

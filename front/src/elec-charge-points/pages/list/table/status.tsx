@@ -1,6 +1,4 @@
 import Tag, { TagVariant } from "common/components/tag"
-import { useMemo } from "react"
-import { useTranslation } from "react-i18next"
 import { useStatusLabels } from "../index.hooks"
 import { ChargePointStatus } from "../types"
 
@@ -17,8 +15,6 @@ const statusToVariant: Record<ChargePointStatus, TagVariant> = {
 export const ChargePointsListTableStatus = ({
   status,
 }: ChargePointsListTableStatusProps) => {
-  const { t } = useTranslation()
-
   const statusLabels = useStatusLabels()
 
   return (

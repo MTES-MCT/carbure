@@ -11,7 +11,7 @@ import {
 import Checkbox from "./checkbox"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control, Field } from "./input"
-import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
+import List, { createQueryFilter, Renderer } from "./list"
 import { TagGroup } from "./tag"
 
 export interface TagAutocompleteProps<T, V = T> extends Control, Trigger {
@@ -36,7 +36,6 @@ function TagAutocomplete<T, V = T>({
   onQuery,
   anchor,
   normalize = defaultNormalizer,
-  children = defaultRenderer,
   ...props
 }: TagAutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
@@ -137,7 +136,9 @@ export function useTagAutocomplete<T, V>({
   function filterOptions(query: string): T[] {
     const options = suggestions
     const includesQuery = createQueryFilter(query)
-    return denormalizeItems(normalizeItems(options, normalize, includesQuery))
+    return denormalizeItems(
+      normalizeItems<T, V>(options, normalize, includesQuery)
+    )
   }
 
   async function onQueryChange(query: string | undefined = "") {

@@ -1,4 +1,4 @@
-import { rest } from "msw"
+import { http, HttpResponse } from "msw"
 import { OwnershipType } from "carbure/types"
 
 import {
@@ -35,154 +35,146 @@ export function setProductionSites(nextProductionSites: any[]) {
   productionSites = clone(nextProductionSites)
 }
 
-export const okSettings = rest.get("/api/user", (req, res, ctx) => {
-  const entity = Data.get("entity")
-  return res(
-    ctx.json({
-      status: "success",
-      data: {
-        email: "producer@test.com",
-        rights: [
-          { ...entityRight, entity },
-          { ...entityRight, entity: operator },
-        ],
-        requests: [
-          { ...entityRight, entity },
-          { ...entityRequest, entity: operator },
-        ],
-      },
-    })
-  )
-})
-
-export const okEmptySettings = rest.get("/api/user", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: {
-        email: "producer@test.com",
-        rights: [],
-        requests: [],
-      },
-    })
-  )
-})
-
-export const okDynamicSettings = rest.get("/api/user", (req, res, ctx) => {
+export const okSettings = http.get("/api/user", () => {
   const entity = Data.get("entity")
 
-  return res(
-    ctx.json({
-      status: "success",
-      data: {
-        email: "producer@test.com",
-        rights: [{ ...entityRight, entity }],
-        requests: [],
-      },
-    })
-  )
+  return HttpResponse.json({
+    status: "success",
+    data: {
+      email: "producer@test.com",
+      rights: [
+        { ...entityRight, entity },
+        { ...entityRight, entity: operator },
+      ],
+      requests: [
+        { ...entityRight, entity },
+        { ...entityRequest, entity: operator },
+      ],
+    },
+  })
 })
 
-export const okEnableMac = rest.post(
+export const okEmptySettings = http.get("/api/user", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: {
+      email: "producer@test.com",
+      rights: [],
+      requests: [],
+    },
+  })
+})
+
+export const okDynamicSettings = http.get("/api/user", () => {
+  const entity = Data.get("entity")
+
+  return HttpResponse.json({
+    status: "success",
+    data: {
+      email: "producer@test.com",
+      rights: [{ ...entityRight, entity }],
+      requests: [],
+    },
+  })
+})
+
+export const okEnableMac = http.post(
   "/api/entity/options/release-for-consumption",
-  (req, res, ctx) => {
+  () => {
     const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_mac: true,
     })
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
-export const okDisableMac = rest.post(
+export const okDisableMac = http.post(
   "/api/entity/options/release-for-consumption",
-  (req, res, ctx) => {
+  () => {
     const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_mac: false,
     })
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okEnableTrading = rest.post(
-  "/api/entity/options/trading",
-  (req, res, ctx) => {
-    const entity = Data.get("entity")
-    setEntity({
-      ...entity,
-      has_trading: true,
+    return HttpResponse.json({
+      status: "success",
     })
-    return res(ctx.json({ status: "success" }))
   }
 )
 
-export const okDisableTrading = rest.post(
-  "/api/entity/options/trading",
-  (req, res, ctx) => {
-    const entity = Data.get("entity")
-    setEntity({
-      ...entity,
-      has_trading: false,
-    })
-    return res(ctx.json({ status: "success" }))
-  }
-)
+export const okEnableTrading = http.post("/api/entity/options/trading", () => {
+  const entity = Data.get("entity")
+  setEntity({
+    ...entity,
+    has_trading: true,
+  })
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
-export const okDeliverySites = rest.get(
-  "/api/entity/depots",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: deliverySites,
-      })
-    )
-  }
-)
+export const okDisableTrading = http.post("/api/entity/options/trading", () => {
+  const entity = Data.get("entity")
+  setEntity({
+    ...entity,
+    has_trading: false,
+  })
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
-export const okAddDeliverySite = rest.post(
-  "/api/entity/depots/add",
-  (req, res, ctx) => {
-    setDeliverySites([deliverySite])
-    return res(ctx.json({ status: "success" }))
-  }
-)
+export const okDeliverySites = http.get("/api/entity/depots", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: deliverySites,
+  })
+})
 
-export const okCreateNewDeliverySite = rest.post(
+export const okAddDeliverySite = http.post("/api/entity/depots/add", () => {
+  setDeliverySites([deliverySite])
+  return HttpResponse.json({
+    status: "success",
+  })
+})
+
+export const okCreateNewDeliverySite = http.post(
   "/entity/depots/create",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success" }))
+  () => {
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
-export const okDeleteDeliverySite = rest.post(
+export const okDeleteDeliverySite = http.post(
   "/api/entity/depots/delete",
-  (req, res, ctx) => {
+  () => {
     setDeliverySites([])
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
-export const okProductionSites = rest.get(
+export const okProductionSites = http.get(
   "/api/entity/production-sites",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: productionSites,
-      })
-    )
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: productionSites,
+    })
   }
 )
 
-export const okAddProductionSite = rest.post(
+export const okAddProductionSite = http.post(
   "/api/entity/production-sites/add",
-  (req, res, ctx) => {
-    // @ts-ignore Find a way to not use _body
-    const body = req._body as FormData
+  async ({ request }) => {
+    const body = (await request.json()) as FormData
 
     const psite = {
       ...productionSite,
@@ -193,15 +185,17 @@ export const okAddProductionSite = rest.post(
 
     setProductionSites([psite])
 
-    return res(ctx.json({ status: "success", data: psite }))
+    return HttpResponse.json({
+      status: "success",
+      data: psite,
+    })
   }
 )
 
-export const okUpdateProductionSite = rest.post(
+export const okUpdateProductionSite = http.post(
   "/api/entity/production-sites/update",
-  (req, res, ctx) => {
-    // @ts-ignore Find a way to not use _body
-    const body = req._body as FormData
+  async ({ request }) => {
+    const body = (await request.json()) as FormData
 
     setProductionSites([
       {
@@ -210,37 +204,53 @@ export const okUpdateProductionSite = rest.post(
       },
     ])
 
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
-export const okDeleteProductionSite = rest.post(
+export const okDeleteProductionSite = http.post(
   "/api/entity/production-sites/delete",
-  (req, res, ctx) => {
+  () => {
     setProductionSites([])
-    return res(ctx.json({ status: "success" }))
+    return HttpResponse.json({
+      status: "success",
+    })
   }
 )
 
-export const okSetBiocarburant = rest.post(
+export const okSetBiocarburant = http.post(
   "/api/entity/production-sites/set-biofuels",
-  (req, res, ctx) => res(ctx.json({ status: "success" }))
+  () =>
+    HttpResponse.json({
+      status: "success",
+    })
 )
 
-export const okSetMatierePremiere = rest.post(
+export const okSetMatierePremiere = http.post(
   "/api/entity/production-sites/set-feedstocks",
-  (req, res, ctx) => res(ctx.json({ status: "success" }))
+  () =>
+    HttpResponse.json({
+      status: "success",
+    })
 )
 
-export const okSetCertificates = rest.post(
+export const okSetCertificates = http.post(
   "/api/entity/production-sites/set-certificates",
-  (req, res, ctx) => res(ctx.json({ status: "success" }))
+  () =>
+    HttpResponse.json({
+      status: "success",
+    })
 )
 
-export const okEntityRights = rest.get(
+export const okEntityRights = http.get(
   "http://localhost/api/entity/users",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success", data: entityRights }))
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: entityRights,
+    })
   }
 )
 
@@ -250,29 +260,30 @@ export const okInviteUser = mockPostWithResponseData("/entity/users/invite", {
   requests: [],
 })
 
-export const okSelfCertificates = rest.get(
-  "/api/entity/certificates",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success", data: [] }))
-  }
-)
+export const okSelfCertificates = http.get("/api/entity/certificates", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: [],
+  })
+})
 
-export const okDoubleCountApplications = rest.get(
+export const okDoubleCountApplications = http.get(
   "/api/double-counting/agreements",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success", data: [] }))
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: [],
+    })
   }
 )
 
-export const okDoubleCountUploadApplication = rest.post(
+export const okDoubleCountUploadApplication = http.post(
   "/api/v3/doublecount/upload",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: { dca_id: 142332 },
-      })
-    )
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: { dca_id: 142332 },
+    })
   }
 )
 
@@ -281,28 +292,28 @@ export const okDoubleCountUploadAgreements = mockGetWithResponseData(
   []
 )
 
-export const okDoubleCountUploadDocumentation = rest.post(
+export const okDoubleCountUploadDocumentation = http.post(
   "/api/v3/doublecount/upload-documentation",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: { dca_id: 142332 },
-      })
-    )
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: { dca_id: 142332 },
+    })
   }
 )
 
-export const koDoubleCountUploadApplication = rest.post(
+export const koDoubleCountUploadApplication = http.post(
   "/api/v3/doublecount/upload",
-  (req, res, ctx) => {
-    return res(
-      ctx.status(400),
-      ctx.json({
+  () => {
+    return HttpResponse.json(
+      {
         status: "error",
         error: "DOUBLE_COUNTING_IMPORT_FAILED",
         data: dcApplicationErrors,
-      })
+      },
+      {
+        status: 400,
+      }
     )
   }
 )

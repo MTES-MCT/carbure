@@ -2,7 +2,6 @@ import { Cell, Column } from "common/components/table"
 import { useTranslation } from "react-i18next"
 import { ChargePoint } from "../types"
 import { ChargePointsListTableStatus } from "./status"
-import { formatDate } from "common/utils/formatters"
 import IsArticle2 from "./is-article-2"
 
 export const useChargePointsColumns = () => {

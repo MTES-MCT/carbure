@@ -1,6 +1,10 @@
 import { Biofuel, Country, Entity, Feedstock } from "carbure/types"
-import { LotPreview, SafDurability, SafProduction, SafTicketPreview } from "saf/types"
-
+import {
+  LotPreview,
+  SafDurability,
+  SafProduction,
+  SafTicketPreview,
+} from "saf/types"
 
 export enum SafTicketSourceStatus {
   Available = "AVAILABLE",
@@ -28,19 +32,17 @@ export interface SafTicketSource {
 
 export interface SafTicketSourceSummary
   extends SafTicketSource,
-  SafProduction,
-  SafDurability {
+    SafProduction,
+    SafDurability {
   count: number
   total_volume: number
   ticket_sources: SafTicketSourceSummaryItem[]
 }
 
-
-
 export interface SafTicketSourceDetails
   extends SafTicketSource,
-  SafProduction,
-  SafDurability {
+    SafProduction,
+    SafDurability {
   added_by: Entity
   parent_lot: LotPreview
 }
@@ -52,7 +54,6 @@ export interface SafTicketSourcesResponse {
   total: number
   ids: number[]
 }
-
 
 export interface SafTicketSourceSummaryItem extends SafTicketSourcePreview {
   year: number

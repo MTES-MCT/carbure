@@ -1,64 +1,48 @@
-import { rest } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { okSettings } from "settings/__test__/api"
 import * as data from "./data"
 
-export const okYears = rest.get("/api/saf/operator/years", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: [2021],
-    })
-  )
+export const okYears = http.get("/api/saf/operator/years", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: [2021],
+  })
 })
 
-export const okSnapshot = rest.get(
-  "/api/saf/operator/snapshot",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: data.safOperatorSnapshot,
-      })
-    )
-  }
-)
+export const okSnapshot = http.get("/api/saf/operator/snapshot", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: data.safOperatorSnapshot,
+  })
+})
 
-export const okFilter = rest.get(
+export const okFilter = http.get(
   "/api/saf/operator/ticket-sources/filters",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: data.safClientFilterOptions,
-      })
-    )
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: data.safClientFilterOptions,
+    })
   }
 )
 
-export const okSafTicketSources = rest.get(
+export const okSafTicketSources = http.get(
   "/api/saf/operator/ticket-sources",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: data.safTicketSourcesResponse,
-      })
-    )
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: data.safTicketSourcesResponse,
+    })
   }
 )
 
-export const okSafTickets = rest.get(
-  "/api/saf/operator/tickets",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: data.safTicketsResponse,
-      })
-    )
-  }
-)
+export const okSafTickets = http.get("/api/saf/operator/tickets", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: data.safTicketsResponse,
+  })
+})
 
 export default setupServer(
   okYears,

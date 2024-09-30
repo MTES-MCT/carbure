@@ -29,7 +29,7 @@ export const LotAdd = () => {
       notify(t("Le lot a bien été créé"), { variant: "success" })
     },
 
-    onError: (res) => {
+    onError: () => {
       notify(t("La création du lot a échoué"), { variant: "danger" })
     },
   })

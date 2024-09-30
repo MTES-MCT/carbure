@@ -9,12 +9,13 @@ import {
   ElecProvisionCertificatesData,
   ElecTransferCertificatesData,
 } from "elec/types-cpo"
-import {
-  ElecAdminSnapshot,
-} from "./types"
+import { ElecAdminSnapshot } from "./types"
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { ElecAdminProvisionCertificateQuery } from "./pages/provision-certificates/types"
-import { ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./pages/transfer-certificates/types"
+import {
+  ElecAdminTransferCertificateFilter,
+  ElecAdminTransferCertificateQuery,
+} from "./pages/transfer-certificates/types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/years", {
@@ -34,7 +35,6 @@ export function importProvisionCertificates(entity_id: number, file: File) {
     file,
   })
 }
-
 
 export async function getProvisionCertificateFilters(
   field: string,
@@ -114,7 +114,6 @@ export async function getTransferCertificateFilters(
     .then((res) => res.data.data?.filter_values ?? [])
 }
 
-
 //TO MOVE WHEN  /elec-charge-points created by Benjamin
 export function downloadChargePointsApplicationDetails(
   entityId: number,
@@ -137,7 +136,6 @@ export function downloadChargePoints(entityId: number, companyId: number) {
   })
 }
 
-
 export function getChargePointsApplications(
   entityId: number,
   companyId: number
@@ -149,7 +147,6 @@ export function getChargePointsApplications(
     }
   )
 }
-
 
 export function getMeterReadingsApplications(
   entityId: number,

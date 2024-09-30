@@ -1,11 +1,9 @@
 import useEntity from "carbure/hooks/entity"
 import { EntityType } from "carbure/types"
 import { Button } from "common/components/button"
-import { Alert } from "common/components/alert"
-import { AlertTriangle } from "common/components/icons"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross, Download, Return, Save } from "common/components/icons"
+import { Check, Cross, Return, Save } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -18,7 +16,6 @@ import { DoubleCountingStatus as DCStatus } from "../../../double-counting/types
 import { ApplicationInfo } from "./application-info"
 import ApplicationStatus from "../../../double-counting/components/application-status"
 import ApplicationTabs from "./application-tabs"
-import { Input } from "common/components/input"
 import ApplicationDetailsDialogAccept from "./application-details-dialog-accept"
 
 export const ApplicationDetailsDialog = () => {

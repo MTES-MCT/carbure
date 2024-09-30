@@ -75,7 +75,7 @@ export function Select<T, V>({
           readOnly={props.readOnly}
           required={props.required}
           title={`${value}`}
-          onChange={(e) => undefined}
+          onChange={() => undefined}
           type="text"
           value={asyncOptions.label}
         />

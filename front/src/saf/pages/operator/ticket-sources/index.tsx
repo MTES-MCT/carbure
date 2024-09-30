@@ -8,10 +8,7 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
-import {
-  SafFilter,
-  SafOperatorSnapshot,
-} from "saf/types"
+import { SafFilter, SafOperatorSnapshot } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../api"
 import { SafFilters } from "../../../components/filters"

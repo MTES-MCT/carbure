@@ -7,9 +7,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import {
-  ElecChargePointsApplicationDetails
-} from "elec/types"
+import { ElecChargePointsApplicationDetails } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../api"
 export type ApplicationDialogProps = {
@@ -41,9 +39,12 @@ export const ChargePointsApplicationAcceptDialog = ({
         onClose()
         onValidated()
         notify(
-          t("L'inscription des {{count}} points de recharge ont été acceptés !", {
-            count: application.charge_point_count,
-          }),
+          t(
+            "L'inscription des {{count}} points de recharge ont été acceptés !",
+            {
+              count: application.charge_point_count,
+            }
+          ),
           { variant: "success" }
         )
       },
@@ -86,10 +87,14 @@ export const ChargePointsApplicationAcceptDialog = ({
           </p>
           {sample && (
             <Alert icon={AlertCircle} variant="info" multiline>
-              <Trans defaults={"L'aménageur <b>{{cpo}}</b> sera notifié et pourra visualiser les points de recharge depuis son espace Carbure."} values={{ cpo: application.cpo.name }} />
+              <Trans
+                defaults={
+                  "L'aménageur <b>{{cpo}}</b> sera notifié et pourra visualiser les points de recharge depuis son espace Carbure."
+                }
+                values={{ cpo: application.cpo.name }}
+              />
             </Alert>
           )}
-
         </section>
       </main>
 

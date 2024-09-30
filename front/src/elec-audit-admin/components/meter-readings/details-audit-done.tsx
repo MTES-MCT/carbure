@@ -30,7 +30,12 @@ export const MeterReadingsApplicationDetailsAuditDone = ({
           <ApplicationSummary application={meterReadingsApplication} />
         </section>
         <Divider />
-        <SampleDetailsAuditDoneSection sample={meterReadingsApplication?.sample!} onDownloadSample={onDownloadSample} />
+        {meterReadingsApplication?.sample && (
+          <SampleDetailsAuditDoneSection
+            sample={meterReadingsApplication.sample}
+            onDownloadSample={onDownloadSample}
+          />
+        )}
         <section>
           <Checkbox
             value={confirmCheckbox}
@@ -63,4 +68,3 @@ export const MeterReadingsApplicationDetailsAuditDone = ({
 }
 
 export default MeterReadingsApplicationDetailsAuditDone
-

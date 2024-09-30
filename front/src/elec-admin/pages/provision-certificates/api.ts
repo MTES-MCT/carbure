@@ -1,14 +1,8 @@
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api } from "common/services/api"
-import {
-  ElecProvisionCertificatesDetails
-} from "elec/types"
-import {
-  ElecProvisionCertificatesData
-} from "elec/types-cpo"
-import {
-  ElecAdminProvisionCertificateQuery
-} from "./types"
+import { ElecProvisionCertificatesDetails } from "elec/types"
+import { ElecProvisionCertificatesData } from "elec/types-cpo"
+import { ElecAdminProvisionCertificateQuery } from "./types"
 
 export function importProvisionCertificates(entity_id: number, file: File) {
   return api.post("/elec/admin/provision-certificates/import-certificates", {
@@ -16,7 +10,6 @@ export function importProvisionCertificates(entity_id: number, file: File) {
     file,
   })
 }
-
 
 export async function getProvisionCertificateFilters(
   field: string,

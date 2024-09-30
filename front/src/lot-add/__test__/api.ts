@@ -1,4 +1,4 @@
-import { rest } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { okDynamicSettings } from "settings/__test__/api"
 import {
@@ -11,17 +11,12 @@ import {
 } from "carbure/__test__/api"
 import { lot } from "transaction-details/__test__/data"
 
-export const okAddLot = rest.post(
-  "/api/transactions/lots/add",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: lot,
-      })
-    )
-  }
-)
+export const okAddLot = http.post("/api/transactions/lots/add", () => {
+  return HttpResponse.json({
+    status: "success",
+    data: lot,
+  })
+})
 
 export default setupServer(
   okAddLot,

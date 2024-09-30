@@ -76,7 +76,6 @@ export interface RadioGroupProps<T, V> extends RadioControl {
 }
 
 export function RadioGroup<T, V extends string | number>({
-  className,
   options,
   autoFocus,
   name,

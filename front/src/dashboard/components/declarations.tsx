@@ -187,6 +187,7 @@ const Legend = () => (
 function getEntityDeclarationsByPeriod(declarations: DashboardDeclaration[]) {
   const groupedByEntity = groupBy(declarations, (d) => d.declaration.entity.id)
   const entityRows = Object.entries(groupedByEntity).map(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ([_, declarations]) => ({
       entity: declarations[0]?.declaration.entity.name ?? i18next.t("Inconnu"),
       ...groupBy(declarations, (d) => d.declaration.period),

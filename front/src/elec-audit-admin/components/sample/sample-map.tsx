@@ -2,7 +2,7 @@ import { ElecChargePointPreview } from "elec-audit-admin/types"
 import { LatLngExpression, icon } from "leaflet"
 import mapPinSVG from "carbure/assets/images/map-pin.svg"
 import "leaflet-defaulticon-compatibility"
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css" // Re-uses images from ~leaflet package
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css" // Re-uses images from ~leaflet package
 import "leaflet/dist/leaflet.css"
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet"
 

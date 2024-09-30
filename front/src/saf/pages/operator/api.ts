@@ -7,10 +7,9 @@ import {
   SafOperatorSnapshot,
   SafQuery,
   SafTicketDetails,
-  SafTicketsResponse
+  SafTicketsResponse,
 } from "../../types"
 import { SafTicketSourceDetails, SafTicketSourcesResponse } from "./types"
-
 
 export function getOperatorYears(entity_id: number) {
   return api.get<Api<number[]>>("/saf/operator/years", {
@@ -148,7 +147,6 @@ export function creditSafTicketSource(entity_id: number, ticket_id: number) {
     ticket_id,
   })
 }
-
 
 export async function findClients(entity_id: number, query?: string) {
   return api
