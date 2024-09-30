@@ -16,5 +16,12 @@ export default defineConfig({
   build: {
     outDir: "./build",
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        assetFileNames: "static/[name].[hash][extname]", // Place les assets dans un dossier "static"
+        chunkFileNames: "static/[name].[hash].js", // Place les chunks JavaScript dans "static"
+        entryFileNames: "static/[name].[hash].js", // Place les fichiers d'entrée dans "static"
+      },
+    },
   },
 })
