@@ -88,7 +88,7 @@ check-frontend:
   extends: .checks
   script:
     - cd front
-    - npx eslint --ext .ts,.tsx src/
+    - npm run lint
   rules:
     - changes:
       - front/**/*
