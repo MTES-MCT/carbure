@@ -49,7 +49,7 @@ export const AddUserDialog = ({
         }
       )
     },
-    onError: (err) => {
+    onError: () => {
       setFieldError("email", t("Le format d'email n'est pas valide"))
     },
   })

@@ -42,7 +42,7 @@ export const CompanyRegistrationDialog = () => {
   >(undefined)
   const registerCompanyRequest = useMutation(api.registerCompany, {
     invalidates: ["user-settings"],
-    onSuccess: (res) => {
+    onSuccess: () => {
       notify(t("Votre demande d'inscription a bien été envoyée !"), {
         variant: "success",
       })

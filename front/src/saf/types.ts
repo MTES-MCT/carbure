@@ -10,7 +10,10 @@ import {
   CBQueryStates,
   CBSnapshot,
 } from "common/hooks/query-builder"
-import { SafTicketSourcePreview, SafTicketSourceStatus } from "./pages/operator/types"
+import {
+  SafTicketSourcePreview,
+  SafTicketSourceStatus,
+} from "./pages/operator/types"
 
 export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
@@ -29,7 +32,6 @@ export interface SafClientSnapshot extends CBSnapshot {
   tickets_pending: number
   tickets_accepted: number
 }
-
 
 export interface SafLot {
   feedstock: Feedstock
@@ -72,8 +74,8 @@ export interface SafTicket {
 
 export interface SafTicketDetails
   extends SafTicket,
-  SafProduction,
-  SafDurability {
+    SafProduction,
+    SafDurability {
   free_field?: string
   client_comment?: string
   // child_ticket_source?: {
@@ -118,7 +120,6 @@ export interface SafTicketsResponse {
   total: number
   ids: number[]
 }
-
 
 export interface SafStates extends CBQueryStates {
   //old QueryParams

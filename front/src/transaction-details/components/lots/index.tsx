@@ -67,7 +67,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const lotData = lot.result?.data.data
   const certificates = lotData?.certificates
-  const creator = lotData?.lot.added_by
+  const creator = lotData?.lot?.added_by
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])

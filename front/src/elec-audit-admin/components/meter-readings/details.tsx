@@ -86,15 +86,16 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
         {meterReadingsApplication?.status ===
           ElecAuditApplicationStatus.Pending && (
-            <MeterReadingsApplicationDetailsPending
-              meterReadingsApplication={meterReadingsApplication}
-              onAccept={acceptApplication}
-              onReject={rejectApplication}
-              onDownloadSample={downloadSample}
-            />
-          )}
+          <MeterReadingsApplicationDetailsPending
+            meterReadingsApplication={meterReadingsApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )}
 
-        {(meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress) && (
+        {meterReadingsApplication?.status ===
+          ElecAuditApplicationStatus.AuditInProgress && (
           <MeterReadingsApplicationDetailsInProgress
             meterReadingsApplication={meterReadingsApplication}
             onAccept={acceptApplication}
@@ -102,7 +103,8 @@ export const MeterReadingsApplicationDetailsDialog = () => {
             onDownloadSample={downloadSample}
           />
         )}
-        {(meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditDone) && (
+        {meterReadingsApplication?.status ===
+          ElecAuditApplicationStatus.AuditDone && (
           <MeterReadingsApplicationDetailsAuditDone
             meterReadingsApplication={meterReadingsApplication}
             onAccept={acceptApplication}

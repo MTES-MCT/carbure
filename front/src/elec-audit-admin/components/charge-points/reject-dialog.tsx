@@ -7,9 +7,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import {
-  ElecChargePointsApplication
-} from "elec/types"
+import { ElecChargePointsApplication } from "elec/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../api"

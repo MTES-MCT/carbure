@@ -8,10 +8,7 @@ import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import css from "../../components/tabs.module.css"
 
-import {
-  SafOperatorSnapshot,
-  SafTicketStatus,
-} from "saf/types"
+import { SafOperatorSnapshot, SafTicketStatus } from "saf/types"
 import { SafTicketSourceStatus } from "./types"
 
 export interface StatusTabsProps {

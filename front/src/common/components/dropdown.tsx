@@ -80,7 +80,7 @@ export const Dropdown = ({
   useEffect(() => {
     if (!open) return
 
-    function onResize(e: Event) {
+    function onResize() {
       setOpen(false)
     }
 
@@ -127,7 +127,7 @@ export const Dropdown = ({
       }
     }
 
-    function onHoverOut(e: MouseEvent) {
+    function onHoverOut() {
       if (isHoverTimeout.current) clearTimeout(isHoverTimeout.current)
       if (open) setOpen(false)
     }

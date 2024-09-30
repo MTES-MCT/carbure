@@ -4,6 +4,7 @@ import { selectionOrQuery } from "common/utils/pagination"
 import { ChargePointsListData, ChargePointsListQuery } from "./types"
 
 export function getChargePointsList(query: ChargePointsListQuery) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { year, ...params } = query
   return api.get<Api<ChargePointsListData>>("elec/cpo/charge-points", {
     params,
@@ -14,6 +15,7 @@ export function getChargePointsFilters(
   field: string,
   query: ChargePointsListQuery
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { year, ...params } = { filter: field, ...query, ...CBQUERY_RESET }
 
   return api
@@ -24,6 +26,7 @@ export function getChargePointsFilters(
 }
 
 export function downloadChargePointsList(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { year, ...params }: ChargePointsListQuery,
   selection: number[]
 ) {

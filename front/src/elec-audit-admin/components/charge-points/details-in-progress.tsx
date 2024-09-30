@@ -35,12 +35,26 @@ export const ChargePointsApplicationDetailsInProgress = ({
         {chargePointApplication?.sample && (
           <section>
             <SampleSummary sample={chargePointApplication?.sample} />
-            <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
-            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} />
+            <ChargePointsSampleMap
+              chargePoints={chargePointApplication?.sample?.charge_points}
+            />
+            <Button
+              icon={Download}
+              label={t("Télécharger l'échantillon")}
+              variant="secondary"
+              action={onDownloadSample}
+            />
           </section>
         )}
         <section>
-          <Alert icon={AlertCircle} variant="warning" multiline label={t("L'échantillon a été reçu par l'auditeur. Vous serez informé par email lorsque ce dernier aura complété le rapport d'audit sur son espace sur Carbure.")} />
+          <Alert
+            icon={AlertCircle}
+            variant="warning"
+            multiline
+            label={t(
+              "L'échantillon a été reçu par l'auditeur. Vous serez informé par email lorsque ce dernier aura complété le rapport d'audit sur son espace sur Carbure."
+            )}
+          />
         </section>
         <section>
           <Checkbox

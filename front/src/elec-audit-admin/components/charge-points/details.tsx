@@ -76,14 +76,15 @@ export const ChargePointsApplicationDetailsDialog = () => {
         </header>
         {chargePointApplication?.status ===
           ElecAuditApplicationStatus.Pending && (
-            <ChargePointsApplicationDetailsPending
-              chargePointApplication={chargePointApplication}
-              onAccept={acceptApplication}
-              onReject={rejectApplication}
-              onDownloadSample={downloadSample}
-            />
-          )}
-        {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
+          <ChargePointsApplicationDetailsPending
+            chargePointApplication={chargePointApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )}
+        {chargePointApplication?.status ===
+          ElecAuditApplicationStatus.AuditInProgress && (
           <ChargePointsApplicationDetailsInProgress
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
@@ -91,7 +92,8 @@ export const ChargePointsApplicationDetailsDialog = () => {
             onDownloadSample={downloadSample}
           />
         )}
-        {chargePointApplication?.status === ElecAuditApplicationStatus.AuditDone && (
+        {chargePointApplication?.status ===
+          ElecAuditApplicationStatus.AuditDone && (
           <ChargePointsApplicationDetailsAuditDone
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
