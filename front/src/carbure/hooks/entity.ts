@@ -20,10 +20,13 @@ export interface EntityManager extends Entity {
   hasRights: (...roles: UserRole[]) => boolean
 }
 
-export function useEntityManager(user: UserManager): EntityManager {
+export function useEntityManager(
+  user: UserManager,
+  entityId?: number // This param is used only to mock current entity in storybook
+): EntityManager {
   const match = useMatch("/org/:entity/*")
 
-  const entityID = parseInt(match?.params.entity ?? "-1", 10)
+  const entityID = entityId ?? parseInt(match?.params.entity ?? "-1", 10)
   const entityRights = user.getRights(entityID)
   const entity = entityRights?.entity
   const type = entity?.entity_type
