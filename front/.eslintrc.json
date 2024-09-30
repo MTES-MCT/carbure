@@ -35,7 +35,8 @@
           { "ts-ignore": "allow-with-description" }
         ],
         "prettier/prettier": "error",
-        "@typescript-eslint/no-explicit-any": "warn"
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-unused-vars": "error"
       }
     }
   ]

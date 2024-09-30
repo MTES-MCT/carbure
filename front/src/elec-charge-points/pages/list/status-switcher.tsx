@@ -1,8 +1,6 @@
 import Tabs from "common/components/tabs"
-import { compact } from "common/utils/collection"
 import { ChargePointsSnapshot } from "elec-charge-points/types"
 import { useMemo } from "react"
-import { useTranslation } from "react-i18next"
 import { useStatusLabels } from "./index.hooks"
 import { ChargePointStatus } from "./types"
 
@@ -16,7 +14,6 @@ export const StatusSwitcher = ({
   snapshot,
   onSwitch,
 }: StatusSwitcherProps) => {
-  const { t } = useTranslation()
   const statuses = useStatusLabels()
 
   const displayedStatuses = useMemo(
