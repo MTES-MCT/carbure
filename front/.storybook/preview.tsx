@@ -3,6 +3,12 @@ import "../src/carbure/assets/css/index.css"
 import i18n from "../src/i18n"
 import { I18nextProvider } from "react-i18next"
 import { useEffect } from "react"
+import { initialize, mswLoader } from "msw-storybook-addon"
+import { withRouter } from "storybook-addon-remix-react-router"
+import mswHandlers from "./mocks"
+
+// Init MSW
+initialize()
 
 const withI18next = (Story, context) => {
   const { locale } = context.globals
@@ -26,7 +32,11 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    msw: {
+      handlers: mswHandlers,
+    },
   },
+  loaders: [mswLoader],
 }
 
 export const globalTypes = {
@@ -44,6 +54,6 @@ export const globalTypes = {
   },
 }
 
-export const decorators = [withI18next]
+export const decorators = [withI18next, withRouter]
 
 export default preview
