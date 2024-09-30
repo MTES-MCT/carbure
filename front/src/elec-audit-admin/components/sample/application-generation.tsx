@@ -22,7 +22,7 @@ import {
   ElecMeterReadingsApplicationDetails,
 } from "elec/types"
 import "leaflet-defaulticon-compatibility"
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css" // Re-uses images from ~leaflet package
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css" // Re-uses images from ~leaflet package
 import "leaflet/dist/leaflet.css"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
