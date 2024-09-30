@@ -6,7 +6,12 @@ import {
   GESOption,
   ProductionSiteDetails,
   Depot,
+  User,
+  UserRightRequest,
+  UserRightStatus,
+  UserRight,
 } from "carbure/types"
+import { mergeDeepRight } from "ramda"
 
 // COUNTRIES
 
@@ -196,23 +201,22 @@ export const biocarburant = {
   name: "EMHV",
 }
 
-export const entityRight = {
-  name: "User",
-  email: "user@company.com",
+export const entityRight: UserRight = {
   entity: producer,
   role: UserRole.Admin,
-  expiration_date: null,
+  expiration_date: "",
+  date_added: "2020-12-23T16:18:27.233Z",
 }
 
-export const entityRequest = {
+export const entityRequest: UserRightRequest = {
   id: 1,
   user: ["user@company.com"],
   entity: producer,
   date_requested: "2020-12-22T16:18:27.233Z",
-  status: "ACCEPTED",
+  status: UserRightStatus.Accepted,
   comment: "",
   role: UserRole.Admin,
-  expiration_date: null,
+  expiration_date: "",
 }
 
 export const entityRights = {
@@ -221,4 +225,54 @@ export const entityRights = {
     rights: [entityRight],
     requests: [entityRequest],
   },
+}
+
+export const entities = {
+  [EntityType.CPO]: cpo,
+  [EntityType.Administration]: admin,
+  [EntityType.Operator]: operator,
+  [EntityType.Trader]: trader,
+  [EntityType.Producer]: producer,
+}
+
+type PartialUserParam = Partial<{
+  email: User["email"]
+  request: Exclude<User["requests"][0], "entity">
+  right: Exclude<User["rights"][0], "entity">
+}>
+type GenerateUserParams = (
+  entityType: keyof typeof entities,
+  partialUser?: PartialUserParam
+) => User
+
+/**
+ * This function simplifies the way we mock a user attaching to an entity
+ * @param entityType The entity you want to mock
+ * @param partialUser Additional informations to overrides default user
+ * @returns
+ */
+export const generateUser: GenerateUserParams = (entityType, partialUser) => {
+  const currentEntity = entities[entityType]
+  return mergeDeepRight<User, PartialUserParam>(
+    {
+      email: "user@company.com",
+      requests: [
+        {
+          ...entityRequest,
+          entity: currentEntity,
+        },
+      ],
+      rights: [
+        {
+          ...entityRight,
+          entity: currentEntity,
+        },
+      ],
+    },
+    {
+      ...(partialUser?.email ? { email: partialUser.email } : {}),
+      ...(partialUser?.request ? { requests: [partialUser.request] } : {}),
+      ...(partialUser?.right ? { rights: [partialUser.right] } : {}),
+    }
+  )
 }
