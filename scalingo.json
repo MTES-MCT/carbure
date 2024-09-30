@@ -1,5 +1,5 @@
 {
-    "scripts": {
-        "first-deploy": "sh scripts/database/restore_db.sh carbure-dev"
-    }
+  "scripts": {
+    "first-deploy": "bash scripts/database/restore_db.sh carbure-dev"
+  }
 }
