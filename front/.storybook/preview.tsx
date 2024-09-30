@@ -1,11 +1,15 @@
+import React, { PropsWithChildren, Suspense, useEffect } from "react"
 import type { Preview } from "@storybook/react"
 import "../src/carbure/assets/css/index.css"
 import i18n from "../src/i18n"
+import { LoaderOverlay } from "../src/common/components/scaffold"
 import { I18nextProvider } from "react-i18next"
-import { useEffect } from "react"
 import { initialize, mswLoader } from "msw-storybook-addon"
 import { withRouter } from "storybook-addon-remix-react-router"
 import mswHandlers from "./mocks"
+import useUserManager, { UserContext } from "../src/carbure/hooks/user"
+import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
+import { PortalProvider } from "../src/common/components/portal"
 
 // Init MSW
 initialize()
@@ -21,6 +25,34 @@ const withI18next = (Story, context) => {
     <I18nextProvider i18n={i18n}>
       <Story />
     </I18nextProvider>
+  )
+}
+
+const App = ({ children }: PropsWithChildren) => {
+  const user = useUserManager()
+  const entityId = user?.user?.rights[0]?.entity.id
+  const entity = useEntityManager(user, entityId)
+
+  if (user.loading) {
+    return <LoaderOverlay />
+  }
+
+  return (
+    <UserContext.Provider value={user}>
+      <EntityContext.Provider value={entity}>
+        <PortalProvider>{children}</PortalProvider>
+      </EntityContext.Provider>
+    </UserContext.Provider>
+  )
+}
+
+const withData = (Story) => {
+  return (
+    <Suspense fallback={<LoaderOverlay />}>
+      <App>
+        <Story />
+      </App>
+    </Suspense>
   )
 }
 
@@ -54,6 +86,6 @@ export const globalTypes = {
   },
 }
 
-export const decorators = [withI18next, withRouter]
+export const decorators = [withData, withI18next, withRouter]
 
 export default preview

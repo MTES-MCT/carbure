@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react"
 import { useQuery } from "common/hooks/async"
-import { Entity, UserRight, UserRightRequest } from "../types"
+import { Entity, User, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"
 
 export interface UserManager {
@@ -13,6 +13,7 @@ export interface UserManager {
   hasEntity: (entityID: number) => boolean
   hasEntities: () => boolean
   getFirstEntity: () => Entity | null
+  user: User | undefined
 }
 
 export function useUserManager(): UserManager {
@@ -56,6 +57,7 @@ export function useUserManager(): UserManager {
     hasEntity,
     hasEntities,
     getFirstEntity,
+    user: res,
   }
 }
 

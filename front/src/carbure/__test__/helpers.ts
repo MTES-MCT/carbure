@@ -68,7 +68,7 @@ export function setEntity(nextEntity: any) {
   Data.set("entity", nextEntity)
 }
 
-export const mockGetWithResponseData = (url: string, data: any) => {
+export const mockGetWithResponseData = <T>(url: string, data: T) => {
   return http.get("/api" + url, () => {
     return HttpResponse.json({
       status: "success",
