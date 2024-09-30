@@ -89,12 +89,8 @@ check-frontend:
   script:
     - cd front
     - npx eslint --ext .ts,.tsx src/
-  only:
-    refs:
-      - dev
-      - preview
-      - master
-    changes:
+  rules:
+    - changes:
       - front/**/*
 
 deploy-dev:
