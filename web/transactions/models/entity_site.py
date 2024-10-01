@@ -1,8 +1,5 @@
 from django.db import models
 
-from core.models import Entity
-from transactions.models import Site
-
 
 class EntitySite(models.Model):
     OWN = "OWN"
@@ -10,11 +7,11 @@ class EntitySite(models.Model):
     PROCESSING = "PROCESSING"
     TYPE_OWNERSHIP = ((OWN, "Propre"), (THIRD_PARTY, "Tiers"), (PROCESSING, "Processing"))
 
-    entity = models.ForeignKey(Entity, null=False, blank=False, on_delete=models.CASCADE)
-    site = models.ForeignKey(Site, null=False, blank=False, on_delete=models.CASCADE)
+    entity = models.ForeignKey("core.Entity", null=False, blank=False, on_delete=models.CASCADE)
+    site = models.ForeignKey("transactions.Site", null=False, blank=False, on_delete=models.CASCADE)
     ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default=THIRD_PARTY)
     blending_is_outsourced = models.BooleanField(default=False)
-    blender = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE, related_name="blender")
+    blender = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE, related_name="blender")
 
     def __str__(self):
         return str(self.id)
@@ -28,6 +25,6 @@ class EntitySite(models.Model):
         }
 
     class Meta:
-        db_table = "entity_depot"
-        verbose_name = "Dépôt Entité"
-        verbose_name_plural = "Dépôts Entité"
+        db_table = "entity_site"
+        verbose_name = "Site Entité"
+        verbose_name_plural = "Sites Entités"

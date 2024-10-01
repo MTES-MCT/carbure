@@ -8,11 +8,12 @@ from django.dispatch import receiver
 from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere
 from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
+from transactions.models import Site
 
 
 class ProductionSiteCertificate(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-    production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
+    production_site = models.ForeignKey(Site, null=True, on_delete=models.CASCADE)
     certificate = models.ForeignKey(EntityCertificate, null=True, blank=True, on_delete=models.CASCADE)
 
     def natural_key(self):
@@ -42,7 +43,7 @@ class DoubleCountingRegistration(models.Model):
 
     certificate_id = models.CharField(max_length=64)
     certificate_holder = models.CharField(max_length=256)
-    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True, blank=True)
+    production_site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
     registered_address = models.TextField()
     valid_from = models.DateField()
     valid_until = models.DateField()
