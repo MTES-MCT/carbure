@@ -106,10 +106,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
                 provisionCertificatesData.elec_provision_certificates
               }
               rowLink={showProvisionCertificateDetails}
-              selected={state.selection}
-              onSelect={actions.setSelection}
               onOrder={actions.setOrder}
-              status={status}
             />
 
             {(state.limit || 0) < total && (

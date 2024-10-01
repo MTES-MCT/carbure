@@ -4,7 +4,7 @@ import { useQuery } from "common/hooks/async"
 import { Api } from "common/services/api"
 import { useCallback } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-
+import type { FetchResponse } from "openapi-fetch"
 const currentYear = new Date().getFullYear()
 
 function useYears(

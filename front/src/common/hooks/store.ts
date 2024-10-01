@@ -5,7 +5,7 @@ export function useStore<S, A extends ActionHandlers<S>>(
   actions: A
 ): [S, ActionCreators<S, A>] {
   const [state, dispatch] = useReducer((state: S, action: Action<S, A>) => {
-    const result = actions[action.type](...action.payload)
+    const result = actions[action.type]?.(...action.payload)
     const partialState = typeof result === "function" ? result(state) : result
     return { ...state, ...partialState } as S
   }, initialState)

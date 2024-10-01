@@ -170,7 +170,7 @@ export function actionColumn<T>(
     cell: (value) => {
       const buttons = actions(value).map((e, key) => ({ ...e, key }))
       if (buttons.length === 0) return <ChevronRight color="var(--gray-dark)" />
-      else return buttons
+      else return <>{buttons}</>
     },
   }
 }

@@ -16,7 +16,7 @@ import {
   okMeterReadingsCheckValid,
 } from "elec/__test__/api"
 
-import { setupServer } from "msw/lib/node"
+import { setupServer } from "msw/node"
 import defaultSettingsRequests from "./api"
 
 const allRequests = [

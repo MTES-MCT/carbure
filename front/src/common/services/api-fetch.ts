@@ -14,7 +14,7 @@ const middleware: Middleware = {
 }
 
 // Enlève le préfixe "/api" de chaque chemin pour générer un type
-type newPaths = {
+export type newPaths = {
   [K in keyof paths as K extends `/api${infer Rest}` ? Rest : never]: paths[K]
 }
 

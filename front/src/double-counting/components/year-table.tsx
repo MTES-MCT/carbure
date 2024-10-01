@@ -5,7 +5,7 @@ function groupRowsByYear<T extends { year: number }>(items: T[]) {
   const years: Record<number, T[]> = {}
   items.forEach((item) => {
     years[item.year] = years[item.year] ?? []
-    years[item.year].push(item)
+    years[item.year]!.push(item)
   })
   return years
 }

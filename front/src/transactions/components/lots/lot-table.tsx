@@ -230,11 +230,13 @@ export const PeriodCell = ({ lot }: LotCellProps) => {
 }
 
 export const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
-  if (!errors[lot.id]) {
+  const lotErrors = errors[lot.id]
+
+  if (!lotErrors) {
     return undefined
-  } else if (errors[lot.id].some((err) => err.is_blocking)) {
+  } else if (lotErrors.some((err) => err.is_blocking)) {
     return "danger"
-  } else if (errors[lot.id].some((err) => !err.is_blocking)) {
+  } else if (lotErrors.some((err) => !err.is_blocking)) {
     return "warning"
   }
 }
