@@ -23,13 +23,13 @@ def create_sites_and_update_related_content(apps, schema_editor):
         "SafTicketSource": apps.get_model("saf", "SafTicketSource"),
     }
 
-    def create_site_and_update_related_content(entity, filter_column_name, site_type, customs_id_field, site_siret_field):
+    def create_site_and_update_related_content(entity, filter_column_name, site_type):
         print(f"Creating site for {entity.name}")
         site = Site.objects.create(
             name=entity.name,
-            site_siret=getattr(entity, site_siret_field, "") or "",
+            site_siret=getattr(entity, "site_id", "") or "",
             city=entity.city if entity.city else "",
-            customs_id=getattr(entity, customs_id_field, "") or "",
+            customs_id=getattr(entity, "depot_id", "") or "",
             site_type=site_type,
             country=entity.country,
             postal_code=entity.postal_code,
@@ -48,6 +48,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
             manager_email=getattr(entity, "manager_email", "") or "",
             private=getattr(entity, "private", False),
             is_enabled=getattr(entity, "is_enabled", True),
+            date_mise_en_service=getattr(entity, "date_mise_en_service", None),
         )
 
         # Update all related content of old entity
@@ -62,7 +63,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
             else:
                 print(f"Model {content.model} not found")
 
-        # If entity is a depot, create a EntitySite relation
+        # Create an EntitySite relation
         if isinstance(entity, Depot):
             entity_depots = EntityDepot.objects.filter(depot=entity)
             for entity_depot in entity_depots:
@@ -73,6 +74,12 @@ def create_sites_and_update_related_content(apps, schema_editor):
                     blending_is_outsourced=entity_depot.blending_is_outsourced,
                     blender=entity_depot.blender,
                 )
+        else:
+            EntitySite.objects.create(
+                site=site,
+                entity=entity.producer,
+                ownership_type="THIRD_PARTY",
+            )
 
     production_sites = ProductionSite.objects.all()
     for production_site in production_sites:
@@ -80,8 +87,6 @@ def create_sites_and_update_related_content(apps, schema_editor):
             entity=production_site,
             filter_column_name="production_site_id",
             site_type="PRODUCTION SITE",
-            customs_id_field="",
-            site_siret_field="site_id",
         )
 
     depots = Depot.objects.all()
@@ -90,8 +95,6 @@ def create_sites_and_update_related_content(apps, schema_editor):
             entity=depot,
             filter_column_name="depot_id",
             site_type=depot.depot_type,
-            customs_id_field="depot_id",
-            site_siret_field="",
         )
 
 

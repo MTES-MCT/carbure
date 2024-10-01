@@ -158,6 +158,7 @@ class Migration(migrations.Migration):
                         to="core.pays",
                     ),
                 ),
+                ("date_mise_en_service", models.DateField(null=True)),
             ],
             options={
                 "verbose_name": "Site de stockage de carburant",

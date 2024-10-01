@@ -42,7 +42,6 @@ def insert_data_into_temp_table(apps, schema_editor):
             print(f"Inserting last bulk {model_name}: {len(content_to_insert_batch)} ({batch_count}/{queryset.count()})")
             ContentToUpdate.objects.bulk_create(content_to_insert_batch)
             print(f"Inserting bulk {model_name} end")
-            print("--------------------------------")
 
     models_to_update = [
         ("CarbureLot", CarbureLot, "carbure_delivery_site", "depot"),
@@ -68,6 +67,7 @@ def insert_data_into_temp_table(apps, schema_editor):
 
         print(f"Emptying '{field_name}' field from {model_name}")
         queryset.update(**{field_name: None})
+        print("--------------------------------")
 
 
 def reverse_migration(apps, schema_editor):
