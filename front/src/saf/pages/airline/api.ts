@@ -1,5 +1,6 @@
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import {
   SafClientSnapshot,
   SafFilter,
@@ -10,9 +11,19 @@ import {
 
 //AIRLINE
 
+// export function getAirlineYears(entity_id: number) {
+//   return api.get<Api<number[]>>("/saf/airline/years", {
+//     params: { entity_id },
+//   })
+// }
+
 export function getAirlineYears(entity_id: number) {
-  return api.get<Api<number[]>>("/saf/airline/years", {
-    params: { entity_id },
+  return apiFetch.GET("/saf/years/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
