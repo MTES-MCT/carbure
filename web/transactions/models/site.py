@@ -61,6 +61,7 @@ class Site(models.Model):
     manager_email = models.CharField(max_length=64, blank=True)
     private = models.BooleanField(default=False)
     is_enabled = models.BooleanField(default=True)
+    date_mise_en_service = models.DateField(null=True, blank=False)
 
     class Meta:
         db_table = "sites"
