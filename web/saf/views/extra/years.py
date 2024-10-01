@@ -48,7 +48,7 @@ class ExtraError:
             response_only=True,
         ),
     ],
-    responses={200: OpenApiTypes.OBJECT, 400: ErrorResponseSerializer},
+    responses={200: {"type": "array", "items": {"type": "integer"}}, 400: ErrorResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.AIRLINE])])
