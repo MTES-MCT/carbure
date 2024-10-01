@@ -99,7 +99,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
           if ("field" in u.metadata) {
             return {
               type: "UPDATED",
-              action: getEventTypeLabel(u.event_type),
+              action: getEventTypeLabel(u.event_type) || "",
               field: u.metadata.field,
               label: i18next.t(u.metadata.field, { ns: "fields" }),
               valueBefore: u.metadata.value_before,
@@ -111,7 +111,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
             return (u.metadata as LotFieldUpdate).changed.map(
               ([field, valueBefore, valueAfter]) => ({
                 type: "UPDATED",
-                action: getEventTypeLabel(u.event_type),
+                action: getEventTypeLabel(u.event_type) || "",
                 field,
                 user: u.user,
                 date: u.event_dt,
@@ -124,7 +124,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
         } else {
           return {
             type: u.event_type,
-            action: getEventTypeLabel(u.event_type),
+            action: getEventTypeLabel(u.event_type) || "",
             label: "",
             field: "",
             valueBefore: "",

@@ -137,10 +137,12 @@ const TicketsGroupedAssignment = ({
                 onSetMaximumVolume={setMaximumVolume}
                 {...bind("volume")}
               />
-              <PeriodSelect
-                deliveryPeriod={lastDeliveryPeriod}
-                {...bind("assignment_period")}
-              />
+              {lastDeliveryPeriod && (
+                <PeriodSelect
+                  deliveryPeriod={lastDeliveryPeriod}
+                  {...bind("assignment_period")}
+                />
+              )}
 
               <Autocomplete
                 required

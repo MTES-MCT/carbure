@@ -76,6 +76,7 @@
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
+    "check-backend": "tsc --noEmit",
     "predev": "react-dsfr update-icons",
     "prebuild": "react-dsfr update-icons",
     "storybook": "storybook dev -p 6006",

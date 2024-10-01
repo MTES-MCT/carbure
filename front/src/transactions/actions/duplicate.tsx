@@ -123,7 +123,7 @@ const DuplicateDialog = ({
               "duplicate-lot",
               selection.length,
             ])
-            duplicateLots.execute(query.entity_id, selection[0])
+            duplicateLots.execute(query.entity_id, selection[0] as number)
           }}
         />
         <Button
