@@ -70,7 +70,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const creator = lotData?.lot?.added_by
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
-  const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
+  const [errors = [], warnings = []] = separateAnomalies(lotData?.errors ?? [])
   const { refToScroll } = useScrollToRef(errors.length > 0)
 
   const form = useLotForm(lotData?.lot, errors, certificates)

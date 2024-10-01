@@ -60,6 +60,7 @@
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
+    "check-backend": "tsc --noEmit",
     "predev": "react-dsfr update-icons",
     "prebuild": "react-dsfr update-icons",
     "generate-api": "npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.d.ts && eslint 'src/api-schema.d.ts' --fix"

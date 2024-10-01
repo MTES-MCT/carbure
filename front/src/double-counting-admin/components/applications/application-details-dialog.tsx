@@ -97,7 +97,7 @@ export const ApplicationDetailsDialog = () => {
 
     const updatedQuotas = Object.keys(quotas).map((id) => [
       parseInt(id),
-      quotas[id],
+      quotas[id]!,
     ])
     const done = await approveQuotas.execute(
       entity.id,
