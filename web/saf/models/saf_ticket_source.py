@@ -40,7 +40,7 @@ class SafTicketSource(models.Model):
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
 
     carbure_production_site = models.ForeignKey(
-        "producers.ProductionSite", null=True, blank=True, default=None, on_delete=models.SET_NULL
+        "transactions.Site", null=True, blank=True, default=None, on_delete=models.SET_NULL
     )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(
