@@ -152,6 +152,6 @@ export type SafQueryType = "assigned" | "received"
 
 export interface SafQuery extends CBQueryParams {
   [SafFilter.Feedstocks]?: string[]
-  [SafFilter.Periods]?: string[]
+  [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
 }
