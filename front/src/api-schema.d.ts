@@ -4,6 +4,230 @@
  */
 
 export interface paths {
+  "/api/elec/applications/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_applications_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_applications_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/{id}/accept/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_applications_accept_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/{id}/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_applications_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/{id}/generate_sample/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_applications_generate_sample_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/{id}/get_sample/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_applications_get_sample_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/{id}/reject/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_applications_reject_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/applications/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_applications_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/charge-points/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_charge_points_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/charge-points/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_charge_points_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/saf/clients/": {
     parameters: {
       query?: never
@@ -276,6 +500,294 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/transactions/api-lots/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["transactions_api_lots_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["transactions_api_lots_retrieve_2"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-blending/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_blending_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-consumption/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_consumption_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-direct-delivery/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_direct_delivery_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_export_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-in-stock/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_in_stock_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-processing/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_processing_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-rfc/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_rfc_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/accept-trading/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_accept_trading_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/add/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_add_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/add-excel/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_add_excel_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/approuve-fix/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_approuve_fix_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/cancel-accept/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_cancel_accept_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["transactions_api_lots_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/request-fix/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_request_fix_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/send/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_send_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/transactions/api-lots/submit-fix/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["transactions_api_lots_submit_fix_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -392,6 +904,12 @@ export interface components {
       is_in_europe?: boolean
     }
     /**
+     * @description * `AC` - Courant alternatif
+     *     * `DC` - Courant continu
+     * @enum {string}
+     */
+    CurrentTypeEnum: "AC" | "DC"
+    /**
      * @description * `UNKNOWN` - UNKNOWN
      *     * `RFC` - RFC
      *     * `STOCK` - STOCK
@@ -447,6 +965,73 @@ export interface components {
       | "HEAT PLANT"
       | "POWER PLANT"
       | "COGENERATION PLANT"
+    ElecChargePoint: {
+      readonly id: number
+      readonly cpo: string
+      charge_point_id: string
+      current_type: components["schemas"]["CurrentTypeEnum"]
+      /** Format: date */
+      application_date: string
+      /** Format: date */
+      installation_date: string
+      readonly mid_id: string
+      readonly measure_date: string
+      readonly measure_energy: string
+      readonly latest_meter_reading_date: string
+      is_article_2?: boolean
+      measure_reference_point_id?: string | null
+      station_name: string
+      station_id: string
+      readonly nominal_power: string
+      cpo_name?: string | null
+      cpo_siren?: string | null
+      readonly status: string
+    }
+    ElecChargePointApplication: {
+      readonly id: number
+      cpo: components["schemas"]["EntityPreview"]
+      status?: components["schemas"]["Status54eEnum"]
+      /** Format: date */
+      application_date: string
+      readonly station_count: string
+      readonly charge_point_count: string
+      readonly power_total: string
+    }
+    ElecChargePointApplicationDetails: {
+      readonly id: number
+      cpo: components["schemas"]["EntityPreview"]
+      status?: components["schemas"]["Status54eEnum"]
+      /** Format: date */
+      application_date: string
+      readonly station_count: string
+      readonly charge_point_count: string
+      readonly power_total: string
+      readonly email_contacts: string
+      readonly sample: string
+    }
+    ElecTransferCertificate: {
+      readonly id: number
+      readonly supplier: components["schemas"]["EntityPreview"]
+      readonly client: components["schemas"]["EntityPreview"]
+      /** Format: date */
+      transfer_date: string
+      /** Format: double */
+      energy_amount: number
+      status?: components["schemas"]["StatusA18Enum"]
+      certificate_id: string
+    }
+    ElecTransferCertificateDetails: {
+      readonly id: number
+      readonly supplier: components["schemas"]["EntityPreview"]
+      readonly client: components["schemas"]["EntityPreview"]
+      /** Format: date */
+      transfer_date: string
+      /** Format: double */
+      energy_amount: number
+      status?: components["schemas"]["StatusA18Enum"]
+      certificate_id: string
+      comment?: string | null
+    }
     Entity: {
       readonly id: number
       name: string
@@ -536,6 +1121,96 @@ export interface components {
       | "REJECTED"
       | "FROZEN"
       | "DELETED"
+    PaginatedElecChargePointApplicationList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecChargePointApplication"][]
+    }
+    PaginatedElecChargePointList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecChargePoint"][]
+    }
+    PaginatedElecTransferCertificateList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecTransferCertificate"][]
+    }
+    PaginatedSafClientList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["SafClient"][]
+    }
+    PaginatedSafTicketList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["SafTicket"][]
+    }
+    PaginatedSafTicketSourceList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["SafTicketSource"][]
+    }
     /**
      * @description * `l` - litres
      *     * `kg` - kg
@@ -572,7 +1247,7 @@ export interface components {
       carbure_id?: string | null
       year: number
       assignment_period: number
-      status?: components["schemas"]["StatusEnum"]
+      status?: components["schemas"]["Status499Enum"]
       /** Format: date */
       agreement_date?: string | null
       readonly supplier: string
@@ -590,7 +1265,7 @@ export interface components {
       carbure_id?: string | null
       year: number
       assignment_period: number
-      status?: components["schemas"]["StatusEnum"]
+      status?: components["schemas"]["Status499Enum"]
       /** Format: date-time */
       readonly created_at: string | null
       readonly supplier: string
@@ -737,7 +1412,28 @@ export interface components {
      *     * `REJECTED` - Refusé
      * @enum {string}
      */
-    StatusEnum: "PENDING" | "ACCEPTED" | "REJECTED"
+    Status499Enum: "PENDING" | "ACCEPTED" | "REJECTED"
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `AUDIT_DONE` - AUDIT_DONE
+     *     * `AUDIT_IN_PROGRESS` - AUDIT_IN_PROGRESS
+     * @enum {string}
+     */
+    Status54eEnum:
+      | "PENDING"
+      | "ACCEPTED"
+      | "REJECTED"
+      | "AUDIT_DONE"
+      | "AUDIT_IN_PROGRESS"
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     * @enum {string}
+     */
+    StatusA18Enum: "PENDING" | "ACCEPTED" | "REJECTED"
     /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
@@ -757,12 +1453,225 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  saf_clients_list: {
+  elec_applications_list: {
     parameters: {
       query?: {
-        entity_id?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        company_id?: number[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description A search term. */
+        search?: string
+        /** @description * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED
+         *     * `AUDIT_DONE` - AUDIT_DONE
+         *     * `AUDIT_IN_PROGRESS` - AUDIT_IN_PROGRESS */
+        status?:
+          | "ACCEPTED"
+          | "AUDIT_DONE"
+          | "AUDIT_IN_PROGRESS"
+          | "PENDING"
+          | "REJECTED"
+        /** @description Transfer date year */
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecChargePointApplicationList"]
+        }
+      }
+    }
+  }
+  elec_applications_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Inscription points de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplicationDetails"]
+        }
+      }
+    }
+  }
+  elec_applications_accept_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Inscription points de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecChargePointApplication"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecChargePointApplication"]
+        "multipart/form-data": components["schemas"]["ElecChargePointApplication"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplication"]
+        }
+      }
+    }
+  }
+  elec_applications_export_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Inscription points de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplication"]
+        }
+      }
+    }
+  }
+  elec_applications_generate_sample_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Inscription points de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecChargePointApplication"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecChargePointApplication"]
+        "multipart/form-data": components["schemas"]["ElecChargePointApplication"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplication"]
+        }
+      }
+    }
+  }
+  elec_applications_get_sample_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Inscription points de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplication"]
+        }
+      }
+    }
+  }
+  elec_applications_reject_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Inscription points de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecChargePointApplication"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecChargePointApplication"]
+        "multipart/form-data": components["schemas"]["ElecChargePointApplication"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplication"]
+        }
+      }
+    }
+  }
+  elec_applications_filters_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePointApplication"]
+        }
+      }
+    }
+  }
+  elec_charge_points_list: {
+    parameters: {
+      query?: {
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
         /** @description A search term. */
         search?: string
       }
@@ -777,7 +1686,176 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafClient"][]
+          "application/json": components["schemas"]["PaginatedElecChargePointList"]
+        }
+      }
+    }
+  }
+  elec_charge_points_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Point de recharge. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecChargePoint"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_list: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        /** @description Entity Id */
+        entity_id: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operator?: string[]
+        /** @description Ordre
+         *
+         *     * `transfer_date` - Transfer date
+         *     * `-transfer_date` - Transfer date (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operator` - Operator
+         *     * `-operator` - Operator (décroissant) */
+        order?: (
+          | "-cpo"
+          | "-energy_amount"
+          | "-operator"
+          | "-transfer_date"
+          | "cpo"
+          | "energy_amount"
+          | "operator"
+          | "transfer_date"
+        )[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description A search term. */
+        search?: string
+        /** @description * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED */
+        status?: "ACCEPTED" | "PENDING" | "REJECTED"
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        transfer_date?: string[]
+        /** @description Transfer date year */
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecTransferCertificateList"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificateDetails"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_export_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificate"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_filters_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificate"]
+        }
+      }
+    }
+  }
+  saf_clients_list: {
+    parameters: {
+      query?: {
+        entity_id?: string
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedSafClientList"]
         }
       }
     }
@@ -872,6 +1950,8 @@ export interface operations {
         )[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         periods?: number[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -894,7 +1974,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicketSource"][]
+          "application/json": components["schemas"]["PaginatedSafTicketSourceList"]
         }
       }
     }
@@ -1150,6 +2230,8 @@ export interface operations {
         )[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         periods?: number[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1172,7 +2254,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicket"][]
+          "application/json": components["schemas"]["PaginatedSafTicketList"]
         }
       }
     }
@@ -1470,9 +2552,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": {
-            [key: string]: unknown
-          }
+          "application/json": number[]
         }
       }
       400: {
@@ -1482,6 +2562,332 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["ErrorResponse"]
         }
+      }
+    }
+  }
+  transactions_api_lots_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_retrieve_2: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_blending_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_consumption_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_direct_delivery_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_export_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_in_stock_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_processing_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_rfc_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_accept_trading_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_add_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_add_excel_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_approuve_fix_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_cancel_accept_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_export_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_request_fix_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_send_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  transactions_api_lots_submit_fix_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

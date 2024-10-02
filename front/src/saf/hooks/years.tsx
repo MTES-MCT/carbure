@@ -1,15 +1,19 @@
-import { AxiosResponse } from "axios"
+/**
+ * TEMPORARY FIX
+ * To simplify the migration between axios and the robust type checking with the backend,
+ * some code will be duplicated, and removed after the migration ended.
+ */
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
-import { Api } from "common/services/api"
 import { useCallback } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { FetchResponseType } from "common/services/api-fetch.types"
 
 const currentYear = new Date().getFullYear()
 
 function useYears(
   root: string,
-  getYears: (entity_id: number) => Promise<AxiosResponse<Api<number[]>, any>>
+  getYears: (entity_id: number) => Promise<FetchResponseType<number[]>>
 ) {
   const location = useLocation()
   const params = useParams<"year">()

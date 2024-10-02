@@ -18,7 +18,7 @@ import {
 // }
 
 export function getAirlineYears(entity_id: number) {
-  return apiFetch.GET("/api/saf/years/", {
+  return apiFetch.GET("/saf/years/", {
     params: {
       query: {
         entity_id,
