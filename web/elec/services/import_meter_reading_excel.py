@@ -32,7 +32,15 @@ class ExcelMeterReadings:
     def parse_meter_reading_excel(excel_file: UploadedFile):
         meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 4)))
         meter_readings_data["line"] = meter_readings_data.index + 2  # add a line number to locate data in the excel file
+<<<<<<< Updated upstream
         meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelMeterReadings.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+=======
+        meter_readings_data.rename(
+            columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelMeterReadings.EXCEL_COLUMNS)},
+            inplace=True,
+        )
+        meter_readings_data["reading_date"] = meter_readings_data["reading_date"].astype(str)
+>>>>>>> Stashed changes
         meter_readings_data = meter_readings_data.drop_duplicates("charge_point_id")
         meter_readings_data.dropna(inplace=True)
 
