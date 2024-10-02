@@ -144,5 +144,5 @@ class ExcelMeterReadingValidator(Validator):
         if meter_reading.get("reading_date") in charge_point_reading_dates:
             self.add_error(
                 "reading_date",
-                _(f"Le relevé du {meter_reading.get("reading_date")} existe déjà"),
+                _(f"Le relevé du {meter_reading.get('reading_date')} existe déjà"),
             )
