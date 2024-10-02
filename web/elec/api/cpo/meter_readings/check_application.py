@@ -66,7 +66,6 @@ def check_application(request: HttpRequest, entity):
     duplicates = {}
     for row in original:
         reading_date = row["reading_date"]
-        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
         if previous_date.get(row["charge_point_id"]) == reading_date:
             duplicates[reading_date] = row["line"]
 

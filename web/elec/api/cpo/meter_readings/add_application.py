@@ -76,7 +76,6 @@ def add_application(request: HttpRequest, entity: Entity):
     duplicate = False
     for row in original:
         reading_date = row["reading_date"]
-        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
         if previous_date.get(row["charge_point_id"]) == reading_date:
             duplicate = True
             break
