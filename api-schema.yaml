@@ -4,6 +4,504 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
+  /api/elec/applications/:
+    get:
+      operationId: elec_applications_list
+      parameters:
+      - in: query
+        name: company_id
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - in: query
+        name: cpo
+        schema:
+          type: array
+          items:
+            type: string
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ACCEPTED
+          - AUDIT_DONE
+          - AUDIT_IN_PROGRESS
+          - PENDING
+          - REJECTED
+        description: |-
+          * `PENDING` - PENDING
+          * `ACCEPTED` - ACCEPTED
+          * `REJECTED` - REJECTED
+          * `AUDIT_DONE` - AUDIT_DONE
+          * `AUDIT_IN_PROGRESS` - AUDIT_IN_PROGRESS
+      - in: query
+        name: year
+        schema:
+          type: number
+        description: Transfer date year
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedElecChargePointApplicationList'
+          description: ''
+  /api/elec/applications/{id}/:
+    get:
+      operationId: elec_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Inscription points de
+          recharge.
+        required: true
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplicationDetails'
+          description: ''
+  /api/elec/applications/{id}/accept/:
+    post:
+      operationId: elec_applications_accept_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Inscription points de
+          recharge.
+        required: true
+      tags:
+      - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplication'
+          description: ''
+  /api/elec/applications/{id}/export/:
+    get:
+      operationId: elec_applications_export_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Inscription points de
+          recharge.
+        required: true
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplication'
+          description: ''
+  /api/elec/applications/{id}/generate_sample/:
+    post:
+      operationId: elec_applications_generate_sample_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Inscription points de
+          recharge.
+        required: true
+      tags:
+      - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplication'
+          description: ''
+  /api/elec/applications/{id}/get_sample/:
+    get:
+      operationId: elec_applications_get_sample_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Inscription points de
+          recharge.
+        required: true
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplication'
+          description: ''
+  /api/elec/applications/{id}/reject/:
+    post:
+      operationId: elec_applications_reject_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Inscription points de
+          recharge.
+        required: true
+      tags:
+      - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ElecChargePointApplication'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplication'
+          description: ''
+  /api/elec/applications/filters/:
+    get:
+      operationId: elec_applications_filters_retrieve
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePointApplication'
+          description: ''
+  /api/elec/charge-points/:
+    get:
+      operationId: elec_charge_points_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedElecChargePointList'
+          description: ''
+  /api/elec/charge-points/{id}/:
+    get:
+      operationId: elec_charge_points_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Point de recharge.
+        required: true
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecChargePoint'
+          description: ''
+  /api/elec/transfer-certificates/:
+    get:
+      operationId: elec_transfer_certificates_list
+      parameters:
+      - in: query
+        name: cpo
+        schema:
+          type: array
+          items:
+            type: string
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - in: query
+        name: entity_id
+        schema:
+          type: number
+        description: Entity Id
+        required: true
+      - in: query
+        name: operator
+        schema:
+          type: array
+          items:
+            type: string
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - in: query
+        name: order
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -cpo
+            - -energy_amount
+            - -operator
+            - -transfer_date
+            - cpo
+            - energy_amount
+            - operator
+            - transfer_date
+        description: |-
+          Ordre
+
+          * `transfer_date` - Transfer date
+          * `-transfer_date` - Transfer date (décroissant)
+          * `energy_amount` - Energy amount
+          * `-energy_amount` - Energy amount (décroissant)
+          * `cpo` - Cpo
+          * `-cpo` - Cpo (décroissant)
+          * `operator` - Operator
+          * `-operator` - Operator (décroissant)
+        explode: false
+        style: form
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ACCEPTED
+          - PENDING
+          - REJECTED
+        description: |-
+          * `PENDING` - PENDING
+          * `ACCEPTED` - ACCEPTED
+          * `REJECTED` - REJECTED
+      - in: query
+        name: transfer_date
+        schema:
+          type: array
+          items:
+            type: string
+            format: date
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - in: query
+        name: year
+        schema:
+          type: number
+        description: Transfer date year
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedElecTransferCertificateList'
+          description: ''
+  /api/elec/transfer-certificates/{id}/:
+    get:
+      operationId: elec_transfer_certificates_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Certificat de Cession
+          (elec).
+        required: true
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecTransferCertificateDetails'
+          description: ''
+  /api/elec/transfer-certificates/export/:
+    get:
+      operationId: elec_transfer_certificates_export_retrieve
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecTransferCertificate'
+          description: ''
+  /api/elec/transfer-certificates/filters/:
+    get:
+      operationId: elec_transfer_certificates_filters_retrieve
+      tags:
+      - elec
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElecTransferCertificate'
+          description: ''
   /api/saf/clients/:
     get:
       operationId: saf_clients_list
@@ -18,6 +516,12 @@ paths:
         description: Which field to use when ordering the results.
         schema:
           type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
       - name: search
         required: false
         in: query
@@ -34,9 +538,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SafClient'
+                $ref: '#/components/schemas/PaginatedSafClientList'
           description: ''
   /api/saf/clients/{id}/:
     get:
@@ -181,6 +683,12 @@ paths:
         description: Which field to use when ordering the results.
         schema:
           type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
       - in: query
         name: periods
         schema:
@@ -234,9 +742,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SafTicketSource'
+                $ref: '#/components/schemas/PaginatedSafTicketSourceList'
           description: ''
   /api/saf/ticket-sources/{id}/:
     get:
@@ -702,6 +1208,12 @@ paths:
         description: Which field to use when ordering the results.
         schema:
           type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
       - in: query
         name: periods
         schema:
@@ -755,9 +1267,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SafTicket'
+                $ref: '#/components/schemas/PaginatedSafTicketList'
           description: ''
   /api/saf/tickets/{id}/:
     get:
@@ -1218,8 +1728,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: {}
+                type: array
+                items:
+                  type: integer
               examples:
                 ExampleOfFiltersResponse.:
                   value:
@@ -1236,6 +1747,228 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: ''
+  /api/transactions/api-lots/:
+    get:
+      operationId: transactions_api_lots_retrieve
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/{id}/:
+    get:
+      operationId: transactions_api_lots_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-blending/:
+    post:
+      operationId: transactions_api_lots_accept_blending_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-consumption/:
+    post:
+      operationId: transactions_api_lots_accept_consumption_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-direct-delivery/:
+    post:
+      operationId: transactions_api_lots_accept_direct_delivery_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-export/:
+    post:
+      operationId: transactions_api_lots_accept_export_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-in-stock/:
+    post:
+      operationId: transactions_api_lots_accept_in_stock_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-processing/:
+    post:
+      operationId: transactions_api_lots_accept_processing_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-rfc/:
+    post:
+      operationId: transactions_api_lots_accept_rfc_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/accept-trading/:
+    post:
+      operationId: transactions_api_lots_accept_trading_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/add/:
+    post:
+      operationId: transactions_api_lots_add_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/add-excel/:
+    post:
+      operationId: transactions_api_lots_add_excel_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/approuve-fix/:
+    post:
+      operationId: transactions_api_lots_approuve_fix_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/cancel-accept/:
+    post:
+      operationId: transactions_api_lots_cancel_accept_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/export/:
+    get:
+      operationId: transactions_api_lots_export_retrieve
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/request-fix/:
+    post:
+      operationId: transactions_api_lots_request_fix_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/send/:
+    post:
+      operationId: transactions_api_lots_send_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/transactions/api-lots/submit-fix/:
+    post:
+      operationId: transactions_api_lots_submit_fix_create
+      tags:
+      - transactions
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
 components:
   schemas:
     Biofuel:
@@ -1527,6 +2260,14 @@ components:
       - code_pays
       - name
       - name_en
+    CurrentTypeEnum:
+      enum:
+      - AC
+      - DC
+      type: string
+      description: |-
+        * `AC` - Courant alternatif
+        * `DC` - Courant continu
     DeliveryTypeEnum:
       enum:
       - UNKNOWN
@@ -1612,6 +2353,213 @@ components:
         * `HEAT PLANT` - HEAT PLANT
         * `POWER PLANT` - POWER PLANT
         * `COGENERATION PLANT` - COGENERATION PLANT
+    ElecChargePoint:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          type: string
+          readOnly: true
+        charge_point_id:
+          type: string
+          maxLength: 64
+        current_type:
+          $ref: '#/components/schemas/CurrentTypeEnum'
+        application_date:
+          type: string
+          format: date
+        installation_date:
+          type: string
+          format: date
+        mid_id:
+          type: string
+          readOnly: true
+        measure_date:
+          type: string
+          readOnly: true
+        measure_energy:
+          type: string
+          readOnly: true
+        latest_meter_reading_date:
+          type: string
+          readOnly: true
+        is_article_2:
+          type: boolean
+        measure_reference_point_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        station_name:
+          type: string
+          maxLength: 128
+        station_id:
+          type: string
+          maxLength: 64
+        nominal_power:
+          type: string
+          readOnly: true
+        cpo_name:
+          type: string
+          nullable: true
+          maxLength: 128
+        cpo_siren:
+          type: string
+          nullable: true
+          maxLength: 64
+        status:
+          type: string
+          readOnly: true
+      required:
+      - application_date
+      - charge_point_id
+      - cpo
+      - current_type
+      - id
+      - installation_date
+      - latest_meter_reading_date
+      - measure_date
+      - measure_energy
+      - mid_id
+      - nominal_power
+      - station_id
+      - station_name
+      - status
+    ElecChargePointApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          $ref: '#/components/schemas/EntityPreview'
+        status:
+          $ref: '#/components/schemas/Status54eEnum'
+        application_date:
+          type: string
+          format: date
+        station_count:
+          type: string
+          readOnly: true
+        charge_point_count:
+          type: string
+          readOnly: true
+        power_total:
+          type: string
+          readOnly: true
+      required:
+      - application_date
+      - charge_point_count
+      - cpo
+      - id
+      - power_total
+      - station_count
+    ElecChargePointApplicationDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          $ref: '#/components/schemas/EntityPreview'
+        status:
+          $ref: '#/components/schemas/Status54eEnum'
+        application_date:
+          type: string
+          format: date
+        station_count:
+          type: string
+          readOnly: true
+        charge_point_count:
+          type: string
+          readOnly: true
+        power_total:
+          type: string
+          readOnly: true
+        email_contacts:
+          type: string
+          readOnly: true
+        sample:
+          type: string
+          readOnly: true
+      required:
+      - application_date
+      - charge_point_count
+      - cpo
+      - email_contacts
+      - id
+      - power_total
+      - sample
+      - station_count
+    ElecTransferCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          allOf:
+          - $ref: '#/components/schemas/EntityPreview'
+          readOnly: true
+        client:
+          allOf:
+          - $ref: '#/components/schemas/EntityPreview'
+          readOnly: true
+        transfer_date:
+          type: string
+          format: date
+        energy_amount:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/StatusA18Enum'
+        certificate_id:
+          type: string
+          maxLength: 32
+      required:
+      - certificate_id
+      - client
+      - energy_amount
+      - id
+      - supplier
+      - transfer_date
+    ElecTransferCertificateDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          allOf:
+          - $ref: '#/components/schemas/EntityPreview'
+          readOnly: true
+        client:
+          allOf:
+          - $ref: '#/components/schemas/EntityPreview'
+          readOnly: true
+        transfer_date:
+          type: string
+          format: date
+        energy_amount:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/StatusA18Enum'
+        certificate_id:
+          type: string
+          maxLength: 32
+        comment:
+          type: string
+          nullable: true
+          maxLength: 256
+      required:
+      - certificate_id
+      - client
+      - energy_amount
+      - id
+      - supplier
+      - transfer_date
     Entity:
       type: object
       properties:
@@ -1774,6 +2722,144 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    PaginatedElecChargePointApplicationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElecChargePointApplication'
+    PaginatedElecChargePointList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElecChargePoint'
+    PaginatedElecTransferCertificateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElecTransferCertificate'
+    PaginatedSafClientList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SafClient'
+    PaginatedSafTicketList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SafTicket'
+    PaginatedSafTicketSourceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SafTicketSource'
     PreferredUnitEnum:
       enum:
       - l
@@ -1876,7 +2962,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          $ref: '#/components/schemas/Status499Enum'
         agreement_date:
           type: string
           format: date
@@ -1934,7 +3020,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          $ref: '#/components/schemas/Status499Enum'
         created_at:
           type: string
           format: date-time
@@ -2309,7 +3395,7 @@ components:
       - assigned_volume
       - id
       - total_volume
-    StatusEnum:
+    Status499Enum:
       enum:
       - PENDING
       - ACCEPTED
@@ -2319,6 +3405,30 @@ components:
         * `PENDING` - En attente
         * `ACCEPTED` - Accepté
         * `REJECTED` - Refusé
+    Status54eEnum:
+      enum:
+      - PENDING
+      - ACCEPTED
+      - REJECTED
+      - AUDIT_DONE
+      - AUDIT_IN_PROGRESS
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `AUDIT_DONE` - AUDIT_DONE
+        * `AUDIT_IN_PROGRESS` - AUDIT_IN_PROGRESS
+    StatusA18Enum:
+      enum:
+      - PENDING
+      - ACCEPTED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
     TransportDocumentTypeEnum:
       enum:
       - DAU
