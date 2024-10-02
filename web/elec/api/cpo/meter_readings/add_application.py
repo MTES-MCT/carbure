@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from django import forms
 from django.http import HttpRequest
 from django.db import transaction
@@ -50,10 +50,20 @@ def add_application(request: HttpRequest, entity: Entity):
         return ErrorResponse(400, AddMeterReadingApplicationError.TOO_LATE)
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
+    previous_application = MeterReadingRepository.get_previous_application(
+        entity, quarter, year
+    )
     renewable_share = MeterReadingRepository.get_renewable_share(year)
+    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related(
+        "charge_point"
+    )
+
     meter_reading_data, errors, original = import_meter_reading_excel(
-        excel_file, charge_points, previous_application, renewable_share
+        excel_file,
+        charge_points,
+        previous_readings,
+        previous_application,
+        renewable_share,
     )
 
     if len(errors) > 0:
@@ -63,7 +73,9 @@ def add_application(request: HttpRequest, entity: Entity):
         return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
 
     charge_points_by_id = [item["charge_point_id"] for item in meter_reading_data]
-    meter_readings = ElecMeterReading.objects.filter(cpo=entity, charge_point_id__in=charge_points_by_id)
+    meter_readings = ElecMeterReading.objects.filter(
+        cpo=entity, charge_point_id__in=charge_points_by_id
+    )
 
     previous_date = {}
     for item in meter_readings:
@@ -72,7 +84,6 @@ def add_application(request: HttpRequest, entity: Entity):
     duplicate = False
     for row in original:
         reading_date = row["reading_date"]
-        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
         if previous_date.get(row["charge_point_id"]) == reading_date:
             duplicate = True
             break
@@ -81,8 +92,13 @@ def add_application(request: HttpRequest, entity: Entity):
         return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
 
     with transaction.atomic():
-        application = ElecMeterReadingApplication(cpo=entity, quarter=quarter, year=year)
-        meter_readings = [ElecMeterReading(**data, application=application, cpo=entity) for data in meter_reading_data]
+        application = ElecMeterReadingApplication(
+            cpo=entity, quarter=quarter, year=year
+        )
+        meter_readings = [
+            ElecMeterReading(**data, application=application, cpo=entity)
+            for data in meter_reading_data
+        ]
 
         application.save()
         ElecMeterReading.objects.bulk_create(meter_readings)

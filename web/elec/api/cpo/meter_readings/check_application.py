@@ -46,25 +46,21 @@ def check_application(request: HttpRequest, entity):
     year = form.cleaned_data["year"] or auto_year
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
+    previous_application = MeterReadingRepository.get_previous_application(
+        entity, quarter, year
+    )
     renewable_share = MeterReadingRepository.get_renewable_share(year)
-    meter_reading_data, errors, original = import_meter_reading_excel(
-        excel_file, charge_points, previous_application, renewable_share
+    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related(
+        "charge_point"
     )
 
-    charge_points_by_id = [item["charge_point_id"] for item in meter_reading_data]
-    meter_readings = ElecMeterReading.objects.filter(cpo=entity, charge_point_id__in=charge_points_by_id)
-
-    previous_date = {}
-    for item in meter_readings:
-        previous_date[item.charge_point_id] = item.reading_date
-
-    duplicates = {}
-    for row in original:
-        reading_date = row["reading_date"]
-        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
-        if previous_date.get(row["charge_point_id"]) == reading_date:
-            duplicates[reading_date] = row["line"]
+    meter_reading_data, errors, __ = import_meter_reading_excel(
+        excel_file,
+        charge_points,
+        previous_readings,
+        previous_application,
+        renewable_share,
+    )
 
     data = {}
     data["file_name"] = excel_file.name
@@ -74,25 +70,16 @@ def check_application(request: HttpRequest, entity):
     data["errors"] = []
     data["error_count"] = 0
 
-    if duplicates:
-        for reading_date, line in duplicates.items():
-            errors.append(
-                {
-                    "error": "INVALID_DATA",
-                    "line": line,
-                    "meta": {"reading_date": [_(f"Le relevé du {reading_date} existe déjà")]},
-                }
-            )
-        data["errors"] = errors
-        data["error_count"] = len(errors)
-        return ErrorResponse(400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data)
-
     if len(errors) > 0:
         data["errors"] = errors
         data["error_count"] = len(data["errors"])
-        return ErrorResponse(400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data)
+        return ErrorResponse(
+            400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data
+        )
 
     if len(meter_reading_data) == 0:
-        return ErrorResponse(400, CheckMeterReadingApplicationError.NO_READING_FOUND, data)
+        return ErrorResponse(
+            400, CheckMeterReadingApplicationError.NO_READING_FOUND, data
+        )
 
     return SuccessResponse(data)
