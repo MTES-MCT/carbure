@@ -36,7 +36,7 @@ export const okChargePointsApplications = http.get(
 )
 
 export const okCPOSnapshot = mockGetWithResponseData(
-  "/elec/cpo/snapshot",
+  "/elec/cpo/certificate-snapshot",
   elecSnapshot
 )
 
