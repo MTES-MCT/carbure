@@ -1,8 +1,7 @@
-from datetime import date, datetime
+from datetime import date
 
 from django import forms
 from django.http import HttpRequest
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from core.carburetypes import CarbureError
