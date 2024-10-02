@@ -30,4 +30,8 @@ export type DefaultResponseType<
 export type FetchResponseType<
   DataType,
   ContentType extends `${string}/${string}` = "application/json",
-> = FetchResponse<DefaultResponseType<DataType, ContentType>, any, ContentType>
+> = FetchResponse<
+  DefaultResponseType<DataType, ContentType>,
+  unknown,
+  ContentType
+>
