@@ -27,17 +27,42 @@ export function getAirlineYears(entity_id: number) {
   })
 }
 
+// export function getAirlineSnapshot(entity_id: number, year: number) {
+//   return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
+//     params: { entity_id, year },
+//   })
+// }
+
+// MISSING TYPE FOR RETURNED DATA
 export function getAirlineSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
-    params: { entity_id, year },
+  return apiFetch.GET("/saf/snapshot/", {
+    params: {
+      query: {
+        entity_id,
+        year,
+      },
+    },
   })
 }
 
+// export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
+//   const params = { filter: field, ...query, ...CBQUERY_RESET }
+//   return api
+//     .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
+//     .then((res) => res.data.data ?? [])
+// }
+
 export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...CBQUERY_RESET }
-  return api
-    .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
-    .then((res) => res.data.data ?? [])
+  const { order, ...queryParams } = {
+    filter: field,
+    ...query,
+    ...CBQUERY_RESET,
+  }
+  return apiFetch.GET("/saf/tickets/filters/", {
+    params: {
+      query: queryParams,
+    },
+  })
 }
 
 export function getSafAirlineTickets(query: SafQuery) {

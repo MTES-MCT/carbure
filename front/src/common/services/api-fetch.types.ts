@@ -27,6 +27,7 @@ export type DefaultResponseType<
     }
   }
 }
+
 export type FetchResponseType<
   DataType,
   ContentType extends `${string}/${string}` = "application/json",
