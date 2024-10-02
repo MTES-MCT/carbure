@@ -17,11 +17,32 @@ from doublecount.models import (
 )
 
 
-def set_font(paragraph, font_name="Times New Roman", font_size=12):
+def replace_and_bold(paragraph, old_text, new_text, font_name="Times New Roman", font_size=12):
+    for run in paragraph.runs:
+        if old_text in run.text:
+            parts = run.text.split(old_text)
+            run.text = parts[0]
+
+            new_run = paragraph.add_run(new_text)
+            new_run.font.bold = True
+            new_run.font.name = font_name
+            new_run.font.size = Pt(font_size)
+            new_run._element.rPr.rFonts.set(qn("w:eastAsia"), font_name)
+
+            if len(parts) > 1:
+                remaining_run = paragraph.add_run(parts[1])
+                remaining_run.font.name = font_name
+                remaining_run.font.size = Pt(font_size)
+                remaining_run._element.rPr.rFonts.set(qn("w:eastAsia"), font_name)
+
+
+def set_font(paragraph, font_name="Times New Roman", font_size=12, bold=None):
     for run in paragraph.runs:
         run.font.name = font_name
         run._element.rPr.rFonts.set(qn("w:eastAsia"), font_name)
         run.font.size = Pt(font_size)
+        if bold:
+            run.font.bold = bold
 
 
 def set_bold_text(paragraph, text):
@@ -100,7 +121,7 @@ def format_to_word(data):
         WordKey.YEAR_N_1: data.get("year_n_1"),
         WordKey.ID: data.get("id"),
         WordKey.BIOFUELS: data.get("biofuels"),
-        WordKey.DECHETS_INDUSTRIELS: data.get("dechets_industriels"),
+        WordKey.DECHETS_INDUSTRIELS: data.get("dechets_industriels").lower(),
     }
 
 
@@ -108,11 +129,11 @@ def format_biofuels_to_text(biofuels):
     if not biofuels:
         return ""
     if len(biofuels) == 1:
-        return f"des {biofuels[0]}"
+        return f"des {biofuels[0]}".lower()
     elif len(biofuels) == 2:
-        return f"des {biofuels[0]} et des {biofuels[1]}"
+        return f"des {biofuels[0]} et des {biofuels[1]}".lower()
     else:
-        return f"des {', des '.join(biofuels[:-1])} et des {biofuels[-1]}"
+        return f"des {', des '.join(biofuels[:-1])} et des {biofuels[-1]}".lower()
 
 
 def check_has_dechets_industriels(application):
@@ -206,12 +227,15 @@ def export_dca(request):
             set_cell_border(c)
 
     # Content
-    for paragraph in doc.paragraphs:
+    for index, paragraph in enumerate(doc.paragraphs):
         for k, v in to_word.items():
             if k in paragraph.text:
                 paragraph.text = paragraph.text.replace(k, v)
+                target = "«DECHETS_INDUSTRIELS»"
+                if target in paragraph.text:
+                    replace_and_bold(paragraph, target, v)
 
-        set_font(paragraph)
+        set_font(paragraph, bold=index in [5, 6, 7, 8])
 
     # Footer
     section = doc.sections[0]
@@ -252,7 +276,7 @@ def export_dca(request):
         i += 1
 
     response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    response["Content-Disposition"] = "attachment; filename=document-paris.docx"
+    response["Content-Disposition"] = f"attachment; filename={application.certificate_id}.docx"
 
     doc_io = BytesIO()
     doc.save(doc_io)
