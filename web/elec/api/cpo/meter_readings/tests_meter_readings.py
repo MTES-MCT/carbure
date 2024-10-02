@@ -236,7 +236,7 @@ class ElecMeterReadingsTest(TestCase):
                     "file_name": "readings.xlsx",
                     "quarter": 3,
                     "year": 2024,
-                    "meter_reading_count": 2,
+                    "meter_reading_count": 1,
                     "error_count": 2,
                     "errors": [
                         {
