@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 
 from core.decorators import check_admin_rights
-from core.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 
 @check_admin_rights()

@@ -16,7 +16,8 @@ from core.models import (
     SustainabilityDeclaration,
 )
 from ml.models import EECStats, EPStats, ETDStats
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from producers.models import ProductionSiteInput, ProductionSiteOutput
+from transactions.models import Site as ProductionSite
 from transactions.models.year_config import YearConfig
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
@@ -81,7 +82,6 @@ def enrich_lot(lot):
         "carbure_client",
         "added_by",
         "carbure_production_site",
-        "carbure_production_site__producer",
         "carbure_production_site__country",
         "production_country",
         "carbure_dispatch_site",

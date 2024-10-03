@@ -10,7 +10,7 @@ from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
-from producers.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 User = get_user_model()
 

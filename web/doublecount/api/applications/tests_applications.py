@@ -12,7 +12,7 @@ from doublecount.api.admin.applications.add import DoubleCountingAddError
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
-from producers.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 
 class Endpoint:

@@ -1,5 +1,11 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+
+class SiteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("entitysite_set__entity")
 
 
 class Site(models.Model):
@@ -61,7 +67,18 @@ class Site(models.Model):
     manager_email = models.CharField(max_length=64, blank=True)
     private = models.BooleanField(default=False)
     is_enabled = models.BooleanField(default=True)
-    date_mise_en_service = models.DateField(null=True, blank=False)
+    date_mise_en_service = models.DateField(null=True, blank=True)
+
+    @property
+    def producer(self):
+        entity_site = self.entitysite_set.first()
+        return entity_site.entity if entity_site else None
+
+    @property
+    def depot_type(self):
+        return self.site_type
+
+    objects = SiteManager()
 
     class Meta:
         db_table = "sites"
@@ -70,6 +87,7 @@ class Site(models.Model):
         ordering = ["name"]
 
     def clean(self):
+        # Clear fields that are not relevant for the site type (when create depot)
         fields_to_clear = {
             "POWER PLANT": ["thermal_efficiency", "useful_temperature"],
             "HEAT PLANT": ["electrical_efficiency", "useful_temperature"],
@@ -80,7 +98,28 @@ class Site(models.Model):
         for field in fields:
             setattr(self, field, None)
 
+        # Check if date_mise_en_service is required for production site
+        if self.site_type == self.PRODUCTION_SITE and not self.date_mise_en_service:
+            raise ValidationError(
+                {"date_mise_en_service": "Ce champ est obligatoire pour les sites de type 'PRODUCTION SITE'."}
+            )
+
         super().clean()
+
+    def natural_key(self):
+        if self.site_type != self.PRODUCTION_SITE:
+            return {
+                "depot_id": self.customs_id,
+                "name": self.name,
+                "city": self.city,
+                "country": self.country.natural_key(),
+                "depot_type": self.depot_type,
+                "address": self.address,
+                "postal_code": self.postal_code,
+                "electrical_efficiency": self.electrical_efficiency,
+                "thermal_efficiency": self.thermal_efficiency,
+                "useful_temperature": self.useful_temperature,
+            }
 
 
 class ContentToUpdate(models.Model):

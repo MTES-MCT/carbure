@@ -4,8 +4,8 @@ from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
-from producers.models import ProductionSite
 from transactions.factories import CarbureLotFactory
+from transactions.models import Site as ProductionSite
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks

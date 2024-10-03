@@ -11,8 +11,8 @@ from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
 from doublecount.factories.sourcing import DoubleCountingSourcingFactory
 from doublecount.models import DoubleCountingApplication
-from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
+from transactions.models import Site as ProductionSite
 
 
 class AdminDoubleCountAgreementsTest(TestCase):

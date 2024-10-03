@@ -5,7 +5,9 @@ from django.http import JsonResponse
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.carburetypes import CarbureSanityCheckErrors
 from core.decorators import check_user_rights
-from core.models import CarbureLot, Depot, Entity, EntityDepot, GenericError, UserRights
+from core.models import CarbureLot, Entity, GenericError, UserRights
+from transactions.models import EntitySite
+from transactions.models import Site as Depot
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -26,7 +28,7 @@ def add_depot(request, entity, entity_id):
         return JsonResponse({"status": "error", "message": "Missing ownership type"}, status=400)
 
     try:
-        ds = Depot.objects.get(depot_id=delivery_site_id)
+        ds = Depot.objects.get(customs_id=delivery_site_id)
     except Exception:
         return JsonResponse(
             {
@@ -44,9 +46,9 @@ def add_depot(request, entity, entity_id):
             return JsonResponse({"status": "error", "message": "Could not find outsourcing blender"}, status=400)
 
     try:
-        ed, created = EntityDepot.objects.update_or_create(
+        ed, created = EntitySite.objects.update_or_create(
             entity=entity,
-            depot=ds,
+            site=ds,
             defaults={
                 "ownership_type": ownership_type,
                 "blending_is_outsourced": blending_is_outsourced,

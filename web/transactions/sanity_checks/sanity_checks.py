@@ -169,7 +169,6 @@ def annotate_lots(lots: QuerySet[CarbureLot]):
         "carbure_client",
         "added_by",
         "carbure_production_site",
-        "carbure_production_site__producer",
         "carbure_production_site__country",
         "production_country",
         "carbure_dispatch_site",

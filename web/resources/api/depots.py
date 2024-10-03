@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.http import JsonResponse
 
-from core.models import Depot
+from transactions.models import Site as Depot
 
 
 def get_depots(request):
@@ -13,9 +13,9 @@ def get_depots(request):
         if pub:
             dsites = dsites.filter(private=False)
         if q:
-            dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
+            dsites = dsites.filter(Q(name__icontains=q) | Q(customs_id__icontains=q) | Q(city__icontains=q))
     except Exception:
         return JsonResponse({"status": "error", "message": "Could not find delivery sites"}, status=400)
 
-    sez = [d.natural_key() for d in dsites]
+    sez = [d.natural_key() for d in dsites if d.site_type != Depot.PRODUCTION_SITE]
     return JsonResponse({"status": "success", "data": sez})

@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from producers.models import ProductionSiteInput, ProductionSiteOutput
+from transactions.models import Site as ProductionSite
 
 
 def get_production_sites(request):

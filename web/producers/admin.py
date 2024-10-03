@@ -1,15 +1,6 @@
 from django.contrib import admin
 
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-
-
-class ProductionSiteAdmin(admin.ModelAdmin):
-    list_display = ("name", "producer", "country", "date_mise_en_service", "ges_option", "gps_coordinates")
-    search_fields = ("name", "producer__name", "country__name", "ges_option")
-    list_filter = ("producer", "country", "ges_option", "eligible_dc")
-
-
-admin.site.register(ProductionSite, ProductionSiteAdmin)
+from producers.models import ProductionSiteInput, ProductionSiteOutput
 
 
 class ProductionSiteInputAdmin(admin.ModelAdmin):

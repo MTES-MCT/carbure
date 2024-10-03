@@ -63,7 +63,7 @@ def send_email_to_user(entity, depot_name, request):
 def send_email_to_dgec(entity, depot_name, request):
     today = datetime.now().strftime("%d/%m/%Y")
     recipient_list = ["carbure@beta.gouv.fr"]
-    admin_link = f"{CarbureEnv.get_base_url()}/admin/core/depot/?is_enabled=False"
+    admin_link = f"{CarbureEnv.get_base_url()}/admin/transactions/site/?is_enabled=False"
     text_message = f"""
     Bonjour,
 

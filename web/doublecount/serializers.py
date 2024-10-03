@@ -3,7 +3,8 @@ from rest_framework import serializers
 
 from certificates.models import ProductionSiteCertificate
 from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from producers.models import ProductionSiteInput, ProductionSiteOutput
+from transactions.models import Site as ProductionSite
 
 from .models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction, DoubleCountingSourcing
 

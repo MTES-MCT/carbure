@@ -4,7 +4,7 @@ from datetime import datetime
 import factory
 
 from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
-from producers.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 
 class CarbureLotFactory(factory.django.DjangoModelFactory):

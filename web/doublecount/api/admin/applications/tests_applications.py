@@ -28,7 +28,7 @@ from doublecount.factories import (
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.doc_file import DoubleCountingDocFileFactory
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
-from producers.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 
 class Endpoint:

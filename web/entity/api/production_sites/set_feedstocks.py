@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.decorators import check_user_rights
 from core.models import CarbureLot, GenericError, MatierePremiere, UserRights
-from producers.models import ProductionSite, ProductionSiteInput
+from producers.models import ProductionSiteInput
+from transactions.models import Site as ProductionSite
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
