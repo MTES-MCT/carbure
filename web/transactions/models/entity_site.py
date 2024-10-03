@@ -17,8 +17,14 @@ class EntitySite(models.Model):
         return str(self.id)
 
     def natural_key(self):
+        from transactions.models import Site
+
+        if self.site.site_type != Site.PRODUCTION_SITE:
+            type = "depot"
+        else:
+            type = "site"
         return {
-            "site": self.site.natural_key(),
+            type: self.site.natural_key(),
             "ownership_type": self.ownership_type,
             "blending_is_outsourced": self.blending_is_outsourced,
             "blender": self.blender.natural_key() if self.blender else None,

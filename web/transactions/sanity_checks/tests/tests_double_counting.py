@@ -5,8 +5,8 @@ from django.test import TestCase
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import MatierePremiere
-from producers.models import ProductionSite
 from transactions.factories import CarbureLotFactory
+from transactions.models import Site as ProductionSite
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks

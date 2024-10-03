@@ -1,14 +1,15 @@
 from django.http import JsonResponse
 
 from core.decorators import check_user_rights
-from core.models import EntityDepot
+from transactions.models import EntitySite
+from transactions.models import Site as Depot
 
 
 @check_user_rights()
 def get_depots(request, entity, entity_id):
     try:
-        ds = EntityDepot.objects.filter(entity=entity)
-        ds = [d.natural_key() for d in ds]
+        ds = EntitySite.objects.filter(entity=entity)
+        ds = [d.natural_key() for d in ds if d.site.site_type != Depot.PRODUCTION_SITE]
     except Exception:
         return JsonResponse(
             {

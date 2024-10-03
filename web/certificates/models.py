@@ -7,7 +7,6 @@ from django.dispatch import receiver
 
 from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere
 from doublecount.models import DoubleCountingApplication
-from producers.models import ProductionSite
 from transactions.models import Site
 
 
@@ -88,7 +87,7 @@ def dc_registration_post_update_production_site(sender, instance, created, updat
         update_fields = {}
     production_site_id = instance.production_site_id
     try:
-        production_site = ProductionSite.objects.get(pk=production_site_id)
+        production_site = Site.objects.get(pk=production_site_id)
         production_site.dc_reference = instance.certificate_id
         production_site.eligible_dc = True
 

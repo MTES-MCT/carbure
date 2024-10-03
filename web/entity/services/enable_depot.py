@@ -5,6 +5,7 @@ from django.conf import settings
 from core.helpers import send_mail
 from core.models import UserRights
 from core.utils import CarbureEnv
+from transactions.models import EntitySite
 
 
 def enable_depot(depot, request):
@@ -15,7 +16,7 @@ def enable_depot(depot, request):
     depot.save()
 
     # Get entity admin users
-    entity = depot.entity
+    entity = EntitySite.objects.filter(site=depot).first().entity
     try:
         admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN)
     except Exception:

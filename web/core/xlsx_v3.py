@@ -5,8 +5,9 @@ import traceback
 import pandas as pd
 import xlsxwriter
 
-from core.models import Biocarburant, CarbureStock, Depot, Entity, GenericCertificate, MatierePremiere, Pays, ProductionSite
+from core.models import Biocarburant, CarbureStock, Depot, Entity, GenericCertificate, MatierePremiere, Pays
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
+from transactions.models import Site as ProductionSite
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
 
 UNKNOWN_PRODUCERS = [

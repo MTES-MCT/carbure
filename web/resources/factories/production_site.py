@@ -4,7 +4,7 @@ from core.models import (
     Entity,
     Pays,
 )
-from producers.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 
 class ProductionSiteFactory(factory.django.DjangoModelFactory):

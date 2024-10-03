@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Depot, Entity, Pays
+from core.models import Entity, Pays
 from core.tests_utils import setup_current_user
+from transactions.models import Site as Depot
 
 
 class EntityDepotsTest(TestCase):

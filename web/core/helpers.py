@@ -20,7 +20,6 @@ from core.models import (
     CarbureStock,
     CarbureStockEvent,
     CarbureStockTransformation,
-    Depot,
     Entity,
     GenericError,
     MatierePremiere,
@@ -41,6 +40,7 @@ from core.serializers import (
 )
 from core.utils import CarbureEnv
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
+from transactions.models import Site as Depot
 
 sort_key_to_django_field = {
     "period": "delivery_date",
@@ -121,7 +121,6 @@ def get_entity_lots_by_status(entity, status=None, export=False):
         "added_by",
         "carbure_vendor",
         "carbure_production_site",
-        "carbure_production_site__producer",
         "carbure_production_site__country",
         "production_country",
         "carbure_dispatch_site",

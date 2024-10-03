@@ -2,7 +2,7 @@ from django.http import JsonResponse
 
 from core.decorators import check_user_rights
 from core.models import CarbureLot, UserRights
-from producers.models import ProductionSite
+from transactions.models import Site as ProductionSite
 
 
 @check_user_rights(role=[UserRights.ADMIN])
