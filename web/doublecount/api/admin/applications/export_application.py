@@ -236,9 +236,10 @@ def export_dca(request):
     for index, paragraph in enumerate(doc.paragraphs):
         for k, v in to_word.items():
             if k in paragraph.text:
-                paragraph.text = paragraph.text.replace(k, v)
                 target = "«DECHETS_INDUSTRIELS»"
-                if target in paragraph.text:
+                if k != target:
+                    paragraph.text = paragraph.text.replace(k, v)
+                elif target in paragraph.text:
                     replace_and_bold(paragraph, target, v)
 
         set_font(paragraph, bold=index in [5, 6, 7, 8])
