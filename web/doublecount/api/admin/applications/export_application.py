@@ -286,10 +286,10 @@ def export_dca(request):
                     set_bold_text(paragraph, f"Article {current_article_number}")
                     current_article_number += 1
             else:
-                extra = ""
+                set_bold_text(paragraph, f"Article {current_article_number}")
                 if current_article_number == 1:
-                    extra = "er"
-                set_bold_text(paragraph, f"Article {current_article_number}{extra}")
+                    superscript_run = paragraph.add_run("er")
+                    superscript_run.font.superscript = True
                 current_article_number += 1
 
         set_font(paragraph)
