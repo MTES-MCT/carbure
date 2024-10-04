@@ -257,7 +257,7 @@ def export_dca(request):
     found_first_article_3 = False
     found_first_article_5 = False
     ARTICLE_DECHETS_INDUSTRIELS = 3
-    ARTICLE_DECHETS_INDUSTRIELS_2 = 5
+    ARTICLE_DECHETS_INDUSTRIELS_2 = 4
     current_article_number = 1
     i = 0
     while i < len(doc.paragraphs):
@@ -280,13 +280,16 @@ def export_dca(request):
                     delete_paragraph(doc.paragraphs[i])
                     delete_paragraph(doc.paragraphs[i])
                     found_first_article_5 = True
-                    current_article_number = 4
+                    current_article_number = 3
                     i -= 1
                 else:
                     set_bold_text(paragraph, f"Article {current_article_number}")
                     current_article_number += 1
             else:
-                set_bold_text(paragraph, f"Article {current_article_number}")
+                extra = ""
+                if current_article_number == 1:
+                    extra = "er"
+                set_bold_text(paragraph, f"Article {current_article_number}{extra}")
                 current_article_number += 1
 
         set_font(paragraph)
