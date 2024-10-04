@@ -17,6 +17,12 @@ from doublecount.models import (
 )
 
 
+def delete_paragraph(paragraph):
+    p = paragraph._element
+    p.getparent().remove(p)
+    paragraph._element = paragraph._p = None
+
+
 def replace_and_bold(paragraph, old_text, new_text, font_name="Times New Roman", font_size=12):
     for run in paragraph.runs:
         if old_text in run.text:
@@ -249,7 +255,9 @@ def export_dca(request):
 
     # Articles
     found_first_article_3 = False
+    found_first_article_5 = False
     ARTICLE_DECHETS_INDUSTRIELS = 3
+    ARTICLE_DECHETS_INDUSTRIELS_2 = 5
     current_article_number = 1
     i = 0
     while i < len(doc.paragraphs):
@@ -260,10 +268,20 @@ def export_dca(request):
 
             if article_number == ARTICLE_DECHETS_INDUSTRIELS:
                 if not has_dechets_industriels and not found_first_article_3:
-                    doc.paragraphs[i].clear()
-                    doc.paragraphs[i + 1].clear()
+                    delete_paragraph(doc.paragraphs[i])
+                    delete_paragraph(doc.paragraphs[i])
                     found_first_article_3 = True
-                    i += 1
+                    i -= 1
+                else:
+                    set_bold_text(paragraph, f"Article {current_article_number}")
+                    current_article_number = 4
+            elif article_number == ARTICLE_DECHETS_INDUSTRIELS_2:
+                if not has_dechets_industriels and not found_first_article_5:
+                    delete_paragraph(doc.paragraphs[i])
+                    delete_paragraph(doc.paragraphs[i])
+                    found_first_article_5 = True
+                    current_article_number = 4
+                    i -= 1
                 else:
                     set_bold_text(paragraph, f"Article {current_article_number}")
                     current_article_number += 1
