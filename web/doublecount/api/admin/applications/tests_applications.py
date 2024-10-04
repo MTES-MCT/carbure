@@ -341,8 +341,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
             footer_text.append(paragraph.text)
 
         footer_text = "\n".join(footer_text)
-        footer = "{}_{}".format(application_data["id"], application_data["year_n"])
-        assert footer in footer_text
+        assert application_data["certificate_id"] == footer_text
 
         # ... content
         del application_data["has_dechets_industriels"]
