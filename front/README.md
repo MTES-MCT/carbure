@@ -107,3 +107,14 @@ elec/
 common/
   components/
   ui/
+```
+
+## Testing components
+
+We decided to stop testing with react testing library because it didn't check the final rendering the user had. This is why these tests will gradually be migrated to Storybook and Chromatic, which offer a tool dedicated to the visual testing of components, corresponding to the user's final rendering.
+
+### Workflow
+
+During development, if certain components need to be tested, create a .stories.tsx file next to the component, and follow Storybook's documentation on how to create stories. Storybook's interface offers the option of launching visual tests for a component, which will launch the storybook build step, and then send the files to Chromatic.
+
+You'll then need to go to Chromatic if the visual differences between the previous state and the current state of the component are no longer the same (see Chromatic documentation).

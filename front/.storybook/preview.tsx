@@ -28,7 +28,7 @@ const withI18next = (Story, context) => {
   )
 }
 
-const App = ({ children }: PropsWithChildren) => {
+const withData = (Story) => {
   const user = useUserManager()
   const entityId = user?.user?.rights[0]?.entity.id
   const entity = useEntityManager(user, entityId)
@@ -36,22 +36,15 @@ const App = ({ children }: PropsWithChildren) => {
   if (user.loading) {
     return <LoaderOverlay />
   }
-
-  return (
-    <UserContext.Provider value={user}>
-      <EntityContext.Provider value={entity}>
-        <PortalProvider>{children}</PortalProvider>
-      </EntityContext.Provider>
-    </UserContext.Provider>
-  )
-}
-
-const withData = (Story) => {
   return (
     <Suspense fallback={<LoaderOverlay />}>
-      <App>
-        <Story />
-      </App>
+      <UserContext.Provider value={user}>
+        <EntityContext.Provider value={entity}>
+          <PortalProvider>
+            <Story />
+          </PortalProvider>
+        </EntityContext.Provider>
+      </UserContext.Provider>
     </Suspense>
   )
 }
