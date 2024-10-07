@@ -52,6 +52,7 @@ build-ci-image:
       - Pipfile.lock
       - front/package.json
       - front/package-lock.json
+      - force-rebuild
 
 check-backend:
   stage: check
