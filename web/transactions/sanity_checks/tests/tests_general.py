@@ -3,11 +3,12 @@ import datetime
 from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
-from core.models import Biocarburant, CarbureLot, Depot, Entity, EntityDepot, MatierePremiere, SustainabilityDeclaration
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, SustainabilityDeclaration
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
-from transactions.models import YearConfig
+from transactions.models import EntitySite, YearConfig
+from transactions.models import Site as Depot
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
@@ -133,7 +134,7 @@ class GeneralSanityChecksTest(TestCase):
             delivery_type=CarbureLot.BLENDING,
         )
 
-        EntityDepot.objects.create(entity=self.producer, depot=depot)
+        EntitySite.objects.create(entity=self.producer, site=depot)
 
         prefetched_data = get_prefetched_data(self.producer)
 

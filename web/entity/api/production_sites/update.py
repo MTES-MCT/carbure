@@ -12,7 +12,7 @@ def update_production_site(request, entity, entity_id):
     if not production_site_id:
         return JsonResponse({"status": "error", "message": "Missing field production_site_id"}, status=400)
 
-    psite = ProductionSite.objects.get(id=production_site_id, producer=entity)
+    psite = ProductionSite.objects.get(id=production_site_id, entitysite__entity=entity)
 
     country_code = request.POST.get("country_code")
     name = request.POST.get("name")

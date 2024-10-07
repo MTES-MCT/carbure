@@ -26,7 +26,6 @@ from core.models import (
     CarbureStockTransformation,
     Entity,
     EntityCertificate,
-    EntityDepot,
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
@@ -211,7 +210,7 @@ admin.site.register(MatierePremiere, MatierePremiereAdmin)
 admin.site.register(Pays, PaysAdmin)
 admin.site.register(GenericError, GenericErrorAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
-admin.site.register(EntityDepot, EntityDepotAdmin)
+# admin.site.register(EntityDepot, EntityDepotAdmin)
 admin.site.register(TransactionDistance, TransactionDistanceAdmin)
 
 

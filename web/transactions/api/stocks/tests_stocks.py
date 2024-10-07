@@ -6,9 +6,10 @@ from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Biocarburant, CarbureLot, CarbureStock, CarbureStockTransformation, Depot, Entity
+from core.models import Biocarburant, CarbureLot, CarbureStock, CarbureStockTransformation, Entity
 from core.tests_utils import setup_current_user
 from transactions.factories import CarbureLotFactory, CarbureStockFactory
+from transactions.models import Site as Depot
 
 
 class StocksFlowTest(TestCase):
@@ -19,12 +20,13 @@ class StocksFlowTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
 

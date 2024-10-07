@@ -6,11 +6,11 @@ from core.models import (
     Biocarburant,
     Entity,
     MatierePremiere,
-    ProductionSite,
     UserRights,
 )
 from core.tests_utils import setup_current_user
 from producers.models import ProductionSiteInput, ProductionSiteOutput
+from transactions.models import Site as ProductionSite
 
 
 class EntityProductionSiteTest(TestCase):

@@ -51,7 +51,7 @@ class DoubleCountingSanityChecksTest(TestCase):
             valid_until=datetime.date(2026, 12, 31),
         )
 
-        self.other_production_site = ProductionSite.objects.exclude(producer=self.producer).last()
+        self.other_production_site = ProductionSite.objects.exclude(entitysite__entity=self.producer).last()
 
         self.other_dc_cert = DoubleCountingRegistration.objects.create(
             certificate_id="FR_09999_2023",

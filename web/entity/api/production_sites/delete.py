@@ -10,7 +10,7 @@ def delete_production_site(request, entity, entity_id):
     site = request.POST.get("production_site_id")
 
     try:
-        ps = ProductionSite.objects.get(id=site, producer=entity)
+        ps = ProductionSite.objects.get(id=site, entitysite__entity=entity)
     except Exception as e:
         print(e)
         return JsonResponse({"status": "error", "message": "Unknown Production Site"}, status=400)

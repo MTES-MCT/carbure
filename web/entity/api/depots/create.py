@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.views.decorators.http import require_POST
+from rest_framework.exceptions import ValidationError
 
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
@@ -18,10 +19,11 @@ from entity.services.geolocation import get_coordinates
 def create_depot(request, entity, entity_id):
     serializer = DepotSerializer(data=request.POST)
 
-    if not serializer.is_valid():
-        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=serializer.errors)
-
-    depot = serializer.save()
+    try:
+        serializer.is_valid(raise_exception=True)
+        depot = serializer.save()
+    except ValidationError as e:
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=e.detail)
 
     depot.gps_coordinates = get_gps_coordinates(depot)
     depot.save()

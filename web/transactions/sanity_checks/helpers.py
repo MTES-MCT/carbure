@@ -5,10 +5,8 @@ from certificates.models import DoubleCountingRegistration
 from core.models import (
     Biocarburant,
     CarbureLot,
-    Depot,
     Entity,
     EntityCertificate,
-    EntityDepot,
     GenericCertificate,
     GenericError,
     MatierePremiere,
@@ -17,6 +15,8 @@ from core.models import (
 )
 from ml.models import EECStats, EPStats, ETDStats
 from producers.models import ProductionSiteInput, ProductionSiteOutput
+from transactions.models import EntitySite
+from transactions.models import Site as Depot
 from transactions.models import Site as ProductionSite
 from transactions.models.year_config import YearConfig
 
@@ -130,7 +130,7 @@ def get_prefetched_data(entity=None):
 
     if entity:
         # get only my production sites
-        entity_psites = ProductionSite.objects.filter(producer=entity).prefetch_related(
+        entity_psites = ProductionSite.objects.filter(entitysite__entity=entity).prefetch_related(
             "productionsiteinput_set", "productionsiteoutput_set", "productionsitecertificate_set"
         )
         data["my_production_sites"] = {ps.name.upper(): ps for ps in entity_psites}
@@ -142,8 +142,10 @@ def get_prefetched_data(entity=None):
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
     depotsbyentities = {}
-    associated_depots = EntityDepot.objects.select_related("entity", "depot").all()
+    associated_depots = EntitySite.objects.select_related("entity", "site").filter(site__in=Depot.depots.all())
     for entitydepot in associated_depots:
+        if entitydepot.site.site_type == Depot.PRODUCTION:
+            continue
         if entitydepot.entity.pk in depotsbyentities:
             depotsbyentities[entitydepot.entity.pk].append(entitydepot.depot.depot_id)
         else:

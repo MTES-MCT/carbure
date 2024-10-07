@@ -1,7 +1,8 @@
 from django import forms
 
 from core.carburetypes import CarbureUnit
-from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
+from transactions.models import Site as Depot
 from transactions.models import Site as ProductionSite
 
 
