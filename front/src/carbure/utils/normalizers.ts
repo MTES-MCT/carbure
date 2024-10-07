@@ -250,7 +250,7 @@ export const getUserRoleOptions = (
   }
 
   return roles.map((role) => ({
-    label: OVERRIDES_ROLE_TRANSLATIONS[role] || getUserRoleLabel(role),
+    label: OVERRIDES_ROLE_TRANSLATIONS[role] ?? getUserRoleLabel(role),
     value: role,
   }))
 }
