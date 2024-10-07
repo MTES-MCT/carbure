@@ -1,9 +1,9 @@
 import json
-from core.decorators import check_user_rights
+
 from django.http.response import JsonResponse
-from transactions.helpers import try_get_date
-from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
-from transactions.sanity_checks import get_prefetched_data
+
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
+from core.decorators import check_user_rights
 from core.models import (
     CarbureLot,
     CarbureLotEvent,
@@ -14,6 +14,8 @@ from core.models import (
     Pays,
     UserRights,
 )
+from transactions.helpers import try_get_date
+from transactions.sanity_checks import get_prefetched_data
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -28,10 +30,10 @@ def stock_split(request, *args, **kwargs):
 
     try:
         unserialized = json.loads(payload)
-        # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'
-        # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,
+        # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'  # noqa: E501
+        # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,  # noqa: E501
         # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None, supplier_certificate: "MON_CERTIFICAT"}]
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Cannot parse payload into JSON"}, status=400)
 
     if not isinstance(unserialized, list):
@@ -53,7 +55,7 @@ def stock_split(request, *args, **kwargs):
 
         try:
             stock = CarbureStock.objects.get(carbure_id=entry["stock_id"])
-        except Exception as e:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find stock"}, status=400)
 
         if stock.carbure_client_id != int(entity_id):
@@ -64,7 +66,7 @@ def stock_split(request, *args, **kwargs):
 
         try:
             volume = float(entry["volume"])
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not parse volume"}, status=400)
 
         # create child lot
@@ -101,7 +103,7 @@ def stock_split(request, *args, **kwargs):
         if country_code is not None:
             try:
                 lot.delivery_site_country = Pays.objects.get(code_pays=country_code)
-            except:
+            except Exception:
                 lot.delivery_site_country = None
         lot.transport_document_type = entry.get("transport_document_type", CarbureLot.OTHER)
         lot.delivery_type = entry.get("delivery_type", CarbureLot.UNKNOWN)
@@ -111,11 +113,11 @@ def stock_split(request, *args, **kwargs):
             delivery_site = Depot.objects.get(depot_id=delivery_site_id)
             lot.carbure_delivery_site = delivery_site
             lot.delivery_site_country = delivery_site.country
-        except:
+        except Exception:
             pass
         try:
             lot.carbure_client = Entity.objects.get(id=entry.get("carbure_client_id", None))
-        except:
+        except Exception:
             lot.carbure_client = None
         if lot.delivery_type in [
             CarbureLot.BLENDING,
@@ -178,4 +180,4 @@ def stock_split(request, *args, **kwargs):
         e.save()
     background_bulk_sanity_checks(new_lots, prefetched_data)
     background_bulk_scoring(new_lots, prefetched_data)
-    return JsonResponse({"status": "success", "data": [l.id for l in new_lots]})
+    return JsonResponse({"status": "success", "data": [lot.id for lot in new_lots]})

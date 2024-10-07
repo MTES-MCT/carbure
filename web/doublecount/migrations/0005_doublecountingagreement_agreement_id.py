@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('doublecount', '0004_alter_doublecountingagreement_producer_and_more'),
+        ("doublecount", "0004_alter_doublecountingagreement_producer_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='doublecountingagreement',
-            name='agreement_id',
+            model_name="doublecountingagreement",
+            name="agreement_id",
             field=models.CharField(blank=True, max_length=16),
         ),
     ]

@@ -1,24 +1,24 @@
-import os
-import django
-import datetime
 import argparse
-import openpyxl
-import requests
-import pandas as pd
-import numpy as np
+import datetime
+import os
 from typing import List, Tuple, cast
-from pandas._typing import Scalar
+
+import django
+import numpy as np
+import openpyxl
+import pandas as pd
+import requests
+from django.conf import settings
+from django.core.mail import get_connection, send_mail
 from openpyxl.cell.cell import Cell
 from openpyxl.worksheet.worksheet import Worksheet
-from django.conf import settings
-from django.core.mail import send_mail, get_connection
+from pandas._typing import Scalar
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
-from core.models import GenericCertificate
-
+from core.models import GenericCertificate  # noqa: E402
+from core.utils import bulk_update_or_create  # noqa: E402
 
 today = datetime.date.today()
 REDCERT_CERT_PAGE = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"
@@ -50,7 +50,7 @@ def download_redcert_certificates() -> None:
 def save_redcert_certificates() -> Tuple[int, list, list]:
     certificates = []
     invalidated = []
-    existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}  # fmt: skip
+    existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}
 
     filename = "%s/REDcert-certificates.xlsx" % (DESTINATION_FOLDER)
     wb = openpyxl.load_workbook(filename, data_only=True)
@@ -124,7 +124,7 @@ def send_email_summary(
 
     fraud = False
     if len(newly_invalidated_certificates):
-        for (_, previous, prev_valid_date, new_valid_date) in newly_invalidated_certificates:
+        for _, previous, prev_valid_date, new_valid_date in newly_invalidated_certificates:
             fraud = True
             mail_content += "**** Certificat expiré *****<br />"
             mail_content += "%s - %s" % (previous.certificate_id, previous.certificate_holder)
@@ -161,7 +161,7 @@ def get_sheet_data(sheet: Worksheet, convert_float: bool) -> List[List[Scalar]]:
 
 
 def convert_cell(cell: Cell, convert_float: bool) -> Scalar:
-    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
+    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC  # noqa: E402
 
     if cell.is_date:
         return cell.value

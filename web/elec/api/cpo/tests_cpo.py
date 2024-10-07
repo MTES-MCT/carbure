@@ -1,13 +1,12 @@
 import datetime
-from core.tests_utils import setup_current_user
-from core.models import Entity
+
 from django.test import TestCase
 from django.urls import reverse
 
+from core.models import Entity
+from core.tests_utils import setup_current_user
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
-from elec.models.elec_charge_point_application import ElecChargePointApplication
-from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
 class ElecCPOTest(TestCase):
@@ -71,14 +70,14 @@ class ElecCPOTest(TestCase):
         prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
         prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
-        self.assertEqual(prov1.remaining_energy_amount, 0)
-        self.assertEqual(prov2.remaining_energy_amount, 0)
-        self.assertEqual(prov3.remaining_energy_amount, 2000)
+        assert prov1.remaining_energy_amount == 0
+        assert prov2.remaining_energy_amount == 0
+        assert prov3.remaining_energy_amount == 2000
 
         transfer_cert = ElecTransferCertificate.objects.all().first()
-        self.assertEqual(transfer_cert.energy_amount, 500)
-        self.assertEqual(transfer_cert.supplier_id, self.cpo.id)
-        self.assertEqual(transfer_cert.client_id, self.operator.id)
+        assert transfer_cert.energy_amount == 500
+        assert transfer_cert.supplier_id == self.cpo.id
+        assert transfer_cert.client_id == self.operator.id
 
     def test_transfer_provision_certificate_multiple(self):
         self.client.post(
@@ -94,14 +93,14 @@ class ElecCPOTest(TestCase):
         prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
         prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
-        self.assertEqual(prov1.remaining_energy_amount, 0)
-        self.assertEqual(prov2.remaining_energy_amount, 0)
-        self.assertEqual(prov3.remaining_energy_amount, 1000)
+        assert prov1.remaining_energy_amount == 0
+        assert prov2.remaining_energy_amount == 0
+        assert prov3.remaining_energy_amount == 1000
 
         transfer_cert = ElecTransferCertificate.objects.all().first()
-        self.assertEqual(transfer_cert.energy_amount, 1500)
-        self.assertEqual(transfer_cert.supplier_id, self.cpo.id)
-        self.assertEqual(transfer_cert.client_id, self.operator.id)
+        assert transfer_cert.energy_amount == 1500
+        assert transfer_cert.supplier_id == self.cpo.id
+        assert transfer_cert.client_id == self.operator.id
 
     def test_transfer_provision_certificate_too_much(self):
         response = self.client.post(
@@ -113,19 +112,19 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["error"], "NOT_ENOUGH_ENERGY")
+        assert response.status_code == 400
+        assert response.json()["error"] == "NOT_ENOUGH_ENERGY"
 
         prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
         prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
         prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
-        self.assertEqual(prov1.remaining_energy_amount, 0)
-        self.assertEqual(prov2.remaining_energy_amount, 500)
-        self.assertEqual(prov3.remaining_energy_amount, 2000)
+        assert prov1.remaining_energy_amount == 0
+        assert prov2.remaining_energy_amount == 500
+        assert prov3.remaining_energy_amount == 2000
 
         transfer_cert_count = ElecTransferCertificate.objects.count()
-        self.assertEqual(transfer_cert_count, 0)
+        assert transfer_cert_count == 0
 
     def test_cancel_transfer_certificate(self):
         self.client.post(
@@ -138,7 +137,7 @@ class ElecCPOTest(TestCase):
         )
 
         transfer = ElecTransferCertificate.objects.last()
-        self.assertEqual(transfer.energy_amount, 1500)
+        assert transfer.energy_amount == 1500
 
         response = self.client.post(
             reverse("elec-cpo-cancel-transfer-certificate"),
@@ -148,15 +147,15 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
         prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
         prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
-        self.assertEqual(prov1.remaining_energy_amount, 0)
-        self.assertEqual(prov2.remaining_energy_amount, 500)
-        self.assertEqual(prov3.remaining_energy_amount, 2000)
+        assert prov1.remaining_energy_amount == 0
+        assert prov2.remaining_energy_amount == 500
+        assert prov3.remaining_energy_amount == 2000
 
     def test_certificate_years(self):
         response = self.client.get(
@@ -167,29 +166,7 @@ class ElecCPOTest(TestCase):
         )
 
         json = response.json()
-        self.assertEqual(json["data"], [2022, 2023])
-
-    def test_charge_point_years(self):
-        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-        application.created_at = datetime.date(2022, 12, 28)
-        application.save()
-
-        ElecMeterReadingApplication.objects.create(
-            status=ElecMeterReadingApplication.ACCEPTED,
-            quarter=2,
-            year=2023,
-            cpo=self.cpo,
-        )
-
-        response = self.client.get(
-            reverse("elec-cpo-charge-point-years"),
-            {
-                "entity_id": self.cpo.id,
-            },
-        )
-
-        json = response.json()
-        self.assertEqual(json["data"], [2022, 2023])
+        assert json["data"] == [2022, 2023]
 
     def test_provision_certificate_filter(self):
         response = self.client.get(
@@ -201,10 +178,10 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["filter_values"], ["XYZ"])
+        assert json["data"]["filter_values"] == ["XYZ"]
 
         response = self.client.get(
             reverse("elec-cpo-provision-certificate-filters"),
@@ -215,10 +192,10 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["filter_values"], ["ABCD", "DCBA"])
+        assert json["data"]["filter_values"] == ["ABCD", "DCBA"]
 
     def test_provision_certificates(self):
         response = self.client.get(
@@ -232,11 +209,11 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["returned"], 1)
-        self.assertEqual(json["data"]["elec_provision_certificates"][0]["operating_unit"], "XYZ")
+        assert json["data"]["returned"] == 1
+        assert json["data"]["elec_provision_certificates"][0]["operating_unit"] == "XYZ"
 
     def test_transfer_certificate_filter(self):
         ElecTransferCertificate.objects.create(
@@ -255,10 +232,10 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["filter_values"], [self.cpo.name])
+        assert json["data"]["filter_values"] == [self.cpo.name]
 
         response = self.client.get(
             reverse("elec-cpo-get-transfer-certificate-filters"),
@@ -269,10 +246,10 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["filter_values"], [self.operator.name])
+        assert json["data"]["filter_values"] == [self.operator.name]
 
     def test_transfer_certificates(self):
         ElecTransferCertificate.objects.create(
@@ -293,10 +270,10 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["returned"], 0)
+        assert json["data"]["returned"] == 0
 
         response = self.client.get(
             reverse("elec-cpo-get-transfer-certificates"),
@@ -309,8 +286,8 @@ class ElecCPOTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         json = response.json()
 
-        self.assertEqual(json["data"]["returned"], 1)
-        self.assertEqual(json["data"]["elec_transfer_certificates"][0]["supplier"]["name"], self.cpo.name)
+        assert json["data"]["returned"] == 1
+        assert json["data"]["elec_transfer_certificates"][0]["supplier"]["name"] == self.cpo.name

@@ -1,24 +1,20 @@
 import datetime
-import unicodedata
-from django.http import JsonResponse
-import openpyxl
-import numpy as np
 import os
+import unicodedata
 from multiprocessing import Process
 from time import perf_counter
-
-import pandas as pd
-from pandas._typing import Scalar
 from typing import List
 
-from core.carburetypes import Carbure, CarbureUnit
-
-from core.models import CarbureLot, GenericCertificate, Biocarburant
-from core.models import TransactionDistance
-from core.ign_distance import get_distance
+import numpy as np
+import openpyxl
+import pandas as pd
+from django.http import JsonResponse
+from pandas._typing import Scalar
 
 from certificates.models import DoubleCountingRegistration
-
+from core.carburetypes import Carbure, CarbureUnit
+from core.ign_distance import get_distance
+from core.models import Biocarburant, CarbureLot, GenericCertificate, TransactionDistance
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 
@@ -94,7 +90,7 @@ def get_uploaded_files_directory():
     if not os.path.exists(directory):
         try:
             os.makedirs(directory)
-        except:
+        except Exception:
             return "/tmp"
     return directory
 
@@ -108,7 +104,7 @@ def calculate_ghg(lot, tx=None):
 
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
-    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
+    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC  # noqa: E402
 
     if cell.is_date:
         return cell.value
@@ -162,7 +158,7 @@ def get_transaction_distance(tx):
         res["distance"] = td.distance
         res["source"] = "DB"
         return res
-    except:
+    except Exception:
         # not found
         # launch in parallel
         p = Process(target=get_distance, args=(starting_point, delivery_point))
@@ -190,7 +186,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             continue
         # TEMPLATE COLUMNS
         # 'champ_libre',
-        # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
+        # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',  # noqa: E501
         # 'supplier', 'supplier_certificate', ('vendor_certificate') removed,
         # 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
         # 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
@@ -198,9 +194,9 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
         # TARGET COLUMNS
         # free_field, carbure_producer, unknown_producer, carbure_production_site, unknown_production_site
-        # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate
+        # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate  # noqa: E501
         # carbure_supplier, unknown_supplier, supplier_certificate
-        # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country
+        # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country  # noqa: E501
         # biofuel, feedstock, country_of_origin
 
         lot["carbure_stock_id"] = lot_row.get("carbure_stock_id", "").strip()
@@ -239,7 +235,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         for key in ["el"]:  # negative value allowed
             try:
                 lot[key] = float(lot_row.get(key, 0))
-            except:
+            except Exception:
                 lot[key] = 0
         for key in [
             "eec",
@@ -253,7 +249,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         ]:  # positive value only
             try:
                 lot[key] = abs(float(lot_row.get(key, 0)))
-            except:
+            except Exception:
                 lot[key] = 0
         lot["transport_document_reference"] = lot_row.get("dae", "")
         lot["delivery_date"] = lot_row.get("delivery_date", "")
@@ -288,7 +284,7 @@ def ErrorResponse(status_code, error=None, data=None, status=Carbure.ERROR, mess
         response_data["error"] = error[0]
         try:
             response_data["message"] = error[1].format(**data)
-        except:
+        except Exception:
             response_data["message"] = error[1]
     # for basic errors
     else:

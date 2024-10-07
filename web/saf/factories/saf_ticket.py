@@ -1,8 +1,9 @@
-import factory
 import random
 from datetime import datetime
 
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
+import factory
+
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
 from saf.models import SafTicket
 
@@ -52,4 +53,4 @@ class SafTicketFactory(factory.django.DjangoModelFactory):
     ghg_reference = 60
     ghg_reduction = factory.Faker("random_number", digits=2)
 
-    # parent_ticket_source = factory.Iterator(SafTicketSource.objects.all())  # fmt: skip
+    # parent_ticket_source = factory.Iterator(SafTicketSource.objects.all())

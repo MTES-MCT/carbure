@@ -1,23 +1,22 @@
 import datetime
 import unicodedata
-from django.db import transaction
 
+from django.db import transaction
 from django.http.response import JsonResponse
+
+from carbure.tasks import background_bulk_scoring
 from core.common import (
     convert_template_row_to_formdata,
     get_uploaded_files_directory,
 )
 from core.decorators import check_user_rights
-
-from transactions.helpers import construct_carbure_lot, bulk_insert_lots
-
 from core.models import (
     CarbureLotEvent,
     CarbureStockEvent,
     Entity,
     UserRights,
 )
-from carbure.tasks import background_bulk_scoring
+from transactions.helpers import bulk_insert_lots, construct_carbure_lot
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 

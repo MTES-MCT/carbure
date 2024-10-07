@@ -1,4 +1,5 @@
 from django.db.models.query_utils import Q
+
 from core.models import CarbureLot, CarbureLotComment, UserRights
 from core.serializers import CarbureLotCommentSerializer
 

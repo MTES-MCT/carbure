@@ -30,12 +30,13 @@ services:
     image: carbure_frontend:local
     container_name: carbure_frontend
     environment:
-      REACT_APP_SENTRY_DSN: ${SENTRY_DSN}
-      REACT_APP_SENTRY_ENV: ${SENTRY_ENV}
+      VITE_SENTRY_DSN: ${SENTRY_DSN}
+      VITE_SENTRY_ENV: ${SENTRY_ENV}
     build:
       context: ./front
     volumes:
       - ./front:/app
+      - /app/node_modules
     networks:
       - carbure
 

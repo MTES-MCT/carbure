@@ -1,7 +1,10 @@
-from math import floor
 import traceback
+from math import floor
+
 from django import forms
+from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
@@ -9,8 +12,6 @@ from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-from django.core.paginator import Paginator
-
 from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
 
 

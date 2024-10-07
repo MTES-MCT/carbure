@@ -1,15 +1,16 @@
 from django.contrib import admin
 
 from elec.models import (
-    ElecProvisionCertificate,
-    ElecTransferCertificate,
     ElecChargePoint,
     ElecChargePointApplication,
     ElecMeterReading,
     ElecMeterReadingApplication,
+    ElecProvisionCertificate,
+    ElecTransferCertificate,
 )
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample
+from elec.models.elec_meter import ElecMeter
 
 
 @admin.register(ElecProvisionCertificate)
@@ -96,7 +97,7 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "station_id",
         "station_name",
         "cpo__name",
-        "mid_id",
+        "current_meter__mid_certificate",
     ]
 
 
@@ -130,10 +131,10 @@ class ElecMeterReadingAdmin(admin.ModelAdmin):
     ]
     search_fields = [
         "id",
-        "charge_point_id",
+        "meter__charge_point__id",
         "cpo__name",
-        "charge_point__station_id",
-        "charge_point__station_name",
+        "meter__charge_point__station_id",
+        "meter__charge_point__station_name",
     ]
 
 
@@ -158,4 +159,20 @@ class ElecAuditChargePointAdmin(admin.ModelAdmin):
 
     search_fields = [
         "id",
+    ]
+
+
+@admin.register(ElecMeter)
+class ElecMeterAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "mid_certificate",
+        "initial_index",
+        "initial_index_date",
+    ]
+
+    search_fields = [
+        "id",
+        "mid_certificate",
+        "charge_point__charge_point_id",
     ]

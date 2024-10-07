@@ -23,7 +23,7 @@
 #     ]
 
 #     def setUp(self):
-#         self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
+#         self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]  # noqa: E501
 #         self.entity = self.producer
 #         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
@@ -31,13 +31,13 @@
 #         # user_model = get_user_model()
 #         # self.password = 'totopouet'
 
-#         # self.user1 = user_model.objects.create_user(email='testuser1@toto.com', name='Le Super Testeur 1', password=self.password)
+#         # self.user1 = user_model.objects.create_user(email='testuser1@toto.com', name='Le Super Testeur 1', password=self.password)  # noqa: E501
 #         # loggedin = self.client.login(username=self.user1.email, password=self.password)
 #         # self.assertTrue(loggedin)
 
 #         # self.supplier = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
 
-#         # self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
+#         # self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]  # noqa: E501
 #         # self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
 #         # self.trader.default_certificate = "TRADER_CERTIFICATE"
 #         # self.trader.save()

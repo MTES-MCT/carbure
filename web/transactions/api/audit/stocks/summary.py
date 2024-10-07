@@ -1,5 +1,7 @@
 import traceback
+
 from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.helpers import filter_stock, get_auditor_stock, get_stocks_summary_data
 from core.models import Entity

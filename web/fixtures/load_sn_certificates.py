@@ -1,21 +1,18 @@
-import sys, os
-import django
-import csv
-import calendar
 import datetime
-import re
-import argparse
+import os
+from typing import List
+
+import django
+import numpy as np
 import openpyxl
 import pandas as pd
-from typing import TYPE_CHECKING, Dict, List, Optional
 from pandas._typing import Scalar
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
-from core.models import GenericCertificate
+from core.models import GenericCertificate  # noqa: E402
+from core.utils import bulk_update_or_create  # noqa: E402
 
 today = datetime.date.today()
 CSV_FOLDER = os.environ["CARBURE_HOME"] + "/web/fixtures/csv/"
@@ -29,7 +26,7 @@ def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
 
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
-    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
+    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC  # noqa: E402
 
     if cell.is_date:
         return cell.value
@@ -61,10 +58,9 @@ def load_certificates():
     data = data[1:]
     df = pd.DataFrame(data, columns=column_names)
     df.fillna("", inplace=True)
-    total_certs = len(df)
+    len(df)
     # print(total_certs)
     # print(df)
-    i = 0
     for row in df.iterrows():
         cert = row[1]
         # print(cert)

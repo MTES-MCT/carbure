@@ -14,7 +14,6 @@ import { compact, matchesSearch } from "common/utils/collection"
 import Select from "common/components/select"
 import { useState } from "react"
 import useEntity from "carbure/hooks/entity"
-import { useParams } from "react-router-dom"
 
 type CertificatesProps = {
   search?: string
@@ -162,7 +161,7 @@ const CheckCertificate = ({ certificate }: ActionProps) => {
 
   const checkCertificate = useMutation(api.checkEntityCertificate, {
     invalidates: ["entity-certificates"],
-    onSuccess(err) {
+    onSuccess() {
       notify(t("Le certificat a été validé !"), { variant: "success" })
     },
     onError() {
@@ -202,7 +201,7 @@ const RejectCertificate = ({ certificate }: ActionProps) => {
 
   const rejectCertificate = useMutation(api.rejectEntityCertificate, {
     invalidates: ["entity-certificates"],
-    onSuccess(err) {
+    onSuccess() {
       notify(t("Le certificat a été refusé !"), { variant: "success" })
     },
     onError() {
@@ -243,7 +242,7 @@ function hasCertificatFilter(
 ) {
   if (certificate === undefined) return true
   if (certificatFilter === "all") return true // prettier-ignore
-  if (certificatFilter === "to_checked" && certificate.checked_by_admin === false && certificate.rejected_by_admin == false) return true // prettier-ignore
+  if (certificatFilter === "to_checked" && certificate.checked_by_admin === false && certificate.rejected_by_admin === false) return true // prettier-ignore
   if (certificatFilter === "checked" && certificate.checked_by_admin === true) return true // prettier-ignore
   if (certificatFilter === "rejected" && certificate.rejected_by_admin === true) return true // prettier-ignore
 }

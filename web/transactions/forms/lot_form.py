@@ -1,7 +1,7 @@
 from django import forms
 
 from core.carburetypes import CarbureUnit
-from core.models import CarbureLot, Entity, Biocarburant, MatierePremiere, Depot, Pays
+from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
 
 
@@ -45,9 +45,7 @@ class LotForm(forms.Form):
     unknown_producer = forms.CharField(required=False)
 
     # multiple choice field to handle duplicate production sites
-    carbure_production_site = forms.ModelMultipleChoiceField(
-        queryset=PRODUCTION_SITES, to_field_name="name", required=False
-    )
+    carbure_production_site = forms.ModelMultipleChoiceField(queryset=PRODUCTION_SITES, to_field_name="name", required=False)
 
     unknown_production_site = forms.CharField(required=False)
     production_site_certificate = forms.CharField(required=False)

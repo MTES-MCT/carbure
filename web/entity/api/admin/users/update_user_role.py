@@ -1,5 +1,6 @@
 from django import forms
 from django.db import transaction
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights, UserRights, UserRightsRequests
@@ -27,7 +28,7 @@ def update_user_role(request):
 
     try:
         rights_request = UserRightsRequests.objects.get(id=request_id)
-    except:
+    except Exception:
         return ErrorResponse(400, UpdateRoleErrors.RIGHTS_NOT_FOUND)
 
     with transaction.atomic():

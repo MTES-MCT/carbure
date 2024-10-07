@@ -1,4 +1,4 @@
-from .node import Node, GHG_FIELDS
+from .node import GHG_FIELDS, Node
 
 
 class TicketNode(Node):
@@ -33,12 +33,12 @@ class TicketNode(Node):
         return self.data.supplier_id
 
     def get_parent(self):
-        from .ticket_source import TicketSourceNode
+        from .ticket_source import TicketSourceNode  # noqa: E402
 
         return TicketSourceNode(self.data.parent_ticket_source, child=self)
 
     def get_children(self):
-        from .ticket_source import TicketSourceNode
+        from .ticket_source import TicketSourceNode  # noqa: E402
 
         return [TicketSourceNode(ticket_source, parent=self) for ticket_source in self.data.safticketsource_set.all()]
 

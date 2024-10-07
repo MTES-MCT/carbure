@@ -1,15 +1,9 @@
-from django.http import JsonResponse
-import pandas as pd
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Biocarburant, CarbureLot, MatierePremiere
-from django.db.models.aggregates import Count, Sum
+from doublecount.api.admin.applications.export_application import check_has_dechets_industriels
 from doublecount.helpers import get_agreement_quotas
-
-from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
-from doublecount.serializers import BiofuelSerializer, FeedStockSerializer
 
 
 class DoubleCountingAgreementError:
@@ -32,5 +26,8 @@ def get_agreement_details(request, *args, **kwargs):
 
     result = DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data
     result["quotas"] = get_agreement_quotas(agreement)
+    result["has_dechets_industriels"] = False
+    if agreement.application:
+        result["has_dechets_industriels"] = check_has_dechets_industriels(agreement.application)
 
     return SuccessResponse(result)

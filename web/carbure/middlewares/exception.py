@@ -1,9 +1,10 @@
-import traceback
 import os
+import traceback
+
 import sentry_sdk
 from django.conf import settings
-from core.carburetypes import CarbureError
 
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse
 
 

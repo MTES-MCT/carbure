@@ -1,7 +1,7 @@
+from django.contrib.auth import authenticate, login
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
 
 
 def user_login(request):
@@ -17,6 +17,6 @@ def user_login(request):
         else:
             # return JsonResponse({'status': 'error', 'message': 'Invalid credentials'}, status=400)
             return ErrorResponse(400, CarbureError.INVALID_LOGIN_CREDENTIALS)
-    except:
+    except Exception:
         # return JsonResponse({'status': 'error', 'message': 'Account not activated'}, status=400)
         return ErrorResponse(400, CarbureError.ACCOUNT_NOT_ACTIVATED)

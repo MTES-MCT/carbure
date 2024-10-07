@@ -1,7 +1,6 @@
 from django.urls import include, path
 
 from .certificate_years import get_certificate_years
-from .charge_point_years import get_charge_point_years
 from .certificate_snapshot import get_certificate_snapshot
 from .charge_point_snapshot import get_charge_point_snapshot
 from .create_transfer_certificate import create_transfer_certificate
@@ -17,7 +16,6 @@ from .clients import get_clients
 urlpatterns = [
     # overview
     path("certificate-years", get_certificate_years, name="elec-cpo-certificate-years"),
-    path("charge-point-years", get_charge_point_years, name="elec-cpo-charge-point-years"),
     path("certificate-snapshot", get_certificate_snapshot, name="elec-cpo-certificate-snapshot"),
     path("charge-point-snapshot", get_charge_point_snapshot, name="elec-cpo-charge-point-snapshot"),
     path("create-transfer-certificate", create_transfer_certificate, name="elec-cpo-create-transfer-certificate"),
@@ -33,4 +31,5 @@ urlpatterns = [
     path("clients", get_clients, name="elec-cpo-clients"),
     path("charge-points/", include("elec.api.cpo.charge_points")),
     path("meter-readings/", include("elec.api.cpo.meter_readings")),
+    path("meters/", include("elec.api.cpo.meters")),
 ]

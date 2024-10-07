@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("saf", "0014_rename_period_safticketsource_delivery_period"),
     ]

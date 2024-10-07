@@ -3,14 +3,9 @@ import {
   mockPostWithResponseData,
 } from "carbure/__test__/helpers"
 import {
-  elecChargePointApplicationDetailsInProgress,
   elecChargePointApplicationDetailsPending,
   elecAuditApplicationSample,
-  elecMeterReadingApplicationDetailsInProgress,
   elecMeterReadingApplicationDetailsPending,
-  elecMeterReadingApplicationAccepted,
-  elecChargePointApplicationAccepted,
-  elecChargePointApplicationRejected,
 } from "elec/__test__/data"
 import {
   elecAdminAuditSnapshot,

@@ -1,6 +1,8 @@
 import datetime
+
 from core.carburetypes import CarbureMLGHGErrors, CarbureSanityCheckErrors
 from core.models import CarbureLot
+
 from .helpers import generic_error, is_red_ii
 
 oct2015 = datetime.date(year=2015, month=10, day=5)

@@ -4,12 +4,15 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useCBQueryBuilder, useCBQueryParamsStore } from "common/hooks/query-builder"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder"
 import * as api from "elec-admin/api"
 import {
   ElecAdminAuditFilter,
   ElecAdminAuditSnapshot,
-  ElecAdminAuditStatus
+  ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import { ElecChargePointsApplication } from "elec/types"
@@ -34,13 +37,9 @@ const ChargePointsApplicationsList = ({
   const status = useAutoStatus()
   const location = useLocation()
   const { t } = useTranslation()
-  const [state, actions] = useCBQueryParamsStore(
-    entity,
-    year,
-    status,
-    snapshot)
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   usePageTitle(state)
-  const query = useCBQueryBuilder(state);
+  const query = useCBQueryBuilder(state)
   const chargePointsApplicationsResponse = useQuery(
     apiAudit.getChargePointsApplications,
     {
@@ -116,7 +115,7 @@ const ChargePointsApplicationsList = ({
                 downloadChargePointsApplication
               }
               rowLink={showChargePointsApplicationDetails}
-              displayCpo={true}
+              displayCpo
             />
 
             {(state.limit || 0) < total && (
@@ -143,7 +142,7 @@ const ChargePointsApplicationsList = ({
 }
 export default ChargePointsApplicationsList
 
-const FILTERS = [ElecAdminAuditFilter.Cpo]
+// const FILTERS = [ElecAdminAuditFilter.Cpo]
 
 export function useAutoStatus() {
   const matchStatus = useMatch(
@@ -153,4 +152,3 @@ export function useAutoStatus() {
     matchStatus?.params?.status?.toUpperCase() as ElecAdminAuditStatus
   return status ?? ElecAdminAuditStatus.Pending
 }
-

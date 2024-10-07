@@ -1,11 +1,13 @@
 import traceback
+
+import pandas as pd
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 from core.utils import normalize_string
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
-import pandas as pd
 
 
 class CertificateImportError:
@@ -24,7 +26,7 @@ def import_provision_certificate_excel(request):
 
     try:
         certificate_df = pd.read_csv(file, sep=";", decimal=",")
-    except:
+    except Exception:
         return ErrorResponse(400, CertificateImportError.CSV_PARSE_ERROR)
 
     cpos = Entity.objects.filter(entity_type=Entity.CPO)
@@ -54,7 +56,7 @@ def import_provision_certificate_excel(request):
         certificate_model_instances.append(certif)
     try:
         ElecProvisionCertificate.objects.bulk_create(certificate_model_instances)
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CertificateImportError.DB_INSERTION_ERROR, "Error during data insert")
 

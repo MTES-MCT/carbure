@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { useMatomo } from "matomo"
 import useEntity from "carbure/hooks/entity"
-import Dropdown, { Anchors } from "common/components/dropdown"
+import Dropdown from "common/components/dropdown"
 import { Bell, Check, Loader } from "common/components/icons"
 import css from "./notifications.module.css"
 import Button from "common/components/button"
@@ -86,7 +86,7 @@ const Notifications = () => {
               normalize={normalizeNotification}
               onSelectValue={(item) => {
                 if (!item) return
-                !item.acked && ackNotifications.execute(entity.id, [item.id])
+                if (!item.acked) ackNotifications.execute(entity.id, [item.id])
                 navigate(getNotificationLink(item))
                 close()
               }}

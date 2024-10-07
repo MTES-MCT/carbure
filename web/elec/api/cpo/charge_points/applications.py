@@ -1,13 +1,15 @@
-from django.views.decorators.http import require_GET
+from math import floor
+
 from django import forms
 from django.core.paginator import Paginator
-from math import floor
+from django.views.decorators.http import require_GET
+
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.serializers.elec_charge_point_application import ElecChargePointApplication, ElecChargePointApplicationSerializer
-from core.carburetypes import CarbureError
 
 
 class ApplicationsFilterForm(forms.Form):

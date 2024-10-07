@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("saf", "0010_alter_safticketsource_carbure_id"),
     ]

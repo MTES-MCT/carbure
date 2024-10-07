@@ -1,6 +1,6 @@
 from django.http import JsonResponse
-from core.decorators import check_admin_rights
 
+from core.decorators import check_admin_rights
 from doublecount.models import (
     DoubleCountingApplication,
 )
@@ -14,10 +14,10 @@ def reject_dca(request, *args, **kwargs):
 
     try:
         dca = DoubleCountingApplication.objects.get(id=dca_id)
-    except:
+    except Exception:
         return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
 
     dca.status = DoubleCountingApplication.REJECTED
-    # send_dca_status_email(dca) TODO: uncomment when email is ready
+    # send_dca_status_email(dca, request) TODO: uncomment when email is ready
     dca.save()
     return JsonResponse({"status": "success"})

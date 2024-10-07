@@ -1,5 +1,8 @@
 import Tabs from "common/components/tabs"
-import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "elec-audit-admin/types"
+import {
+  ElecAdminAuditSnapshot,
+  ElecAdminAuditStatus,
+} from "elec-audit-admin/types"
 import { useTranslation } from "react-i18next"
 
 interface StatusSwitcherProps {
@@ -22,26 +25,32 @@ export const StatusSwitcher = ({
         {
           key: ElecAdminAuditStatus.Pending,
           path: ElecAdminAuditStatus.Pending.toLowerCase(),
-          label: t("En attente ({{count}})", { count: snapshot.charge_points_applications_pending }),
+          label: t("En attente ({{count}})", {
+            count: snapshot.charge_points_applications_pending,
+          }),
         },
 
         {
           key: ElecAdminAuditStatus.AuditInProgress,
           path: ElecAdminAuditStatus.AuditInProgress.toLowerCase(),
-          label: t("En cours d'audit ({{count}})", { count: snapshot.charge_points_applications_audit_in_progress })
+          label: t("En cours d'audit ({{count}})", {
+            count: snapshot.charge_points_applications_audit_in_progress,
+          }),
         },
         {
           key: ElecAdminAuditStatus.AuditDone,
           path: ElecAdminAuditStatus.AuditDone.toLowerCase(),
-          label: t("Audit à valider ({{count}})", { count: snapshot.charge_points_applications_audit_done })
+          label: t("Audit à valider ({{count}})", {
+            count: snapshot.charge_points_applications_audit_done,
+          }),
         },
         {
           key: ElecAdminAuditStatus.History,
           path: ElecAdminAuditStatus.History.toLowerCase(),
-          label: t("Historique ({{count}})", { count: snapshot.charge_points_applications_history })
+          label: t("Historique ({{count}})", {
+            count: snapshot.charge_points_applications_history,
+          }),
         },
-
-
       ]}
     />
   )

@@ -1,9 +1,10 @@
 from typing import List
-from openpyxl import Workbook
-from doublecount.parser.helpers import extract_year
 
+from openpyxl import Workbook
+
+from doublecount.parser.excel_to_carbure_convertor import get_feedstock_from_dc_feedstock
+from doublecount.parser.helpers import extract_year
 from doublecount.parser.types import SourcingRow
-from doublecount.parser.excel_to_carbure_convertor import DC_FEEDSTOCK_UNRECOGNIZED, get_feedstock_from_dc_feedstock
 
 
 def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[SourcingRow]:

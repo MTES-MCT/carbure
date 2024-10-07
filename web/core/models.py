@@ -1,13 +1,14 @@
 import datetime
-from django.db import models
-from django.conf import settings
-from django.utils import timezone
-from django.contrib.auth import get_user_model
 import hashlib
 from calendar import monthrange
-from django.db.models.signals import pre_save, post_save
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 usermodel = get_user_model()
 
@@ -131,7 +132,7 @@ class Entity(models.Model):
         return self.name.replace(" ", "").upper()
 
     def slugify(self):
-        from core.common import normalize
+        from core.common import normalize  # noqa: E402
 
         return normalize(self.name).replace(" ", "_")
 
@@ -357,8 +358,20 @@ class Depot(models.Model):
     accise = models.CharField(max_length=32, blank=True, null=True, default=None)
     private = models.BooleanField(default=False)
 
-    electrical_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
-    thermal_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
+    electrical_efficiency = models.FloatField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Entre 0 et 1",
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
+    thermal_efficiency = models.FloatField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Entre 0 et 1",
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
     useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
     is_enabled = models.BooleanField(default=True)
@@ -430,7 +443,7 @@ class EntityDepot(models.Model):
         verbose_name_plural = "Dépôts Entité"
 
 
-from producers.models import ProductionSite
+from producers.models import ProductionSite  # noqa: E402
 
 
 class SustainabilityDeclaration(models.Model):
@@ -822,7 +835,7 @@ class CarbureLot(models.Model):
         data_source_is_producer = CarbureLotReliabilityScore(
             lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, max_score=3, score=0
         )
-        if self.carbure_producer != None:
+        if self.carbure_producer is not None:
             data_source_is_producer.score = 3
 
         # lot declared by both 1 POINT
@@ -1035,7 +1048,9 @@ def lot_pre_save_update_quantities(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=CarbureLot)
-def lot_post_save_gen_carbure_id(sender, instance, created, update_fields={}, *args, **kwargs):
+def lot_post_save_gen_carbure_id(sender, instance, created, update_fields=None, *args, **kwargs):
+    if update_fields is None:
+        update_fields = {}
     old_carbure_id = instance.carbure_id
     instance.generate_carbure_id()
 

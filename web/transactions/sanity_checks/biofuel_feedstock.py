@@ -1,5 +1,6 @@
 from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Biocarburant, CarbureLot, MatierePremiere, Pays
+
 from .helpers import generic_error
 
 
@@ -40,7 +41,6 @@ def check_provenance_mp(lot: CarbureLot):
 
 
 def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: MatierePremiere):
-
     if biofuel.is_alcool and not feedstock.compatible_alcool:
         yield f"{biofuel} issu de fermentation et {feedstock} n'est pas fermentescible"
 
@@ -82,7 +82,7 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
 
     hvo_biofuels = ("HVOE", "HVOG", "HVOC")
     if biofuel.code in hvo_biofuels and not feedstock.is_huile_vegetale:
-        yield "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG/HOC"
+        yield "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG/HOC"  # noqa: E501
 
     hc_biofuels = ("HCE", "HCG", "HCC")
     hc_feedstocks = (

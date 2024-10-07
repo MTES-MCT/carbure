@@ -1,10 +1,11 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_http_methods
-from django import forms
+
+from auth.api.register import send_email as send_registration_email
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import UserRights, UserRightsRequests, Entity
-from auth.api.register import send_email as send_registration_email
+from core.models import UserRights, UserRightsRequests
 
 User = get_user_model()
 
@@ -26,7 +27,7 @@ def invite_user(request, entity, entity_id):
     form = InviteUserForm(request.POST)
 
     if not form.is_valid():
-        errors = {key: e for key, e in form.errors.items()}
+        errors = dict(form.errors.items())
         return ErrorResponse(400, InviteUserError.INVITE_FAILED, data=errors)
 
     email = form.cleaned_data["email"]
@@ -43,7 +44,7 @@ def invite_user(request, entity, entity_id):
         email_subject = "Carbure - Invitation à rejoindre une entité"
         email_type = "invite_user_email"
 
-    except:
+    except Exception:
         # Create a new user (non active) with a random password
         user = User.objects.create_user(email=email, password=User.objects.make_random_password(20), is_active=False)
         user.save()
@@ -60,7 +61,7 @@ def invite_user(request, entity, entity_id):
         UserRightsRequests.objects.update_or_create(user=user, entity=entity, defaults={"role": role, "status": "ACCEPTED"})
         UserRights.objects.create(user=user, entity=entity, role=role)
 
-    except:
+    except Exception:
         return ErrorResponse(400, InviteUserError.INVITE_FAILED)
 
     # Send email

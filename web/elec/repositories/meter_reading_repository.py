@@ -1,4 +1,5 @@
-from django.db.models import Count, Sum, F, Q
+from django.db.models import Count, F, Q, Sum
+
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_charge_point import ElecChargePoint
@@ -7,7 +8,6 @@ from transactions.models.year_config import YearConfig
 
 
 class MeterReadingRepository:
-
     @staticmethod
     def get_annotated_applications():
         return ElecMeterReadingApplication.objects.all().annotate(
@@ -18,7 +18,10 @@ class MeterReadingRepository:
     @staticmethod
     def get_annotated_applications_details():
         return MeterReadingRepository.get_annotated_applications().annotate(
-            power_total=Sum("elec_meter_readings__charge_point__nominal_power")
+            power_total=Sum(
+                "elec_meter_readings__meter__charge_point__nominal_power",
+                filter=Q(elec_meter_readings__meter__charge_point__is_deleted=False),
+            ),
         )
 
     @staticmethod
@@ -44,20 +47,24 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
-        return ElecMeterReading.objects.filter(cpo=cpo, application=application).select_related("charge_point")
+        return ElecMeterReading.objects.filter(
+            cpo=cpo, application=application, meter__charge_point__is_deleted=False
+        ).select_related("meter", "meter__charge_point")
 
     @staticmethod
     def get_application_meter_readings_summary(cpo: Entity, application: ElecMeterReadingApplication):
         return (
             MeterReadingRepository.get_application_meter_readings(cpo, application)
             .values("extracted_energy", "renewable_energy", "reading_date")
-            .annotate(charge_point_id=F("charge_point__charge_point_id"))
+            .annotate(charge_point_id=F("meter__charge_point__charge_point_id"))
         )
 
     @staticmethod
     def get_application_charge_points(cpo: Entity, application: ElecMeterReadingApplication):
-        charge_point_ids = ElecMeterReading.objects.filter(cpo=cpo, application=application).values_list("charge_point_id", flat=True)  # fmt:skip
-        return ElecChargePoint.objects.filter(pk__in=charge_point_ids)
+        charge_point_ids = ElecMeterReading.objects.filter(cpo=cpo, application=application).values_list(
+            "meter__charge_point_id", flat=True
+        )
+        return ElecChargePoint.objects.filter(pk__in=charge_point_ids, is_deleted=False)
 
     @staticmethod
     def get_renewable_share(year: int):
@@ -66,11 +73,10 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_entities_without_application(quarter, year):
-
         return Entity.objects.annotate(
             meter_readings_charge_points_count=Count(
                 "elec_charge_points",
-                filter=Q(elec_charge_points__is_article_2=False),
+                filter=Q(elec_charge_points__is_article_2=False, elec_charge_points__is_deleted=False),
                 distinct=True,
             ),
             app_count=Count(

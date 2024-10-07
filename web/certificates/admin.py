@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from certificates.models import ProductionSiteCertificate
-from certificates.models import DoubleCountingRegistration, DoubleCountingRegistrationInputOutput
+from certificates.models import DoubleCountingRegistration, DoubleCountingRegistrationInputOutput, ProductionSiteCertificate
 
 
 class ProductionSiteCertificateAdmin(admin.ModelAdmin):
@@ -27,7 +26,7 @@ class DoubleCountingRegistrationAdmin(admin.ModelAdmin):
 
 
 @admin.register(DoubleCountingRegistrationInputOutput)
-class DoubleCountingRegistrationAdmin(admin.ModelAdmin):
+class DoubleCountingRegistrationInputOutputAdmin(admin.ModelAdmin):
     list_display = ("get_certid", "get_holder", "biofuel", "feedstock")
     search_fields = (
         "certificate__certificate_id",

@@ -1,10 +1,11 @@
 # /api/stats/entity
-import jwt
 import time
 import traceback
 
+import jwt
 from django.conf import settings
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
 
@@ -34,7 +35,7 @@ def get_metabase_dashboard(type: str):
 def get_entity_stats(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, StatsEntityError.MALFORMED_PARAMS)
 
@@ -42,7 +43,7 @@ def get_entity_stats(request, *args, **kwargs):
         entity = Entity.objects.get(id=entity_id)
         dashboard_id = get_metabase_dashboard(entity.entity_type)
 
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, StatsEntityError.STATS_DASHBOARD_TYPE_UNAVAILABLE)
 

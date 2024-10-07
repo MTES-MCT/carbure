@@ -1,13 +1,14 @@
-from django.conf import settings
 import pandas as pd
 from django import forms
+from django.conf import settings
 from django.db.models import Sum
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+from core.helpers import send_mail
 from core.models import ExternalAdminRights
 from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
@@ -87,14 +88,14 @@ def accept_application(request: HttpRequest):
         audit_sample.status = ElecAuditSample.AUDITED
         audit_sample.save()
 
-    send_email_to_cpo(application)
+    send_email_to_cpo(application, request)
 
     return SuccessResponse()
 
 
-def send_email_to_cpo(application: ElecMeterReadingApplication):
+def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpRequest):
     quarter = f"T{application.quarter} {application.year}"
-    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum('renewable_energy'))['total_energy'], 2)
+    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec/{application.year}/provisioned"
 
@@ -108,12 +109,12 @@ def send_email_to_cpo(application: ElecMeterReadingApplication):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
+        request=request,
         subject=f"[CarbuRe] Relevés {quarter} validés",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=["carbure@beta.gouv.fr"],
-        fail_silently=False,
     )

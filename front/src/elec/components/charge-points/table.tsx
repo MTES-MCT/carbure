@@ -1,16 +1,10 @@
-import { EntityManager } from "carbure/hooks/entity"
 import Button from "common/components/button"
-import { Check, Cross, Download } from "common/components/icons"
-import { usePortal } from "common/components/portal"
+import { Download } from "common/components/icons"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import {
-  ElecChargePointsApplication,
-  ElecAuditApplicationStatus,
-} from "elec/types"
+import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
-// import { elecChargePointsApplications } from "elec/__test__/data"
 import { compact } from "common/utils/collection"
 
 import { To } from "react-router-dom"
@@ -68,9 +62,7 @@ const ChargePointsApplicationsTable: React.FC<
           header: t("Puissance cumulée"),
           cell: (application) => (
             <Cell
-              text={
-                `${formatNumber(Math.round(application.power_total))}` + " kW"
-              }
+              text={`${formatNumber(Math.round(application.power_total))} kW`}
             />
           ),
         },

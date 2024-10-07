@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 
+from core.decorators import check_user_rights
 from core.serializers import GenericCertificateSerializer
 from producers.models import ProductionSite
-from core.decorators import check_user_rights
 
 
 @check_user_rights("entity_id")
@@ -10,7 +10,7 @@ def get_production_sites(request, entity, entity_id):
     psites = ProductionSite.objects.filter(producer=entity)
 
     psitesbyid = {p.id: p for p in psites}
-    for k, v in psitesbyid.items():
+    for _k, v in psitesbyid.items():
         v.inputs = []
         v.outputs = []
 

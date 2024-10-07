@@ -1,14 +1,13 @@
 import traceback
 
 from django import forms
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
-
 from core.decorators import check_admin_rights
 from core.models import (
     GenericError,
 )
-
 from core.utils import MultipleValueField
 
 
@@ -32,12 +31,12 @@ def toggle_warning(request):
         for error in errors:
             try:
                 lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
-            except:
+            except Exception:
                 traceback.print_exc()
                 return ErrorResponse(404, CarbureError.UNKNOWN_ERROR)
             lot_error.acked_by_admin = checked
             lot_error.save()
         return SuccessResponse()
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(500, CarbureError.UNKNOWN_ERROR)

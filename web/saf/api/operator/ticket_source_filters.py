@@ -1,9 +1,12 @@
 # /api/saf/operator/ticket-sources/filters
 
 import traceback
+
 from django.db.models.functions import Coalesce
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+
 from .ticket_sources import TicketSourceFilterForm, find_ticket_sources
 
 
@@ -31,7 +34,7 @@ def get_ticket_source_filters(request, *args, **kwargs):
         data = get_filter_values(ticket_sources, filter)
 
         return SuccessResponse(list(set(data)))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketSourceFiltersError.FILTER_LISTING_FAILED)
 

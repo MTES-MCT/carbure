@@ -1,9 +1,11 @@
-from dateutil.relativedelta import relativedelta
 import datetime
 import math
+
+from dateutil.relativedelta import relativedelta
 from django.http.response import JsonResponse
+
 from core.decorators import check_admin_rights
-from core.models import Entity, SustainabilityDeclaration, CarbureLot
+from core.models import CarbureLot, Entity, SustainabilityDeclaration
 from core.serializers import SustainabilityDeclarationSerializer
 
 

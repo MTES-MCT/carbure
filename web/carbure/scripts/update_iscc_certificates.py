@@ -3,33 +3,36 @@
 
 # Extraction des certificats ISCC https://www.iscc-system.org/certificates/all-certificates/
 import os
-from pprint import pprint
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-import re
-import json
-from typing import Tuple, cast
-import shutil
-import argparse
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
-from datetime import date, datetime  # Pour le nom du fichier sauvegardé
-from os import listdir
-from os.path import isfile
-from django.conf import settings
-from django.core.mail import send_mail, get_connection
-from core.common import Perf
-from core.utils import bulk_update_or_create
-from core.models import GenericCertificate
+import argparse  # noqa: E402
+import json  # noqa: E402
+import re  # noqa: E402
+import shutil  # noqa: E402
+from datetime import date, datetime  # Pour le nom du fichier sauvegardé  # noqa: E402
+from os import listdir  # noqa: E402
+from os.path import isfile  # noqa: E402
+from typing import Tuple, cast  # noqa: E402
+
+import pandas as pd  # noqa: E402
+import requests  # noqa: E402
+from bs4 import BeautifulSoup  # noqa: E402
+from django.conf import settings  # noqa: E402
+from django.core.mail import get_connection, send_mail  # noqa: E402
+
+from core.models import GenericCertificate  # noqa: E402
+from core.utils import bulk_update_or_create  # noqa: E402
 
 ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=2"
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"
 DESTINATION_FOLDER = "/tmp"
-HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"}  # fmt: skip
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"  # noqa: E501
+}
 PAGELENGTH = 3000
 
 
@@ -105,14 +108,14 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
     for _, row in df.iterrows():
         try:
             if "." in row["valid_from"]:
-                vf = row["valid_from"].split(".")
+                row["valid_from"].split(".")
             elif "-" in row["valid_from"]:
                 valid_from = datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
             else:
                 print("* Unrecognized date format [%s]" % (row["valid_from"]))
                 print(row)
                 valid_from = date(year=1970, month=1, day=1)
-        except:
+        except Exception:
             valid_from = date(year=1970, month=1, day=1)
 
         try:
@@ -125,7 +128,7 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
                 print("* Unrecognized date format [%s]" % (row["valid_until"]))
                 print(row)
                 valid_until = date(year=1970, month=1, day=1)
-        except:
+        except Exception:
             valid_until = date(year=1970, month=1, day=1)
 
         if "," in row["certificate_holder"]:

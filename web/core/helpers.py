@@ -1,17 +1,17 @@
-import os
-import datetime
 import calendar
+import datetime
 from multiprocessing.context import Process
+
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F, OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
-from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
-from core.common import try_get_certificate, try_get_double_counting_certificate
 
+from core.common import try_get_certificate, try_get_double_counting_certificate
 from core.ign_distance import get_distance
 from core.models import (
     Biocarburant,
@@ -22,12 +22,12 @@ from core.models import (
     CarbureStockTransformation,
     Depot,
     Entity,
+    GenericError,
     MatierePremiere,
     Pays,
     TransactionDistance,
     UserRights,
 )
-from core.models import GenericError
 from core.serializers import (
     CarbureLotAdminEventSerializer,
     CarbureLotAdminSerializer,
@@ -41,7 +41,6 @@ from core.serializers import (
 )
 from core.utils import CarbureEnv
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
-
 
 sort_key_to_django_field = {
     "period": "delivery_date",
@@ -276,7 +275,9 @@ def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     )
 
 
-def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
+def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=None):
+    if blacklist is None:
+        blacklist = []
     year = query.get("year", False)
     periods = query.getlist("periods", [])
     production_sites = query.getlist("production_sites", [])
@@ -463,7 +464,7 @@ def sort_lots(lots, query):
 
 
 def prepare_filters(filter_list):
-    return sorted(list(set([i for i in filter_list if i is not None])))
+    return sorted({i for i in filter_list if i is not None})
 
 
 UNKNOWN_VALUE = "UNKNOWN"
@@ -659,7 +660,9 @@ def get_stock_with_metadata(stock, query):
         return response
 
 
-def filter_stock(stock, query, blacklist=[]):
+def filter_stock(stock, query, blacklist=None):
+    if blacklist is None:
+        blacklist = []
     periods = query.getlist("periods", [])
     depots = query.getlist("depots", [])
     feedstocks = query.getlist("feedstocks", [])
@@ -832,7 +835,7 @@ def get_transaction_distance(lot):
         res["distance"] = td.distance
         res["source"] = "DB"
         return res
-    except:
+    except Exception:
         # not found, launch in background for next time
         p = Process(target=get_distance, args=(starting_point, delivery_point))
         p.start()
@@ -840,9 +843,8 @@ def get_transaction_distance(lot):
         return res
 
 
-def send_email_declaration_validated(declaration):
+def send_email_declaration_validated(declaration, request):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
-    email_subject = email_subject if CarbureEnv.is_prod else "TEST " + email_subject
     text_message = """
     Bonjour,
 
@@ -851,34 +853,28 @@ def send_email_declaration_validated(declaration):
     Merci,
     L'équipe CarbuRe
     """
-    env = os.getenv("IMAGE_TAG", False)
-    if env != "prod":
-        # send only to staff / superuser
-        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(
-                entity=declaration.entity,
-                user__is_staff=False,
-                user__is_superuser=False,
-            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
-        ]
+
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(
+            entity=declaration.entity,
+            user__is_staff=False,
+            user__is_superuser=False,
+        ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
+    ]
 
     period = declaration.period.strftime("%Y-%m")
-    msg = EmailMultiAlternatives(
+    send_mail(
+        request=request,
         subject=email_subject,
-        body=text_message % (period),
+        message=text_message % (period),
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=recipients,
+        recipient_list=recipients,
     )
-    msg.send()
 
 
-def send_email_declaration_invalidated(declaration):
+def send_email_declaration_invalidated(declaration, request):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
-    email_subject = email_subject if CarbureEnv.is_prod else "TEST " + email_subject
     text_message = """
     Bonjour,
 
@@ -888,29 +884,45 @@ def send_email_declaration_invalidated(declaration):
     Merci,
     L'équipe CarbuRe
     """
-    env = os.getenv("IMAGE_TAG", False)
-    if env != "prod":
-        # send only to staff / superuser
-        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(
-                entity=declaration.entity,
-                user__is_staff=False,
-                user__is_superuser=False,
-            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
-        ]
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(
+            entity=declaration.entity,
+            user__is_staff=False,
+            user__is_superuser=False,
+        ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
+    ]
 
     period = declaration.period.strftime("%Y-%m")
-    msg = EmailMultiAlternatives(
+    send_mail(
+        request=request,
         subject=email_subject,
-        body=text_message % (period),
+        message=text_message % (period),
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=recipients,
+        recipient_list=recipients,
     )
-    msg.send()
+
+
+def send_mail(request, subject, message, from_email, recipient_list, html_message=None, **kwargs):
+    if not CarbureEnv.is_prod and not CarbureEnv.is_local:
+        if request.user.is_authenticated:
+            if request.user.email in recipient_list:
+                recipient_list = [request.user.email]
+            else:
+                recipient_list = ["carbure@beta.gouv.fr"]
+        else:
+            # If user not authenticated, we are in registration process we keep recipient_list
+            pass
+
+        subject = f"[TEST] {subject}"
+        kwargs["cc"] = None
+
+    email = EmailMultiAlternatives(subject, message, from_email, recipient_list, **kwargs)
+
+    if html_message:
+        email.attach_alternative(html_message, "text/html")
+
+    email.send(fail_silently=False)
 
 
 def get_lots_summary_data(lots, entity, short=False):
@@ -1097,6 +1109,7 @@ def get_known_certificates(lot):
         d["vendor_certificate"] = try_get_certificate(lot.vendor_certificate)
     if lot.production_site_double_counting_certificate:
         d["production_site_double_counting_certificate"] = try_get_double_counting_certificate(
-            lot.production_site_double_counting_certificate, lot.carbure_production_site
+            lot.production_site_double_counting_certificate,
+            lot.carbure_production_site,
         )
     return d

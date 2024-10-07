@@ -2,10 +2,9 @@ import factory
 from django.test import TestCase
 from django.urls import reverse
 
-from core.tests_utils import setup_current_user
 from core.models import Biocarburant, Entity
-from saf.factories import SafTicketSourceFactory, SafTicketFactory
-from saf.models import SafTicketSource, SafTicket
+from core.tests_utils import setup_current_user
+from saf.models import SafTicket, SafTicketSource
 from transactions.factories.carbure_lot import CarbureLotFactory
 
 
@@ -43,31 +42,39 @@ class SafCreateTicketSourcesTest(TestCase):
         )
 
     def test_create_ticket_sources_from_declaration(self):
-        self.assertEqual(SafTicketSource.objects.count(), 0)
+        assert SafTicketSource.objects.count() == 0
 
         # declaration of the producer for the period
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period}
+        )
 
-        self.assertEqual(SafTicketSource.objects.count(), 0)
+        assert SafTicketSource.objects.count() == 0
 
         # declaration of the operator for the period
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         ticket_sources = SafTicketSource.objects.all()
-        self.assertEqual(ticket_sources.count(), 10)
-        self.assertEqual(ticket_sources.values("parent_lot__id").distinct().count(), 10)
+        assert ticket_sources.count() == 10
+        assert ticket_sources.values("parent_lot__id").distinct().count() == 10
 
         lots_by_id = {lot.id: lot for lot in self.lots}
 
         for ts in ticket_sources:
             parent_lot = lots_by_id.get(ts.parent_lot.id)
-            self.assertEqual(ts.total_volume, parent_lot.volume)
-            self.assertEqual(ts.assigned_volume, 0.0)
+            assert ts.total_volume == parent_lot.volume
+            assert ts.assigned_volume == 0.0
 
     def test_update_ticket_sources_from_redeclaration(self):
         # two-sided declaration
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period})  # fmt:skip
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.producer.id, "period": self.period}
+        )
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         first_ticket_source = SafTicketSource.objects.first()
 
@@ -84,30 +91,34 @@ class SafCreateTicketSourcesTest(TestCase):
         }
 
         response = self.client.post(reverse("saf-operator-assign-ticket"), params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # check that ticket was created
         tickets = SafTicket.objects.all()
-        self.assertEqual(tickets.count(), 1)
-        self.assertEqual(tickets.first().parent_ticket_source, first_ticket_source)
+        assert tickets.count() == 1
+        assert tickets.first().parent_ticket_source == first_ticket_source
 
         # check that ticket source was updated
         first_ticket_source.refresh_from_db()
-        self.assertEqual(first_ticket_source.assigned_volume, 60000.0)
+        assert first_ticket_source.assigned_volume == 60000.0
 
         # operator invalidates its declaration
-        self.client.post(reverse("transactions-declarations-invalidate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-invalidate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         # ticket sources still exist
-        self.assertEqual(SafTicketSource.objects.count(), 10)
+        assert SafTicketSource.objects.count() == 10
 
         # check that ticket source was not updated
         first_ticket_source.refresh_from_db()
-        self.assertEqual(first_ticket_source.assigned_volume, 60000.0)
+        assert first_ticket_source.assigned_volume == 60000.0
 
         # operator revalidates its declaration
-        self.client.post(reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period})  # fmt:skip
+        self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.operator.id, "period": self.period}
+        )
 
         # check that ticket source was not updated
         first_ticket_source.refresh_from_db()
-        self.assertEqual(first_ticket_source.assigned_volume, 60000.0)
+        assert first_ticket_source.assigned_volume == 60000.0

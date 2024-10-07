@@ -1,16 +1,19 @@
 import {
-  Entity,
   Biofuel,
   Country,
+  Entity,
   Feedstock,
   ProductionSite,
 } from "carbure/types"
-import { Order } from "common/components/table"
 import {
   CBQueryParams,
   CBQueryStates,
   CBSnapshot,
 } from "common/hooks/query-builder"
+import {
+  SafTicketSourcePreview,
+  SafTicketSourceStatus,
+} from "./pages/operator/types"
 
 export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
@@ -28,54 +31,6 @@ export interface SafOperatorSnapshot extends CBSnapshot {
 export interface SafClientSnapshot extends CBSnapshot {
   tickets_pending: number
   tickets_accepted: number
-}
-
-export interface SafTicketSource {
-  id: number
-  carbure_id: string
-  year: number
-  delivery_period: number
-  created_at: string
-  total_volume: number
-  assigned_volume: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-  country_of_origin: Country
-  assigned_tickets: SafTicketPreview[]
-  ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
-  parent_lot?: {
-    id: number
-    carbure_id: string
-  }
-}
-
-export interface SafTicketSourceSummary
-  extends SafTicketSource,
-    SafProduction,
-    SafDurability {
-  count: number
-  total_volume: number
-  ticket_sources: SafTicketSourceSummaryItem[]
-}
-
-export interface SafTicketSourcePreview {
-  id: number
-  carbure_id: string
-}
-export interface SafTicketSourceSummaryItem extends SafTicketSourcePreview {
-  year: number
-  delivery_period: number
-  total_volume: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-}
-
-export interface SafTicketSourceDetails
-  extends SafTicketSource,
-    SafProduction,
-    SafDurability {
-  added_by: Entity
-  parent_lot: LotPreview
 }
 
 export interface SafLot {
@@ -158,25 +113,12 @@ export interface SafTicketAssignementQuery {
   free_field: string
 }
 
-export interface SafTicketSourcesResponse {
-  saf_ticket_sources: SafTicketSource[]
-  from: number
-  returned: number
-  total: number
-  ids: number[]
-}
-
 export interface SafTicketsResponse {
   saf_tickets: SafTicket[]
   from: number
   returned: number
   total: number
   ids: number[]
-}
-
-export enum SafTicketSourceStatus {
-  Available = "AVAILABLE",
-  History = "HISTORY",
 }
 
 export interface SafStates extends CBQueryStates {

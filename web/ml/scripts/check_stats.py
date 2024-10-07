@@ -1,16 +1,13 @@
-import argparse
 import os
+
 import django
-from tqdm import tqdm
-import pandas as pd
-import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot
-from ml.models import EECStats, EPStats, ETDStats
+from core.models import CarbureLot  # noqa: E402
 
 
 def check_ml_score():

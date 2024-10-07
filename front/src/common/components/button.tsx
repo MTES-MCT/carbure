@@ -3,8 +3,6 @@ import { Loader, Upload } from "common/components/icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
 import { Link, To } from "react-router-dom"
-import { ExternalLink as ExternalLinkIcon } from "common/components/icons"
-import { sub } from "date-fns"
 
 export type ButtonVariant =
   | "primary"
@@ -85,8 +83,10 @@ export function Button<T>({
           className
         )}
         onClick={(e) => {
-          captive && e.stopPropagation()
-          captive && e.preventDefault()
+          if (captive) {
+            e.stopPropagation()
+            e.preventDefault()
+          }
           action?.()
         }}
       >

@@ -1,7 +1,7 @@
 from datetime import datetime
+
 from django.http.response import JsonResponse
 
-from django.http import JsonResponse
 from certificates.models import DoubleCountingRegistration
 from core.decorators import check_user_rights
 from core.models import UserRights
@@ -38,7 +38,7 @@ def get_agreements(request, *args, **kwargs):
         try:
             agreement = DoubleCountingRegistration.objects.get(application_id=application["id"])
             application["agreement_id"] = agreement.id
-        except:
+        except Exception:
             application["agreement_id"] = None
 
     return JsonResponse({"status": "success", "data": applications_data})

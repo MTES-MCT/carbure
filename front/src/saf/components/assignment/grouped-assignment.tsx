@@ -16,8 +16,8 @@ import {
   formatPeriodFromDate,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource } from "saf/types"
-import * as api from "../../api"
+import { SafTicketSource } from "saf/pages/operator/types"
+import * as api from "../../pages/operator/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 

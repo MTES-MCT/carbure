@@ -1,5 +1,5 @@
-from django.db.models import QuerySet, F, Value, CharField
-from django.db.models.functions import Concat, Coalesce
+from django.db.models import CharField, F, QuerySet, Value
+from django.db.models.functions import Coalesce, Concat
 
 from core.models import CarbureLot, CarbureStock
 

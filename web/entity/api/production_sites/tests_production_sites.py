@@ -1,16 +1,16 @@
-from core.tests_utils import setup_current_user
-from core.models import (
-    Entity,
-    Pays,
-    ProductionSite,
-    MatierePremiere,
-    Biocarburant,
-    UserRights,
-)
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+
+from core.models import (
+    Biocarburant,
+    Entity,
+    MatierePremiere,
+    ProductionSite,
+    UserRights,
+)
+from core.tests_utils import setup_current_user
+from producers.models import ProductionSiteInput, ProductionSiteOutput
 
 
 class EntityProductionSiteTest(TestCase):
@@ -46,9 +46,9 @@ class EntityProductionSiteTest(TestCase):
 
         # get - 0 sites
         response = self.client.get(reverse(url_get), {"entity_id": self.entity1.id})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(len(data), 0)
+        assert len(data) == 0
         # add 1
         psite = {
             "country_code": "FR",
@@ -67,22 +67,22 @@ class EntityProductionSiteTest(TestCase):
             "manager_email": "",
         }
         response = self.client.post(reverse(url_add), psite)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # check in db
         site = ProductionSite.objects.get(site_id="FR0001")
         # update
         psite["postal_code"] = "75018"
         response = self.client.post(reverse(url_update), psite)
-        self.assertEqual(response.status_code, 400)  # update without specifying site_id
+        assert response.status_code == 400  # update without specifying site_id
         psite["production_site_id"] = site.id
         psite["country_code"] = "WW"
         response = self.client.post(reverse(url_update), psite)
-        self.assertEqual(response.status_code, 400)  # unknown country code WW
+        assert response.status_code == 400  # unknown country code WW
         psite["country_code"] = "FR"
         response = self.client.post(reverse(url_update), psite)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         site = ProductionSite.objects.get(site_id="FR0001")
-        self.assertEqual(site.postal_code, "75018")
+        assert site.postal_code == "75018"
 
         # set mps/bcs
         MatierePremiere.objects.update_or_create(code="COLZA", name="Colza")
@@ -98,7 +98,7 @@ class EntityProductionSiteTest(TestCase):
                 "matiere_premiere_codes": ["COLZA", "BEETROOT"],
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response = self.client.post(
             reverse(url_set_bcs),
             {
@@ -107,120 +107,99 @@ class EntityProductionSiteTest(TestCase):
                 "biocarburant_codes": ["ETH", "HVO"],
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # check
         inputs = ProductionSiteInput.objects.filter(production_site=site)
         outputs = ProductionSiteOutput.objects.filter(production_site=site)
-        self.assertEqual(len(inputs), 2)
-        self.assertEqual(len(outputs), 2)
+        assert len(inputs) == 2
+        assert len(outputs) == 2
 
         # delete
         post = {"entity_id": self.entity1.id}
         response = self.client.post(reverse(url_delete), post)
-        self.assertEqual(response.status_code, 400)  # missing production_site_id
+        assert response.status_code == 400  # missing production_site_id
 
         post["production_site_id"] = site.id
         response = self.client.post(reverse(url_delete), post)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # get - 0 sites
         response = self.client.get(reverse(url_get), {"entity_id": self.entity1.id})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(len(data), 0)
+        assert len(data) == 0
 
     def test_add_production_site(self):
         postdata = {"entity_id": self.entity2.id}
         url = "entity-production-sites-add"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COUNTRY_CODE",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COUNTRY_CODE"
         postdata["country_code"] = "ZZ"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_NAME")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_NAME"
         postdata["name"] = "Site de production 007"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COM_DATE")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COM_DATE"
         postdata["date_mise_en_service"] = "12/05/2007"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION"
         postdata["ges_option"] = "DEFAULT"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ID")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ID"
         postdata["site_id"] = "FR78895468"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ZIP_CODE")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ZIP_CODE"
         postdata["postal_code"] = "64430"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_NAME",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_NAME"
         postdata["manager_name"] = "William Rock"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_PHONE",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_PHONE"
         postdata["manager_phone"] = "0145247000"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL"
         postdata["manager_email"] = "will.rock@example.com"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_CITY")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_CITY"
         postdata["city"] = "Guermiette"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ADDRESS")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ADDRESS"
         postdata["address"] = "1 rue de la paix"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_COM_DATE_WRONG_FORMAT",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_COM_DATE_WRONG_FORMAT"
         postdata["date_mise_en_service"] = "2007-05-12"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_COUNTRY_CODE",
-        )
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_COUNTRY_CODE"
         postdata["country_code"] = "FR"
 
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_PRODUCER")
+        assert response.status_code == 400
+        assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_PRODUCER"
         postdata["entity_id"] = self.entity1.id
         response = self.client.post(reverse(url), postdata)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200

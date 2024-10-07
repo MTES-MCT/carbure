@@ -1,7 +1,7 @@
 import Button from "common/components/button"
 import { Download } from "common/components/icons"
 import Table, { Cell, actionColumn } from "common/components/table"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
 import { ElecMeterReadingsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
@@ -67,9 +67,7 @@ const MeterReadingsApplicationsTable: React.FC<
           header: t("kwh renouvelables"),
           cell: (application) => (
             <Cell
-              text={
-                `${formatNumber(Math.round(application.energy_total))}` + " kWh"
-              }
+              text={`${formatNumber(Math.round(application.energy_total))} kWh`}
             />
           ),
         },

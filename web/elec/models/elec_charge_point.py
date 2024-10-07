@@ -1,6 +1,6 @@
 from django.db import models
-from core.models import Entity
 
+from core.models import Entity
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 
 
@@ -15,16 +15,18 @@ class ElecChargePoint(models.Model):
     CURRENT_TYPES = [(AC, "Courant alternatif"), (DC, "Courant continu")]
 
     # related
-    application = models.ForeignKey(ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")  # fmt:skip
+    application = models.ForeignKey(
+        ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points"
+    )
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")
+    current_meter = models.ForeignKey(
+        "ElecMeter", on_delete=models.SET_NULL, null=True, blank=True, related_name="elec_charge_points"
+    )
 
     # cpo excel data
     charge_point_id = models.CharField(max_length=64)
     current_type = models.CharField(max_length=2, choices=CURRENT_TYPES)
     installation_date = models.DateField()
-    mid_id = models.CharField(max_length=128, null=True, blank=True)
-    measure_date = models.DateField(null=True, blank=True)
-    measure_energy = models.FloatField(null=True, blank=True)
     is_article_2 = models.BooleanField(default=False)
     measure_reference_point_id = models.CharField(max_length=64, null=True, blank=True)
 
@@ -36,3 +38,17 @@ class ElecChargePoint(models.Model):
     cpo_siren = models.CharField(max_length=64, null=True, blank=True)
     latitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
     longitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
+
+    is_deleted = models.BooleanField(default=False)
+
+    @property
+    def mid_id(self):
+        return self.current_meter.mid_certificate if self.current_meter else None
+
+    @property
+    def measure_date(self):
+        return self.current_meter.initial_index_date if self.current_meter else None
+
+    @property
+    def measure_energy(self):
+        return self.current_meter.initial_index if self.current_meter else None

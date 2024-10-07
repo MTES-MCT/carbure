@@ -1,11 +1,13 @@
 # /api/saf/airline/accept-ticket
 
 import traceback
+
 from django.db import transaction
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.models import CarbureNotification, UserRights
 from saf.models import SafTicket, create_source_from_ticket
-from core.models import UserRights, CarbureNotification
 
 
 class SafTicketAcceptError:
@@ -19,7 +21,7 @@ def credit_ticket_source(request, *args, **kwargs):
     try:
         entity_id = int(request.POST.get("entity_id"))
         ticket_id = int(request.POST.get("ticket_id"))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketAcceptError.MALFORMED_PARAMS)
 

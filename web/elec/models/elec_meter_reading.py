@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.models import Entity
-from elec.models.elec_charge_point import ElecChargePoint
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
@@ -14,6 +14,18 @@ class ElecMeterReading(models.Model):
     extracted_energy = models.FloatField(null=True, blank=True)
     renewable_energy = models.FloatField(null=True, blank=True)
     reading_date = models.DateField()
-    charge_point = models.ForeignKey(ElecChargePoint, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
-    application = models.ForeignKey(ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")  # fmt:skip
+    application = models.ForeignKey(
+        ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings"
+    )
+    meter = models.ForeignKey(
+        ElecMeter, on_delete=models.CASCADE, null=True, blank=False, related_name="elec_meter_readings"
+    )
+
+    @property
+    def charge_point(self):
+        return self.meter.charge_point if self.meter else None
+
+    @property
+    def charge_point_id(self):
+        return self.charge_point.id if self.charge_point else None

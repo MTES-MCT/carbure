@@ -122,10 +122,8 @@ export interface FileListInputProps extends Control {
 }
 
 export const FileListInput = ({
-  clear,
   placeholder = i18next.t("Selectionner des fichiers"),
   value,
-  autoFocus,
   onChange,
   ...props
 }: FileListInputProps) => (
@@ -146,10 +144,8 @@ export interface FileInputProps extends Control {
 }
 
 export const FileInput = ({
-  clear,
   placeholder = i18next.t("Selectionner un fichier"),
   value,
-  autoFocus,
   onChange,
   ...props
 }: FileInputProps) => {
@@ -402,7 +398,7 @@ export const SearchInput = ({
     if (!debounce) return onChange?.(search)
 
     setSearch(search)
-    timeoutRef.current && window.clearTimeout(timeoutRef.current)
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
     timeoutRef.current = window.setTimeout(() => onChange?.(search), debounce)
   }
 

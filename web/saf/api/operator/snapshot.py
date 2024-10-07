@@ -1,10 +1,12 @@
 # /api/saf/operator/snapshot
 
 import traceback
+
 from django.db.models.expressions import F
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from saf.models import SafTicketSource, SafTicket
+from saf.models import SafTicket, SafTicketSource
 
 
 class SafSnapshotError:
@@ -17,7 +19,7 @@ def get_snapshot(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
-    except:
+    except Exception:
         return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMED)
     try:
         sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)

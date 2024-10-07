@@ -1,9 +1,10 @@
 from django.db import transaction
 
+from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
+from saf.models import SafTicket, SafTicketSource
+
 from .group_nodes_by_type import group_nodes_by_type
 from .node import Node
-from saf.models import SafTicket, SafTicketSource
-from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
 
 
 @transaction.atomic

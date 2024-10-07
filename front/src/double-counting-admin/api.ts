@@ -81,6 +81,18 @@ export function approveDoubleCountingQuotas(
   )
 }
 
+export function downloadDoubleCountingApplication(
+  entity_id: number | undefined,
+  dca_id: number,
+  industrial_wastes?: string
+) {
+  return download("/double-counting/admin/applications/export", {
+    entity_id,
+    dca_id,
+    ...(industrial_wastes ? { di: industrial_wastes } : {}),
+  })
+}
+
 export function approveDoubleCountingApplication(
   entity_id: number | undefined,
   dca_id: number

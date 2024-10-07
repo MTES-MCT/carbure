@@ -1,14 +1,16 @@
-# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb
+# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb  # noqa: E501
 
 import datetime
-from core.tests_utils import setup_current_user
-from core.models import Entity
+
 from django.test import TestCase
 from django.urls import reverse
 
+from core.models import Entity
+from core.tests_utils import setup_current_user
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
@@ -36,6 +38,16 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             [(self.cpo, "RW"), (self.admin, "ADMIN")],
         )
 
+        meter_data = {
+            "mid_certificate": "123-456",
+            "initial_index": 1000.123,
+            "initial_index_date": datetime.date(2023, 6, 29),
+            "charge_point": None,
+        }
+
+        self.meter = ElecMeter.objects.create(**meter_data)
+        self.meter2 = ElecMeter.objects.create(**meter_data)
+
     def create_application(self):
         charge_point_application = ElecChargePointApplication.objects.create(cpo=self.cpo)
 
@@ -45,9 +57,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             charge_point_id="ABCDE12345",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -58,15 +68,16 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             longitude=2.3522,
         )
 
+        self.meter.charge_point = charge_point1
+        self.meter.save()
+
         charge_point2 = ElecChargePoint.objects.create(
             application=charge_point_application,
             cpo=self.cpo,
             charge_point_id="FGX10398",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 12),
-            mid_id="123-456",
-            measure_date=datetime.date(2023, 6, 29),
-            measure_energy=1000.1234,
+            current_meter=self.meter2,
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
@@ -77,13 +88,16 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             longitude=2.1522,
         )
 
+        self.meter2.charge_point = charge_point2
+        self.meter2.save()
+
         meter_readings_application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=3, year=2023)
 
         meter_reading1 = ElecMeterReading.objects.create(
             extracted_energy=1234,
             renewable_energy=2345,
             reading_date=datetime.date(2023, 8, 29),
-            charge_point=charge_point1,
+            meter=self.meter,
             application=meter_readings_application,
             cpo=self.cpo,
         )
@@ -92,7 +106,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             extracted_energy=8900,
             renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
-            charge_point=charge_point1,
+            meter=self.meter,
             application=meter_readings_application,
             cpo=self.cpo,
         )
@@ -101,7 +115,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             extracted_energy=8900,
             renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
-            charge_point=charge_point2,
+            meter=self.meter2,
             application=meter_readings_application,
             cpo=self.cpo,
         )
@@ -109,10 +123,10 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
     def test_accept_application(self):
         application, meter_readings = self.create_application()
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
+        assert application.status == ElecChargePointApplication.PENDING
 
         # create sample
-        self.assertIsNone(application.audit_sample.first())
+        assert application.audit_sample.first() is None
         response = self.client.post(
             reverse("elec-admin-audit-meter-readings-generate-sample"),
             {
@@ -121,13 +135,14 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
                 "percentage": 10,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(len(data["charge_points"]), 1)
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
+
+        assert len(data["charge_points"]) == 1
+        assert application.status == ElecChargePointApplication.PENDING
         audit_sample = application.audit_sample.first()
-        self.assertIsNotNone(audit_sample)
-        self.assertEqual(audit_sample.status, ElecAuditSample.IN_PROGRESS)
+        assert audit_sample is not None
+        assert audit_sample.status == ElecAuditSample.IN_PROGRESS
 
         # force accept without audit
         response = self.client.post(
@@ -139,21 +154,21 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
+        assert response.status_code == 200
+        assert response.json() == {"status": "success"}
 
         application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.ACCEPTED)
+        assert application.status == ElecChargePointApplication.ACCEPTED
 
         # audit_sample should be marked as audited
         audit_sample.refresh_from_db()
-        self.assertEqual(audit_sample.status, ElecAuditSample.AUDITED)
+        assert audit_sample.status == ElecAuditSample.AUDITED
 
         # provision certificate should have been created
         certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
-        self.assertEqual(len(certificates), 2)
-        self.assertEqual(
-            certificates.first().energy_amount,
-            (meter_readings[0].renewable_energy + meter_readings[1].renewable_energy) / 1000,
+        assert len(certificates) == 2
+        assert (
+            certificates.first().energy_amount
+            == (meter_readings[0].renewable_energy + meter_readings[1].renewable_energy) / 1000
         )
-        self.assertEqual(certificates[1].energy_amount, meter_readings[2].renewable_energy / 1000)
+        assert certificates[1].energy_amount == meter_readings[2].renewable_energy / 1000
