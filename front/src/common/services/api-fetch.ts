@@ -1,7 +1,7 @@
 import createClient, { Middleware } from "openapi-fetch"
 import { getI18n } from "react-i18next"
 import { toFormData } from "./api"
-import { newPaths } from "./api-fetch.types"
+import { type newPaths } from "./api-fetch.types"
 
 const middleware: Middleware = {
   async onRequest({ request }) {
@@ -17,5 +17,4 @@ export const api = createClient<newPaths>({
   baseUrl: `${window.location.origin}/api`,
   bodySerializer: (data) => toFormData(data),
 })
-
 api.use(middleware)
