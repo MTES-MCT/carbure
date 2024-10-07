@@ -23,7 +23,7 @@ import { ExportButton } from "../operator/ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
-} from "common/hooks/query-builder"
+} from "common/hooks/query-builder-2"
 
 export interface AirlineTicketsProps {
   year: number
