@@ -1,5 +1,4 @@
 stages:
-  - prepare
   - check
   - deploy
 
@@ -8,7 +7,7 @@ workflow:
   # 1. Don't run pipelines for MR drafts.
   # 2. Don't run branch pipelines when there's an open MR for the branch (run the MR pipeline instead).
   # 3. Run all other MR pipelines
-  # 4. Run branch pipelines for dev, preview and master
+  # 4. Run branch pipelines for dev and master
   # 5. Else, don't run it
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^Draft:/ # 1
       when: never
@@ -16,60 +15,19 @@ workflow:
       when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # 3
       when: always
-    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "preview" || $CI_COMMIT_BRANCH == "master" # 4
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master" # 4
       when: always
     - when: never # 5
 
 variables:
   MYSQL_DATABASE: carbure_mysql_test_db
   MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
-
-# use prebuild CI image when running checks
-.checks:
-  image: $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
-  before_script:
-    - mv /app/.venv ./.venv
-    - mv /app/front/node_modules ./front
-
-# prepare git env to push new code to scalingo
-.scalingo:
-  image: alpine:latest
-  before_script:
-    - mkdir ~/.ssh
-    - apk add --update git openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SCALINGO_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh-keyscan $SCALINGO_SSH_HOST $SCALINGO_SSH_HOST_SECNUMCLOUD >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - git config user.name $GIT_USER_NAME
-    - git config user.email $GIT_USER_EMAIL
-    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV || true
-    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING || true
-    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD || true
-    - git fetch origin $CI_COMMIT_BRANCH --unshallow
-    - git checkout $CI_COMMIT_BRANCH
-
-build-ci-image:
-  stage: prepare
-  image: docker:stable
-  services:
-    - docker:dind
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest    
-  rules:
-    - changes: 
-      - ci/Dockerfile
-      - Pipfile
-      - Pipfile.lock
-      - front/package.json
-      - front/package-lock.json
-      - force-rebuild
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIPENV_VENV_IN_PROJECT: true
 
 check-backend:
   stage: check
-  extends: .checks
+  extends: .backend
   services:
     - mysql:8.0
     - redis:latest
@@ -80,26 +38,18 @@ check-backend:
     - pipenv run ruff check
     - pipenv run ruff format --check
     - TEST=1 pipenv run python web/manage.py test web
-  rules:
-    - changes:
-      - web/**/*
-    
+
 check-frontend:
   stage: check
-  extends: .checks
+  extends: .frontend
   script:
-    - cd front
     - npm run lint
-  rules:
-    - changes:
-      - front/**/*
 
 deploy-dev:
   stage: deploy
   extends: .scalingo
   only:
     - dev
-    - preview
   script:
     - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
@@ -119,3 +69,56 @@ deploy-prod:
     - master
   script:
     - git push scalingo-prod master -f
+
+# --------------------------------------------------------------------------- #
+
+# prepare backend env
+.backend:
+  image: python:3.12
+  cache:
+    - key:
+        files:
+          - Pipfile.lock
+      paths:
+        - .cache/pip/
+        - .venv/
+  before_script:
+    - pip install pipenv
+    - pipenv install --dev --deploy --ignore-pipfile
+  rules:
+    - changes:
+      - web/**/*
+
+# prepare frontend env
+.frontend:
+  image: node:latest
+  cache:
+    - key:
+        files:
+          - front/package-lock.json
+      paths:
+        - front/.npm/
+  before_script:
+    - cd front
+    - npm ci --cache .npm --prefer-offline
+  rules:
+    - changes:
+      - front/**/*
+
+# prepare git env to push new code to scalingo
+.scalingo:
+  image: alpine:latest
+  before_script:
+    - mkdir ~/.ssh
+    - apk add --update git openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SCALINGO_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - ssh-keyscan $SCALINGO_SSH_HOST $SCALINGO_SSH_HOST_SECNUMCLOUD >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config user.name $GIT_USER_NAME
+    - git config user.email $GIT_USER_EMAIL
+    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV || true
+    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING || true
+    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD || true
+    - git fetch origin $CI_COMMIT_BRANCH --unshallow
+    - git checkout $CI_COMMIT_BRANCH
