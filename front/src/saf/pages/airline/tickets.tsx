@@ -8,6 +8,7 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   SafClientSnapshot,
+  SafColumsOrder,
   SafFilter,
   SafQuery,
   SafStates,
@@ -42,7 +43,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
     snapshot
   )
 
-  const query = useCBQueryBuilder(state)
+  const query = useCBQueryBuilder<SafColumsOrder[]>(state)
   const apiGetTickets = (query: SafQuery) => api.getSafAirlineTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {
@@ -50,8 +51,10 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
     params: [query],
   })
 
-  const ticketsData = ticketsResponse.result?.data.data
-  const ids = ticketsData?.ids ?? []
+  // const ticketsData = ticketsResponse.result?.data.data
+  const ticketsData = ticketsResponse.result?.data?.results
+  // const ids = ticketsData?.ids ?? []
+  const ids: any = []
 
   const showTicketDetail = (ticket: SafTicket) => {
     return {
@@ -61,7 +64,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
     }
   }
 
-  const getTicketFilter = (filter: any) => {
+  const getTicketFilter = (filter: SafFilter) => {
     return api.getAirlineTicketFilters(filter, query)
   }
 
