@@ -14,7 +14,7 @@ import {
   SafTicketSourcePreview,
   SafTicketSourceStatus,
 } from "./pages/operator/types"
-
+import { apiTypes } from "common/services/api-fetch.types"
 export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
@@ -120,6 +120,7 @@ export interface SafTicketsResponse {
   total: number
   ids: number[]
 }
+// export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
 
 export interface SafStates extends CBQueryStates {
   //old QueryParams
