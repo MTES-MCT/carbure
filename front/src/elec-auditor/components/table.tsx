@@ -54,7 +54,7 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
           ),
         },
         {
-          header: t("Date limité"),
+          header: t("Date limite"),
           cell: (application) => {
             const limitDate = getApplicationAuditLimitDate(
               application.audit_order_date!
