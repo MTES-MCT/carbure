@@ -9,7 +9,7 @@ import {
   CBQueryParams,
   CBQueryStates,
   CBSnapshot,
-} from "common/hooks/query-builder"
+} from "common/hooks/query-builder-2"
 import {
   SafTicketSourcePreview,
   SafTicketSourceStatus,
@@ -150,7 +150,15 @@ export enum SafFilter {
 
 export type SafQueryType = "assigned" | "received"
 
-export interface SafQuery extends CBQueryParams {
+export type SafColumsOrder =
+  | "volume"
+  | "client"
+  // | "supplier"
+  | "period"
+  | "feedstock"
+  | "ghg_reduction"
+
+export interface SafQuery extends CBQueryParams<SafColumsOrder[]> {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
