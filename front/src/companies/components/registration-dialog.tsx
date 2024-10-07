@@ -228,25 +228,21 @@ const PrefetchedCompanyForm = ({
         required
         label={t("Nom légal")}
         {...companyForm.bind("legal_name")}
-        disabled
       />
       <TextInput
         required
         label={t("Adresse de la société (Numéro et rue)")}
         {...companyForm.bind("registered_address")}
-        disabled
       />
       <TextInput
         required
         label={t("Ville")}
         {...companyForm.bind("registered_city")}
-        disabled
       />
       <TextInput
         required
         label={t("Code postal")}
         {...companyForm.bind("registered_zipcode")}
-        disabled
       />
       <Autocomplete
         label={t("Pays")}
@@ -254,7 +250,6 @@ const PrefetchedCompanyForm = ({
         getOptions={findCountries}
         normalize={normalizeCountry}
         {...companyForm.bind("registered_country")}
-        disabled
       />
       <TextInput
         required
