@@ -88,6 +88,7 @@ deploy-prod:
   rules:
     - changes:
       - web/**/*
+      - .gitlab-ci.yml
 
 # prepare frontend env
 .frontend:
@@ -104,6 +105,7 @@ deploy-prod:
   rules:
     - changes:
       - front/**/*
+      - .gitlab-ci.yml
 
 # prepare git env to push new code to scalingo
 .scalingo:
