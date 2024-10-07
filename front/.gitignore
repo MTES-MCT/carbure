@@ -25,3 +25,4 @@ yarn-error.log*
 /public/dsfr/
 
 *storybook.log
+storybook-static/
