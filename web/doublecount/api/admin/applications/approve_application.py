@@ -1,12 +1,10 @@
 from certificates.models import DoubleCountingRegistration
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-
 from doublecount.models import (
     DoubleCountingApplication,
     DoubleCountingProduction,
 )
-
-from core.common import ErrorResponse, SuccessResponse
 
 
 class DoubleCountingApplicationApproveError:
@@ -23,7 +21,7 @@ def approve_dca(request, *args, **kwargs):
 
     try:
         application = DoubleCountingApplication.objects.get(id=dca_id)
-    except:
+    except Exception:
         return ErrorResponse(400, DoubleCountingApplicationApproveError.APPLICATION_NOT_FOUND)
 
     # ensure all quotas have been validated
@@ -57,8 +55,8 @@ def approve_dca(request, *args, **kwargs):
                 valid_until=application.period_end,
                 application=application,
             )
-        except:
+        except Exception:
             return ErrorResponse(400, "Error while creating Agreement")
 
-    # send_dca_status_email(application) TODO: uncomment when email is ready
+    # send_dca_status_email(application, request) TODO: uncomment when email is ready
     return SuccessResponse()

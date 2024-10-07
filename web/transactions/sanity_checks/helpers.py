@@ -1,9 +1,7 @@
-from collections import defaultdict
 import datetime
+from collections import defaultdict
+
 from certificates.models import DoubleCountingRegistration
-from ml.models import EECStats, EPStats, ETDStats
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-from transactions.models.year_config import YearConfig
 from core.models import (
     Biocarburant,
     CarbureLot,
@@ -17,6 +15,9 @@ from core.models import (
     Pays,
     SustainabilityDeclaration,
 )
+from ml.models import EECStats, EPStats, ETDStats
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from transactions.models.year_config import YearConfig
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 
@@ -129,7 +130,9 @@ def get_prefetched_data(entity=None):
 
     if entity:
         # get only my production sites
-        entity_psites = ProductionSite.objects.filter(producer=entity).prefetch_related("productionsiteinput_set", "productionsiteoutput_set", "productionsitecertificate_set")  # fmt:skip
+        entity_psites = ProductionSite.objects.filter(producer=entity).prefetch_related(
+            "productionsiteinput_set", "productionsiteoutput_set", "productionsitecertificate_set"
+        )
         data["my_production_sites"] = {ps.name.upper(): ps for ps in entity_psites}
 
         # get all my linked certificates
@@ -138,7 +141,7 @@ def get_prefetched_data(entity=None):
 
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
-    depotsbyentities = dict()
+    depotsbyentities = {}
     associated_depots = EntityDepot.objects.select_related("entity", "depot").all()
     for entitydepot in associated_depots:
         if entitydepot.entity.pk in depotsbyentities:

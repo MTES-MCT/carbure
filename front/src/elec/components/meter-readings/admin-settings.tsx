@@ -1,7 +1,6 @@
 import useEntity from "carbure/hooks/entity"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
-import { usePortal } from "common/components/portal"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import * as api from "elec-admin/api"
@@ -17,7 +16,6 @@ const ElecAdminMeterReadingsSettings = ({
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const portal = usePortal()
 
   const applicationsQuery = useQuery(api.getMeterReadingsApplications, {
     key: "meter-readings-applications",

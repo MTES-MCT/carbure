@@ -1,7 +1,8 @@
 from typing import List
+
+from core.models import Biocarburant, MatierePremiere
 from doublecount.errors import DcError, DoubleCountingError, error
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
-from core.models import Biocarburant, MatierePremiere
 from doublecount.parser.types import ProductionBaseRow, ProductionRow, SourcingRow
 from transactions.sanity_checks.double_counting import get_dc_biofuel_feedstock_incompatibilities
 
@@ -67,7 +68,7 @@ def check_production_row_integrity(
     year = data["year"]
     meta = {"tab_name": tab_name, "year": year}
 
-    if not year in [dca.period_start.year, dca.period_end.year]:
+    if year not in [dca.period_start.year, dca.period_end.year]:
         errors.append(error(DoubleCountingError.INVALID_YEAR, line, meta))
 
     # if not data["biofuel"]:
@@ -108,7 +109,7 @@ def check_dc_globally(
     errors: List[DcError] = []
 
     errors += check_sourcing_vs_production(sourcing, production)
-    # errors += check_pome_excess(production) TODO : decommenter ça et les tests POME_GT_2000 quand l'outil sera mis à disposition de producteur, pour l'instant ça empeche Emilien de valider les dossiers rapidement (sinon doit contacter le producteur)
+    # errors += check_pome_excess(production) TODO : decommenter ça et les tests POME_GT_2000 quand l'outil sera mis à disposition de producteur, pour l'instant ça empeche Emilien de valider les dossiers rapidement (sinon doit contacter le producteur)  # noqa: E501
 
     return errors
 
@@ -124,9 +125,9 @@ def check_sourcing_vs_production(
     for s in sourcing:
         year = s.year
         feedstock = s.feedstock.code if s.feedstock else "UNKNOWN"
-        if not year in sourcing_by_year_by_feedstock:
+        if year not in sourcing_by_year_by_feedstock:
             sourcing_by_year_by_feedstock[year] = {}
-        if not feedstock in sourcing_by_year_by_feedstock[year]:
+        if feedstock not in sourcing_by_year_by_feedstock[year]:
             sourcing_by_year_by_feedstock[year][feedstock] = 0
         sourcing_by_year_by_feedstock[year][feedstock] += s.metric_tonnes or 0
 
@@ -135,9 +136,9 @@ def check_sourcing_vs_production(
     for p in production:
         year = p.year
         feedstock = p.feedstock.code if p.feedstock else "UNKNOWN"
-        if not year in production_by_year_by_feedstock:
+        if year not in production_by_year_by_feedstock:
             production_by_year_by_feedstock[year] = {}
-        if not feedstock in production_by_year_by_feedstock[year]:
+        if feedstock not in production_by_year_by_feedstock[year]:
             production_by_year_by_feedstock[year][feedstock] = 0
         production_by_year_by_feedstock[year][feedstock] += p.estimated_production or 0
 
@@ -158,7 +159,7 @@ def check_sourcing_vs_production(
     return errors
 
 
-# check that biofuels made with POME (EFFLUENTS_HUILERIES_PALME_RAFLE) aren't requested in the quota for more than 2000 tonnes / year
+# check that biofuels made with POME (EFFLUENTS_HUILERIES_PALME_RAFLE) aren't requested in the quota for more than 2000 tonnes / year  # noqa: E501
 def check_pome_excess(production: list[DoubleCountingProduction]) -> List[DcError]:
     errors: List[DcError] = []
 

@@ -1,15 +1,15 @@
-from core.models import UserRights, UserRightsRequests
-from core.utils import CarbureEnv
-from django.core.mail import send_mail
 from django.conf import settings
 
+from core.helpers import send_mail
+from core.models import UserRights, UserRightsRequests
+from core.utils import CarbureEnv
 
-def enable_entity(entity):
 
+def enable_entity(entity, request):
     # get entity admin
     try:
         right_request = UserRightsRequests.objects.get(entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
-    except:
+    except Exception:
         raise Exception("Cette société n'a pas de demande d'inscription en attente")
 
     admin_user = right_request.user
@@ -37,17 +37,17 @@ def enable_entity(entity):
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
     Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {CarbureEnv.get_base_url()}/account
- 
+
     Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/affichage/traduction
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
+        request=request,
         subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
-        fail_silently=False,
     )

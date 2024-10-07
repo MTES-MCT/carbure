@@ -1,6 +1,5 @@
 import Table, { Cell, Order } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
-import { ElecAdminProvisionCertificateStatus } from "./types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
@@ -12,9 +11,6 @@ export interface ElecAdminProvisionCertificateTableProps {
   order: Order | undefined
   rowLink?: (provisionCertificate: ElecProvisionCertificatePreview) => To
   onOrder: (order: Order | undefined) => void
-  selected: number[]
-  onSelect: (selected: number[]) => void
-  status: ElecAdminProvisionCertificateStatus
 }
 
 export const ElecAdminProvisionCertificateTable = memo(
@@ -24,9 +20,6 @@ export const ElecAdminProvisionCertificateTable = memo(
     order,
     rowLink,
     onOrder,
-    selected,
-    onSelect,
-    status,
   }: ElecAdminProvisionCertificateTableProps) => {
     const columns = useColumns()
     return (

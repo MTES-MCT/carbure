@@ -1,11 +1,12 @@
 import datetime
-from rest_framework import serializers
-from core.excel import export_to_excel
 
-from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
-from core.serializers import EntityPreviewSerializer, ProductionSiteSerializer
-from saf.models import SafTicket
+from rest_framework import serializers
+
+from core.excel import export_to_excel
 from core.models import Entity
+from core.serializers import EntityPreviewSerializer, ProductionSiteSerializer
+from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
+from saf.models import SafTicket
 
 
 class SafClientSerializer(serializers.ModelSerializer):
@@ -41,7 +42,7 @@ class SafTicketSerializer(serializers.ModelSerializer):
 
 
 class SafTicketDetailsSerializer(serializers.ModelSerializer):
-    from .saf_ticket_source import SafTicketSourcePreviewSerializer
+    from .saf_ticket_source import SafTicketSourcePreviewSerializer  # noqa: E402
 
     class Meta:
         model = SafTicket

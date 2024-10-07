@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("elec", "0032_elecauditsample_elecauditchargepoint"),
     ]

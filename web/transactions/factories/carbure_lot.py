@@ -1,8 +1,9 @@
-import factory
 import random
 from datetime import datetime
 
-from core.models import CarbureLot, CarbureStock, Entity, MatierePremiere, Biocarburant, Pays, Depot
+import factory
+
+from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
 from producers.models import ProductionSite
 
 

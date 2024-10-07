@@ -1,7 +1,8 @@
-import factory
-from datetime import datetime, date
-from certificates.models import DoubleCountingRegistration
+from datetime import date, datetime
 
+import factory
+
+from certificates.models import DoubleCountingRegistration
 from producers.models import ProductionSite
 
 

@@ -2,7 +2,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { ElecChargePointsApplicationDetails } from "elec/types"
 import "leaflet-defaulticon-compatibility"
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css" // Re-uses images from ~leaflet package
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css" // Re-uses images from ~leaflet package
 import "leaflet/dist/leaflet.css"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"

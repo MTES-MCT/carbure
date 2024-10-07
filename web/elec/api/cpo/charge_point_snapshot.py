@@ -4,14 +4,13 @@ import traceback
 
 from django import forms
 from django.views.decorators.http import require_GET
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from elec.models import ElecChargePointApplication
-from elec.models import ElecChargePoint
-from elec.models import ElecMeterReadingApplication
-from elec.api.cpo.charge_points.charge_points import filter_charge_points
 from elec.api.cpo.charge_points.applications import filter_charge_point_applications
+from elec.api.cpo.charge_points.charge_points import filter_charge_points
 from elec.api.cpo.meter_readings.applications import filter_meter_readings_applications
+from elec.models import ElecChargePoint, ElecChargePointApplication, ElecMeterReadingApplication
 
 
 class ElecSnapshotError:
@@ -22,11 +21,13 @@ class ElecSnapshotError:
 class ElecSnapshotForm(forms.Form):
     entity_id = forms.IntegerField()
     category = forms.CharField()
-    year = forms.IntegerField()
-    created_at = forms.DateField(required=False)
+    year = forms.IntegerField(required=False)
+    application_date = forms.DateField(required=False)
     charge_point_id = forms.CharField(required=False)
-    last_extracted_energy = forms.FloatField(required=False)
+    station_id = forms.CharField(required=False)
+    latest_meter_reading_month = forms.IntegerField(required=False)
     is_article_2 = forms.BooleanField(required=False)
+    search = forms.CharField(required=False)
 
 
 @require_GET
@@ -40,7 +41,7 @@ def get_charge_point_snapshot(request, *args, **kwargs):
     entity_id = snapshot_form.cleaned_data["entity_id"]
 
     category = snapshot_form.cleaned_data["category"]
-    year = snapshot_form.cleaned_data["year"]
+
     if category == "charge_point_application":
         model_class = ElecChargePointApplication
         filter_method = filter_charge_point_applications
@@ -53,26 +54,20 @@ def get_charge_point_snapshot(request, *args, **kwargs):
     else:
         return ErrorResponse(400, ElecSnapshotError.MALFORMED_PARAMS, "Wrong category")
 
-    charge_point_appplications_count = ElecChargePointApplication.objects.filter(
-        cpo_id=entity_id, created_at__year=year
-    ).count()
-    meter_reading_appplications_count = ElecMeterReadingApplication.objects.filter(
-        cpo_id=entity_id, created_at__year=year
-    ).count()
-    charge_points_count = ElecChargePoint.objects.filter(cpo_id=entity_id, application__created_at__year=year).count()
+    charge_point_applications_count = ElecChargePointApplication.objects.filter(cpo_id=entity_id).count()
+    meter_reading_applications_count = ElecMeterReadingApplication.objects.filter(cpo_id=entity_id).count()
+    charge_points_count = ElecChargePoint.objects.filter(cpo_id=entity_id, is_deleted=False).count()
     try:
         items = model_class.objects.filter(cpo_id=entity_id)
 
         return SuccessResponse(
             {
-                "charge_point_appplications": charge_point_appplications_count,
-                "meter_reading_appplications": meter_reading_appplications_count,
+                "charge_point_applications": charge_point_applications_count,
+                "meter_reading_applications": meter_reading_applications_count,
                 "charge_points": charge_points_count,
                 "pending": filter_method(items, status="PENDING", **snapshot_form.cleaned_data).count(),
                 "audit_in_progress": filter_method(items, status="AUDIT_IN_PROGRESS", **snapshot_form.cleaned_data).count(),
-                "accepted": filter_method(
-                    items, status="HISTORY", **snapshot_form.cleaned_data
-                ).count(),  # TODO AUDIT_DONE ?
+                "accepted": filter_method(items, status="ACCEPTED", **snapshot_form.cleaned_data).count(),
             }
         )
     except Exception:

@@ -1,8 +1,8 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
 from core.serializers import EntityPreviewSerializer
 from elec.models import ElecChargePointApplication
-from django.contrib.auth import get_user_model
-
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
 
@@ -59,7 +59,7 @@ class ElecChargePointApplicationDetailsSerializer(ElecChargePointApplicationSeri
         audited_charge_points = audit_sample.audited_charge_points.all()
         comment_count = audited_charge_points.exclude(comment="").count()
         auditor_name = audit_sample.auditor.name if audit_sample.auditor else None
-        charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points)
+        charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points, is_deleted=False)
 
         return {
             "application_id": instance.id,

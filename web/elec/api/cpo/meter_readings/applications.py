@@ -1,19 +1,21 @@
 from datetime import date
+from math import floor
+
 from django import forms
+from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET
+
+import elec.services.meter_readings_application_quarter as quarters
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
-from django.core.paginator import Paginator
-from math import floor
-from core.carburetypes import CarbureError
-
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
-from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplication
-
-import elec.services.meter_readings_application_quarter as quarters
+from elec.serializers.elec_meter_reading_application import (
+    ElecMeterReadingApplication,
+    ElecMeterReadingApplicationSerializer,
+)
 
 
 class ApplicationsFilterForm(forms.Form):
@@ -62,7 +64,9 @@ def get_applications(request, entity):
     else:
         object_list = applications
     serialized_applications = ElecMeterReadingApplicationSerializer(object_list, many=True).data
-    serialized_current_application = ElecMeterReadingApplicationSerializer(current_application).data if current_application else None  # fmt:skip
+    serialized_current_application = (
+        ElecMeterReadingApplicationSerializer(current_application).data if current_application else None
+    )
 
     return SuccessResponse(
         {

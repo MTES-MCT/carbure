@@ -1,8 +1,10 @@
 # /api/saf/operator/tickets/filters
 
 import traceback
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+
 from .tickets import TicketFilterForm, find_tickets
 
 
@@ -30,7 +32,7 @@ def get_ticket_filters(request, *args, **kwargs):
         data = get_filter_values(tickets, filter)
 
         return SuccessResponse(list(set(data)))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketFiltersError.FILTER_LISTING_FAILED)
 

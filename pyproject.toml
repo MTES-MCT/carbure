@@ -1,4 +1,25 @@
-[tool.black]
+[tool.ruff]
+src = ["web"]
+exclude = ["__init__.py", "scripts"]
 line-length = 125
-include = '\.pyi?$'
-exclude = '/(\.git|\.hg|\.mypy_cache|\.tox|\.venv|_build|buck-out|build|dist|migrations)/'
+
+[tool.ruff.lint]
+select = [
+    "F",  # Pyflakes
+    "E",  # Pycodestyle Error
+    "W",  # Pycodestyle Error
+    "I",  # isort
+    "C4", # comprehension list
+    "ICN", # Import convention
+    "PYI", # Type Hinting
+    "T20", # No direct printing
+    "B018", # useless expression
+    "B011", # assert false
+    "B006", # Mutable argument default
+    "B007", # unused loop variable
+    "INP", # No PEP420
+    "PT", # Pytest rules
+]
+ignore = [
+    "T201", # Print
+]

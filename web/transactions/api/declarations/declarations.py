@@ -1,10 +1,10 @@
 import datetime
+
 from django.db.models.aggregates import Count
-
-from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
-from core.decorators import check_user_rights
+from django.http.response import JsonResponse
 
+from core.decorators import check_user_rights
 from core.models import (
     CarbureLot,
     SustainabilityDeclaration,

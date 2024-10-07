@@ -1,11 +1,11 @@
+from datetime import datetime
 from typing import List
+
+import xlsxwriter
 from django import forms
 from django.db.models.query_utils import Q
-from datetime import datetime
 from django.http.response import HttpResponse, JsonResponse
-import xlsxwriter
 
-from django.http import JsonResponse
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationPublicSerializer, DoubleCountingRegistrationSerializer
 from core.common import ErrorResponse
@@ -104,7 +104,7 @@ def export_agreements(agreements: List[DoubleCountingRegistration]):
     worksheet = workbook.add_worksheet("Agréments Double comptage")
 
     # header
-    title1 = "Liste des unités de production de biocarburants reconnues au titre du décret n° 2019-570 du 7 juin 2019 portant sur la taxe incitative relative à l'incorporation des biocarburants"
+    title1 = "Liste des unités de production de biocarburants reconnues au titre du décret n° 2019-570 du 7 juin 2019 portant sur la taxe incitative relative à l'incorporation des biocarburants"  # noqa: E501
     title_format = workbook.add_format({"align": "center", "valign": "vcenter", "bold": True, "border": 1})
     worksheet.merge_range("A1:H1", title1, title_format)
 

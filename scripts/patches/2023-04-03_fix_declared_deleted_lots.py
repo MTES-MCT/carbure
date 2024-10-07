@@ -1,16 +1,20 @@
-import os
-import django
 import argparse
+import os
 
+import django
 from django.db import transaction
 from django.db.models import Q
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureLot, CarbureLotEvent
-from core.utils import generate_reports
-from core.traceability import get_traceability_nodes, bulk_update_traceability_nodes, bulk_delete_traceability_nodes
+from core.models import CarbureLot, CarbureLotEvent  # noqa: E402
+from core.traceability import (
+    bulk_delete_traceability_nodes,
+    bulk_update_traceability_nodes,
+    get_traceability_nodes,
+)  # noqa: E402
+from core.utils import generate_reports  # noqa: E402
 
 
 @transaction.atomic
@@ -39,10 +43,7 @@ def fix_declared_deleted_lots(apply):
 
     for node in lot_nodes_to_update:
         # apply the update to the lot
-        node.update({
-            "supplier_certificate": "2BS010181",
-            "production_site_certificate": "2BS010001"
-        })
+        node.update({"supplier_certificate": "2BS010181", "production_site_certificate": "2BS010001"})
 
         # if the node changed, recursively apply the update to related nodes
         if len(node.diff) > 0:
@@ -52,7 +53,6 @@ def fix_declared_deleted_lots(apply):
 
     # prepare analysis of traceability for deleting the relevant lots
     lot_nodes_to_delete = get_traceability_nodes(lots_to_delete)
-
 
     for node in lot_nodes_to_delete:
         deleted, updated = node.delete()

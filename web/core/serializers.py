@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 from core.models import (
     CarbureLot,
-    CarbureLotEvent,
     CarbureLotComment,
+    CarbureLotEvent,
     CarbureLotReliabilityScore,
     CarbureNotification,
     CarbureStock,
@@ -52,7 +52,13 @@ class EntityDepotSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EntityDepot
-        fields = ["entity", "depot", "ownership_type", "blending_is_outsourced", "blender"]
+        fields = [
+            "entity",
+            "depot",
+            "ownership_type",
+            "blending_is_outsourced",
+            "blender",
+        ]
 
 
 class ProductionSiteSerializer(serializers.ModelSerializer):
@@ -84,13 +90,31 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
 class GenericErrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = GenericError
-        fields = ["error", "is_blocking", "field", "value", "extra", "fields", "acked_by_creator", "acked_by_recipient"]
+        fields = [
+            "error",
+            "is_blocking",
+            "field",
+            "value",
+            "extra",
+            "fields",
+            "acked_by_creator",
+            "acked_by_recipient",
+        ]
 
 
 class GenericErrorAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = GenericError
-        fields = ["error", "is_blocking", "field", "value", "extra", "fields", "acked_by_admin", "acked_by_auditor"]
+        fields = [
+            "error",
+            "is_blocking",
+            "field",
+            "value",
+            "extra",
+            "fields",
+            "acked_by_admin",
+            "acked_by_auditor",
+        ]
 
 
 class CarbureLotEventSerializer(serializers.ModelSerializer):
@@ -141,6 +165,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
     delivery_date = serializers.SerializerMethodField()
     delivery_site = serializers.SerializerMethodField()
     delivery_site_country = serializers.SerializerMethodField()
+    delivery_site_name = serializers.SerializerMethodField()
     country_of_origin = serializers.SerializerMethodField()
     biofuel = serializers.SerializerMethodField()
     feedstock = serializers.SerializerMethodField()
@@ -189,6 +214,8 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
             "ghg_reference_red_ii",
             "ghg_reduction_red_ii",
             "free_field",
+            "data_reliability_score",
+            "delivery_site_name",
         ]
 
     def get_production_site_double_counting_certificate(self, obj):
@@ -217,6 +244,9 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
     def get_delivery_site_country(self, obj):
         return obj.delivery_site_country.code_pays if obj.delivery_site_country else ""
+
+    def get_delivery_site_name(self, obj):
+        return obj.carbure_delivery_site.name if obj.carbure_delivery_site else obj.unknown_delivery_site
 
     def get_feedstock(self, obj):
         return obj.feedstock.code if obj.feedstock else ""
@@ -566,7 +596,15 @@ class EntityCertificateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EntityCertificate
-        fields = ["id", "entity", "certificate", "has_been_updated", "checked_by_admin", "rejected_by_admin", "added_dt"]
+        fields = [
+            "id",
+            "entity",
+            "certificate",
+            "has_been_updated",
+            "checked_by_admin",
+            "rejected_by_admin",
+            "added_dt",
+        ]
 
 
 class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
@@ -578,7 +616,14 @@ class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SustainabilityDeclaration
-        fields = ["entity", "declared", "checked", "deadline", "period", "reminder_count"]
+        fields = [
+            "entity",
+            "declared",
+            "checked",
+            "deadline",
+            "period",
+            "reminder_count",
+        ]
 
 
 class CarbureNotificationSerializer(serializers.ModelSerializer):
@@ -586,7 +631,16 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarbureNotification
-        fields = ["id", "dest", "datetime", "type", "acked", "send_by_email", "email_sent", "meta"]
+        fields = [
+            "id",
+            "dest",
+            "datetime",
+            "type",
+            "acked",
+            "send_by_email",
+            "email_sent",
+            "meta",
+        ]
 
 
 class EntityPreviewSerializer(serializers.ModelSerializer):

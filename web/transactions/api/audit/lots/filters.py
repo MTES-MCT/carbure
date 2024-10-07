@@ -1,4 +1,5 @@
 from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.helpers import get_lots_filters_data
 from core.models import Entity

@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react"
+import { screen, waitFor } from "@testing-library/react"
 import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
@@ -75,7 +75,9 @@ test("check the sample generation", async () => {
   const generateButton = await screen.findByText("Générer l'échantillon")
   server.use(okGenerateSample)
   await user.click(generateButton)
-  screen.getByText("Pourcentage de puissance installée à auditeur")
+  await waitFor(() =>
+    screen.getByText("Pourcentage de puissance installée à auditeur")
+  )
 
   const downloadButton = await screen.findByText("Télécharger l'échantillon")
   await user.click(downloadButton)

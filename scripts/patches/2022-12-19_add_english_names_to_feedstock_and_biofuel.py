@@ -1,11 +1,12 @@
-import os
 import json
+import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import MatierePremiere, Biocarburant
+from core.models import Biocarburant, MatierePremiere  # noqa: E402
 
 
 def add_english_names_to_feedstock_and_biofuel():

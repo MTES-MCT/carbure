@@ -18,7 +18,6 @@ import {
   normalizeEntityType,
 } from "carbure/utils/normalizers"
 import useEntity from "carbure/hooks/entity"
-import { companiesSummary } from "companies-admin/__test__/data"
 
 type EntitySummaryProps = {
   search?: string
@@ -94,14 +93,6 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             entity.isAdmin && {
               value: "double-counting",
               label: t("Demandes d'agrément double comptage"),
-            },
-            entity.isAdmin && {
-              value: "charge-points",
-              label: t("Inscriptions de points de recharge"),
-            },
-            entity.isAdmin && {
-              value: "meter-readings",
-              label: t("Validation des relevés trimestriels"),
             },
           ])}
         />

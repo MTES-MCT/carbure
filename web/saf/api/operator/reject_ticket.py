@@ -1,11 +1,13 @@
 # /api/saf/airline/reject-ticket
 
 import traceback
+
 from django.db import transaction
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.models import CarbureNotification, UserRights
 from saf.models import SafTicket
-from core.models import UserRights, CarbureNotification
 
 
 class SafTicketRejectError:
@@ -20,7 +22,7 @@ def reject_ticket(request, *args, **kwargs):
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_id = int(request.POST.get("ticket_id"))
         comment = request.POST.get("comment")
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketRejectError.MALFORMED_PARAMS)
 

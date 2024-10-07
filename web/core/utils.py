@@ -1,13 +1,15 @@
 import os
 import unicodedata
+from os import environ as env
+
+import xlsxwriter
 from django import forms
-from django.db import connection, transaction
 from django.conf import settings
 from django.core.paginator import Paginator
-import xlsxwriter
-from core.xlsx_v3 import make_carbure_lots_sheet
+from django.db import connection, transaction
+
 from core.models import Entity, UserRights
-from os import environ as env
+from core.xlsx_v3 import make_carbure_lots_sheet
 
 
 # transform a string into a standard form in lower case without accents
@@ -96,7 +98,7 @@ def generate_reports(name, entity_lots, include_partners=False):
     for entity_id in lots_by_entity:
         entity = entities_by_id[entity_id]
         location = f"/tmp/reports/{name}_{entity.name}.xlsx"
-        entity_lots = sorted(lots_by_entity[entity_id].values(), key=lambda l: l.delivery_date)
+        entity_lots = sorted(lots_by_entity[entity_id].values(), key=lambda lot: lot.delivery_date)
         entity_users = users_by_entity.get(entity_id, [])
         emails = ", ".join([user.email for user in entity_users])
         print(f"> {len(entity_lots)} lots for {entity.name} ({emails})")
@@ -161,12 +163,15 @@ class Validator(forms.Form):
     DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y"]
 
     @classmethod
-    def bulk_validate(SpecializedValidator, items, context={}) -> tuple[list, list]:
+    def bulk_validate(SpecializedValidator, items, context=None) -> tuple[list, list]:
         """
         Use this method to validate a list of dicts with the current Validator.
-        Ex: If you defined a LotValidator, you can run `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`
+        Ex: If you defined a LotValidator, you can run
+        `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`
         """
 
+        if context is None:
+            context = {}
         valid_items = []
         errors = []
 
@@ -181,7 +186,9 @@ class Validator(forms.Form):
 
     # extend the default Form constructor by adding the ability to set a context with external data
     # useful during calls to self.extend() and self.validate() as you can use data that doesn't belong to the FormData itself
-    def __init__(self, data, context={}, **kwargs):
+    def __init__(self, data, context=None, **kwargs):
+        if context is None:
+            context = {}
         super().__init__(data=data, **kwargs)
         self.context = context
         extended_data = self.extend(self.data)

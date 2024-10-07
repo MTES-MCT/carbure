@@ -1,15 +1,15 @@
 from django import forms
+from django.conf import settings
 from django.db import transaction
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
-from django.conf import settings
 
-from core.utils import CarbureEnv
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.helpers import send_mail
 from core.models import Entity
+from core.utils import CarbureEnv
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
@@ -100,21 +100,21 @@ def accept_report(request: HttpRequest, entity: Entity):
         data["error_count"] = 1
         return ErrorResponse(400, AcceptReportError.NO_CHARGE_POINT_DETECTED, data)
 
-    send_email_to_dgec(audit_sample)
+    send_email_to_dgec(audit_sample, request)
     return SuccessResponse(data)
 
 
-def send_email_to_dgec(audit_sample: ElecAuditSample):
+def send_email_to_dgec(audit_sample: ElecAuditSample, request: HttpRequest):
     auditor = audit_sample.auditor.name
     cpo = audit_sample.cpo.name
     year = audit_sample.created_at.year
 
     admin_link = f"{CarbureEnv.get_base_url()}/org/9/elec-admin-audit/{year}"
 
-    if audit_sample.charge_point_application != None:
+    if audit_sample.charge_point_application is not None:
         application_id = audit_sample.charge_point_application.pk
         admin_link += f"/charge-points/audit_in_progress#application/{application_id}"
-    elif audit_sample.meter_reading_application != None:
+    elif audit_sample.meter_reading_application is not None:
         application_id = audit_sample.meter_reading_application.pk
         admin_link += f"/meter_readings/audit_in_progress#application/{application_id}"
 
@@ -128,12 +128,12 @@ def send_email_to_dgec(audit_sample: ElecAuditSample):
 
     Bien cordialement,
     L'équipe CarbuRe
-    """
+    """  # noqa: E501
 
     send_mail(
+        request=request,
         subject="[CarbuRe] Nouveau résultat d'audit élec disponible",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=["carbure@beta.gouv.fr"],
-        fail_silently=False,
     )

@@ -1,7 +1,8 @@
-from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, Depot
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import Depot, Entity, Pays
+from core.tests_utils import setup_current_user
 
 
 class EntityDepotsTest(TestCase):
@@ -23,12 +24,11 @@ class EntityDepotsTest(TestCase):
     def test_depots(self):
         url_get = "entity-depots"
         url_add = "entity-depots-add"
-        url_delete = "entity-depots-delete"
         # get 0
         response = self.client.get(reverse(url_get), {"entity_id": self.admin.id})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(len(data), 0)
+        assert len(data) == 0
         # add
         france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
         depot, _ = Depot.objects.update_or_create(depot_id="TEST", name="toto", city="paris", country=france)
@@ -38,12 +38,12 @@ class EntityDepotsTest(TestCase):
             "ownership_type": "OWN",
         }
         response = self.client.post(reverse(url_add), postdata)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # get 1
         response = self.client.get(reverse(url_get), {"entity_id": self.admin.id})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
         # delete #TODO
         # response = self.client.post(
         #     reverse(url_delete), {"entity_id": self.admin.id, "delivery_site_id": depot.depot_id}
@@ -66,11 +66,11 @@ class EntityDepotsTest(TestCase):
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
-        self.assertEqual(res.status_code, 200)
+        assert res.status_code == 200
         new_depot = Depot.objects.get(depot_id="123456789012345")
-        self.assertIsNotNone(new_depot)
-        self.assertEqual(new_depot.name, "Dépôt de test")
-        self.assertEqual(new_depot.is_enabled, False)
+        assert new_depot is not None
+        assert new_depot.name == "Dépôt de test"
+        assert new_depot.is_enabled is False
 
     def test_create_depot_fail(self):
         params = {
@@ -82,7 +82,7 @@ class EntityDepotsTest(TestCase):
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
-        self.assertEqual(res.status_code, 400)
+        assert res.status_code == 400
         data = res.json()
-        self.assertEqual(data["error"], "MALFORMED_PARAMS")
-        self.assertIsNotNone(data["data"]["depot_id"])
+        assert data["error"] == "MALFORMED_PARAMS"
+        assert data["data"]["depot_id"] is not None

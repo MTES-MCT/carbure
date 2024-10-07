@@ -10,6 +10,13 @@ export type CBSnapshot = Record<string, number>
 
 export type CBFilterSelection = Record<string, string[]>
 
+export type CBQueryResult = {
+  from: number
+  ids: number[]
+  returned: number
+  total: number
+}
+
 export const CBQUERY_RESET: Partial<CBQueryParams> = {
   limit: undefined,
   from_idx: undefined,

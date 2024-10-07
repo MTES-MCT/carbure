@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("saf", "0004_alter_safticketsource_options_and_more"),
     ]

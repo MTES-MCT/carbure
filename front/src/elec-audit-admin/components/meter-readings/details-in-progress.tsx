@@ -35,18 +35,34 @@ export const MeterReadingsApplicationDetailsInProgress = ({
         {meterReadingsApplication?.sample && (
           <section>
             <SampleSummary sample={meterReadingsApplication?.sample} />
-            <ChargePointsSampleMap chargePoints={meterReadingsApplication?.sample?.charge_points} />
-            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} />
+            <ChargePointsSampleMap
+              chargePoints={meterReadingsApplication?.sample?.charge_points}
+            />
+            <Button
+              icon={Download}
+              label={t("Télécharger l'échantillon")}
+              variant="secondary"
+              action={onDownloadSample}
+            />
           </section>
         )}
         <section>
-          <Alert icon={AlertCircle} variant="warning" multiline label={t("L'échantillon a été reçu par l'auditeur. Vous serez informé par email lorsque ce dernier aura complété le rapport d'audit sur son espace sur Carbure.")} />
+          <Alert
+            icon={AlertCircle}
+            variant="warning"
+            multiline
+            label={t(
+              "L'échantillon a été reçu par l'auditeur. Vous serez informé par email lorsque ce dernier aura complété le rapport d'audit sur son espace sur Carbure."
+            )}
+          />
         </section>
         <section>
           <Checkbox
             value={confirmCheckbox}
             onChange={setConfirmCheckbox}
-            label={t("Je confirme avoir reçu le résultat d'audit ou souhaite valider sans audit.")}
+            label={t(
+              "Je confirme avoir reçu le résultat d'audit ou souhaite valider sans audit."
+            )}
           />
         </section>
       </main>

@@ -1,26 +1,21 @@
 import argparse
-from decimal import Decimal
-import django
 import os
-import pandas as pd
-from tqdm import tqdm
-from collections import defaultdict
-from django.db import transaction
-from django.core.paginator import Paginator
-from django.db.models.functions import Length
 
+import django
+import pandas as pd
+from django.db import transaction
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.utils import bulk_update_or_create
-from elec.models.elec_charge_point import ElecChargePoint
-from elec.services.transport_data_gouv import TransportDataGouv
+from core.utils import bulk_update_or_create  # noqa: E402
+from elec.models.elec_charge_point import ElecChargePoint  # noqa: E402
+from elec.services.transport_data_gouv import TransportDataGouv  # noqa: E402
 
 
 @transaction.atomic
 def refresh_charge_point_data(cpo, batch):
-    print(f"> Refresh charge point data from TDG")
+    print("> Refresh charge point data from TDG")
 
     charge_points = ElecChargePoint.objects.all().order_by("charge_point_id")
     if cpo:
@@ -84,7 +79,7 @@ def extract_charge_point_update(charge_point_data: dict) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Refresh charge point data and meter readings")
-    parser.add_argument("--batch", dest="batch", type=int, action="store", default=10, help="How many operations at a time")  # fmt:skip
+    parser.add_argument("--batch", dest="batch", type=int, action="store", default=10, help="How many operations at a time")
     parser.add_argument("--cpo", dest="cpo", type=str, action="store", help="Focus on one CPO")
     args = parser.parse_args()
 

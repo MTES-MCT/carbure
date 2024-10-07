@@ -65,7 +65,9 @@ const UpdateManyConfirmationDialog = ({
     onError: (err) => {
       const errors = (err as AxiosError<LotsUpdateResponse>).response?.data
         .errors
-      errors && showErrors()
+      if (errors) {
+        showErrors()
+      }
     },
   })
 
@@ -211,6 +213,6 @@ export const getLotsEntitiesToNotify = (lots: Lot[]) => {
     }
   })
   return entities_to_notify
-    .filter((e, i) => entities_to_notify.indexOf(e) == i)
+    .filter((e, i) => entities_to_notify.indexOf(e) === i)
     .join(", ")
 }

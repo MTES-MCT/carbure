@@ -2,11 +2,11 @@ from django import forms
 from django.db import transaction
 from django.db.models import Q
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import UserRights, CarbureLot, CarbureLotEvent, GenericError
+from core.models import CarbureLot, CarbureLotEvent, GenericError, UserRights
 from core.notifications import notify_correction_done
-from core.traceability import Node, get_traceability_nodes, bulk_update_traceability_nodes, diff_to_metadata
+from core.traceability import Node, bulk_update_traceability_nodes, diff_to_metadata, get_traceability_nodes
 
 
 class SubmitFixError:

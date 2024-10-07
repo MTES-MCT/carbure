@@ -5,7 +5,7 @@ import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { UserRightsTable } from "common/molecules/user-rights-table"
 
-export default () => {
+const UserRights = () => {
   const { id } = useParams<"id">()
   const entity = useEntity()
   const company_id = parseInt(id ?? "", 10)
@@ -45,3 +45,5 @@ export default () => {
     />
   )
 }
+
+export default UserRights

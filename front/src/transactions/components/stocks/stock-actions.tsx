@@ -12,7 +12,7 @@ export interface StockActionsProps {
   selection: number[]
 }
 
-export const StockActions = ({ count, ...props }: StockActionsProps) => {
+export const StockActions = ({ ...props }: StockActionsProps) => {
   return (
     <ActionBar>
       <StockExcelButton />

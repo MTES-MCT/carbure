@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0011_alter_carburelot_parent_lot_and_more'),
+        ("core", "0011_alter_carburelot_parent_lot_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='entity',
-            name='registered_city',
-            field=models.TextField(blank=True, default=''),
+            model_name="entity",
+            name="registered_city",
+            field=models.TextField(blank=True, default=""),
         ),
         migrations.AddField(
-            model_name='entity',
-            name='registered_country',
-            field=models.TextField(blank=True, default=''),
+            model_name="entity",
+            name="registered_country",
+            field=models.TextField(blank=True, default=""),
         ),
         migrations.AddField(
-            model_name='entity',
-            name='registered_zipcode',
-            field=models.TextField(blank=True, default=''),
+            model_name="entity",
+            name="registered_zipcode",
+            field=models.TextField(blank=True, default=""),
         ),
     ]

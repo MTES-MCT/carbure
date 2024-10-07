@@ -68,9 +68,9 @@ export function Table<T>({
             >
               {column.key && (
                 <span
-                  className={cl(column.key != order?.column && css.sortable)}
+                  className={cl(column.key !== order?.column && css.sortable)}
                 >
-                  {column.key != order?.column || order?.direction === "asc"
+                  {column.key !== order?.column || order?.direction === "asc"
                     ? " ▲"
                     : " ▼"}
                 </span>
@@ -80,7 +80,6 @@ export function Table<T>({
           ))}
         </header>
       )}
-
       <ul className={css.rows}>
         {[...rows].sort(compare).map((row, i) => {
           const props = rowProps?.(row, i) ?? {}
@@ -113,7 +112,6 @@ export function Table<T>({
           )
         })}
       </ul>
-
       {loading && <LoaderOverlay />}
     </div>
   )

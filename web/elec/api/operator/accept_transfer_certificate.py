@@ -4,7 +4,8 @@ import traceback
 
 from django import forms
 from django.views.decorators.http import require_POST
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights
 from elec.models import ElecTransferCertificate
@@ -34,7 +35,7 @@ def accept_transfer_certificate(request, *args, **kwargs):
         transfer_certificate.status = ElecTransferCertificate.ACCEPTED
         transfer_certificate.save()
         return SuccessResponse()
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, ElecRejectError.ACCEPT_FAILED)
 

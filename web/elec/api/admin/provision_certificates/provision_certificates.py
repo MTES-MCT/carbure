@@ -1,15 +1,15 @@
-import datetime
 import csv
+import datetime
 import traceback
 from math import floor
 
 from django import forms
-from django.db.models import Q
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import HttpResponse
+
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
@@ -109,7 +109,7 @@ def find_provision_certificates(provision_certificates, **filters):
             status_filter = status_filter | Q(remaining_energy_amount=0)
         provision_certificates = provision_certificates.filter(status_filter)
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         provision_certificates = provision_certificates.filter(
             Q(cpo__name__icontains=filters["search"]) | Q(operating_unit__icontains=filters["search"])
         )

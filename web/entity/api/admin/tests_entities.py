@@ -1,7 +1,8 @@
-from core.tests_utils import setup_current_user
-from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
+
+from core.models import Entity
+from core.tests_utils import setup_current_user
 
 
 class AdminEntitiesTest(TestCase):
@@ -21,27 +22,27 @@ class AdminEntitiesTest(TestCase):
     def test_get_entities(self):
         response = self.client.get(reverse("transactions-admin-entities"), {"entity_id": self.admin.id})
         # api works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns at least 5 entities
-        self.assertGreaterEqual(len(response.json()["data"]), 5)
+        assert len(response.json()["data"]) >= 5
 
         # check if querying works
         response = self.client.get(reverse("transactions-admin-entities"), {"q": "prod", "entity_id": self.admin.id})
         # works
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # and returns at least 2 entities
         data = response.json()["data"]
-        self.assertGreaterEqual(len(data), 2)
+        assert len(data) >= 2
         # check if the content is correct
         random_entity = data[0]["entity"]
-        self.assertIn("entity_type", random_entity)
-        self.assertIn("name", random_entity)
+        assert "entity_type" in random_entity
+        assert "name" in random_entity
 
     def test_get_entities_details(self):
         response = self.client.get(
             reverse("transactions-admin-entities-details"),
             {"entity_id": self.admin.id, "company_id": self.admin.id},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.json()["data"]
-        self.assertEqual(data["name"], "MTE - DGEC")
+        assert data["name"] == "MTE - DGEC"

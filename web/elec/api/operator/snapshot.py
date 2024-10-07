@@ -4,7 +4,8 @@ import traceback
 
 from django import forms
 from django.db.models import Sum
-from core.common import SuccessResponse, ErrorResponse
+
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from elec.models import ElecTransferCertificate
 

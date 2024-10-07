@@ -4,7 +4,6 @@ import { formatNumber } from "common/utils/formatters"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
-  DoubleCountingProduction,
   DoubleCountingSourcing,
   DoubleCountingSourcingAggregation,
 } from "../types"
@@ -130,12 +129,4 @@ export const SourcingFullTable = ({
       )}
     </>
   )
-}
-
-type ProductionTableProps = {
-  hasAgreement?: boolean
-
-  quotas?: Record<string, number>
-  production: DoubleCountingProduction[]
-  setQuotas?: (quotas: Record<string, number>) => void
 }

@@ -26,7 +26,7 @@ import {
 } from "./data"
 import HashRoute from "common/components/hash-route"
 
-beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }))
 beforeEach(() => Data.set("lot-details", lotDetails))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -157,7 +157,7 @@ test("edit transaction details", async () => {
 
   const dd = getField("Date de livraison")
   await user.clear(dd)
-  await user.type(dd, "2021-31-01")
+  await user.type(dd, "2021-01-31")
 
   screen.getAllByDisplayValue("Producteur Test")
 
@@ -259,7 +259,6 @@ test("check transaction errors", async () => {
 
 test("check transaction comments", async () => {
   const user = userEvent.setup()
-
   Data.set("lot-details", tofixDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 

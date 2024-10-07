@@ -1,20 +1,29 @@
-from calendar import c
 import datetime
-from django.core.mail import EmailMessage
 import os
-from typing import List
-from django.http import JsonResponse
-from django.conf import settings
+import re
 import traceback
 import unicodedata
-import re
-from django.db import transaction
+from typing import List
+
 import pandas as pd
+from django.conf import settings
+from django.db import transaction
+from django.db.models.aggregates import Count, Sum
+from django.http import JsonResponse
+
 from certificates.models import DoubleCountingRegistration
-from core.models import CarbureLot, Entity, Pays, Biocarburant, MatierePremiere, UserRights
-from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
-from doublecount.dc_sanity_checks import check_production_row, check_production_row_integrity, check_sourcing_row
-from doublecount.models import DoubleCountingApplication
+from core.common import CarbureException
+from core.helpers import send_mail
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays, UserRights
+from core.utils import CarbureEnv
+from doublecount.dc_sanity_checks import (
+    check_dc_globally,
+    check_production_row,
+    check_production_row_integrity,
+    check_sourcing_row,
+)
+from doublecount.errors import DoubleCountingError, error
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
 from doublecount.parser.dc_parser import (
     ProductionForecastRow,
     ProductionMaxRow,
@@ -22,12 +31,6 @@ from doublecount.parser.dc_parser import (
     SourcingRow,
     parse_dc_excel,
 )
-from doublecount.errors import DoubleCountingError, error
-from django.db.models.aggregates import Count, Sum
-
-
-from core.common import CarbureException
-from doublecount.dc_sanity_checks import check_dc_globally, error, DoubleCountingError
 from doublecount.serializers import (
     BiofuelSerializer,
     DoubleCountingProductionSerializer,
@@ -39,7 +42,8 @@ from producers.models import ProductionSite
 today = datetime.date.today()
 
 
-def send_dca_confirmation_email(dca):
+def send_dca_confirmation_email(dca, request):
+    # To the user
     text_message = """
     Bonjour,
 
@@ -49,24 +53,48 @@ def send_dca_confirmation_email(dca):
     L'équipe CarbuRe
     """
     email_subject = "Carbure - Dossier Double Comptage"
-    cc = None
-    if os.getenv("IMAGE_TAG", "dev") != "prod":
-        # send only to staff / superuser
-        recipients = ["carbure@beta.gouv.fr"]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
-        ]
-        cc = "carbure@beta.gouv.fr"
 
-    email = EmailMessage(
-        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+            role__in=[UserRights.AUDITOR, UserRights.RO]
+        )
+    ]
+    cc = ["carbure@beta.gouv.fr"]
+
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        bcc=cc,
     )
-    email.send(fail_silently=False)
+
+    # To the manager
+    dca_created_at = dca.created_at.strftime("%d/%m/%Y")
+    text_message = f"""
+    Bonjour,
+
+    Une nouvelle demande d'agrément double comptage vient d'être déposée par le producteur {dca.producer.name}
+    à la date du {dca_created_at}.
+
+    Le dossier est disponible ici {CarbureEnv.get_base_url()}/org/{dca.producer_id}/double-counting/applications.
+
+    Bonne journée,
+    L'équipe CarbuRe
+    """
+    if os.getenv("IMAGE_TAG", "dev") == "prod":
+        recipients = ["emilien.baudet@developpement-durable.gouv.fr"]
+
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        bcc=cc,
+    )
 
 
 def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[SourcingRow]):
@@ -99,7 +127,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
         # Feedstock
         try:
             feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
-        except:
+        except Exception:
             feedstock = None
 
         if feedstock and not feedstock.is_double_compte:
@@ -137,11 +165,11 @@ def get_country(string, countries):
     country_string = string.strip()
     try:
         country = countries.get(code_pays=country_string)
-    except:
+    except Exception:
         country = None
         try:
             country = countries.get(name=country_string)
-        except:
+        except Exception:
             country = None
 
     return country
@@ -279,7 +307,7 @@ def load_dc_production_data(
 def get_material(code, list):
     try:
         return list.get(code=code)
-    except:
+    except Exception:
         return None
 
 
@@ -418,14 +446,14 @@ def get_lot_dc_agreement(feedstock, delivery_date, production_site):
                 dc_certificate = current_certificate.certificate_id
             else:  # le certificat renseigné sur le site de production est mis par defaut
                 dc_certificate = production_site.dc_reference
-        except:
+        except Exception:
             dc_certificate = production_site.dc_reference
     else:
         dc_certificate = None
     return dc_certificate
 
 
-def send_dca_status_email(dca):
+def send_dca_status_email(dca, request):
     if dca.status == DoubleCountingApplication.ACCEPTED:
         text_message = """
         Bonjour,
@@ -434,9 +462,7 @@ def send_dca_status_email(dca):
 
         Bonne journée,
         L'équipe CarbuRe
-        """ % (
-            dca.production_site.name
-        )
+        """ % (dca.production_site.name)
     elif dca.status == DoubleCountingApplication.REJECTED:
         text_message = """
         Bonjour,
@@ -445,30 +471,30 @@ def send_dca_status_email(dca):
 
         Bonne journée,
         L'équipe CarbuRe
-        """ % (
-            dca.production_site.name
-        )
+        """ % (dca.production_site.name)
     else:
         # no mail to send
         return
+
     email_subject = "Carbure - Dossier Double Comptage"
-    cc = None
-    if os.getenv("IMAGE_TAG", "dev") != "prod":
-        # send only to staff / superuser
-        recipients = ["carbure@beta.gouv.fr"]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
-        ]
-        cc = "carbure@beta.gouv.fr"
-    email = EmailMessage(
-        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
+
+    recipients = [
+        r.user.email
+        for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+            role__in=[UserRights.AUDITOR, UserRights.RO]
+        )
+    ]
+
+    cc = ["carbure@beta.gouv.fr"]
+
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        bcc=cc,
     )
-    email.send(fail_silently=False)
 
 
 def get_quotas(year: int, producer_id: int = None):

@@ -1,14 +1,15 @@
 import traceback
 
-from core.helpers import send_email_declaration_invalidated
+from django.db import transaction
+from django.db.models import Q
+
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
+from core.helpers import send_email_declaration_invalidated
 from core.models import CarbureLot, CarbureLotEvent, SustainabilityDeclaration, UserRights
 from core.notifications import notify_declaration_cancelled
-from django.db import transaction
-from django.db.models import Q
 from transactions.helpers import check_locked_year
 
 
@@ -22,7 +23,7 @@ def invalidate_declaration(request, *args, **kwargs):
     try:
         entity_id = int(request.POST.get("entity_id", None))
         period = int(request.POST.get("period", None))
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, InvalidateDeclarationError.MALFORMED_PARAMS)
 
@@ -33,7 +34,7 @@ def invalidate_declaration(request, *args, **kwargs):
     # 2. get or create a declaration entry for the given period and entity and mark it as undeclared
     try:
         declaration = SustainabilityDeclaration.init_declaration(entity_id, period)
-    except:
+    except Exception:
         traceback.print_exc()
         return ErrorResponse(400, InvalidateDeclarationError.DECLARATION_CANNOT_BE_CREATED)
 
@@ -88,6 +89,6 @@ def invalidate_declaration(request, *args, **kwargs):
 
         # Send confirmation email
         notify_declaration_cancelled(declaration)
-        send_email_declaration_invalidated(declaration)
+        send_email_declaration_invalidated(declaration, request)
 
     return SuccessResponse()

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("elec", "0035_elecauditsample_auditor_elecauditsample_cpo_and_more"),
     ]

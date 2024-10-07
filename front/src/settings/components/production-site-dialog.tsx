@@ -109,7 +109,7 @@ export const ProductionSiteForm = ({
       notify(t("Le site de production a bien été créé !"), {
         variant: "success",
       })
-      onClose && onClose()
+      onClose?.()
     },
 
     onError: () => {

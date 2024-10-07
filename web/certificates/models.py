@@ -1,11 +1,13 @@
+import datetime
+
+from dateutil.relativedelta import relativedelta
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere
 from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-import datetime
-from dateutil.relativedelta import relativedelta
 
 
 class ProductionSiteCertificate(models.Model):
@@ -80,7 +82,9 @@ class DoubleCountingRegistration(models.Model):
 
 
 @receiver(post_save, sender=DoubleCountingRegistration)
-def dc_registration_post_update_production_site(sender, instance, created, update_fields={}, *args, **kwargs):
+def dc_registration_post_update_production_site(sender, instance, created, update_fields=None, *args, **kwargs):
+    if update_fields is None:
+        update_fields = {}
     production_site_id = instance.production_site_id
     try:
         production_site = ProductionSite.objects.get(pk=production_site_id)
@@ -88,7 +92,7 @@ def dc_registration_post_update_production_site(sender, instance, created, updat
         production_site.eligible_dc = True
 
         production_site.save()
-    except:
+    except Exception:
         # print("Production Site not found")
         pass
 

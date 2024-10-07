@@ -1,10 +1,11 @@
 import traceback
 
+from django.http import JsonResponse
+
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.carburetypes import CarbureSanityCheckErrors
 from core.decorators import check_user_rights
 from core.models import CarbureLot, Depot, Entity, EntityDepot, GenericError, UserRights
-from django.http import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -39,7 +40,7 @@ def add_depot(request, entity, entity_id):
     if blending_is_outsourced:
         try:
             blender = Entity.objects.get(id=blending_entity_id, entity_type=Entity.OPERATOR)
-        except:
+        except Exception:
             return JsonResponse({"status": "error", "message": "Could not find outsourcing blender"}, status=400)
 
     try:

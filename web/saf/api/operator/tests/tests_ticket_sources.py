@@ -1,11 +1,11 @@
 from datetime import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 
-
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
-from saf.models import SafTicketSource, SafTicket
+from saf.models import SafTicket, SafTicketSource
 
 
 class SafTicketSourcesTest(TestCase):
@@ -109,7 +109,7 @@ class SafTicketSourcesTest(TestCase):
         }
         response = self.client.get(reverse("saf-operator-ticket-sources"), query)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         expected_ticket_source = {
             "id": 1234,
@@ -157,8 +157,8 @@ class SafTicketSourcesTest(TestCase):
         response_ticket_source.pop("created_at")
         response_ticket_source["assigned_tickets"][0].pop("created_at")
 
-        self.assertEqual(response_ticket_source, expected_ticket_source)
-        self.assertEqual(response.json()["data"]["from"], 0)
-        self.assertEqual(response.json()["data"]["returned"], 1)
-        self.assertEqual(response.json()["data"]["total"], 2)
-        self.assertEqual(response.json()["data"]["ids"], [1234, 12345])
+        assert response_ticket_source == expected_ticket_source
+        assert response.json()["data"]["from"] == 0
+        assert response.json()["data"]["returned"] == 1
+        assert response.json()["data"]["total"] == 2
+        assert response.json()["data"]["ids"] == [1234, 12345]

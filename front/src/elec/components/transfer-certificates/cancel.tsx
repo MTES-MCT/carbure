@@ -18,7 +18,6 @@ export const ElecCancelTransferButton = ({
   transferCertificate,
   onClose,
 }: ElecCancelTransferButtonProps) => {
-  const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()

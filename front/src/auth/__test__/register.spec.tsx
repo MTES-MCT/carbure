@@ -3,9 +3,7 @@ import { TestRoot } from "setupTests"
 
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { ActivateRequest } from "auth/components/activate"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
-import { Register, RegisterPending } from "../components/register"
 import server from "./api"
 import Auth from "auth"
 
@@ -13,7 +11,7 @@ beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const AuthWithRouter = ({ children }: { children?: React.ReactNode }) => {
+const AuthWithRouter = () => {
   return (
     <TestRoot url={`/auth/register`}>
       <Route path="/auth/*" element={<Auth />} />

@@ -1,9 +1,9 @@
-from core.decorators import otp_or_403
-from core.models import Entity, UserRights, UserRightsRequests
 from django.conf import settings
-from django.core.mail import send_mail
 from django.http import JsonResponse
 
+from core.decorators import otp_or_403
+from core.helpers import send_mail
+from core.models import Entity, UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
 
@@ -25,7 +25,6 @@ def request_entity_access(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
-
         rr, created = UserRightsRequests.objects.update_or_create(
             user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "ACCEPTED"}
         )
@@ -60,10 +59,10 @@ def request_entity_access(request):
         recipient_list.append("carbure@beta.gouv.fr")
 
         send_mail(
+            request=request,
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipient_list,
-            fail_silently=False,
         )
     return JsonResponse({"status": "success"})

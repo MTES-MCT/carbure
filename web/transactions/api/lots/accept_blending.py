@@ -1,10 +1,10 @@
 from django.http.response import JsonResponse
+
 from core.decorators import check_user_rights
 from core.helpers import (
     filter_lots,
     get_entity_lots_by_status,
 )
-
 from core.models import (
     CarbureLot,
     CarbureLotEvent,

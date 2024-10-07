@@ -1,21 +1,16 @@
-# test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb
+# test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb  # noqa: E501
 from datetime import date
-from math import prod
-import os
-import stat
-from core.tests_utils import setup_current_user
-from core.models import Entity, UserRights
+
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
 
-from doublecount.errors import DoubleCountingError
+from core.models import Entity, UserRights
+from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
-
 
 User = get_user_model()
 
@@ -92,11 +87,11 @@ class DoubleCountAgreementsTest(TestCase):
         application1 = data[0]
         application2 = data[1]
         application3 = data[2]
-        self.assertEqual(len(data), 3)
+        assert len(data) == 3
 
-        self.assertEqual(application1["quotas_progression"], None)
-        self.assertEqual(application2["quotas_progression"], 0)
-        self.assertEqual(application3["quotas_progression"], None)
+        assert application1["quotas_progression"] is None
+        assert application2["quotas_progression"] == 0
+        assert application3["quotas_progression"] is None
 
     def test_get_agreements_quotas(self):
         # check quotas

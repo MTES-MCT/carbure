@@ -1,4 +1,3 @@
-from random import choices
 from django.db import models
 
 from elec.models.elec_charge_point import ElecChargePoint

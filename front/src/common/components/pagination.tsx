@@ -5,7 +5,6 @@ import { Row } from "./scaffold"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
-import { Anchors } from "./dropdown"
 
 export interface PaginationProps {
   total: number

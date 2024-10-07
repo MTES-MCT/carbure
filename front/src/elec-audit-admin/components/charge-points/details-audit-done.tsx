@@ -18,7 +18,7 @@ export const ChargePointsApplicationDetailsAuditDone = ({
   chargePointApplication,
   onAccept,
   onReject,
-  onDownloadSample
+  onDownloadSample,
 }: ChargePointsApplicationDetailsAuditDoneProps) => {
   const { t } = useTranslation()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
@@ -30,7 +30,12 @@ export const ChargePointsApplicationDetailsAuditDone = ({
           <ApplicationSummary application={chargePointApplication} />
         </section>
         <Divider />
-        <SampleDetailsAuditDoneSection sample={chargePointApplication?.sample!} onDownloadSample={onDownloadSample} />
+        {chargePointApplication?.sample && (
+          <SampleDetailsAuditDoneSection
+            sample={chargePointApplication.sample}
+            onDownloadSample={onDownloadSample}
+          />
+        )}
 
         <section>
           <Checkbox

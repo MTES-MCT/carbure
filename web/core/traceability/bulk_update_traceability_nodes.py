@@ -1,11 +1,11 @@
 from django.db import transaction
 
-from transactions.services.carbure_id import bulk_generate_stock_carbure_id, bulk_generate_lot_carbure_id
+from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
+from core.traceability import Node
+from saf.models import SafTicket, SafTicketSource
+from transactions.services.carbure_id import bulk_generate_lot_carbure_id, bulk_generate_stock_carbure_id
 
 from .group_nodes_by_type import group_nodes_by_type
-from saf.models import SafTicket, SafTicketSource
-from core.traceability import Node
-from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
 
 
 @transaction.atomic

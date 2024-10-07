@@ -56,9 +56,10 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
         {
           header: t("Date limite"),
           cell: (application) => {
-            let limitDate = getApplicationAuditLimitDate(
+            const limitDate = getApplicationAuditLimitDate(
               application.audit_order_date!
             )
+
             return <Cell text={`${formatDate(limitDate)}`} />
           },
         },

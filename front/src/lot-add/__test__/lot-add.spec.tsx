@@ -165,7 +165,7 @@ test("check the form fields are working", async () => {
 
   await user.type(getField("Pays d'origine de la matière première"), "France")
 
-  await user.type(getField("Date de livraison"), "2020-31-12")
+  await user.type(getField("Date de livraison"), "2020-12-31")
 
   await user.type(getField("Producteur"), "Pr")
   await user.click(await screen.findByText("Producteur Test"))

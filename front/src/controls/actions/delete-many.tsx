@@ -55,7 +55,6 @@ const DeleteManyConfirmationDialog = ({
   const [comment, setComment] = useState<string | undefined>()
   const entity = useEntity()
   const notify = useNotify()
-  const portal = usePortal()
 
   const lots_ids = useMemo(() => lots.map((l) => l.id), [lots])
 

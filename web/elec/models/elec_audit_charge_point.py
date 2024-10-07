@@ -11,7 +11,9 @@ class ElecAuditChargePoint(models.Model):
         verbose_name = "Point de recharge audité"
         verbose_name_plural = "Points de recharge audités"
 
-    audit_sample = models.ForeignKey(ElecAuditSample, on_delete=models.deletion.CASCADE, related_name="audited_charge_points")  # fmt:skip
+    audit_sample = models.ForeignKey(
+        ElecAuditSample, on_delete=models.deletion.CASCADE, related_name="audited_charge_points"
+    )
 
     is_auditable = models.BooleanField(null=True, blank=True)
     current_type = models.CharField(max_length=2, null=True, blank=True, choices=ElecChargePoint.CURRENT_TYPES)
@@ -21,5 +23,9 @@ class ElecAuditChargePoint(models.Model):
     audit_date = models.DateField(null=True, blank=True)
     comment = models.CharField(max_length=512, default="")
 
-    charge_point = models.ForeignKey(ElecChargePoint, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="charge_point_audit")  # fmt:skip
-    meter_reading = models.ForeignKey(ElecMeterReading, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="meter_reading_audit")  # fmt:skip
+    charge_point = models.ForeignKey(
+        ElecChargePoint, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="charge_point_audit"
+    )
+    meter_reading = models.ForeignKey(
+        ElecMeterReading, on_delete=models.deletion.CASCADE, null=True, blank=True, related_name="meter_reading_audit"
+    )

@@ -1,18 +1,19 @@
 # /api/saf/operator/tickets
 
-from math import floor
 import traceback
+from math import floor
+
 from django import forms
 from django.core.paginator import Paginator
 from django.db.models import Q
 
-from core.common import SuccessResponse, ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.excel import ExcelResponse, export_to_excel
+from core.excel import ExcelResponse
 from core.utils import MultipleValueField
 from saf.models import SafTicket
 from saf.serializers import SafTicketSerializer
-from saf.serializers.saf_ticket import SafTicketDetailsSerializer, export_tickets_to_excel
+from saf.serializers.saf_ticket import export_tickets_to_excel
 
 
 class SafTicketError:
@@ -133,7 +134,7 @@ def find_tickets(**filters):
     else:
         raise Exception("Status '%s' does not exist for tickets" % filters["status"])
 
-    if filters["search"] != None:
+    if filters["search"] is not None:
         tickets = tickets.filter(
             Q(carbure_id__icontains=filters["search"])
             | Q(supplier__name__icontains=filters["search"])

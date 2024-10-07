@@ -1,17 +1,18 @@
-from datetime import date, datetime
+from datetime import date
+
 from django import forms
 from django.http import HttpRequest
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
+
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.services.meter_readings_application_quarter import get_application_quarter
+from elec.models.elec_meter_reading import ElecMeterReading
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
-from elec.models.elec_meter_reading import ElecMeterReading
+from elec.services.meter_readings_application_quarter import get_application_quarter
 
 
 class CheckMeterReadingApplicationForm(forms.Form):
@@ -46,13 +47,9 @@ def check_application(request: HttpRequest, entity):
     year = form.cleaned_data["year"] or auto_year
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    previous_application = MeterReadingRepository.get_previous_application(
-        entity, quarter, year
-    )
+    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
-    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related(
-        "charge_point"
-    )
+    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
 
     meter_reading_data, errors, __ = import_meter_reading_excel(
         excel_file,
@@ -73,13 +70,9 @@ def check_application(request: HttpRequest, entity):
     if len(errors) > 0:
         data["errors"] = errors
         data["error_count"] = len(data["errors"])
-        return ErrorResponse(
-            400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data
-        )
+        return ErrorResponse(400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data)
 
     if len(meter_reading_data) == 0:
-        return ErrorResponse(
-            400, CheckMeterReadingApplicationError.NO_READING_FOUND, data
-        )
+        return ErrorResponse(400, CheckMeterReadingApplicationError.NO_READING_FOUND, data)
 
     return SuccessResponse(data)

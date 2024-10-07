@@ -1,16 +1,17 @@
-from auth.tokens import account_activation_token
+from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
-from django import forms
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext as _
+
+from auth.tokens import account_activation_token
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
+from core.helpers import send_mail
 
 
 def request_activation_link(request):
@@ -30,12 +31,12 @@ def request_activation_link(request):
             html_message = loader.render_to_string("emails/account_activation_email.html", email_context)
             text_message = loader.render_to_string("emails/account_activation_email.txt", email_context)
             send_mail(
+                request=request,
                 subject=email_subject,
                 message=text_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 html_message=html_message,
                 recipient_list=[user.email],
-                fail_silently=False,
             )
             # return JsonResponse({'status': 'success'})
             return SuccessResponse()
@@ -61,7 +62,7 @@ class UserResendActivationLinkForm(forms.Form):
         user_email = self.cleaned_data["email"]
         user_email = user_email.lower()
 
-        field_lookup = {f"email__iexact": user_email}
+        field_lookup = {"email__iexact": user_email}
         if not get_user_model().objects.filter(**field_lookup).exists():
             raise ValidationError(self.error_messages["unknown_user"], code="invalid")
         return user_email

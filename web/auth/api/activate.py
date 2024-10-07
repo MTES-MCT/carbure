@@ -1,10 +1,10 @@
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
+
 from auth.tokens import account_activation_token
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
-from django.contrib.auth import login
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 

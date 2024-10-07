@@ -1,14 +1,12 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 
-from transactions.api.lots.tests.tests_utils import get_lot
-from core.tests_utils import setup_current_user
-from core.models import CarbureLot, Entity, UserRights
-from django_otp.plugins.otp_email.models import EmailDevice
-from transactions.models import YearConfig
 from core.carburetypes import CarbureError
+from core.models import CarbureLot, Entity
+from core.tests_utils import setup_current_user
+from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.models import YearConfig
 
 
 class LotCorrectionTest(TestCase):
@@ -50,7 +48,7 @@ class LotCorrectionTest(TestCase):
         lot_data["carbure_client_id"] = client.id if client else self.trader.id
 
         add_response = self.client.post(reverse("transactions-lots-add"), lot_data)
-        self.assertEqual(add_response.status_code, 200)
+        assert add_response.status_code == 200
 
         lot_id = add_response.json()["data"]["id"]
 
@@ -58,7 +56,7 @@ class LotCorrectionTest(TestCase):
             reverse("transactions-lots-send"),
             {"entity_id": supplier.id, "selection": [lot_id]},
         )
-        self.assertEqual(send_response.status_code, 200)
+        assert send_response.status_code == 200
 
         return CarbureLot.objects.get(id=lot_id)
 
@@ -68,7 +66,7 @@ class LotCorrectionTest(TestCase):
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
 
@@ -77,7 +75,7 @@ class LotCorrectionTest(TestCase):
             reverse("transactions-lots-submit-fix"),
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
 
@@ -86,66 +84,66 @@ class LotCorrectionTest(TestCase):
             reverse("transactions-lots-approve-fix"),
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
 
     def test_recall_and_update(self):
         lot = self.prepare_lot(self.producer)
-        self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
-        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        assert lot.correction_status == CarbureLot.NO_PROBLEMO
+        assert lot.lot_status == CarbureLot.PENDING
         lot = self.request_fix(lot, self.producer)
-        self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
-        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        assert lot.correction_status == CarbureLot.IN_CORRECTION
+        assert lot.lot_status == CarbureLot.PENDING
         response = self.client.post(
             reverse("transactions-lots-update"),
             {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
-        self.assertEqual(lot.volume, 42000)
+        assert lot.volume == 42000
 
     def test_simple_correction(self):
         YearConfig.objects.create(year=2020, locked=True)
 
         lot = self.prepare_lot(self.producer, self.trader)
-        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
-        self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
+        assert lot.lot_status == CarbureLot.PENDING
+        assert lot.correction_status == CarbureLot.NO_PROBLEMO
 
         # client requests correction
         lot = self.request_fix(lot, self.trader)
-        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
-        self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
+        assert lot.lot_status == CarbureLot.PENDING
+        assert lot.correction_status == CarbureLot.IN_CORRECTION
 
         # we update
         response = self.client.post(
             reverse("transactions-lots-update"),
             {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         lot = CarbureLot.objects.get(id=lot.id)
-        self.assertEqual(lot.volume, 42000)
+        assert lot.volume == 42000
 
         # and mark as fixed
         lot = self.submit_fix(lot, self.producer)
-        self.assertEqual(lot.correction_status, CarbureLot.FIXED)
+        assert lot.correction_status == CarbureLot.FIXED
 
         # as client, accept fix
         lot = self.approve_fix(lot, self.trader)
-        self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
-        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        assert lot.correction_status == CarbureLot.NO_PROBLEMO
+        assert lot.lot_status == CarbureLot.PENDING
 
         # finally, accept lot
         response = self.client.post(
             reverse("transactions-lots-accept-in-stock"),
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         lot = CarbureLot.objects.get(id=lot.id)
-        self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
-        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        assert lot.correction_status == CarbureLot.NO_PROBLEMO
+        assert lot.lot_status == CarbureLot.ACCEPTED
 
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)
@@ -157,9 +155,9 @@ class LotCorrectionTest(TestCase):
             reverse("transactions-lots-request-fix"),
             {"entity_id": self.producer.id, "lot_ids": [lot.id]},
         )
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["status"], "error")
-        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
+        assert response.status_code == 400
+        assert response.json()["status"] == "error"
+        assert response.json()["error"] == CarbureError.YEAR_LOCKED
 
     # check that the owner can edit everything on a root lot
     def test_full_owner_correction(self):
