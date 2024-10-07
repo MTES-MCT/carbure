@@ -21,8 +21,7 @@ export const SafAirline = () => {
     key: "airline-snapshot",
     params: [entity.id, years.selected],
   })
-  const snapshotData = snapshot.result?.data
-  // const snapshotData = safClientSnapshot //TO TEST with testing data
+  const snapshotData = snapshot.result?.data.data
 
   return (
     <Main>

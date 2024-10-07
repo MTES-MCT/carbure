@@ -1,4 +1,4 @@
-import { CBQUERY_RESET } from "common/hooks/query-builder"
+import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import { api, Api, download } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
 import {
@@ -17,6 +17,7 @@ import {
 //   })
 // }
 
+// OK
 export function getAirlineYears(entity_id: number) {
   return apiFetch.GET("/saf/years/", {
     params: {
@@ -27,14 +28,14 @@ export function getAirlineYears(entity_id: number) {
   })
 }
 
-// export function getAirlineSnapshot(entity_id: number, year: number) {
-//   return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
-//     params: { entity_id, year },
-//   })
-// }
+export function getAirlineSnapshot(entity_id: number, year: number) {
+  return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
+    params: { entity_id, year },
+  })
+}
 
 // MISSING TYPE FOR RETURNED DATA
-export function getAirlineSnapshot(entity_id: number, year: number) {
+export function getAirlineSnapshot2(entity_id: number, year: number) {
   return apiFetch.GET("/saf/snapshot/", {
     params: {
       query: {
@@ -45,25 +46,26 @@ export function getAirlineSnapshot(entity_id: number, year: number) {
   })
 }
 
-// export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-//   const params = { filter: field, ...query, ...CBQUERY_RESET }
-//   return api
-//     .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
-//     .then((res) => res.data.data ?? [])
-// }
-
 export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-  const { order, ...queryParams } = {
-    filter: field,
-    ...query,
-    ...CBQUERY_RESET,
-  }
-  return apiFetch.GET("/saf/tickets/filters/", {
-    params: {
-      query: queryParams,
-    },
-  })
+  const params = { filter: field, ...query, ...CBQUERY_RESET }
+  return api
+    .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
+    .then((res) => res.data.data ?? [])
 }
+
+// Il manque en possibilité d'order des colonnes "supplier"
+// Le typage renvoyé par la fonction n'est pas bon, je suis censé récupérer un tableau d'entiers ou de chaines de caractères
+// export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
+//   return apiFetch.GET("/saf/tickets/filters/", {
+//     params: {
+//       query: {
+//         filter: field,
+//         ...query,
+//         ...CBQUERY_RESET,
+//       },
+//     },
+//   })
+// }
 
 export function getSafAirlineTickets(query: SafQuery) {
   return api.get<Api<SafTicketsResponse>>("/saf/airline/tickets", {
