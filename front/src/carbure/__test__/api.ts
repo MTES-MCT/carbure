@@ -1,5 +1,4 @@
 import { http, HttpResponse } from "msw"
-// import { setupServer } from "msw/node"
 import translations from "../../../public/locales/fr/translation.json"
 import errors from "../../../public/locales/fr/errors.json"
 import fields from "../../../public/locales/fr/fields.json"
@@ -14,10 +13,8 @@ import {
   matierePremiere,
   biocarburant,
   productionSite,
-  entities,
   generateUser,
 } from "./data"
-import { Api } from "common/services/api"
 import { mockGetWithResponseData } from "./helpers"
 
 export const okStats = http.get("/api/home-stats", () => {
@@ -114,11 +111,3 @@ export const okDefaultUser = mockGetWithResponseData(
   "/user",
   generateUser(EntityType.Administration)
 )
-
-// export default setupServer(
-//   okNotifications,
-//   okTranslations,
-//   okErrorsTranslations,
-//   okFieldsTranslations,
-//   okStats
-// )
