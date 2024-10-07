@@ -4,6 +4,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django_otp import user_has_device
 from django_otp.plugins.otp_email.models import EmailDevice
 
 from auth.tokens import account_activation_token
@@ -49,9 +50,10 @@ def send_email(user, request, subject, email_type="account_activation_email", ex
         html_message=html_message,
         recipient_list=[user.email],
     )
-    email_otp = EmailDevice()
-    email_otp.user = user
-    email_otp.name = "email"
-    email_otp.confirmed = True
-    email_otp.email = user.email
-    email_otp.save()
+    if not user_has_device(user):
+        email_otp = EmailDevice()
+        email_otp.user = user
+        email_otp.name = "email"
+        email_otp.confirmed = True
+        email_otp.email = user.email
+        email_otp.save()

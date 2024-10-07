@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 
 from django import forms
 from django.db import transaction
@@ -54,8 +54,14 @@ def add_application(request: HttpRequest, entity: Entity):
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
+    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
+
     meter_reading_data, errors, original = import_meter_reading_excel(
-        excel_file, charge_points, previous_application, renewable_share
+        excel_file,
+        charge_points,
+        previous_readings,
+        previous_application,
+        renewable_share,
     )
 
     if len(errors) > 0:
@@ -76,7 +82,6 @@ def add_application(request: HttpRequest, entity: Entity):
     duplicate = False
     for row in original:
         reading_date = row["reading_date"]
-        reading_date = datetime.strptime(reading_date, "%d/%m/%Y").date()
         if previous_date.get(row["charge_point_id"]) == reading_date:
             duplicate = True
             break
