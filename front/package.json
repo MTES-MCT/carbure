@@ -76,13 +76,14 @@
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
-    "check-backend": "tsc --noEmit",
     "predev": "react-dsfr update-icons",
     "prebuild": "react-dsfr update-icons",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --test",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "generate-api": "npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.d.ts && eslint 'src/api-schema.d.ts' --fix"
+    "generate-api": "npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.d.ts && eslint 'src/api-schema.d.ts' --fix",
+    "check-diff": "git diff --exit-code ../api-schema.yaml || (echo 'Des différences ont été détectées' && exit 1)",
+    "check-backend-types": "npm run generate-api && npm run check-diff && tsc --noEmit"
   },
   "browserslist": {
     "production": [
