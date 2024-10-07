@@ -17,6 +17,7 @@ class LotGHGTest(TestCase):
         "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -33,7 +34,7 @@ class LotGHGTest(TestCase):
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)

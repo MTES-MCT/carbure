@@ -32,7 +32,7 @@ class EntityDepotsTest(TestCase):
         assert len(data) == 0
         # add
         france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
-        depot, _ = Depot.objects.update_or_create(depot_id="TEST", name="toto", city="paris", country=france)
+        depot, _ = Depot.objects.update_or_create(customs_id="TEST", name="toto", city="paris", country=france)
         postdata = {
             "entity_id": self.admin.id,
             "delivery_site_id": depot.depot_id,
@@ -62,13 +62,13 @@ class EntityDepotsTest(TestCase):
             "name": "Dépôt de test",
             "city": "Paris",
             "country_code": self.pays.code_pays,
-            "depot_type": "BIOFUEL DEPOT",
-            "depot_id": "123456789012345",
+            "site_type": "BIOFUEL DEPOT",
+            "customs_id": "123456789012345",
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
         assert res.status_code == 200
-        new_depot = Depot.objects.get(depot_id="123456789012345")
+        new_depot = Depot.objects.get(customs_id="123456789012345")
         assert new_depot is not None
         assert new_depot.name == "Dépôt de test"
         assert new_depot.is_enabled is False
@@ -79,11 +79,11 @@ class EntityDepotsTest(TestCase):
             "name": "Dépôt de test",
             "city": "Paris",
             "country_code": self.pays.code_pays,
-            "depot_type": "BIOFUEL DEPOT",
+            "site_type": "BIOFUEL DEPOT",
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
         assert res.status_code == 400
         data = res.json()
         assert data["error"] == "MALFORMED_PARAMS"
-        assert data["data"]["depot_id"] is not None
+        assert data["data"]["customs_id"] is not None

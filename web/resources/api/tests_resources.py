@@ -5,13 +5,13 @@ from django.urls import reverse
 
 from core.models import (
     Biocarburant,
-    Depot,
     Entity,
     MatierePremiere,
     Pays,
-    ProductionSite,
 )
 from core.tests_utils import setup_current_user
+from transactions.models import Site as Depot
+from transactions.models import Site as ProductionSite
 
 
 class ResourcesTest(TestCase):

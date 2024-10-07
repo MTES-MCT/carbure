@@ -58,7 +58,7 @@ class ProductionSite(models.Model):
 class ProductionSiteInput(models.Model):
     INPUT_STATUS = (("Pending", "En attente de validation"), ("Valid", "Validé"))
 
-    production_site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+    production_site = models.ForeignKey(Site, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     status = models.CharField(max_length=16, choices=INPUT_STATUS, default="Pending")
 
@@ -77,7 +77,7 @@ class ProductionSiteInput(models.Model):
 class ProductionSiteOutput(models.Model):
     OUTPUT_STATUS = (("Pending", "En attente de validation"), ("Valid", "Validé"))
 
-    production_site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+    production_site = models.ForeignKey(Site, on_delete=models.CASCADE)
     biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
     status = models.CharField(max_length=16, choices=OUTPUT_STATUS, default="Pending")
 

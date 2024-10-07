@@ -3,11 +3,11 @@ import factory
 from core.models import (
     Biocarburant,
     CarbureStock,
-    Depot,
     Entity,
     MatierePremiere,
     Pays,
 )
+from transactions.models import Site as Depot
 from transactions.models import Site as ProductionSite
 
 

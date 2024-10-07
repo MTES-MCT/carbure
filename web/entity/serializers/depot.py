@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from core.models import Pays
@@ -16,6 +17,11 @@ class DepotSerializer(serializers.ModelSerializer):
         validated_data["is_enabled"] = False
 
         depot_instance = Depot(**validated_data)
-        depot_instance.full_clean()
+
+        try:
+            depot_instance.full_clean()
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message_dict)
+
         depot_instance.save()
         return depot_instance

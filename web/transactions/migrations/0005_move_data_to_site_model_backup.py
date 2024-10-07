@@ -63,10 +63,12 @@ def insert_data_into_temp_table(apps, schema_editor):
         queryset = model.objects.filter(**{f"{field_name}__isnull": False})
         print(f"Number of {model_name} selected: {queryset.count()}")
 
-        create_content_to_update(model_name, field_name, queryset, field_type)
+        if queryset.count() > 0:
+            create_content_to_update(model_name, field_name, queryset, field_type)
 
-        print(f"Emptying '{field_name}' field from {model_name}")
-        queryset.update(**{field_name: None})
+            print(f"Emptying '{field_name}' field from {model_name}")
+            queryset.update(**{field_name: None})
+
         print("--------------------------------")
 
 
@@ -80,6 +82,12 @@ class Migration(migrations.Migration):
     dependencies = [
         ("transactions", "0004_contenttoupdate_site_entitysite"),
         ("producers", "0004_alter_productionsiteinput_production_site_and_more"),
+        (
+            "doublecount",
+            "0014_rename_agreement_id_doublecountingapplication_certificate_id_and_more",
+        ),
+        ("certificates", "0005_alter_doublecountingregistration_options_and_more"),
+        ("saf", "0020_safticket_saf_ticket_parent__0bbce0_idx_and_more"),
     ]
 
     operations = [

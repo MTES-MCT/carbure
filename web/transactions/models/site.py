@@ -8,6 +8,11 @@ class SiteManager(models.Manager):
         return super().get_queryset().prefetch_related("entitysite_set__entity")
 
 
+class DepotManager(SiteManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(site_type__in=Site.DEPOT_TYPES)
+
+
 class Site(models.Model):
     OTHER = "OTHER"
     EFS = "EFS"
@@ -30,6 +35,8 @@ class Site(models.Model):
         (COGENERATION_PLANT, "COGENERATION PLANT"),
         (PRODUCTION_SITE, "PRODUCTION SITE"),
     )
+
+    DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT]
 
     GES_OPTIONS = [("Default", "Valeurs par défaut"), ("Actual", "Valeurs réelles"), ("NUTS2", "Valeurs NUTS2")]
 
@@ -78,7 +85,12 @@ class Site(models.Model):
     def depot_type(self):
         return self.site_type
 
+    @property
+    def depot_id(self):
+        return self.customs_id
+
     objects = SiteManager()
+    depots = DepotManager()
 
     class Meta:
         db_table = "sites"
@@ -101,8 +113,12 @@ class Site(models.Model):
         # Check if date_mise_en_service is required for production site
         if self.site_type == self.PRODUCTION_SITE and not self.date_mise_en_service:
             raise ValidationError(
-                {"date_mise_en_service": "Ce champ est obligatoire pour les sites de type 'PRODUCTION SITE'."}
+                {"date_mise_en_service": ["Ce champ est obligatoire pour les sites de type 'PRODUCTION SITE'."]}
             )
+
+        # Check if customs_id is required for depot
+        if self.site_type != self.PRODUCTION_SITE and not self.customs_id:
+            raise ValidationError({"customs_id": ["Ce champ est obligatoire pour les dépots."]})
 
         super().clean()
 
@@ -120,6 +136,10 @@ class Site(models.Model):
                 "thermal_efficiency": self.thermal_efficiency,
                 "useful_temperature": self.useful_temperature,
             }
+
+    def is_depot(self):
+        # Check if the site is a depot
+        return self.site_type in self.DEPOT_TYPES
 
 
 class ContentToUpdate(models.Model):

@@ -9,12 +9,12 @@ from core.models import (
     CarbureLotEvent,
     CarbureStock,
     CarbureStockEvent,
-    Depot,
     Entity,
     Pays,
     UserRights,
 )
 from transactions.helpers import try_get_date
+from transactions.models import Site as Depot
 from transactions.sanity_checks import get_prefetched_data
 
 
