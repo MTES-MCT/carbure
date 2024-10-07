@@ -36,3 +36,8 @@ export type FetchResponseType<
   unknown,
   ContentType
 >
+
+/**
+ * The list of component types returned by the api
+ */
+export type apiTypes = components["schemas"]
