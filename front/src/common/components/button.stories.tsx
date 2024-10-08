@@ -9,6 +9,7 @@ const meta: Meta<typeof Button> = {
     variant: "primary",
     label: "Button",
   },
+  title: "ui/button",
 }
 type Story = StoryObj<typeof Button>
 
