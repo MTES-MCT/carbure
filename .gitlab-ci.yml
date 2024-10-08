@@ -1,23 +1,28 @@
 stages:
   - check
-  - deploy
+
 
 workflow:
   rules:
-  # 1. Don't run pipelines for MR drafts.
-  # 2. Don't run branch pipelines when there's an open MR for the branch (run the MR pipeline instead).
-  # 3. Run all other MR pipelines
-  # 4. Run branch pipelines for dev and master
-  # 5. Else, don't run it
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^Draft:/ # 1
+    # 1. Don't run pipelines for MR drafts.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^Draft:/
       when: never
-    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS # 2
+
+    # 2. Don't run branch pipelines when there's an open MR for the branch (run the MR pipeline instead).
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # 3
+
+    # 3. Run all other MR pipelines
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: always
-    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master" # 4
+
+    # 4. Run branch pipelines for dev and master
+    - if: $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master"
       when: always
-    - when: never # 5
+
+    # 5. Else, don't run it
+    - when: never
+
 
 variables:
   MYSQL_DATABASE: carbure_mysql_test_db
@@ -25,6 +30,8 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PIPENV_VENV_IN_PROJECT: true
 
+
+# job: run linting and tests for backend
 check-backend:
   stage: check
   extends: .backend
@@ -39,40 +46,15 @@ check-backend:
     - pipenv run ruff format --check
     - TEST=1 pipenv run python web/manage.py test web
 
+
+# job: run linting and tests for frontend
 check-frontend:
   stage: check
   extends: .frontend
   script:
     - npm run lint
 
-deploy-dev:
-  stage: deploy
-  extends: .scalingo
-  only:
-    - dev
-  script:
-    - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
-deploy-staging:
-  stage: deploy
-  extends: .scalingo
-  only:
-    - master
-  script:
-    - git push scalingo-staging master -f
-
-deploy-prod:
-  stage: deploy
-  extends: .scalingo
-  when: manual
-  only:
-    - master
-  script:
-    - git push scalingo-prod master -f
-
-# --------------------------------------------------------------------------- #
-
-# prepare backend env
 .backend:
   image: python:3.12
   cache:
@@ -90,7 +72,7 @@ deploy-prod:
       - web/**/*
       - .gitlab-ci.yml
 
-# prepare frontend env
+
 .frontend:
   image: node:latest
   cache:
@@ -106,21 +88,3 @@ deploy-prod:
     - changes:
       - front/**/*
       - .gitlab-ci.yml
-
-# prepare git env to push new code to scalingo
-.scalingo:
-  image: alpine:latest
-  before_script:
-    - mkdir ~/.ssh
-    - apk add --update git openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SCALINGO_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh-keyscan $SCALINGO_SSH_HOST $SCALINGO_SSH_HOST_SECNUMCLOUD >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - git config user.name $GIT_USER_NAME
-    - git config user.email $GIT_USER_EMAIL
-    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV || true
-    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING || true
-    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD || true
-    - git fetch origin $CI_COMMIT_BRANCH --unshallow
-    - git checkout $CI_COMMIT_BRANCH
