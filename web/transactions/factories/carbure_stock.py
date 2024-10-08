@@ -7,8 +7,7 @@ from core.models import (
     MatierePremiere,
     Pays,
 )
-from transactions.models import Site as Depot
-from transactions.models import Site as ProductionSite
+from transactions.models import Depot, ProductionSite
 
 
 class CarbureStockFactory(factory.django.DjangoModelFactory):

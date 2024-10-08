@@ -22,8 +22,7 @@ from doublecount.serializers import (
     EntitySummarySerializer,
     FeedStockSerializer,
 )
-from transactions.models import Site as Depot
-from transactions.models import Site as ProductionSite
+from transactions.models import Depot, ProductionSite
 
 
 class DepotSerializer(serializers.ModelSerializer):

@@ -5,7 +5,7 @@ import factory
 
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from saf.models import SafTicket
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class SafTicketFactory(factory.django.DjangoModelFactory):

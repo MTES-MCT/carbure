@@ -15,6 +15,7 @@ class SafTicketsTest(TestCase):
         "json/countries.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):

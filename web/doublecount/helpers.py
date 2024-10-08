@@ -37,7 +37,7 @@ from doublecount.serializers import (
     DoubleCountingSourcingSerializer,
     FeedStockSerializer,
 )
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 today = datetime.date.today()
 

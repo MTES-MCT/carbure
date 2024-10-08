@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from core.models import Pays
-from transactions.models import Site as Depot
+from transactions.models import Depot
 
 
 class DepotSerializer(serializers.ModelSerializer):

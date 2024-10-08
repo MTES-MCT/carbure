@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.http import JsonResponse
 
-from transactions.models import Site as Depot
+from transactions.models import Depot
 
 
 def get_depots(request):

@@ -1,8 +1,7 @@
 import random
 
 from core.models import Entity
-from transactions.models import Site as Depot
-from transactions.models import Site as ProductionSite
+from transactions.models import Depot, ProductionSite
 
 
 def get_lot(entity):

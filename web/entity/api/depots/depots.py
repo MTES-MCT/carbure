@@ -1,8 +1,7 @@
 from django.http import JsonResponse
 
 from core.decorators import check_user_rights
-from transactions.models import EntitySite
-from transactions.models import Site as Depot
+from transactions.models import Depot, EntitySite
 
 
 @check_user_rights()

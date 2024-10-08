@@ -8,11 +8,6 @@ class SiteManager(models.Manager):
         return super().get_queryset().prefetch_related("entitysite_set__entity")
 
 
-class DepotManager(SiteManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(site_type__in=Site.DEPOT_TYPES)
-
-
 class Site(models.Model):
     OTHER = "OTHER"
     EFS = "EFS"
@@ -90,7 +85,6 @@ class Site(models.Model):
         return self.customs_id
 
     objects = SiteManager()
-    depots = DepotManager()
 
     class Meta:
         db_table = "sites"

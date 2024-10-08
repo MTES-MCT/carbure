@@ -10,7 +10,7 @@ from core.models import (
 )
 from core.tests_utils import setup_current_user
 from producers.models import ProductionSiteInput, ProductionSiteOutput
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class EntityProductionSiteTest(TestCase):
@@ -21,6 +21,7 @@ class EntityProductionSiteTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -69,7 +70,7 @@ class EntityProductionSiteTest(TestCase):
         response = self.client.post(reverse(url_add), psite)
         assert response.status_code == 200
         # check in db
-        site = ProductionSite.objects.get(site_id="FR0001")
+        site = ProductionSite.objects.get(site_siret="FR0001")
         # update
         psite["postal_code"] = "75018"
         response = self.client.post(reverse(url_update), psite)
@@ -81,7 +82,7 @@ class EntityProductionSiteTest(TestCase):
         psite["country_code"] = "FR"
         response = self.client.post(reverse(url_update), psite)
         assert response.status_code == 200
-        site = ProductionSite.objects.get(site_id="FR0001")
+        site = ProductionSite.objects.get(site_siret="FR0001")
         assert site.postal_code == "75018"
 
         # set mps/bcs

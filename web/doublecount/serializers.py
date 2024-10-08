@@ -4,7 +4,7 @@ from rest_framework import serializers
 from certificates.models import ProductionSiteCertificate
 from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
 from producers.models import ProductionSiteInput, ProductionSiteOutput
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 from .models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction, DoubleCountingSourcing
 
@@ -86,6 +86,7 @@ class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
     inputs = serializers.SerializerMethodField()
     outputs = serializers.SerializerMethodField()
     certificates = serializers.SerializerMethodField()
+    producer = EntitySerializer(read_only=True)
 
     class Meta:
         model = ProductionSite
@@ -98,7 +99,7 @@ class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
             "ges_option",
             "eligible_dc",
             "dc_reference",
-            "site_id",
+            "site_siret",
             "address",
             "city",
             "postal_code",
@@ -221,6 +222,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    producer = EntitySerializer(read_only=True)
 
     class Meta:
         model = DoubleCountingApplication

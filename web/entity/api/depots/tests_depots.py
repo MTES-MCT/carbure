@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from core.models import Entity, Pays
 from core.tests_utils import setup_current_user
-from transactions.models import Site as Depot
+from transactions.models import Depot
 
 
 class EntityDepotsTest(TestCase):
@@ -14,6 +14,7 @@ class EntityDepotsTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):

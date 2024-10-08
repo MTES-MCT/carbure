@@ -3,7 +3,7 @@ from datetime import date, datetime
 import factory
 
 from certificates.models import DoubleCountingRegistration
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class DoubleCountingRegistrationFactory(factory.django.DjangoModelFactory):

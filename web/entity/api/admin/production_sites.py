@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 
 from core.decorators import check_admin_rights
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 @check_admin_rights()
@@ -9,7 +9,7 @@ def get_entity_production_sites(request):
     company_id = request.GET.get("company_id", False)
 
     try:
-        psites = ProductionSite.objects.filter(producer__id=company_id)
+        psites = ProductionSite.objects.filter(entitysite__entity_id=company_id)
         psitesbyid = {p.id: p for p in psites}
         for _k, v in psitesbyid.items():
             v.inputs = []

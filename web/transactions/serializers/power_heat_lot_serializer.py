@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from core.models import CarbureLot
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCSVSerializer, CarbureLotPublicSerializer
-from transactions.models import Site as Depot
+from transactions.models import Depot
 
 
 # mixin serializer to add specific GHG info for power and heat production

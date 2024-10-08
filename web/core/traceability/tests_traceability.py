@@ -26,6 +26,7 @@ class TraceabilityTest(TestCase):
         "json/entities.json",
         "json/productionsites.json",
         "json/depots.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -261,7 +262,7 @@ class TraceabilityTest(TestCase):
 
     def test_traceability_stock_to_parent_lot(self):
         root_lot = CarbureLotFactory.create(
-            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site_id=1
+            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site_id=91
         )
         child_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity, depot_id=10)
         child_lot = CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=child_stock, added_by=self.entity)
