@@ -22,6 +22,14 @@ class FilterActionMixin:
                 response_only=True,
             ),
         ],
+        responses={
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                },
+            },
+        },
     )
     @action(methods=["get"], detail=False)
     def filters(self, request, *args, **kwargs):
