@@ -37,6 +37,7 @@ export const AllVariants: Story = {
         <Button {...args} variant="warning" label="Warning" />
         <Button {...args} variant="link" label="With link" />
         <Button {...args} variant="icon" icon={Cross} />
+        <Button {...args} variant="icon" icon={Cross} />
       </div>
     )
   },
