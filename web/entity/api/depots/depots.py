@@ -7,8 +7,8 @@ from transactions.models import Depot, EntitySite
 @check_user_rights()
 def get_depots(request, entity, entity_id):
     try:
-        ds = EntitySite.objects.filter(entity=entity)
-        ds = [d.natural_key() for d in ds if d.site.site_type != Depot.PRODUCTION_SITE]
+        ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.all())
+        ds = [d.natural_key() for d in ds]
     except Exception:
         return JsonResponse(
             {
