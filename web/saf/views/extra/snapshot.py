@@ -49,7 +49,23 @@ class ExtraError:
             response_only=True,
         ),
     ],
-    responses={200: OpenApiTypes.OBJECT, 400: ErrorResponseSerializer},
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "ticket_sources_available": {"type": "integer"},
+                "ticket_sources_history": {"type": "integer"},
+                "tickets_assigned": {"type": "integer"},
+                "tickets_assigned_pending": {"type": "integer"},
+                "tickets_assigned_accepted": {"type": "integer"},
+                "tickets_assigned_rejected": {"type": "integer"},
+                "tickets_received": {"type": "integer"},
+                "tickets_received_pending": {"type": "integer"},
+                "tickets_received_accepted": {"type": "integer"},
+            },
+        },
+        400: ErrorResponseSerializer,
+    },
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.AIRLINE])])

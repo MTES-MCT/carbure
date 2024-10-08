@@ -22,6 +22,7 @@ class TicketFilter(django_filters.FilterSet):
             ("feedstock__code", "feedstock"),
             ("ghg_reduction", "ghg_reduction"),
             ("created_at", "created_at"),
+            ("suppliers", "suppliers"),
         )
     )
 
