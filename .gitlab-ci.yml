@@ -53,6 +53,8 @@ check-frontend:
   extends: .frontend
   script:
     - npm run lint
+    - npx chromatic
+  interruptible: true
 
 
 .backend:

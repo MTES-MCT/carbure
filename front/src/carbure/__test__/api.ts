@@ -1,5 +1,4 @@
 import { http, HttpResponse } from "msw"
-import { setupServer } from "msw/node"
 import translations from "../../../public/locales/fr/translation.json"
 import errors from "../../../public/locales/fr/errors.json"
 import fields from "../../../public/locales/fr/fields.json"
@@ -14,7 +13,9 @@ import {
   matierePremiere,
   biocarburant,
   productionSite,
+  generateUser,
 } from "./data"
+import { mockGetWithResponseData } from "./helpers"
 
 export const okStats = http.get("/api/home-stats", () => {
   return HttpResponse.json({
@@ -106,10 +107,7 @@ export const okFieldsTranslations = http.get(
   }
 )
 
-export default setupServer(
-  okNotifications,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
-  okStats
+export const okDefaultUser = mockGetWithResponseData(
+  "/user",
+  generateUser(EntityType.Administration)
 )
