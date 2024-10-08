@@ -2,7 +2,7 @@ from django.http import JsonResponse
 
 from core.decorators import check_user_rights
 from core.serializers import GenericCertificateSerializer
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 @check_user_rights("entity_id")

@@ -28,7 +28,7 @@ from doublecount.factories import (
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.doc_file import DoubleCountingDocFileFactory
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class Endpoint:
@@ -46,6 +46,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -62,6 +63,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.production_site.country = france
         self.production_site.city = "Paris"
         self.production_site.postal_code = "75000"
+        self.production_site.dc_reference = ""
         self.production_site.save()
         self.requested_start_year = 2023
 
@@ -77,7 +79,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # Add data properties to the post data if provided
         post_data = {
             "entity_id": self.admin.id,
-            "producer_id": self.production_site.producer.id,
+            "producer_id": self.production_site.entitysite_set.first().entity.id,
             "production_site_id": self.production_site.id,
             "file": f,
         }
@@ -198,7 +200,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.production_site.save()
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 400
-
+        print(response.json())
         error = response.json()["error"]
         assert error == DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED
 

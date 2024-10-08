@@ -15,9 +15,7 @@ from core.models import (
 )
 from ml.models import EECStats, EPStats, ETDStats
 from producers.models import ProductionSiteInput, ProductionSiteOutput
-from transactions.models import EntitySite
-from transactions.models import Site as Depot
-from transactions.models import Site as ProductionSite
+from transactions.models import Depot, EntitySite, ProductionSite
 from transactions.models.year_config import YearConfig
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
@@ -142,14 +140,12 @@ def get_prefetched_data(entity=None):
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
     depotsbyentities = {}
-    associated_depots = EntitySite.objects.select_related("entity", "site").filter(site__in=Depot.depots.all())
+    associated_depots = EntitySite.objects.select_related("entity", "site").filter(site__in=Depot.objects.all())
     for entitydepot in associated_depots:
-        if entitydepot.site.site_type == Depot.PRODUCTION:
-            continue
         if entitydepot.entity.pk in depotsbyentities:
-            depotsbyentities[entitydepot.entity.pk].append(entitydepot.depot.depot_id)
+            depotsbyentities[entitydepot.entity.pk].append(entitydepot.site.depot_id)
         else:
-            depotsbyentities[entitydepot.entity.pk] = [entitydepot.depot.depot_id]
+            depotsbyentities[entitydepot.entity.pk] = [entitydepot.site.depot_id]
     data["depotsbyentity"] = depotsbyentities
 
     # MAPPING OF ENTITIES AND THEIR CERTIFICATES

@@ -6,7 +6,7 @@ import pandas as pd
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from transactions.models import Site as Depot  # noqa: E402
+from transactions.models import Depot  # noqa: E402
 
 filename = "%s/web/fixtures/csv/depots_gps_coordinates.csv" % (os.environ["CARBURE_HOME"])
 

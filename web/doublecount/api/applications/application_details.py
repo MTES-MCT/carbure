@@ -23,7 +23,8 @@ def get_application_details(request, *args, **kwargs):
         return ErrorResponse(400, DoubleCountingApplicationError.APPLICATION_NOT_FOUND)
 
     serializer = DoubleCountingApplicationSerializer(application)
-    return SuccessResponse(serializer.data)
+    s = serializer.data
+    return SuccessResponse(s)
     # if not export:
     #     return SuccessResponse(serializer.data)
     # else:

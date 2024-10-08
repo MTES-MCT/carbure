@@ -22,7 +22,7 @@ from doublecount.models import (
     DoubleCountingSourcing,
 )
 from doublecount.parser.dc_parser import parse_dc_excel
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class DoubleCountingAdminAddFrom(forms.Form):

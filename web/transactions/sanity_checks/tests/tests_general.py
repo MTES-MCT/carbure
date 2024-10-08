@@ -7,8 +7,7 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Susta
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
-from transactions.models import EntitySite, YearConfig
-from transactions.models import Site as Depot
+from transactions.models import Depot, EntitySite, YearConfig
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
@@ -23,6 +22,7 @@ class GeneralSanityChecksTest(TestCase):
         "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -60,8 +60,8 @@ class GeneralSanityChecksTest(TestCase):
     def test_mac_not_efpe(self):
         error = CarbureSanityCheckErrors.MAC_NOT_EFPE
 
-        efs = Depot.objects.filter(depot_type=Depot.EFS).first()
-        efpe = Depot.objects.filter(depot_type=Depot.EFPE).first()
+        efs = Depot.objects.filter(site_type=Depot.EFS).first()
+        efpe = Depot.objects.filter(site_type=Depot.EFPE).first()
 
         lot = self.create_lot(delivery_type=CarbureLot.BLENDING, carbure_delivery_site=efs)
 

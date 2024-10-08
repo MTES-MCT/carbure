@@ -40,7 +40,7 @@ def bulk_generate_stock_carbure_id(stocks: QuerySet[CarbureStock], save=False):
         stocks.select_related("parent_lot", "parent_transformation__source_stock__parent_lot", "production_country", "depot")
         .annotate(
             country_code=Coalesce("production_country__code_pays", Value("00"), output_field=CharField()),
-            delivery_site_id=Coalesce("depot__depot_id", Value("00"), output_field=CharField()),
+            delivery_site_id=Coalesce("depot__customs_id", Value("00"), output_field=CharField()),
             parent_lot_period=F("parent_lot__period"),
             parent_transform_period=F("parent_transformation__source_stock__parent_lot__period"),
             period=Coalesce("parent_lot_period", "parent_transform_period", Value("000000"), output_field=CharField()),

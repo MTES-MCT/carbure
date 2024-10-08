@@ -40,7 +40,7 @@ from core.serializers import (
 )
 from core.utils import CarbureEnv
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
-from transactions.models import Site as Depot
+from transactions.models import Depot
 
 sort_key_to_django_field = {
     "period": "delivery_date",

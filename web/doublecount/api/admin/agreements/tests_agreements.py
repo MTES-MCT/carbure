@@ -12,7 +12,7 @@ from doublecount.factories.production import DoubleCountingProductionFactory
 from doublecount.factories.sourcing import DoubleCountingSourcingFactory
 from doublecount.models import DoubleCountingApplication
 from transactions.factories.carbure_lot import CarbureLotFactory
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class AdminDoubleCountAgreementsTest(TestCase):
@@ -23,6 +23,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):

@@ -7,8 +7,7 @@ import xlsxwriter
 
 from core.models import Biocarburant, CarbureStock, Entity, GenericCertificate, MatierePremiere, Pays
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
-from transactions.models import Site as Depot
-from transactions.models import Site as ProductionSite
+from transactions.models import Depot, ProductionSite
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
 
 UNKNOWN_PRODUCERS = [

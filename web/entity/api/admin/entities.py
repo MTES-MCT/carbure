@@ -5,6 +5,7 @@ from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 from doublecount.models import DoubleCountingApplication
 from elec.models import ElecChargePointApplication, ElecMeterReadingApplication
+from transactions.models import Depot, ProductionSite
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
@@ -75,9 +76,9 @@ def get_entities(request, entity: Entity):
 
     # add info only visible by full admins
     if entity.entity_type == Entity.ADMIN:
-        entities = entities.prefetch_related("entitydepot_set", "productionsite_set").annotate(
-            depots=Count("entitydepot", distinct=True),
-            production_sites=Count("productionsite", distinct=True),
+        entities = entities.prefetch_related("entitysite_set").annotate(
+            depots=Count("entitysite", filter=Q(entitysite__site__in=Depot.objects.all()), distinct=True),
+            production_sites=Count("entitysite", filter=Q(entitysite__site__in=ProductionSite.objects.all()), distinct=True),
             certificates=Count("entitycertificate", distinct=True),
             certificates_pending=Count(
                 "entitycertificate",

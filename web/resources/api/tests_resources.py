@@ -10,8 +10,7 @@ from core.models import (
     Pays,
 )
 from core.tests_utils import setup_current_user
-from transactions.models import Site as Depot
-from transactions.models import Site as ProductionSite
+from transactions.models import Depot, EntitySite, ProductionSite
 
 
 class ResourcesTest(TestCase):
@@ -176,10 +175,10 @@ class ResourcesTest(TestCase):
     def test_get_delivery_sites(self):
         # create delivery sites
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
-        Depot.objects.update_or_create(name="Depot1", depot_id="007", country=fr)
-        Depot.objects.update_or_create(name="Gennevilliers", depot_id="042", country=fr)
-        Depot.objects.update_or_create(name="Gennevilliers 2", depot_id="043", country=fr)
-        Depot.objects.update_or_create(name="Carcassonne", depot_id="044", country=fr)
+        Depot.objects.update_or_create(name="Depot1", customs_id="007", country=fr)
+        Depot.objects.update_or_create(name="Gennevilliers", customs_id="042", country=fr)
+        Depot.objects.update_or_create(name="Gennevilliers 2", customs_id="043", country=fr)
+        Depot.objects.update_or_create(name="Carcassonne", customs_id="044", country=fr)
 
         url = "resources-depots"
         response = self.client.get(reverse(url))
@@ -199,30 +198,38 @@ class ResourcesTest(TestCase):
         producer, _ = Entity.objects.update_or_create(name="toto", entity_type="Producteur")
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
-        ProductionSite.objects.update_or_create(
+
+        ps1 = ProductionSite.objects.create(
             name="Usine1",
-            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
+            site_type="PRODUCTION SITE",
         )
-        ProductionSite.objects.update_or_create(
+        EntitySite.objects.create(entity=producer, site=ps1)
+
+        ps2 = ProductionSite.objects.create(
             name="Usine2",
-            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
+            site_type="PRODUCTION SITE",
         )
-        ProductionSite.objects.update_or_create(
+        EntitySite.objects.create(entity=producer, site=ps2)
+
+        ps3 = ProductionSite.objects.create(
             name="Usine3",
-            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
+            site_type="PRODUCTION SITE",
         )
-        ProductionSite.objects.update_or_create(
+        EntitySite.objects.create(entity=producer, site=ps3)
+
+        ps4 = ProductionSite.objects.create(
             name="Usine4",
-            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
+            site_type="PRODUCTION SITE",
         )
+        EntitySite.objects.create(entity=producer, site=ps4)
 
         url = "resources-production-sites"
         response = self.client.get(reverse(url))

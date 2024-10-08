@@ -17,6 +17,7 @@ class BiofuelFeedstockSanityChecksTest(TestCase):
         "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):

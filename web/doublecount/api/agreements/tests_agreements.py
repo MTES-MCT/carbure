@@ -10,7 +10,7 @@ from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 User = get_user_model()
 
@@ -23,6 +23,7 @@ class DoubleCountAgreementsTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -33,11 +34,11 @@ class DoubleCountAgreementsTest(TestCase):
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
         self.production_site1 = ProductionSite.objects.first()
-        self.production_site1.producer = self.producer
+        self.production_site1.entitysite_set.update(entity=self.producer)
         self.production_site1.save()
 
         self.production_site2 = ProductionSite.objects.first()
-        self.production_site2.producer = self.producer
+        self.production_site2.entitysite_set.update(entity=self.producer)
         self.production_site2.save()
 
         self.requested_start_year = 2023

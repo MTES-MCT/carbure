@@ -4,7 +4,7 @@ from django.http import JsonResponse
 
 from core.decorators import check_user_rights
 from core.models import Entity, Pays, UserRights
-from transactions.models import Site as ProductionSite
+from transactions.models import EntitySite, ProductionSite
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -17,9 +17,9 @@ def add_production_site(request, entity, entity_id):
 
     eligible_dc = request.POST.get("eligible_dc")
     eligible_dc = eligible_dc == "true"
-    dc_reference = request.POST.get("dc_reference")
+    dc_reference = request.POST.get("dc_reference", "")
 
-    site_id = request.POST.get("site_id")
+    site_siret = request.POST.get("site_id")
     address = request.POST.get("address")
     city = request.POST.get("city")
     postal_code = request.POST.get("postal_code")
@@ -35,7 +35,7 @@ def add_production_site(request, entity, entity_id):
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COM_DATE"}, status=400)
     if ges_option is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION"}, status=400)
-    if site_id is None:
+    if site_siret is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ID"}, status=400)
     if postal_code is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ZIP_CODE"}, status=400)
@@ -72,8 +72,7 @@ def add_production_site(request, entity, entity_id):
         )
 
     try:
-        obj, _ = ProductionSite.objects.update_or_create(
-            producer=producer,
+        site = ProductionSite.objects.create(
             country=country,
             name=name,
             city=city,
@@ -81,13 +80,17 @@ def add_production_site(request, entity, entity_id):
             postal_code=postal_code,
             eligible_dc=eligible_dc,
             dc_reference=dc_reference,
-            site_id=site_id,
+            site_siret=site_siret,
             manager_name=manager_name,
             manager_phone=manager_phone,
             manager_email=manager_email,
             date_mise_en_service=date_mise_en_service,
             ges_option=ges_option,
+            site_type=ProductionSite.PRODUCTION_SITE,
         )
+
+        if site:
+            EntitySite.objects.create(entity=producer, site=site)
 
     except Exception:
         return JsonResponse(
@@ -97,4 +100,4 @@ def add_production_site(request, entity, entity_id):
             },
             status=400,
         )
-    return JsonResponse({"status": "success", "data": obj.natural_key()})
+    return JsonResponse({"status": "success", "data": site.natural_key()})

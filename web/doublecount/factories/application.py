@@ -4,7 +4,7 @@ from datetime import date, datetime
 import factory
 
 from doublecount.models import DoubleCountingApplication
-from transactions.models import Site as ProductionSite
+from transactions.models import ProductionSite
 
 
 class DoubleCountingApplicationFactory(factory.django.DjangoModelFactory):
