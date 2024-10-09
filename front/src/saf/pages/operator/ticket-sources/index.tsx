@@ -8,7 +8,11 @@ import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
-import { SafFilter, SafOperatorSnapshot } from "saf/types"
+import {
+  SafFilter,
+  SafOperatorColumnsOrder,
+  SafOperatorSnapshot,
+} from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../api"
 import { SafFilters } from "../../../components/filters"
@@ -23,7 +27,7 @@ import NoResult from "common/components/no-result"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
-} from "common/hooks/query-builder"
+} from "common/hooks/query-builder-2"
 import { SafTicketSource, SafTicketSourceStatus } from "../types"
 
 export interface TicketSourcesProps {
@@ -38,19 +42,20 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const status = useAutoStatus()
 
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
-  const query = useCBQueryBuilder(state)
+  const query = useCBQueryBuilder<SafOperatorColumnsOrder[]>(state)
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",
     params: [query],
   })
 
-  const ticketSoucesData = ticketSourcesResponse.result?.data.data
-  const ids = ticketSoucesData?.ids ?? []
+  const ticketSoucesData = ticketSourcesResponse.result?.data
+  // const ids = ticketSoucesData?.ids ?? []
+  const ids: any = []
 
-  const total = ticketSoucesData?.total ?? 0
-  const count = ticketSoucesData?.returned ?? 0
-  const ticketSources = ticketSoucesData?.saf_ticket_sources
+  const total = ticketSoucesData?.count ?? 0
+  const count = ticketSoucesData?.results.length ?? 0
+  const ticketSources = ticketSoucesData?.results
 
   let selectedTicketSources
   if (state.selection?.length > 0 && ticketSources) {
