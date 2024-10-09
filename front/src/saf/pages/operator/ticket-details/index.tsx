@@ -97,7 +97,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          {ticket?.status === SafTicketStatus.Pending &&
+          {ticket?.status === SafTicketStatus.PENDING &&
             ticket?.client === entity.name && (
               <>
                 <Button
@@ -117,7 +117,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
           {ticket?.client !== entity.name &&
             ticket?.status &&
-            [SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
+            [SafTicketStatus.PENDING, SafTicketStatus.REJECTED].includes(
               ticket?.status
             ) && (
               <Button

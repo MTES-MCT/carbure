@@ -82,7 +82,7 @@ export const safTicketPreview1: SafTicketPreview = {
   client: "Air France",
   volume: 1000,
   created_at: "2022-01-10",
-  status: SafTicketStatus.Rejected,
+  status: SafTicketStatus.REJECTED,
 }
 
 export const safTicketPreview2: SafTicketPreview = {
@@ -91,7 +91,7 @@ export const safTicketPreview2: SafTicketPreview = {
   client: "CORSAIR",
   volume: 2000,
   created_at: "2022-02-10",
-  status: SafTicketStatus.Pending,
+  status: SafTicketStatus.PENDING,
 }
 
 export const safTicketSourceDetails: SafTicketSourceDetails = {
@@ -175,13 +175,13 @@ export const safTicket: SafTicket = {
   biofuel: bioduel1,
   country_of_origin: country1,
   ghg_reduction: 74,
-  status: SafTicketStatus.Pending,
+  status: SafTicketStatus.PENDING,
 }
 
 export const safTicketAssignedDetails: SafTicketDetails = {
   id: 12343,
   carbure_id: "A22332",
-  status: SafTicketStatus.Pending,
+  status: SafTicketStatus.PENDING,
   year: 2022,
   assignment_period: 202202,
   client: "Air France",
@@ -222,7 +222,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
 
 export const safTicketReceivedDetails: SafTicketDetails = {
   ...safTicketAssignedDetails,
-  status: SafTicketStatus.Accepted, // SafTicketStatus.Pending
+  status: SafTicketStatus.ACCEPTED, // SafTicketStatus.PENDING
   client: "TERF SAF",
   // child_ticket_source: { id: 2355, carbure_id: "adada" }
   parent_ticket_source: { id: 2355, carbure_id: "adada" },
