@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
-import useYears from "common/hooks/years"
+import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
@@ -10,6 +10,7 @@ import OperatorTabs from "./tabs"
 import TicketSources from "./ticket-sources"
 import OperatorTickets from "./tickets"
 import { SafTicketSourceStatus } from "saf/pages/operator/types"
+import { SafOperatorSnapshot } from "saf/types"
 
 export const SafOperator = () => {
   const { t } = useTranslation()
@@ -23,7 +24,7 @@ export const SafOperator = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshotData = snapshot.result?.data.data
+  const snapshotData = snapshot.result?.data as SafOperatorSnapshot
 
   return (
     <Main>

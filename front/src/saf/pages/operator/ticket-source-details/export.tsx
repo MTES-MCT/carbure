@@ -1,12 +1,12 @@
 import Button from "common/components/button"
 import { Download } from "common/components/icons"
 import { useTranslation } from "react-i18next"
-import { SafQuery } from "saf/types"
+import { SafOperatorQuery } from "saf/types"
 
 export interface ExportButtonProps {
   asideX?: boolean
-  query: SafQuery
-  download: (query: SafQuery) => unknown
+  query: SafOperatorQuery
+  download: (query: SafOperatorQuery) => unknown
 }
 
 export const ExportButton = ({

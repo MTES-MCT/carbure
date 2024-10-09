@@ -2,14 +2,13 @@ import useEntity from "carbure/hooks/entity"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
-import useYears from "../../hooks/years"
+import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import AirlineTabs from "./tabs"
 import AirlineTickets from "./tickets"
-import { SafTicketStatus } from "../../types"
-import { SafAirlineSnapshot } from "./types"
+import { SafAirlineSnapshot, SafTicketStatus } from "../../types"
 
 export const SafAirline = () => {
   const { t } = useTranslation()

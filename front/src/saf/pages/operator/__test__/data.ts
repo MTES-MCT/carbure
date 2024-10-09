@@ -2,7 +2,7 @@ import { operator, producer, productionSite } from "carbure/__test__/data"
 import { Biofuel, Country, Feedstock } from "carbure/types"
 import {
   LotPreview,
-  SafClientSnapshot,
+  SafAirlineSnapshot,
   SafOperatorSnapshot,
   SafTicket,
   SafTicketDetails,
@@ -30,7 +30,7 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   tickets_received_pending: 1,
 }
 
-export const safClientSnapshot: SafClientSnapshot = {
+export const SafAirlineSnapshot: SafAirlineSnapshot = {
   tickets_pending: 2,
   tickets_accepted: 1,
 }
