@@ -64,12 +64,6 @@ export function downloadSafAirlineTickets(query: SafQuery) {
   })
 }
 
-// export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
-//   return api.get<Api<SafTicketDetails>>("/saf/airline/tickets/details", {
-//     params: { entity_id, ticket_id },
-//   })
-// }
-
 export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
   return apiFetch.GET(`/saf/tickets/{id}/`, {
     params: {
@@ -84,9 +78,15 @@ export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
 }
 
 export function acceptSafTicket(entity_id: number, ticket_id: number) {
-  return api.post("/saf/airline/accept-ticket", {
-    entity_id,
-    ticket_id,
+  return apiFetch.POST("/saf/tickets/{id}/accept/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
@@ -95,9 +95,17 @@ export function rejectSafAirlineTicket(
   ticket_id: number,
   comment: string
 ) {
-  return api.post("/saf/airline/reject-ticket", {
-    entity_id,
-    comment,
-    ticket_id,
+  return apiFetch.POST("/saf/tickets/{id}/reject/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      comment,
+    },
   })
 }

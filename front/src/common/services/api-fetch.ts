@@ -6,16 +6,44 @@ import {
   QueryParams,
   type newPaths,
 } from "./api-fetch.types"
+import { getCookie } from "common/utils/cookies"
+
+export class HttpError extends Error {
+  public status: number // Propriété pour stocker le statut HTTP
+  public data?: any // Propriété pour stocker des données supplémentaires
+
+  constructor(message: string, status: number, data?: any) {
+    super(message)
+    this.status = status
+    this.data = data
+
+    // Maintenir la pile d'appels correcte (important pour le débogage)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, HttpError)
+    }
+
+    // Définit le nom de l'erreur
+    this.name = "CustomError"
+  }
+}
 
 const API_ROOT = `${window.location.origin}/api`
 
 const middleware: Middleware = {
   async onRequest({ request }) {
+    const csrfToken = getCookie("csrftoken")
     request.headers.set("Accept-Language", getI18n().language)
-    request.headers.set("xsrfCookieName", "csrftoken")
-    request.headers.set("xsrfHeaderName", "X-CSRFTOKEN")
+    request.headers.set("x-csrftoken", csrfToken ?? "")
 
     return request
+  },
+  onResponse: async ({ response }) => {
+    if (!response.ok) {
+      const message = await response.json()
+
+      throw new HttpError("Http error", response.status, message)
+    }
+    return response
   },
 }
 
