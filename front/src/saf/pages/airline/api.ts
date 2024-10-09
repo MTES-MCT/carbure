@@ -1,10 +1,9 @@
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
-import { api, Api, download } from "common/services/api"
 import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
-import { SafFilter, SafQuery, SafTicketDetails } from "../../types"
+import { SafFilter, SafQuery } from "../../types"
 
 //AIRLINE
 
@@ -51,6 +50,7 @@ export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
 
 // je récupère bien le nouvel objet de pagination, mais je n'ai plus la liste d'ids dans les résultats
 export function getSafAirlineTickets(query: SafQuery) {
+  const order = query.order
   return apiFetch.GET("/saf/tickets/", {
     params: {
       query,

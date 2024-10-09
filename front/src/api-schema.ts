@@ -1035,6 +1035,8 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
+        /** @description Filter string to apply */
+        filter?: string
         /** @description Ordre
          *
          *     * `volume` - Volume
