@@ -14,6 +14,7 @@ import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 startReactDsfr({ defaultColorScheme: "system" })
 
 async function enableMocking() {
+  console.log("LA VALEUR DE NODE ENV", import.meta.env.NODE_ENV)
   if (import.meta.env.NODE_ENV === "development") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { worker } = await import("./mocks")
