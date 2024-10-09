@@ -34,7 +34,7 @@ export function getAirlineSnapshot(entity_id: number, year: number) {
   })
 }
 
-// MISSING TYPE FOR RETURNED DATA
+// Le type retourné contient 6-7 valeurs, alors qu'on en recoit que 2, ca s'explique par le fait qu'on a centralisé opérateur/aviation
 export function getAirlineSnapshot2(entity_id: number, year: number) {
   return apiFetch.GET("/saf/snapshot/", {
     params: {
@@ -46,26 +46,27 @@ export function getAirlineSnapshot2(entity_id: number, year: number) {
   })
 }
 
-export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...CBQUERY_RESET }
-  return api
-    .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
-    .then((res) => res.data.data ?? [])
-}
-
-// Il manque en possibilité d'order des colonnes "supplier"
-// Le typage renvoyé par la fonction n'est pas bon, je suis censé récupérer un tableau d'entiers ou de chaines de caractères
 // export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-//   return apiFetch.GET("/saf/tickets/filters/", {
-//     params: {
-//       query: {
-//         filter: field,
-//         ...query,
-//         ...CBQUERY_RESET,
-//       },
-//     },
-//   })
+//   const params = { filter: field, ...query, ...CBQUERY_RESET }
+//   return api
+//     .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
+//     .then((res) => res.data.data ?? [])
 // }
+
+// OK
+export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
+  return apiFetch
+    .GET("/saf/tickets/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
+}
 
 // export function getSafAirlineTickets(query: SafQuery) {
 //   return api.get<Api<SafTicketsResponse>>("/saf/airline/tickets", {
