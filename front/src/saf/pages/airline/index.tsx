@@ -9,6 +9,7 @@ import * as api from "./api"
 import AirlineTabs from "./tabs"
 import AirlineTickets from "./tickets"
 import { SafTicketStatus } from "../../types"
+import { SafAirlineSnapshot } from "./types"
 
 export const SafAirline = () => {
   const { t } = useTranslation()
@@ -21,7 +22,7 @@ export const SafAirline = () => {
     key: "airline-snapshot",
     params: [entity.id, years.selected],
   })
-  const snapshotData = snapshot.result?.data.data
+  const snapshotData = snapshot.result?.data as SafAirlineSnapshot
 
   return (
     <Main>
