@@ -1,7 +1,15 @@
+import environ
 from django.db import migrations
 
 
 def insert_data_into_temp_table(apps, schema_editor):
+    env = environ.Env(
+        TEST=(bool, False),
+    )
+
+    if env("TEST") == 1:
+        return
+
     ContentToUpdate = apps.get_model("transactions", "ContentToUpdate")
     CarbureLot = apps.get_model("core", "CarbureLot")
     CarbureStock = apps.get_model("core", "CarbureStock")
