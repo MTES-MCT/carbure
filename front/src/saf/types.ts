@@ -10,11 +10,9 @@ import {
   CBQueryStates,
   CBSnapshot,
 } from "common/hooks/query-builder-2"
-import {
-  SafTicketSourcePreview,
-  SafTicketSourceStatus,
-} from "./pages/operator/types"
+import { SafTicketSourceStatus } from "./pages/operator/types"
 import { apiTypes } from "common/services/api-fetch.types"
+import { PathsApiSafTicketsGetParametersQueryOrder } from "api-schema"
 export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
@@ -126,14 +124,7 @@ export enum SafFilter {
 
 export type SafQueryType = "assigned" | "received"
 
-export type SafColumsOrder =
-  | "volume"
-  | "client"
-  // | "supplier"
-  | "period"
-  | "feedstock"
-  | "ghg_reduction"
-
+export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
 export interface SafQuery extends CBQueryParams<SafColumsOrder[]> {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]

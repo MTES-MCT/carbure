@@ -1,23 +1,13 @@
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import { api, Api, download } from "common/services/api"
-import { api as apiFetch } from "common/services/api-fetch"
 import {
-  SafClientSnapshot,
-  SafFilter,
-  SafQuery,
-  SafTicketDetails,
-  SafTicketsResponse,
-} from "../../types"
+  api as apiFetch,
+  download as downloadFetch,
+} from "common/services/api-fetch"
+import { SafFilter, SafQuery, SafTicketDetails } from "../../types"
 
 //AIRLINE
 
-// export function getAirlineYears(entity_id: number) {
-//   return api.get<Api<number[]>>("/saf/airline/years", {
-//     params: { entity_id },
-//   })
-// }
-
-// OK
 export function getAirlineYears(entity_id: number) {
   return apiFetch.GET("/saf/years/", {
     params: {
@@ -29,13 +19,6 @@ export function getAirlineYears(entity_id: number) {
 }
 
 export function getAirlineSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
-    params: { entity_id, year },
-  })
-}
-
-// Le type retourné contient 6-7 valeurs, alors qu'on en recoit que 2, ca s'explique par le fait qu'on a centralisé opérateur/aviation
-export function getAirlineSnapshot2(entity_id: number, year: number) {
   return apiFetch.GET("/saf/snapshot/", {
     params: {
       query: {
@@ -46,14 +29,6 @@ export function getAirlineSnapshot2(entity_id: number, year: number) {
   })
 }
 
-// export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-//   const params = { filter: field, ...query, ...CBQUERY_RESET }
-//   return api
-//     .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
-//     .then((res) => res.data.data ?? [])
-// }
-
-// OK
 export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
   return apiFetch
     .GET("/saf/tickets/filters/", {
@@ -84,7 +59,9 @@ export function getSafAirlineTickets(query: SafQuery) {
 }
 
 export function downloadSafAirlineTickets(query: SafQuery) {
-  return download("/saf/airline/tickets", { ...query, export: true })
+  return downloadFetch("/saf/tickets/export/", {
+    ...query,
+  })
 }
 
 export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {

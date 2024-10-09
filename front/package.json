@@ -80,7 +80,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --test",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "generate-api": "npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.d.ts --enum && eslint 'src/api-schema.d.ts' --fix",
+    "generate-api": "npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.d.ts --enum --dedupe-enums && eslint 'src/api-schema.d.ts' --fix",
     "check-diff": "git diff --exit-code ../api-schema.yaml || (echo 'Des différences ont été détectées' && exit 1)",
     "check-backend-types": "npm run generate-api && npm run check-diff && tsc --noEmit"
   },
