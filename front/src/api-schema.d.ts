@@ -4,230 +4,6 @@
  */
 
 export interface paths {
-  "/api/elec/applications/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_applications_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/{id}/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_applications_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/{id}/accept/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["elec_applications_accept_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/{id}/export/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_applications_export_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/{id}/generate_sample/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["elec_applications_generate_sample_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/{id}/get_sample/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_applications_get_sample_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/{id}/reject/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["elec_applications_reject_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/applications/filters/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_applications_filters_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/charge-points/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_charge_points_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/charge-points/{id}/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_charge_points_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/transfer-certificates/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_transfer_certificates_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/transfer-certificates/{id}/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_transfer_certificates_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/transfer-certificates/export/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_transfer_certificates_export_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/elec/transfer-certificates/filters/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["elec_transfer_certificates_filters_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/saf/clients/": {
     parameters: {
       query?: never
@@ -500,294 +276,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/transactions/api-lots/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["transactions_api_lots_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/{id}/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["transactions_api_lots_retrieve_2"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-blending/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_blending_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-consumption/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_consumption_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-direct-delivery/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_direct_delivery_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-export/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_export_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-in-stock/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_in_stock_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-processing/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_processing_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-rfc/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_rfc_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/accept-trading/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_accept_trading_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/add/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_add_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/add-excel/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_add_excel_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/approuve-fix/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_approuve_fix_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/cancel-accept/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_cancel_accept_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/export/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["transactions_api_lots_export_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/request-fix/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_request_fix_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/send/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_send_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/transactions/api-lots/submit-fix/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["transactions_api_lots_submit_fix_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -886,7 +374,7 @@ export interface components {
      *     * `OTHER` - Autre
      * @enum {string}
      */
-    CategoryEnum: "CONV" | "ANN-IX-A" | "ANN-IX-B" | "TALLOL" | "OTHER"
+    CategoryEnum: CategoryEnum
     Comment: {
       comment?: string
     }
@@ -896,19 +384,13 @@ export interface components {
      *     * `FIXED` - FIXED
      * @enum {string}
      */
-    CorrectionStatusEnum: "NO_PROBLEMO" | "IN_CORRECTION" | "FIXED"
+    CorrectionStatusEnum: CorrectionStatusEnum
     Country: {
       name: string
       name_en: string
       code_pays: string
       is_in_europe?: boolean
     }
-    /**
-     * @description * `AC` - Courant alternatif
-     *     * `DC` - Courant continu
-     * @enum {string}
-     */
-    CurrentTypeEnum: "AC" | "DC"
     /**
      * @description * `UNKNOWN` - UNKNOWN
      *     * `RFC` - RFC
@@ -922,17 +404,7 @@ export interface components {
      *     * `CONSUMPTION` - CONSUMPTION
      * @enum {string}
      */
-    DeliveryTypeEnum:
-      | "UNKNOWN"
-      | "RFC"
-      | "STOCK"
-      | "BLENDING"
-      | "EXPORT"
-      | "TRADING"
-      | "PROCESSING"
-      | "DIRECT"
-      | "FLUSHED"
-      | "CONSUMPTION"
+    DeliveryTypeEnum: DeliveryTypeEnum
     Depot: {
       readonly id: number
       name: string
@@ -956,82 +428,7 @@ export interface components {
      *     * `COGENERATION PLANT` - COGENERATION PLANT
      * @enum {string}
      */
-    DepotTypeEnum:
-      | "OTHER"
-      | "EFS"
-      | "EFPE"
-      | "OIL DEPOT"
-      | "BIOFUEL DEPOT"
-      | "HEAT PLANT"
-      | "POWER PLANT"
-      | "COGENERATION PLANT"
-    ElecChargePoint: {
-      readonly id: number
-      readonly cpo: string
-      charge_point_id: string
-      current_type: components["schemas"]["CurrentTypeEnum"]
-      /** Format: date */
-      application_date: string
-      /** Format: date */
-      installation_date: string
-      readonly mid_id: string
-      readonly measure_date: string
-      readonly measure_energy: string
-      readonly latest_meter_reading_date: string
-      is_article_2?: boolean
-      measure_reference_point_id?: string | null
-      station_name: string
-      station_id: string
-      readonly nominal_power: string
-      cpo_name?: string | null
-      cpo_siren?: string | null
-      readonly status: string
-    }
-    ElecChargePointApplication: {
-      readonly id: number
-      cpo: components["schemas"]["EntityPreview"]
-      status?: components["schemas"]["Status54eEnum"]
-      /** Format: date */
-      application_date: string
-      readonly station_count: string
-      readonly charge_point_count: string
-      readonly power_total: string
-    }
-    ElecChargePointApplicationDetails: {
-      readonly id: number
-      cpo: components["schemas"]["EntityPreview"]
-      status?: components["schemas"]["Status54eEnum"]
-      /** Format: date */
-      application_date: string
-      readonly station_count: string
-      readonly charge_point_count: string
-      readonly power_total: string
-      readonly email_contacts: string
-      readonly sample: string
-    }
-    ElecTransferCertificate: {
-      readonly id: number
-      readonly supplier: components["schemas"]["EntityPreview"]
-      readonly client: components["schemas"]["EntityPreview"]
-      /** Format: date */
-      transfer_date: string
-      /** Format: double */
-      energy_amount: number
-      status?: components["schemas"]["StatusA18Enum"]
-      certificate_id: string
-    }
-    ElecTransferCertificateDetails: {
-      readonly id: number
-      readonly supplier: components["schemas"]["EntityPreview"]
-      readonly client: components["schemas"]["EntityPreview"]
-      /** Format: date */
-      transfer_date: string
-      /** Format: double */
-      energy_amount: number
-      status?: components["schemas"]["StatusA18Enum"]
-      certificate_id: string
-      comment?: string | null
-    }
+    DepotTypeEnum: DepotTypeEnum
     Entity: {
       readonly id: number
       name: string
@@ -1077,17 +474,7 @@ export interface components {
      *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
      * @enum {string}
      */
-    EntityTypeEnum:
-      | "Producteur"
-      | "Opérateur"
-      | "Administration"
-      | "Trader"
-      | "Auditor"
-      | "Administration Externe"
-      | "Charge Point Operator"
-      | "Compagnie aérienne"
-      | "Unknown"
-      | "Power or Heat Producer"
+    EntityTypeEnum: EntityTypeEnum
     ErrorResponse: {
       message: string
     }
@@ -1104,7 +491,7 @@ export interface components {
      *     * `NUTS2` - Valeurs NUTS2
      * @enum {string}
      */
-    GesOptionEnum: "Default" | "Actual" | "NUTS2"
+    GesOptionEnum: GesOptionEnum
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -1114,58 +501,7 @@ export interface components {
      *     * `DELETED` - DELETED
      * @enum {string}
      */
-    LotStatusEnum:
-      | "DRAFT"
-      | "PENDING"
-      | "ACCEPTED"
-      | "REJECTED"
-      | "FROZEN"
-      | "DELETED"
-    PaginatedElecChargePointApplicationList: {
-      /** @example 123 */
-      count: number
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null
-      results: components["schemas"]["ElecChargePointApplication"][]
-    }
-    PaginatedElecChargePointList: {
-      /** @example 123 */
-      count: number
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null
-      results: components["schemas"]["ElecChargePoint"][]
-    }
-    PaginatedElecTransferCertificateList: {
-      /** @example 123 */
-      count: number
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null
-      results: components["schemas"]["ElecTransferCertificate"][]
-    }
+    LotStatusEnum: LotStatusEnum
     PaginatedSafClientList: {
       /** @example 123 */
       count: number
@@ -1217,7 +553,7 @@ export interface components {
      *     * `MJ` - MJ
      * @enum {string}
      */
-    PreferredUnitEnum: "l" | "kg" | "MJ"
+    PreferredUnitEnum: PreferredUnitEnum
     ProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -1247,7 +583,7 @@ export interface components {
       carbure_id?: string | null
       year: number
       assignment_period: number
-      status?: components["schemas"]["Status499Enum"]
+      status?: components["schemas"]["StatusEnum"]
       /** Format: date */
       agreement_date?: string | null
       readonly supplier: string
@@ -1265,7 +601,7 @@ export interface components {
       carbure_id?: string | null
       year: number
       assignment_period: number
-      status?: components["schemas"]["Status499Enum"]
+      status?: components["schemas"]["StatusEnum"]
       /** Format: date-time */
       readonly created_at: string | null
       readonly supplier: string
@@ -1412,28 +748,7 @@ export interface components {
      *     * `REJECTED` - Refusé
      * @enum {string}
      */
-    Status499Enum: "PENDING" | "ACCEPTED" | "REJECTED"
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `ACCEPTED` - ACCEPTED
-     *     * `REJECTED` - REJECTED
-     *     * `AUDIT_DONE` - AUDIT_DONE
-     *     * `AUDIT_IN_PROGRESS` - AUDIT_IN_PROGRESS
-     * @enum {string}
-     */
-    Status54eEnum:
-      | "PENDING"
-      | "ACCEPTED"
-      | "REJECTED"
-      | "AUDIT_DONE"
-      | "AUDIT_IN_PROGRESS"
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `ACCEPTED` - ACCEPTED
-     *     * `REJECTED` - REJECTED
-     * @enum {string}
-     */
-    StatusA18Enum: "PENDING" | "ACCEPTED" | "REJECTED"
+    StatusEnum: StatusEnum
     /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
@@ -1443,7 +758,7 @@ export interface components {
      *     * `OTHER` - OTHER
      * @enum {string}
      */
-    TransportDocumentTypeEnum: "DAU" | "DAE" | "DSA" | "DSAC" | "DSP" | "OTHER"
+    TransportDocumentTypeEnum: TransportDocumentTypeEnum
   }
   responses: never
   parameters: never
@@ -1453,386 +768,6 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  elec_applications_list: {
-    parameters: {
-      query?: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        company_id?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        cpo?: string[]
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        /** @description A page number within the paginated result set. */
-        page?: number
-        /** @description A search term. */
-        search?: string
-        /** @description * `PENDING` - PENDING
-         *     * `ACCEPTED` - ACCEPTED
-         *     * `REJECTED` - REJECTED
-         *     * `AUDIT_DONE` - AUDIT_DONE
-         *     * `AUDIT_IN_PROGRESS` - AUDIT_IN_PROGRESS */
-        status?:
-          | "ACCEPTED"
-          | "AUDIT_DONE"
-          | "AUDIT_IN_PROGRESS"
-          | "PENDING"
-          | "REJECTED"
-        /** @description Transfer date year */
-        year?: number
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PaginatedElecChargePointApplicationList"]
-        }
-      }
-    }
-  }
-  elec_applications_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Inscription points de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplicationDetails"]
-        }
-      }
-    }
-  }
-  elec_applications_accept_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Inscription points de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ElecChargePointApplication"]
-        "application/x-www-form-urlencoded": components["schemas"]["ElecChargePointApplication"]
-        "multipart/form-data": components["schemas"]["ElecChargePointApplication"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplication"]
-        }
-      }
-    }
-  }
-  elec_applications_export_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Inscription points de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplication"]
-        }
-      }
-    }
-  }
-  elec_applications_generate_sample_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Inscription points de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ElecChargePointApplication"]
-        "application/x-www-form-urlencoded": components["schemas"]["ElecChargePointApplication"]
-        "multipart/form-data": components["schemas"]["ElecChargePointApplication"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplication"]
-        }
-      }
-    }
-  }
-  elec_applications_get_sample_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Inscription points de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplication"]
-        }
-      }
-    }
-  }
-  elec_applications_reject_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Inscription points de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ElecChargePointApplication"]
-        "application/x-www-form-urlencoded": components["schemas"]["ElecChargePointApplication"]
-        "multipart/form-data": components["schemas"]["ElecChargePointApplication"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplication"]
-        }
-      }
-    }
-  }
-  elec_applications_filters_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePointApplication"]
-        }
-      }
-    }
-  }
-  elec_charge_points_list: {
-    parameters: {
-      query?: {
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        /** @description A page number within the paginated result set. */
-        page?: number
-        /** @description A search term. */
-        search?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PaginatedElecChargePointList"]
-        }
-      }
-    }
-  }
-  elec_charge_points_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Point de recharge. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecChargePoint"]
-        }
-      }
-    }
-  }
-  elec_transfer_certificates_list: {
-    parameters: {
-      query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        cpo?: string[]
-        /** @description Entity Id */
-        entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        operator?: string[]
-        /** @description Ordre
-         *
-         *     * `transfer_date` - Transfer date
-         *     * `-transfer_date` - Transfer date (décroissant)
-         *     * `energy_amount` - Energy amount
-         *     * `-energy_amount` - Energy amount (décroissant)
-         *     * `cpo` - Cpo
-         *     * `-cpo` - Cpo (décroissant)
-         *     * `operator` - Operator
-         *     * `-operator` - Operator (décroissant) */
-        order?: (
-          | "-cpo"
-          | "-energy_amount"
-          | "-operator"
-          | "-transfer_date"
-          | "cpo"
-          | "energy_amount"
-          | "operator"
-          | "transfer_date"
-        )[]
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        /** @description A page number within the paginated result set. */
-        page?: number
-        /** @description A search term. */
-        search?: string
-        /** @description * `PENDING` - PENDING
-         *     * `ACCEPTED` - ACCEPTED
-         *     * `REJECTED` - REJECTED */
-        status?: "ACCEPTED" | "PENDING" | "REJECTED"
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        transfer_date?: string[]
-        /** @description Transfer date year */
-        year?: number
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PaginatedElecTransferCertificateList"]
-        }
-      }
-    }
-  }
-  elec_transfer_certificates_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Certificat de Cession (elec). */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecTransferCertificateDetails"]
-        }
-      }
-    }
-  }
-  elec_transfer_certificates_export_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecTransferCertificate"]
-        }
-      }
-    }
-  }
-  elec_transfer_certificates_filters_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ElecTransferCertificate"]
-        }
-      }
-    }
-  }
   saf_clients_list: {
     parameters: {
       query?: {
@@ -1902,7 +837,15 @@ export interface operations {
         }
         content: {
           "application/json": {
-            [key: string]: unknown
+            ticket_sources_available?: number
+            ticket_sources_history?: number
+            tickets_assigned?: number
+            tickets_assigned_pending?: number
+            tickets_assigned_accepted?: number
+            tickets_assigned_rejected?: number
+            tickets_received?: number
+            tickets_received_pending?: number
+            tickets_received_accepted?: number
           }
         }
       }
@@ -1938,16 +881,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: (
-          | "-feedstock"
-          | "-ghg_reduction"
-          | "-period"
-          | "-volume"
-          | "feedstock"
-          | "ghg_reduction"
-          | "period"
-          | "volume"
-        )[]
+        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -2054,16 +988,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: (
-          | "-feedstock"
-          | "-ghg_reduction"
-          | "-period"
-          | "-volume"
-          | "feedstock"
-          | "ghg_reduction"
-          | "period"
-          | "volume"
-        )[]
+        order?: PathsApiSafTicketSourcesExportGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -2115,16 +1040,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: (
-          | "-feedstock"
-          | "-ghg_reduction"
-          | "-period"
-          | "-volume"
-          | "feedstock"
-          | "ghg_reduction"
-          | "period"
-          | "volume"
-        )[]
+        order?: PathsApiSafTicketSourcesFiltersGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -2149,7 +1065,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicketSource"]
+          "application/json": string[]
         }
       }
     }
@@ -2213,21 +1129,10 @@ export interface operations {
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order?: (
-          | "-client"
-          | "-created_at"
-          | "-feedstock"
-          | "-ghg_reduction"
-          | "-period"
-          | "-volume"
-          | "client"
-          | "created_at"
-          | "feedstock"
-          | "ghg_reduction"
-          | "period"
-          | "volume"
-        )[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `suppliers` - Suppliers
+         *     * `-suppliers` - Suppliers (décroissant) */
+        order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -2424,21 +1329,10 @@ export interface operations {
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order?: (
-          | "-client"
-          | "-created_at"
-          | "-feedstock"
-          | "-ghg_reduction"
-          | "-period"
-          | "-volume"
-          | "client"
-          | "created_at"
-          | "feedstock"
-          | "ghg_reduction"
-          | "period"
-          | "volume"
-        )[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `suppliers` - Suppliers
+         *     * `-suppliers` - Suppliers (décroissant) */
+        order?: PathsApiSafTicketsExportGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -2491,21 +1385,10 @@ export interface operations {
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order?: (
-          | "-client"
-          | "-created_at"
-          | "-feedstock"
-          | "-ghg_reduction"
-          | "-period"
-          | "-volume"
-          | "client"
-          | "created_at"
-          | "feedstock"
-          | "ghg_reduction"
-          | "period"
-          | "volume"
-        )[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `suppliers` - Suppliers
+         *     * `-suppliers` - Suppliers (décroissant) */
+        order?: PathsApiSafTicketsFiltersGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -2530,7 +1413,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicket"]
+          "application/json": string[]
         }
       }
     }
@@ -2565,330 +1448,159 @@ export interface operations {
       }
     }
   }
-  transactions_api_lots_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_retrieve_2: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_blending_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_consumption_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_direct_delivery_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_export_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_in_stock_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_processing_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_rfc_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_accept_trading_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_add_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_add_excel_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_approuve_fix_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_cancel_accept_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_export_retrieve: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_request_fix_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_send_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  transactions_api_lots_submit_fix_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
+}
+export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
+  ValueMinusfeedstock = "-feedstock",
+  ValueMinusghg_reduction = "-ghg_reduction",
+  ValueMinusperiod = "-period",
+  ValueMinusvolume = "-volume",
+  feedstock = "feedstock",
+  ghg_reduction = "ghg_reduction",
+  period = "period",
+  volume = "volume",
+}
+export enum PathsApiSafTicketSourcesExportGetParametersQueryOrder {
+  ValueMinusfeedstock = "-feedstock",
+  ValueMinusghg_reduction = "-ghg_reduction",
+  ValueMinusperiod = "-period",
+  ValueMinusvolume = "-volume",
+  feedstock = "feedstock",
+  ghg_reduction = "ghg_reduction",
+  period = "period",
+  volume = "volume",
+}
+export enum PathsApiSafTicketSourcesFiltersGetParametersQueryOrder {
+  ValueMinusfeedstock = "-feedstock",
+  ValueMinusghg_reduction = "-ghg_reduction",
+  ValueMinusperiod = "-period",
+  ValueMinusvolume = "-volume",
+  feedstock = "feedstock",
+  ghg_reduction = "ghg_reduction",
+  period = "period",
+  volume = "volume",
+}
+export enum PathsApiSafTicketsGetParametersQueryOrder {
+  ValueMinusclient = "-client",
+  ValueMinuscreated_at = "-created_at",
+  ValueMinusfeedstock = "-feedstock",
+  ValueMinusghg_reduction = "-ghg_reduction",
+  ValueMinusperiod = "-period",
+  ValueMinussuppliers = "-suppliers",
+  ValueMinusvolume = "-volume",
+  client = "client",
+  created_at = "created_at",
+  feedstock = "feedstock",
+  ghg_reduction = "ghg_reduction",
+  period = "period",
+  suppliers = "suppliers",
+  volume = "volume",
+}
+export enum PathsApiSafTicketsExportGetParametersQueryOrder {
+  ValueMinusclient = "-client",
+  ValueMinuscreated_at = "-created_at",
+  ValueMinusfeedstock = "-feedstock",
+  ValueMinusghg_reduction = "-ghg_reduction",
+  ValueMinusperiod = "-period",
+  ValueMinussuppliers = "-suppliers",
+  ValueMinusvolume = "-volume",
+  client = "client",
+  created_at = "created_at",
+  feedstock = "feedstock",
+  ghg_reduction = "ghg_reduction",
+  period = "period",
+  suppliers = "suppliers",
+  volume = "volume",
+}
+export enum PathsApiSafTicketsFiltersGetParametersQueryOrder {
+  ValueMinusclient = "-client",
+  ValueMinuscreated_at = "-created_at",
+  ValueMinusfeedstock = "-feedstock",
+  ValueMinusghg_reduction = "-ghg_reduction",
+  ValueMinusperiod = "-period",
+  ValueMinussuppliers = "-suppliers",
+  ValueMinusvolume = "-volume",
+  client = "client",
+  created_at = "created_at",
+  feedstock = "feedstock",
+  ghg_reduction = "ghg_reduction",
+  period = "period",
+  suppliers = "suppliers",
+  volume = "volume",
+}
+export enum CategoryEnum {
+  CONV = "CONV",
+  ANN_IX_A = "ANN-IX-A",
+  ANN_IX_B = "ANN-IX-B",
+  TALLOL = "TALLOL",
+  OTHER = "OTHER",
+}
+export enum CorrectionStatusEnum {
+  NO_PROBLEMO = "NO_PROBLEMO",
+  IN_CORRECTION = "IN_CORRECTION",
+  FIXED = "FIXED",
+}
+export enum DeliveryTypeEnum {
+  UNKNOWN = "UNKNOWN",
+  RFC = "RFC",
+  STOCK = "STOCK",
+  BLENDING = "BLENDING",
+  EXPORT = "EXPORT",
+  TRADING = "TRADING",
+  PROCESSING = "PROCESSING",
+  DIRECT = "DIRECT",
+  FLUSHED = "FLUSHED",
+  CONSUMPTION = "CONSUMPTION",
+}
+export enum DepotTypeEnum {
+  OTHER = "OTHER",
+  EFS = "EFS",
+  EFPE = "EFPE",
+  OIL_DEPOT = "OIL DEPOT",
+  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
+  HEAT_PLANT = "HEAT PLANT",
+  POWER_PLANT = "POWER PLANT",
+  COGENERATION_PLANT = "COGENERATION PLANT",
+}
+export enum EntityTypeEnum {
+  Producteur = "Producteur",
+  Op_rateur = "Op\u00E9rateur",
+  Administration = "Administration",
+  Trader = "Trader",
+  Auditor = "Auditor",
+  Administration_Externe = "Administration Externe",
+  Charge_Point_Operator = "Charge Point Operator",
+  Compagnie_a_rienne = "Compagnie a\u00E9rienne",
+  Unknown = "Unknown",
+  Power_or_Heat_Producer = "Power or Heat Producer",
+}
+export enum GesOptionEnum {
+  Default = "Default",
+  Actual = "Actual",
+  NUTS2 = "NUTS2",
+}
+export enum LotStatusEnum {
+  DRAFT = "DRAFT",
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+  FROZEN = "FROZEN",
+  DELETED = "DELETED",
+}
+export enum PreferredUnitEnum {
+  l = "l",
+  kg = "kg",
+  MJ = "MJ",
+}
+export enum StatusEnum {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+}
+export enum TransportDocumentTypeEnum {
+  DAU = "DAU",
+  DAE = "DAE",
+  DSA = "DSA",
+  DSAC = "DSAC",
+  DSP = "DSP",
+  OTHER = "OTHER",
 }

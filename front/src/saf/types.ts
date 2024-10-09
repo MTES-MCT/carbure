@@ -56,34 +56,9 @@ export interface SafTicketPreview {
   created_at: string
 }
 
-export interface SafTicket {
-  id: number
-  carbure_id: string
-  year: number
-  assignment_period: number
-  created_at: string
-  supplier: string
-  client: string
-  volume: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-  country_of_origin: Country
-  ghg_reduction: number
-  status: SafTicketStatus
-}
+export type SafTicket = apiTypes["SafTicket"]
 
-export interface SafTicketDetails
-  extends SafTicket,
-    SafProduction,
-    SafDurability {
-  free_field?: string
-  client_comment?: string
-  // child_ticket_source?: {
-  //   id: number
-  //   carbure_id: string
-  // },
-  parent_ticket_source?: SafTicketSourcePreview
-}
+export type SafTicketDetails = apiTypes["SafTicketDetails"]
 
 export interface SafProduction {
   carbure_producer: Entity | null
@@ -113,14 +88,14 @@ export interface SafTicketAssignementQuery {
   free_field: string
 }
 
-export interface SafTicketsResponse {
-  saf_tickets: SafTicket[]
-  from: number
-  returned: number
-  total: number
-  ids: number[]
-}
-// export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
+// export interface SafTicketsResponse {
+//   saf_tickets: SafTicket[]
+//   from: number
+//   returned: number
+//   total: number
+//   ids: number[]
+// }
+export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
 
 export interface SafStates extends CBQueryStates {
   //old QueryParams
