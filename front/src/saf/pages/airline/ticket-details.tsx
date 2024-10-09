@@ -43,7 +43,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
     },
   })
 
-  const ticket = ticketResponse.result?.data?.data
+  const ticket = ticketResponse.result?.data
   // const ticket = safTicketDetails //TO TEST
 
   const showRejectModal = () => {
@@ -77,7 +77,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          {ticket?.status === SafTicketStatus.Pending && (
+          {ticket?.status === SafTicketStatus.PENDING && (
             <>
               <Button
                 icon={Check}

@@ -12,7 +12,11 @@ import {
 } from "common/hooks/query-builder-2"
 import { SafTicketSourceStatus } from "./pages/operator/types"
 import { apiTypes } from "common/services/api-fetch.types"
-import { PathsApiSafTicketsGetParametersQueryOrder } from "api-schema"
+import {
+  PathsApiSafTicketsGetParametersQueryOrder,
+  StatusEnum as SafTicketStatus,
+} from "api-schema"
+
 export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
@@ -106,12 +110,6 @@ export interface SafStates extends CBQueryStates {
 
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
 
-export enum SafTicketStatus {
-  Pending = "PENDING",
-  Accepted = "ACCEPTED",
-  Rejected = "REJECTED",
-}
-
 export enum SafFilter {
   Feedstocks = "feedstocks",
   Periods = "periods",
@@ -130,3 +128,6 @@ export interface SafQuery extends CBQueryParams<SafColumsOrder[]> {
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
 }
+
+// Generated enum is EnumStatus and the name is not readable
+export { SafTicketStatus }

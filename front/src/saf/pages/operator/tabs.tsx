@@ -228,7 +228,7 @@ export function useAutoStatus() {
     matchView.params.view === "tickets-received"
   ) {
     const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
-    return status ?? SafTicketStatus.Pending
+    return status ?? SafTicketStatus.PENDING
   }
 
   return SafTicketSourceStatus.Available

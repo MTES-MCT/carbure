@@ -26,8 +26,8 @@ export const AirlineTabs = ({
       className={css.safTabs}
       tabs={compact([
         {
-          key: SafTicketStatus.Pending,
-          path: `tickets/${SafTicketStatus.Pending.toLowerCase()}`,
+          key: SafTicketStatus.PENDING,
+          path: `tickets/${SafTicketStatus.PENDING.toLowerCase()}`,
           label: (
             <Row>
               <Col>
@@ -48,8 +48,8 @@ export const AirlineTabs = ({
           ),
         },
         {
-          key: SafTicketStatus.Accepted,
-          path: `tickets/${SafTicketStatus.Accepted.toLowerCase()}`,
+          key: SafTicketStatus.ACCEPTED,
+          path: `tickets/${SafTicketStatus.ACCEPTED.toLowerCase()}`,
           label: (
             <Row>
               <Col>
@@ -80,7 +80,7 @@ const defaultCount: SafClientSnapshot = {
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/saf/:year/tickets/:status/*")
   const status = matchStatus?.params.status as SafTicketStatus
-  return (status.toUpperCase() as SafTicketStatus) ?? SafTicketStatus.Pending
+  return (status.toUpperCase() as SafTicketStatus) ?? SafTicketStatus.PENDING
 }
 
 export default AirlineTabs

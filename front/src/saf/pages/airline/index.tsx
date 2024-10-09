@@ -66,7 +66,7 @@ export const SafAirline = () => {
           element={
             <Navigate
               replace
-              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}/`}
+              to={`tickets/${SafTicketStatus.PENDING.toLocaleLowerCase()}/`}
             />
           }
         />
