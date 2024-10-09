@@ -535,6 +535,11 @@ paths:
         explode: false
         style: form
       - in: query
+        name: filter
+        schema:
+          type: string
+        description: Filter string to apply
+      - in: query
         name: order
         schema:
           type: array
