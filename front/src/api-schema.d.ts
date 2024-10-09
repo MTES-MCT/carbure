@@ -836,17 +836,22 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": {
-            ticket_sources_available?: number
-            ticket_sources_history?: number
-            tickets_assigned?: number
-            tickets_assigned_pending?: number
-            tickets_assigned_accepted?: number
-            tickets_assigned_rejected?: number
-            tickets_received?: number
-            tickets_received_pending?: number
-            tickets_received_accepted?: number
-          }
+          "application/json":
+            | {
+                tickets_pending: number
+                tickets_accepted: number
+              }
+            | {
+                ticket_sources_available: number
+                ticket_sources_history: number
+                tickets_assigned: number
+                tickets_assigned_pending: number
+                tickets_assigned_accepted: number
+                tickets_assigned_rejected: number
+                tickets_received: number
+                tickets_received_pending: number
+                tickets_received_accepted: number
+              }
         }
       }
       400: {
@@ -988,7 +993,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesExportGetParametersQueryOrder[]
+        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1040,7 +1045,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesFiltersGetParametersQueryOrder[]
+        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1332,7 +1337,7 @@ export interface operations {
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
          *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsExportGetParametersQueryOrder[]
+        order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1372,6 +1377,8 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
+        /** @description Filter string to apply */
+        filter?: string
         /** @description Ordre
          *
          *     * `client` - Client
@@ -1388,7 +1395,7 @@ export interface operations {
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
          *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsFiltersGetParametersQueryOrder[]
+        order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1459,59 +1466,7 @@ export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
   period = "period",
   volume = "volume",
 }
-export enum PathsApiSafTicketSourcesExportGetParametersQueryOrder {
-  ValueMinusfeedstock = "-feedstock",
-  ValueMinusghg_reduction = "-ghg_reduction",
-  ValueMinusperiod = "-period",
-  ValueMinusvolume = "-volume",
-  feedstock = "feedstock",
-  ghg_reduction = "ghg_reduction",
-  period = "period",
-  volume = "volume",
-}
-export enum PathsApiSafTicketSourcesFiltersGetParametersQueryOrder {
-  ValueMinusfeedstock = "-feedstock",
-  ValueMinusghg_reduction = "-ghg_reduction",
-  ValueMinusperiod = "-period",
-  ValueMinusvolume = "-volume",
-  feedstock = "feedstock",
-  ghg_reduction = "ghg_reduction",
-  period = "period",
-  volume = "volume",
-}
 export enum PathsApiSafTicketsGetParametersQueryOrder {
-  ValueMinusclient = "-client",
-  ValueMinuscreated_at = "-created_at",
-  ValueMinusfeedstock = "-feedstock",
-  ValueMinusghg_reduction = "-ghg_reduction",
-  ValueMinusperiod = "-period",
-  ValueMinussuppliers = "-suppliers",
-  ValueMinusvolume = "-volume",
-  client = "client",
-  created_at = "created_at",
-  feedstock = "feedstock",
-  ghg_reduction = "ghg_reduction",
-  period = "period",
-  suppliers = "suppliers",
-  volume = "volume",
-}
-export enum PathsApiSafTicketsExportGetParametersQueryOrder {
-  ValueMinusclient = "-client",
-  ValueMinuscreated_at = "-created_at",
-  ValueMinusfeedstock = "-feedstock",
-  ValueMinusghg_reduction = "-ghg_reduction",
-  ValueMinusperiod = "-period",
-  ValueMinussuppliers = "-suppliers",
-  ValueMinusvolume = "-volume",
-  client = "client",
-  created_at = "created_at",
-  feedstock = "feedstock",
-  ghg_reduction = "ghg_reduction",
-  period = "period",
-  suppliers = "suppliers",
-  volume = "volume",
-}
-export enum PathsApiSafTicketsFiltersGetParametersQueryOrder {
   ValueMinusclient = "-client",
   ValueMinuscreated_at = "-created_at",
   ValueMinusfeedstock = "-feedstock",
