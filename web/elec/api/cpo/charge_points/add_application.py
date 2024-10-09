@@ -56,6 +56,15 @@ def add_application(request: HttpRequest, entity: Entity):
         # to associate it to the right charge point
         meters = []
         for data in charge_point_data:
+            # Do not create a meter if the MID is not provided
+            if not data.get("mid_id") or len(data.get("mid_id")) < 4:
+                meter = None
+                meters.append(meter)
+                data.pop("mid_id")
+                data.pop("measure_energy")
+                data.pop("measure_date")
+                continue
+
             meter = ElecMeter(
                 mid_certificate=data.pop("mid_id"),
                 initial_index=data.pop("measure_energy"),
@@ -77,6 +86,10 @@ def add_application(request: HttpRequest, entity: Entity):
         ]
         ElecChargePoint.objects.bulk_create(charge_points)
 
+        # Remove the None meters from meters list
+        meters = [meter for meter in meters if meter]
+
+        # Get new charge points with meter associated
         new_charge_points = ElecChargePoint.objects.filter(current_meter__in=meters).order_by("id")
 
         # Associate the right charge point to the right meter
