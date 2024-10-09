@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import css from "../../components/tabs.module.css"
 
-import { SafOperatorSnapshot, SafTicketStatus } from "saf/types"
-import { SafTicketSourceStatus } from "./types"
+import { SafTicketStatus } from "saf/types"
+import { SafTicketSourceStatus, SafOperatorSnapshot } from "./types"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -84,7 +84,6 @@ export const OperatorTabs = ({
 const defaultCount: SafOperatorSnapshot = {
   ticket_sources_available: 0,
   ticket_sources_history: 0,
-  tickets: 0,
   tickets_assigned: 0,
   tickets_assigned_accepted: 0,
   tickets_assigned_pending: 0,

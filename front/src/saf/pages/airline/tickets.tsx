@@ -7,7 +7,7 @@ import { SearchInput } from "common/components/input"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
-  SafClientSnapshot,
+  SafAirlineSnapshot,
   SafColumsOrder,
   SafFilter,
   SafQuery,
@@ -28,7 +28,7 @@ import {
 
 export interface AirlineTicketsProps {
   year: number
-  snapshot?: SafClientSnapshot
+  snapshot?: SafAirlineSnapshot
 }
 
 export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
