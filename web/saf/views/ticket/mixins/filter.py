@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -8,6 +8,14 @@ from core.models import Entity
 class FilterActionMixin:
     @extend_schema(
         filters=True,
+        parameters=[
+            OpenApiParameter(
+                name="filter",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter string to apply",
+            ),
+        ],
         examples=[
             OpenApiExample(
                 "Example of filters response.",
