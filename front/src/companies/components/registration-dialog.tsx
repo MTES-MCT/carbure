@@ -207,139 +207,136 @@ const PrefetchedCompanyForm = ({
   const companyForm = useCompanyForm(prefetchedCompany)
 
   return (
-    <>
-      <Form form={companyForm} id="add-company" onSubmit={onSubmitForm}>
-        <TextInput
-          required
-          label={t("N° d'enregistrement de la société (SIREN)")}
-          {...companyForm.bind("registration_id")}
-          disabled
-        />
-        <TextInput
-          required
-          label={t("Nom de la société (visible dans carbure)")}
-          {...companyForm.bind("name")}
-        />
-        <TextInput
-          required
-          label={t("Nom légal")}
-          {...companyForm.bind("legal_name")}
-          disabled
-        />
-        <TextInput
-          required
-          label={t("Adresse de la société (Numéro et rue)")}
-          {...companyForm.bind("registered_address")}
-          disabled
-        />
-        <TextInput
-          required
-          label={t("Ville")}
-          {...companyForm.bind("registered_city")}
-          disabled
-        />
-        <TextInput
-          required
-          label={t("Code postal")}
-          {...companyForm.bind("registered_zipcode")}
-          disabled
-        />
-        <Autocomplete
-          label={t("Pays")}
-          placeholder={t("Rechercher un pays...")}
-          getOptions={findCountries}
-          normalize={normalizeCountry}
-          {...companyForm.bind("registered_country")}
-          disabled
-        />
-        <TextInput
-          required
-          label={t("Responsable durabilité")}
-          placeholder="Jean-Pierre Champollion"
-          {...companyForm.bind("sustainability_officer")}
-        />
-        <TextInput
-          required
-          type="tel"
-          pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
-          label={t(
-            "N° téléphone responsable durabilité (commence par +33 pour la France)"
-          )}
-          placeholder="exemple : +33612345678"
-          {...companyForm.bind("sustainability_officer_phone_number")}
-        />
-        <TextInput
-          required
-          type="email"
-          label={t("Email responsable durabilité")}
-          {...companyForm.bind("sustainability_officer_email")}
-        />
+    <Form form={companyForm} id="add-company" onSubmit={onSubmitForm}>
+      <TextInput
+        required
+        label={t("N° d'enregistrement de la société (SIREN)")}
+        {...companyForm.bind("registration_id")}
+        disabled
+      />
+      <TextInput
+        required
+        label={t("Nom de la société (visible dans carbure)")}
+        {...companyForm.bind("name")}
+      />
+      <TextInput
+        required
+        label={t("Nom légal")}
+        {...companyForm.bind("legal_name")}
+      />
+      <TextInput
+        required
+        label={t("Adresse de la société (Numéro et rue)")}
+        {...companyForm.bind("registered_address")}
+      />
+      <TextInput
+        required
+        label={t("Ville")}
+        {...companyForm.bind("registered_city")}
+      />
+      <TextInput
+        required
+        label={t("Code postal")}
+        {...companyForm.bind("registered_zipcode")}
+      />
+      <Autocomplete
+        label={t("Pays")}
+        placeholder={t("Rechercher un pays...")}
+        getOptions={findCountries}
+        normalize={normalizeCountry}
+        {...companyForm.bind("registered_country")}
+      />
+      <TextInput
+        required
+        label={t("Responsable durabilité")}
+        placeholder="Jean-Pierre Champollion"
+        {...companyForm.bind("sustainability_officer")}
+      />
+      <TextInput
+        required
+        type="tel"
+        pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
+        label={t(
+          "N° téléphone responsable durabilité (commence par +33 pour la France)"
+        )}
+        placeholder="exemple : +33612345678"
+        {...companyForm.bind("sustainability_officer_phone_number")}
+      />
+      <TextInput
+        required
+        type="email"
+        label={t("Email responsable durabilité")}
+        {...companyForm.bind("sustainability_officer_email")}
+      />
 
-        <Select
-          required
-          label={t("Type d'activité")}
-          placeholder={t("Précisez le type d'activité")}
-          {...companyForm.bind("entity_type")}
-          options={[
-            {
-              value: EntityType.Producer,
-              label: getEntityTypeLabel(EntityType.Producer),
-            },
-            {
-              value: EntityType.Airline,
-              label: getEntityTypeLabel(EntityType.Airline),
-            },
-            {
-              value: EntityType.CPO,
-              label: getEntityTypeLabel(EntityType.CPO),
-            },
-            {
-              value: EntityType.Operator,
-              label: getEntityTypeLabel(EntityType.Operator),
-            },
-            {
-              value: EntityType.Trader,
-              label: getEntityTypeLabel(EntityType.Trader),
-            },
-            {
-              value: EntityType.PowerOrHeatProducer,
-              label: getEntityTypeLabel(EntityType.PowerOrHeatProducer),
-            },
-          ]}
-        />
-        {companyForm.value?.entity_type &&
-          ![EntityType.Airline, EntityType.CPO].includes(
-            companyForm.value?.entity_type
-          ) && (
-            <Autocomplete
-              label={t("Certificat (schéma volontaire ou national)")}
-              normalize={normalizeCertificate}
-              getOptions={(query) =>
-                getCertificates(query).then((res) => res.data.data ?? [])
-              }
-              {...companyForm.bind("certificate")}
-            />
-          )}
-        <TextArea
-          required
-          label={t("Description de l'activité")}
-          maxLength={5000}
-          {...companyForm.bind("activity_description")}
-        />
+      <Select
+        required
+        label={t("Type d'activité")}
+        placeholder={t("Précisez le type d'activité")}
+        {...companyForm.bind("entity_type")}
+        options={[
+          {
+            value: EntityType.Producer,
+            label: getEntityTypeLabel(EntityType.Producer),
+          },
+          {
+            value: EntityType.Airline,
+            label: getEntityTypeLabel(EntityType.Airline),
+          },
+          {
+            value: EntityType.CPO,
+            label: getEntityTypeLabel(EntityType.CPO),
+          },
+          {
+            value: EntityType.Operator,
+            label: getEntityTypeLabel(EntityType.Operator),
+          },
+          {
+            value: EntityType.Trader,
+            label: getEntityTypeLabel(EntityType.Trader),
+          },
+          {
+            value: EntityType.Auditor,
+            label: getEntityTypeLabel(EntityType.Auditor),
+          },
+          {
+            value: EntityType.PowerOrHeatProducer,
+            label: getEntityTypeLabel(EntityType.PowerOrHeatProducer),
+          },
+        ]}
+      />
+      {companyForm.value?.entity_type &&
+        ![EntityType.Airline, EntityType.CPO].includes(
+          companyForm.value?.entity_type
+        ) && (
+          <Autocomplete
+            label={t("Certificat (schéma volontaire ou national)")}
+            normalize={normalizeCertificate}
+            getOptions={(query) =>
+              getCertificates(query).then((res) => res.data.data ?? [])
+            }
+            {...companyForm.bind("certificate")}
+          />
+        )}
+      <TextArea
+        required
+        label={t("Description de l'activité")}
+        maxLength={5000}
+        {...companyForm.bind("activity_description")}
+      />
 
-        <TextInput
-          placeholder="https://www.example.com"
-          type="url"
-          label={t("Site web (commençant par https://)")}
-          {...companyForm.bind("website")}
-        />
+      <TextInput
+        placeholder="https://www.example.com"
+        type="url"
+        label={t("Site web (commençant par https://)")}
+        {...companyForm.bind("website")}
+      />
 
-        <TextInput
-          label={t("Numéro de TVA")}
-          {...companyForm.bind("vat_number")}
-        />
-      </Form>
-    </>
+      <TextInput
+        label={t("Numéro de TVA")}
+        {...companyForm.bind("vat_number")}
+      />
+    </Form>
   )
 }
 
