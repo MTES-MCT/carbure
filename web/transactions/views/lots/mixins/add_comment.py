@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -14,7 +15,23 @@ class AddCommentSerializer(serializers.Serializer):
 
 
 class AddCommentMixin:
-    @action(methods=["post"], detail=False, url_path="add-comment")
+    @extend_schema(
+        filters=True,
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=AddCommentSerializer,
+        responses={
+            200: OpenApiTypes.ANY,
+        },
+    )
+    @action(methods=["post"], detail=False, url_path="add-comment", serializer_class=AddCommentSerializer)
     def add_comment(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

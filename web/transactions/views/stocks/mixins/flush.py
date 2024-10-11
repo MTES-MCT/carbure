@@ -25,7 +25,7 @@ class StockFlushSerializer(serializers.Serializer):
 
 
 class FlushMixin:
-    @action(methods=["post"], detail=False)
+    @action(methods=["post"], detail=False, serializer_class=StockFlushSerializer)
     def flush(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

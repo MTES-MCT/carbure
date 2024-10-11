@@ -18,7 +18,7 @@ class StockFilter(django_filters.FilterSet):
     selection = django_filters.ModelMultipleChoiceFilter(queryset=CarbureStock.objects.all(), field_name="pk")
     blacklist = django_filters.CharFilter(method="apply_blacklist")
 
-    sort_by = django_filters.OrderingFilter(
+    ordering = django_filters.OrderingFilter(
         fields=(
             ("id", "id"),
             ("remaining_volume", "remaining_volume"),

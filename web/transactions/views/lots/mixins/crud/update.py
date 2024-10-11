@@ -37,7 +37,7 @@ class UpdateLotSerializer(serializers.Serializer):
 
 
 class UpdateMixin:
-    @action(methods=["post"], detail=True, url_path="update-lot")
+    @action(methods=["post"], detail=True, url_path="update-lot", serializer_class=LotSerializer)
     def update_lot(self, request, id=None):
         entity_id = int(self.request.query_params.get("entity_id"))
 

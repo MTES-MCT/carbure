@@ -1,17 +1,27 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from apikey.authentication import APIKeyAuthentication
 from core.helpers import get_lot_comments, get_lot_updates, get_stock_events
-from core.models import CarbureLot, CarbureStock, CarbureStockTransformation, Entity
+from core.models import (
+    CarbureLot,
+    CarbureStock,
+    CarbureStockTransformation,
+    Entity,
+    UserRights,
+)
 from core.serializers import (
     CarbureLotPublicSerializer,
     CarbureStockPublicSerializer,
     CarbureStockTransformationPublicSerializer,
 )
 from transactions.filters import StockFilter
+from transactions.permissions import HasUserRights
 
 from .mixins import ActionMixins
 
@@ -20,7 +30,47 @@ class StockViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, ActionMix
     lookup_field = "id"
     serializer_class = CarbureStockPublicSerializer
     filterset_class = StockFilter
+    permission_classes = (
+        IsAuthenticated,
+        HasUserRights(None, [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]),
+    )
     ordering_fields = ["id", "remaining_volume", "biofuel", "supplier", "country"]
+    search_fields = [
+        "feedstock__name",
+        "biofuel__name",
+        "carbure_id",
+        "country_of_origin__name",
+        "depot__name",
+        "parent_lot__free_field",
+        "parent_lot__transport_document_reference",
+    ]
+
+    def get_authenticators(self):
+        method = self.request.method.lower()
+
+        if method == "options":
+            self.action = "metadata"
+        else:
+            self.action = self.action_map.get(method)
+        if self.action in [
+            "flush",
+        ]:
+            return [
+                SessionAuthentication(),
+                BasicAuthentication(),
+                APIKeyAuthentication(),
+            ]
+        return super().get_authenticators()
+
+    def get_permissions(self):
+        if self.action in ["cancel_transformation", "flush", "split", "transform"]:
+            return [
+                HasUserRights(
+                    [UserRights.ADMIN, UserRights.RW],
+                    [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER],
+                ),
+            ]
+        return super().get_permissions()
 
     def get_queryset(self):
         entity_id = self.request.query_params.get("entity_id")
@@ -70,27 +120,3 @@ class StockViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, ActionMix
         data["comments"] = get_lot_comments(stock.parent_lot)
 
         return Response(data)
-
-    # def list(self, request, *args, **kwargs):
-    #     export = query.get("export", False)
-
-    #     entity_id = self.request.query_params.get("entity_id")
-    #     query = self.request.query_params
-    #     stock = self.filter_queryset(self.get_queryset())
-
-    #     # enrich dataset with additional metadata
-    #     serializer = CarbureStockPublicSerializer(stock, many=True)
-
-    #     return Response(serializer.data)
-    # else:
-    #     file_location = export_carbure_stock(returned)
-    #     with open(file_location, "rb") as excel:
-    #         data = excel.read()
-    #         ctype = (
-    #             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    #         )
-    #         response = HttpResponse(content=data, content_type=ctype)
-    #         response["Content-Disposition"] = 'attachment; filename="%s"' % (
-    #             file_location
-    #         )
-    #     return response
