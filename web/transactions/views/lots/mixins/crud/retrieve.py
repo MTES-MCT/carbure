@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -23,6 +24,17 @@ from transactions.views.utils import get_lot_children, get_lot_parents
 
 
 class RetrieveMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+    )
     def retrieve(self, request, id=None):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

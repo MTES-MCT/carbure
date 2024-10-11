@@ -1,10 +1,12 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from apikey.authentication import APIKeyAuthentication
 from carbure.tasks import background_bulk_scoring
 from core.models import CarbureLotEvent, Entity
 from core.serializers import CarbureLotPublicSerializer
@@ -17,7 +19,11 @@ class AddLotError:
 
 
 class AddMixin:
-    @action(methods=["post"], detail=False)
+    @action(
+        methods=["post"],
+        detail=False,
+        authentication_classes=(SessionAuthentication, BasicAuthentication, APIKeyAuthentication),
+    )
     def add(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

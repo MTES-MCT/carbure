@@ -1,4 +1,3 @@
-# import django_filters
 from django.db import models
 from django.db.models import Q
 from django_filters import rest_framework as django_filters
@@ -27,7 +26,6 @@ class LotsFilter(django_filters.FilterSet):
     suppliers = django_filters.CharFilter(method="filter_suppliers")
     correction_status = django_filters.CharFilter(method="filter_correction_status")
     delivery_types = django_filters.CharFilter(method="filter_delivery_types")
-    search = django_filters.CharFilter(method="filter_search")
     lot_status = django_filters.CharFilter(field_name="lot_status", lookup_expr="in")
     category = django_filters.CharFilter(method="filter_category")
     scores = django_filters.CharFilter(field_name="data_reliability_score", lookup_expr="in")
@@ -40,7 +38,7 @@ class LotsFilter(django_filters.FilterSet):
     invalid = django_filters.BooleanFilter(method="filter_invalid")
     deadline = django_filters.BooleanFilter(method="filter_deadline")
 
-    sort_by = django_filters.OrderingFilter(
+    ordering = django_filters.OrderingFilter(
         fields=(
             ("id", "id"),
             ("volume", "volume"),
@@ -145,23 +143,6 @@ class LotsFilter(django_filters.FilterSet):
     def filter_delivery_types(self, queryset, name, value):
         delivery_types = value.split(",")
         return queryset.filter(delivery_type__in=delivery_types)
-
-    def filter_search(self, queryset, name, value):
-        return queryset.filter(
-            Q(feedstock__name__icontains=value)
-            | Q(biofuel__name__icontains=value)
-            | Q(carbure_producer__name__icontains=value)
-            | Q(unknown_producer__icontains=value)
-            | Q(carbure_id__icontains=value)
-            | Q(country_of_origin__name__icontains=value)
-            | Q(carbure_client__name__icontains=value)
-            | Q(unknown_client__icontains=value)
-            | Q(carbure_delivery_site__name__icontains=value)
-            | Q(unknown_delivery_site__icontains=value)
-            | Q(free_field__icontains=value)
-            | Q(transport_document_reference__icontains=value)
-            | Q(production_site_double_counting_certificate__icontains=value)
-        )
 
     def filter_category(self, queryset, name, value):
         if value == "stocks":

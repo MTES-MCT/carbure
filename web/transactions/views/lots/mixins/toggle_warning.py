@@ -18,7 +18,7 @@ class ToggleWarningSerializer(serializers.Serializer):
 
 
 class ToggleWarningMixin:
-    @action(methods=["post"], detail=True, url_path="toggle-warning")
+    @action(methods=["post"], detail=True, url_path="toggle-warning", serializer_class=ToggleWarningSerializer)
     def toggle_warning(self, request, id=None):
         entity_id = self.request.query_params.get("entity_id")
         serializer = ToggleWarningSerializer(data=request.data)

@@ -21,7 +21,7 @@ class TransformSerializer(serializers.Serializer):
 
 
 class TransformMixin:
-    @action(methods=["post"], detail=False, serializer_class=TransformSerializer)
+    @action(methods=["post"], detail=False)
     def transform(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
 
