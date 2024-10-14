@@ -43,12 +43,7 @@ export interface SafLot {
   volume: number
 }
 
-export interface LotPreview {
-  id: number
-  carbure_id: string
-  volume: number
-  delivery_date: string
-}
+export type LotPreview = apiTypes["CarbureLotPublic"]
 
 export interface SafTicketPreview {
   id: number
