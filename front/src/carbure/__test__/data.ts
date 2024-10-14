@@ -1,3 +1,4 @@
+import { CategoryEnum, PreferredUnitEnum } from "api-schema"
 import {
   Entity,
   EntityType,
@@ -10,6 +11,7 @@ import {
   UserRightRequest,
   UserRightStatus,
   UserRight,
+  Feedstock,
 } from "carbure/types"
 import { mergeDeepRight } from "ramda"
 
@@ -41,7 +43,7 @@ export const company: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const producer: Entity = {
@@ -62,7 +64,7 @@ export const producer: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const trader: Entity = {
@@ -83,13 +85,13 @@ export const trader: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const operator: Entity = {
   id: 2,
   name: "Opérateur Test",
-  entity_type: EntityType.Operator,
+  entity_type: EntityType.Op_rateur,
   has_mac: true,
   has_trading: false,
   has_stocks: false,
@@ -104,7 +106,7 @@ export const operator: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const admin: Entity = {
@@ -125,7 +127,7 @@ export const admin: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const cpo: Entity = {
@@ -146,7 +148,7 @@ export const cpo: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 // DELIVERY SITES
@@ -188,10 +190,11 @@ export const productionSite: ProductionSiteDetails = {
 
 // MATIERE PREMIERE
 
-export const matierePremiere = {
+export const matierePremiere: Feedstock = {
   code: "COLZA",
   name: "Colza",
-  category: "CONV",
+  name_en: "Colza",
+  category: CategoryEnum.CONV,
 }
 
 // BIOCARBURANT
@@ -230,9 +233,9 @@ export const entityRights = {
 export const entities = {
   [EntityType.CPO]: cpo,
   [EntityType.Administration]: admin,
-  [EntityType.Operator]: operator,
+  [EntityType.Op_rateur]: operator,
   [EntityType.Trader]: trader,
-  [EntityType.Producer]: producer,
+  [EntityType.Producteur]: producer,
 }
 
 type PartialUserParam = Partial<{
