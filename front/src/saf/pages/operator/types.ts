@@ -1,12 +1,5 @@
-import { Biofuel, Country, Entity, Feedstock } from "carbure/types"
+import { Biofuel, Feedstock } from "carbure/types"
 import { apiTypes } from "common/services/api-fetch.types"
-import {
-  LotPreview,
-  SafDurability,
-  SafProduction,
-  SafTicketPreview,
-} from "saf/types"
-
 export enum SafTicketSourceStatus {
   Available = "AVAILABLE",
   History = "HISTORY",
@@ -32,7 +25,4 @@ export interface SafTicketSourceSummaryItem extends SafTicketSourcePreview {
   biofuel: Biofuel
 }
 
-export interface SafTicketSourcePreview {
-  id: number
-  carbure_id: string
-}
+export type SafTicketSourcePreview = apiTypes["SafTicketSourcePreview"]

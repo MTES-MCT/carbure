@@ -131,7 +131,15 @@ export function useColumns() {
       key: "ghg_reduction",
       header: t("Réd. GES"),
       cell: (ticketSource: SafTicketSource) => {
-        return <Cell text={`${ticketSource.ghg_reduction.toFixed(0)}%`} />
+        return (
+          <Cell
+            text={
+              ticketSource.ghg_reduction
+                ? `${ticketSource.ghg_reduction.toFixed(0)}%`
+                : ""
+            }
+          />
+        )
       },
     },
 
@@ -148,10 +156,7 @@ export function useColumns() {
 export default TicketSourcesTable
 
 export interface ParentLotButtonProps {
-  lot?: {
-    id: number
-    carbure_id: string
-  }
+  lot?: SafTicketSource["parent_lot"]
 }
 
 export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
@@ -165,7 +170,7 @@ export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
     navigate({
       pathname: location.pathname,
       search: location.search,
-      hash: `lot/${lot!.id}`,
+      hash: `lot/${lot.id}`,
     })
   }
 
