@@ -66,19 +66,20 @@ export interface SafProduction {
   production_site_commissioning_date: string
 }
 
-export interface SafDurability {
-  eec: number
-  el: number
-  ep: number
-  etd: number
-  eu: number
-  esca: number
-  eccs: number
-  eccr: number
-  eee: number
-  ghg_total: number
-  ghg_reduction: number
-}
+export type SafDurability = Pick<
+  SafTicketDetails,
+  | "eec"
+  | "el"
+  | "ep"
+  | "etd"
+  | "eu"
+  | "esca"
+  | "eccs"
+  | "eccr"
+  | "eee"
+  | "ghg_total"
+  | "ghg_reduction"
+>
 
 export interface SafTicketAssignementQuery {
   volume: number

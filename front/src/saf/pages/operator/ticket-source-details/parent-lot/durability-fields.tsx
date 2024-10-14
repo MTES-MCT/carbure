@@ -6,15 +6,11 @@ import {
   formatPercentage,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSourceDetails } from "../../types"
+import { SafDurability } from "saf/types"
 
 const formatNumberToText = (value: number | undefined) =>
   value ? formatNumber(value) : ""
-const DurabilityFields = ({
-  ticketSource,
-}: {
-  ticketSource: SafTicketSourceDetails
-}) => {
+const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
   const { t } = useTranslation()
 
   return (
@@ -24,14 +20,14 @@ const DurabilityFields = ({
           hasTooltip
           label="EEC"
           title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
-          value={formatNumberToText(ticketSource.eec)}
+          value={formatNumberToText(durability.eec)}
           readOnly
         />
         <TextInput
           hasTooltip
           label="EL"
           title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
-          value={formatNumberToText(ticketSource.el)}
+          value={formatNumberToText(durability.el)}
           readOnly
         />
         <TextInput
@@ -39,7 +35,7 @@ const DurabilityFields = ({
           hasTooltip
           label="EP"
           title={t("Émissions résultant dela transformation")}
-          value={formatNumberToText(ticketSource.ep)}
+          value={formatNumberToText(durability.ep)}
           readOnly
         />
         <TextInput
@@ -47,14 +43,14 @@ const DurabilityFields = ({
           hasTooltip
           label="ETD"
           title={t("Émissions résultant du transport et de la distribution")}
-          value={formatNumberToText(ticketSource.etd)}
+          value={formatNumberToText(durability.etd)}
           readOnly
         />
         <TextInput
           label="EU"
           hasTooltip
           title={t("Émissions résultant du carburant à l'usage")}
-          value={formatNumberToText(ticketSource.eu)}
+          value={formatNumberToText(durability.eu)}
           readOnly
         />
 
@@ -62,7 +58,7 @@ const DurabilityFields = ({
           readOnly
           hasTooltip
           label="Total"
-          value={formatGHG(ticketSource.ghg_total ?? 0)}
+          value={formatGHG(durability.ghg_total ?? 0)}
         />
       </Fieldset>
       <Fieldset small label={t("Réductions")}>
@@ -70,28 +66,28 @@ const DurabilityFields = ({
           label="ESCA"
           hasTooltip
           title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
-          value={formatNumberToText(ticketSource.esca)}
+          value={formatNumberToText(durability.esca)}
           readOnly
         />
         <TextInput
           label="ECCS"
           hasTooltip
           title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
-          value={formatNumberToText(ticketSource.eccs)}
+          value={formatNumberToText(durability.eccs)}
           readOnly
         />
         <TextInput
           label="ECCR"
           hasTooltip
           title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
-          value={formatNumberToText(ticketSource.eccr)}
+          value={formatNumberToText(durability.eccr)}
           readOnly
         />
         <TextInput
           label="EEE"
           hasTooltip
           title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
-          value={formatNumberToText(ticketSource.eee)}
+          value={formatNumberToText(durability.eee)}
           readOnly
         />
 
@@ -99,7 +95,7 @@ const DurabilityFields = ({
           readOnly
           hasTooltip
           label={t("Réduction")}
-          value={formatPercentage(ticketSource.ghg_reduction ?? 0)}
+          value={formatPercentage(durability.ghg_reduction ?? 0)}
         />
       </Fieldset>
     </>
