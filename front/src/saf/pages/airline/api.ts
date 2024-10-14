@@ -50,7 +50,6 @@ export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
 
 // je récupère bien le nouvel objet de pagination, mais je n'ai plus la liste d'ids dans les résultats
 export function getSafAirlineTickets(query: SafQuery) {
-  const order = query.order
   return apiFetch.GET("/saf/tickets/", {
     params: {
       query,

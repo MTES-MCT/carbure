@@ -51,7 +51,6 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
     params: [query],
   })
 
-  // const ticketsData = ticketsResponse.result?.data.data
   const ticketsData = ticketsResponse.result?.data
   // const ids = ticketsData?.ids ?? []
   const ids: any = []

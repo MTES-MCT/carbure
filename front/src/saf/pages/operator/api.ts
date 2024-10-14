@@ -90,17 +90,6 @@ export function downloadOperatorTicketSources(query: SafOperatorQuery) {
   })
 }
 
-// export function getOperatorTicketSourceDetails(
-//   entity_id: number,
-//   ticket_source_id: number
-// ) {
-//   return api.get<Api<SafTicketSourceDetails>>(
-//     "/saf/operator/ticket-sources/details",
-//     {
-//       params: { ticket_source_id, entity_id },
-//     }
-//   )
-// }
 export function getOperatorTicketSourceDetails(
   entity_id: number,
   ticket_source_id: number
@@ -117,26 +106,55 @@ export function getOperatorTicketSourceDetails(
   })
 }
 
+// export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
+//   const params = { filter: field, ...query, ...CBQUERY_RESET }
+//   return api
+//     .get<Api<string[]>>("/saf/operator/tickets/filters", { params })
+//     .then((res) => res.data.data ?? [])
+// }
 export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...CBQUERY_RESET }
-  return api
-    .get<Api<string[]>>("/saf/operator/tickets/filters", { params })
-    .then((res) => res.data.data ?? [])
+  return apiFetch
+    .GET("/saf/tickets/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
 }
 
+// export function getOperatorTickets(query: SafQuery) {
+//   return api.get<Api<SafTicketsResponse>>("/saf/operator/tickets", {
+//     params: query,
+//   })
+// }
 export function getOperatorTickets(query: SafQuery) {
-  return api.get<Api<SafTicketsResponse>>("/saf/operator/tickets", {
-    params: query,
+  return apiFetch.GET("/saf/tickets/", {
+    params: {
+      query,
+    },
   })
 }
 
 export function downloadOperatorTickets(query: SafQuery) {
-  return download("/saf/operator/tickets", { ...query, export: true })
+  return downloadFetch("/saf/tickets/export/", {
+    ...query,
+  })
 }
 
 export function getOperatorTicketDetails(entity_id: number, ticket_id: number) {
-  return api.get<Api<SafTicketDetails>>("/saf/operator/tickets/details", {
-    params: { entity_id, ticket_id },
+  return apiFetch.GET(`/saf/tickets/{id}/`, {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
