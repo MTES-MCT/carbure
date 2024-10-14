@@ -6,9 +6,15 @@ import {
   formatPercentage,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafDurability } from "../../../../types"
+import { SafTicketSourceDetails } from "../../types"
 
-const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
+const formatNumberToText = (value: number | undefined) =>
+  value ? formatNumber(value) : ""
+const DurabilityFields = ({
+  ticketSource,
+}: {
+  ticketSource: SafTicketSourceDetails
+}) => {
   const { t } = useTranslation()
 
   return (
@@ -18,14 +24,14 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           hasTooltip
           label="EEC"
           title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
-          value={formatNumber(durability.eec)}
+          value={formatNumberToText(ticketSource.eec)}
           readOnly
         />
         <TextInput
           hasTooltip
           label="EL"
           title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
-          value={formatNumber(durability.el)}
+          value={formatNumberToText(ticketSource.el)}
           readOnly
         />
         <TextInput
@@ -33,7 +39,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           hasTooltip
           label="EP"
           title={t("Émissions résultant dela transformation")}
-          value={formatNumber(durability.ep)}
+          value={formatNumberToText(ticketSource.ep)}
           readOnly
         />
         <TextInput
@@ -41,14 +47,14 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           hasTooltip
           label="ETD"
           title={t("Émissions résultant du transport et de la distribution")}
-          value={formatNumber(durability.etd)}
+          value={formatNumberToText(ticketSource.etd)}
           readOnly
         />
         <TextInput
           label="EU"
           hasTooltip
           title={t("Émissions résultant du carburant à l'usage")}
-          value={formatNumber(durability.eu)}
+          value={formatNumberToText(ticketSource.eu)}
           readOnly
         />
 
@@ -56,7 +62,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           readOnly
           hasTooltip
           label="Total"
-          value={formatGHG(durability.ghg_total ?? 0)}
+          value={formatGHG(ticketSource.ghg_total ?? 0)}
         />
       </Fieldset>
       <Fieldset small label={t("Réductions")}>
@@ -64,28 +70,28 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           label="ESCA"
           hasTooltip
           title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
-          value={formatNumber(durability.esca)}
+          value={formatNumberToText(ticketSource.esca)}
           readOnly
         />
         <TextInput
           label="ECCS"
           hasTooltip
           title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
-          value={formatNumber(durability.eccs)}
+          value={formatNumberToText(ticketSource.eccs)}
           readOnly
         />
         <TextInput
           label="ECCR"
           hasTooltip
           title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
-          value={formatNumber(durability.eccr)}
+          value={formatNumberToText(ticketSource.eccr)}
           readOnly
         />
         <TextInput
           label="EEE"
           hasTooltip
           title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
-          value={formatNumber(durability.eee)}
+          value={formatNumberToText(ticketSource.eee)}
           readOnly
         />
 
@@ -93,7 +99,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           readOnly
           hasTooltip
           label={t("Réduction")}
-          value={formatPercentage(durability.ghg_reduction ?? 0)}
+          value={formatPercentage(ticketSource.ghg_reduction ?? 0)}
         />
       </Fieldset>
     </>

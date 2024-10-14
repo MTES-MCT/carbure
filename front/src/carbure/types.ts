@@ -1,3 +1,5 @@
+import { apiTypes } from "common/services/api-fetch.types"
+
 export interface Entity {
   id: number
   name: string
@@ -78,12 +80,7 @@ export interface Biofuel {
   name: string
 }
 
-export interface Country {
-  code_pays: string
-  name: string
-  name_en: string
-  is_in_europe: boolean
-}
+export type Country = apiTypes["Country"]
 
 export interface ProductionSite {
   id: number

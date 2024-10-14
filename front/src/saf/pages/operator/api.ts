@@ -90,16 +90,31 @@ export function downloadOperatorTicketSources(query: SafOperatorQuery) {
   })
 }
 
+// export function getOperatorTicketSourceDetails(
+//   entity_id: number,
+//   ticket_source_id: number
+// ) {
+//   return api.get<Api<SafTicketSourceDetails>>(
+//     "/saf/operator/ticket-sources/details",
+//     {
+//       params: { ticket_source_id, entity_id },
+//     }
+//   )
+// }
 export function getOperatorTicketSourceDetails(
   entity_id: number,
   ticket_source_id: number
 ) {
-  return api.get<Api<SafTicketSourceDetails>>(
-    "/saf/operator/ticket-sources/details",
-    {
-      params: { ticket_source_id, entity_id },
-    }
-  )
+  return apiFetch.GET("/saf/ticket-sources/{id}/", {
+    params: {
+      path: {
+        id: ticket_source_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+  })
 }
 
 export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
