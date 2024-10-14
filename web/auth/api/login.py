@@ -8,9 +8,9 @@ def user_login(request):
     username = request.POST.get("username", "")
     password = request.POST.get("password", "")
     user = authenticate(username=username, password=password)
-    login(request, user)
     try:
         if user.is_authenticated:
+            login(request, user)
             request.session.set_expiry(3 * 30 * 24 * 60 * 60)  # 3 months
             # return JsonResponse({'status': 'success', 'message': 'User logged in'})
             return SuccessResponse()

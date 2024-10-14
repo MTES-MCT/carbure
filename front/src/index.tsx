@@ -14,14 +14,14 @@ import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 startReactDsfr({ defaultColorScheme: "system" })
 
 async function enableMocking() {
-  if (import.meta.env.NODE_ENV === "development") {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { worker } = await import("./mocks")
-    console.info(
-      "MOCKING ENABLED: to enable/disable the mocked api, comment/uncomment the line below in the file 'index.tsx'"
-    )
-    // return worker.start()
-  }
+  if (import.meta.env.MODE !== "development") return
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { worker } = await import("./mocks")
+  console.info(
+    "MOCKING ENABLED: to enable/disable the mocked api, comment/uncomment the line below in the file 'index.tsx'"
+  )
+  // return worker.start()
 }
 
 enableMocking().then(() =>

@@ -303,9 +303,9 @@ class ElecCharginPointsTest(TestCase):
         assert charge_points[0].charge_point_id == "FRBBBB222201"
         assert charge_points[0].current_type == "DC"
         assert str(charge_points[0].installation_date) == "2022-05-10"
-        assert charge_points[0].mid_id == ""
+        assert charge_points[0].mid_id is None
         assert charge_points[0].measure_date is None
-        assert charge_points[0].measure_energy == 0
+        assert charge_points[0].measure_energy is None
         assert charge_points[0].is_article_2 is True
         assert charge_points[0].measure_reference_point_id == "1234561"
         assert charge_points[0].cpo == self.cpo
