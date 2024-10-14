@@ -85,7 +85,7 @@ export const TicketSourceFields = ({
           readOnly
         />
       </Fieldset>
-      <DurabilityFields ticketSource={ticketSource} />
+      <DurabilityFields durability={ticketSource} />
     </div>
   )
 }

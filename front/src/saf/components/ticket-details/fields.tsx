@@ -66,7 +66,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         />
         <DateInput
           label={t("Date de mise en service")}
-          value={ticket.production_site_commissioning_date}
+          value={ticket.production_site_commissioning_date ?? ""}
           readOnly
         />
       </Fieldset>

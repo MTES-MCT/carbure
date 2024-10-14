@@ -33,10 +33,10 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticketResponse = useQuery(api.getOperatorTicketDetails, {
     key: "ticket-details",
-    params: [entity.id, parseInt(match?.params.id || "")],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
-  const ticket = ticketResponse.result?.data?.data
+  const ticket = ticketResponse.result?.data
   // const ticket = safTicketReceivedDetails //TO TEST
 
   const showCancelModal = () => {

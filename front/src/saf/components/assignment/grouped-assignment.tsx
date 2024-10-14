@@ -54,7 +54,7 @@ const TicketsGroupedAssignment = ({
       entity.id,
       ticketSources.map((ticketSource) => ticketSource.id),
       value.volume!,
-      value.assignment_period!,
+      value.assignment_period,
       value.client!,
       value.free_field!
     )

@@ -68,12 +68,7 @@ export interface Notification {
   meta: null | any
 }
 
-export interface Feedstock {
-  code: string
-  name: string
-  is_double_compte?: boolean
-  category: string
-}
+export type Feedstock = apiTypes["FeedStock"]
 
 export interface Biofuel {
   code: string
