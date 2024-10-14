@@ -81,11 +81,11 @@ export const TicketSourceFields = ({
         />
         <DateInput
           label={t("Date de mise en service")}
-          value={ticketSource.production_site_commissioning_date}
+          value={ticketSource.production_site_commissioning_date ?? ""}
           readOnly
         />
       </Fieldset>
-      <DurabilityFields durability={ticketSource} />
+      <DurabilityFields ticketSource={ticketSource} />
     </div>
   )
 }

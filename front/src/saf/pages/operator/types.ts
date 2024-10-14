@@ -1,4 +1,5 @@
 import { Biofuel, Country, Entity, Feedstock } from "carbure/types"
+import { apiTypes } from "common/services/api-fetch.types"
 import {
   LotPreview,
   SafDurability,
@@ -11,41 +12,9 @@ export enum SafTicketSourceStatus {
   History = "HISTORY",
 }
 
-export interface SafTicketSource {
-  id: number
-  carbure_id: string
-  year: number
-  delivery_period: number
-  created_at: string
-  total_volume: number
-  assigned_volume: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-  country_of_origin: Country
-  assigned_tickets: SafTicketPreview[]
-  ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
-  parent_lot?: {
-    id: number
-    carbure_id: string
-  }
-}
+export type SafTicketSource = apiTypes["SafTicketSource"]
 
-export interface SafTicketSourceSummary
-  extends SafTicketSource,
-    SafProduction,
-    SafDurability {
-  count: number
-  total_volume: number
-  ticket_sources: SafTicketSourceSummaryItem[]
-}
-
-export interface SafTicketSourceDetails
-  extends SafTicketSource,
-    SafProduction,
-    SafDurability {
-  added_by: Entity
-  parent_lot: LotPreview
-}
+export type SafTicketSourceDetails = apiTypes["SafTicketSourceDetails"]
 
 export interface SafTicketSourcesResponse {
   saf_ticket_sources: SafTicketSource[]

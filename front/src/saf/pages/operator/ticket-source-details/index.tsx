@@ -36,11 +36,10 @@ export const TicketSourceDetails = ({
 
   const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
     key: "ticket-source-details",
-    params: [entity.id, parseInt(match?.params.id || "")],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
-  const ticketSource = ticketSourceResponse.result?.data?.data
-  // const ticketSource = safTicketSourceDetails //TO TEST
+  const ticketSource = ticketSourceResponse.result?.data
 
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
