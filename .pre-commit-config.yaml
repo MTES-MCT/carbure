@@ -9,6 +9,6 @@ repos:
     hooks:
       - id: run-npm-script
         name: Eslint/Prettier
-        entry: cd front && npm run lint
+        entry: bash -c 'cd front && npm run lint'
         language: system
         files: ^front/
