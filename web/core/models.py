@@ -333,6 +333,7 @@ class Depot(models.Model):
     HEAT_PLANT = "HEAT PLANT"
     POWER_PLANT = "POWER PLANT"
     COGENERATION_PLANT = "COGENERATION PLANT"
+    EFCA = "EFCA"
 
     TYPE_DEPOT = (
         (OTHER, "Autre"),
@@ -343,6 +344,7 @@ class Depot(models.Model):
         (HEAT_PLANT, "HEAT PLANT"),
         (POWER_PLANT, "POWER PLANT"),
         (COGENERATION_PLANT, "COGENERATION PLANT"),
+        (EFCA, "EFCA"),
     )
 
     name = models.CharField(max_length=128, null=False, blank=False)
