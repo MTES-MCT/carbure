@@ -646,6 +646,18 @@ export interface components {
       client_comment?: string | null
       readonly parent_ticket_source: components["schemas"]["SafTicketSourcePreview"]
     }
+    SafTicketPreview: {
+      readonly id: number
+      carbure_id?: string | null
+      readonly client: string
+      /** Format: date */
+      agreement_date?: string | null
+      /** Format: double */
+      volume: number
+      status?: components["schemas"]["StatusEnum"]
+      /** Format: date-time */
+      readonly created_at: string | null
+    }
     SafTicketSource: {
       readonly id: number
       carbure_id?: string | null
@@ -662,7 +674,7 @@ export interface components {
       readonly country_of_origin: components["schemas"]["Country"]
       /** Format: double */
       ghg_reduction?: number
-      readonly assigned_tickets: string
+      readonly assigned_tickets: components["schemas"]["SafTicketPreview"][]
       readonly parent_lot: components["schemas"]["SafTicketSourceParentLot"]
     }
     SafTicketSourceAssignment: {
@@ -689,7 +701,7 @@ export interface components {
       readonly feedstock: components["schemas"]["FeedStock"]
       readonly biofuel: components["schemas"]["Biofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
-      readonly assigned_tickets: string
+      readonly assigned_tickets: components["schemas"]["SafTicketPreview"][]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
       readonly carbure_production_site: components["schemas"]["ProductionSite"]

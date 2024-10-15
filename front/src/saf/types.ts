@@ -45,14 +45,7 @@ export interface SafLot {
 
 export type LotPreview = apiTypes["CarbureLotPublic"]
 
-export interface SafTicketPreview {
-  id: number
-  carbure_id: string
-  client: string
-  volume: number
-  status: SafTicketStatus
-  created_at: string
-}
+export type SafTicketPreview = apiTypes["SafTicketPreview"]
 
 export type SafTicket = apiTypes["SafTicket"]
 
