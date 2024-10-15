@@ -89,6 +89,8 @@ def add_application(request: HttpRequest, entity: Entity):
     if duplicate:
         return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
 
+    [data.pop("charge_point_id", None) for data in meter_reading_data]
+
     with transaction.atomic():
         application = ElecMeterReadingApplication(cpo=entity, quarter=quarter, year=year)
         meter_readings = [ElecMeterReading(**data, application=application, cpo=entity) for data in meter_reading_data]
