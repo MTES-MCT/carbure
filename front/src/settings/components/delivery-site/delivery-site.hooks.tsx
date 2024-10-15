@@ -76,7 +76,7 @@ const useDepotTypeTranslations = () => {
         ),
       },
       {
-        type: DepotType.Other,
+        type: DepotType.OTHER,
         label: t("Autre"),
       },
     ],
