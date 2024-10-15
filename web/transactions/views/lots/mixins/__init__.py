@@ -1,7 +1,14 @@
 from .accept import AcceptMixin
 from .add_comment import AddCommentMixin
 from .add_excel import AddExcelMixin
-from .crud import AddMixin, DeleteLotsMixin, ListMixin, RetrieveMixin, UpdateMixin
+from .crud import (
+    AddMixin,
+    BulkCreateMixin,
+    DeleteLotsMixin,
+    ListMixin,
+    RetrieveMixin,
+    UpdateMixin,
+)
 from .duplicate import DuplicateMixin
 from .export import ExportMixin
 from .filters import FiltesrMixin
@@ -18,6 +25,7 @@ class ActionMixin(
     AddMixin,
     AddCommentMixin,
     AddExcelMixin,
+    BulkCreateMixin,
     DeleteLotsMixin,
     DuplicateMixin,
     ExportMixin,

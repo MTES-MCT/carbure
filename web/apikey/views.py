@@ -31,7 +31,7 @@ class APIKeyViewSet(
         serializer.save(user=self.request.user)
 
     @action(methods=["post"], detail=True)
-    def revork(self, request, id=None):
+    def revoke(self, request, id=None):
         apikey = self.get_object()
 
         if apikey.user != request.user:

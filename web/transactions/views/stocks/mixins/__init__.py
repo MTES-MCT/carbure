@@ -1,4 +1,5 @@
 from .cancel_transformation import CancelTransformationMixin
+from .extract_lots import ExtractLotsMixin
 from .filters import FiltesrMixin
 from .flush import FlushMixin
 from .split import SplitMixin
@@ -9,6 +10,7 @@ from .transform import TransformMixin
 
 class ActionMixins(
     CancelTransformationMixin,
+    ExtractLotsMixin,
     FiltesrMixin,
     FlushMixin,
     SplitMixin,

@@ -18,9 +18,9 @@ class StockFlushSerializer(serializers.Serializer):
     stock_ids = serializers.PrimaryKeyRelatedField(queryset=CarbureStock.objects.all(), many=True)
     free_field = serializers.CharField(required=False, allow_null=True, default=None)
 
-    def validate_lot_ids(self, value):
+    def validate_stock_ids(self, value):
         if not value:
-            raise serializers.ValidationError("lot_ids must not be empty.")
+            raise serializers.ValidationError("stock_ids must not be empty.")
         return value
 
 

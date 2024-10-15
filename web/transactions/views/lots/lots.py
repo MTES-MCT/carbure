@@ -61,7 +61,7 @@ class LotsViewSet(GenericViewSet, ActionMixin):
             self.action = "metadata"
         else:
             self.action = self.action_map.get(method)
-        if self.action in ["list", "add"]:
+        if self.action in ["list", "add", "bulk_create"]:
             return [
                 SessionAuthentication(),
                 BasicAuthentication(),

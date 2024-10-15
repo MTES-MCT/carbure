@@ -52,9 +52,7 @@ class StockViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, ActionMix
             self.action = "metadata"
         else:
             self.action = self.action_map.get(method)
-        if self.action in [
-            "flush",
-        ]:
+        if self.action in ["list", "extract_lots", "split"]:
             return [
                 SessionAuthentication(),
                 BasicAuthentication(),
