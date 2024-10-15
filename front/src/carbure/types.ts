@@ -1,9 +1,38 @@
 import { EntityTypeEnum as EntityType } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
-export type Entity = apiTypes["Entity"]
+export interface Entity {
+  id: number
+  name: string
+  entity_type: EntityType
+  legal_name: string
+  registration_id: string
+  sustainability_officer_phone_number: string
+  sustainability_officer_email?: string
+  sustainability_officer: string
+  registered_address: string
+  registered_city: string
+  registered_zipcode: string
+  registered_country?: Country
+  has_mac: boolean
+  has_trading: boolean
+  has_stocks: boolean
+  has_direct_deliveries: boolean
+  preferred_unit?: Unit
+  default_certificate?: string
+  ext_admin_pages?: ExternalAdminPages[]
+  has_saf?: boolean
+  has_elec: boolean
+  activity_description?: string
+  website?: string
+  vat_number?: string
+}
 
-export type EntityPreview = apiTypes["EntityPreview"]
+export interface EntityPreview {
+  id: number
+  name: string
+  entity_type: EntityType
+}
 
 export interface User {
   email: string

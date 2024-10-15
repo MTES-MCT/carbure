@@ -2193,6 +2193,38 @@ components:
       - supplier
       - volume
       - year
+    SafTicketPreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        client:
+          type: string
+          readOnly: true
+        agreement_date:
+          type: string
+          format: date
+          nullable: true
+        volume:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - client
+      - created_at
+      - id
+      - volume
     SafTicketSource:
       type: object
       properties:
@@ -2238,7 +2270,9 @@ components:
           type: number
           format: double
         assigned_tickets:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/SafTicketPreview'
           readOnly: true
         parent_lot:
           allOf:
@@ -2325,7 +2359,9 @@ components:
           - $ref: '#/components/schemas/Country'
           readOnly: true
         assigned_tickets:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/SafTicketPreview'
           readOnly: true
         carbure_producer:
           allOf:
