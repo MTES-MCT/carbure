@@ -62,6 +62,12 @@ ERROR_METER_READINGS = [
         "current_reading": 800,
         "reading_date": datetime.date(2024, 9, 29),
     },
+    {
+        "charge_point_id": "FR00IJKAA",
+        "previous_reading": 300,
+        "current_reading": 900,
+        "reading_date": datetime.date(2024, 9, 29),
+    },
 ]
 
 
@@ -261,7 +267,7 @@ class ElecMeterReadingsTest(TestCase):
                 "quarter": 3,
                 "year": 2024,
                 "meter_reading_count": 1,
-                "error_count": 2,
+                "error_count": 3,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -269,6 +275,11 @@ class ElecMeterReadingsTest(TestCase):
                         "meta": {"extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]},
                     },
                     {"error": "INVALID_DATA", "line": 4, "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]}},
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 6,
+                        "meta": {"charge_point_id": ["Le point de recharge n'a pas encore été inscrit sur la plateforme."]},
+                    },
                 ],
             },
         }
