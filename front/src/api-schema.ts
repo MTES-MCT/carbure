@@ -957,7 +957,10 @@ export interface operations {
   }
   saf_ticket_sources_assign_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Tickets source SAF. */

@@ -23,6 +23,7 @@ import Score from "transaction-details/components/score"
 import { To } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
+import { Unit } from "carbure/types"
 
 export interface LotTableProps {
   loading: boolean
@@ -206,7 +207,7 @@ export const BiofuelCell = ({ lot }: LotCellProps) => {
     MJ: "lhv_amount" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   return (
