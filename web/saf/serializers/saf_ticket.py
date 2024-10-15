@@ -94,14 +94,6 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
     # client = EntityPreviewSerializer(read_only=True)
 
 
-class SafTicketPreviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SafTicket
-        fields = ["id", "carbure_id", "client", "agreement_date", "volume", "status", "created_at"]
-
-    client = serializers.SlugRelatedField(read_only=True, slug_field="name")
-
-
 def export_tickets_to_excel(tickets):
     today = datetime.datetime.today()
     location = "/tmp/carbure_saf_tickets_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
