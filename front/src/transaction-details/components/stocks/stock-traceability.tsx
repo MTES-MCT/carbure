@@ -5,6 +5,7 @@ import { Split } from "common/components/icons"
 import { formatUnit } from "common/utils/formatters"
 import { StockDetails } from "../../types"
 import useEntity from "carbure/hooks/entity"
+import { Unit } from "carbure/types"
 
 export interface TraceabilityProps {
   details: StockDetails | undefined
@@ -33,7 +34,7 @@ export const StockTraceability = ({
   const hasParent = parentLot !== undefined || parentTransform !== undefined
   const hasChildren = childrenLot.length > 0 || childrenTransform.length > 0
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
 
   const unitToLotField = {
     l: "volume" as const,
@@ -82,7 +83,7 @@ export const StockTraceability = ({
                     (-
                     {formatUnit(
                       parentTransform.volume_deducted_from_source,
-                      "l"
+                      Unit.l
                     )}
                     )
                   </b>
@@ -120,7 +121,7 @@ export const StockTraceability = ({
                       ns: "biofuels",
                     })}{" "}
                     {formatUnit(child.dest_stock[stockField], unit)} (-
-                    {formatUnit(child.volume_deducted_from_source, "l")})
+                    {formatUnit(child.volume_deducted_from_source, Unit.l)})
                   </b>
                 </ExternalLink>
               </li>

@@ -15,6 +15,7 @@ import NoResult from "../../../common/components/no-result"
 import { useSummaryColumns } from "../lots/lot-summary"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
+import { Unit } from "carbure/types"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
   query: StockQuery
@@ -53,7 +54,7 @@ export const StockSummaryBar = ({
     MJ: "total_remaining_lhv_amount" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   return (
@@ -161,7 +162,7 @@ export const StockSummary = ({
     MJ: "remaining_lhv_amount_sum" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   const stock = summaryData?.stock ?? []

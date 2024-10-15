@@ -178,6 +178,7 @@ export const DeliverySiteForm = ({
           {...bind("city")}
           required
           readOnly={isReadOnly}
+          value={value.city ?? ""}
         />
         <TextInput
           label={t("Code postal")}
@@ -200,7 +201,7 @@ export const DeliverySiteForm = ({
             {deliverySite.blending_is_outsourced && (
               <TextInput
                 label={t("Incorporateur Tiers")}
-                value={deliverySite.blender?.name || ""}
+                value={deliverySite.blender?.name ?? ""}
                 readOnly
               />
             )}

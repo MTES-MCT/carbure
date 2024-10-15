@@ -20,6 +20,7 @@ import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../../../common/components/no-result"
 import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
+import { Unit } from "carbure/types"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
@@ -51,7 +52,7 @@ export const LotSummaryBar = ({
     MJ: "total_lhv_amount" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   const summaryData = summary.result?.data.data ?? {
@@ -170,7 +171,7 @@ export const LotSummary = ({
     MJ: "lhv_amount_sum" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   const input = summaryData?.in ?? []
@@ -371,7 +372,7 @@ export const QuantityCell = ({ item }: SummaryCellProps) => {
     MJ: "lhv_amount_sum" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   return <Cell text={formatUnit(item[field] ?? 0, unit)} />
@@ -386,7 +387,7 @@ export const RemainingQuantityCell = ({ item }: SummaryCellProps) => {
     MJ: "remaining_lhv_amount_sum" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   return <Cell text={formatUnit(item[field] ?? 0, unit)} />
