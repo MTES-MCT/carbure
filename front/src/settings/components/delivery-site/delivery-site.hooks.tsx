@@ -7,9 +7,9 @@ import { useTranslation } from "react-i18next"
 export const useDeliverySiteFlags = (depotType?: DepotType) =>
   useMemo(
     () => ({
-      isPowerPlant: depotType === DepotType.PowerPlant,
-      isHeatPlant: depotType === DepotType.HeatPlant,
-      isCogenerationPlant: depotType === DepotType.CogenerationPlant,
+      isPowerPlant: depotType === DepotType.POWER_PLANT,
+      isHeatPlant: depotType === DepotType.HEAT_PLANT,
+      isCogenerationPlant: depotType === DepotType.COGENERATION_PLANT,
     }),
     [depotType]
   )
@@ -41,35 +41,35 @@ const useDepotTypeTranslations = () => {
         tooltip: t("Entrepôt fiscal de carburants d'aviation"),
       },
       {
-        type: DepotType.BiofuelDepot,
+        type: DepotType.BIOFUEL_DEPOT,
         label: t("Biofuel Depot"),
         tooltip: t(
           "Entrepôt de biocarburants qui se situe uniquement en dehors de la France"
         ),
       },
       {
-        type: DepotType.OilDepot,
+        type: DepotType.OIL_DEPOT,
         label: t("Oil Depot"),
         tooltip: t(
           "Entrepôt de biocarburants qui se situe uniquement en dehors de la France"
         ),
       },
       {
-        type: DepotType.PowerPlant,
+        type: DepotType.POWER_PLANT,
         label: t("Centrale électrique"),
         tooltip: t(
           "Centrale de production d'électricité qui utilise des biocarburants"
         ),
       },
       {
-        type: DepotType.HeatPlant,
+        type: DepotType.HEAT_PLANT,
         label: t("Centrale de chaleur"),
         tooltip: t(
           "Centrale de production de chaleur qui utilise des biocarburants"
         ),
       },
       {
-        type: DepotType.CogenerationPlant,
+        type: DepotType.COGENERATION_PLANT,
         label: t("Centrale de cogénération"),
         tooltip: t(
           "Centrale de production d'électricité et de chaleur qui utilise des biocarburants"
@@ -112,7 +112,7 @@ export const useGetDepotTypeOptions = ({
     if (country?.code_pays === "FR") {
       depotTypeOptions = depotTypeOptions.filter(
         ({ type }) =>
-          ![DepotType.OilDepot, DepotType.BiofuelDepot].includes(type)
+          ![DepotType.OIL_DEPOT, DepotType.BIOFUEL_DEPOT].includes(type)
       )
     }
 
@@ -124,9 +124,9 @@ export const useGetDepotTypeOptions = ({
             DepotType.EFS,
             DepotType.EFCA,
             DepotType.EFPE,
-            DepotType.CogenerationPlant,
-            DepotType.HeatPlant,
-            DepotType.PowerPlant,
+            DepotType.COGENERATION_PLANT,
+            DepotType.HEAT_PLANT,
+            DepotType.POWER_PLANT,
           ].includes(type)
       )
     }

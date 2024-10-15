@@ -158,24 +158,6 @@ export function getOperatorTicketDetails(entity_id: number, ticket_id: number) {
   })
 }
 
-// export function assignSafTicket(
-//   entity_id: number,
-//   ticket_source_id: number,
-//   volume: number,
-//   assignment_period: number,
-//   client: EntityPreview,
-//   free_field?: string
-// ) {
-//   return api.post("/saf/operator/assign-ticket", {
-//     entity_id,
-//     ticket_source_id,
-//     assignment_period,
-//     volume,
-//     client_id: client.id,
-//     free_field,
-//   })
-// }
-
 export function assignSafTicket(
   entity_id: number,
   ticket_source_id: number,
@@ -189,6 +171,9 @@ export function assignSafTicket(
       path: {
         id: ticket_source_id,
       },
+      query: {
+        entity_id,
+      },
     },
     body: {
       volume,
@@ -201,28 +186,6 @@ export function assignSafTicket(
   })
 }
 
-// export function groupedAssignSafTicket(
-//   entity_id: number,
-//   ticket_sources_ids: number[],
-//   volume: number,
-//   assignment_period: number,
-//   client: EntityPreview,
-//   agreement_reference: string,
-//   free_field?: string
-// ) {
-//   return api.post<Api<{ assigned_tickets_count: number }>>(
-//     "/saf/operator/grouped-assign-ticket",
-//     {
-//       entity_id,
-//       ticket_sources_ids,
-//       assignment_period,
-//       volume,
-//       client_id: client.id,
-//       agreement_reference,
-//       free_field,
-//     }
-//   )
-// }
 export function groupedAssignSafTicket(
   entity_id: number,
   ticket_sources_ids: number[],
@@ -251,9 +214,15 @@ export function groupedAssignSafTicket(
 }
 
 export function cancelSafTicket(entity_id: number, ticket_id: number) {
-  return api.post("/saf/operator/cancel-ticket", {
-    entity_id,
-    ticket_id,
+  return apiFetch.POST("/saf/tickets/{id}/cancel/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
@@ -262,10 +231,18 @@ export function rejectSafOperatorTicket(
   ticket_id: number,
   comment: string
 ) {
-  return api.post("/saf/operator/reject-ticket", {
-    entity_id,
-    comment,
-    ticket_id,
+  return apiFetch.POST("/saf/tickets/{id}/reject/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      comment,
+    },
   })
 }
 
