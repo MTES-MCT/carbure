@@ -86,6 +86,7 @@ class ExcelMeterReadingValidator(Validator):
     extracted_energy = forms.FloatField(min_value=0)
     reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     renewable_energy = forms.FloatField()
+    charge_point_id = forms.CharField()
 
     def extend(self, meter_reading):
         renewable_share = self.context.get("renewable_share")
@@ -121,9 +122,10 @@ class ExcelMeterReadingValidator(Validator):
                 _("La quantité d'énergie soutirée est inférieure au précédent relevé."),
             )
 
-        charge_point_reading_dates = previous_reading_dates_by_charge_point.get(charge_point.id, [])
-        if meter_reading.get("reading_date") in charge_point_reading_dates:
-            self.add_error(
-                "reading_date",
-                _(f"Le relevé du {meter_reading.get('reading_date')} existe déjà"),
-            )
+        if charge_point:
+            charge_point_reading_dates = previous_reading_dates_by_charge_point.get(charge_point.id, [])
+            if meter_reading.get("reading_date") in charge_point_reading_dates:
+                self.add_error(
+                    "reading_date",
+                    _(f"Le relevé du {meter_reading.get('reading_date')} existe déjà"),
+                )
