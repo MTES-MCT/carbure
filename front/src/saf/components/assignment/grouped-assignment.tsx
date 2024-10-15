@@ -56,6 +56,7 @@ const TicketsGroupedAssignment = ({
       value.volume!,
       value.assignment_period,
       value.client!,
+      "",
       value.free_field!
     )
 

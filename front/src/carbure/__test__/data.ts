@@ -154,11 +154,12 @@ export const cpo: Entity = {
 // DELIVERY SITES
 
 export const deliverySite: Depot = {
+  id: 1,
   depot_id: "10",
   name: "Test Delivery Site",
   city: "Test City",
   country: country,
-  depot_type: DepotType.Other,
+  depot_type: DepotType.OTHER,
   address: "Test Address",
   postal_code: "64430",
   electrical_efficiency: null,
@@ -186,6 +187,7 @@ export const productionSite: ProductionSiteDetails = {
   inputs: [],
   outputs: [],
   certificates: [],
+  producer: producer as any,
 }
 
 // MATIERE PREMIERE
@@ -202,6 +204,7 @@ export const matierePremiere: Feedstock = {
 export const biocarburant = {
   code: "EMHV",
   name: "EMHV",
+  name_en: "EMHV",
 }
 
 export const entityRight: UserRight = {

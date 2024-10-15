@@ -158,6 +158,24 @@ export function getOperatorTicketDetails(entity_id: number, ticket_id: number) {
   })
 }
 
+// export function assignSafTicket(
+//   entity_id: number,
+//   ticket_source_id: number,
+//   volume: number,
+//   assignment_period: number,
+//   client: EntityPreview,
+//   free_field?: string
+// ) {
+//   return api.post("/saf/operator/assign-ticket", {
+//     entity_id,
+//     ticket_source_id,
+//     assignment_period,
+//     volume,
+//     client_id: client.id,
+//     free_field,
+//   })
+// }
+
 export function assignSafTicket(
   entity_id: number,
   ticket_source_id: number,
@@ -166,16 +184,45 @@ export function assignSafTicket(
   client: EntityPreview,
   free_field?: string
 ) {
-  return api.post("/saf/operator/assign-ticket", {
-    entity_id,
-    ticket_source_id,
-    assignment_period,
-    volume,
-    client_id: client.id,
-    free_field,
+  return apiFetch.POST("/saf/ticket-sources/{id}/assign/", {
+    params: {
+      path: {
+        id: ticket_source_id,
+      },
+    },
+    body: {
+      volume,
+      assignment_period,
+      client_id: client.id,
+      free_field,
+      agreement_date: "",
+      agreement_reference: "",
+    },
   })
 }
 
+// export function groupedAssignSafTicket(
+//   entity_id: number,
+//   ticket_sources_ids: number[],
+//   volume: number,
+//   assignment_period: number,
+//   client: EntityPreview,
+//   agreement_reference: string,
+//   free_field?: string
+// ) {
+//   return api.post<Api<{ assigned_tickets_count: number }>>(
+//     "/saf/operator/grouped-assign-ticket",
+//     {
+//       entity_id,
+//       ticket_sources_ids,
+//       assignment_period,
+//       volume,
+//       client_id: client.id,
+//       agreement_reference,
+//       free_field,
+//     }
+//   )
+// }
 export function groupedAssignSafTicket(
   entity_id: number,
   ticket_sources_ids: number[],
@@ -185,18 +232,22 @@ export function groupedAssignSafTicket(
   agreement_reference: string,
   free_field?: string
 ) {
-  return api.post<Api<{ assigned_tickets_count: number }>>(
-    "/saf/operator/grouped-assign-ticket",
-    {
-      entity_id,
-      ticket_sources_ids,
+  return apiFetch.POST("/saf/ticket-sources/group-assign/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      agreement_date: "",
+      agreement_reference: "",
       assignment_period,
-      volume,
       client_id: client.id,
-      agreement_reference,
+      ticket_sources_ids,
+      volume,
       free_field,
-    }
-  )
+    },
+  })
 }
 
 export function cancelSafTicket(entity_id: number, ticket_id: number) {

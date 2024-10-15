@@ -49,7 +49,7 @@ const Depots = () => {
               key: "city",
               header: t("Ville"),
               cell: (e) => e.city,
-              orderBy: (e) => e.city,
+              orderBy: (e) => e.city ?? "",
             },
             {
               key: "depot_id",

@@ -86,9 +86,9 @@ export const UnitSelect = (props: SelectProps<Option<Unit>, Unit>) => {
   const { t } = useTranslation()
 
   const units: Option<Unit>[] = [
-    { value: "l", label: t("litres") },
-    { value: "kg", label: t("kg") },
-    { value: "MJ", label: t("MJ") },
+    { value: Unit.l, label: t("litres") },
+    { value: Unit.kg, label: t("kg") },
+    { value: Unit.MJ, label: t("MJ") },
   ]
 
   return <Select variant="text" options={units} {...props} />
@@ -116,10 +116,11 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
   const bind = useBind<LotFormValue>()
   const bound = bind("feedstock")
 
-  // prettier-ignore
-  const icon = bound.value
-    ? <span className="icon" style={{ fontSize: '0.9em' }}>{bound.value.category.toUpperCase()}</span>
-    : undefined
+  const icon = bound.value ? (
+    <span className="icon" style={{ fontSize: "0.9em" }}>
+      {bound.value.category?.toUpperCase()}
+    </span>
+  ) : undefined
 
   return (
     <Autocomplete
