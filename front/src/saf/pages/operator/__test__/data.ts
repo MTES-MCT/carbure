@@ -1,8 +1,14 @@
-import { operator, producer, productionSite } from "carbure/__test__/data"
+import {
+  company,
+  deliverySite,
+  operator,
+  producer,
+  productionSite,
+  trader,
+} from "carbure/__test__/data"
 import { Biofuel, Country, Feedstock } from "carbure/types"
 import {
   LotPreview,
-  SafAirlineSnapshot,
   SafOperatorSnapshot,
   SafTicket,
   SafTicketDetails,
@@ -16,6 +22,7 @@ import {
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
+import { CategoryEnum } from "api-schema"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,
@@ -30,22 +37,19 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   tickets_received_pending: 1,
 }
 
-export const SafAirlineSnapshot: SafAirlineSnapshot = {
-  tickets_pending: 2,
-  tickets_accepted: 1,
-}
-
 export const safClientFilterOptions: string[] = ["Air France", "CORSAIR"]
 
 const feedstock1: Feedstock = {
   code: "LIES_DE_VIN",
   name: "Lies de vin",
+  name_en: "Lies de vin",
   is_double_compte: false,
-  category: "ANN-IX-A",
+  category: CategoryEnum.ANN_IX_A,
 }
-const bioduel1: Biofuel = {
+const biofuel1: Biofuel = {
   code: "HOC",
   name: "Autres Huiles Hydrotraitées - Kérosène",
+  name_en: "Autres Huiles Hydrotraitées - Kérosène",
 }
 const country1: Country = {
   code_pays: "FR",
@@ -64,9 +68,13 @@ export const safTicketSource: SafTicketSource = {
   assigned_volume: 0,
   assigned_tickets: [],
   feedstock: feedstock1,
-  biofuel: bioduel1,
+  biofuel: biofuel1,
   country_of_origin: country1,
   ghg_reduction: 54,
+  parent_lot: {
+    id: 1,
+    carbure_id: "1",
+  },
 }
 
 export const lotPreview: LotPreview = {
@@ -74,6 +82,23 @@ export const lotPreview: LotPreview = {
   carbure_id: "12345678",
   volume: 1000,
   delivery_date: "2022-02-08",
+  added_by: operator,
+  biofuel: biofuel1,
+  carbure_client: company,
+  carbure_delivery_site: deliverySite,
+  year: 2022,
+  carbure_dispatch_site: deliverySite,
+  carbure_producer: producer,
+  carbure_production_site: productionSite,
+  carbure_supplier: trader,
+  carbure_vendor: trader,
+  country_of_origin: country1,
+  period: 4,
+  created_at: "2022-02-07",
+  delivery_site_country: country1,
+  dispatch_site_country: country1,
+  feedstock: feedstock1,
+  production_country: country1,
 }
 
 export const safTicketPreview1: SafTicketPreview = {
@@ -103,7 +128,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   total_volume: 5000,
   assigned_volume: 3000,
   feedstock: feedstock1,
-  biofuel: bioduel1,
+  biofuel: biofuel1,
   country_of_origin: country1,
   ghg_reduction: 54,
   parent_lot: lotPreview,
@@ -137,9 +162,13 @@ export const safTicketSource2: SafTicketSource = {
   total_volume: 5000,
   assigned_volume: 2000,
   feedstock: feedstock1,
-  biofuel: bioduel1,
+  biofuel: biofuel1,
   country_of_origin: country1,
   ghg_reduction: 64,
+  parent_lot: {
+    id: 1,
+    carbure_id: "1",
+  },
 }
 
 export const safTicketSourcesResponse: SafTicketSourcesResponse = {
@@ -168,11 +197,10 @@ export const safTicket: SafTicket = {
   year: 2022,
   assignment_period: 202202,
   client: "Air France",
-  created_at: "2022-01-10",
   supplier: producer.name,
   volume: 2000,
   feedstock: feedstock1,
-  biofuel: bioduel1,
+  biofuel: biofuel1,
   country_of_origin: country1,
   ghg_reduction: 74,
   status: SafTicketStatus.PENDING,
@@ -189,7 +217,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   supplier: producer.name,
   volume: 2000,
   feedstock: feedstock1,
-  biofuel: bioduel1,
+  biofuel: biofuel1,
   country_of_origin: country1,
   client_comment: "C'eest vraiment n'importe quoi !",
   ghg_reduction: 74,
@@ -208,6 +236,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   eccr: 0,
   eee: 0,
   ghg_total: 23.5,
+  parent_ticket_source: safTicketSource,
 }
 
 // const safTicketSourceSummaryItem: SafTicketSourceSummaryItem = {
@@ -217,21 +246,17 @@ export const safTicketAssignedDetails: SafTicketDetails = {
 //   delivery_period: 202202,
 //   total_volume: 3000,
 //   feedstock: feedstock1,
-//   biofuel: bioduel1,
+//   biofuel: biofuel1,
 // }
 
 export const safTicketReceivedDetails: SafTicketDetails = {
   ...safTicketAssignedDetails,
   status: SafTicketStatus.ACCEPTED, // SafTicketStatus.PENDING
   client: "TERF SAF",
-  // child_ticket_source: { id: 2355, carbure_id: "adada" }
-  parent_ticket_source: { id: 2355, carbure_id: "adada" },
+  parent_ticket_source: safTicketSource,
 }
 
 export const safTicketsResponse: SafTicketsResponse = {
-  saf_tickets: [safTicket, safTicket],
-  from: 1,
-  returned: 1,
-  total: 11,
-  ids: [12343, 12343],
+  count: 2,
+  results: [safTicket, safTicket],
 }

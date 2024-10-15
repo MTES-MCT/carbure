@@ -63,7 +63,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         value={formatGHG(value.ghg_total ?? 0)}
       />
 
-      {canSeePlantGHG(entity, value, DepotType.PowerPlant) && (
+      {canSeePlantGHG(entity, value, DepotType.POWER_PLANT) && (
         <NumberInput
           readOnly
           label="ECEL"
@@ -76,7 +76,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         />
       )}
 
-      {canSeePlantGHG(entity, value, DepotType.HeatPlant) && (
+      {canSeePlantGHG(entity, value, DepotType.HEAT_PLANT) && (
         <NumberInput
           readOnly
           label="ECH"
@@ -144,7 +144,7 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         />
       )}
 
-      {canSeePlantGHG(entity, value, DepotType.PowerPlant) && (
+      {canSeePlantGHG(entity, value, DepotType.POWER_PLANT) && (
         <TextInput
           readOnly
           label="Réd. élec."
@@ -153,7 +153,7 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         />
       )}
 
-      {canSeePlantGHG(entity, value, DepotType.HeatPlant) && (
+      {canSeePlantGHG(entity, value, DepotType.HEAT_PLANT) && (
         <TextInput
           readOnly
           label="Réd. chaleur"
@@ -181,7 +181,7 @@ function canSeePlantGHG(entity: Entity, lot: LotFormValue, type: DepotType) {
   const isDeliverySiteForHeat =
     lot.delivery_site instanceof Object &&
     (lot.delivery_site.depot_type === type ||
-      lot.delivery_site.depot_type === DepotType.CogenerationPlant)
+      lot.delivery_site.depot_type === DepotType.COGENERATION_PLANT)
 
   return isEntityAllowed && isDeliverySiteForHeat
 }
