@@ -82,7 +82,8 @@
     "chromatic": "chromatic --exit-zero-on-changes",
     "generate-api": "npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.ts --enum --dedupe-enums && eslint 'src/api-schema.ts' --fix",
     "check-diff": "git diff --exit-code ../api-schema.yaml || (echo 'Des différences ont été détectées' && exit 1)",
-    "check-backend-types": "npm run generate-api && npm run check-diff && tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "generate-and-check-types": "npm run generate-api && npm run check-diff && npm run check-types"
   },
   "browserslist": {
     "production": [
