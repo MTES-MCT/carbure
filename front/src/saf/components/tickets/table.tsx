@@ -37,10 +37,6 @@ export const TicketsTable = memo(
   }: TicketsTableProps) => {
     const columns = useColumns()
 
-    // const total = ticketsData?.total ?? 0
-    // const count = ticketsData?.returned ?? 0
-    // const tickets = ticketsData?.saf_tickets
-
     const total = ticketsData?.count ?? 0
     const count = ticketsData?.results.length ?? 0
     const tickets = ticketsData?.results
@@ -68,6 +64,7 @@ export const TicketsTable = memo(
             {(state.limit || 0) < total && (
               <Pagination
                 page={state.page}
+                startPage={1}
                 limit={state.limit}
                 total={total}
                 onPage={actions.setPage}

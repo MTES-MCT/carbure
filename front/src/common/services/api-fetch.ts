@@ -41,7 +41,7 @@ const middleware: Middleware = {
     if (!response.ok) {
       const message = await response.json()
 
-      throw new HttpError("Http error", response.status, message)
+      throw new HttpError(message, response.status, message)
     }
     return response
   },

@@ -1,20 +1,12 @@
 import { extract } from "carbure/api"
 import { EntityPreview } from "carbure/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
-import { api, Api, download } from "common/services/api"
-import {
-  SafFilter,
-  SafOperatorQuery,
-  SafOperatorSnapshot,
-  SafQuery,
-  SafTicketDetails,
-  SafTicketsResponse,
-} from "../../types"
+import { api, Api } from "common/services/api"
+import { SafFilter, SafOperatorQuery, SafQuery } from "../../types"
 import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
-import { SafTicketSourceDetails, SafTicketSourcesResponse } from "./types"
 
 export function getOperatorYears(entity_id: number) {
   return apiFetch.GET("/saf/years/", {

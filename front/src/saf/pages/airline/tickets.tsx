@@ -98,7 +98,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
           state={state}
           actions={actions}
           order={state.order}
-          status={status as SafTicketStatus}
+          status={status}
           ticketsData={ticketsData}
           rowLink={showTicketDetail}
         />
