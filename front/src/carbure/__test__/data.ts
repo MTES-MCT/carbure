@@ -91,7 +91,7 @@ export const trader: Entity = {
 export const operator: Entity = {
   id: 2,
   name: "Opérateur Test",
-  entity_type: EntityType.Op_rateur,
+  entity_type: EntityType.Operator,
   has_mac: true,
   has_trading: false,
   has_stocks: false,
@@ -236,9 +236,9 @@ export const entityRights = {
 export const entities = {
   [EntityType.CPO]: cpo,
   [EntityType.Administration]: admin,
-  [EntityType.Op_rateur]: operator,
+  [EntityType.Operator]: operator,
   [EntityType.Trader]: trader,
-  [EntityType.Producteur]: producer,
+  [EntityType.Producer]: producer,
 }
 
 type PartialUserParam = Partial<{

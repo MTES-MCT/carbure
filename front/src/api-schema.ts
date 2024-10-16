@@ -1534,16 +1534,16 @@ export enum DepotTypeEnum {
   COGENERATION_PLANT = "COGENERATION PLANT",
 }
 export enum EntityTypeEnum {
-  Producteur = "Producteur",
-  Op_rateur = "Op\u00E9rateur",
+  Producer = "Producteur",
+  Operator = "Op\u00E9rateur",
   Administration = "Administration",
   Trader = "Trader",
   Auditor = "Auditor",
-  Administration_Externe = "Administration Externe",
-  Charge_Point_Operator = "Charge Point Operator",
-  Compagnie_a_rienne = "Compagnie a\u00E9rienne",
+  ExternalAdmin = "Administration Externe",
+  CPO = "Charge Point Operator",
+  Airline = "Compagnie a\u00E9rienne",
   Unknown = "Unknown",
-  Power_or_Heat_Producer = "Power or Heat Producer",
+  PowerOrHeatProducer = "Power or Heat Producer",
 }
 export enum GesOptionEnum {
   Default = "Default",
