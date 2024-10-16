@@ -13,7 +13,6 @@ import {
   SafQuery,
   SafStates,
   SafTicket,
-  SafTicketStatus,
 } from "saf/types"
 import * as api from "./api"
 import { SafFilters } from "../../components/filters"
@@ -52,7 +51,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
   })
 
   const ticketsData = ticketsResponse.result?.data
-  // const ids = ticketsData?.ids ?? []
+
   const ids: any = []
 
   const showTicketDetail = (ticket: SafTicket) => {
