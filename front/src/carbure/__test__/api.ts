@@ -23,8 +23,8 @@ export const okStats = http.get("/api/home-stats", () => {
     data: {
       total_volume: 1000000,
       entities: {
-        [EntityType.Op_rateur]: 25,
-        [EntityType.Producteur]: 25,
+        [EntityType.Operator]: 25,
+        [EntityType.Producer]: 25,
         [EntityType.Trader]: 25,
       },
     },
