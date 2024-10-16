@@ -53,4 +53,4 @@ pre-commit = "*"
 ruff = "*"
 
 [requires]
-python_version = "3"
+python_version = "3.12"
