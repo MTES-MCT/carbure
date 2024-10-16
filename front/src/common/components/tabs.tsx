@@ -57,7 +57,7 @@ export const Tabs = ({
         className={cl(css.tabs, css[variant], className)}
         style={style}
       >
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const props = {
             key: tab.key,
             className: cl(css.tab, tab.key === focus && css.active),
