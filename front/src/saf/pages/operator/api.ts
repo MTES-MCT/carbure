@@ -156,6 +156,7 @@ export function assignSafTicket(
   volume: number,
   assignment_period: number,
   client: EntityPreview,
+  agreement_reference?: string,
   free_field?: string
 ) {
   return apiFetch.POST("/saf/ticket-sources/{id}/assign/", {
@@ -172,8 +173,8 @@ export function assignSafTicket(
       assignment_period,
       client_id: client.id,
       free_field,
+      agreement_reference,
       agreement_date: "",
-      agreement_reference: "",
     },
   })
 }
@@ -194,8 +195,7 @@ export function groupedAssignSafTicket(
       },
     },
     body: {
-      agreement_date: "",
-      agreement_reference: "",
+      agreement_reference,
       assignment_period,
       client_id: client.id,
       ticket_sources_ids,

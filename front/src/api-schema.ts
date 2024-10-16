@@ -100,6 +100,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/saf/ticket-sources/credit/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["saf_ticket_sources_credit_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/saf/ticket-sources/export/": {
     parameters: {
       query?: never
@@ -391,6 +407,10 @@ export interface components {
       code_pays: string
       is_in_europe?: boolean
     }
+    CreditTicketSource: {
+      ticket_id: number
+      entity_id: number
+    }
     /**
      * @description * `UNKNOWN` - UNKNOWN
      *     * `RFC` - RFC
@@ -426,6 +446,7 @@ export interface components {
      *     * `HEAT PLANT` - HEAT PLANT
      *     * `POWER PLANT` - POWER PLANT
      *     * `COGENERATION PLANT` - COGENERATION PLANT
+     *     * `EFCA` - EFCA
      * @enum {string}
      */
     DepotTypeEnum: DepotTypeEnum
@@ -492,6 +513,9 @@ export interface components {
      * @enum {string}
      */
     GesOptionEnum: GesOptionEnum
+    GroupAssignmentResponse: {
+      assigned_tickets_count: number
+    }
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -681,8 +705,8 @@ export interface components {
       client_id: number
       /** Format: double */
       volume: number
-      agreement_reference: string
-      agreement_date: string
+      agreement_reference?: string
+      agreement_date?: string | null
       free_field?: string | null
       assignment_period: number
     }
@@ -736,8 +760,8 @@ export interface components {
       client_id: number
       /** Format: double */
       volume: number
-      agreement_reference: string
-      agreement_date: string
+      agreement_reference?: string
+      agreement_date?: string | null
       free_field?: string | null
       assignment_period: number
       ticket_sources_ids: number[]
@@ -986,6 +1010,31 @@ export interface operations {
       }
     }
   }
+  saf_ticket_sources_credit_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreditTicketSource"]
+        "application/x-www-form-urlencoded": components["schemas"]["CreditTicketSource"]
+        "multipart/form-data": components["schemas"]["CreditTicketSource"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CreditTicketSource"]
+        }
+      }
+    }
+  }
   saf_ticket_sources_export_retrieve: {
     parameters: {
       query: {
@@ -1115,7 +1164,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": unknown
+          "application/json": components["schemas"]["GroupAssignmentResponse"]
         }
       }
       400: {
@@ -1532,6 +1581,7 @@ export enum DepotTypeEnum {
   HEAT_PLANT = "HEAT PLANT",
   POWER_PLANT = "POWER PLANT",
   COGENERATION_PLANT = "COGENERATION PLANT",
+  EFCA = "EFCA",
 }
 export enum EntityTypeEnum {
   Producer = "Producteur",
