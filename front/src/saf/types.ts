@@ -80,13 +80,6 @@ export interface SafTicketAssignementQuery {
   free_field: string
 }
 
-// export interface SafTicketsResponse {
-//   saf_tickets: SafTicket[]
-//   from: number
-//   returned: number
-//   total: number
-//   ids: number[]
-// }
 export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
 
 export interface SafStates extends CBQueryStates {

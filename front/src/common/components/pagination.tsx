@@ -9,6 +9,8 @@ import Select from "./select"
 export interface PaginationProps {
   total: number
   page: number
+  // With the new backend structure, pagination page starts to 1 instead of 0
+  startPage?: number
   limit: number | undefined
   onPage: (page: number) => void
   onLimit: (limit: number | undefined) => void
@@ -20,17 +22,21 @@ export const Pagination = ({
   limit,
   onPage,
   onLimit,
+  startPage = 0,
 }: PaginationProps) => {
   const { t } = useTranslation()
   const pageCount = limit ? Math.ceil(total / limit) : 1
 
+  const handlePage = (page: number) => {
+    onPage(page + startPage)
+  }
   return (
     <Row className={css.pagination}>
       <Button
         disabled={page === 0}
         variant="secondary"
         icon={ChevronLeft}
-        action={() => onPage(page - 1)}
+        action={() => handlePage(page - 1)}
       />
 
       <section>
@@ -40,8 +46,8 @@ export const Pagination = ({
           variant="solid"
           anchor="top start"
           placeholder={t("Choisir une page")}
-          value={page}
-          onChange={(page) => page !== undefined && onPage(page)}
+          value={page - startPage}
+          onChange={(page) => page !== undefined && handlePage(page)}
           options={listPages(pageCount)}
         />
 
@@ -69,7 +75,7 @@ export const Pagination = ({
         disabled={page === pageCount - 1}
         variant="secondary"
         icon={ChevronRight}
-        action={() => onPage(page + 1)}
+        action={() => handlePage(page + 1)}
       />
     </Row>
   )
