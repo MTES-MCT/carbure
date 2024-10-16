@@ -1,10 +1,15 @@
 import traceback
 
 from django.db import transaction
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from core.models import CarbureNotification
@@ -24,6 +29,15 @@ class CreditTicketSourceSerializer(serializers.Serializer):
 
 class CreditActionMixin:
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
         examples=[
             OpenApiExample(
                 "Example of credit response.",
@@ -33,22 +47,10 @@ class CreditActionMixin:
             ),
         ],
     )
-    @action(
-        methods=["post"],
-        detail=False,
-        serializer_class=CreditTicketSourceSerializer,
-    )
-    def credit(self, request):
-        # entity_id = int(request.query_params.get("entity_id"))
-
-        serializer = CreditTicketSourceSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        ticket_id = serializer.validated_data["ticket_id"]
-        entity_id = serializer.validated_data["entity_id"]
-
-        ticket = SafTicket.objects.filter(id=ticket_id, client_id=entity_id).first()
-        if not ticket:
-            raise ValidationError({"message": SafTicketAcceptError.TICKET_NOT_FOUND})
+    @action(methods=["get"], detail=True, url_path="credit-source")
+    def credit_source(self, request, id=None):
+        entity_id = int(request.query_params.get("entity_id"))
+        ticket = get_object_or_404(SafTicket, id=id, client_id=entity_id)
 
         try:
             with transaction.atomic():
