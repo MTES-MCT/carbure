@@ -55,7 +55,8 @@ export const TicketAssignment = ({
       value.volume!,
       value.assignment_period,
       value.client!,
-      value.free_field!
+      value.agreement_reference,
+      value.free_field
     )
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
