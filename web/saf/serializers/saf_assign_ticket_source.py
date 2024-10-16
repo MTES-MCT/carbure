@@ -4,8 +4,8 @@ from rest_framework import serializers
 class SafTicketSourceAssignmentSerializer(serializers.Serializer):
     client_id = serializers.IntegerField(required=True)
     volume = serializers.FloatField(required=True)
-    agreement_reference = serializers.CharField(required=True)
-    agreement_date = serializers.CharField(required=True)
+    agreement_reference = serializers.CharField(required=False)
+    agreement_date = serializers.CharField(required=False)
     free_field = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     assignment_period = serializers.IntegerField(required=True)
 
