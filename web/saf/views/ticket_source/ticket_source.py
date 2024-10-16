@@ -34,7 +34,7 @@ class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet,
     ]
 
     def get_permissions(self):
-        if self.action in ["grouped_assign", "assign"]:
+        if self.action in ["grouped_assign", "assign", "credit"]:
             return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
         return super().get_permissions()
 
