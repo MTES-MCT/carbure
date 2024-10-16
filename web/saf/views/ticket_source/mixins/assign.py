@@ -49,8 +49,8 @@ class AssignActionMixin:
 
         client_id = serializer.validated_data["client_id"]
         volume = serializer.validated_data["volume"]
-        agreement_reference = serializer.validated_data["agreement_reference"]
-        agreement_date = serializer.validated_data["agreement_date"]
+        agreement_reference = serializer.validated_data.get("agreement_reference")
+        agreement_date = serializer.validated_data.get("agreement_date")
         free_field = serializer.validated_data.get("free_field")
         assignment_period = serializer.validated_data["assignment_period"]
 
