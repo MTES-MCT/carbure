@@ -100,22 +100,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/saf/ticket-sources/credit/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["saf_ticket_sources_credit_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/saf/ticket-sources/export/": {
     parameters: {
       query?: never
@@ -222,6 +206,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["saf_tickets_cancel_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/saf/tickets/{id}/credit-source/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["saf_tickets_credit_source_retrieve"]
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -406,10 +406,6 @@ export interface components {
       name_en: string
       code_pays: string
       is_in_europe?: boolean
-    }
-    CreditTicketSource: {
-      ticket_id: number
-      entity_id: number
     }
     /**
      * @description * `UNKNOWN` - UNKNOWN
@@ -706,7 +702,7 @@ export interface components {
       /** Format: double */
       volume: number
       agreement_reference?: string
-      agreement_date?: string | null
+      agreement_date?: string
       free_field?: string | null
       assignment_period: number
     }
@@ -761,7 +757,7 @@ export interface components {
       /** Format: double */
       volume: number
       agreement_reference?: string
-      agreement_date?: string | null
+      agreement_date?: string
       free_field?: string | null
       assignment_period: number
       ticket_sources_ids: number[]
@@ -1006,31 +1002,6 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["SafTicketSourceAssignment"]
-        }
-      }
-    }
-  }
-  saf_ticket_sources_credit_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreditTicketSource"]
-        "application/x-www-form-urlencoded": components["schemas"]["CreditTicketSource"]
-        "multipart/form-data": components["schemas"]["CreditTicketSource"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CreditTicketSource"]
         }
       }
     }
@@ -1334,6 +1305,31 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ErrorResponse"]
+        }
+      }
+    }
+  }
+  saf_tickets_credit_source_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Ticket SAF. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SafTicket"]
         }
       }
     }

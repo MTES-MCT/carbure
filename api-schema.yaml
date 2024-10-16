@@ -357,38 +357,6 @@ paths:
                   value: {}
                   summary: Example of assign response.
           description: ""
-  /api/saf/ticket-sources/credit/:
-    post:
-      operationId: saf_ticket_sources_credit_create
-      tags:
-        - saf
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreditTicketSource"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/CreditTicketSource"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/CreditTicketSource"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreditTicketSource"
-              examples:
-                ExampleOfCreditResponse.:
-                  value:
-                    status: success
-                  summary: Example of credit response.
-          description: ""
   /api/saf/ticket-sources/export/:
     get:
       operationId: saf_ticket_sources_export_retrieve
@@ -975,6 +943,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/saf/tickets/{id}/credit-source/:
+    get:
+      operationId: saf_tickets_credit_source_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Ticket SAF.
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafTicket"
+              examples:
+                ExampleOfCreditResponse.:
+                  value:
+                    status: success
+                  summary: Example of credit response.
           description: ""
   /api/saf/tickets/{id}/reject/:
     post:
@@ -1644,16 +1645,6 @@ components:
         - code_pays
         - name
         - name_en
-    CreditTicketSource:
-      type: object
-      properties:
-        ticket_id:
-          type: integer
-        entity_id:
-          type: integer
-      required:
-        - entity_id
-        - ticket_id
     DeliveryTypeEnum:
       enum:
         - UNKNOWN
@@ -2371,7 +2362,6 @@ components:
           type: string
         agreement_date:
           type: string
-          nullable: true
         free_field:
           type: string
           nullable: true
@@ -2513,7 +2503,6 @@ components:
           type: string
         agreement_date:
           type: string
-          nullable: true
         free_field:
           type: string
           nullable: true
