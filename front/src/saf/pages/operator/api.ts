@@ -156,7 +156,7 @@ export function assignSafTicket(
   volume: number,
   assignment_period: number,
   client: EntityPreview,
-  agreement_reference?: string,
+  i?: string,
   free_field?: string
 ) {
   return apiFetch.POST("/saf/ticket-sources/{id}/assign/", {
@@ -173,7 +173,7 @@ export function assignSafTicket(
       assignment_period,
       client_id: client.id,
       free_field,
-      agreement_reference,
+      i,
       agreement_date: "",
     },
   })
@@ -185,7 +185,7 @@ export function groupedAssignSafTicket(
   volume: number,
   assignment_period: number,
   client: EntityPreview,
-  agreement_reference: string,
+  i: string,
   free_field?: string
 ) {
   return apiFetch.POST("/saf/ticket-sources/group-assign/", {
@@ -195,7 +195,7 @@ export function groupedAssignSafTicket(
       },
     },
     body: {
-      agreement_reference,
+      i,
       assignment_period,
       client_id: client.id,
       ticket_sources_ids,
@@ -239,9 +239,15 @@ export function rejectSafOperatorTicket(
 }
 
 export function creditSafTicketSource(entity_id: number, ticket_id: number) {
-  return api.post("/saf/operator/credit-ticket-source", {
-    entity_id,
-    ticket_id,
+  return apiFetch.GET("/saf/tickets/{id}/credit-source/", {
+    params: {
+      query: {
+        entity_id,
+      },
+      path: {
+        id: ticket_id,
+      },
+    },
   })
 }
 
