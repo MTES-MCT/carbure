@@ -357,6 +357,38 @@ paths:
                   value: {}
                   summary: Example of assign response.
           description: ""
+  /api/saf/ticket-sources/credit/:
+    post:
+      operationId: saf_ticket_sources_credit_create
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreditTicketSource"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CreditTicketSource"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreditTicketSource"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditTicketSource"
+              examples:
+                ExampleOfCreditResponse.:
+                  value:
+                    status: success
+                  summary: Example of credit response.
+          description: ""
   /api/saf/ticket-sources/export/:
     get:
       operationId: saf_ticket_sources_export_retrieve
@@ -676,7 +708,8 @@ paths:
         "200":
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: "#/components/schemas/GroupAssignmentResponse"
           description: ""
         "400":
           content:
@@ -1611,6 +1644,16 @@ components:
         - code_pays
         - name
         - name_en
+    CreditTicketSource:
+      type: object
+      properties:
+        ticket_id:
+          type: integer
+        entity_id:
+          type: integer
+      required:
+        - entity_id
+        - ticket_id
     DeliveryTypeEnum:
       enum:
         - UNKNOWN
@@ -1686,6 +1729,7 @@ components:
         - HEAT PLANT
         - POWER PLANT
         - COGENERATION PLANT
+        - EFCA
       type: string
       description: |-
         * `OTHER` - Autre
@@ -1696,6 +1740,7 @@ components:
         * `HEAT PLANT` - HEAT PLANT
         * `POWER PLANT` - POWER PLANT
         * `COGENERATION PLANT` - COGENERATION PLANT
+        * `EFCA` - EFCA
     Entity:
       type: object
       properties:
@@ -1853,6 +1898,13 @@ components:
         * `Default` - Valeurs par défaut
         * `Actual` - Valeurs réelles
         * `NUTS2` - Valeurs NUTS2
+    GroupAssignmentResponse:
+      type: object
+      properties:
+        assigned_tickets_count:
+          type: integer
+      required:
+        - assigned_tickets_count
     LotStatusEnum:
       enum:
         - DRAFT
@@ -2319,14 +2371,13 @@ components:
           type: string
         agreement_date:
           type: string
+          nullable: true
         free_field:
           type: string
           nullable: true
         assignment_period:
           type: integer
       required:
-        - agreement_date
-        - agreement_reference
         - assignment_period
         - client_id
         - volume
@@ -2462,6 +2513,7 @@ components:
           type: string
         agreement_date:
           type: string
+          nullable: true
         free_field:
           type: string
           nullable: true
@@ -2472,8 +2524,6 @@ components:
           items:
             type: integer
       required:
-        - agreement_date
-        - agreement_reference
         - assignment_period
         - client_id
         - ticket_sources_ids
