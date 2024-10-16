@@ -57,7 +57,7 @@ export const Tabs = ({
         className={cl(css.tabs, css[variant], className)}
         style={style}
       >
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const props = {
             key: tab.key,
             className: cl(css.tab, tab.key === focus && css.active),
@@ -69,13 +69,18 @@ export const Tabs = ({
 
           // basic tab that doesn't deal with router
           if (!tab.path) {
-            return <button {...props}>{tab.label}</button>
+            console.log("le tab", tab)
+            return (
+              <button {...props} key={props.key}>
+                {tab.label}
+              </button>
+            )
           }
 
           // anchor link to same page
           if (tab.path.startsWith("#")) {
             return (
-              <a {...props} href={tab.path}>
+              <a {...props} href={tab.path} key={props.key}>
                 {tab.label}
               </a>
             )
@@ -85,6 +90,7 @@ export const Tabs = ({
             <NavLink
               {...props}
               to={keepSearch ? tab.path + location.search : tab.path}
+              key={props.key}
             >
               {tab.label}
             </NavLink>

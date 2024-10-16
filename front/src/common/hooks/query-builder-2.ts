@@ -16,16 +16,9 @@ export type CBSnapshot = Record<string, number>
 
 export type CBFilterSelection = Record<string, string[]>
 
-export type CBQueryResult = {
-  from: number
-  ids: number[]
-  returned: number
-  total: number
-}
-
 export const CBQUERY_RESET: Partial<CBQueryParams<[]>> = {
   limit: undefined,
-  from_idx: undefined,
+  page: 1,
   order: undefined,
 }
 
@@ -75,7 +68,7 @@ export interface CBQueryParams<Columns extends string[]> {
   status: string
   type?: string
   search?: string
-  from_idx: number
+  page: number
   limit?: number
   order?: OrderColumns<Columns>
 }
@@ -91,7 +84,7 @@ export function useCBQueryBuilder<Columns extends string[]>(
     status,
     type,
     search,
-    page = 0,
+    page = 1,
     limit,
     order,
     filters,
@@ -104,8 +97,8 @@ export function useCBQueryBuilder<Columns extends string[]>(
       status,
       type,
       search,
-      from_idx: page * (limit ?? 0),
-      limit: limit || undefined,
+      page: page > 0 ? page : 1,
+      limit: limit ?? undefined,
       order: formatOrder<OrderColumns<Columns>>(order),
       ...filters,
     }),
@@ -133,50 +126,39 @@ export function useCBQueryParamsStore<
       status,
       type,
       filters: filtersParams,
-      // search: undefined,
-      // invalid: false,
-      // deadline: false,
       order: undefined,
       selection: [],
-      page: 0,
+      page: 1,
       limit,
     } as CBQueryStates<GenericCBQueryStates>,
     {
       setEntity: (entity: Entity) => ({
         entity,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
-        page: 0,
+        page: 1,
       }),
 
       setYear: (year: number) => ({
         year,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
-        page: 0,
+        page: 1,
       }),
 
       setSnapshot: (snapshot: CBSnapshot) => ({
         snapshot,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
         selection: [],
-        page: 0,
+        page: 1,
       }),
 
       setStatus: (status: string) => {
         return {
           status,
           filters: filtersParams,
-          // invalid: false,
-          // deadline: false,
           selection: [],
-          page: 0,
+          page: 1,
         }
       },
 
@@ -185,7 +167,7 @@ export function useCBQueryParamsStore<
           type,
           filters: filtersParams,
           selection: [],
-          page: 0,
+          page: 1,
         }
       },
 
@@ -196,14 +178,14 @@ export function useCBQueryParamsStore<
         return {
           filters,
           selection: [],
-          page: 0,
+          page: 1,
         }
       },
 
       setSearch: (search: string | undefined) => ({
         search,
         selection: [],
-        page: 0,
+        page: 1,
       }),
 
       setOrder: (order: Order | undefined) => ({
@@ -214,17 +196,19 @@ export function useCBQueryParamsStore<
         selection,
       }),
 
-      setPage: (page?: number) => ({
-        page,
-        selection: [],
-      }),
+      setPage: (page?: number) => {
+        return {
+          page,
+          selection: [],
+        }
+      },
 
       setLimit: (limit?: number) => {
         saveLimit(limit)
         return {
           limit,
           selection: [],
-          page: 0,
+          page: 1,
         }
       },
     }
