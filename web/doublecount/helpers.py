@@ -438,6 +438,7 @@ def check_dc_file(file):
         },
         None,
         None,
+        None,
     )
 
 
@@ -647,6 +648,7 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
     # preload data
     feedstocks = MatierePremiere.objects.all()
     countries = Pays.objects.all()
+
     for row in sourcing_history_rows:
         line = row["line"]
         meta = {"year": row["year"]}

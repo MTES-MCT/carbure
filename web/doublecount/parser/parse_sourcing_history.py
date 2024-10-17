@@ -9,7 +9,7 @@ from doublecount.parser.types import SourcingHistoryRow
 
 
 def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[SourcingHistoryRow]:
-    sourcing_sheet = excel_file["Historique d'approvisionnem"]
+    sourcing_sheet = excel_file["Historique d'approvisionnement"]
     sourcing_rows: List[SourcingHistoryRow] = []
 
     current_year = 2100
@@ -32,7 +32,6 @@ def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[Sourci
             continue
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
-
         # skip row if no feedstock is recognized and no origin country is defined
         if not feedstock and not origin_country_cell:
             continue
