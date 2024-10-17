@@ -9,7 +9,7 @@ def bulk_generate_lot_carbure_id(lots: QuerySet[CarbureLot], save=False):
         lots.select_related("carbure_delivery_site", "production_country")
         .annotate(
             country_code=Coalesce("production_country__code_pays", Value("00"), output_field=CharField()),
-            delivery_site_id=Coalesce("carbure_delivery_site__depot_id", Value("00"), output_field=CharField()),
+            delivery_site_id=Coalesce("carbure_delivery_site__customs_id", Value("00"), output_field=CharField()),
             new_carbure_id=Concat(
                 Value("L"),
                 F("period"),
