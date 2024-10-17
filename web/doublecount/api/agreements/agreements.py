@@ -21,7 +21,6 @@ def get_agreements(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": []})
 
     applications_data = DoubleCountingApplicationPartialSerializer(applications, many=True).data
-    print(">>>applications_data: ", applications_data)
     current_year = datetime.now().year
 
     quotas = get_quotas(year=current_year, producer_id=entity_id)

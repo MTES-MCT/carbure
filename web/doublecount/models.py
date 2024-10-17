@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from core.models import Biocarburant, Entity, MatierePremiere, Pays
+from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
 from transactions.models import Site
 
 usermodel = get_user_model()
@@ -94,6 +94,39 @@ class DoubleCountingSourcing(models.Model):
         db_table = "double_counting_sourcing"
         verbose_name = "Sourcing Double Compte"
         verbose_name_plural = "Sourcing Double Compte"
+
+
+class DoubleCountingSourcingHistory(models.Model):
+    dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="history_sourcing")
+    year = models.IntegerField(blank=False, null=False)
+    feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
+    origin_country = models.ForeignKey(Pays, on_delete=models.CASCADE, related_name="history_origin_country")
+    supply_country = models.ForeignKey(
+        Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="history_supply_country"
+    )
+    transit_country = models.ForeignKey(
+        Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="history_transit_country"
+    )
+    metric_tonnes = models.IntegerField(blank=False, null=False)
+    raw_material_supplier = models.CharField(max_length=128, default="")
+    supplier_certificate_name = models.CharField(max_length=64, default="")
+    supplier_certificate = models.ForeignKey(GenericCertificate, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return "%s - %s - %st %s - %s - %s - %s" % (
+            self.dca,
+            self.feedstock,
+            self.metric_tonnes,
+            self.feedstock.name,
+            self.origin_country,
+            self.supply_country,
+            self.raw_material_supplier,
+        )
+
+    class Meta:
+        db_table = "double_counting_sourcing_history"
+        verbose_name = "Sourcing Double Compte Historique"
+        verbose_name_plural = "Sourcing Double Compte Historique"
 
 
 class DoubleCountingProduction(models.Model):
