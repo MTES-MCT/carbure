@@ -22,11 +22,8 @@ def check_file(request, *args, **kwargs):
         return ErrorResponse(400, CheckFileError.MISSING_FILE)
 
     try:
-        info, errors, sourcing_data, production_data = check_dc_file(file)
-        error_count = (
-            # len(errors["sourcing_history"])
-            +len(errors["sourcing_forecast"]) + len(errors["production"]) + len(errors["global"])
-        )
+        info, errors, sourcing_data, production_data, sourcing_history_data = check_dc_file(file)
+        error_count = +len(errors["sourcing_forecast"]) + len(errors["production"]) + len(errors["global"])
 
         has_dechets_industriels = check_has_dechets_industriels(production_data)
 
@@ -40,6 +37,7 @@ def check_file(request, *args, **kwargs):
             "producer_email": info["producer_email"],
             "production": production_data,
             "sourcing": sourcing_data,
+            "sourcing_history": sourcing_history_data,
         }
 
         return SuccessResponse({"file": file_info, "checked_at": datetime.datetime.now().isoformat()})
