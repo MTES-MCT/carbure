@@ -68,7 +68,10 @@ def check_application(request: HttpRequest, entity):
     data["error_count"] = 0
 
     if len(errors) > 0:
-        data["errors"] = errors
+        for error in errors:
+            error["meta"].pop("meter", None)
+        data["errors"] = [error for error in errors if error["meta"]]
+
         data["error_count"] = len(data["errors"])
         return ErrorResponse(400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data)
 
