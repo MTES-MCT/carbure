@@ -23,17 +23,24 @@ from doublecount.dc_sanity_checks import (
     check_sourcing_row,
 )
 from doublecount.errors import DoubleCountingError, error
-from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
+from doublecount.models import (
+    DoubleCountingApplication,
+    DoubleCountingProduction,
+    DoubleCountingSourcing,
+    DoubleCountingSourcingHistory,
+)
 from doublecount.parser.dc_parser import (
     ProductionForecastRow,
     ProductionMaxRow,
     RequestedQuotaRow,
+    SourcingHistoryRow,
     SourcingRow,
     parse_dc_excel,
 )
 from doublecount.serializers import (
     BiofuelSerializer,
     DoubleCountingProductionSerializer,
+    DoubleCountingSourcingHistorySerializer,
     DoubleCountingSourcingSerializer,
     FeedStockSerializer,
 )
@@ -365,6 +372,7 @@ def check_dc_file(file):
             production_max_rows,
             production_forecast_rows,
             requested_quota_rows,
+            sourcing_history_rows,
         ) = parse_dc_excel(filepath)
         start, end, global_errors = load_dc_period(info["start_year"])
 
@@ -380,17 +388,21 @@ def check_dc_file(file):
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
 
+        sourcing_history_data, sourcing_history_errors = load_dc_sourcing_history_data(dca, sourcing_history_rows)
+
         global_errors += check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
 
         return (
             info,
             {
                 "sourcing_forecast": sourcing_forecast_errors,
+                "sourcing_history": sourcing_history_errors,
                 "production": production_errors,
                 "global": global_errors,
             },
             DoubleCountingSourcingSerializer(sourcing_forecast_data, many=True).data,
             DoubleCountingProductionSerializer(production_data, many=True).data,
+            DoubleCountingSourcingHistorySerializer(sourcing_history_data, many=True).data,
         )
 
     except CarbureException as e:
@@ -420,10 +432,11 @@ def check_dc_file(file):
         info,
         {
             "sourcing_forecast": [],
-            # "sourcing_history": [],
+            "sourcing_history": [],
             "production": [],
             "global": [excel_error],
         },
+        None,
         None,
         None,
     )
@@ -625,3 +638,66 @@ def get_agreement_quotas(agreement: DoubleCountingRegistration):
     del quotas_df["feedstock_id"]
     del quotas_df["biofuel_id"]
     return quotas_df.to_dict("records")
+
+
+def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_history_rows: List[SourcingHistoryRow]):
+    # prepare error list
+    sourcing_data = []
+    sourcing_errors = []
+
+    # preload data
+    feedstocks = MatierePremiere.objects.all()
+    countries = Pays.objects.all()
+
+    for row in sourcing_history_rows:
+        line = row["line"]
+        meta = {"year": row["year"]}
+        metric_tonnes = row["metric_tonnes"]
+
+        if not metric_tonnes:
+            continue
+
+        errors = check_sourcing_row(row)
+        if len(errors) > 0:
+            sourcing_errors += errors
+            continue
+
+        # CREATE SOURCING
+        sourcing = DoubleCountingSourcingHistory(dca=dca)
+        sourcing.year = row["year"]
+        sourcing.metric_tonnes = row["metric_tonnes"]
+
+        # Feedstock
+        try:
+            feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
+        except Exception:
+            feedstock = None
+
+        if feedstock and not feedstock.is_double_compte:
+            continue
+        if feedstock:
+            sourcing.feedstock = feedstock
+
+        # Origin country
+        origin_country = get_country(row["origin_country"], countries)
+        if origin_country:
+            sourcing.origin_country = origin_country
+        else:
+            errors.append(
+                error(
+                    DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN,
+                    line=line,
+                    meta=meta,
+                )
+            )
+        sourcing.supply_country = get_country(row["supply_country"], countries)
+        sourcing.transit_country = get_country(row["transit_country"], countries)
+        sourcing.raw_material_supplier = row["raw_material_supplier"]
+        sourcing.supplier_certificate_name = row["supplier_certificate_name"]
+        sourcing.supplier_certificate = row["supplier_certificate"]
+
+        sourcing_errors += errors
+        if len(errors) == 0:
+            sourcing_data.append(sourcing)
+
+    return sourcing_data, sourcing_errors

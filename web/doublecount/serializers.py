@@ -6,7 +6,13 @@ from core.models import Biocarburant, Entity, GenericCertificate, MatierePremier
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
 
-from .models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction, DoubleCountingSourcing
+from .models import (
+    DoubleCountingApplication,
+    DoubleCountingDocFile,
+    DoubleCountingProduction,
+    DoubleCountingSourcing,
+    DoubleCountingSourcingHistory,
+)
 
 
 class EntitySerializer(serializers.ModelSerializer):
@@ -155,6 +161,28 @@ class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingSourcing
         fields = ["id", "year", "feedstock", "origin_country", "supply_country", "transit_country", "metric_tonnes"]
+
+
+class DoubleCountingSourcingHistorySerializer(serializers.ModelSerializer):
+    feedstock = FeedStockSerializer(read_only=True)
+    origin_country = CountrySerializer(read_only=True)
+    supply_country = CountrySerializer(read_only=True)
+    transit_country = CountrySerializer(read_only=True)
+
+    class Meta:
+        model = DoubleCountingSourcingHistory
+        fields = [
+            "id",
+            "year",
+            "feedstock",
+            "origin_country",
+            "supply_country",
+            "transit_country",
+            "metric_tonnes",
+            "raw_material_supplier",
+            "supplier_certificate_name",
+            "supplier_certificate",
+        ]
 
 
 class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):

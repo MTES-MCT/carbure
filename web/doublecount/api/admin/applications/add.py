@@ -14,6 +14,7 @@ from doublecount.helpers import (
     load_dc_period,
     load_dc_production_data,
     load_dc_sourcing_data,
+    load_dc_sourcing_history_data,
     send_dca_confirmation_email,
 )
 from doublecount.models import (
@@ -76,9 +77,14 @@ def add_application_by_type(request, entity_type):
     # 1 - load dc Data
     filepath = load_dc_filepath(file)
 
-    info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows = parse_dc_excel(
-        filepath
-    )
+    (
+        info,
+        sourcing_forecast_rows,
+        production_max_rows,
+        production_forecast_rows,
+        requested_quota_rows,
+        sourcing_history_rows,
+    ) = parse_dc_excel(filepath)
 
     start, end, _ = load_dc_period(info["start_year"])
 
@@ -133,12 +139,15 @@ def add_application_by_type(request, entity_type):
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
     production_data, _ = load_dc_production_data(dca, production_max_rows, production_forecast_rows, requested_quota_rows)
+    sourcing_history_data, _ = load_dc_sourcing_history_data(dca, sourcing_history_rows)
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
     for sourcing in sourcing_forecast_data:
         sourcing.save()
     DoubleCountingProduction.objects.filter(dca=dca).delete()
     for production in production_data:
         production.save()
+    for sourcing_history in sourcing_history_data:
+        sourcing_history.save()
 
     try:
         send_dca_confirmation_email(dca, request)
