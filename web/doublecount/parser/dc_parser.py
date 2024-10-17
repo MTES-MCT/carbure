@@ -5,12 +5,26 @@ from openpyxl import load_workbook
 from doublecount.parser.parse_info import parse_info
 from doublecount.parser.parse_production import parse_production_forecast, parse_production_max, parse_requested_quota
 from doublecount.parser.parse_sourcing_forecast import parse_sourcing_forecast
-from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow, SourcingRow
+from doublecount.parser.parse_sourcing_history import parse_sourcing_history
+from doublecount.parser.types import (
+    ProductionForecastRow,
+    ProductionMaxRow,
+    RequestedQuotaRow,
+    SourcingHistoryRow,
+    SourcingRow,
+)
 
 
 def parse_dc_excel(
     filename: str,
-) -> Tuple[dict[str], List[SourcingRow], List[ProductionMaxRow], List[ProductionForecastRow], List[RequestedQuotaRow]]:
+) -> Tuple[
+    dict[str],
+    List[SourcingRow],
+    List[ProductionMaxRow],
+    List[ProductionForecastRow],
+    List[RequestedQuotaRow],
+    List[SourcingHistoryRow],
+]:
     excel_file = load_workbook(filename, data_only=True)
 
     info = parse_info(excel_file)
@@ -26,6 +40,14 @@ def parse_dc_excel(
     sourcing_forecast_rows = parse_sourcing_forecast(excel_file, start_year=start_year)
     production_max_rows = parse_production_max(excel_file, start_year=start_year)
     production_forecast_rows = parse_production_forecast(excel_file, start_year=start_year)
+    sourcing_history_rows = parse_sourcing_history(excel_file, start_year=start_year)
 
     info["start_year"] = start_year
-    return info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows
+    return (
+        info,
+        sourcing_forecast_rows,
+        production_max_rows,
+        production_forecast_rows,
+        requested_quota_rows,
+        sourcing_history_rows,
+    )
