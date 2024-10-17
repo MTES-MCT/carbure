@@ -94,7 +94,7 @@ class LotForm(forms.Form):
             elif field == "carbure_production_site":
                 producer = form_data["carbure_producer_id"]
                 if producer:
-                    lot_data["carbure_production_site"] = form_data[field].filter(producer=producer).first()
+                    lot_data["carbure_production_site"] = form_data[field].filter(entitysite__entity=producer).first()
             elif field == "carbure_delivery_site_depot_id":
                 lot_data["carbure_delivery_site"] = form_data[field].first()
             elif field in FORM_TO_LOT_FIELD:
