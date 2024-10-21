@@ -69,6 +69,7 @@ export const TicketsTable = memo(
                 total={total}
                 onPage={actions.setPage}
                 onLimit={actions.setLimit}
+                keepSearch
               />
             )}
           </>
