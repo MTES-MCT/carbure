@@ -32,6 +32,11 @@ export function formatNumber(num: number, fractionDigits = 2) {
   return numStr
 }
 
+export function roundNumber(num: number, fractionDigits = 2) {
+  const factor = Math.pow(10, fractionDigits)
+  return Math.round(num * factor) / factor
+}
+
 export function formatPercentage(num: number) {
   return formatNumber(num) + "%"
 }
