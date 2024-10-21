@@ -5,6 +5,7 @@ import { Row } from "./scaffold"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
+import { useSearchParams } from "react-router-dom"
 
 export interface PaginationProps {
   total: number
@@ -14,6 +15,7 @@ export interface PaginationProps {
   limit: number | undefined
   onPage: (page: number) => void
   onLimit: (limit: number | undefined) => void
+  keepSearch?: boolean
 }
 
 export const Pagination = ({
@@ -23,12 +25,23 @@ export const Pagination = ({
   onPage,
   onLimit,
   startPage = 0,
+  keepSearch = false,
 }: PaginationProps) => {
   const { t } = useTranslation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const pageCount = limit ? Math.ceil(total / limit) : 1
 
   const handlePage = (page: number) => {
     onPage(page + startPage)
+    if (keepSearch) {
+      if (page + startPage === startPage) {
+        searchParams.delete("page")
+      } else {
+        searchParams.set("page", `${page + startPage}`)
+      }
+
+      setSearchParams(searchParams)
+    }
   }
   return (
     <Row className={css.pagination}>
