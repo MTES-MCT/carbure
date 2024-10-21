@@ -116,7 +116,10 @@ export function useCBQueryParamsStore<
   type?: string
 ) {
   const [limit, saveLimit] = useLimit()
-  const [filtersParams, setFiltersParams] = useFilterSearchParams()
+  const [{ page, ...filtersParams }, setFiltersParams] = useFilterSearchParams()
+
+  // Retrieve page from url and set the "page" attribute in the store
+  const computedPage = page?.[0] ? parseInt(page[0]) : 1
 
   const [state, actions] = useStore(
     {
@@ -128,7 +131,7 @@ export function useCBQueryParamsStore<
       filters: filtersParams,
       order: undefined,
       selection: [],
-      page: 1,
+      page: computedPage,
       limit,
     } as CBQueryStates<GenericCBQueryStates>,
     {
@@ -197,6 +200,7 @@ export function useCBQueryParamsStore<
       }),
 
       setPage: (page?: number) => {
+        console.log("action set page", page)
         return {
           page,
           selection: [],
@@ -235,6 +239,10 @@ export function useCBQueryParamsStore<
 
   if (type && state.type !== type) {
     actions.setType(type)
+  }
+
+  if (computedPage && state.page !== computedPage) {
+    actions.setPage(computedPage)
   }
 
   return [state, actions] as [typeof state, typeof actions]
