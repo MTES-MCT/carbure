@@ -11,9 +11,6 @@ type OrderColumns<Columns extends string[]> = {
     : `-${Columns[K]}`
 }
 
-/* Types */
-export type CBSnapshot = Record<string, number>
-
 export type CBFilterSelection = Record<string, string[]>
 
 export const CBQUERY_RESET: Partial<CBQueryParams<[]>> = {
@@ -45,7 +42,6 @@ interface BaseCBQueryStates {
   page: number
   limit?: number
   order?: Order
-  snapshot?: CBSnapshot
 }
 export type CBQueryStates<
   GenericCBQueryStates extends BaseCBQueryStates = BaseCBQueryStates,
@@ -60,7 +56,6 @@ export type CBQueryStates<
   selection: GenericCBQueryStates["selection"]
   limit?: GenericCBQueryStates["limit"]
   order?: GenericCBQueryStates["order"]
-  snapshot?: GenericCBQueryStates["snapshot"]
 }
 export interface CBQueryParams<Columns extends string[]> {
   entity_id: number
@@ -98,7 +93,7 @@ export function useCBQueryBuilder<Columns extends string[]>(
       type,
       search,
       page: page > 0 ? page : 1,
-      limit: limit ?? undefined,
+      page_size: limit ?? undefined,
       order: formatOrder<OrderColumns<Columns>>(order),
       ...filters,
     }),
@@ -108,13 +103,7 @@ export function useCBQueryBuilder<Columns extends string[]>(
 
 export function useCBQueryParamsStore<
   GenericCBQueryStates extends BaseCBQueryStates = BaseCBQueryStates,
->(
-  entity: Entity,
-  year: number,
-  status: string,
-  snapshot?: CBSnapshot,
-  type?: string
-) {
+>(entity: Entity, year: number, status: string, type?: string) {
   const [limit, saveLimit] = useLimit()
   const [{ page, ...filtersParams }, setFiltersParams] = useFilterSearchParams()
 
@@ -125,7 +114,6 @@ export function useCBQueryParamsStore<
     {
       entity,
       year,
-      snapshot,
       status,
       type,
       filters: filtersParams,
@@ -144,13 +132,6 @@ export function useCBQueryParamsStore<
 
       setYear: (year: number) => ({
         year,
-        filters: filtersParams,
-        selection: [],
-        page: 1,
-      }),
-
-      setSnapshot: (snapshot: CBSnapshot) => ({
-        snapshot,
         filters: filtersParams,
         selection: [],
         page: 1,
@@ -200,7 +181,6 @@ export function useCBQueryParamsStore<
       }),
 
       setPage: (page?: number) => {
-        console.log("action set page", page)
         return {
           page,
           selection: [],
@@ -231,10 +211,6 @@ export function useCBQueryParamsStore<
   // // sync store state with status set in the route
   if (state.status !== status) {
     actions.setStatus(status)
-  }
-
-  if (snapshot && state.snapshot !== snapshot) {
-    actions.setSnapshot(snapshot)
   }
 
   if (type && state.type !== type) {

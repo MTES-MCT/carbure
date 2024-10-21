@@ -9,18 +9,26 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import { SafTicketStatus } from "saf/types"
-import NavigationButtons from "transaction-details/components/lots/navigation"
+import { SafStates, SafTicketStatus } from "saf/types"
 import * as api from "./api"
 import TicketTag from "../../components/tickets/tag"
 import ClientComment from "../../components/ticket-details/client-comment"
 import { TicketFields } from "../../components/ticket-details/fields"
 import RejectAssignment from "../../components/ticket-details/reject-assignment"
 
-export interface TicketDetailsProps {
-  neighbors: number[]
-}
-export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
+import { CBQueryStates } from "common/hooks/query-builder-2"
+import { Navigation, NavigationProps } from "common/components/navigation"
+
+export type TicketDetailsProps = {
+  state: CBQueryStates<SafStates>
+  total: number
+} & Pick<NavigationProps, "baseIdsList" | "fetchIdsForPage">
+export const ClientTicketDetails = ({
+  state,
+  total,
+  fetchIdsForPage,
+  baseIdsList,
+}: TicketDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -32,7 +40,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticketResponse = useQuery(api.getAirlineTicketDetails, {
     key: "ticket-details",
-    params: [entity.id, parseInt(match?.params.id || "")],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
   const acceptSafTicket = useMutation(api.acceptSafTicket, {
@@ -44,7 +52,6 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   })
 
   const ticket = ticketResponse.result?.data
-  // const ticket = safTicketDetails //TO TEST
 
   const showRejectModal = () => {
     portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
@@ -95,7 +102,16 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
               />
             </>
           )}
-          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
+          {baseIdsList && baseIdsList.length > 0 && (
+            <Navigation
+              basePage={state.page}
+              limit={state.limit}
+              total={total}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={baseIdsList}
+              closeAction={closeDialog}
+            />
+          )}
         </footer>
 
         {ticketResponse.loading && <LoaderOverlay />}
