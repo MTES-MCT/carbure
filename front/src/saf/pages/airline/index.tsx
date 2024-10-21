@@ -49,15 +49,11 @@ export const SafAirline = () => {
         {/* //TODO comment merger les deux instructions si dessous  https://stackoverflow.com/questions/47369023/react-router-v4-allow-only-certain-parameters-in-url */}
         <Route
           path="/tickets/pending"
-          element={
-            <AirlineTickets year={years.selected} snapshot={snapshotData} />
-          }
+          element={<AirlineTickets year={years.selected} />}
         />
         <Route
           path="/tickets/accepted"
-          element={
-            <AirlineTickets year={years.selected} snapshot={snapshotData} />
-          }
+          element={<AirlineTickets year={years.selected} />}
         />
 
         <Route
