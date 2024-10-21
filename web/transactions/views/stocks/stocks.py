@@ -1,4 +1,10 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import serializers
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
@@ -16,6 +22,8 @@ from core.models import (
     UserRights,
 )
 from core.serializers import (
+    CarbureLotCommentSerializer,
+    CarbureLotEventSerializer,
     CarbureLotPublicSerializer,
     CarbureStockPublicSerializer,
     CarbureStockTransformationPublicSerializer,
@@ -24,6 +32,17 @@ from transactions.filters import StockFilter
 from transactions.permissions import HasUserRights
 
 from .mixins import ActionMixins
+
+
+class StockDetailsResponseSerializer(serializers.Serializer):
+    stock = CarbureStockPublicSerializer()
+    parent_lot = CarbureLotPublicSerializer(allow_null=True)
+    parent_transformation = CarbureStockTransformationPublicSerializer(allow_null=True)
+    children_lot = CarbureLotPublicSerializer(many=True)
+    children_transformation = CarbureStockTransformationPublicSerializer(many=True)
+    events = CarbureLotCommentSerializer(many=True)
+    updates = CarbureLotCommentSerializer(many=True)
+    comments = CarbureLotEventSerializer(many=True)
 
 
 class StockViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, ActionMixins):
@@ -93,6 +112,32 @@ class StockViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, ActionMix
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        responses=StockDetailsResponseSerializer,
+    )
     def retrieve(self, request, id=None):
         entity_id = request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

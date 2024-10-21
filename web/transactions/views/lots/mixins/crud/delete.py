@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -25,7 +26,30 @@ class DeleteLotsSerializer(serializers.Serializer):
     selection = serializers.PrimaryKeyRelatedField(queryset=CarbureLot.objects.all(), many=True)
 
 
+class DeleteLotsNodeDiffSerializer(serializers.Serializer):
+    node = serializers.DictField()
+    diff = serializers.DictField()
+
+
+class DeleteLotsResponseSerializer(serializers.Serializer):
+    deletions = serializers.ListField(child=DeleteLotsNodeDiffSerializer())
+    updates = serializers.ListField(child=DeleteLotsNodeDiffSerializer())
+
+
 class DeleteLotsMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=DeleteLotsSerializer,
+        responses=DeleteLotsResponseSerializer,
+    )
     @action(methods=["post"], detail=False, serializer_class=DeleteLotsSerializer)
     def delete(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")

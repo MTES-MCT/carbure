@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.response import Response
@@ -11,8 +12,34 @@ from core.serializers import GenericErrorSerializer
 from transactions.helpers import bulk_insert_lots, construct_carbure_lot
 from transactions.sanity_checks.helpers import get_prefetched_data
 
+from .add import CreateLotSerializer
+
+
+class BulkCreateResponseSerializer(serializers.Serializer):
+    class EmbeddedGenericErrorSerializer(serializers.Serializer):
+        index = serializers.IntegerField()
+        errors = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+
+    lots = serializers.IntegerField()
+    valid = serializers.IntegerField()
+    invalid = serializers.IntegerField()
+    errors = EmbeddedGenericErrorSerializer(many=True)
+
 
 class BulkCreateMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=CreateLotSerializer(many=True),
+        responses=BulkCreateResponseSerializer,
+    )
     @action(methods=["post"], detail=False, url_path="bulk-create")
     def bulk_create(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")

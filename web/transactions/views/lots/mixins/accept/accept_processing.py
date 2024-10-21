@@ -1,3 +1,5 @@
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -6,15 +8,43 @@ from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.models import CarbureLot, CarbureLotEvent, Entity
 
 
+class AcceptProcessingSerializer(serializers.Serializer):
+    selection = serializers.ListField(child=serializers.IntegerField(), allow_empty=True)
+    processing_entity_id = serializers.IntegerField()
+
+
 class AcceptProcessingMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=AcceptProcessingSerializer,
+        examples=[
+            OpenApiExample(
+                "Example response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False, url_path="accept-processing")
     def accept_processing(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
 
         lots = self.filter_queryset(self.get_queryset())
         # TODO: fix, required ?
-        selection = request.data.getlist("selection")
-        processing_entity_id = request.data.get("processing_entity_id")
+        serializer = AcceptProcessingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        selection = serializer.validated_data["selection"]
+        processing_entity_id = serializer.validated_data["processing_entity_id"]
 
         entity = Entity.objects.get(pk=entity_id)
         processing_entity = Entity.objects.get(pk=processing_entity_id)

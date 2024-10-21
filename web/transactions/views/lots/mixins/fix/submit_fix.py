@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Q
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -23,6 +24,26 @@ class SubmitFixSerializer(serializers.Serializer):
 
 
 class SubmitFixMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=SubmitFixSerializer,
+        examples=[
+            OpenApiExample(
+                "Example response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False, url_path="submit-fix")
     def submit_fix(self, request, *args, **kwargs):
         entity_id = int(self.request.query_params.get("entity_id"))

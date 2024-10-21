@@ -1,4 +1,11 @@
 from django.db.models.query_utils import Q
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,6 +14,36 @@ from core.models import CarbureLot, CarbureStockTransformation, Entity
 from saf.permissions import HasUserRights
 
 
+class YearsSerializer(serializers.Serializer):
+    years = serializers.ListField(child=serializers.IntegerField())
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+    responses=YearsSerializer,
+    examples=[
+        OpenApiExample(
+            "Example of response.",
+            value=[
+                "2020",
+                "2021",
+                "2022",
+                "2023",
+                "2024",
+            ],
+            request_only=False,
+            response_only=True,
+        ),
+    ],
+)
 @api_view(["GET"])
 @permission_classes(
     [

@@ -1,6 +1,6 @@
+import django_filters
 from django.db import models
 from django.db.models import Q
-from django_filters import rest_framework as django_filters
 
 from core.helpers import get_lots_with_deadline, get_lots_with_errors
 from core.models import CarbureLot
@@ -14,7 +14,7 @@ class CarbureLotStatus(models.TextChoices):
 
 
 class LotsFilter(django_filters.FilterSet):
-    status = django_filters.ChoiceFilter(choices=CarbureLotStatus, method="filter_status")
+    status = django_filters.ChoiceFilter(choices=CarbureLotStatus.choices, method="filter_status")
     year = django_filters.NumberFilter(field_name="year")
     periods = django_filters.CharFilter(method="filter_periods")
     production_sites = django_filters.CharFilter(method="filter_production_sites")

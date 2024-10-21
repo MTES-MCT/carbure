@@ -1,13 +1,12 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from apikey.authentication import APIKeyAuthentication
 from carbure.tasks import background_bulk_scoring
 from core.models import CarbureLotEvent, Entity
 from core.serializers import CarbureLotPublicSerializer
@@ -16,52 +15,57 @@ from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 class CreateLotSerializer(serializers.Serializer):
-    """
-    free_field, null
-    carbure_stock_id, null,
-    delivery_date, null
-    biofuel_code, null,
-    feedstock_code, null
-    country_code, null
-    production_site_certificate, null
-    production_site_certificate_type, null
-    carbure_production_site, null
-    unknown_producer,
-    unknown_production_site,
-    production_country_code,
-    production_site_commissioning_date,
-    production_site_double_counting_certificate
-    eec,
-    el,
-    ep,
-    etd,
-    eu,
-    esca,
-    eccs,
-    eccr,
-    eee,
+    free_field = serializers.CharField(allow_null=True, required=False)
+    carbure_stock_id = serializers.CharField(allow_null=True, required=False)
+    delivery_date = serializers.DateField(allow_null=True, required=False)
+    biofuel_code = serializers.CharField(allow_null=True, required=False)
+    feedstock_code = serializers.CharField(allow_null=True, required=False)
+    country_code = serializers.CharField(allow_null=True, required=False)
+    production_site_certificate = serializers.CharField(allow_null=True, required=False)
+    production_site_certificate_type = serializers.CharField(allow_null=True, required=False)
+    carbure_production_site = serializers.CharField(allow_null=True, required=False)
+    unknown_producer = serializers.CharField(required=False)
+    unknown_production_site = serializers.CharField(required=False)
+    production_country_code = serializers.CharField(allow_null=True, required=False)
+    production_site_commissioning_date = serializers.DateField(allow_null=True, required=False)
+    production_site_double_counting_certificate = serializers.CharField(allow_null=True, required=False)
 
-    delivery_type,
-    carbure_client_id,
-    unknown_client,
+    # GHG emission values
+    eec = serializers.FloatField(allow_null=True, required=False)
+    el = serializers.FloatField(allow_null=True, required=False)
+    ep = serializers.FloatField(allow_null=True, required=False)
+    etd = serializers.FloatField(allow_null=True, required=False)
+    eu = serializers.FloatField(allow_null=True, required=False)
+    esca = serializers.FloatField(allow_null=True, required=False)
+    eccs = serializers.FloatField(allow_null=True, required=False)
+    eccr = serializers.FloatField(allow_null=True, required=False)
+    eee = serializers.FloatField(allow_null=True, required=False)
 
-    quantity
-    unit
-    volume,
-    weight,
-    lhv_amount,
+    # Delivery information
+    delivery_type = serializers.CharField(allow_null=True, required=False)
+    carbure_client_id = serializers.IntegerField(allow_null=True, required=False)
+    unknown_client = serializers.CharField(required=False)
 
-    unknown_supplier,
-    supplier_certificate,
+    # Quantity information
+    quantity = serializers.FloatField(allow_null=True, required=False)
+    unit = serializers.CharField(allow_null=True, required=False)
+    volume = serializers.FloatField(allow_null=True, required=False)
+    weight = serializers.FloatField(allow_null=True, required=False)
+    lhv_amount = serializers.FloatField(allow_null=True, required=False)
 
-    transport_document_type
-    transport_document_reference,
-    carbure_delivery_site_depot_id,
-    unknown_delivery_site,
-    delivery_site_country_code,
+    # Supplier information
+    unknown_supplier = serializers.CharField(required=False)
+    supplier_certificate = serializers.CharField(allow_null=True, required=False)
 
-    vendor_certificate,
-    """
+    # Transport document
+    transport_document_type = serializers.CharField(allow_null=True, required=False)
+    transport_document_reference = serializers.CharField(allow_null=True, required=False)
+    carbure_delivery_site_depot_id = serializers.IntegerField(allow_null=True, required=False)
+    unknown_delivery_site = serializers.CharField(required=False)
+    delivery_site_country_code = serializers.CharField(allow_null=True, required=False)
+
+    # Vendor certificate
+    vendor_certificate = serializers.CharField(allow_null=True, required=False)
 
 
 class AddLotError:
@@ -69,11 +73,20 @@ class AddLotError:
 
 
 class AddMixin:
-    @action(
-        methods=["post"],
-        detail=False,
-        authentication_classes=(SessionAuthentication, BasicAuthentication, APIKeyAuthentication),
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=CreateLotSerializer,
+        responses=CarbureLotPublicSerializer,
     )
+    @action(methods=["post"], detail=False)
     def add(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

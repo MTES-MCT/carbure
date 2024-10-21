@@ -3,7 +3,12 @@ import unicodedata
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.response import Response
@@ -15,7 +20,30 @@ from transactions.helpers import bulk_insert_lots, construct_carbure_lot
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
+class AddExcelSerializer(serializers.Serializer):
+    file = serializers.FileField(required=True)
+
+
+class addExcelResponseSerializer(serializers.Serializer):
+    lots = serializers.IntegerField()
+    valid = serializers.IntegerField()
+    invalid = serializers.IntegerField()
+
+
 class AddExcelMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=AddExcelSerializer,
+        responses={200: addExcelResponseSerializer},
+    )
     @action(methods=["post"], detail=False, url_path="add-excel")
     def add_excel(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")

@@ -1,13 +1,19 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers, status
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from carbure.tasks import background_bulk_scoring
 from core.carburetypes import CarbureStockErrors
-from core.models import CarbureLot, CarbureLotEvent, Entity, GenericError
+from core.models import CarbureLotEvent, Entity, GenericError
 from core.traceability import (
     LotNode,
     diff_to_metadata,
@@ -32,12 +38,33 @@ class UpdateLotError:
     INTEGRITY_CHECKS_FAILED = "INTEGRITY_CHECKS_FAILED"
 
 
-class UpdateLotSerializer(serializers.Serializer):
-    lot_id = serializers.PrimaryKeyRelatedField(queryset=CarbureLot.objects.all())
-
-
 class UpdateMixin:
-    @action(methods=["post"], detail=True, url_path="update-lot", serializer_class=LotSerializer)
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of assign response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+        request=LotSerializer,
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="update-lot",
+        serializer_class=LotSerializer,
+    )
     def update_lot(self, request, id=None):
         entity_id = int(self.request.query_params.get("entity_id"))
 
@@ -118,7 +145,7 @@ class UpdateMixin:
                     metadata=diff_to_metadata(lot_node.diff),
                 )
 
-        return Response({})
+        return Response({"status": "success"})
 
 
 # before applying an update, check that if the lot comes from a stock

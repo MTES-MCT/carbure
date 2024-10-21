@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -27,9 +27,14 @@ class AddCommentMixin:
             )
         ],
         request=AddCommentSerializer,
-        responses={
-            200: OpenApiTypes.ANY,
-        },
+        examples=[
+            OpenApiExample(
+                "Example response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
     @action(methods=["post"], detail=False, url_path="add-comment", serializer_class=AddCommentSerializer)
     def add_comment(self, request, *args, **kwargs):

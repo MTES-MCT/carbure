@@ -1,9 +1,15 @@
 from django.db import transaction
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from core.models import CarbureLot, CarbureLotEvent
+
+
+class AcceptConsumptionSerializer(serializers.Serializer):
+    selection = serializers.ListField(child=serializers.IntegerField(), allow_empty=True)
 
 
 class AcceptConsumptionError:
@@ -13,13 +19,36 @@ class AcceptConsumptionError:
 
 
 class AcceptConsumptionMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=AcceptConsumptionSerializer,
+        examples=[
+            OpenApiExample(
+                "Example of assign response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False, url_path="accept-consumption")
     def accept_consumption(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
 
         lots = self.filter_queryset(self.get_queryset())
         # TODO: fix, required ?
-        selection = request.data.getlist("selection")
+        serializer = AcceptConsumptionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        selection = serializer.validated_data["selection"]
         if len(selection) > 0:
             lots = lots.filter(pk__in=selection)
 

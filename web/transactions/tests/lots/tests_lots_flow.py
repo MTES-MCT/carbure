@@ -141,14 +141,12 @@ class LotsFlowTest(TestCase):
 
     def test_duplicate_lot(self):
         lot = self.create_draft()
-        response = self.client.post(
+        response = self.client.get(
             reverse("transactions-api-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
-            {"entity_id": self.producer.id, "lot_id": lot.id},
         )
         assert response.status_code == 200
-        response = self.client.post(
-            reverse("transactions-api-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.trader.id}",
-            {"entity_id": self.trader.id, "lot_id": lot.id},
+        response = self.client.get(
+            reverse("transactions-api-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.trader.id}"
         )
         assert response.status_code == 403
 

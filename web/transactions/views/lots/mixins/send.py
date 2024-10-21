@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -14,22 +15,55 @@ from transactions.sanity_checks import (
 )
 
 
+class SendSerializer(serializers.Serializer):
+    selection = serializers.ListField(child=serializers.IntegerField(), allow_empty=True)
+
+
+class SendResponseSerializer(serializers.Serializer):
+    submitted = serializers.IntegerField()
+    sent = serializers.IntegerField()
+    auto_accepted = serializers.IntegerField()
+    ignored = serializers.IntegerField()
+    rejected = serializers.IntegerField()
+
+
 class SendMixin:
+    @extend_schema(
+        filters=True,
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        responses=SendResponseSerializer,
+        request=SendSerializer,
+    )
     @action(methods=["post"], detail=False)
     def send(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)
 
-        filtered_lots = self.filter_queryset(self.get_queryset())
-        nb_lots = len(filtered_lots)
+        lots = self.filter_queryset(self.get_queryset())
+        serializer = SendSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        selection = serializer.validated_data["selection"]
+        if len(selection) > 0:
+            lots = lots.filter(pk__in=selection)
+
+        nb_lots = len(lots)
         nb_sent = 0
         nb_rejected = 0
         nb_ignored = 0
         nb_auto_accepted = 0
-        lot_ids = [lot.id for lot in filtered_lots]
+        lot_ids = [lot.id for lot in lots]
         created_lot_ids = []
         prefetched_data = get_prefetched_data(entity)
-        for lot in filtered_lots:
+        for lot in lots:
             if lot.added_by != entity:
                 return PermissionDenied({"message": "Entity not authorized to send this lot"})
             if lot.lot_status != CarbureLot.DRAFT:
@@ -168,13 +202,10 @@ class SendMixin:
         notify_lots_received(sent_lots)
         return Response(
             {
-                "status": "success",
-                "data": {
-                    "submitted": nb_lots,
-                    "sent": nb_sent,
-                    "auto-accepted": nb_auto_accepted,
-                    "ignored": nb_ignored,
-                    "rejected": nb_rejected,
-                },
+                "submitted": nb_lots,
+                "sent": nb_sent,
+                "auto-accepted": nb_auto_accepted,
+                "ignored": nb_ignored,
+                "rejected": nb_rejected,
             }
         )

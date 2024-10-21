@@ -1,5 +1,6 @@
 from django.db.models.fields import NOT_PROVIDED
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -9,7 +10,17 @@ from transactions.sanity_checks import bulk_sanity_checks, bulk_scoring, get_pre
 
 
 class DuplicateMixin:
-    @action(methods=["post"], detail=True)
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of assign response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
+    @action(methods=["get"], detail=True)
     def duplicate(self, request, id=None):
         entity_id = self.request.query_params.get("entity_id")
         entity = get_object_or_404(Entity, id=entity_id)

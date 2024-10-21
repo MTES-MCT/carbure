@@ -1,5 +1,6 @@
 import traceback
 
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,6 +19,26 @@ class ToggleWarningSerializer(serializers.Serializer):
 
 
 class ToggleWarningMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=ToggleWarningSerializer,
+        examples=[
+            OpenApiExample(
+                "Example of assign response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=True, url_path="toggle-warning", serializer_class=ToggleWarningSerializer)
     def toggle_warning(self, request, id=None):
         entity_id = self.request.query_params.get("entity_id")

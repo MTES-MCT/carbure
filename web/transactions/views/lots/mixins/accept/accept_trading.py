@@ -1,3 +1,5 @@
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -7,17 +9,47 @@ from core.models import CarbureLot, CarbureLotEvent, Entity
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
+class AcceptTradingSerializer(serializers.Serializer):
+    selection = serializers.ListField(child=serializers.IntegerField(), allow_empty=True)
+    client_entity_id = serializers.CharField(required=False)
+    unknown_client = serializers.CharField(required=False)
+    certificate = serializers.CharField(required=False)
+
+
 class AcceptTradingMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=AcceptTradingSerializer,
+        examples=[
+            OpenApiExample(
+                "Example response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False, url_path="accept-trading")
     def accept_trading(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
 
         lots = self.filter_queryset(self.get_queryset())
         # TODO: fix, required ?
-        selection = request.data.getlist("selection")
-        client_entity_id = request.data.get("client_entity_id")
-        unknown_client = request.data.get("unknown_client")
-        certificate = request.data.get("certificate")
+        serializer = AcceptTradingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        selection = serializer.validated_data["selection"]
+        client_entity_id = serializer.validated_data.get("client_entity_id")
+        unknown_client = serializer.validated_data.get("unknown_client")
+        certificate = serializer.validated_data.get("certificate")
 
         entity = Entity.objects.get(id=entity_id)
 

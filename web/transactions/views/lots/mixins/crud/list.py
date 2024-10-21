@@ -1,9 +1,11 @@
+from rest_framework.mixins import ListModelMixin
+
 from core.helpers import count_lots_of_interest, get_lots_errors
 from core.models import Entity
 
 
-class ListMixin:
-    def list(self, request, *args, **kwargs):
+class ListMixin(ListModelMixin):
+    def list(self, request):
         entity_id = self.request.query_params.get("entity_id")
         entity = Entity.objects.get(id=entity_id)
         lots = self.filter_queryset(self.get_queryset())

@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -18,21 +19,12 @@ from transactions.helpers import try_get_date
 from transactions.sanity_checks import get_prefetched_data
 
 
-class SplitCreateSerializer(serializers.Serializer):
-    """
-    stock_id, volume, delivery_date
-    supplier_certificate
-    dispatch_date
-    unknown_client
-    unknown_delivery_site
-    delivery_site_country_id
-    transport_document_type
-    delivery_type
-    transport_document_reference
-    carbure_delivery_site_id
-    carbure_client_id
-    """
+class SplitResponseSerializer(serializers.Serializer):
+    status = serializers.CharField(default="success")
+    data = serializers.ListField(child=serializers.IntegerField())
 
+
+class SplitCreateSerializer(serializers.Serializer):
     stock_id = serializers.CharField(max_length=255)
     volume = serializers.FloatField()
     delivery_date = serializers.DateField()
@@ -49,7 +41,7 @@ class SplitCreateSerializer(serializers.Serializer):
 
 
 class SplitSerializer(serializers.Serializer):
-    payload = serializers.JSONField(required=True)
+    payload = SplitCreateSerializer(many=True)
 
     def validate_payload(self, value):
         if not value:
@@ -61,7 +53,20 @@ class SplitSerializer(serializers.Serializer):
 
 
 class SplitMixin:
-    @action(methods=["post"], detail=False, serializer_class=SplitSerializer)
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=SplitSerializer,
+        responses=SplitResponseSerializer,
+    )
+    @action(methods=["post"], detail=False)
     def split(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
 
@@ -70,9 +75,6 @@ class SplitMixin:
         serializer = SplitSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data["payload"]
-
-        serializer = SplitCreateSerializer(data=payload, many=True)
-        serializer.is_valid(raise_exception=True)
 
         new_lots = []
         for entry in payload:

@@ -1,5 +1,11 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,6 +28,26 @@ class StockCancelTransformationSerializer(serializers.Serializer):
 
 
 class CancelTransformationMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=StockCancelTransformationSerializer,
+        examples=[
+            OpenApiExample(
+                "Example of response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False, url_path="cancel-transformation")
     def cancel_transformation(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
@@ -64,4 +90,4 @@ class CancelTransformationMixin:
             )
             CarbureStockTransformation.objects.filter(id__in=[t.id for t in stock_transformations]).delete()
 
-        return Response()
+        return Response({"status": "success"})

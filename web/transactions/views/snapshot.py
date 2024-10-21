@@ -1,4 +1,9 @@
-from rest_framework import status
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +13,32 @@ from core.models import CarbureLot, CarbureStock, Entity
 from saf.permissions import HasUserRights
 
 
+class SnapshotSerializer(serializers.Serializer):
+    draft = serializers.IntegerField()
+    in_total = serializers.IntegerField()
+    in_pending = serializers.IntegerField()
+    in_tofix = serializers.IntegerField()
+    stock = serializers.IntegerField()
+    stock_total = serializers.IntegerField()
+    out_total = serializers.IntegerField()
+    out_pending = serializers.IntegerField()
+    out_tofix = serializers.IntegerField()
+    draft_imported = serializers.IntegerField()
+    draft_stocks = serializers.IntegerField()
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+    responses=SnapshotSerializer,
+)
 @api_view(["GET"])
 @permission_classes(
     [

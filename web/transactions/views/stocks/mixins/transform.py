@@ -1,4 +1,10 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -21,6 +27,26 @@ class TransformSerializer(serializers.Serializer):
 
 
 class TransformMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=TransformSerializer,
+        examples=[
+            OpenApiExample(
+                "Example of response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False)
     def transform(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")

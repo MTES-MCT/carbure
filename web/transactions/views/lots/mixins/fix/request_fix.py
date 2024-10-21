@@ -1,4 +1,10 @@
 from django.db import transaction
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -23,6 +29,26 @@ class RequestFixSerializer(serializers.Serializer):
 
 
 class RequestFixMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
+        request=RequestFixSerializer,
+        examples=[
+            OpenApiExample(
+                "Example response.",
+                value={"status": "success"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     @action(methods=["post"], detail=False, url_path="request-fix")
     def request_fix(self, request, *args, **kwargs):
         entity_id = request.query_params.get(
@@ -64,4 +90,4 @@ class RequestFixMixin:
             client_lots = lots.filter(carbure_client_id=entity_id).exclude(carbure_supplier_id=entity_id)
             notify_correction_request(client_lots)
             background_bulk_sanity_checks(lots)
-        return Response({})
+        return Response({"status": "success"})
