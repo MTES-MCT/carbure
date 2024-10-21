@@ -7,7 +7,6 @@ import { SearchInput } from "common/components/input"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
-  SafAirlineSnapshot,
   SafColumsOrder,
   SafFilter,
   SafQuery,
@@ -27,10 +26,9 @@ import {
 
 export interface AirlineTicketsProps {
   year: number
-  snapshot?: SafAirlineSnapshot
 }
 
-export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
+export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
@@ -38,21 +36,31 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
   const [state, actions] = useCBQueryParamsStore<SafStates>(
     entity,
     year,
-    status,
-    snapshot
+    status
   )
 
   const query = useCBQueryBuilder<SafColumsOrder[]>(state)
-  const apiGetTickets = (query: SafQuery) => api.getSafAirlineTickets(query)
+  const apiGetTickets = (query: SafQuery) => {
+    return api.getSafAirlineTickets(query)
+  }
 
   const ticketsResponse = useQuery(apiGetTickets, {
     key: "tickets",
     params: [query],
   })
 
+  const fetchIdsForPage = async (page: number) => {
+    const response = await apiGetTickets({
+      ...query,
+      page,
+    })
+
+    return response.data?.results ?? []
+  }
+
   const ticketsData = ticketsResponse.result?.data
 
-  const ids: any = []
+  const ids = ticketsData?.results.map((ticket) => ticket.id) || []
 
   const showTicketDetail = (ticket: SafTicket) => {
     return {
@@ -103,10 +111,19 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
         />
       </section>
 
-      <HashRoute
-        path="ticket/:id"
-        element={<ClientTicketDetails neighbors={ids} />}
-      />
+      {ticketsData && (
+        <HashRoute
+          path="ticket/:id"
+          element={
+            <ClientTicketDetails
+              state={state}
+              total={ticketsData?.count || 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={ids}
+            />
+          }
+        />
+      )}
     </>
   )
 }
