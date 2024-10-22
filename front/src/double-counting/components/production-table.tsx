@@ -1,9 +1,9 @@
 import Button from "common/components/button"
 import { NumberInput } from "common/components/input"
 import { Cell, Column } from "common/components/table"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatPercentage } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { DoubleCountingProduction } from "../types"
+import { DoubleCountingProduction, DoubleCountingSourcing } from "../types"
 import YearTable from "./year-table"
 
 type ProductionTableProps = {
@@ -11,12 +11,13 @@ type ProductionTableProps = {
 
   quotas?: Record<string, number>
   production: DoubleCountingProduction[]
+  sourcing: DoubleCountingSourcing[]
   setQuotas?: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
   hasAgreement,
-
+  sourcing,
   quotas,
   production,
   setQuotas,
@@ -39,6 +40,24 @@ export const ProductionTable = ({
     {
       header: t("Prod. estimée"),
       cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
+    },
+    {
+      header: t("Rendement estimé"),
+      cell: (p) => {
+        const source = sourcing.find(
+          (source) => source.feedstock.code === p.feedstock.code
+        )
+        const estimatedEfficiency = source
+          ? (p.estimated_production / source.metric_tonnes) * 100
+          : null
+        return (
+          <Cell
+            text={
+              estimatedEfficiency ? formatPercentage(estimatedEfficiency) : ""
+            }
+          />
+        )
+      },
     },
     {
       header: t("Quota demandé"),

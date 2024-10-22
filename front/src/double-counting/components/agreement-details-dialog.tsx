@@ -157,6 +157,7 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
         <section>
           <ProductionTable
             production={agreement.application.production ?? []}
+            sourcing={agreement.application.sourcing ?? []}
             hasAgreement={true}
           />
         </section>
