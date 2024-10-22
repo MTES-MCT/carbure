@@ -32,12 +32,13 @@ export const Pagination = ({
   const pageCount = limit ? Math.ceil(total / limit) : 1
 
   const handlePage = (page: number) => {
-    onPage(page + startPage)
+    console.log("page", page)
+    onPage(page)
     if (keepSearch) {
-      if (page + startPage === startPage) {
+      if (page === startPage) {
         searchParams.delete("page")
       } else {
-        searchParams.set("page", `${page + startPage}`)
+        searchParams.set("page", `${page}`)
       }
 
       setSearchParams(searchParams)
@@ -46,7 +47,7 @@ export const Pagination = ({
   return (
     <Row className={css.pagination}>
       <Button
-        disabled={page === 0}
+        disabled={page === startPage}
         variant="secondary"
         icon={ChevronLeft}
         action={() => handlePage(page - 1)}
@@ -60,7 +61,9 @@ export const Pagination = ({
           anchor="top start"
           placeholder={t("Choisir une page")}
           value={page - startPage}
-          onChange={(page) => page !== undefined && handlePage(page)}
+          onChange={(page) =>
+            page !== undefined && handlePage(page + startPage)
+          }
           options={listPages(pageCount)}
         />
 
@@ -85,7 +88,7 @@ export const Pagination = ({
       </section>
 
       <Button
-        disabled={page === pageCount - 1}
+        disabled={page === startPage + pageCount - 1}
         variant="secondary"
         icon={ChevronRight}
         action={() => handlePage(page + 1)}
