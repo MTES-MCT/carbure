@@ -7,9 +7,16 @@ from django import forms
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import connection, transaction
+from rest_framework.pagination import PageNumberPagination
 
 from core.models import Entity, UserRights
 from core.xlsx_v3 import make_carbure_lots_sheet
+
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = "page_size"
+    max_page_size = 1000
 
 
 # transform a string into a standard form in lower case without accents
