@@ -1,7 +1,7 @@
 import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import useStore from "./store"
 import { useSearchParams } from "react-router-dom"
 
@@ -198,6 +198,13 @@ export function useCBQueryParamsStore<
     }
   )
 
+  // If an external component updates page query, we need to sync the store with the new value
+  useEffect(() => {
+    const currentPage = parseInt(page?.[0] ?? "1")
+
+    actions.setPage(currentPage)
+  }, [page, actions])
+
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
     actions.setEntity(entity)
@@ -216,11 +223,6 @@ export function useCBQueryParamsStore<
   if (type && state.type !== type) {
     actions.setType(type)
   }
-
-  // if (computedPage && state.page !== computedPage) {
-  //   console.log("nouvelle page ?", computedPage)
-  //   actions.setPage(computedPage)
-  // }
 
   return [state, actions] as [typeof state, typeof actions]
 }

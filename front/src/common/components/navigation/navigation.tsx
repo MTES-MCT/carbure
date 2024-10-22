@@ -8,6 +8,7 @@ import { getNeighborsInfos } from "./navigation.utils"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import css from "./navigation.module.css"
+import { useSearchParams } from "react-router-dom"
 
 const getItemsIds = (items: { id: number }[]) => items.map((item) => item.id)
 
@@ -15,11 +16,10 @@ const getKeyByValue = (map: Map<number, number[]>, value: number) => {
   return [...map.entries()].find(([, val]) => val.includes(value))?.[0]
 }
 
-export type NavigationProps = {
+export type NavigationButtonsProps = {
   // Call the backend to retrieve ids based on page
   fetchIdsForPage: (page: number) => Promise<{ id: number }[]>
-  // First page when a modal is opened
-  basePage: number
+
   // ids already retrieved to avoid unecessary http calls
   baseIdsList?: number[]
   // Total of elements
@@ -39,16 +39,19 @@ export type NavigationProps = {
  *
  * The component handles fetching new pages when necessary, allowing smooth navigation across the list.
  */
-const Navigation = ({
+const NavigationButtons = ({
   fetchIdsForPage,
   baseIdsList = [],
-  basePage,
   total,
   limit,
   closeAction,
-}: NavigationProps) => {
+}: NavigationButtonsProps) => {
   const { t } = useTranslation()
   const match = useHashMatch(":root/:id")
+  const [searchParams] = useSearchParams()
+  const searchParamsPage = searchParams.get("page")
+
+  const basePage = searchParamsPage ? parseInt(searchParamsPage) : 1
 
   // Get the current id from url
   const current = parseInt(match?.params.id ?? "")
@@ -131,4 +134,4 @@ const Navigation = ({
   )
 }
 
-export default Navigation
+export default NavigationButtons

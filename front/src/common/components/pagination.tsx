@@ -32,7 +32,6 @@ export const Pagination = ({
   const pageCount = limit ? Math.ceil(total / limit) : 1
 
   const handlePage = (page: number) => {
-    console.log("page", page)
     onPage(page)
     if (keepSearch) {
       if (page === startPage) {
@@ -80,7 +79,6 @@ export const Pagination = ({
             { value: 25, label: "25" },
             { value: 50, label: "50" },
             { value: 100, label: "100" },
-            { value: undefined, label: t("Tous") },
           ]}
         />
 

@@ -48,7 +48,6 @@ export const OperatorTickets = ({
     entity,
     year,
     status,
-    snapshot,
     type
   )
   const query = useCBQueryBuilder<SafColumsOrder[]>(state)
@@ -60,8 +59,7 @@ export const OperatorTickets = ({
   })
 
   const ticketsData = ticketsResponse.result?.data
-  // const ids = ticketsData?.ids ?? []
-  const ids: any = []
+  const ids = ticketsData?.results.map((ticket) => ticket.id) || []
 
   const showTicketDetail = (ticket: SafTicket) => {
     return {
@@ -74,6 +72,14 @@ export const OperatorTickets = ({
   const getTicketFilter = (filter: any) =>
     api.getOperatorTicketFilters(filter, query)
 
+  const fetchIdsForPage = async (page: number) => {
+    const response = await apiGetTickets({
+      ...query,
+      page,
+    })
+
+    return response.data?.results ?? []
+  }
   const filters =
     type === "received"
       ? OPERATOR_RECEIVED_FILTERS //
@@ -125,7 +131,14 @@ export const OperatorTickets = ({
 
       <HashRoute
         path="ticket/:id"
-        element={<OperatorTicketDetails neighbors={ids} />}
+        element={
+          <OperatorTicketDetails
+            limit={state.limit}
+            total={ticketsData?.count ?? 0}
+            fetchIdsForPage={fetchIdsForPage}
+            baseIdsList={ids}
+          />
+        }
       />
       <HashRoute path="ticket-source/:id" element={<TicketSourceDetails />} />
     </>
