@@ -21,6 +21,8 @@ import { SourcingFullTable } from "../../../double-counting/components/sourcing-
 import { ProductionTable } from "../../../double-counting/components/production-table"
 import Tabs from "common/components/tabs"
 import { ROUTE_URLS } from "common/utils/routes"
+import { ProductionSiteForm } from "settings/components/production-site-dialog"
+import { ProductionSiteDetails } from "carbure/types"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -112,9 +114,10 @@ export const AgreementDetailsDialog = () => {
 
           {application &&
             application.status === DoubleCountingStatus.Accepted && (
-              <>
-                <AgreementTabs agreement={agreement} />
-              </>
+              <AgreementTabs
+                agreement={agreement}
+                productionSite={application.production_site}
+              />
             )}
         </main>
 
@@ -134,16 +137,25 @@ export const AgreementDetailsDialog = () => {
   )
 }
 
-const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
-  const [focus, setFocus] = useState("quotas")
+const AgreementTabs = ({
+  agreement,
+  productionSite,
+}: {
+  agreement: AgreementDetails
+  productionSite: ProductionSiteDetails
+}) => {
+  const [focus, setFocus] = useState("production_site")
   const { t } = useTranslation()
-
   return (
     <>
       <section>
         <Tabs
           variant="switcher"
           tabs={compact([
+            {
+              key: "production_site",
+              label: t("Site de production"),
+            },
             {
               key: "quotas",
               label: t("Quotas"),
@@ -161,7 +173,11 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
           onFocus={setFocus}
         />
       </section>
-
+      {focus === "production_site" && productionSite && (
+        <section>
+          <ProductionSiteForm readOnly productionSite={productionSite} />
+        </section>
+      )}
       {focus === "quotas" && (
         <section>
           <QuotasTable quotas={agreement.quotas} />
