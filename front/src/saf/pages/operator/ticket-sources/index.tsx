@@ -133,6 +133,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
                 total={total}
                 onPage={actions.setPage}
                 onLimit={actions.setLimit}
+                startPage={1}
               />
             )}
           </>

@@ -217,9 +217,10 @@ export function useCBQueryParamsStore<
     actions.setType(type)
   }
 
-  if (computedPage && state.page !== computedPage) {
-    actions.setPage(computedPage)
-  }
+  // if (computedPage && state.page !== computedPage) {
+  //   console.log("nouvelle page ?", computedPage)
+  //   actions.setPage(computedPage)
+  // }
 
   return [state, actions] as [typeof state, typeof actions]
 }
