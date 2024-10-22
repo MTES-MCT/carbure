@@ -1,1 +1,4 @@
-export { default as Navigation, type NavigationProps } from "./navigation"
+export {
+  default as NavigationButtons,
+  type NavigationButtonsProps,
+} from "./navigation"

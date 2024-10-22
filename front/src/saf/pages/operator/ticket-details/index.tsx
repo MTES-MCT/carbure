@@ -9,7 +9,6 @@ import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
-import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../api"
 import TicketTag from "../../../components/tickets/tag"
 import CancelAssignment from "./cancel-assignment"
@@ -18,11 +17,20 @@ import CreditTicketSource from "./credit-ticket-source"
 import { TicketFields } from "../../../components/ticket-details/fields"
 import LinkedTicketSource from "./linked-ticket-source"
 import RejectAssignment from "../../../components/ticket-details/reject-assignment"
+import {
+  NavigationButtons,
+  NavigationButtonsProps,
+} from "common/components/navigation"
 
-export interface TicketDetailsProps {
-  neighbors?: number[]
-}
-export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
+export type TicketDetailsProps = Partial<
+  Omit<NavigationButtonsProps, "closeAction">
+>
+export const OperatorTicketDetails = ({
+  limit,
+  total,
+  fetchIdsForPage,
+  baseIdsList,
+}: TicketDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -127,9 +135,12 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
                 action={showCancelModal}
               />
             )}
-          {neighbors && (
+          {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
             <NavigationButtons
-              neighbors={neighbors}
+              limit={limit}
+              total={total ?? 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={baseIdsList}
               closeAction={closeDialog}
             />
           )}

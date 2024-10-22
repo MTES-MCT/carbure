@@ -41,7 +41,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
 
-  const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useCBQueryParamsStore(entity, year, status)
   const query = useCBQueryBuilder<SafOperatorColumnsOrder[]>(state)
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
@@ -50,8 +50,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   })
 
   const ticketSoucesData = ticketSourcesResponse.result?.data
-  // const ids = ticketSoucesData?.ids ?? []
-  const ids: any = []
+  const ids = ticketSoucesData?.results.map((ticket) => ticket.id)
 
   const total = ticketSoucesData?.count ?? 0
   const count = ticketSoucesData?.results.length ?? 0
@@ -70,6 +69,15 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
       search: location.search,
       hash: `ticket-source/${ticketSource.id}`,
     }
+  }
+
+  const fetchIdsForPage = async (page: number) => {
+    const response = await api.getOperatorTicketSources({
+      ...query,
+      page,
+    })
+
+    return response.data?.results ?? []
   }
 
   return (
@@ -147,7 +155,14 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
       </section>
       <HashRoute
         path="ticket-source/:id"
-        element={<TicketSourceDetail neighbors={ids} />}
+        element={
+          <TicketSourceDetail
+            limit={state.limit}
+            total={ticketSoucesData?.count ?? 0}
+            fetchIdsForPage={fetchIdsForPage}
+            baseIdsList={ids}
+          />
+        }
       />
       <HashRoute path="lot/:id" element={<LotDetails />} />
       <HashRoute path="ticket/:id" element={<OperatorTicketDetails />} />
