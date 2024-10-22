@@ -116,7 +116,7 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
           path="ticket/:id"
           element={
             <ClientTicketDetails
-              state={state}
+              limit={state.limit}
               total={ticketsData?.count || 0}
               fetchIdsForPage={fetchIdsForPage}
               baseIdsList={ids}

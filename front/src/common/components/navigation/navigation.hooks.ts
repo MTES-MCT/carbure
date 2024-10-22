@@ -45,7 +45,9 @@ export function useNavigation(
 
       const searchParamPage = searchParams.get("page")
       // Change page query param when the next id is on a new page
-      if (!hasPrevCurrentPage && searchParamPage) {
+      if (searchParamPage && parseInt(searchParamPage) - 1 === 1) {
+        searchParams.delete("page")
+      } else if (!hasPrevCurrentPage && searchParamPage) {
         searchParams.set("page", `${parseInt(searchParamPage) - 1}`)
       }
 
@@ -59,8 +61,8 @@ export function useNavigation(
 
   const next = useCallback(() => {
     const searchParams = new URLSearchParams(location.search)
+    const searchParamPage = parseInt(searchParams.get("page") ?? "1")
 
-    const searchParamPage = searchParams.get("page")
     if (isOut && neighbors[0]) {
       // Remove page param to restart page
       searchParams.delete("page")
@@ -71,8 +73,8 @@ export function useNavigation(
       })
     } else if (hasNext && neighbors[index + 1]) {
       // Change page query param when the next id is on a new page
-      if (!hasNextCurrentPage && searchParamPage) {
-        searchParams.set("page", `${parseInt(searchParamPage) + 1}`)
+      if (!hasNextCurrentPage) {
+        searchParams.set("page", `${searchParamPage + 1}`)
       }
       navigate({
         pathname: location.pathname,
