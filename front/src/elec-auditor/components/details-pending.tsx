@@ -46,7 +46,7 @@ export const ApplicationDetailsPending = ({
     },
   ]
 
-  const step: IndicatorStep = steps[currentStep].key as IndicatorStep
+  const step: IndicatorStep = steps[currentStep]?.key as IndicatorStep
 
   function setStep(key: string) {
     setCurrentStep(steps.findIndex((step) => step.key === key))
@@ -69,7 +69,7 @@ export const ApplicationDetailsPending = ({
     return (
       <section>
         <Stepper
-          title={steps[currentStep].title}
+          title={steps[currentStep]?.title}
           stepCount={steps.length}
           currentStep={currentStep + 1}
           nextTitle={steps[currentStep + 1]?.title}

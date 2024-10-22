@@ -119,7 +119,13 @@ const DeliverySitesSettings = ({
               key: "type",
               header: t("Type"),
               cell: (ds) => (
-                <Cell text={depotTypeLabels[ds.depot!.depot_type]} />
+                <Cell
+                  text={
+                    ds.depot?.depot_type
+                      ? depotTypeLabels[ds.depot?.depot_type]
+                      : ""
+                  }
+                />
               ),
             },
             {

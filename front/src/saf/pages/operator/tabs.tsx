@@ -84,7 +84,6 @@ export const OperatorTabs = ({
 const defaultCount: SafOperatorSnapshot = {
   ticket_sources_available: 0,
   ticket_sources_history: 0,
-  tickets: 0,
   tickets_assigned: 0,
   tickets_assigned_accepted: 0,
   tickets_assigned_pending: 0,
@@ -228,7 +227,7 @@ export function useAutoStatus() {
     matchView.params.view === "tickets-received"
   ) {
     const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
-    return status ?? SafTicketStatus.Pending
+    return status ?? SafTicketStatus.PENDING
   }
 
   return SafTicketSourceStatus.Available

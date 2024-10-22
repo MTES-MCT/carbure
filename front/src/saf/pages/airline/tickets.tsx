@@ -7,12 +7,11 @@ import { SearchInput } from "common/components/input"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
-  SafClientSnapshot,
+  SafColumsOrder,
   SafFilter,
   SafQuery,
   SafStates,
   SafTicket,
-  SafTicketStatus,
 } from "saf/types"
 import * as api from "./api"
 import { SafFilters } from "../../components/filters"
@@ -23,14 +22,13 @@ import { ExportButton } from "../operator/ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
-} from "common/hooks/query-builder"
+} from "common/hooks/query-builder-2"
 
 export interface AirlineTicketsProps {
   year: number
-  snapshot?: SafClientSnapshot
 }
 
-export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
+export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
@@ -38,20 +36,31 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
   const [state, actions] = useCBQueryParamsStore<SafStates>(
     entity,
     year,
-    status,
-    snapshot
+    status
   )
 
-  const query = useCBQueryBuilder(state)
-  const apiGetTickets = (query: SafQuery) => api.getSafAirlineTickets(query)
+  const query = useCBQueryBuilder<SafColumsOrder[]>(state)
+  const apiGetTickets = (query: SafQuery) => {
+    return api.getSafAirlineTickets(query)
+  }
 
   const ticketsResponse = useQuery(apiGetTickets, {
     key: "tickets",
     params: [query],
   })
 
-  const ticketsData = ticketsResponse.result?.data.data
-  const ids = ticketsData?.ids ?? []
+  const fetchIdsForPage = async (page: number) => {
+    const response = await apiGetTickets({
+      ...query,
+      page,
+    })
+
+    return response.data?.results ?? []
+  }
+
+  const ticketsData = ticketsResponse.result?.data
+
+  const ids = ticketsData?.results.map((ticket) => ticket.id) || []
 
   const showTicketDetail = (ticket: SafTicket) => {
     return {
@@ -61,7 +70,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
     }
   }
 
-  const getTicketFilter = (filter: any) => {
+  const getTicketFilter = (filter: SafFilter) => {
     return api.getAirlineTicketFilters(filter, query)
   }
 
@@ -96,16 +105,25 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
           state={state}
           actions={actions}
           order={state.order}
-          status={status as SafTicketStatus}
+          status={status}
           ticketsData={ticketsData}
           rowLink={showTicketDetail}
         />
       </section>
 
-      <HashRoute
-        path="ticket/:id"
-        element={<ClientTicketDetails neighbors={ids} />}
-      />
+      {ticketsData && (
+        <HashRoute
+          path="ticket/:id"
+          element={
+            <ClientTicketDetails
+              limit={state.limit}
+              total={ticketsData?.count || 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={ids}
+            />
+          }
+        />
+      )}
     </>
   )
 }

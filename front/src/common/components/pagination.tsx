@@ -5,13 +5,17 @@ import { Row } from "./scaffold"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
+import { useSearchParams } from "react-router-dom"
 
 export interface PaginationProps {
   total: number
   page: number
+  // With the new backend structure, pagination page starts to 1 instead of 0
+  startPage?: number
   limit: number | undefined
   onPage: (page: number) => void
   onLimit: (limit: number | undefined) => void
+  keepSearch?: boolean
 }
 
 export const Pagination = ({
@@ -20,17 +24,32 @@ export const Pagination = ({
   limit,
   onPage,
   onLimit,
+  startPage = 0,
+  keepSearch = false,
 }: PaginationProps) => {
   const { t } = useTranslation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const pageCount = limit ? Math.ceil(total / limit) : 1
 
+  const handlePage = (page: number) => {
+    onPage(page)
+    if (keepSearch) {
+      if (page === startPage) {
+        searchParams.delete("page")
+      } else {
+        searchParams.set("page", `${page}`)
+      }
+
+      setSearchParams(searchParams)
+    }
+  }
   return (
     <Row className={css.pagination}>
       <Button
-        disabled={page === 0}
+        disabled={page === startPage}
         variant="secondary"
         icon={ChevronLeft}
-        action={() => onPage(page - 1)}
+        action={() => handlePage(page - 1)}
       />
 
       <section>
@@ -40,8 +59,10 @@ export const Pagination = ({
           variant="solid"
           anchor="top start"
           placeholder={t("Choisir une page")}
-          value={page}
-          onChange={(page) => page !== undefined && onPage(page)}
+          value={page - startPage}
+          onChange={(page) =>
+            page !== undefined && handlePage(page + startPage)
+          }
           options={listPages(pageCount)}
         />
 
@@ -58,7 +79,6 @@ export const Pagination = ({
             { value: 25, label: "25" },
             { value: 50, label: "50" },
             { value: 100, label: "100" },
-            { value: undefined, label: t("Tous") },
           ]}
         />
 
@@ -66,10 +86,10 @@ export const Pagination = ({
       </section>
 
       <Button
-        disabled={page === pageCount - 1}
+        disabled={page === startPage + pageCount - 1}
         variant="secondary"
         icon={ChevronRight}
-        action={() => onPage(page + 1)}
+        action={() => handlePage(page + 1)}
       />
     </Row>
   )

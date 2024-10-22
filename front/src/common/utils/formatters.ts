@@ -110,7 +110,7 @@ export function standardize(str: string) {
 }
 
 export function capitalize(str: string) {
-  return str[0].toUpperCase() + str.slice(1)
+  return str[0]?.toUpperCase() + str.slice(1)
 }
 
 export function variations(count: number) {

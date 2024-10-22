@@ -1,12 +1,21 @@
 import datetime
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.excel import export_to_excel
 from core.models import CarbureLot
 from core.serializers import CarbureLotPublicSerializer, EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
-from saf.models import SafTicketSource
+from saf.models import SafTicket, SafTicketSource
+
+
+class SafTicketPreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SafTicket
+        fields = ["id", "carbure_id", "client", "agreement_date", "volume", "status", "created_at"]
+
+    client = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
 
 class SafTicketSourceParentLotSerializer(serializers.ModelSerializer):
@@ -43,9 +52,8 @@ class SafTicketSourceSerializer(serializers.ModelSerializer):
     assigned_tickets = serializers.SerializerMethodField()
     parent_lot = SafTicketSourceParentLotSerializer(read_only=True)
 
+    @extend_schema_field(SafTicketPreviewSerializer(many=True))
     def get_assigned_tickets(self, obj):
-        from .saf_ticket import SafTicketPreviewSerializer  # noqa: E402
-
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 
 
@@ -93,9 +101,8 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
     assigned_tickets = serializers.SerializerMethodField()
     parent_lot = CarbureLotPublicSerializer()
 
+    @extend_schema_field(SafTicketPreviewSerializer(many=True))
     def get_assigned_tickets(self, obj):
-        from .saf_ticket import SafTicketPreviewSerializer  # noqa: E402
-
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 
 
