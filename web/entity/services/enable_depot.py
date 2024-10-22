@@ -30,7 +30,7 @@ def send_email_to_admin_users(entity, depot, admins, request):
     today = datetime.now().strftime("%d/%m/%Y")
     subject = f"[CarbuRe][Votre demande de création du dépôt {depot.name}  a été acceptée]"
     subject = subject if CarbureEnv.is_prod else "TEST " + subject
-    recipient_list = [admins.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
+    recipient_list = [admin.user.email for admin in admins] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
     text_message = f"""
     Bonjour,
 
