@@ -7,7 +7,7 @@ import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import {
   AgreementDetails,
@@ -15,11 +15,12 @@ import {
 } from "../../../double-counting/types"
 import AgreementStatusTag from "./agreement-status"
 import { QuotasTable } from "../../../double-counting/components/quotas-table"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { compact } from "common/utils/collection"
 import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
 import { ProductionTable } from "../../../double-counting/components/production-table"
 import Tabs from "common/components/tabs"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -62,7 +63,20 @@ export const AgreementDetailsDialog = () => {
                   producer: agreement?.producer ?? "N/A",
                   productionSite: agreement?.production_site ?? "N/A",
                 }}
-                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>"
+                components={{
+                  Link: application ? (
+                    <Link
+                      to={ROUTE_URLS.ADMIN_COMPANY_DETAIL(
+                        entity.id,
+                        application?.producer.id
+                      )}
+                      target="_blank"
+                    />
+                  ) : (
+                    <Fragment />
+                  ),
+                }}
+                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>"
               />
             </p>
           </section>
