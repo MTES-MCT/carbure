@@ -1,19 +1,25 @@
 import Button from "common/components/button"
 import { Download } from "common/components/icons"
+import { CBQueryParams } from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
-import { SafQuery } from "saf/types"
 
-export interface ExportButtonProps {
+export interface ExportButtonProps<
+  GenericType extends CBQueryParams<ParamsType>,
+  ParamsType extends string[],
+> {
   asideX?: boolean
-  query: SafQuery
-  download: (query: SafQuery) => unknown
+  query: GenericType
+  download: (query: GenericType) => unknown
 }
 
-export const ExportButton = ({
+export const ExportButton = <
+  GenericType extends CBQueryParams<ParamsType>,
+  ParamsType extends string[],
+>({
   asideX,
   query,
   download,
-}: ExportButtonProps) => {
+}: ExportButtonProps<GenericType, ParamsType>) => {
   const { t } = useTranslation()
   return (
     <Button

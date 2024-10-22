@@ -10,17 +10,24 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
-import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "./api"
 import TicketTag from "../../components/tickets/tag"
 import ClientComment from "../../components/ticket-details/client-comment"
 import { TicketFields } from "../../components/ticket-details/fields"
 import RejectAssignment from "../../components/ticket-details/reject-assignment"
+import {
+  NavigationButtons,
+  NavigationButtonsProps,
+} from "common/components/navigation"
 
-export interface TicketDetailsProps {
-  neighbors: number[]
-}
-export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
+export type TicketDetailsProps = Omit<NavigationButtonsProps, "closeAction">
+
+export const ClientTicketDetails = ({
+  limit,
+  total,
+  fetchIdsForPage,
+  baseIdsList,
+}: TicketDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -32,7 +39,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticketResponse = useQuery(api.getAirlineTicketDetails, {
     key: "ticket-details",
-    params: [entity.id, parseInt(match?.params.id || "")],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
   const acceptSafTicket = useMutation(api.acceptSafTicket, {
@@ -43,8 +50,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
     },
   })
 
-  const ticket = ticketResponse.result?.data?.data
-  // const ticket = safTicketDetails //TO TEST
+  const ticket = ticketResponse.result?.data
 
   const showRejectModal = () => {
     portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
@@ -77,7 +83,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          {ticket?.status === SafTicketStatus.Pending && (
+          {ticket?.status === SafTicketStatus.PENDING && (
             <>
               <Button
                 icon={Check}
@@ -95,7 +101,15 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
               />
             </>
           )}
-          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
+          {baseIdsList && baseIdsList.length > 0 && (
+            <NavigationButtons
+              limit={limit}
+              total={total}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={baseIdsList}
+              closeAction={closeDialog}
+            />
+          )}
         </footer>
 
         {ticketResponse.loading && <LoaderOverlay />}

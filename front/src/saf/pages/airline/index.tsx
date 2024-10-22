@@ -2,13 +2,13 @@ import useEntity from "carbure/hooks/entity"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
-import useYears from "common/hooks/years"
+import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import AirlineTabs from "./tabs"
 import AirlineTickets from "./tickets"
-import { SafTicketStatus } from "../../types"
+import { SafAirlineSnapshot, SafTicketStatus } from "../../types"
 
 export const SafAirline = () => {
   const { t } = useTranslation()
@@ -21,8 +21,7 @@ export const SafAirline = () => {
     key: "airline-snapshot",
     params: [entity.id, years.selected],
   })
-  const snapshotData = snapshot.result?.data.data
-  // const snapshotData = safClientSnapshot //TO TEST with testing data
+  const snapshotData = snapshot.result?.data as SafAirlineSnapshot
 
   return (
     <Main>
@@ -50,15 +49,11 @@ export const SafAirline = () => {
         {/* //TODO comment merger les deux instructions si dessous  https://stackoverflow.com/questions/47369023/react-router-v4-allow-only-certain-parameters-in-url */}
         <Route
           path="/tickets/pending"
-          element={
-            <AirlineTickets year={years.selected} snapshot={snapshotData} />
-          }
+          element={<AirlineTickets year={years.selected} />}
         />
         <Route
           path="/tickets/accepted"
-          element={
-            <AirlineTickets year={years.selected} snapshot={snapshotData} />
-          }
+          element={<AirlineTickets year={years.selected} />}
         />
 
         <Route
@@ -66,7 +61,7 @@ export const SafAirline = () => {
           element={
             <Navigate
               replace
-              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}/`}
+              to={`tickets/${SafTicketStatus.PENDING.toLocaleLowerCase()}/`}
             />
           }
         />

@@ -54,16 +54,17 @@ const TicketsGroupedAssignment = ({
       entity.id,
       ticketSources.map((ticketSource) => ticketSource.id),
       value.volume!,
-      value.assignment_period!,
+      value.assignment_period,
       value.client!,
-      value.free_field!
+      value.agreement_reference || "",
+      value.free_field
     )
 
-    if (response.data.data) {
+    if (response.data) {
       onTicketsAssigned(
         value.volume!,
         value.client!.name,
-        response.data.data?.assigned_tickets_count
+        response.data.assigned_tickets_count
       )
       onClose()
     }
@@ -137,10 +138,12 @@ const TicketsGroupedAssignment = ({
                 onSetMaximumVolume={setMaximumVolume}
                 {...bind("volume")}
               />
-              <PeriodSelect
-                deliveryPeriod={lastDeliveryPeriod}
-                {...bind("assignment_period")}
-              />
+              {lastDeliveryPeriod && (
+                <PeriodSelect
+                  deliveryPeriod={lastDeliveryPeriod}
+                  {...bind("assignment_period")}
+                />
+              )}
 
               <Autocomplete
                 required

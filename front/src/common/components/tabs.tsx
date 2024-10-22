@@ -42,8 +42,8 @@ export const Tabs = ({
 }: TabsProps) => {
   const matcher = useMatcher()
   const location = useLocation()
-  const tabs = tabsConfig.filter(Boolean) as Tab[]
-  const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
+  const tabs = tabsConfig.filter(Boolean)
+  const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]!
   const [focus, setFocus] = useState(controlledFocus ?? match?.key)
 
   useEffect(() => {
@@ -69,13 +69,17 @@ export const Tabs = ({
 
           // basic tab that doesn't deal with router
           if (!tab.path) {
-            return <button {...props}>{tab.label}</button>
+            return (
+              <button {...props} key={props.key}>
+                {tab.label}
+              </button>
+            )
           }
 
           // anchor link to same page
           if (tab.path.startsWith("#")) {
             return (
-              <a {...props} href={tab.path}>
+              <a {...props} href={tab.path} key={props.key}>
                 {tab.label}
               </a>
             )
@@ -85,6 +89,7 @@ export const Tabs = ({
             <NavLink
               {...props}
               to={keepSearch ? tab.path + location.search : tab.path}
+              key={props.key}
             >
               {tab.label}
             </NavLink>
