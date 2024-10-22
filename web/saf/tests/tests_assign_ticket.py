@@ -2,8 +2,8 @@ from datetime import datetime
 
 from django.urls import reverse
 
-from saf.api.operator.tests.test_viewset import TestCase
 from saf.models import SafTicket
+from saf.tests import TestCase
 
 
 class SafAssignTicketTest(TestCase):
