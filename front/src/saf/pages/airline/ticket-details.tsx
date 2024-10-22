@@ -9,22 +9,21 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import { SafStates, SafTicketStatus } from "saf/types"
+import { SafTicketStatus } from "saf/types"
 import * as api from "./api"
 import TicketTag from "../../components/tickets/tag"
 import ClientComment from "../../components/ticket-details/client-comment"
 import { TicketFields } from "../../components/ticket-details/fields"
 import RejectAssignment from "../../components/ticket-details/reject-assignment"
+import {
+  NavigationButtons,
+  NavigationButtonsProps,
+} from "common/components/navigation"
 
-import { CBQueryStates } from "common/hooks/query-builder-2"
-import { Navigation, NavigationProps } from "common/components/navigation"
+export type TicketDetailsProps = Omit<NavigationButtonsProps, "closeAction">
 
-export type TicketDetailsProps = {
-  state: CBQueryStates<SafStates>
-  total: number
-} & Pick<NavigationProps, "baseIdsList" | "fetchIdsForPage">
 export const ClientTicketDetails = ({
-  state,
+  limit,
   total,
   fetchIdsForPage,
   baseIdsList,
@@ -103,9 +102,8 @@ export const ClientTicketDetails = ({
             </>
           )}
           {baseIdsList && baseIdsList.length > 0 && (
-            <Navigation
-              basePage={state.page}
-              limit={state.limit}
+            <NavigationButtons
+              limit={limit}
               total={total}
               fetchIdsForPage={fetchIdsForPage}
               baseIdsList={baseIdsList}

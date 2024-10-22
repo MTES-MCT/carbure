@@ -69,7 +69,6 @@ export const Tabs = ({
 
           // basic tab that doesn't deal with router
           if (!tab.path) {
-            console.log("le tab", tab)
             return (
               <button {...props} key={props.key}>
                 {tab.label}
