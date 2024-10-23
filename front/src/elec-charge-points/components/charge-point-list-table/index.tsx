@@ -1,15 +1,17 @@
 import Table, { Order } from "common/components/table"
 import { compact } from "common/utils/collection"
-import { ChargePoint } from "../types"
+import { ChargePoint } from "elec-charge-points/types"
+import { To } from "react-router-dom"
 import { useChargePointsColumns } from "./index.hooks"
 
-type ChargePointsListTableProps = {
+export type ChargePointsListTableProps = {
   loading: boolean
   chargePoints: ChargePoint[]
   order?: Order
   selected: number[]
   onSelect: (selected: number[]) => void
   onOrder: (order: Order | undefined) => void
+  rowLink?: (chargePoint: ChargePoint) => To
 }
 
 export const ChargePointsListTable = ({
@@ -17,6 +19,7 @@ export const ChargePointsListTable = ({
   order,
   onOrder,
   chargePoints,
+  rowLink,
 }: ChargePointsListTableProps) => {
   const columns = useChargePointsColumns()
 
@@ -35,6 +38,7 @@ export const ChargePointsListTable = ({
         columns.measure_energy,
         columns.is_article_2,
       ])}
+      rowLink={rowLink}
     />
   )
 }
