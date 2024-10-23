@@ -955,6 +955,14 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert data["error"] == "AUDIT_IN_PROGRESS"
 
+        # charge_point_id already exists
+        application.status = ElecChargePointApplication.PENDING
+        application.save()
+        response = self.client.post(url, payload)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error"] == "CP_ID_ALREADY_EXISTS"
+
     def test_update_charge_point_prm(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
         application.created_at = datetime.date(2023, 12, 28)

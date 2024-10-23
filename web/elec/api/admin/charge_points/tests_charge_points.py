@@ -225,7 +225,6 @@ class ElecCharginPointsTest(TestCase):
         }
 
         data = response.json()
-        print("response : ", data, response.status_code)
         assert response.status_code == 200
         assert data == expected
 
