@@ -11,12 +11,20 @@ class Command(BaseCommand):
     help = "Delete duplicate charge points"
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", action="store_true", help="Dry run mode, no pdc deleted", default=True)
+        parser.add_argument(
+            "--dry-run",
+            choices=["true", "false"],
+            help="Dry run mode by default, no pdc deleted.",
+            default="true",
+        )
 
     def handle(self, *args, **options):
-        dry_run = options["dry_run"]
+        dry_run = options["dry_run"] == "true"
 
-        print("-- Dry run mode : ", dry_run)
+        if dry_run:
+            self.stdout.write(" -- Running in dry run mode. No charge points deleted.")
+        else:
+            self.stdout.write(" -- Executing deletion of duplicate charge points.")
 
         # Subquery to get charge points with at least 2 occurrences
         duplicate_charge_points = (
@@ -28,8 +36,8 @@ class Command(BaseCommand):
         # Get charge points objects
         charge_points = ElecChargePoint.objects.filter(charge_point_id__in=Subquery(duplicate_charge_points))
 
-        print("Nombre de doublons : ", charge_points.count())
-        print("Nombre de pdc à conserver : ", len(duplicate_charge_points))
+        self.stdout.write(f"Nombre de doublons : {charge_points.count()}")
+        self.stdout.write(f"Nombre de pdc à conserver : {len(duplicate_charge_points)}")
 
         # Subquery to get the most recent reading date for each charge point
         latest_readings = (
@@ -70,10 +78,10 @@ class Command(BaseCommand):
 
         # Delete all charge points that are not in the list of IDs to keep
         charge_points_to_delete = charge_points.exclude(id__in=ids_to_keep)
-        print("Points de charge à supprimer :", charge_points_to_delete.count())
+        self.stdout.write(f"Points de charge à supprimer : {charge_points_to_delete.count()}")
 
         if not dry_run:
             charge_points_to_delete.delete()
-            print("Points de charge supprimés !")
+            self.stdout.write("Points de charge supprimés !")
 
-        print(f"Points de charge conservés : {len(ids_to_keep)}")
+        self.stdout.write(f"Points de charge conservés : {len(ids_to_keep)}")
