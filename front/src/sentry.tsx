@@ -7,12 +7,12 @@ import { MailTo } from "common/components/button"
 // Define sentry only if url/env are defined in .env AND environment is not local
 if (
   import.meta.env.VITE_SENTRY_DSN &&
-  import.meta.env.VITE_APP_ENV &&
+  import.meta.env.VITE_SENTRY_ENV &&
   process.env.NODE_ENV !== "development"
 ) {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
-    environment: `carbure-${import.meta.env.VITE_APP_ENV}`,
+    environment: import.meta.env.VITE_SENTRY_ENV,
   })
 }
 
