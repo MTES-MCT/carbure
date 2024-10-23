@@ -1534,5 +1534,6 @@
   "Point de recharge non trouvé.": "Please confirm the deletion of the recharge point.",
   "Le point de recharge a bien été mis à jour.": "The recharge point has been updated.",
   "Une erreur est survenue lors de la mise à jour du point de recharge.": "An error occurred while updating the recharge point.",
-  "Confirmer": "Confirm"
+  "Confirmer": "Confirm",
+  "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.": "Identifier not found. Please check that your charge point does exist on transport.data.gouv.fr."
 }

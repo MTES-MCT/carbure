@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next"
 import IsArticle2 from "./is-article-2"
 import { ChargePoint } from "elec-charge-points/types"
 import { ChargePointStatusTag } from "../charge-point-status-tag"
-import { formatDate } from "common/utils/formatters"
 
 export const useChargePointsColumns = () => {
   const { t } = useTranslation()
@@ -27,7 +26,7 @@ export const useChargePointsColumns = () => {
     latest_meter_reading_date: {
       header: t("Date du dernier relevé"),
       cell: (chargePoint) => (
-        <Cell text={formatDate(chargePoint.latest_meter_reading_date)} />
+        <Cell text={chargePoint.latest_meter_reading_date ?? t("N/A")} />
       ),
     },
     charge_point_id: {

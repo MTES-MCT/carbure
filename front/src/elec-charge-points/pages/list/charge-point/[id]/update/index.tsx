@@ -20,6 +20,7 @@ import { ChangeMeter } from "./change-meter"
 import { ChangeMeasureReferencePoint } from "./change-prm"
 import { DeleteChargePointDialog } from "./delete-charge-point-dialog"
 import { MetersHistory } from "./meters-history"
+import { AxiosError } from "axios"
 
 const UpdateChargePointDialog = () => {
   const entity = useEntity()
@@ -30,7 +31,9 @@ const UpdateChargePointDialog = () => {
   const notify = useNotify()
   const closeDialog = () => navigate({ search: location.search, hash: "#" })
   const match = useHashMatch("charge-point/:id/update")
-  const { value, bind, setValue } = useForm<Partial<ChargePoint>>({})
+  const { value, bind, setValue, setFieldError } = useForm<
+    Partial<ChargePoint>
+  >({})
 
   const chargePointDetailQuery = useQuery(api.getChargePointDetail, {
     key: "charge-points-details",
@@ -49,17 +52,27 @@ const UpdateChargePointDialog = () => {
         variant: "success",
       })
     },
-    onError: () => {
-      notify(
-        t(
-          "Une erreur est survenue lors de la mise à jour du point de recharge."
-        ),
-        { variant: "danger" }
-      )
+    onError: (e) => {
+      const error = (e as AxiosError<{ error: string }>).response?.data.error
+      if (error === "CP_ID_NOT_IN_TGD") {
+        setFieldError(
+          "charge_point_id",
+          t(
+            "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr."
+          )
+        )
+      } else {
+        notify(
+          t(
+            "Une erreur est survenue lors de la mise à jour du point de recharge."
+          ),
+          { variant: "danger" }
+        )
+      }
     },
   })
   const chargePointDetail = chargePointDetailQuery?.result?.data.data
-  const isReadOnly = value.status !== ChargePointStatus.Pending
+  const isReadOnly = value.status === ChargePointStatus.AuditInProgress
 
   const openChangeMeterDialog = () => {
     if (!chargePointDetail) return
@@ -112,6 +125,7 @@ const UpdateChargePointDialog = () => {
                         "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur"
                       )} ${CONTACT_US_EMAIL}`}
                       {...bind("charge_point_id")}
+                      hideError={false}
                     />
                     <NumberInput
                       label={`${t("Dernier index en kWh")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
