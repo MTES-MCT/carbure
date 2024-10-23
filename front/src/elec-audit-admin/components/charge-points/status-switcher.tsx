@@ -18,7 +18,6 @@ export const StatusSwitcher = ({
   const { t } = useTranslation()
   return (
     <Tabs
-      keepSearch
       focus={status}
       variant="switcher"
       onFocus={(status) => onSwitch(status as ElecAdminAuditStatus)}
