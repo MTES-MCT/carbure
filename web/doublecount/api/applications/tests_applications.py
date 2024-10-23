@@ -83,6 +83,10 @@ class DoubleCountApplicationsTest(TestCase):
         production = file_data["production"]
         assert len(production) == 4
 
+        # check sourcing data
+        sourcing_history = file_data["sourcing_history"]
+        assert len(sourcing_history) == 14
+
     def test_has_dechets_industriels(self):
         response = self.check_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 200

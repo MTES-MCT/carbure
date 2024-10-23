@@ -50,7 +50,7 @@ const mapDeliverySiteToForm: (
   city: deliverySite?.depot?.city ?? "",
   country: deliverySite?.depot?.country,
   depot_id: deliverySite?.depot?.depot_id ?? "",
-  depot_type: deliverySite?.depot?.depot_type ?? DepotType.Other,
+  depot_type: deliverySite?.depot?.depot_type ?? DepotType.OTHER,
   address: deliverySite?.depot?.address ?? "",
   postal_code: deliverySite?.depot?.postal_code ?? "",
   ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
@@ -178,6 +178,7 @@ export const DeliverySiteForm = ({
           {...bind("city")}
           required
           readOnly={isReadOnly}
+          value={value.city ?? ""}
         />
         <TextInput
           label={t("Code postal")}
@@ -200,7 +201,7 @@ export const DeliverySiteForm = ({
             {deliverySite.blending_is_outsourced && (
               <TextInput
                 label={t("Incorporateur Tiers")}
-                value={deliverySite.blender?.name || ""}
+                value={deliverySite.blender?.name ?? ""}
                 readOnly
               />
             )}

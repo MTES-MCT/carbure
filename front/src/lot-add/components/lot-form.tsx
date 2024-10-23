@@ -18,6 +18,7 @@ import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { LotCertificates } from "transaction-details/types"
 import { matches } from "common/utils/collection"
+import { roundNumber } from "common/utils/formatters"
 
 export interface LotFormProps {
   readOnly?: boolean
@@ -324,16 +325,16 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
   delivery_site_country: lot?.delivery_site_country ?? undefined,
   delivery_date: lot?.delivery_date ?? undefined,
 
-  eec: lot?.eec ?? 0,
-  el: lot?.el ?? 0,
-  ep: lot?.ep ?? 0,
-  etd: lot?.etd ?? 0,
-  eu: lot?.eu ?? 0,
+  eec: lot?.eec ? roundNumber(lot.eec) : 0,
+  el: lot?.el ? roundNumber(lot.el) : 0,
+  ep: lot?.ep ? roundNumber(lot.ep) : 0,
+  etd: lot?.etd ? roundNumber(lot.etd) : 0,
+  eu: lot?.eu ? roundNumber(lot.eu) : 0,
 
-  esca: lot?.esca ?? 0,
-  eccs: lot?.eccs ?? 0,
-  eccr: lot?.eccr ?? 0,
-  eee: lot?.eee ?? 0,
+  esca: lot?.esca ? roundNumber(lot.esca) : 0,
+  eccs: lot?.eccs ? roundNumber(lot.eccs) : 0,
+  eccr: lot?.eccr ? roundNumber(lot.eccr) : 0,
+  eee: lot?.eee ? roundNumber(lot.eee) : 0,
 
   ghg_total: lot?.ghg_total ?? 0,
   ghg_reduction: lot?.ghg_reduction ?? 0,

@@ -10,20 +10,26 @@ import { useQuery } from "common/hooks/async"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../api"
 import TicketAssignment from "../../../components/assignment/simple-assignment"
 import ParentLot from "./parent-lot"
 import TicketSourceTag from "../ticket-sources/tag"
 import AssignedTickets from "./assigned-tickets"
 import TicketSourceFields from "./fields"
+import {
+  NavigationButtons,
+  NavigationButtonsProps,
+} from "common/components/navigation"
 
-export interface TicketSourceDetailsProps {
-  neighbors?: number[]
-}
+export type TicketSourceDetailsProps = Partial<
+  Omit<NavigationButtonsProps, "closeAction">
+>
 
 export const TicketSourceDetails = ({
-  neighbors,
+  limit,
+  total,
+  fetchIdsForPage,
+  baseIdsList,
 }: TicketSourceDetailsProps) => {
   const { t } = useTranslation()
 
@@ -36,11 +42,10 @@ export const TicketSourceDetails = ({
 
   const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
     key: "ticket-source-details",
-    params: [entity.id, parseInt(match?.params.id || "")],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
-  const ticketSource = ticketSourceResponse.result?.data?.data
-  // const ticketSource = safTicketSourceDetails //TO TEST
+  const ticketSource = ticketSourceResponse.result?.data
 
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
@@ -108,9 +113,12 @@ export const TicketSourceDetails = ({
             }
             action={showAssignement}
           />
-          {neighbors && (
+          {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
             <NavigationButtons
-              neighbors={neighbors}
+              limit={limit}
+              total={total ?? 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={baseIdsList}
               closeAction={closeDialog}
             />
           )}

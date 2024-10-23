@@ -9,7 +9,6 @@ import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
-import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../api"
 import TicketTag from "../../../components/tickets/tag"
 import CancelAssignment from "./cancel-assignment"
@@ -18,11 +17,20 @@ import CreditTicketSource from "./credit-ticket-source"
 import { TicketFields } from "../../../components/ticket-details/fields"
 import LinkedTicketSource from "./linked-ticket-source"
 import RejectAssignment from "../../../components/ticket-details/reject-assignment"
+import {
+  NavigationButtons,
+  NavigationButtonsProps,
+} from "common/components/navigation"
 
-export interface TicketDetailsProps {
-  neighbors?: number[]
-}
-export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
+export type TicketDetailsProps = Partial<
+  Omit<NavigationButtonsProps, "closeAction">
+>
+export const OperatorTicketDetails = ({
+  limit,
+  total,
+  fetchIdsForPage,
+  baseIdsList,
+}: TicketDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -33,10 +41,10 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticketResponse = useQuery(api.getOperatorTicketDetails, {
     key: "ticket-details",
-    params: [entity.id, parseInt(match?.params.id || "")],
+    params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
-  const ticket = ticketResponse.result?.data?.data
+  const ticket = ticketResponse.result?.data
   // const ticket = safTicketReceivedDetails //TO TEST
 
   const showCancelModal = () => {
@@ -97,7 +105,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          {ticket?.status === SafTicketStatus.Pending &&
+          {ticket?.status === SafTicketStatus.PENDING &&
             ticket?.client === entity.name && (
               <>
                 <Button
@@ -117,7 +125,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
           {ticket?.client !== entity.name &&
             ticket?.status &&
-            [SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
+            [SafTicketStatus.PENDING, SafTicketStatus.REJECTED].includes(
               ticket?.status
             ) && (
               <Button
@@ -127,9 +135,12 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
                 action={showCancelModal}
               />
             )}
-          {neighbors && (
+          {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
             <NavigationButtons
-              neighbors={neighbors}
+              limit={limit}
+              total={total ?? 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={baseIdsList}
               closeAction={closeDialog}
             />
           )}

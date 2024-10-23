@@ -13,6 +13,7 @@ import { isRedII } from "lot-add/components/ghg-fields"
 import { To } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
+import { Unit } from "carbure/types"
 
 export interface StockTableProps {
   loading: boolean
@@ -161,7 +162,7 @@ export const BiofuelCell = ({ stock }: StockCellProps) => {
     MJ: "remaining_lhv_amount" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   return (

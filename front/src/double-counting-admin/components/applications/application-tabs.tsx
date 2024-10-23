@@ -75,6 +75,7 @@ const ApplicationTabs = ({
             quotas={quotas ?? {}}
             setQuotas={setQuotas}
             hasAgreement={hasAgreement}
+            sourcing={sourcing ?? []}
           />
         </section>
       )}

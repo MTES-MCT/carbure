@@ -1,0 +1,2584 @@
+openapi: 3.0.3
+info:
+  title: Carbure API
+  version: 1.0.0
+  description: Carbure
+paths:
+  /api/saf/clients/:
+    get:
+      operationId: saf_clients_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSafClientList"
+          description: ""
+  /api/saf/clients/{id}/:
+    get:
+      operationId: saf_clients_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Entity.
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafClient"
+          description: ""
+  /api/saf/snapshot/:
+    get:
+      operationId: saf_snapshot_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                oneOf:
+                  - type: object
+                    properties:
+                      tickets_pending:
+                        type: integer
+                      tickets_accepted:
+                        type: integer
+                    required:
+                      - tickets_pending
+                      - tickets_accepted
+                  - type: object
+                    properties:
+                      ticket_sources_available:
+                        type: integer
+                      ticket_sources_history:
+                        type: integer
+                      tickets_assigned:
+                        type: integer
+                      tickets_assigned_pending:
+                        type: integer
+                      tickets_assigned_accepted:
+                        type: integer
+                      tickets_assigned_rejected:
+                        type: integer
+                      tickets_received:
+                        type: integer
+                      tickets_received_pending:
+                        type: integer
+                      tickets_received_accepted:
+                        type: integer
+                    required:
+                      - ticket_sources_available
+                      - ticket_sources_history
+                      - tickets_assigned
+                      - tickets_assigned_pending
+                      - tickets_assigned_accepted
+                      - tickets_assigned_rejected
+                      - tickets_received
+                      - tickets_received_pending
+                      - tickets_received_accepted
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    tickets_pending: 5
+                    tickets_accepted: 10
+                    ...: ...
+                  summary: Example of filters response.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/saf/ticket-sources/:
+    get:
+      operationId: saf_ticket_sources_list
+      parameters:
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: delivery_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -feedstock
+                - -ghg_reduction
+                - -period
+                - -volume
+                - feedstock
+                - ghg_reduction
+                - period
+                - volume
+          description: |-
+            Ordre
+
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `feedstock` - Feedstock
+            * `-feedstock` - Feedstock (décroissant)
+            * `ghg_reduction` - Ghg reduction
+            * `-ghg_reduction` - Ghg reduction (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - in: query
+          name: periods
+          schema:
+            type: array
+            items:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: production_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: suppliers
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSafTicketSourceList"
+          description: ""
+  /api/saf/ticket-sources/{id}/:
+    get:
+      operationId: saf_ticket_sources_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Tickets source SAF.
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafTicketSourceDetails"
+          description: ""
+  /api/saf/ticket-sources/{id}/assign/:
+    post:
+      operationId: saf_ticket_sources_assign_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Tickets source SAF.
+          required: true
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceAssignment"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceAssignment"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceAssignment"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafTicketSourceAssignment"
+              examples:
+                ExampleOfAssignResponse.:
+                  value: {}
+                  summary: Example of assign response.
+          description: ""
+  /api/saf/ticket-sources/export/:
+    get:
+      operationId: saf_ticket_sources_export_retrieve
+      parameters:
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: delivery_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -feedstock
+                - -ghg_reduction
+                - -period
+                - -volume
+                - feedstock
+                - ghg_reduction
+                - period
+                - volume
+          description: |-
+            Ordre
+
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `feedstock` - Feedstock
+            * `-feedstock` - Feedstock (décroissant)
+            * `ghg_reduction` - Ghg reduction
+            * `-ghg_reduction` - Ghg reduction (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: array
+            items:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: production_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: suppliers
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: csv file.csv
+                  summary: Example of export response.
+          description: ""
+  /api/saf/ticket-sources/filters/:
+    get:
+      operationId: saf_ticket_sources_filters_retrieve
+      parameters:
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: delivery_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -feedstock
+                - -ghg_reduction
+                - -period
+                - -volume
+                - feedstock
+                - ghg_reduction
+                - period
+                - volume
+          description: |-
+            Ordre
+
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `feedstock` - Feedstock
+            * `-feedstock` - Feedstock (décroissant)
+            * `ghg_reduction` - Ghg reduction
+            * `-ghg_reduction` - Ghg reduction (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: array
+            items:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: production_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: suppliers
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
+  /api/saf/ticket-sources/group-assign/:
+    post:
+      operationId: saf_ticket_sources_group_assign_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceGroupAssignment"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceGroupAssignment"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceGroupAssignment"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupAssignmentResponse"
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/saf/tickets/:
+    get:
+      operationId: saf_tickets_list
+      parameters:
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -client
+                - -created_at
+                - -feedstock
+                - -ghg_reduction
+                - -period
+                - -suppliers
+                - -volume
+                - client
+                - created_at
+                - feedstock
+                - ghg_reduction
+                - period
+                - suppliers
+                - volume
+          description: |-
+            Ordre
+
+            * `client` - Client
+            * `-client` - Client (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `feedstock` - Feedstock
+            * `-feedstock` - Feedstock (décroissant)
+            * `ghg_reduction` - Ghg reduction
+            * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `suppliers` - Suppliers
+            * `-suppliers` - Suppliers (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - in: query
+          name: periods
+          schema:
+            type: array
+            items:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: production_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: suppliers
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSafTicketList"
+          description: ""
+  /api/saf/tickets/{id}/:
+    get:
+      operationId: saf_tickets_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Ticket SAF.
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafTicketDetails"
+          description: ""
+  /api/saf/tickets/{id}/accept/:
+    post:
+      operationId: saf_tickets_accept_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Ticket SAF.
+          required: true
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Comment"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/saf/tickets/{id}/cancel/:
+    post:
+      operationId: saf_tickets_cancel_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Ticket SAF.
+          required: true
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Comment"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/saf/tickets/{id}/credit-source/:
+    get:
+      operationId: saf_tickets_credit_source_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Ticket SAF.
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafTicket"
+              examples:
+                ExampleOfCreditResponse.:
+                  value:
+                    status: success
+                  summary: Example of credit response.
+          description: ""
+  /api/saf/tickets/{id}/reject/:
+    post:
+      operationId: saf_tickets_reject_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Ticket SAF.
+          required: true
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Comment"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/saf/tickets/export/:
+    get:
+      operationId: saf_tickets_export_retrieve
+      parameters:
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -client
+                - -created_at
+                - -feedstock
+                - -ghg_reduction
+                - -period
+                - -suppliers
+                - -volume
+                - client
+                - created_at
+                - feedstock
+                - ghg_reduction
+                - period
+                - suppliers
+                - volume
+          description: |-
+            Ordre
+
+            * `client` - Client
+            * `-client` - Client (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `feedstock` - Feedstock
+            * `-feedstock` - Feedstock (décroissant)
+            * `ghg_reduction` - Ghg reduction
+            * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `suppliers` - Suppliers
+            * `-suppliers` - Suppliers (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: array
+            items:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: production_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: suppliers
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: csv file.csv
+                  summary: Example of export response.
+          description: ""
+  /api/saf/tickets/filters/:
+    get:
+      operationId: saf_tickets_filters_retrieve
+      parameters:
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -client
+                - -created_at
+                - -feedstock
+                - -ghg_reduction
+                - -period
+                - -suppliers
+                - -volume
+                - client
+                - created_at
+                - feedstock
+                - ghg_reduction
+                - period
+                - suppliers
+                - volume
+          description: |-
+            Ordre
+
+            * `client` - Client
+            * `-client` - Client (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `feedstock` - Feedstock
+            * `-feedstock` - Feedstock (décroissant)
+            * `ghg_reduction` - Ghg reduction
+            * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `suppliers` - Suppliers
+            * `-suppliers` - Suppliers (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: array
+            items:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: production_sites
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: suppliers
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
+  /api/saf/years/:
+    get:
+      operationId: saf_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - saf
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - "2020"
+                    - "2021"
+                    - "2022"
+                    - "2023"
+                    - "2024"
+                  summary: Example of filters response.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+components:
+  schemas:
+    Biofuel:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        name_en:
+          type: string
+          maxLength: 64
+        code:
+          type: string
+          maxLength: 16
+      required:
+        - code
+        - name
+        - name_en
+    CarbureLotPublic:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        carbure_id:
+          type: string
+          maxLength: 64
+        carbure_producer:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        unknown_producer:
+          type: string
+          nullable: true
+          maxLength: 64
+        carbure_production_site:
+          allOf:
+            - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        unknown_production_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        production_site_commissioning_date:
+          type: string
+          format: date
+          nullable: true
+        production_site_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_site_double_counting_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        carbure_supplier:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        unknown_supplier:
+          type: string
+          nullable: true
+          maxLength: 64
+        supplier_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        supplier_certificate_type:
+          type: string
+          nullable: true
+          maxLength: 64
+        transport_document_type:
+          $ref: "#/components/schemas/TransportDocumentTypeEnum"
+        transport_document_reference:
+          type: string
+          nullable: true
+          maxLength: 128
+        carbure_client:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        unknown_client:
+          type: string
+          nullable: true
+          maxLength: 64
+        dispatch_date:
+          type: string
+          format: date
+          nullable: true
+        carbure_dispatch_site:
+          allOf:
+            - $ref: "#/components/schemas/Depot"
+          readOnly: true
+        unknown_dispatch_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        dispatch_site_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        delivery_date:
+          type: string
+          format: date
+          nullable: true
+        carbure_delivery_site:
+          allOf:
+            - $ref: "#/components/schemas/Depot"
+          readOnly: true
+        unknown_delivery_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        delivery_site_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        delivery_type:
+          $ref: "#/components/schemas/DeliveryTypeEnum"
+        lot_status:
+          $ref: "#/components/schemas/LotStatusEnum"
+        correction_status:
+          $ref: "#/components/schemas/CorrectionStatusEnum"
+        volume:
+          type: number
+          format: double
+        weight:
+          type: number
+          format: double
+        lhv_amount:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        ghg_total:
+          type: number
+          format: double
+        ghg_reference:
+          type: number
+          format: double
+        ghg_reduction:
+          type: number
+          format: double
+        ghg_reference_red_ii:
+          type: number
+          format: double
+        ghg_reduction_red_ii:
+          type: number
+          format: double
+        free_field:
+          type: string
+          nullable: true
+        added_by:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        carbure_vendor:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        vendor_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        vendor_certificate_type:
+          type: string
+          nullable: true
+          maxLength: 64
+        data_reliability_score:
+          type: string
+          maxLength: 1
+      required:
+        - added_by
+        - biofuel
+        - carbure_client
+        - carbure_delivery_site
+        - carbure_dispatch_site
+        - carbure_producer
+        - carbure_production_site
+        - carbure_supplier
+        - carbure_vendor
+        - country_of_origin
+        - created_at
+        - delivery_site_country
+        - dispatch_site_country
+        - feedstock
+        - id
+        - period
+        - production_country
+        - year
+    CategoryEnum:
+      enum:
+        - CONV
+        - ANN-IX-A
+        - ANN-IX-B
+        - TALLOL
+        - OTHER
+      type: string
+      description: |-
+        * `CONV` - Conventionnel
+        * `ANN-IX-A` - ANNEXE IX-A
+        * `ANN-IX-B` - ANNEXE IX-B
+        * `TALLOL` - Tallol
+        * `OTHER` - Autre
+    Comment:
+      type: object
+      properties:
+        comment:
+          type: string
+    CorrectionStatusEnum:
+      enum:
+        - NO_PROBLEMO
+        - IN_CORRECTION
+        - FIXED
+      type: string
+      description: |-
+        * `NO_PROBLEMO` - NO_PROBLEMO
+        * `IN_CORRECTION` - IN_CORRECTION
+        * `FIXED` - FIXED
+    Country:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        code_pays:
+          type: string
+          maxLength: 64
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
+    DeliveryTypeEnum:
+      enum:
+        - UNKNOWN
+        - RFC
+        - STOCK
+        - BLENDING
+        - EXPORT
+        - TRADING
+        - PROCESSING
+        - DIRECT
+        - FLUSHED
+        - CONSUMPTION
+      type: string
+      description: |-
+        * `UNKNOWN` - UNKNOWN
+        * `RFC` - RFC
+        * `STOCK` - STOCK
+        * `BLENDING` - BLENDING
+        * `EXPORT` - EXPORT
+        * `TRADING` - TRADING
+        * `PROCESSING` - PROCESSING
+        * `DIRECT` - DIRECT
+        * `FLUSHED` - FLUSHED
+        * `CONSUMPTION` - CONSUMPTION
+    Depot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        city:
+          type: string
+          nullable: true
+          maxLength: 128
+        depot_id:
+          type: string
+          maxLength: 32
+        country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        depot_type:
+          $ref: "#/components/schemas/DepotTypeEnum"
+        address:
+          type: string
+          maxLength: 128
+        postal_code:
+          type: string
+          maxLength: 32
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        accise:
+          type: string
+          nullable: true
+          maxLength: 32
+      required:
+        - country
+        - depot_id
+        - id
+        - name
+    DepotTypeEnum:
+      enum:
+        - OTHER
+        - EFS
+        - EFPE
+        - OIL DEPOT
+        - BIOFUEL DEPOT
+        - HEAT PLANT
+        - POWER PLANT
+        - COGENERATION PLANT
+        - EFCA
+      type: string
+      description: |-
+        * `OTHER` - Autre
+        * `EFS` - EFS
+        * `EFPE` - EFPE
+        * `OIL DEPOT` - OIL DEPOT
+        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+        * `HEAT PLANT` - HEAT PLANT
+        * `POWER PLANT` - POWER PLANT
+        * `COGENERATION PLANT` - COGENERATION PLANT
+        * `EFCA` - EFCA
+    Entity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_mac:
+          type: boolean
+        has_trading:
+          type: boolean
+        has_direct_deliveries:
+          type: boolean
+        has_stocks:
+          type: boolean
+        preferred_unit:
+          $ref: "#/components/schemas/PreferredUnitEnum"
+        legal_name:
+          type: string
+          maxLength: 128
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country:
+          type: integer
+          nullable: true
+        activity_description:
+          type: string
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+      required:
+        - id
+        - name
+    EntityPreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+      required:
+        - id
+        - name
+    EntitySummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+      required:
+        - id
+        - name
+    EntityTypeEnum:
+      enum:
+        - Producteur
+        - Opérateur
+        - Administration
+        - Trader
+        - Auditor
+        - Administration Externe
+        - Charge Point Operator
+        - Compagnie aérienne
+        - Unknown
+        - Power or Heat Producer
+      type: string
+      description: |-
+        * `Producteur` - Producteur
+        * `Opérateur` - Opérateur
+        * `Administration` - Administration
+        * `Trader` - Trader
+        * `Auditor` - Auditeur
+        * `Administration Externe` - Administration Externe
+        * `Charge Point Operator` - Charge Point Operator
+        * `Compagnie aérienne` - Compagnie aérienne
+        * `Unknown` - Unknown
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+      x-enum-varnames:
+        - Producer
+        - Operator
+        - Administration
+        - Trader
+        - Auditor
+        - ExternalAdmin
+        - CPO
+        - Airline
+        - Unknown
+        - PowerOrHeatProducer
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    FeedStock:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        code:
+          type: string
+          maxLength: 64
+        category:
+          $ref: "#/components/schemas/CategoryEnum"
+        is_double_compte:
+          type: boolean
+      required:
+        - code
+        - name
+        - name_en
+    GesOptionEnum:
+      enum:
+        - Default
+        - Actual
+        - NUTS2
+      type: string
+      description: |-
+        * `Default` - Valeurs par défaut
+        * `Actual` - Valeurs réelles
+        * `NUTS2` - Valeurs NUTS2
+    GroupAssignmentResponse:
+      type: object
+      properties:
+        assigned_tickets_count:
+          type: integer
+      required:
+        - assigned_tickets_count
+    LotStatusEnum:
+      enum:
+        - DRAFT
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - FROZEN
+        - DELETED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `FROZEN` - FROZEN
+        * `DELETED` - DELETED
+    PaginatedSafClientList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafClient"
+    PaginatedSafTicketList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafTicket"
+    PaginatedSafTicketSourceList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafTicketSource"
+    PreferredUnitEnum:
+      enum:
+        - l
+        - kg
+        - MJ
+      type: string
+      description: |-
+        * `l` - litres
+        * `kg` - kg
+        * `MJ` - MJ
+    ProductionSite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/Entity"
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        date_mise_en_service:
+          type: string
+          format: date
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          nullable: true
+          maxLength: 64
+        site_id:
+          type: string
+          maxLength: 64
+        address:
+          type: string
+          maxLength: 256
+        city:
+          type: string
+          maxLength: 64
+        postal_code:
+          type: string
+          maxLength: 64
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+      required:
+        - country
+        - date_mise_en_service
+        - id
+        - name
+        - producer
+    SafClient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        name:
+          type: string
+          maxLength: 64
+      required:
+        - id
+        - name
+    SafTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/StatusEnum"
+        agreement_date:
+          type: string
+          format: date
+          nullable: true
+        supplier:
+          type: string
+          readOnly: true
+        client:
+          type: string
+          readOnly: true
+        volume:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        ghg_reduction:
+          type: number
+          format: double
+      required:
+        - assignment_period
+        - biofuel
+        - client
+        - country_of_origin
+        - feedstock
+        - id
+        - supplier
+        - volume
+        - year
+    SafTicketDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/StatusEnum"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        supplier:
+          type: string
+          readOnly: true
+        client:
+          type: string
+          readOnly: true
+        free_field:
+          type: string
+          nullable: true
+        agreement_date:
+          type: string
+          format: date
+          nullable: true
+        agreement_reference:
+          type: string
+          nullable: true
+          maxLength: 64
+        volume:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        carbure_producer:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        unknown_producer:
+          type: string
+          nullable: true
+          maxLength: 64
+        carbure_production_site:
+          allOf:
+            - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        unknown_production_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_site_commissioning_date:
+          type: string
+          format: date
+          nullable: true
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        ghg_reduction:
+          type: number
+          format: double
+        ghg_total:
+          type: number
+          format: double
+        client_comment:
+          type: string
+          nullable: true
+        parent_ticket_source:
+          allOf:
+            - $ref: "#/components/schemas/SafTicketSourcePreview"
+          readOnly: true
+      required:
+        - assignment_period
+        - biofuel
+        - carbure_producer
+        - carbure_production_site
+        - client
+        - country_of_origin
+        - created_at
+        - feedstock
+        - id
+        - parent_ticket_source
+        - supplier
+        - volume
+        - year
+    SafTicketPreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        client:
+          type: string
+          readOnly: true
+        agreement_date:
+          type: string
+          format: date
+          nullable: true
+        volume:
+          type: number
+          format: double
+        status:
+          $ref: "#/components/schemas/StatusEnum"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+        - client
+        - created_at
+        - id
+        - volume
+    SafTicketSource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        delivery_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        total_volume:
+          type: number
+          format: double
+        assigned_volume:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        ghg_reduction:
+          type: number
+          format: double
+        assigned_tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafTicketPreview"
+          readOnly: true
+        parent_lot:
+          allOf:
+            - $ref: "#/components/schemas/SafTicketSourceParentLot"
+          readOnly: true
+      required:
+        - assigned_tickets
+        - assigned_volume
+        - biofuel
+        - country_of_origin
+        - created_at
+        - delivery_period
+        - feedstock
+        - id
+        - parent_lot
+        - total_volume
+        - year
+    SafTicketSourceAssignment:
+      type: object
+      properties:
+        client_id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        agreement_reference:
+          type: string
+        agreement_date:
+          type: string
+        free_field:
+          type: string
+          nullable: true
+        assignment_period:
+          type: integer
+      required:
+        - assignment_period
+        - client_id
+        - volume
+    SafTicketSourceDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        delivery_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        added_by:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        total_volume:
+          type: number
+          format: double
+        assigned_volume:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        assigned_tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafTicketPreview"
+          readOnly: true
+        carbure_producer:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        unknown_producer:
+          type: string
+          nullable: true
+          maxLength: 64
+        carbure_production_site:
+          allOf:
+            - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        unknown_production_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_site_commissioning_date:
+          type: string
+          format: date
+          nullable: true
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        ghg_reduction:
+          type: number
+          format: double
+        ghg_total:
+          type: number
+          format: double
+        parent_lot:
+          $ref: "#/components/schemas/CarbureLotPublic"
+      required:
+        - added_by
+        - assigned_tickets
+        - assigned_volume
+        - biofuel
+        - carbure_producer
+        - carbure_production_site
+        - country_of_origin
+        - created_at
+        - delivery_period
+        - feedstock
+        - id
+        - parent_lot
+        - total_volume
+        - year
+    SafTicketSourceGroupAssignment:
+      type: object
+      properties:
+        client_id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        agreement_reference:
+          type: string
+        agreement_date:
+          type: string
+        free_field:
+          type: string
+          nullable: true
+        assignment_period:
+          type: integer
+        ticket_sources_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - assignment_period
+        - client_id
+        - ticket_sources_ids
+        - volume
+    SafTicketSourceParentLot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          maxLength: 64
+      required:
+        - id
+    SafTicketSourcePreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        total_volume:
+          type: number
+          format: double
+        assigned_volume:
+          type: number
+          format: double
+      required:
+        - assigned_volume
+        - id
+        - total_volume
+    StatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - En attente
+        * `ACCEPTED` - Accepté
+        * `REJECTED` - Refusé
+    TransportDocumentTypeEnum:
+      enum:
+        - DAU
+        - DAE
+        - DSA
+        - DSAC
+        - DSP
+        - OTHER
+      type: string
+      description: |-
+        * `DAU` - DAU
+        * `DAE` - DAE
+        * `DSA` - DSA
+        * `DSAC` - DSAC
+        * `DSP` - DSP
+        * `OTHER` - OTHER
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

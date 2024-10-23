@@ -1,3 +1,4 @@
+import { CategoryEnum, PreferredUnitEnum } from "api-schema"
 import {
   Entity,
   EntityType,
@@ -10,6 +11,7 @@ import {
   UserRightRequest,
   UserRightStatus,
   UserRight,
+  Feedstock,
 } from "carbure/types"
 import { mergeDeepRight } from "ramda"
 
@@ -41,7 +43,7 @@ export const company: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const producer: Entity = {
@@ -62,7 +64,7 @@ export const producer: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const trader: Entity = {
@@ -83,7 +85,7 @@ export const trader: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const operator: Entity = {
@@ -104,7 +106,7 @@ export const operator: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const admin: Entity = {
@@ -125,7 +127,7 @@ export const admin: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const cpo: Entity = {
@@ -146,17 +148,18 @@ export const cpo: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: "l",
+  preferred_unit: PreferredUnitEnum.l,
 }
 
 // DELIVERY SITES
 
 export const deliverySite: Depot = {
+  id: 1,
   depot_id: "10",
   name: "Test Delivery Site",
   city: "Test City",
   country: country,
-  depot_type: DepotType.Other,
+  depot_type: DepotType.OTHER,
   address: "Test Address",
   postal_code: "64430",
   electrical_efficiency: null,
@@ -184,14 +187,16 @@ export const productionSite: ProductionSiteDetails = {
   inputs: [],
   outputs: [],
   certificates: [],
+  producer: producer as any,
 }
 
 // MATIERE PREMIERE
 
-export const matierePremiere = {
+export const matierePremiere: Feedstock = {
   code: "COLZA",
   name: "Colza",
-  category: "CONV",
+  name_en: "Colza",
+  category: CategoryEnum.CONV,
 }
 
 // BIOCARBURANT
@@ -199,6 +204,7 @@ export const matierePremiere = {
 export const biocarburant = {
   code: "EMHV",
   name: "EMHV",
+  name_en: "EMHV",
 }
 
 export const entityRight: UserRight = {

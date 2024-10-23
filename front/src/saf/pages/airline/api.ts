@@ -1,54 +1,91 @@
-import { CBQUERY_RESET } from "common/hooks/query-builder"
-import { api, Api, download } from "common/services/api"
+import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import {
-  SafClientSnapshot,
-  SafFilter,
-  SafQuery,
-  SafTicketDetails,
-  SafTicketsResponse,
-} from "../../types"
+  api as apiFetch,
+  download as downloadFetch,
+} from "common/services/api-fetch"
+import { SafFilter, SafQuery } from "../../types"
 
 //AIRLINE
 
 export function getAirlineYears(entity_id: number) {
-  return api.get<Api<number[]>>("/saf/airline/years", {
-    params: { entity_id },
+  return apiFetch.GET("/saf/years/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
 export function getAirlineSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
-    params: { entity_id, year },
+  return apiFetch.GET("/saf/snapshot/", {
+    params: {
+      query: {
+        entity_id,
+        year,
+      },
+    },
   })
 }
 
 export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
-  const params = { filter: field, ...query, ...CBQUERY_RESET }
-  return api
-    .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
-    .then((res) => res.data.data ?? [])
+  return apiFetch
+    .GET("/saf/tickets/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
 }
 
+// export function getSafAirlineTickets(query: SafQuery) {
+//   return api.get<Api<SafTicketsResponse>>("/saf/airline/tickets", {
+//     params: query,
+//   })
+// }
+
+// je récupère bien le nouvel objet de pagination, mais je n'ai plus la liste d'ids dans les résultats
 export function getSafAirlineTickets(query: SafQuery) {
-  return api.get<Api<SafTicketsResponse>>("/saf/airline/tickets", {
-    params: query,
+  return apiFetch.GET("/saf/tickets/", {
+    params: {
+      query,
+    },
   })
 }
 
 export function downloadSafAirlineTickets(query: SafQuery) {
-  return download("/saf/airline/tickets", { ...query, export: true })
+  return downloadFetch("/saf/tickets/export/", {
+    ...query,
+  })
 }
 
 export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
-  return api.get<Api<SafTicketDetails>>("/saf/airline/tickets/details", {
-    params: { entity_id, ticket_id },
+  return apiFetch.GET(`/saf/tickets/{id}/`, {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
 export function acceptSafTicket(entity_id: number, ticket_id: number) {
-  return api.post("/saf/airline/accept-ticket", {
-    entity_id,
-    ticket_id,
+  return apiFetch.POST("/saf/tickets/{id}/accept/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
   })
 }
 
@@ -57,9 +94,17 @@ export function rejectSafAirlineTicket(
   ticket_id: number,
   comment: string
 ) {
-  return api.post("/saf/airline/reject-ticket", {
-    entity_id,
-    comment,
-    ticket_id,
+  return apiFetch.POST("/saf/tickets/{id}/reject/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      comment,
+    },
   })
 }

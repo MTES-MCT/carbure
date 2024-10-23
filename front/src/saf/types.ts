@@ -9,16 +9,19 @@ import {
   CBQueryParams,
   CBQueryStates,
   CBSnapshot,
-} from "common/hooks/query-builder"
+} from "common/hooks/query-builder-2"
+import { SafTicketSourceStatus } from "./pages/operator/types"
+import { apiTypes } from "common/services/api-fetch.types"
 import {
-  SafTicketSourcePreview,
-  SafTicketSourceStatus,
-} from "./pages/operator/types"
+  PathsApiSafTicketsGetParametersQueryOrder,
+  PathsApiSafTicketSourcesGetParametersQueryOrder,
+  StatusEnum as SafTicketStatus,
+} from "api-schema"
 
+// SafSnapshot query returns two possible objects, one for airline entity, one for operator
 export interface SafOperatorSnapshot extends CBSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
-  tickets: number
   tickets_assigned: number
   tickets_assigned_accepted: number
   tickets_assigned_pending: number
@@ -28,7 +31,7 @@ export interface SafOperatorSnapshot extends CBSnapshot {
   tickets_received_pending: number
 }
 
-export interface SafClientSnapshot extends CBSnapshot {
+export interface SafAirlineSnapshot extends CBSnapshot {
   tickets_pending: number
   tickets_accepted: number
 }
@@ -40,50 +43,13 @@ export interface SafLot {
   volume: number
 }
 
-export interface LotPreview {
-  id: number
-  carbure_id: string
-  volume: number
-  delivery_date: string
-}
+export type LotPreview = apiTypes["CarbureLotPublic"]
 
-export interface SafTicketPreview {
-  id: number
-  carbure_id: string
-  client: string
-  volume: number
-  status: SafTicketStatus
-  created_at: string
-}
+export type SafTicketPreview = apiTypes["SafTicketPreview"]
 
-export interface SafTicket {
-  id: number
-  carbure_id: string
-  year: number
-  assignment_period: number
-  created_at: string
-  supplier: string
-  client: string
-  volume: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-  country_of_origin: Country
-  ghg_reduction: number
-  status: SafTicketStatus
-}
+export type SafTicket = apiTypes["SafTicket"]
 
-export interface SafTicketDetails
-  extends SafTicket,
-    SafProduction,
-    SafDurability {
-  free_field?: string
-  client_comment?: string
-  // child_ticket_source?: {
-  //   id: number
-  //   carbure_id: string
-  // },
-  parent_ticket_source?: SafTicketSourcePreview
-}
+export type SafTicketDetails = apiTypes["SafTicketDetails"]
 
 export interface SafProduction {
   carbure_producer: Entity | null
@@ -93,19 +59,20 @@ export interface SafProduction {
   production_site_commissioning_date: string
 }
 
-export interface SafDurability {
-  eec: number
-  el: number
-  ep: number
-  etd: number
-  eu: number
-  esca: number
-  eccs: number
-  eccr: number
-  eee: number
-  ghg_total: number
-  ghg_reduction: number
-}
+export type SafDurability = Pick<
+  SafTicketDetails,
+  | "eec"
+  | "el"
+  | "ep"
+  | "etd"
+  | "eu"
+  | "esca"
+  | "eccs"
+  | "eccr"
+  | "eee"
+  | "ghg_total"
+  | "ghg_reduction"
+>
 
 export interface SafTicketAssignementQuery {
   volume: number
@@ -113,30 +80,18 @@ export interface SafTicketAssignementQuery {
   free_field: string
 }
 
-export interface SafTicketsResponse {
-  saf_tickets: SafTicket[]
-  from: number
-  returned: number
-  total: number
-  ids: number[]
-}
+export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
 
 export interface SafStates extends CBQueryStates {
   //old QueryParams
 
   status: SafTicketSourceStatus | SafTicketStatus
   filters: SafFilterSelection
-  snapshot?: SafOperatorSnapshot | SafClientSnapshot
+  snapshot?: SafOperatorSnapshot | SafAirlineSnapshot
   type?: SafQueryType
 }
 
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
-
-export enum SafTicketStatus {
-  Pending = "PENDING",
-  Accepted = "ACCEPTED",
-  Rejected = "REJECTED",
-}
 
 export enum SafFilter {
   Feedstocks = "feedstocks",
@@ -150,8 +105,23 @@ export enum SafFilter {
 
 export type SafQueryType = "assigned" | "received"
 
-export interface SafQuery extends CBQueryParams {
+// Airline
+export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
+export interface SafQuery extends CBQueryParams<SafColumsOrder[]> {
   [SafFilter.Feedstocks]?: string[]
-  [SafFilter.Periods]?: string[]
+  [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
 }
+
+// Operator
+export type SafOperatorColumnsOrder =
+  PathsApiSafTicketSourcesGetParametersQueryOrder
+export interface SafOperatorQuery
+  extends CBQueryParams<SafOperatorColumnsOrder[]> {
+  [SafFilter.Feedstocks]?: string[]
+  [SafFilter.Periods]?: number[]
+  [SafFilter.Clients]?: string[]
+}
+
+// Generated enum is EnumStatus and the name is not readable
+export { SafTicketStatus }
