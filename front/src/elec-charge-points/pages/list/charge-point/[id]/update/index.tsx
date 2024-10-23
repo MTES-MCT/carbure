@@ -53,14 +53,26 @@ const UpdateChargePointDialog = () => {
       })
     },
     onError: (e) => {
-      const error = (e as AxiosError<{ error: string }>).response?.data.error
-      if (error === "CP_ID_NOT_IN_TGD") {
-        setFieldError(
-          "charge_point_id",
-          t(
+      const errors = {
+        CP_ID_NOT_IN_TGD: {
+          field: "charge_point_id",
+          error: t(
             "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr."
-          )
-        )
+          ),
+        },
+        CP_ID_ALREADY_EXISTS: {
+          field: "charge_point_id",
+          error: t(
+            "Cet identifiant est déjà utilisé pour un autre point de charge."
+          ),
+        },
+      }
+      const error = (e as AxiosError<{ error: string }>).response?.data.error
+
+      if (error && Object.keys(errors).includes(error)) {
+        const errorKey = error as keyof typeof errors
+        const currentError = errors[errorKey]
+        setFieldError(currentError.field, currentError.error)
       } else {
         notify(
           t(

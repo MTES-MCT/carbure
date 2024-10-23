@@ -1622,5 +1622,6 @@
   "Le point de recharge a bien été mis à jour.": "Le point de recharge a bien été mis à jour.",
   "Une erreur est survenue lors de la mise à jour du point de recharge.": "Une erreur est survenue lors de la mise à jour du point de recharge.",
   "Confirmer": "Confirmer",
-  "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.": "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr."
+  "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.": "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.",
+  "Cet identifiant est déjà utilisé pour un autre point de charge.": "Cet identifiant est déjà utilisé pour un autre point de charge."
 }
