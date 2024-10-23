@@ -1,7 +1,6 @@
 @import "./reset.css";
 @import "./fonts.css";
 @import "./theme.css";
-/* @import '@gouvfr/dsfr/dist/css/dsfr.min.css'; */
 
 * {
   box-sizing: border-box;
