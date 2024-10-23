@@ -1,6 +1,6 @@
 import Tag, { TagVariant } from "common/components/tag"
-import { useStatusLabels } from "../index.hooks"
-import { ChargePointStatus } from "../types"
+import { useStatusLabels } from "elec-charge-points/hooks/charge-point-status.hooks"
+import { ChargePointStatus } from "elec-charge-points/types"
 
 type ChargePointsListTableStatusProps = {
   status: ChargePointStatus
@@ -12,7 +12,7 @@ const statusToVariant: Record<ChargePointStatus, TagVariant> = {
   [ChargePointStatus.Accepted]: "success",
 }
 
-export const ChargePointsListTableStatus = ({
+export const ChargePointStatusTag = ({
   status,
 }: ChargePointsListTableStatusProps) => {
   const statusLabels = useStatusLabels()
