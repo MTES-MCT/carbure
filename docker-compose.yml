@@ -32,6 +32,7 @@ services:
     environment:
       VITE_SENTRY_DSN: ${SENTRY_DSN}
       VITE_APP_ENV: ${IMAGE_TAG}
+      CHROMATIC_PROJECT_TOKEN: ${CHROMATIC_PROJECT_TOKEN}
     build:
       context: ./front
     volumes:

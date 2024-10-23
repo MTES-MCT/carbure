@@ -37,9 +37,9 @@ export const TicketsTable = memo(
   }: TicketsTableProps) => {
     const columns = useColumns()
 
-    const total = ticketsData?.total ?? 0
-    const count = ticketsData?.returned ?? 0
-    const tickets = ticketsData?.saf_tickets
+    const total = ticketsData?.count ?? 0
+    const count = ticketsData?.results.length ?? 0
+    const tickets = ticketsData?.results
 
     return (
       <>
@@ -64,10 +64,12 @@ export const TicketsTable = memo(
             {(state.limit || 0) < total && (
               <Pagination
                 page={state.page}
+                startPage={1}
                 limit={state.limit}
                 total={total}
                 onPage={actions.setPage}
                 onLimit={actions.setLimit}
+                keepSearch
               />
             )}
           </>
@@ -144,7 +146,7 @@ export function useColumns() {
       key: "ghg_reduction",
       header: t("Réd. GES"),
       cell: (ticket: SafTicket) => (
-        <Cell text={`${ticket.ghg_reduction.toFixed(0)}%`} />
+        <Cell text={`${ticket.ghg_reduction?.toFixed(0)}%`} />
       ),
     },
   }

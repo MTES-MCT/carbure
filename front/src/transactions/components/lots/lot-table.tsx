@@ -23,6 +23,7 @@ import Score from "transaction-details/components/score"
 import { To } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
+import { Unit } from "carbure/types"
 
 export interface LotTableProps {
   loading: boolean
@@ -206,7 +207,7 @@ export const BiofuelCell = ({ lot }: LotCellProps) => {
     MJ: "lhv_amount" as const,
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
   return (
@@ -230,11 +231,13 @@ export const PeriodCell = ({ lot }: LotCellProps) => {
 }
 
 export const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
-  if (!errors[lot.id]) {
+  const lotErrors = errors[lot.id]
+
+  if (!lotErrors) {
     return undefined
-  } else if (errors[lot.id].some((err) => err.is_blocking)) {
+  } else if (lotErrors.some((err) => err.is_blocking)) {
     return "danger"
-  } else if (errors[lot.id].some((err) => !err.is_blocking)) {
+  } else if (lotErrors.some((err) => !err.is_blocking)) {
     return "warning"
   }
 }

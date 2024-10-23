@@ -2,6 +2,7 @@ import { useMatch } from "react-router-dom"
 import { createContext, useContext } from "react"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
 import { UserManager } from "./user"
+import { PreferredUnitEnum } from "api-schema"
 
 export interface EntityManager extends Entity {
   isBlank: boolean
@@ -20,10 +21,13 @@ export interface EntityManager extends Entity {
   hasRights: (...roles: UserRole[]) => boolean
 }
 
-export function useEntityManager(user: UserManager): EntityManager {
+export function useEntityManager(
+  user: UserManager,
+  entityId?: number // This param is used only to mock current entity in storybook
+): EntityManager {
   const match = useMatch("/org/:entity/*")
 
-  const entityID = parseInt(match?.params.entity ?? "-1", 10)
+  const entityID = entityId ?? parseInt(match?.params.entity ?? "-1", 10)
   const entityRights = user.getRights(entityID)
   const entity = entityRights?.entity
   const type = entity?.entity_type
@@ -47,7 +51,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     has_trading: entity?.has_trading ?? false,
     has_stocks: entity?.has_stocks ?? false,
     has_direct_deliveries: entity?.has_direct_deliveries ?? false,
-    preferred_unit: entity?.preferred_unit ?? "l",
+    preferred_unit: entity?.preferred_unit ?? PreferredUnitEnum.l,
     default_certificate: entity?.default_certificate ?? "",
     has_saf: entity?.has_saf ?? false,
     has_elec: entity?.has_elec ?? false,

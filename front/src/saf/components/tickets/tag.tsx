@@ -13,17 +13,17 @@ export const TicketTag = ({ status, small, big }: TicketTagProps) => {
   let variant: TagVariant
 
   switch (status) {
-    case SafTicketStatus.Accepted:
+    case SafTicketStatus.ACCEPTED:
       label = t("Accepté")
       variant = "success"
       break
 
-    case SafTicketStatus.Pending:
+    case SafTicketStatus.PENDING:
       label = t("En attente")
       variant = "info"
       break
 
-    case SafTicketStatus.Rejected:
+    case SafTicketStatus.REJECTED:
       label = t("Refusé")
       variant = "danger"
       break

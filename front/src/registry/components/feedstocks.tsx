@@ -30,7 +30,7 @@ const Feedstocks = () => {
             key: "category",
             header: t("Catégorie"),
             cell: (e) => e.category,
-            orderBy: (e) => e.category,
+            orderBy: (e) => e.category ?? "",
           },
         ]}
       />
