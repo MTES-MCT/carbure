@@ -7,7 +7,7 @@ import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import {
   AgreementDetails,
@@ -15,11 +15,14 @@ import {
 } from "../../../double-counting/types"
 import AgreementStatusTag from "./agreement-status"
 import { QuotasTable } from "../../../double-counting/components/quotas-table"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { compact } from "common/utils/collection"
 import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
 import { ProductionTable } from "../../../double-counting/components/production-table"
 import Tabs from "common/components/tabs"
+import { ROUTE_URLS } from "common/utils/routes"
+import { ProductionSiteForm } from "settings/components/production-site-dialog"
+import { ProductionSiteDetails } from "carbure/types"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -62,7 +65,20 @@ export const AgreementDetailsDialog = () => {
                   producer: agreement?.producer ?? "N/A",
                   productionSite: agreement?.production_site ?? "N/A",
                 }}
-                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>"
+                components={{
+                  Link: application ? (
+                    <Link
+                      to={ROUTE_URLS.ADMIN_COMPANY_DETAIL(
+                        entity.id,
+                        application?.producer.id
+                      )}
+                      target="_blank"
+                    />
+                  ) : (
+                    <Fragment />
+                  ),
+                }}
+                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>"
               />
             </p>
           </section>
@@ -98,9 +114,10 @@ export const AgreementDetailsDialog = () => {
 
           {application &&
             application.status === DoubleCountingStatus.Accepted && (
-              <>
-                <AgreementTabs agreement={agreement} />
-              </>
+              <AgreementTabs
+                agreement={agreement}
+                productionSite={application.production_site}
+              />
             )}
         </main>
 
@@ -120,16 +137,25 @@ export const AgreementDetailsDialog = () => {
   )
 }
 
-const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
-  const [focus, setFocus] = useState("quotas")
+const AgreementTabs = ({
+  agreement,
+  productionSite,
+}: {
+  agreement: AgreementDetails
+  productionSite: ProductionSiteDetails
+}) => {
+  const [focus, setFocus] = useState("production_site")
   const { t } = useTranslation()
-
   return (
     <>
       <section>
         <Tabs
           variant="switcher"
           tabs={compact([
+            {
+              key: "production_site",
+              label: t("Site de production"),
+            },
             {
               key: "quotas",
               label: t("Quotas"),
@@ -147,7 +173,11 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
           onFocus={setFocus}
         />
       </section>
-
+      {focus === "production_site" && productionSite && (
+        <section>
+          <ProductionSiteForm readOnly productionSite={productionSite} />
+        </section>
+      )}
       {focus === "quotas" && (
         <section>
           <QuotasTable quotas={agreement.quotas} />
@@ -164,6 +194,7 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
         <section>
           <ProductionTable
             production={agreement.application.production ?? []}
+            sourcing={agreement.application.sourcing ?? []}
             hasAgreement={true}
           />
         </section>

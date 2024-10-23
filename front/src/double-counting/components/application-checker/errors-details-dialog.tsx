@@ -100,7 +100,10 @@ export const ErrorsDetailsDialog = ({
 
         {focusedErrors.length === 0 && focus === "production" && (
           <section>
-            <ProductionTable production={fileData.production ?? []} />
+            <ProductionTable
+              production={fileData.production ?? []}
+              sourcing={fileData.sourcing}
+            />
           </section>
         )}
       </main>
