@@ -27,9 +27,21 @@
 }
 .nav {
   padding: var(--spacing-l);
-  border-right: 1px solid var(--border-default-grey);
+  border-bottom: 1px solid var(--border-default-grey);
+  flex-grow: 1;
   width: var(--main-navigation-nav-width);
   overflow-y: auto;
+}
+
+.nav-wrapper {
+  border-right: 1px solid var(--border-default-grey);
+  display: flex;
+  flex-direction: column;
+  width: var(--main-navigation-nav-width);
+}
+
+.bottom-nav {
+  padding: var(--spacing-l);
 }
 
 .page {
