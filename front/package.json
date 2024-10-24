@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.9.8",
+    "@codegouvfr/react-dsfr": "^1.14.1",
     "@sentry/react": "^8.30.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
