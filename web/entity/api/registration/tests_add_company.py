@@ -51,7 +51,6 @@ class EntityRegistrationAddCompanyTest(TestCase):
             params,
         )
         # # check new entity created
-        print("*** response ***", response.json(), response.status_code)
         assert response.status_code == 200
         entity = Entity.objects.get(legal_name="Mon entreprise test", registration_id="542051180")
         assert entity.registered_address == "1 rue de la paix"

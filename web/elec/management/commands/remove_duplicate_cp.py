@@ -26,11 +26,11 @@ class Command(BaseCommand):
         else:
             self.stdout.write(" -- Executing deletion of duplicate charge points.")
 
-        # Subquery to get charge points with at least 2 occurrences
+        # Subquery to get not delete charge points with at least 2 occurrences
         duplicate_charge_points = (
             ElecChargePoint.objects.values("charge_point_id")
             .annotate(count=Count("charge_point_id"))
-            .filter(count__gt=1)
+            .filter(count__gt=1, is_deleted=False)
             .values("charge_point_id")
         )
         # Get charge points objects
@@ -81,7 +81,8 @@ class Command(BaseCommand):
         self.stdout.write(f"Points de charge à supprimer : {charge_points_to_delete.count()}")
 
         if not dry_run:
-            charge_points_to_delete.delete()
+            # charge_points_to_delete.delete()
+            charge_points_to_delete.update(is_deleted=True)
             self.stdout.write("Points de charge supprimés !")
 
         self.stdout.write(f"Points de charge conservés : {len(ids_to_keep)}")
