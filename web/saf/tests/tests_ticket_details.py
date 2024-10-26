@@ -3,8 +3,8 @@ from datetime import datetime
 from django.urls import reverse
 
 from core.models import Biocarburant, MatierePremiere, Pays
-from saf.api.operator.tests.test_viewset import TestCase
 from saf.models import SafTicket, SafTicketSource
+from saf.tests import TestCase
 
 
 class SafTicketDetailsTest(TestCase):
