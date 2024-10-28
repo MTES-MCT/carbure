@@ -9,10 +9,27 @@ type Story = StoryObj<typeof Text>
 
 export default meta
 
-export const OverrideHeadingStyle: Story = {
+export const DefaultText: Story = {
   args: {
-    is: "h1",
-    as: "h3",
-    children: "This is a h1 with h3 visual style",
+    children: "This is a default text",
+  },
+}
+
+export const AllVariants: Story = {
+  render: () => (
+    <>
+      <Text size="xl">this is a xl text</Text>
+      <Text size="lg">this is a lg text</Text>
+      <Text size="md">this is a md text</Text>
+      <Text size="sm">this is a sm text</Text>
+      <Text size="xs">this is a xs text</Text>
+    </>
+  ),
+}
+
+export const WithBorder: Story = {
+  args: {
+    children: "This is a default text",
+    border: true,
   },
 }

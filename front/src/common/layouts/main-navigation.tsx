@@ -2,6 +2,7 @@ import { PropsWithChildren, useContext } from "react"
 import { MainNavigationContext } from "./main-navigation.context"
 import styles from "./main-navigation.module.css"
 import { fr } from "@codegouvfr/react-dsfr"
+import { Text } from "common/components/text"
 
 export const MainNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(MainNavigationContext)
@@ -11,9 +12,13 @@ export const MainNavigation = ({ children }: PropsWithChildren) => {
     <div>
       <header className={styles.header}>
         <div className={styles["header-left"]}>
-          <h1>CarbuRe</h1>
+          <Text is="h2" size="xl">
+            Carbure
+          </Text>
         </div>
-        <div className={styles["header-right"]}>{title}</div>
+        <div className={styles["header-right"]}>
+          <Text is="h1">{title}</Text>
+        </div>
       </header>
       <div className={styles["body"]}>
         <div className={styles["nav-wrapper"]}>

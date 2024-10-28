@@ -13,11 +13,11 @@
 .header-left {
   border-right: 1px solid var(--border-default-grey);
   width: var(--main-navigation-nav-width);
-  padding: var(--spacing-l);
+  padding: var(--spacing-5v) var(--spacing-3w);
 }
 
 .header-right {
-  padding: var(--spacing-l);
+  padding: var(--spacing-5v) var(--spacing-3w);
   flex-grow: 1;
 }
 
