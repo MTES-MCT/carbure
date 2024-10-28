@@ -32,16 +32,9 @@
   width: var(--main-navigation-nav-width);
   overflow-y: auto;
 }
-
-.nav-wrapper {
+.sidebar {
   border-right: 1px solid var(--border-default-grey);
-  display: flex;
-  flex-direction: column;
   width: var(--main-navigation-nav-width);
-}
-
-.bottom-nav {
-  padding: var(--spacing-l);
 }
 
 .page {
