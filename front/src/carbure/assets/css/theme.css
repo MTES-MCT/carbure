@@ -37,6 +37,49 @@
   --font-size: 16px;
   --font-family: Marianne, arial, sans-serif;
 
+  /*
+  * Values copied from the DSFR and not exposed in the DSFR variables
+  * @see https://www.systeme-de-design.gouv.fr/fondamentaux/espacement
+  *
+  * 1v = 4px
+  */
+  --spacing-0-5v: 0.125rem; /* 2px */
+  --spacing-1v: 0.25rem; /* 4px */
+  --spacing-1-5v: 0.375rem; /* 6px */
+  --spacing-3v: 0.75rem; /* 12px */
+  --spacing-5v: 1.25rem; /* 20px */
+  --spacing-7v: 1.75rem; /* 28px */
+  --spacing-9v: 2.25rem; /* 36px */
+  --spacing-11v: 2.75rem; /* 44px */
+  --spacing-13v: 3.25rem; /* 52px */
+  --spacing-15v: 3.75rem; /* 60px */
+  --spacing-17v: 4.25rem; /* 68px */
+  --spacing-19v: 4.75rem; /* 76px */
+  --spacing-21v: 5.25rem; /* 84px */
+  --spacing-23v: 5.75rem; /* 92px */
+  --spacing-25v: 6.25rem; /* 100px */
+  --spacing-27v: 6.75rem; /* 108px */
+  --spacing-29v: 7.25rem; /* 116px */
+  --spacing-31v: 7.75rem; /* 124px */
+
+  /* 1w = 8px */
+  --spacing-1w: 0.5rem; /* 8px */
+  --spacing-2w: 1rem; /* 16px */
+  --spacing-3w: 1.5rem; /* 24px */
+  --spacing-4w: 2rem; /* 32px */
+  --spacing-5w: 2.5rem; /* 40px */
+  --spacing-6w: 3rem; /* 48px */
+  --spacing-7w: 3.5rem; /* 56px */
+  --spacing-8w: 4rem; /* 64px */
+  --spacing-9w: 4.5rem; /* 72px */
+  --spacing-10w: 5rem; /* 80px */
+  --spacing-11w: 5.5rem; /* 88px */
+  --spacing-12w: 6rem; /* 96px */
+  --spacing-13w: 6.5rem; /* 104px */
+  --spacing-14w: 7rem; /* 112px */
+  --spacing-15w: 7.5rem; /* 120px */
+  --spacing-16w: 8rem; /* 128px */
+
   --spacing-xxs: 2px;
   --spacing-xs: 4px;
   --spacing-s: 8px;
@@ -50,7 +93,7 @@
 
   --shadow: 0 1px 2px var(--gray-medium);
   --border: 1px solid var(--gray-highlight);
-  --border-radius: var(--spacing-xs);
+  --border-radius: var(--spacing-1v);
 }
 
 @media screen and (min-width: 1600px) {

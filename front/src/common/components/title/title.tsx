@@ -3,7 +3,9 @@
  * Implements typography styles defined in:
  * @see https://www.systeme-de-design.gouv.fr/fondamentaux/typographie
  */
+
 import cl from "clsx"
+import styles from "./title.module.css"
 type HeadingTags = "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 type TitleProps = {
   // The tag to use for the title
@@ -18,12 +20,35 @@ type TitleProps = {
   as?: HeadingTags
 
   // If the default style is not appropriate, you can override it with this property
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "xs" | "sm" | "md" | "lg" | "xl"
+
+  className?: string
+
+  style?: React.CSSProperties
+
+  border?: boolean
 }
 
-export const Title = ({ is, children, as, size }: TitleProps) => {
+export const Title = ({
+  is,
+  children,
+  as,
+  size,
+  border = false,
+  className,
+  ...props
+}: TitleProps) => {
   const TitleTag = is
-  const classes = cl(as && `fr-${as}`, size && `fr-display--${size}`)
+  const classes = cl(
+    as && `fr-${as}`,
+    size && `fr-display--${size}`,
+    !border && styles.title,
+    className
+  )
 
-  return <TitleTag className={classes}>{children}</TitleTag>
+  return (
+    <TitleTag className={classes} {...props}>
+      {children}
+    </TitleTag>
+  )
 }
