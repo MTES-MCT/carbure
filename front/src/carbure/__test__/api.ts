@@ -107,6 +107,10 @@ export const okFieldsTranslations = http.get(
   }
 )
 
+export const okUnauthorizedUser = http.get("/api/user", () => {
+  return new HttpResponse(null, { status: 401 })
+})
+
 export const okDefaultUser = mockGetWithResponseData(
   "/user",
   generateUser(EntityType.Administration)
