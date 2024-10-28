@@ -4,6 +4,9 @@
  * @see https://www.systeme-de-design.gouv.fr/fondamentaux/typographie
  */
 
+import { fr } from "@codegouvfr/react-dsfr"
+import cl from "clsx"
+import styles from "./text.module.css"
 type TextProps = {
   // The tag to use for the text
   is?: React.ElementType
@@ -11,10 +14,34 @@ type TextProps = {
   // The content of the text
   children: React.ReactNode
 
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "xs" | "sm" | "md" | "lg" | "xl"
+
+  className?: string
+
+  style?: React.CSSProperties
+
+  border?: boolean
 }
-export const Text = ({ is = "p", children, size = "md" }: TextProps) => {
+export const Text = ({
+  is = "p",
+  children,
+  size = "md",
+  className,
+  border = false,
+  ...props
+}: TextProps) => {
   const TextTag = is
 
-  return <TextTag className="">{children}</TextTag>
+  return (
+    <TextTag
+      className={cl(
+        fr.cx(`fr-text--${size}`),
+        !border && styles.text,
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </TextTag>
+  )
 }
