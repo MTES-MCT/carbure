@@ -3,10 +3,13 @@ import { MainNavigationContext } from "./main-navigation.context"
 import styles from "./main-navigation.module.css"
 import { fr } from "@codegouvfr/react-dsfr"
 import { Text } from "common/components/text"
+import { useUser } from "carbure/hooks/user"
+import { PrivateSidebar } from "./private-sidebar"
+import { PublicSidebar } from "./public-sidebar"
 
 export const MainNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(MainNavigationContext)
-  const a = Array.from({ length: 100 })
+  const user = useUser()
 
   return (
     <div>
@@ -21,13 +24,8 @@ export const MainNavigation = ({ children }: PropsWithChildren) => {
         </div>
       </header>
       <div className={styles["body"]}>
-        <div className={styles["nav-wrapper"]}>
-          <nav className={styles["nav"]}>
-            {a.map((_, index) => (
-              <div key={index}>element {index}</div>
-            ))}
-          </nav>
-          <div className={styles["bottom-nav"]}>BOTTOM NAV</div>
+        <div className={styles["sidebar"]}>
+          {user.isAuthenticated() ? <PrivateSidebar /> : <PublicSidebar />}
         </div>
 
         <section className={styles["page"]}>{children}</section>
