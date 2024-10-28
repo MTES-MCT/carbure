@@ -44,12 +44,22 @@ export const ProductionTable = ({
     {
       header: t("Rendement estimé"),
       cell: (p) => {
-        const source = sourcing.find(
-          (source) => source.feedstock.code === p.feedstock.code
+        // Find sources related to the production
+        const sources = sourcing.filter(
+          (source) =>
+            source.feedstock.code === p.feedstock.code && p.year === source.year
         )
-        const estimatedEfficiency = source
-          ? (p.estimated_production / source.metric_tonnes) * 100
+
+        // Calculate sum weight
+        const metricTonnes = sources.reduce(
+          (sum, source) => source.metric_tonnes + sum,
+          0
+        )
+
+        const estimatedEfficiency = sources.length
+          ? (p.estimated_production / metricTonnes) * 100
           : null
+
         return (
           <Cell
             text={
