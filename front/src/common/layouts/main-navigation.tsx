@@ -1,14 +1,18 @@
 import { PropsWithChildren, useContext } from "react"
 import { MainNavigationContext } from "./main-navigation.context"
 import styles from "./main-navigation.module.css"
+import { fr } from "@codegouvfr/react-dsfr"
 
 export const MainNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(MainNavigationContext)
   const a = Array.from({ length: 100 })
+
   return (
     <div>
       <header className={styles.header}>
-        <div className={styles["header-left"]}>CarbuRe</div>
+        <div className={styles["header-left"]}>
+          <h1>CarbuRe</h1>
+        </div>
         <div className={styles["header-right"]}>{title}</div>
       </header>
       <div className={styles["body"]}>
