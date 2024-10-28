@@ -5,6 +5,7 @@ import {
   MainNavigationProvider,
   useMainNavigation,
 } from "./main-navigation.context"
+import { okUnauthorizedUser } from "carbure/__test__/api"
 
 const meta: Meta<typeof MainNavigation> = {
   component: MainNavigation,
@@ -23,7 +24,7 @@ type Story = StoryObj<typeof MainNavigation>
 
 export default meta
 
-export const BaseLayout: Story = {
+export const PrivateLayout: Story = {
   decorators: [
     (Story) => {
       useMainNavigation("this is a title")
@@ -40,5 +41,14 @@ export const BaseLayout: Story = {
         <div style={{ background: "blue", height: "500px" }}>other content</div>
       </>
     ),
+  },
+}
+
+export const PublicLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [okUnauthorizedUser],
+    },
   },
 }
