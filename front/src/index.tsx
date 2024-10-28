@@ -11,7 +11,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { SentryProvider } from "./sentry"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 
-startReactDsfr({ defaultColorScheme: "system" })
+startReactDsfr({ defaultColorScheme: "light" })
 
 async function enableMocking() {
   if (import.meta.env.MODE !== "development") return

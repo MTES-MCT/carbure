@@ -22,7 +22,7 @@ export const AllHeadings: Story = {
   ),
 }
 
-export const OverrideHeadingStyle: Story = {
+export const OverridesHeadingStyle: Story = {
   args: {
     is: "h1",
     as: "h3",
@@ -35,5 +35,21 @@ export const Display: Story = {
     is: "p",
     size: "lg",
     children: "This is a p with lg display style",
+  },
+}
+
+export const OverridesWithStyle: Story = {
+  args: {
+    is: "h1",
+    style: { fontSize: "20px" },
+    children: "This is a h1 with 20px",
+  },
+}
+
+export const WithBorder: Story = {
+  args: {
+    is: "h1",
+    children: "This is a default text",
+    border: true,
   },
 }
