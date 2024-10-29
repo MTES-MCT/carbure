@@ -8,9 +8,7 @@ import { getNeighborsInfos } from "./navigation.utils"
  * @returns An array containing all ids
  */
 const mapToNeighbors = (map: Map<number, number[]>) =>
-  Array.from(map.entries())
-    .sort((a, b) => a[0] - b[0])
-    .reduce((acc, [, values]) => acc.concat(values), [] as number[])
+  [...map.entries()].sort((a, b) => a[0] - b[0]).flatMap(([, values]) => values)
 
 /**
  * Return an array of booleans to know if the current id has next/previous id
@@ -40,28 +38,19 @@ export function useNavigation(
     hasPrevCurrentPage,
     hasNextCurrentPage,
   } = getNeighborsInfos(idsMap, current, currentPage, pageCount)
-  console.log("infos 1", {
-    idsMap,
-    current,
-    currentPage,
-    pageCount,
-    neighbors,
-    index,
-    isOut,
-    hasPrev,
-    hasNext,
-    res: JSON.stringify(idsMap.entries()),
-  })
+
   const prev = useCallback(() => {
     if (hasPrev && neighbors[index - 1]) {
       const searchParams = new URLSearchParams(location.search)
 
       const searchParamPage = searchParams.get("page")
-      // Change page query param when the next id is on a new page
-      if (searchParamPage && parseInt(searchParamPage) - 1 === 1) {
-        searchParams.delete("page")
-      } else if (!hasPrevCurrentPage && searchParamPage) {
-        searchParams.set("page", `${parseInt(searchParamPage) - 1}`)
+
+      // Update page query param when the current id is the last id of the current page
+      if (!hasPrevCurrentPage && searchParamPage) {
+        const prevPage = parseInt(searchParamPage) - 1
+
+        if (prevPage === 1) searchParams.delete("page")
+        else searchParams.set("page", prevPage.toString())
       }
 
       navigate({
@@ -75,12 +64,7 @@ export function useNavigation(
   const next = useCallback(() => {
     const searchParams = new URLSearchParams(location.search)
     const searchParamPage = parseInt(searchParams.get("page") ?? "1")
-    console.log("infos 2", {
-      searchParams,
-      searchParamPage,
-      neighbors,
-      isOut,
-    })
+
     if (isOut && neighbors[0]) {
       // Remove page param to restart page
       searchParams.delete("page")
