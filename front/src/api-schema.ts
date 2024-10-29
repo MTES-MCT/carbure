@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+  "/api/entity/{company_id}/enable/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entity_enable_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/saf/clients/": {
     parameters: {
       query?: never
@@ -800,6 +816,39 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  entity_enable_create: {
+    parameters: {
+      query: {
+        /** @description The id of the admin entity enabling the company */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description The id of the company that is being enabled */
+        company_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"]
+        }
+      }
+    }
+  }
   saf_clients_list: {
     parameters: {
       query?: {
@@ -808,6 +857,8 @@ export interface operations {
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         /** @description A search term. */
         search?: string
       }
@@ -923,6 +974,8 @@ export interface operations {
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         periods?: number[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1179,6 +1232,8 @@ export interface operations {
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         periods?: number[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */

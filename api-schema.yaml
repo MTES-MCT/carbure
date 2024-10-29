@@ -4,6 +4,39 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
+  /api/entity/{company_id}/enable/:
+    post:
+      operationId: entity_enable_create
+      parameters:
+        - in: path
+          name: company_id
+          schema:
+            type: integer
+          description: The id of the company that is being enabled
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: The id of the admin entity enabling the company
+          required: true
+      tags:
+        - entity
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: ""
   /api/saf/clients/:
     get:
       operationId: saf_clients_list
@@ -22,6 +55,12 @@ paths:
           required: false
           in: query
           description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
           schema:
             type: integer
         - name: search
@@ -228,6 +267,12 @@ paths:
           required: false
           in: query
           description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
           schema:
             type: integer
         - in: query
@@ -771,6 +816,12 @@ paths:
           required: false
           in: query
           description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
           schema:
             type: integer
         - in: query
