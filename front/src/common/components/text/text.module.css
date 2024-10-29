@@ -1,5 +1,14 @@
-.text {
+.noMargin {
   margin: 0;
+}
+
+/*
+ * Remove the underline of the link defined in DSFR
+ */
+.text[href] {
+  text-decoration: none;
+  --underline-img: none;
+  --external-link-content: none;
 }
 
 /*

@@ -26,7 +26,7 @@ type TitleProps = {
 
   style?: React.CSSProperties
 
-  border?: boolean
+  margin?: boolean
 }
 
 export const Title = ({
@@ -34,7 +34,7 @@ export const Title = ({
   children,
   as,
   size,
-  border = false,
+  margin = false,
   className,
   ...props
 }: TitleProps) => {
@@ -42,7 +42,7 @@ export const Title = ({
   const classes = cl(
     as && `fr-${as}`,
     size && `fr-display--${size}`,
-    !border && styles.title,
+    !margin && styles.title,
     className
   )
 
