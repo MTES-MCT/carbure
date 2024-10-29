@@ -1,3 +1,5 @@
+import os
+import shutil
 import time
 
 import undetected_chromedriver as uc
@@ -11,6 +13,10 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from core.models import GenericCertificate
 
+DOWNLOAD_DIR = "/tmp/certificates"
+FINAL_DIR = "/tmp/certificates/final"
+URL = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"
+
 
 class Command(BaseCommand):
     help = "Download redcert certificates pdfs"
@@ -19,17 +25,39 @@ class Command(BaseCommand):
         parser.add_argument("--id", type=str, help="Download a specific certificate")
 
     def handle(self, *args, **options):
-        url = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"
+        start_time = time.time()
+
+        self.create_directories()
 
         # Instanciate the chrome driver
         driver = self.create_driver()
 
+        self.load_redcert_page(driver)
+
+        if options["id"]:
+            self.get_single_certificate(driver, options["id"])
+        else:
+            certificates_to_update = self.get_all_certificates(driver, start_time)
+
+        driver.quit()
+
+        self.update_certificates(certificates_to_update)
+
+        self.stdout.write(f"Time spent: {time.time() - start_time:.2f} seconds")
+        self.stdout.write(self.style.SUCCESS("Script executed successfully"))
+
+    def create_directories(self):
+        # Create the download directories if they don't exist
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+        os.makedirs(FINAL_DIR, exist_ok=True)
+
+    def load_redcert_page(self, driver):
         # Add a timeout to prevent infinite loading
         timeout = 30
         driver.set_page_load_timeout(timeout)
 
         try:
-            driver.get(url)
+            driver.get(URL)
         except TimeoutException:
             driver.quit()
             raise CommandError("Timeout : page not loaded in time")
@@ -42,138 +70,137 @@ class Command(BaseCommand):
                 )
             )
         )
-        driver.save_screenshot("screenshot-form1.png")
 
-        start_time = time.time()
+    def get_single_certificate(self, driver, certificate_id):
+        self.stdout.write("Searching for certificate with id %s" % certificate_id)
+        # Fill the form
+        search_box = driver.find_element(By.XPATH, "//*[@id='ctl00_mainContentPlaceHolder_zertifikatIdentifikatorTextBox']")
+        search_box.send_keys(certificate_id)
 
-        if options["id"]:
-            self.stdout.write("Searching for certificate with id %s" % options["id"])
-            # Fill the form
-            search_box = driver.find_element(
-                By.XPATH, "//*[@id='ctl00_mainContentPlaceHolder_zertifikatIdentifikatorTextBox']"
+        # And submit
+        search_box.send_keys(Keys.RETURN)
+
+        # Wait until results are loaded
+        time.sleep(5)
+        driver.save_screenshot("screenshot-form2.png")
+
+        # Click on input element with src="Images/Apps/documentAcrobat.svg"
+        dl_button = driver.find_element(
+            By.XPATH,
+            "//input[@type='image' and contains(@onclick, 'SelectedPDF$0')]",
+        )
+
+        dl_button.click()
+
+        self.stdout.write("Click !")
+
+        # Wait for the pdf to be downloaded
+        time.sleep(3)
+        self.stdout.write("PDF should be downloaded")
+
+    def get_all_certificates(self, driver, start_time):
+        self.stdout.write("No id provided, downloading all certificates")
+
+        select_element = driver.find_element(By.ID, "ctl00_mainContentPlaceHolder_searchStatusDELocalizedDropDownList")
+        select = Select(select_element)
+
+        # Select only valid certificates and submit form
+        select.select_by_value("1")  # value="1"
+        driver.find_element(By.XPATH, '//*[@id="ctl00_mainContentPlaceHolder_SearchButton"]').click()
+
+        # Wait until results are loaded
+        time.sleep(18)
+
+        # Change the number of results per page to 100
+        pagination_100 = driver.find_element(
+            By.XPATH, '//*[@id="ctl00_mainContentPlaceHolder_PaginationControl_NumberOfPageResultsLarge"]'
+        )
+        pagination_100.click()
+
+        # Wait until results are loaded, again...
+        time.sleep(18)
+
+        # Get all certificates with 'valid_until' date > today
+        certificates = GenericCertificate.objects.filter(
+            certificate_type=GenericCertificate.REDCERT, valid_until__gte=time.strftime("%Y-%m-%d")
+        )
+
+        nb_pdf_downloaded = 0
+        nb_skipped = 0
+        nb_results = driver.find_element(By.ID, "ctl00_mainContentPlaceHolder_PaginationControl_TotalNumberOfResults").text
+        nb_results = nb_results.split()[0]
+        max_pages = int(nb_results) // 100 + 1
+        certificates_to_update = []
+
+        self.stdout.write(f"{max_pages} pages")
+
+        for page_number in range(1, max_pages):
+            if page_number > 1:
+                self.go_to_next_page(driver, page_number)
+
+            rows = driver.find_elements(By.CSS_SELECTOR, "tr")
+            rows = rows[1:]  # Remove the first row header
+
+            nb_pdf_downloaded, nb_skipped, certificates_to_udpate = self.download_certificates(
+                driver,
+                rows=rows,
+                certificates=certificates,
+                nb_pdf_downloaded=nb_pdf_downloaded,
+                nb_skipped=nb_skipped,
             )
-            search_box.send_keys(options["id"])
 
-            # And submit
-            search_box.send_keys(Keys.RETURN)
+            certificates_to_update.extend(certificates_to_udpate)
 
-            # Wait until results are loaded
-            time.sleep(5)
-            driver.save_screenshot("screenshot-form2.png")
+            self.stdout.write(f"Time spent: {time.time() - start_time:.2f} seconds")
+            self.stdout.write(f"Downloaded {nb_pdf_downloaded} pdfs")
+            self.stdout.write(f"Skipped {nb_skipped} pdfs")
 
-            # Click on input element with src="Images/Apps/documentAcrobat.svg"
-            dl_button = driver.find_element(
-                By.XPATH,
-                "//input[@type='image' and contains(@onclick, 'SelectedPDF$0')]",
-            )
+            if page_number % 10 == 0:
+                self.go_to_next_10(driver)
 
-            dl_button.click()
+        self.stdout.write(f"TOTAL Downloaded {nb_pdf_downloaded} pdfs")
+        self.stdout.write(f"TOTAL Skipped {nb_skipped} pdfs")
 
-            self.stdout.write("Click !")
-
-            # Wait for the pdf to be downloaded
-            time.sleep(3)
-            self.stdout.write("pdf should be downloaded")
-
-        else:
-            self.stdout.write("No id provided, downloading all certificates")
-
-            select_element = driver.find_element(By.ID, "ctl00_mainContentPlaceHolder_searchStatusDELocalizedDropDownList")
-            select = Select(select_element)
-
-            # Select only valid certificates
-            select.select_by_value("1")  # value="1"
-
-            # And submit form
-            driver.find_element(By.XPATH, '//*[@id="ctl00_mainContentPlaceHolder_SearchButton"]').click()
-
-            # Wait until results are loaded
-            time.sleep(18)
-            driver.save_screenshot("screenshot-form3.png")
-
-            # Get all certificates with 'valid_until' date > today
-            certificates = GenericCertificate.objects.filter(
-                certificate_type=GenericCertificate.REDCERT, valid_until__gte=time.strftime("%Y-%m-%d")
-            )
-
-            certificate_ids = [c.certificate_id for c in certificates]
-
-            pagination_100 = driver.find_element(
-                By.XPATH, '//*[@id="ctl00_mainContentPlaceHolder_PaginationControl_NumberOfPageResultsLarge"]'
-            )
-
-            pagination_100.click()
-
-            # Wait until results are loaded
-            time.sleep(18)
-            driver.save_screenshot("screenshot-form3.png")
-
-            nb_pdf_downloaded = 0
-            nb_skipped = 0
-            nb_results = driver.find_element(
-                By.ID, "ctl00_mainContentPlaceHolder_PaginationControl_TotalNumberOfResults"
-            ).text
-            nb_results = nb_results.split()[0]
-            max_pages = int(nb_results) // 100 + 1
-            self.stdout.write(f"{max_pages} pages")
-
-            for page_number in range(1, max_pages):
-                if page_number > 1:
-                    self.go_to_next_page(driver, page_number)
-
-                rows = driver.find_elements(By.CSS_SELECTOR, "tr")
-                # Remove the first row header
-                rows = rows[1:]
-
-                nb_pdf_downloaded, nb_skipped = self.download_certificates(
-                    driver,
-                    rows=rows,
-                    certificate_ids=certificate_ids,
-                    nb_pdf_downloaded=nb_pdf_downloaded,
-                    nb_skipped=nb_skipped,
-                )
-
-                self.stdout.write(f"Time spent: {time.time() - start_time:.2f} seconds")
-                self.stdout.write(f"Downloaded {nb_pdf_downloaded} pdfs")
-                self.stdout.write(f"Skipped {nb_skipped} pdfs")
-
-                if page_number % 10 == 0:
-                    self.go_to_next_10(driver)
-
-        self.stdout.write(f"Time spent: {time.time() - start_time:.2f} seconds")
-        self.stdout.write(f"Downloaded {nb_pdf_downloaded} pdfs")
-        self.stdout.write(f"Skipped {nb_skipped} pdfs")
-        driver.quit()
+        return certificates_to_update
 
     def download_certificates(self, driver, **kwargs):
+        certificates = kwargs["certificates"]
+        certificates_to_update = []
+
         for i, row in enumerate(kwargs["rows"]):
             cells = row.find_elements(By.TAG_NAME, "td")
             if len(cells) >= 3:
                 redcert_id = cells[2].text
                 self.stdout.write(f"{i+1}/{len(kwargs["rows"])}: {redcert_id}")
 
-                if redcert_id not in kwargs["certificate_ids"]:
+                if redcert_id not in certificates.values_list("certificate_id", flat=True):
                     self.stdout.write("Skipping certificate %s" % redcert_id)
                     kwargs["nb_skipped"] += 1
                     continue
 
                 try:
-                    dl_button = driver.find_element(
-                        By.XPATH,
-                        f"//input[@type='image' and contains(@onclick, 'SelectedPDF${i}')]",
-                    )
+                    dl_button = row.find_element(By.CLASS_NAME, "lastColumns").find_element(By.TAG_NAME, "input")
                     actions = ActionChains(driver)
                     actions.move_to_element(dl_button).click().perform()
 
-                    # Wait for the pdf to be downloaded
-                    time.sleep(2)
+                    new_name = f"certificate_{redcert_id}.pdf"
+                    self.wait_for_download_and_move(new_name)
+
+                    certificates_to_update.append(certificates.filter(certificate_id=redcert_id).first())
                     kwargs["nb_pdf_downloaded"] += 1
 
                 except NoSuchElementException:
                     self.stdout.write("No PDF found for certificate %s" % redcert_id)
                     kwargs["nb_skipped"] += 1
 
-        return kwargs["nb_pdf_downloaded"], kwargs["nb_skipped"]
+        return kwargs["nb_pdf_downloaded"], kwargs["nb_skipped"], certificates_to_update
+
+    def update_certificates(self, certificates_to_update):
+        self.stdout.write("Updating certificates download links...")
+        for certificate in certificates_to_update:
+            certificate.download_link = f"certificates/final/certificate_{certificate.certificate_id}.pdf"
+
+        GenericCertificate.objects.bulk_update(certificates_to_update, ["download_link"])
 
     def go_to_next_10(self, driver):
         self.stdout.write("--> Going to next ten")
@@ -207,8 +234,6 @@ class Command(BaseCommand):
     def create_driver(self):
         self.stdout.write("Creating new driver...")
 
-        download_dir = "/tmp/certificates"
-
         # Create ChromeOptions object
         options = uc.ChromeOptions()
         options.headless = True
@@ -220,7 +245,7 @@ class Command(BaseCommand):
         options.add_experimental_option(
             "prefs",
             {
-                "download.default_directory": download_dir,  # Définir le dossier de téléchargement
+                "download.default_directory": DOWNLOAD_DIR,  # Définir le dossier de téléchargement
                 "download.prompt_for_download": False,  # Désactiver les pop-ups de confirmation de téléchargement
                 "download.directory_upgrade": True,  # Mettre à jour le dossier de téléchargement si nécessaire
                 "plugins.always_open_pdf_externally": True,  # Ouvrir les fichiers PDF directement (ne pas les ouvrir dans Chrome)
@@ -230,3 +255,20 @@ class Command(BaseCommand):
         driver = uc.Chrome(options=options)
         self.stdout.write("Driver ready")
         return driver
+
+    def wait_for_download_and_move(self, new_name):
+        # Wait for the download to finish
+        while True:
+            crdownload_files = [f for f in os.listdir(DOWNLOAD_DIR) if f.endswith(".crdownload")]
+            pdf_files = [f for f in os.listdir(DOWNLOAD_DIR) if f.endswith(".pdf") or f.endswith(".PDF")]
+
+            # If there is a PDF file and no CRDOWNLOAD file, the download is finished
+            if pdf_files and not crdownload_files:
+                downloaded_file = os.path.join(DOWNLOAD_DIR, pdf_files[0])  # Take the first one
+                final_path = os.path.join(FINAL_DIR, new_name)
+
+                # Move and rename the file
+                shutil.move(downloaded_file, final_path)
+                break
+
+            time.sleep(0.3)
