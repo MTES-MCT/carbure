@@ -6,6 +6,7 @@ import {
   useMainNavigation,
 } from "./main-navigation.context"
 import { okUnauthorizedUser } from "carbure/__test__/api"
+import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const meta: Meta<typeof MainNavigation> = {
   component: MainNavigation,
@@ -32,6 +33,17 @@ export const PrivateLayout: Story = {
       return <Story />
     },
   ],
+  parameters: {
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { entityId: "3", year: "2024" },
+      },
+      routing: {
+        path: "/org/:entityId/transactions/:year/drafts",
+        handle: "Profile",
+      },
+    }),
+  },
   args: {
     children: (
       <>

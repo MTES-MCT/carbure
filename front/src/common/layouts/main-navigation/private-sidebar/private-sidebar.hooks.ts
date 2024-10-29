@@ -1,5 +1,8 @@
+import { fr } from "@codegouvfr/react-dsfr"
 import useEntity from "carbure/hooks/entity"
+import { SurveyLine } from "common/components/icon/icon"
 import { useRoutes } from "common/hooks/routes"
+import { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 type MenuItem = {
@@ -9,8 +12,9 @@ type MenuItem = {
 }
 
 type MenuSection = Omit<MenuItem, "children"> & {
-  icon: string
+  icon?: React.ElementType
   path: string
+  additionalInfo?: string | number
 }
 
 export const usePrivateSidebar = () => {
@@ -37,12 +41,13 @@ export const usePrivateSidebar = () => {
       {
         path: routes.BIOFUELS().DRAFT,
         title: t("Brouillons"),
-        icon: "",
+        icon: SurveyLine,
       },
       {
         path: routes.BIOFUELS().RECEIVED,
         title: t("Reçus"),
-        icon: "",
+        additionalInfo: "12",
+        icon: SurveyLine,
       },
     ],
   }

@@ -7,39 +7,48 @@
 import { fr } from "@codegouvfr/react-dsfr"
 import cl from "clsx"
 import styles from "./text.module.css"
-type TextProps = {
-  // The tag to use for the text
-  is?: React.ElementType
+
+type TextOwnProps<T extends React.ElementType> = {
+  // The HTML tag to use for the text
+  is?: T
 
   // The content of the text
   children: React.ReactNode
 
+  // The size of the text
   size?: "xs" | "sm" | "md" | "lg" | "xl"
 
+  // Additional CSS classes
   className?: string
-
   style?: React.CSSProperties
 
-  border?: boolean
+  // Add/remove the border bottom defined in the DSFR
+  margin?: boolean
 
   fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"
 }
-export const Text = ({
-  is = "p",
+
+type TextProps<T extends React.ElementType> = TextOwnProps<T> &
+  Omit<React.ComponentProps<T>, keyof TextOwnProps<T>>
+
+const defaultElement = "p"
+
+export const Text: <T extends React.ElementType = typeof defaultElement>(
+  props: TextProps<T>
+) => React.ReactElement | null = ({
+  is: TextTag = defaultElement,
   children,
   size = "md",
   className,
-  border = false,
+  margin = false,
   fontWeight = "regular",
   ...props
-}: TextProps) => {
-  const TextTag = is
-
+}) => {
   return (
     <TextTag
       className={cl(
         fr.cx(`fr-text--${size}`),
-        !border && styles.text,
+        !margin && styles.noMargin,
         fontWeight === "semibold"
           ? styles.semibold
           : fr.cx(`fr-text--${fontWeight}`),

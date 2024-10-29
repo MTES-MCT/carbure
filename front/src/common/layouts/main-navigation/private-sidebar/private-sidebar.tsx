@@ -2,6 +2,7 @@ import { Text } from "common/components/text"
 import { usePrivateSidebar } from "./private-sidebar.hooks"
 import styles from "./private-sidebar.module.css"
 import { NavLink } from "react-router-dom"
+import cl from "clsx"
 
 export const PrivateSidebar = () => {
   const menuItems = usePrivateSidebar()
@@ -12,7 +13,7 @@ export const PrivateSidebar = () => {
           style={{ border: "1px solid red", padding: "20px 0", width: "100%" }}
         ></div>
         <nav>
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <div key={item.title}>
               <Text
                 size="sm"
@@ -22,15 +23,31 @@ export const PrivateSidebar = () => {
                 {item.title}
               </Text>
               <div>
-                {item.children.map((child) => (
+                {item.children.map(({ icon: Icon, ...child }) => (
                   <NavLink
-                    key={child.title}
                     to={child.path}
-                    className={styles["nav-item-child"]}
+                    key={child.title}
+                    className={({ isActive }) =>
+                      cl(
+                        styles["nav-item-child"],
+                        isActive && styles["nav-item-child--active"]
+                      )
+                    }
                   >
-                    {/* <Text is={NavLink} fontWeight="semibold">
-                      {child.title}
-                    </Text> */}
+                    <div className={styles["nav-item-child-content"]}>
+                      {Icon && (
+                        <Icon className={styles["nav-item-child-icon"]} />
+                      )}
+                      <Text fontWeight="semibold">{child.title}</Text>
+                    </div>
+                    {child.additionalInfo && (
+                      <Text
+                        fontWeight="semibold"
+                        className={styles["nav-item-child-additional-info"]}
+                      >
+                        {child.additionalInfo}
+                      </Text>
+                    )}
                   </NavLink>
                 ))}
               </div>
