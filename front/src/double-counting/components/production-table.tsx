@@ -5,6 +5,8 @@ import { formatNumber, formatPercentage } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { DoubleCountingProduction, DoubleCountingSourcing } from "../types"
 import YearTable from "./year-table"
+import useEntity from "carbure/hooks/entity"
+import { compact } from "common/utils/collection"
 
 type ProductionTableProps = {
   hasAgreement?: boolean
@@ -23,8 +25,8 @@ export const ProductionTable = ({
   setQuotas,
 }: ProductionTableProps) => {
   const { t } = useTranslation()
-
-  const productionColumns: Column<DoubleCountingProduction>[] = [
+  const entity = useEntity()
+  const productionColumns: Column<DoubleCountingProduction>[] = compact([
     {
       header: t("Matière première"),
       cell: (p) => <Cell text={t(p.feedstock.code, { ns: "feedstocks" })} />,
@@ -41,7 +43,7 @@ export const ProductionTable = ({
       header: t("Prod. estimée"),
       cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
     },
-    {
+    entity.isAdmin && {
       header: t("Rendement estimé"),
       cell: (p) => {
         // Find sources related to the production
@@ -73,7 +75,7 @@ export const ProductionTable = ({
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
     },
-  ]
+  ])
 
   if (hasAgreement) {
     productionColumns?.push({
