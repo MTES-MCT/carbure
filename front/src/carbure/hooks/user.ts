@@ -44,7 +44,6 @@ export function useUserManager(): UserManager {
   }
 
   function isAuthenticated() {
-    console.log(settings.result, settings.error)
     return settings.result !== undefined && settings.error === undefined
   }
 
