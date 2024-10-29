@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  "/api/entity/{company_id}/enable/": {
+  "/api/entities/{company_id}/enable/": {
     parameters: {
       query?: never
       header?: never
@@ -13,7 +13,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["entity_enable_create"]
+    post: operations["entities_enable_create"]
     delete?: never
     options?: never
     head?: never
@@ -816,7 +816,7 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  entity_enable_create: {
+  entities_enable_create: {
     parameters: {
       query: {
         /** @description The id of the admin entity enabling the company */

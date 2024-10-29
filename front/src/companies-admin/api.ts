@@ -122,7 +122,7 @@ export function rejectEntityCertificate(
 }
 
 export function enableCompany(entity_id: number, company_id: number) {
-  return apiFetch.POST("/entity/{company_id}/enable/", {
+  return apiFetch.POST("/entities/{company_id}/enable/", {
     params: {
       path: { company_id },
       query: { entity_id },
