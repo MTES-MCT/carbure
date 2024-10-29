@@ -40,6 +40,8 @@ python-docx = "*"
 django-filter = "*"
 drf-spectacular = "*"
 drf-nested-routers = "*"
+undetected-chromedriver = "*"
+setuptools = "*"
 
 [dev-packages]
 django-stubs = "*"
