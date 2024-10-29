@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { ChevronLeft } from "common/components/icons"
+import { AlertCircle, Check, ChevronLeft } from "common/components/icons"
 import { Button } from "common/components/button"
 import UserRights from "../components/user-rights"
 import * as api from "../api"
@@ -7,13 +7,14 @@ import DeliverySitesSettings from "settings/components/delivery-site/delivery-si
 import ProductionSitesSettings from "settings/components/production-site"
 import { EntityType } from "carbure/types"
 import Certificates from "companies-admin/components/certificates"
-import { Main, Row } from "common/components/scaffold"
+import { Col, Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
+import Alert from "common/components/alert"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ const EntityDetails = () => {
   }
 
   const entityData = company.result?.data.data
+  const isEnabled = Boolean(entityData?.is_enabled)
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
 
@@ -68,8 +70,35 @@ const EntityDetails = () => {
       />
 
       <section>
-        <UserRights />
-        {entityData && <CompanyInfo company={entityData} key={entityData.id} />}
+        {!isEnabled && (
+          <Alert variant="warning" icon={AlertCircle} label={t("Attention")}>
+            <Col
+              style={{ gap: "var(--spacing-m)", padding: "var(--spacing-m) 0" }}
+            >
+              <h1>{t("Cette société n'est pas encore autorisée")}</h1>
+              <p>
+                {t(
+                  "Si les informations ci-dessous vous semblent correctes, vous pouvez autoriser cette société en cliquant sur le bouton suivant :"
+                )}
+              </p>
+              <Button
+                variant="success"
+                icon={<Check color="var(--green-dark)" />}
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: "var(--spacing-s)",
+                }}
+              >
+                {t("Autoriser la société")}
+              </Button>
+            </Col>
+          </Alert>
+        )}
+
+        <UserRights readOnly={!isEnabled} />
+        {entityData && (
+          <CompanyInfo readOnly company={entityData} key={entityData.id} />
+        )}
         {entityData && !isAirline && (
           <DeliverySitesSettings
             readOnly
@@ -86,7 +115,9 @@ const EntityDetails = () => {
             }
           />
         )}
-        {!isAirline && <Certificates entity_id={companyId} />}
+        {!isAirline && (
+          <Certificates readOnly={!isEnabled} entity_id={companyId} />
+        )}
       </section>
     </Main>
   )
