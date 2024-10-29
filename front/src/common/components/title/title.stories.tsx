@@ -46,10 +46,10 @@ export const OverridesWithStyle: Story = {
   },
 }
 
-export const WithBorder: Story = {
+export const Withmargin: Story = {
   args: {
     is: "h1",
     children: "This is a default text",
-    border: true,
+    margin: true,
   },
 }

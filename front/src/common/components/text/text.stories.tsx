@@ -30,6 +30,6 @@ export const AllVariants: Story = {
 export const WithBorder: Story = {
   args: {
     children: "This is a default text",
-    border: true,
+    margin: true,
   },
 }
