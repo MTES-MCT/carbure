@@ -4,7 +4,7 @@ from .home_stats import get_home_stats
 urlpatterns = [
     path("auth/", include("auth.api")),
     path("double-counting/", include("doublecount.api")),
-    path("entity/", include("entity.api")),
+    path("entity/", include("entity.urls")),
     path("saf/", include("saf.urls")),
     path("resources/", include("resources.api")),
     path("transactions/", include("transactions.api")),

@@ -78,6 +78,9 @@ class HasAdminRights(BaseEntityPermission):
         self.role = role
         self.allow_external = allow_external
 
+    def __call__(self):
+        return self
+
     def has_permission(self, request, view):
         entity = self.get_entity(request)
         if entity is None or entity.entity_type not in [
