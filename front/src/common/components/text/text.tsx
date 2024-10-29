@@ -21,6 +21,8 @@ type TextProps = {
   style?: React.CSSProperties
 
   border?: boolean
+
+  fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"
 }
 export const Text = ({
   is = "p",
@@ -28,6 +30,7 @@ export const Text = ({
   size = "md",
   className,
   border = false,
+  fontWeight = "regular",
   ...props
 }: TextProps) => {
   const TextTag = is
@@ -37,6 +40,9 @@ export const Text = ({
       className={cl(
         fr.cx(`fr-text--${size}`),
         !border && styles.text,
+        fontWeight === "semibold"
+          ? styles.semibold
+          : fr.cx(`fr-text--${fontWeight}`),
         className
       )}
       {...props}
