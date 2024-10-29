@@ -105,3 +105,7 @@ class HasAdminRights(BaseEntityPermission):
             except ExternalAdminRights.DoesNotExist:
                 return False
 
+        if isinstance(self.role, list) and rights.role not in self.role:
+            return False
+
+        return True
