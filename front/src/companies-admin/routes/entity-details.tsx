@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next"
 import { useNavigate, useParams } from "react-router-dom"
-import { AlertCircle, Check, ChevronLeft } from "common/components/icons"
+import { ChevronLeft } from "common/components/icons"
 import { Button } from "common/components/button"
 import UserRights from "../components/user-rights"
 import * as api from "../api"
@@ -7,14 +8,13 @@ import DeliverySitesSettings from "settings/components/delivery-site/delivery-si
 import ProductionSitesSettings from "settings/components/production-site"
 import { EntityType } from "carbure/types"
 import Certificates from "companies-admin/components/certificates"
-import { Col, Main, Row } from "common/components/scaffold"
+import { Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
-import { useTranslation } from "react-i18next"
-import Alert from "common/components/alert"
+import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -26,10 +26,6 @@ const EntityDetails = () => {
   const company = useQuery(api.getCompanyDetails, {
     key: "entity-details",
     params: [entity.id, companyId],
-  })
-
-  const enableCompany = useMutation(api.enableCompany, {
-    invalidates: ["entity-details"],
   })
 
   const getDepots = (company_id: number) => {
@@ -74,31 +70,8 @@ const EntityDetails = () => {
       />
 
       <section>
-        {!isEnabled && (
-          <Alert variant="warning" icon={AlertCircle} label={t("Attention")}>
-            <Col
-              style={{ gap: "var(--spacing-m)", padding: "var(--spacing-m) 0" }}
-            >
-              <h1>{t("Cette société n'est pas encore autorisée")}</h1>
-              <p>
-                {t(
-                  "Si les informations ci-dessous vous semblent correctes, vous pouvez autoriser cette société en cliquant sur le bouton suivant :"
-                )}
-              </p>
-              <Button
-                variant="success"
-                icon={<Check color="var(--green-dark)" />}
-                loading={enableCompany.loading}
-                action={() => enableCompany.execute(entity.id, companyId)}
-                style={{
-                  alignSelf: "flex-start",
-                  marginTop: "var(--spacing-s)",
-                }}
-              >
-                {t("Autoriser la société")}
-              </Button>
-            </Col>
-          </Alert>
+        {!isEnabled && entityData && (
+          <AuthorizeEntityBanner company={entityData} />
         )}
 
         <UserRights readOnly={!isEnabled} />
