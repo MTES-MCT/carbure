@@ -8,7 +8,9 @@ import { getNeighborsInfos } from "./navigation.utils"
  * @returns An array containing all ids
  */
 const mapToNeighbors = (map: Map<number, number[]>) =>
-  [...map.entries()].sort((a, b) => a[0] - b[0]).flatMap(([, values]) => values)
+  Array.from(map.entries())
+    .sort((a, b) => a[0] - b[0])
+    .reduce((acc, [, values]) => acc.concat(values), [] as number[])
 
 /**
  * Return an array of booleans to know if the current id has next/previous id
@@ -38,7 +40,18 @@ export function useNavigation(
     hasPrevCurrentPage,
     hasNextCurrentPage,
   } = getNeighborsInfos(idsMap, current, currentPage, pageCount)
-
+  console.log("infos 1", {
+    idsMap,
+    current,
+    currentPage,
+    pageCount,
+    neighbors,
+    index,
+    isOut,
+    hasPrev,
+    hasNext,
+    res: JSON.stringify(idsMap.entries()),
+  })
   const prev = useCallback(() => {
     if (hasPrev && neighbors[index - 1]) {
       const searchParams = new URLSearchParams(location.search)
@@ -62,7 +75,12 @@ export function useNavigation(
   const next = useCallback(() => {
     const searchParams = new URLSearchParams(location.search)
     const searchParamPage = parseInt(searchParams.get("page") ?? "1")
-
+    console.log("infos 2", {
+      searchParams,
+      searchParamPage,
+      neighbors,
+      isOut,
+    })
     if (isOut && neighbors[0]) {
       // Remove page param to restart page
       searchParams.delete("page")

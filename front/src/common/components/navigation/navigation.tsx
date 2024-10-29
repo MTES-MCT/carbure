@@ -82,11 +82,12 @@ const NavigationButtons = ({
     const items = await fetchIdsForPage(page)
 
     if (items && !idsMap.has(page)) {
-      setIdsMap(idsMap.set(page, getItemsIds(items)))
+      setIdsMap(new Map(idsMap.set(page, getItemsIds(items))))
     }
 
     return items
   }
+  console.log("valeur de id map", JSON.stringify(idsMap.entries()))
 
   const { loading } = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
