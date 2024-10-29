@@ -4,4 +4,15 @@ export const ROUTE_URLS = {
   // Company detail page when the entity is admin
   ADMIN_COMPANY_DETAIL: (entity_id: number, company_id: number) =>
     `/org/${entity_id}/entities/${company_id}`,
+
+  BIOFUELS: (entity_id: number, year: number) => {
+    const baseUrl = `/org/${entity_id}/transactions/${year}`
+
+    return {
+      DRAFT: `${baseUrl}/drafts`,
+      RECEIVED: `${baseUrl}/in`,
+      STOCKS: `${baseUrl}/stocks`,
+      SENDED: `${baseUrl}/out`,
+    }
+  },
 }
