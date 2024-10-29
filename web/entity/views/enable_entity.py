@@ -1,4 +1,3 @@
-from django.db.models import Q
 from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiTypes,
@@ -36,9 +35,11 @@ from saf.serializers.schema import ErrorResponseSerializer
     responses={200: OpenApiTypes.ANY, 400: ErrorResponseSerializer},
 )
 @api_view(["POST"])
-@permission_classes([IsAuthenticated, HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])])
+@permission_classes(
+    [IsAuthenticated, HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])]
+)
 def enable_entity(request, company_id):
-    entity_id = request.query_params.get('entity_id')
+    entity_id = request.query_params.get("entity_id")
 
     admin_entity = Entity.objects.get(pk=entity_id)
     administrated_entities = get_administrated_entities(admin_entity)
