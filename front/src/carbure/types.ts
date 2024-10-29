@@ -31,6 +31,7 @@ export interface Entity {
   activity_description?: string
   website?: string
   vat_number?: string
+  is_enabled?: boolean
 }
 
 export interface EntityPreview {
