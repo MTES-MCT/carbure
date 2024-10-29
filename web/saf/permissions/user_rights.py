@@ -70,6 +70,14 @@ class HasUserRights(BaseEntityPermission):
 
 
 class HasAdminRights(BaseEntityPermission):
+    allow_external = None
+    role = None
+
+    def __init__(self, allow_external=None, role=None):
+        super().__init__()
+        self.role = role
+        self.allow_external = allow_external
+
     def has_permission(self, request, view):
         entity = self.get_entity(request)
         if entity is None or entity.entity_type not in [
@@ -82,8 +90,8 @@ class HasAdminRights(BaseEntityPermission):
         if rights is None:
             return False
 
-        is_admin_only = getattr(view, "is_admin_only", False)
-        allow_external = getattr(view, "allow_external", [])
+        allow_external = self.allow_external if isinstance(self.allow_external, list) else []
+        is_admin_only = len(self.allow_external) == 0
 
         if is_admin_only:
             if entity.entity_type != Entity.ADMIN or not request.user.is_staff:
@@ -94,5 +102,3 @@ class HasAdminRights(BaseEntityPermission):
             except ExternalAdminRights.DoesNotExist:
                 return False
 
-        request.entity = entity
-        return True
