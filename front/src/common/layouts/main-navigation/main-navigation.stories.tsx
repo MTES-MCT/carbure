@@ -7,6 +7,8 @@ import {
 } from "./main-navigation.context"
 import { okUnauthorizedUser } from "carbure/__test__/api"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
+import { EntityType } from "carbure/types"
+import { mockUser } from "carbure/__test__/helpers"
 
 const meta: Meta<typeof MainNavigation> = {
   component: MainNavigation,
@@ -43,16 +45,60 @@ export const PrivateLayout: Story = {
       </>
     ),
   },
+  // parameters: {
+  //   reactRouter: reactRouterParameters({
+  //     location: {
+  //       pathParams: { entityId: "3", year: "2024" },
+  //     },
+  //     routing: {
+  //       path: "/org/:entityId/transactions/:year/in",
+  //       handle: "Profile",
+  //     },
+  //   }),
+  // },
+}
+
+export const OperatorLayout: Story = {
+  ...PrivateLayout,
   parameters: {
-    reactRouter: reactRouterParameters({
-      location: {
-        pathParams: { entityId: "3", year: "2024" },
-      },
-      routing: {
-        path: "/org/:entityId/transactions/:year/in",
-        handle: "Profile",
-      },
-    }),
+    msw: {
+      handlers: [
+        mockUser(EntityType.Operator, {
+          right: {
+            entity: {
+              has_elec: true,
+              has_saf: true,
+            },
+          },
+        }),
+      ],
+    },
+  },
+}
+
+export const ProducerLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [mockUser(EntityType.Producer)],
+    },
+  },
+}
+export const TraderLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [mockUser(EntityType.Trader)],
+    },
+  },
+}
+
+export const AirlineLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [mockUser(EntityType.Airline)],
+    },
   },
 }
 
