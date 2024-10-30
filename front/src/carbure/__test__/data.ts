@@ -13,6 +13,7 @@ import {
   UserRight,
   Feedstock,
 } from "carbure/types"
+import { DeepPartial } from "common/types"
 import { mergeDeepRight } from "ramda"
 
 // COUNTRIES
@@ -193,6 +194,27 @@ export const cpo: Entity = {
   ext_admin_pages: [],
 }
 
+export const airline: Entity = {
+  id: 5,
+  name: "Airline Test",
+  entity_type: EntityType.Airline,
+  has_mac: false,
+  has_trading: false,
+  has_stocks: false,
+  has_elec: false,
+  has_direct_deliveries: false,
+  default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registered_country: country,
+  registered_zipcode: "",
+  registered_city: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
+  preferred_unit: PreferredUnitEnum.l,
+}
+
 // DELIVERY SITES
 
 export const deliverySite: Depot = {
@@ -282,17 +304,14 @@ export const entities = {
   [EntityType.Operator]: operator,
   [EntityType.Trader]: trader,
   [EntityType.Producer]: producer,
+  [EntityType.Airline]: airline,
 }
 
-type PartialUserParam = Partial<{
+type PartialUserParam = DeepPartial<{
   email: User["email"]
-  request: Exclude<User["requests"][0], "entity">
-  right: Exclude<User["rights"][0], "entity">
+  request: User["requests"][0]
+  right: User["rights"][0]
 }>
-type GenerateUserParams = (
-  entityType: keyof typeof entities,
-  partialUser?: PartialUserParam
-) => User
 
 /**
  * This function simplifies the way we mock a user attaching to an entity
@@ -300,28 +319,31 @@ type GenerateUserParams = (
  * @param partialUser Additional informations to overrides default user
  * @returns
  */
-export const generateUser: GenerateUserParams = (entityType, partialUser) => {
+export const generateUser = (
+  entityType: keyof typeof entities,
+  partialUser?: PartialUserParam
+) => {
   const currentEntity = entities[entityType]
-  return mergeDeepRight<User, PartialUserParam>(
-    {
-      email: "user@company.com",
-      requests: [
+
+  return {
+    email: partialUser?.email ?? "user@company.com",
+    requests: [
+      mergeDeepRight(
         {
           ...entityRequest,
           entity: currentEntity,
         },
-      ],
-      rights: [
+        partialUser?.request ?? {}
+      ),
+    ],
+    rights: [
+      mergeDeepRight(
         {
           ...entityRight,
           entity: currentEntity,
         },
-      ],
-    },
-    {
-      ...(partialUser?.email ? { email: partialUser.email } : {}),
-      ...(partialUser?.request ? { requests: [partialUser.request] } : {}),
-      ...(partialUser?.right ? { rights: [partialUser.right] } : {}),
-    }
-  )
+        partialUser?.right ?? {}
+      ),
+    ],
+  }
 }

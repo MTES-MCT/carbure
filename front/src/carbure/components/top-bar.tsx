@@ -118,61 +118,61 @@ const Navigation = ({ entity }: NavigationProps) => {
             tabs={compact([
               isAdmin && {
                 key: "dashboard",
-                path: "dashboard",
+                path: "dashboard", // pas encore migré
                 label: t("Accueil"),
               },
 
               (isAdmin || isAuditor) && {
                 key: "controls",
-                path: "controls",
+                path: "controls", // pas encore migré
                 label: t("Biocarburants"),
               },
 
               isAuditor && {
                 key: "elec-audit",
-                path: "elec-audit",
+                path: "elec-audit", // pas encore migré
                 label: t("Elec"),
               },
 
               (isIndustry || isPowerOrHeatProducer) && {
                 key: "transactions",
-                path: "transactions",
+                path: "transactions", // ok
                 label: t("Transactions"),
               },
 
               ((has_saf && isOperator) || isAirline) && {
                 key: "saf",
-                path: "saf",
+                path: "saf", // ok
                 label: t("Aviation"),
               },
 
               ((has_elec && isOperator) || isCPO) && {
                 key: "elec",
-                path: "elec",
+                path: "elec", // ok
                 label: t("Électricité"),
               },
 
               isCPO && {
                 key: "charge-points",
-                path: "charge-points",
+                path: "charge-points", // ok
                 label: t("PDC"),
               },
 
               (isAdmin || entity.hasAdminRight("ELEC")) && {
                 key: "elec-admin",
-                path: "elec-admin",
+                path: "elec-admin", // pas encore migré
                 label: t("Électricité"),
               },
 
               (isAdmin || entity.hasAdminRight("ELEC")) && {
                 key: "elec-admin-audit",
-                path: "elec-admin-audit",
+                path: "elec-admin-audit", // pas encore migré
                 label: t("PDC"),
               },
 
               (isOperator || isProducer) && {
                 key: "stats",
-                path: "stats",
+                path: "stats", // pas encore migré
                 label: t("Statistiques"),
               },
 
@@ -181,25 +181,25 @@ const Navigation = ({ entity }: NavigationProps) => {
                 entity.hasAdminRight("ELEC") ||
                 entity.hasAdminRight("DCA")) && {
                 key: "entities",
-                path: "entities",
+                path: "entities", // pas encore migré
                 label: t("Sociétés"),
               },
 
               (isAdmin || entity.hasAdminRight("DCA")) && {
                 key: "double-counting",
-                path: "double-counting",
+                path: "double-counting", // pas encore migré
                 label: t("Double comptage"),
               },
 
               entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && {
                 key: "settings",
-                path: "settings",
+                path: "settings", // pas encore migré
                 label: t("Société"),
               },
 
               (isIndustry || isPowerOrHeatProducer) && {
                 key: "registry",
-                path: "registry",
+                path: "registry", // pas encore migré
                 label: t("Annuaire"),
               },
             ])}
