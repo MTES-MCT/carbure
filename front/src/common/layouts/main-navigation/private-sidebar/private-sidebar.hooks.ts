@@ -41,8 +41,7 @@ export const usePrivateSidebar = () => {
 
   const biofuels: MenuSection = {
     title: t("Lot de biocarburants"),
-    // condition: isIndustry || isPowerOrHeatProducer,
-    condition: true,
+    condition: isIndustry || isPowerOrHeatProducer,
     children: [
       {
         path: routes.BIOFUELS().DRAFT,
@@ -75,30 +74,33 @@ export const usePrivateSidebar = () => {
 
   const elec: MenuSection = {
     title: t("Certificats d'électricité"),
-    condition: true,
+    condition: (has_elec && isOperator) || isCPO,
     children: [
       {
         path: routes.ELEC().CERTIFICATES,
         title: t("Certificats"),
         icon: FileTextLine,
         iconActive: FileTextFill,
+        condition: has_elec && isOperator,
       },
       {
         path: routes.ELEC().PROVISIONNED_ENERGY,
         title: t("Énergie disponible"),
         icon: ArrowGoBackLine,
+        condition: isCPO,
       },
       {
         path: routes.ELEC().TRANSFERRED_ENERGY,
         title: t("Énergie cédée"),
         icon: ArrowGoForwardLine,
+        condition: isCPO,
       },
     ],
   }
 
   const chargePoints: MenuSection = {
     title: t("Point de recharge"),
-    condition: true,
+    condition: isCPO,
     children: [
       {
         path: routes.ELEC().CHARGE_POINTS.PENDING,
@@ -123,33 +125,51 @@ export const usePrivateSidebar = () => {
 
   const saf: MenuSection = {
     title: t("Aviation"),
-    condition: true,
+    condition: (has_saf && isOperator) || isAirline,
     children: [
       {
         path: routes.SAF().TICKET_SOURCES,
         title: t("Volumes SAF"),
         icon: ContrastDropLine,
         iconActive: ContrastDropFill,
+        condition: has_saf && isOperator,
       },
       {
-        path: routes.SAF().TICKETS_AFFECTED,
+        path: routes.SAF().TICKETS,
         title: t("Tickets affectés"),
         icon: ArrowGoForwardLine,
+        condition: has_saf && isOperator,
       },
       {
         path: routes.SAF().TICKETS_RECEIVED,
         title: t("Tickets reçus"),
         icon: ArrowGoBackLine,
+        condition: has_saf && isOperator,
+      },
+      {
+        path: routes.SAF().TICKETS_PENDING,
+        title: t("Tickets en attente"),
+        icon: ArrowGoBackLine,
+        condition: isAirline,
+      },
+      {
+        path: routes.SAF().TICKETS_ACCEPTED,
+        title: t("Tickets acceptés"),
+        icon: ArrowGoForwardLine,
+        condition: isAirline,
       },
     ],
   }
 
-  return [biofuels, elec, chargePoints, saf].filter((category) =>
-    category.condition
-      ? {
-          ...category,
-          children: category.children.filter((child) => child.condition),
-        }
-      : category
-  )
+  return [biofuels, elec, chargePoints, saf]
+    .filter(
+      (category) =>
+        category.condition === undefined || category.condition === true
+    )
+    .map((category) => ({
+      ...category,
+      children: category.children.filter(
+        (child) => child.condition === undefined || child.condition === true
+      ),
+    }))
 }
