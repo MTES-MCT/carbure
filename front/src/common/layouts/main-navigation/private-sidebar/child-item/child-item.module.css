@@ -13,7 +13,7 @@
 
 .nav-item-child-content {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--spacing-1w);
   color: var(--grey-50-1000);
 }
