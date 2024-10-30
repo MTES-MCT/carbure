@@ -1,0 +1,36 @@
+.nav-item-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-image: none;
+  padding: var(--spacing-1w);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.nav-item-child[href]:hover {
+  background-color: var(--background-alt-blue-france);
+}
+
+.nav-item-child-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1w);
+  color: var(--grey-50-1000);
+}
+
+.nav-item-child-icon {
+  color: var(--text-title-gray);
+}
+
+.nav-item-child--active {
+  background-color: var(--background-alt-blue-france);
+  color: var(--text-default-info);
+}
+.nav-item-child--active .nav-item-child-icon,
+.nav-item-child--active .nav-item-child-content {
+  color: var(--text-default-info);
+}
+
+.nav-item-child-additional-info {
+  color: var(--grey-425-625);
+}

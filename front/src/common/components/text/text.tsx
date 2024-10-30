@@ -28,8 +28,11 @@ type TextOwnProps<T extends React.ElementType> = {
   fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"
 }
 
+// Make mandatory the componentProps property if there are mandatory props for the generic component
 type TextProps<T extends React.ElementType> = TextOwnProps<T> &
-  Omit<React.ComponentProps<T>, keyof TextOwnProps<T>>
+  (object extends React.ComponentProps<T>
+    ? { componentProps?: React.ComponentProps<T> }
+    : { componentProps: React.ComponentProps<T> })
 
 const defaultElement = "p"
 
@@ -42,17 +45,20 @@ export const Text: <T extends React.ElementType = typeof defaultElement>(
   className,
   margin = false,
   fontWeight = "regular",
+  componentProps,
   ...props
 }) => {
   return (
     <TextTag
+      {...componentProps}
       className={cl(
         fr.cx(`fr-text--${size}`),
         !margin && styles.noMargin,
         fontWeight === "semibold"
           ? styles.semibold
           : fr.cx(`fr-text--${fontWeight}`),
-        className
+        className,
+        componentProps?.className
       )}
       {...props}
     >
