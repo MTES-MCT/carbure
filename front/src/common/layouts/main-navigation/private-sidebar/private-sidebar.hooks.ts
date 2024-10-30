@@ -2,6 +2,10 @@ import useEntity from "carbure/hooks/entity"
 import {
   ArrowGoBackLine,
   ArrowGoForwardLine,
+  BuildingFill,
+  BuildingLine,
+  CalendarCheckFill,
+  CalendarCheckLine,
   ContrastDropFill,
   ContrastDropLine,
   FileTextFill,
@@ -74,10 +78,45 @@ export const usePrivateSidebar = () => {
     condition: true,
     children: [
       {
-        path: routes.ELEC_CERTIFICATES,
+        path: routes.ELEC().CERTIFICATES,
         title: t("Certificats"),
         icon: FileTextLine,
         iconActive: FileTextFill,
+      },
+      {
+        path: routes.ELEC().PROVISIONNED_ENERGY,
+        title: t("Énergie disponible"),
+        icon: ArrowGoBackLine,
+      },
+      {
+        path: routes.ELEC().TRANSFERRED_ENERGY,
+        title: t("Énergie cédée"),
+        icon: ArrowGoForwardLine,
+      },
+    ],
+  }
+
+  const chargePoints: MenuSection = {
+    title: t("Point de recharge"),
+    condition: true,
+    children: [
+      {
+        path: routes.ELEC().CHARGE_POINTS.PENDING,
+        title: t("Inscription"),
+        icon: FileTextLine,
+        iconActive: FileTextFill,
+      },
+      {
+        path: routes.ELEC().CHARGE_POINTS.METER_READINGS,
+        title: t("Relevés trimestriels"),
+        icon: CalendarCheckLine,
+        iconActive: CalendarCheckFill,
+      },
+      {
+        path: routes.ELEC().CHARGE_POINTS.LIST,
+        title: t("Point de recharge"),
+        icon: BuildingLine,
+        iconActive: BuildingFill,
       },
     ],
   }
@@ -105,7 +144,7 @@ export const usePrivateSidebar = () => {
     ],
   }
 
-  return [biofuels, elec, saf].filter((category) =>
+  return [biofuels, elec, chargePoints, saf].filter((category) =>
     category.condition
       ? {
           ...category,

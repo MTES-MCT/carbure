@@ -124,3 +124,33 @@ export const SettingsFill = ({ className, ...props }: IconProps) => {
     <Icon {...props} className={cl(fr.cx("ri-settings-3-line"), className)} />
   )
 }
+
+export const CalendarCheckLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon
+      {...props}
+      className={cl(fr.cx("ri-calendar-check-line"), className)}
+    />
+  )
+}
+
+export const CalendarCheckFill = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon
+      {...props}
+      className={cl(fr.cx("ri-calendar-check-fill"), className)}
+    />
+  )
+}
+
+export const BuildingLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-building-4-line"), className)} />
+  )
+}
+
+export const BuildingFill = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-building-4-fill"), className)} />
+  )
+}
