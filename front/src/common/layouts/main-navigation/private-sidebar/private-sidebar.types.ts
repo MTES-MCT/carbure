@@ -6,6 +6,8 @@ export type MenuSection = {
 
 export type MenuItem = Omit<MenuSection, "children"> & {
   icon?: React.ElementType
+  iconActive?: React.ElementType
   path: string
   additionalInfo?: string | number
+  target?: string
 }
