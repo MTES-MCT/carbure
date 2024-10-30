@@ -8,16 +8,15 @@ export const useRoutes = () => {
   const entity = useEntity()
   const currentYear = new Date().getFullYear()
 
-  const routes: {
-    [K in keyof typeof ROUTE_URLS]: (
-      ...args: any[]
-    ) => ReturnType<(typeof ROUTE_URLS)[K]>
-  } = {
+  const routes = {
     ...ROUTE_URLS,
     ADMIN_COMPANY_DETAIL: (company_id: number) =>
       ROUTE_URLS.ADMIN_COMPANY_DETAIL(entity.id, company_id),
     BIOFUELS: (year: number = currentYear) =>
       ROUTE_URLS.BIOFUELS(entity.id, year),
+    ELEC_CERTIFICATES: ROUTE_URLS.ELEC_CERTIFICATES(entity.id),
+    SAF: (year: number = currentYear) => ROUTE_URLS.SAF(entity.id, year),
+    SETTINGS: ROUTE_URLS.SETTINGS(entity.id),
   }
 
   return routes

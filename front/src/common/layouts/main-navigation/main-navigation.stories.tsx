@@ -33,17 +33,6 @@ export const PrivateLayout: Story = {
       return <Story />
     },
   ],
-  parameters: {
-    reactRouter: reactRouterParameters({
-      location: {
-        pathParams: { entityId: "3", year: "2024" },
-      },
-      routing: {
-        path: "/org/:entityId/transactions/:year/drafts",
-        handle: "Profile",
-      },
-    }),
-  },
   args: {
     children: (
       <>
@@ -53,6 +42,17 @@ export const PrivateLayout: Story = {
         <div style={{ background: "blue", height: "500px" }}>other content</div>
       </>
     ),
+  },
+  parameters: {
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { entityId: "3", year: "2024" },
+      },
+      routing: {
+        path: "/org/:entityId/transactions/:year/in",
+        handle: "Profile",
+      },
+    }),
   },
 }
 
