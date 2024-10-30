@@ -14,7 +14,7 @@ export const useRoutes = () => {
       ROUTE_URLS.ADMIN_COMPANY_DETAIL(entity.id, company_id),
     BIOFUELS: (year: number = currentYear) =>
       ROUTE_URLS.BIOFUELS(entity.id, year),
-    ELEC_CERTIFICATES: ROUTE_URLS.ELEC_CERTIFICATES(entity.id),
+    ELEC: (year: number = currentYear) => ROUTE_URLS.ELEC(entity.id, year),
     SAF: (year: number = currentYear) => ROUTE_URLS.SAF(entity.id, year),
     SETTINGS: ROUTE_URLS.SETTINGS(entity.id),
   }
