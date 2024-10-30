@@ -38,8 +38,10 @@ export const ROUTE_URLS = {
 
     return {
       TICKET_SOURCES: `${baseUrl}/ticket-sources`,
-      TICKETS_RECEIVED: `${baseUrl}/received`,
-      TICKETS_AFFECTED: `${baseUrl}/affected`,
+      TICKETS_RECEIVED: `${baseUrl}/tickets-received`,
+      TICKETS: `${baseUrl}/tickets`,
+      TICKETS_PENDING: `${baseUrl}/tickets/pending`,
+      TICKETS_ACCEPTED: `${baseUrl}/tickets/accepted`,
     }
   },
 
