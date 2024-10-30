@@ -15,12 +15,14 @@ export const MainNavigation = ({ children }: PropsWithChildren) => {
     <div>
       <header className={styles.header}>
         <div className={styles["header-left"]}>
-          <Text is="h2" size="xl">
+          <Text is="h2" size="xl" fontWeight="bold">
             Carbure
           </Text>
         </div>
         <div className={styles["header-right"]}>
-          <Text is="h1">{title}</Text>
+          <Text is="h1" fontWeight="bold">
+            {title}
+          </Text>
         </div>
       </header>
       <div className={styles["body"]}>
