@@ -19,8 +19,20 @@ export const ROUTE_URLS = {
     }
   },
 
-  ELEC_CERTIFICATES: (entity_id: number) => urlWithOrgId(entity_id, "/elec"),
+  ELEC: (entity_id: number, year: number) => {
+    const baseUrl = urlWithOrgId(entity_id, `/elec/${year}`)
 
+    return {
+      CERTIFICATES: `${baseUrl}/certificates`,
+      PROVISIONNED_ENERGY: `${baseUrl}/provisioned`,
+      TRANSFERRED_ENERGY: `${baseUrl}/transferred`,
+      CHARGE_POINTS: {
+        PENDING: `${baseUrl}/charge-points/pending`,
+        METER_READINGS: `${baseUrl}/charge-points/meter-readings`,
+        LIST: `${baseUrl}/charge-points/list`,
+      },
+    }
+  },
   SAF: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/saf/${year}`)
 
