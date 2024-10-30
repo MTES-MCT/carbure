@@ -1,8 +1,7 @@
 import { Text } from "common/components/text"
 import { usePrivateSidebar } from "./private-sidebar.hooks"
 import styles from "./private-sidebar.module.css"
-import { NavLink } from "react-router-dom"
-import cl from "clsx"
+import { ChildItem } from "./child-item"
 
 export const PrivateSidebar = () => {
   const menuItems = usePrivateSidebar()
@@ -22,33 +21,9 @@ export const PrivateSidebar = () => {
               >
                 {item.title}
               </Text>
-              <div>
-                {item.children.map(({ icon: Icon, ...child }) => (
-                  <NavLink
-                    to={child.path}
-                    key={child.title}
-                    className={({ isActive }) =>
-                      cl(
-                        styles["nav-item-child"],
-                        isActive && styles["nav-item-child--active"]
-                      )
-                    }
-                  >
-                    <div className={styles["nav-item-child-content"]}>
-                      {Icon && (
-                        <Icon className={styles["nav-item-child-icon"]} />
-                      )}
-                      <Text fontWeight="semibold">{child.title}</Text>
-                    </div>
-                    {child.additionalInfo && (
-                      <Text
-                        fontWeight="semibold"
-                        className={styles["nav-item-child-additional-info"]}
-                      >
-                        {child.additionalInfo}
-                      </Text>
-                    )}
-                  </NavLink>
+              <div className={styles["nav-item-children"]}>
+                {item.children.map((child) => (
+                  <ChildItem child={child} />
                 ))}
               </div>
             </div>

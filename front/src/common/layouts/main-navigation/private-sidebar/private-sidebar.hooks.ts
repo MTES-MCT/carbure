@@ -1,21 +1,8 @@
-import { fr } from "@codegouvfr/react-dsfr"
 import useEntity from "carbure/hooks/entity"
 import { SurveyLine } from "common/components/icon/icon"
 import { useRoutes } from "common/hooks/routes"
-import { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
-
-type MenuItem = {
-  title: string
-  condition?: boolean
-  children: MenuSection[]
-}
-
-type MenuSection = Omit<MenuItem, "children"> & {
-  icon?: React.ElementType
-  path: string
-  additionalInfo?: string | number
-}
+import { MenuSection } from "./private-sidebar.types"
 
 export const usePrivateSidebar = () => {
   const {
@@ -33,7 +20,7 @@ export const usePrivateSidebar = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
 
-  const biofuels: MenuItem = {
+  const biofuels: MenuSection = {
     title: t("Lot de biocarburants"),
     // condition: isIndustry || isPowerOrHeatProducer,
     condition: true,
