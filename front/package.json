@@ -78,6 +78,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
     "predev": "react-dsfr update-icons",
+    "prestorybook": "react-dsfr update-icons",
     "prebuild": "react-dsfr update-icons",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --test",
