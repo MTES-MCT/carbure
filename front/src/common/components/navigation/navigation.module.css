@@ -1,0 +1,4 @@
+.navigation {
+  display: flex;
+  gap: var(--spacing-m);
+}

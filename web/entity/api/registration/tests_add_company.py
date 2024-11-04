@@ -41,9 +41,9 @@ class EntityRegistrationAddCompanyTest(TestCase):
             "registered_country": "FR",
             "registered_zipcode": "75001",
             "registration_id": "542051180",
-            "sustainability_officer": "",
+            "sustainability_officer": "officer@test.com",
             "sustainability_officer_email": "officer@test.com",
-            "sustainability_officer_phone_number": "",
+            "sustainability_officer_phone_number": "0612345678",
         }
 
         response = self.client.post(

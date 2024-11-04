@@ -3,7 +3,6 @@ import {
   Country,
   Entity,
   Feedstock,
-  ProductionSite,
   ProductionSiteDetails,
 } from "carbure/types"
 
@@ -155,7 +154,7 @@ export interface DoubleCountingAgreementsOverview {
 export interface DoubleCountingAgreementOverview {
   id: number
   producer: Entity
-  production_site: ProductionSite
+  production_site: ProductionSiteDetails
   certificate_id: string
   valid_from: Date
   valid_until: Date

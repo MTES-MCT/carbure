@@ -7,11 +7,11 @@ import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import css from "../../components/tabs.module.css"
 
-import { SafClientSnapshot, SafTicketStatus } from "saf/types"
+import { SafAirlineSnapshot, SafTicketStatus } from "saf/types"
 
 export interface StatusTabsProps {
   loading: boolean
-  count?: SafClientSnapshot
+  count?: SafAirlineSnapshot
 }
 
 export const AirlineTabs = ({
@@ -26,8 +26,8 @@ export const AirlineTabs = ({
       className={css.safTabs}
       tabs={compact([
         {
-          key: SafTicketStatus.Pending,
-          path: `tickets/${SafTicketStatus.Pending.toLowerCase()}`,
+          key: SafTicketStatus.PENDING,
+          path: `tickets/${SafTicketStatus.PENDING.toLowerCase()}`,
           label: (
             <Row>
               <Col>
@@ -48,8 +48,8 @@ export const AirlineTabs = ({
           ),
         },
         {
-          key: SafTicketStatus.Accepted,
-          path: `tickets/${SafTicketStatus.Accepted.toLowerCase()}`,
+          key: SafTicketStatus.ACCEPTED,
+          path: `tickets/${SafTicketStatus.ACCEPTED.toLowerCase()}`,
           label: (
             <Row>
               <Col>
@@ -72,7 +72,7 @@ export const AirlineTabs = ({
   )
 }
 
-const defaultCount: SafClientSnapshot = {
+const defaultCount: SafAirlineSnapshot = {
   tickets_pending: 0,
   tickets_accepted: 0,
 }
@@ -80,7 +80,7 @@ const defaultCount: SafClientSnapshot = {
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/saf/:year/tickets/:status/*")
   const status = matchStatus?.params.status as SafTicketStatus
-  return (status.toUpperCase() as SafTicketStatus) ?? SafTicketStatus.Pending
+  return (status.toUpperCase() as SafTicketStatus) ?? SafTicketStatus.PENDING
 }
 
 export default AirlineTabs

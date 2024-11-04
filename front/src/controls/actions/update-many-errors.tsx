@@ -44,7 +44,7 @@ export const UpdateErrorsDialog = ({
 
           {errorsKeys.map((lot_id) => {
             const lot_id_number = Number(lot_id)
-            const lotErrors = errors[lot_id_number]
+            const lotErrors = errors[lot_id_number] ?? []
             return (
               <ErrorCollapse
                 errors={lotErrors}

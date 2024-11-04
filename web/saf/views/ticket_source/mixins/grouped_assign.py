@@ -3,7 +3,7 @@ import traceback
 from django.db import transaction
 from django.db.models.aggregates import Max, Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -14,6 +14,10 @@ from saf.serializers import SafTicketSourceGroupAssignmentSerializer
 from saf.serializers.schema import ErrorResponseSerializer
 
 from .utils import SafTicketAssignError
+
+
+class GroupAssignmentResponseSerializer(serializers.Serializer):
+    assigned_tickets_count = serializers.IntegerField()
 
 
 class GroupAssignActionMixin:
@@ -27,7 +31,7 @@ class GroupAssignActionMixin:
                 required=True,
             )
         ],
-        responses={200: OpenApiTypes.ANY, 400: ErrorResponseSerializer},
+        responses={200: GroupAssignmentResponseSerializer, 400: ErrorResponseSerializer},
     )
     @action(
         methods=["post"],
@@ -43,8 +47,8 @@ class GroupAssignActionMixin:
         ticket_sources_ids = serializer.validated_data["ticket_sources_ids"]
         client_id = serializer.validated_data["client_id"]
         volume = serializer.validated_data["volume"]
-        agreement_reference = serializer.validated_data["agreement_reference"]
-        agreement_date = serializer.validated_data["agreement_date"]
+        agreement_reference = serializer.validated_data.get("agreement_reference")
+        agreement_date = serializer.validated_data.get("agreement_date")
         free_field = serializer.validated_data.get("free_field")
         assignment_period = serializer.validated_data["assignment_period"]
 
