@@ -16,7 +16,6 @@ import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
 import { compact } from "common/utils/collection"
 import Notifications from "./notifications"
-import DevBanner from "./dev-banner"
 import { UserRole } from "carbure/types"
 
 const Topbar = () => {
@@ -25,8 +24,6 @@ const Topbar = () => {
 
   return (
     <>
-      <DevBanner />
-
       {user.isAuthenticated() ? (
         <PrivateTopbar entity={entity} user={user} />
       ) : (
