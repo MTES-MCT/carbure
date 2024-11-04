@@ -25,14 +25,14 @@ import { MenuSection } from "./private-sidebar.types"
 
 export const usePrivateSidebar = () => {
   const {
-    isAdmin,
-    isAuditor,
+    // isAdmin,
+    // isAuditor,
     isIndustry,
     isOperator,
     isPowerOrHeatProducer,
     has_saf,
     isAirline,
-    isProducer,
+    // isProducer,
     isCPO,
     has_elec,
   } = useEntity()

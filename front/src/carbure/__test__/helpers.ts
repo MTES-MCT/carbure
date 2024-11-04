@@ -1,6 +1,5 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { EntityType } from "carbure/types"
 import { http, HttpResponse } from "msw"
 import { generateUser } from "./data"
 
