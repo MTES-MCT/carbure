@@ -1,36 +1,35 @@
 import type { Meta, StoryObj } from "@storybook/react"
 
-import { MainNavigation } from "./main-navigation"
+import { PrivateNavigation } from "./private-navigation"
 import {
-  MainNavigationProvider,
-  useMainNavigation,
-} from "./main-navigation.context"
+  PrivateNavigationProvider,
+  usePrivateNavigation,
+} from "./private-navigation.context"
 import { okUnauthorizedUser } from "carbure/__test__/api"
-import { reactRouterParameters } from "storybook-addon-remix-react-router"
 import { EntityType } from "carbure/types"
 import { mockUser } from "carbure/__test__/helpers"
 
-const meta: Meta<typeof MainNavigation> = {
-  component: MainNavigation,
+const meta: Meta<typeof PrivateNavigation> = {
+  component: PrivateNavigation,
   decorators: [
     (Story) => (
-      <MainNavigationProvider>
+      <PrivateNavigationProvider>
         <Story />
-      </MainNavigationProvider>
+      </PrivateNavigationProvider>
     ),
   ],
   parameters: {
     layout: "fullscreen",
   },
 }
-type Story = StoryObj<typeof MainNavigation>
+type Story = StoryObj<typeof PrivateNavigation>
 
 export default meta
 
 export const PrivateLayout: Story = {
   decorators: [
     (Story) => {
-      useMainNavigation("this is a title")
+      usePrivateNavigation("this is a title")
 
       return <Story />
     },
@@ -98,6 +97,15 @@ export const AirlineLayout: Story = {
   parameters: {
     msw: {
       handlers: [mockUser(EntityType.Airline)],
+    },
+  },
+}
+
+export const ChargePointOperatorLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [mockUser(EntityType.CPO)],
     },
   },
 }
