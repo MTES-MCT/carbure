@@ -1,0 +1,24 @@
+.logo {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  margin-right: var(--spacing-xl);
+}
+
+.logo .logoText {
+  margin-left: 24px;
+}
+
+.logoText h1 {
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+.logo h2 {
+  margin: 0;
+  margin-left: 16px;
+}
+
+.republique {
+  height: 112px;
+}

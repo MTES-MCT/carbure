@@ -11,12 +11,12 @@ import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 
-// import css from our app
-import "../src/carbure/assets/css/index.css"
-
 // Dsfr style is imported in index.html with a line for each component used to avoid importing unused css
 import "@codegouvfr/react-dsfr/dsfr/core/core.min.css"
 import "@codegouvfr/react-dsfr/dsfr/utility/icons/icons.min.css"
+
+// import css from our app
+import "../src/carbure/assets/css/index.css"
 
 startReactDsfr({ defaultColorScheme: "light" })
 
