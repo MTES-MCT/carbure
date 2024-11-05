@@ -11,10 +11,6 @@ import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 
-// Dsfr style is imported in index.html with a line for each component used to avoid importing unused css.
-// To simplify that in storybook, we import the full dsfr css here.
-import "@codegouvfr/react-dsfr/main.css"
-
 // import css from our app
 import "../src/carbure/assets/css/index.css"
 
@@ -50,7 +46,9 @@ const withData = (Story) => {
       <UserContext.Provider value={user}>
         <EntityContext.Provider value={entity}>
           <PortalProvider>
-            <Story />
+            <div className="new-dsfr">
+              <Story />
+            </div>
           </PortalProvider>
         </EntityContext.Provider>
       </UserContext.Provider>
