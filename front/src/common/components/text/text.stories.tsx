@@ -4,6 +4,7 @@ import { Text } from "./text"
 
 const meta: Meta<typeof Text> = {
   component: Text,
+  title: "common/components/Text",
 }
 type Story = StoryObj<typeof Text>
 

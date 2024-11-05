@@ -4,6 +4,7 @@ import { ReactNode, useState } from "react"
 
 const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
   component: Select,
+  title: "common/components/Select",
   args: {
     options: [
       { label: "Item 1", value: "1" },

@@ -5,6 +5,7 @@ import { userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<typeof List<{ label: string; value: string }, string>> = {
   component: List,
+  title: "common/components/List",
   args: {
     items: [
       { label: "Item 1", value: "1" },
