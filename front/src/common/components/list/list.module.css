@@ -46,7 +46,3 @@
 .list li[data-selected] {
   color: var(--text-action-high-blue-france);
 }
-
-.search {
-  max-width: unset;
-}
