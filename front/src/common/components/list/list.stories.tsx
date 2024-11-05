@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { List } from "./list"
 import { useState } from "react"
+import { userEvent, waitFor, within } from "@storybook/test"
 
-const meta: Meta<typeof List> = {
+const meta: Meta<typeof List<{ label: string; value: string }, string>> = {
   component: List,
   args: {
     items: [
@@ -24,7 +25,7 @@ const meta: Meta<typeof List> = {
   },
 }
 
-type Story = StoryObj<typeof List>
+type Story = StoryObj<typeof List<{ label: string; value: string }, string>>
 
 export default meta
 
@@ -73,5 +74,11 @@ export const SearchList: Story = {
   args: {
     ...DefaultList.args,
     search: true,
+  },
+  play: async ({ canvasElement }) => {
+    const input = await waitFor(() =>
+      within(canvasElement).getByRole("searchbox")
+    )
+    await userEvent.type(input, "Item 3")
   },
 }
