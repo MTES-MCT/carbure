@@ -1,0 +1,14 @@
+.entity-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.entity-selector-name {
+  color: var(--artwork-major-blue-france);
+}
+
+.entity-selector-type {
+  color: var(--text-mention-grey);
+  margin-top: calc(var(--spacing-1v) * -1);
+}
