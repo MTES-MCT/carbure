@@ -4,6 +4,7 @@ import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<typeof SearchInput> = {
   component: SearchInput,
+  title: "common/components/inputs/search",
 }
 
 type Story = StoryObj<typeof SearchInput>
