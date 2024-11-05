@@ -177,7 +177,7 @@ export function List<T, V>({
           }}
         >
           {render(config)}
-          {config.selected && <CheckLine />}
+          {config.selected && <CheckLine size="sm" />}
         </Text>
       )
     })

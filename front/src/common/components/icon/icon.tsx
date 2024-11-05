@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr"
 import cl from "clsx"
+import styles from "./icon.module.css"
 export interface IconProps {
   passthrough?: boolean
   size?: "xs" | "sm" | "md" | "lg"
@@ -10,7 +11,7 @@ const Icon = ({ size = "md", ...props }: IconProps) => {
   return (
     <span
       {...props}
-      className={cl(props.className, fr.cx(`fr-icon--${size}`))}
+      className={cl(props.className, styles[`fr-icon--${size}`])}
     />
   )
 }

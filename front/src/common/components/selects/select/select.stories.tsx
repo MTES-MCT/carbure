@@ -6,7 +6,7 @@ const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
   component: Select,
   args: {
     options: [
-      { label: <div style={{ color: "red" }}>Item 1</div>, value: "1" },
+      { label: "Item 1", value: "1" },
       { label: "Item 2", value: "2" },
       { label: "Item 3", value: "3" },
     ],
@@ -15,7 +15,9 @@ const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
     const [value, setValue] = useState<string | undefined>(args.value)
 
     return (
-      <Select {...args} value={value} onChange={(item) => setValue(item)} />
+      <div style={{ width: "300px" }}>
+        <Select {...args} value={value} onChange={(item) => setValue(item)} />
+      </div>
     )
   },
 }
@@ -43,5 +45,12 @@ export const Loading: Story = {
 export const Disabled: Story = {
   args: {
     disabled: true,
+  },
+}
+
+export const CustomRenderer: Story = {
+  args: {
+    value: "1",
+    valueRenderer: (item) => <div style={{ color: "red" }}>{item.label}</div>,
   },
 }

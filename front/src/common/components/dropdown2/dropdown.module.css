@@ -1,0 +1,13 @@
+.dropdown {
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  max-height: 33vh;
+  border-top: 1px solid var(--border-open-blue-france);
+  background-color: var(--background-elevation-overlap-grey);
+  box-shadow: 0px 12px 32px -8px rgba(0, 0, 36, 0.12);
+  overflow-y: auto;
+  margin-top: 1px;
+  z-index: 2;
+}
