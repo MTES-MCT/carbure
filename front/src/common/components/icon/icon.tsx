@@ -154,3 +154,7 @@ export const BuildingFill = ({ className, ...props }: IconProps) => {
     <Icon {...props} className={cl(fr.cx("ri-building-4-fill"), className)} />
   )
 }
+
+export const CheckLine = ({ className, ...props }: IconProps) => {
+  return <Icon {...props} className={cl(fr.cx("ri-check-line"), className)} />
+}
