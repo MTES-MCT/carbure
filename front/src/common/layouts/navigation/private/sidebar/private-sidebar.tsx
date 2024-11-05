@@ -9,6 +9,7 @@ import {
   SettingsFill,
   SettingsLine,
 } from "common/components/icon"
+import { EntitySelector } from "./entity-selector"
 
 export const PrivateSidebar = () => {
   const menuItems = usePrivateSidebar()
@@ -18,9 +19,7 @@ export const PrivateSidebar = () => {
   return (
     <div className={styles["private-sidebar"]}>
       <div className={styles["nav-wrapper"]}>
-        <div
-          style={{ border: "1px solid red", padding: "20px 0", width: "100%" }}
-        ></div>
+        <EntitySelector />
         <nav className={styles["nav"]}>
           {menuItems.map((item) => (
             <div key={item.title}>

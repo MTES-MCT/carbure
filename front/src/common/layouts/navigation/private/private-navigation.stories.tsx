@@ -109,12 +109,3 @@ export const ChargePointOperatorLayout: Story = {
     },
   },
 }
-
-export const PublicLayout: Story = {
-  ...PrivateLayout,
-  parameters: {
-    msw: {
-      handlers: [okUnauthorizedUser],
-    },
-  },
-}
