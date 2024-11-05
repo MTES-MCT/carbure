@@ -6,12 +6,14 @@ type SearchInputProps = {
   onChange?: (search: string) => void
   value?: string
   placeholder?: string
+  className?: string
 }
 export const SearchInput = ({
   debounce,
   onChange,
   value,
   placeholder,
+  ...props
 }: SearchInputProps) => {
   const timeoutRef = useRef<number>()
   const [search, setSearch] = useState(value ?? "")
@@ -37,6 +39,7 @@ export const SearchInput = ({
         />
       )}
       label={placeholder}
+      {...props}
     />
   )
 }

@@ -15,11 +15,10 @@ import {
 } from "../../utils/normalize"
 import { multipleSelection, singleSelection } from "../../utils/selection"
 import { isInside } from "../dropdown"
-import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar"
 import css from "./list.module.css"
 import { Text } from "../text"
 import { CheckLine } from "../icon"
-import { SearchInput } from "../input"
+import { SearchInput } from "../inputs"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>
@@ -195,26 +194,7 @@ export function List<T, V>({
       onBlur={onExit}
       onKeyDown={onKeyDown}
     >
-      {/* {search && (
-        <SearchInput
-          clear={true}
-          variant="inline"
-          value={query}
-          onChange={setQuery}
-          className={css.search}
-        />
-      )} */}
-      {search && (
-        <SearchBar
-          renderInput={(props) => (
-            <input
-              {...props}
-              value={query}
-              onChange={(event) => setQuery(event.currentTarget.value)}
-            />
-          )}
-        />
-      )}
+      {search && <SearchInput value={query} onChange={setQuery} />}
       {renderItems(normItems)}
     </ul>
   )
