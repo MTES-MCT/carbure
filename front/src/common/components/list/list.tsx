@@ -15,14 +15,16 @@ import {
 } from "../../utils/normalize"
 import { multipleSelection, singleSelection } from "../../utils/selection"
 import { isInside } from "../dropdown"
-import { SearchInput } from "../input"
+import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar"
 import css from "./list.module.css"
+import { Text } from "../text"
+import { CheckLine } from "../icon"
+import { SearchInput } from "../input"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>
   items: T[]
   search?: boolean
-  striped?: boolean
   multiple?: boolean
   selectedValue?: V
   selectedValues?: V[]
@@ -39,7 +41,6 @@ export interface ListProps<T, V> {
 
 export function List<T, V>({
   search,
-  striped,
   items,
   multiple = false,
   controlRef,
@@ -162,20 +163,23 @@ export function List<T, V>({
         )
       }
 
-      // render item
       return (
-        <li
+        <Text
+          is="li"
           key={label}
           data-key={label}
           data-disabled={disabled ? true : undefined}
           data-level={level > 0 ? level : undefined}
           data-selected={config.selected ? true : undefined}
           data-focused={config.focused ? true : undefined}
-          onMouseOver={!disabled ? () => selection.focus(value) : undefined}
-          onClick={!disabled ? () => selection.select(value) : undefined}
+          componentProps={{
+            onMouseOver: !disabled ? () => selection.focus(value) : undefined,
+            onClick: !disabled ? () => selection.select(value) : undefined,
+          }}
         >
           {render(config)}
-        </li>
+          {config.selected && <CheckLine />}
+        </Text>
       )
     })
   }
@@ -185,19 +189,30 @@ export function List<T, V>({
       data-list
       ref={listRef}
       tabIndex={0}
-      className={cl(css.list, striped && css.striped, className)}
+      className={cl(css.list, className)}
       style={style}
       onMouseOut={onExit}
       onBlur={onExit}
       onKeyDown={onKeyDown}
     >
-      {search && (
+      {/* {search && (
         <SearchInput
           clear={true}
           variant="inline"
           value={query}
           onChange={setQuery}
           className={css.search}
+        />
+      )} */}
+      {search && (
+        <SearchBar
+          renderInput={(props) => (
+            <input
+              {...props}
+              value={query}
+              onChange={(event) => setQuery(event.currentTarget.value)}
+            />
+          )}
         />
       )}
       {renderItems(normItems)}
