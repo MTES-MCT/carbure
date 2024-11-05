@@ -3,6 +3,7 @@ import { Button } from "./button"
 
 const meta: Meta<typeof Button> = {
   component: Button,
+  title: "common/components/Button",
   args: {
     children: "Button",
   },
