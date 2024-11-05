@@ -22,7 +22,7 @@ type TextOwnProps<T extends React.ElementType> = {
   className?: string
   style?: React.CSSProperties
 
-  // Add/remove the border bottom defined in the DSFR
+  // Add/remove the margin bottom defined in the DSFR
   margin?: boolean
 
   fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"

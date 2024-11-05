@@ -2,12 +2,17 @@ import { fr } from "@codegouvfr/react-dsfr"
 import cl from "clsx"
 export interface IconProps {
   passthrough?: boolean
-  size?: number
+  size?: "xs" | "sm" | "md" | "lg"
   className?: string
 }
 
-const Icon = ({ size = 24, ...props }: IconProps) => {
-  return <span {...props} style={{ width: size, height: size }} />
+const Icon = ({ size = "md", ...props }: IconProps) => {
+  return (
+    <span
+      {...props}
+      className={cl(props.className, fr.cx(`fr-icon--${size}`))}
+    />
+  )
 }
 
 export const SurveyLine = ({ className, ...props }: IconProps) => {
@@ -157,4 +162,10 @@ export const BuildingFill = ({ className, ...props }: IconProps) => {
 
 export const CheckLine = ({ className, ...props }: IconProps) => {
   return <Icon {...props} className={cl(fr.cx("ri-check-line"), className)} />
+}
+
+export const ArrowDownSLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-arrow-down-s-line"), className)} />
+  )
 }
