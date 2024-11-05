@@ -1,0 +1,19 @@
+.fr-icon--xs::before,
+.fr-icon--xs::after {
+  --icon-size: 0.75rem;
+}
+
+.fr-icon--sm::before,
+.fr-icon--sm::after {
+  --icon-size: 1rem;
+}
+
+.fr-icon--md::before,
+.fr-icon--md::after {
+  --icon-size: 1.5rem;
+}
+
+.fr-icon--lg::before,
+.fr-icon--lg::after {
+  --icon-size: 2rem;
+}

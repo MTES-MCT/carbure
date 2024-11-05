@@ -1,8 +1,5 @@
+/* We use a button to trigger the dropdown, but we want to have a full width button with a dropdown icon fixed on the right */
 .select-button {
-  display: flex;
-  column-gap: var(--spacing-2w);
-  border: 1px solid var(--border-default-grey);
-  background: transparent;
-  padding: var(--spacing-1w) var(--spacing-2w);
-  color: var(--text-action-high-blue-france);
+  justify-content: space-between;
+  width: 100%;
 }

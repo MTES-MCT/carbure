@@ -20,6 +20,7 @@ const meta: Meta<typeof List<{ label: string; value: string }, string>> = {
         {...args}
         selectedValue={value}
         onSelectValue={(item) => setValue(item)}
+        style={{ width: "300px" }}
       />
     )
   },
