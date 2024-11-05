@@ -13,13 +13,13 @@ const meta: Meta<typeof List<{ label: string; value: string }, string>> = {
     ],
   },
   render: (args) => {
-    const [value, setValue] = useState<string | undefined>("")
+    const [value, setValue] = useState<string | undefined>(args.selectedValue)
 
     return (
       <List
         {...args}
         selectedValue={value}
-        onSelectValue={(item) => setValue(item as string)}
+        onSelectValue={(item) => setValue(item)}
       />
     )
   },
@@ -33,7 +33,6 @@ export const DefaultList: Story = {}
 
 export const CustomStyleList: Story = {
   args: {
-    ...DefaultList.args,
     children: (item) => (
       <div style={{ background: "red" }}>
         List of div paragraphs : {item.label}
@@ -44,27 +43,25 @@ export const CustomStyleList: Story = {
 
 export const SelectedValue: Story = {
   args: {
-    ...DefaultList.args,
     selectedValue: "1",
   },
 }
 
 export const SelectedValues: Story = {
   args: {
-    ...DefaultList.args,
     multiple: true,
     selectedValues: ["1", "2"],
   },
   render: (args) => {
     const [value, setValue] = useState<string[] | undefined>(
-      args.selectedValues as string[]
+      args.selectedValues
     )
 
     return (
       <List
         {...args}
         selectedValues={value}
-        onSelectValues={(items) => setValue(items as string[])}
+        onSelectValues={(items) => setValue(items)}
       />
     )
   },
@@ -72,7 +69,6 @@ export const SelectedValues: Story = {
 
 export const SearchList: Story = {
   args: {
-    ...DefaultList.args,
     search: true,
   },
   play: async ({ canvasElement }) => {
@@ -80,5 +76,13 @@ export const SearchList: Story = {
       within(canvasElement).getByRole("searchbox")
     )
     await userEvent.type(input, "Item 3")
+  },
+}
+
+export const SelectValue: Story = {
+  play: async ({ canvasElement }) => {
+    const { getByText } = within(canvasElement)
+    const item = await waitFor(() => getByText("Item 2"))
+    await userEvent.click(item)
   },
 }
