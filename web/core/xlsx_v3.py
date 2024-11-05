@@ -136,7 +136,7 @@ def get_my_certificates(entity=None):
 
 def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_producer=True):
     worksheet_lots = workbook.add_worksheet("lots")
-    psites = ProductionSite.objects.filter(entitysite__entity=entity)
+    psites = ProductionSite.objects.filter(created_by=entity)
     clients = Entity.objects.filter(entity_type__in=["Opérateur", "Trader"]).exclude(id=entity.id)
     mps = MatierePremiere.objects.all()
     bcs = Biocarburant.objects.all()
@@ -276,7 +276,7 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
 
 def make_producers_lots_sheet_simple(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
-    psites = ProductionSite.objects.filter(entitysite__entity=entity)
+    psites = ProductionSite.objects.filter(created_by=entity)
     clients = Entity.objects.filter(entity_type__in=["Opérateur", "Trader"])
     mps = MatierePremiere.objects.all()
     bcs = Biocarburant.objects.all()
@@ -1041,7 +1041,7 @@ def export_carbure_stock(stocks):
 
 def make_template_carbure_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
-    psites = ProductionSite.objects.filter(entitysite__entity=entity)
+    psites = ProductionSite.objects.filter(created_by=entity)
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER, Entity.POWER_OR_HEAT_PRODUCER]).exclude(
         id=entity.id
     )

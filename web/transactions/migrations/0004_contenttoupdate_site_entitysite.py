@@ -73,6 +73,7 @@ class Migration(migrations.Migration):
                             ("POWER PLANT", "POWER PLANT"),
                             ("COGENERATION PLANT", "COGENERATION PLANT"),
                             ("PRODUCTION SITE", "PRODUCTION SITE"),
+                            ("EFCA", "EFCA"),
                         ],
                         default="OTHER",
                         max_length=32,
@@ -159,6 +160,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("date_mise_en_service", models.DateField(null=True, blank=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to="core.entity"),
+                ),
             ],
             options={
                 "verbose_name": "Site de stockage de carburant",

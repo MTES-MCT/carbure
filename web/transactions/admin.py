@@ -31,8 +31,8 @@ class SiteAdmin(admin.ModelAdmin):
     actions = ["enable_site"]
 
     def enable_site(self, request, queryset):
-        for depot in queryset:
-            response = enable_depot.enable_depot(depot, request)
+        for site in queryset:
+            response = enable_depot.enable_depot(site, request)
             messages.add_message(request, messages.SUCCESS, response)
 
     enable_site.short_description = "Valider les sites sélectionnés"

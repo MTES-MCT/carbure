@@ -73,6 +73,7 @@ def add_production_site(request, entity, entity_id):
 
     try:
         site = ProductionSite.objects.create(
+            created_by=producer,
             country=country,
             name=name,
             city=city,

@@ -17,9 +17,7 @@ class EntitySite(models.Model):
         return str(self.id)
 
     def natural_key(self):
-        from transactions.models import Site
-
-        if self.site.site_type != Site.PRODUCTION_SITE:
+        if self.site.is_depot():
             type = "depot"
         else:
             type = "site"

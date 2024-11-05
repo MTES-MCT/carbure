@@ -18,7 +18,7 @@ def set_production_site_certificates(request, *args, **kwargs):
     if not production_site_id:
         return JsonResponse({"status": "error", "message": "Please provide a production_site_id"}, status=400)
     try:
-        production_site = ProductionSite.objects.get(entitysite__entity=entity, id=production_site_id)
+        production_site = ProductionSite.objects.get(created_by=entity, id=production_site_id)
     except Exception:
         traceback.print_exc()
         return JsonResponse({"status": "error", "message": "Production site not found"}, status=400)

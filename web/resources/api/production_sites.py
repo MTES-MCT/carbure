@@ -16,7 +16,7 @@ def get_production_sites(request):
     if q:
         psites = psites.filter(name__icontains=q)
     if pid:
-        psites = psites.filter(entitysite__entity_id=pid)
+        psites = psites.filter(created_by_id=pid)
 
     psitesbyid = {p.id: p for p in psites}
     for _k, v in psitesbyid.items():
@@ -42,7 +42,7 @@ def get_production_sites(request):
             "dc_reference": p.dc_reference,
             "inputs": p.inputs,
             "outputs": p.outputs,
-            "producer": p.entitysite_set.first().entity.natural_key(),
+            "producer": p.created_by.natural_key(),
         }
         for p in psites
     ]

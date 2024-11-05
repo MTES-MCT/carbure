@@ -63,8 +63,8 @@ class EntityDepotsTest(TestCase):
             "name": "Dépôt de test",
             "city": "Paris",
             "country_code": self.pays.code_pays,
-            "site_type": "BIOFUEL DEPOT",
-            "customs_id": "123456789012345",
+            "depot_type": "BIOFUEL DEPOT",
+            "depot_id": "123456789012345",  # keep "depot_id" to not change front api call (but named "customs_id" from now)
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
@@ -80,11 +80,11 @@ class EntityDepotsTest(TestCase):
             "name": "Dépôt de test",
             "city": "Paris",
             "country_code": self.pays.code_pays,
-            "site_type": "BIOFUEL DEPOT",
+            "depot_type": "BIOFUEL DEPOT",
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
         assert res.status_code == 400
         data = res.json()
         assert data["error"] == "MALFORMED_PARAMS"
-        assert data["data"]["customs_id"] is not None
+        assert data["data"]["depot_id"] is not None

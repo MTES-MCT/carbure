@@ -7,7 +7,7 @@ from transactions.models import ProductionSite
 
 @check_user_rights("entity_id")
 def get_production_sites(request, entity, entity_id):
-    psites = ProductionSite.objects.filter(entitysite__entity=entity)
+    psites = ProductionSite.objects.filter(created_by=entity)
 
     psitesbyid = {p.id: p for p in psites}
     for _k, v in psitesbyid.items():

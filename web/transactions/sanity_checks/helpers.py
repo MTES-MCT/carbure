@@ -128,7 +128,7 @@ def get_prefetched_data(entity=None):
 
     if entity:
         # get only my production sites
-        entity_psites = ProductionSite.objects.filter(entitysite__entity=entity).prefetch_related(
+        entity_psites = ProductionSite.objects.filter(created_by=entity).prefetch_related(
             "productionsiteinput_set", "productionsiteoutput_set", "productionsitecertificate_set"
         )
         data["my_production_sites"] = {ps.name.upper(): ps for ps in entity_psites}

@@ -29,7 +29,7 @@ class DoubleCountingSanityChecksTest(TestCase):
         self.other_feedstock = MatierePremiere.objects.exclude(is_double_compte=True).first()
 
         self.production_site = ProductionSite.objects.first()
-        self.producer = self.production_site.entitysite_set.first().entity
+        self.producer = self.production_site.created_by
 
         self.old_dc_cert = DoubleCountingRegistration.objects.create(
             certificate_id="FR_00999_2021",

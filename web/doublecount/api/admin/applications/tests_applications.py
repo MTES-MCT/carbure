@@ -58,6 +58,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
 
         self.production_site = ProductionSite.objects.first()
+        self.production_site.created_by = self.producer
         self.production_site.address = "1 rue de la Paix"
         france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
         self.production_site.country = france
@@ -79,7 +80,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # Add data properties to the post data if provided
         post_data = {
             "entity_id": self.admin.id,
-            "producer_id": self.production_site.entitysite_set.first().entity.id,
+            "producer_id": self.production_site.producer.id,
             "production_site_id": self.production_site.id,
             "file": f,
         }
@@ -114,6 +115,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # 1 - test add file
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 200
+        print("**** self.production_site.producer ", self.production_site.__dict__)
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )

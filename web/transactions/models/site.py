@@ -18,6 +18,7 @@ class Site(models.Model):
     POWER_PLANT = "POWER PLANT"
     COGENERATION_PLANT = "COGENERATION PLANT"
     PRODUCTION_SITE = "PRODUCTION SITE"
+    EFCA = "EFCA"
 
     SITE_TYPE = (
         (OTHER, "Autre"),
@@ -29,9 +30,10 @@ class Site(models.Model):
         (POWER_PLANT, "POWER PLANT"),
         (COGENERATION_PLANT, "COGENERATION PLANT"),
         (PRODUCTION_SITE, "PRODUCTION SITE"),
+        (EFCA, "EFCA"),
     )
 
-    DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT]
+    DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT, EFCA]
 
     GES_OPTIONS = [("Default", "Valeurs par défaut"), ("Actual", "Valeurs réelles"), ("NUTS2", "Valeurs NUTS2")]
 
@@ -70,11 +72,11 @@ class Site(models.Model):
     private = models.BooleanField(default=False)
     is_enabled = models.BooleanField(default=True)
     date_mise_en_service = models.DateField(null=True, blank=True)
+    created_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL)
 
     @property
     def producer(self):
-        entity_site = self.entitysite_set.first()
-        return entity_site.entity if entity_site else None
+        return self.created_by
 
     @property
     def depot_type(self):
@@ -117,19 +119,12 @@ class Site(models.Model):
         super().clean()
 
     def natural_key(self):
-        if self.site_type != self.PRODUCTION_SITE:
-            return {
-                "depot_id": self.customs_id,
-                "name": self.name,
-                "city": self.city,
-                "country": self.country.natural_key(),
-                "depot_type": self.depot_type,
-                "address": self.address,
-                "postal_code": self.postal_code,
-                "electrical_efficiency": self.electrical_efficiency,
-                "thermal_efficiency": self.thermal_efficiency,
-                "useful_temperature": self.useful_temperature,
-            }
+        from transactions.models import Depot, ProductionSite
+
+        if self.is_depot():
+            return Depot.natural_key(self)
+        else:
+            return ProductionSite.natural_key(self)
 
     def is_depot(self):
         # Check if the site is a depot

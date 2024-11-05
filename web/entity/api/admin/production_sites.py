@@ -9,7 +9,7 @@ def get_entity_production_sites(request):
     company_id = request.GET.get("company_id", False)
 
     try:
-        psites = ProductionSite.objects.filter(entitysite__entity_id=company_id)
+        psites = ProductionSite.objects.filter(created_by_id=company_id)
         psitesbyid = {p.id: p for p in psites}
         for _k, v in psitesbyid.items():
             v.inputs = []

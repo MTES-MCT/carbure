@@ -7,7 +7,7 @@ from transactions.models import Depot, EntitySite
 @check_user_rights()
 def get_depots(request, entity, entity_id):
     try:
-        ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.all())
+        ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.filter(is_enabled=True))
         ds = [d.natural_key() for d in ds]
     except Exception:
         return JsonResponse(

@@ -23,7 +23,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
         "SafTicketSource": apps.get_model("saf", "SafTicketSource"),
     }
 
-    def create_site_and_update_related_content(entity, filter_column_name, site_type):
+    def create_site_and_update_related_content(entity, filter_column_name, site_type, created_by):
         print(f"Creating site for {entity.name}")
         site = Site.objects.create(
             name=entity.name,
@@ -49,6 +49,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
             private=getattr(entity, "private", False),
             is_enabled=getattr(entity, "is_enabled", True),
             date_mise_en_service=getattr(entity, "date_mise_en_service", None),
+            created_by=created_by,
         )
 
         # Update all related content of old entity
@@ -87,6 +88,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
             entity=production_site,
             filter_column_name="production_site_id",
             site_type="PRODUCTION SITE",
+            created_by=production_site.producer,
         )
 
     depots = Depot.objects.all()
@@ -95,6 +97,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
             entity=depot,
             filter_column_name="depot_id",
             site_type=depot.depot_type,
+            created_by=depot.entity,
         )
 
 
@@ -111,7 +114,7 @@ class Migration(migrations.Migration):
         ("transactions", "0005_move_data_to_site_model_backup"),
         ("certificates", "0006_alter_doublecountingregistration_production_site_and_more"),
         ("core", "0035_alter_carburelot_carbure_delivery_site_and_more"),
-        ("doublecount", "0015_alter_doublecountingapplication_production_site"),
+        ("doublecount", "0016_alter_doublecountingapplication_production_site"),
         ("producers", "0005_alter_productionsiteinput_production_site_and_more"),
         ("saf", "0021_alter_safticket_carbure_production_site_and_more"),
     ]

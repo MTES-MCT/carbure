@@ -39,6 +39,8 @@ class LotsCertifMayhemTest(TestCase):
         self.producer.default_certificate = "PRODUCER_CERTIFICATE"
         self.producer.save()
 
+        print("producer : ", self.producer.__dict__)
+
         self.trader = Entity.objects.get(pk=18)  #  .filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
@@ -63,6 +65,7 @@ class LotsCertifMayhemTest(TestCase):
         data = response.json()["data"]
         lot_id = data["id"]
         lot = CarbureLot.objects.get(id=lot_id)
+        print("lot : ", lot.__dict__)
         return lot
 
     def send_lot(self, lot, expected_status=200):
@@ -71,7 +74,7 @@ class LotsCertifMayhemTest(TestCase):
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         if response.status_code != 200:
-            print(response.json())
+            print(response.json(), response.status_code)
         assert response.status_code == expected_status
         lot = CarbureLot.objects.get(id=lot.id)
         return lot

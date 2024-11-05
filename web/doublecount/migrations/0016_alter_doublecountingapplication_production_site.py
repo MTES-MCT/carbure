@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "doublecount",
-            "0014_rename_agreement_id_doublecountingapplication_certificate_id_and_more",
+            "0015_doublecountingsourcinghistory",
         ),
         ("transactions", "0005_move_data_to_site_model_backup"),
     ]

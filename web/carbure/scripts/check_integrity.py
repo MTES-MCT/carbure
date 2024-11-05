@@ -26,6 +26,7 @@ def check_integrity(year, batch=1000):
             "carbure_client",
             "added_by",
             "carbure_production_site",
+            "carbure_production_site__created_by",
             "carbure_production_site__country",
             "production_country",
             "carbure_dispatch_site",

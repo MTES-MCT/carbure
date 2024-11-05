@@ -204,6 +204,7 @@ class ResourcesTest(TestCase):
             country=fr,
             date_mise_en_service=today,
             site_type="PRODUCTION SITE",
+            created_by=producer,
         )
         EntitySite.objects.create(entity=producer, site=ps1)
 
@@ -212,6 +213,7 @@ class ResourcesTest(TestCase):
             country=fr,
             date_mise_en_service=today,
             site_type="PRODUCTION SITE",
+            created_by=producer,
         )
         EntitySite.objects.create(entity=producer, site=ps2)
 
@@ -220,6 +222,7 @@ class ResourcesTest(TestCase):
             country=fr,
             date_mise_en_service=today,
             site_type="PRODUCTION SITE",
+            created_by=producer,
         )
         EntitySite.objects.create(entity=producer, site=ps3)
 
@@ -228,12 +231,14 @@ class ResourcesTest(TestCase):
             country=fr,
             date_mise_en_service=today,
             site_type="PRODUCTION SITE",
+            created_by=producer,
         )
         EntitySite.objects.create(entity=producer, site=ps4)
 
         url = "resources-production-sites"
         response = self.client.get(reverse(url))
         # api works
+        print(response.json(), response.status_code)
         assert response.status_code == 200
         # and returns 4 entries
         assert len(response.json()["data"]) >= 2
