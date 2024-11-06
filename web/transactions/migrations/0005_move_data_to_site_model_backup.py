@@ -3,7 +3,7 @@ import os
 
 import environ
 import psutil
-from django.db import migrations
+from django.db import migrations, transaction
 
 
 def get_memory_usage():
@@ -92,10 +92,11 @@ def insert_data_into_temp_table(apps, schema_editor):
         print(f"Number of {model_name} selected: {count}")
 
         if count > 0:
-            create_content_to_update(model_name, field_name, queryset, field_type, count)
+            with transaction.atomic():
+                create_content_to_update(model_name, field_name, queryset, field_type, count)
 
-            print(f"Emptying '{field_name}' field from {model_name}")
-            queryset.update(**{field_name: None})
+                print(f"Emptying '{field_name}' field from {model_name}")
+                queryset.update(**{field_name: None})
 
         print("--------------------------------")
 
@@ -107,6 +108,8 @@ def reverse_migration(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
+
     dependencies = [
         ("transactions", "0004_contenttoupdate_site_entitysite"),
         ("producers", "0004_alter_productionsiteinput_production_site_and_more"),
