@@ -93,9 +93,8 @@ def insert_data_into_temp_table(apps, schema_editor):
             with transaction.atomic():
                 create_content_to_update(model_name, field_name, queryset, field_type, count)
 
-            with transaction.atomic():
-                print(f"Emptying '{field_name}' field from {model_name}")
-                queryset.update(**{field_name: None})
+            print(f"Emptying '{field_name}' field from {model_name}")
+            queryset.update(**{field_name: None})
 
         print("--------------------------------")
 
