@@ -1,5 +1,15 @@
+import gc
+import os
+
 import environ
+import psutil
 from django.db import migrations
+
+
+def get_memory_usage():
+    process = psutil.Process(os.getpid())
+    mem = process.memory_info().rss  # Memory used by the process in bytes
+    return mem / (1024 * 1024)  # Convert to MB
 
 
 def insert_data_into_temp_table(apps, schema_editor):
@@ -22,7 +32,7 @@ def insert_data_into_temp_table(apps, schema_editor):
     SafTicketSource = apps.get_model("saf", "SafTicketSource")
 
     # Fill in _tmp_site_migration table with current data
-    def create_content_to_update(model_name, field_name, queryset, field_type):
+    def create_content_to_update(model_name, field_name, queryset, field_type, total_count):
         print(f"Inserting bulk {model_name} start")
 
         batch_size = 1000
@@ -42,14 +52,22 @@ def insert_data_into_temp_table(apps, schema_editor):
                 )
             if len(content_to_insert_batch) >= batch_size:
                 batch_count += batch_size
-                print(f"Inserting bulk {model_name}: {len(content_to_insert_batch)} ({batch_count}/{queryset.count()})")
+                print(
+                    f"Inserting bulk {model_name}: {len(content_to_insert_batch)} ({batch_count}/{total_count}) - Memory usage: {get_memory_usage():.2f} MB"  # noqa: E501
+                )
                 ContentToUpdate.objects.bulk_create(content_to_insert_batch)
                 content_to_insert_batch = []
+                gc.collect()  # Force garbage collection to avoid memory leak
+
+                print(f"Current memory usage: {get_memory_usage():.2f} MB")
 
         if content_to_insert_batch:
-            print(f"Inserting last bulk {model_name}: {len(content_to_insert_batch)} ({batch_count}/{queryset.count()})")
+            print(f"Inserting last bulk {model_name}: {len(content_to_insert_batch)} ({batch_count}/{total_count})")
             ContentToUpdate.objects.bulk_create(content_to_insert_batch)
             print(f"Inserting bulk {model_name} end")
+            gc.collect()  # Force garbage collection to avoid memory leak
+
+        print(f"Final memory usage: {get_memory_usage():.2f} MB")
 
     models_to_update = [
         ("CarbureLot", CarbureLot, "carbure_delivery_site", "depot"),
@@ -69,10 +87,12 @@ def insert_data_into_temp_table(apps, schema_editor):
     for model_name, model, field_name, field_type in models_to_update:
         print(f"Selecting {model_name} with field {field_name}")
         queryset = model.objects.filter(**{f"{field_name}__isnull": False})
-        print(f"Number of {model_name} selected: {queryset.count()}")
+        queryset = queryset.only("id", field_name)
+        count = queryset.count()
+        print(f"Number of {model_name} selected: {count}")
 
-        if queryset.count() > 0:
-            create_content_to_update(model_name, field_name, queryset, field_type)
+        if count > 0:
+            create_content_to_update(model_name, field_name, queryset, field_type, count)
 
             print(f"Emptying '{field_name}' field from {model_name}")
             queryset.update(**{field_name: None})
