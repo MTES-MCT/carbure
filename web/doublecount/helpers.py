@@ -603,7 +603,7 @@ def get_agreement_quotas(agreement: DoubleCountingRegistration):
         CarbureLot.objects.filter(
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
             delivery_type__in=[CarbureLot.DIRECT, CarbureLot.RFC, CarbureLot.BLENDING],
-            carbure_production_site_id=application.production_site,
+            production_site_double_counting_certificate=application.certificate_id,
         )
         .values("year", "feedstock", "biofuel")
         .filter(feedstock_id__in=feedstocks.keys(), year__in=[agreement.valid_from.year, agreement.valid_from.year + 1])
