@@ -59,8 +59,6 @@ def insert_data_into_temp_table(apps, schema_editor):
                 content_to_insert_batch = []
                 gc.collect()  # Force garbage collection to avoid memory leak
 
-                print(f"Current memory usage: {get_memory_usage():.2f} MB")
-
         if content_to_insert_batch:
             print(f"Inserting last bulk {model_name}: {len(content_to_insert_batch)} ({batch_count}/{total_count})")
             ContentToUpdate.objects.bulk_create(content_to_insert_batch)
@@ -95,6 +93,7 @@ def insert_data_into_temp_table(apps, schema_editor):
             with transaction.atomic():
                 create_content_to_update(model_name, field_name, queryset, field_type, count)
 
+            with transaction.atomic():
                 print(f"Emptying '{field_name}' field from {model_name}")
                 queryset.update(**{field_name: None})
 
