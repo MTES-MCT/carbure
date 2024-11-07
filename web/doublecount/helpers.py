@@ -514,14 +514,18 @@ def get_quotas(year: int, producer_id: int = None):
     producers_query = Entity.objects.filter(entity_type=Entity.PRODUCER)
     if producer_id is not None:
         producers_query = producers_query.filter(id=producer_id)
-    producers = {p.id: p for p in producers_query}
-    production_sites = {p.id: p for p in ProductionSite.objects.all()}
+    double_counting_certificates_queryset = (
+        DoubleCountingApplication.objects.filter(status=DoubleCountingApplication.ACCEPTED)
+        .exclude(certificate_id="")
+        .distinct()
+    )
+    double_counting_certificates = [d.certificate_id for d in double_counting_certificates_queryset]
     biofuels = {p.id: p for p in Biocarburant.objects.all()}
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
     # tous les couples BC / MP pour sur une année
     detailed_quotas = DoubleCountingProduction.objects.values(
-        "year", "dca__producer", "dca__production_site", "biofuel", "feedstock", "approved_quota", "dca__certificate_id"
+        "year", "biofuel", "feedstock", "approved_quota", "dca__certificate_id"
     ).filter(year=year, feedstock_id__in=feedstocks.keys(), approved_quota__gt=0)
 
     # tous les lots pour des MP double compté groupé par couple et par année
@@ -529,13 +533,17 @@ def get_quotas(year: int, producer_id: int = None):
         CarbureLot.objects.filter(
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
             delivery_type__in=[CarbureLot.DIRECT, CarbureLot.RFC, CarbureLot.BLENDING],
-            carbure_producer__in=producers.keys(),
-            carbure_production_site__in=production_sites.keys(),
+            production_site_double_counting_certificate__in=double_counting_certificates,
             year=year,
             feedstock_id__in=feedstocks.keys(),
             biofuel_id__in=biofuels.keys(),
         )
-        .values("year", "carbure_producer", "carbure_production_site", "feedstock", "biofuel")
+        .values(
+            "year",
+            "feedstock",
+            "biofuel",
+            "production_site_double_counting_certificate",
+        )
         .annotate(production_kg=Sum("weight"), lot_count=Count("id"))
     )
 
@@ -544,8 +552,6 @@ def get_quotas(year: int, producer_id: int = None):
         columns={
             "biofuel": "biofuel_id",
             "feedstock": "feedstock_id",
-            "dca__producer": "producer_id",
-            "dca__production_site": "production_site_id",
             "dca__certificate_id": "certificate_id",
         }
     )
@@ -553,10 +559,9 @@ def get_quotas(year: int, producer_id: int = None):
     # crée un dataframe pour le résumé des lots par couple et par année
     production_lots_df = pd.DataFrame(production_lots).rename(
         columns={
-            "carbure_producer": "producer_id",
-            "carbure_production_site": "production_site_id",
             "feedstock": "feedstock_id",
             "biofuel": "biofuel_id",
+            "production_site_double_counting_certificate": "certificate_id",
         }
     )
 
@@ -565,9 +570,9 @@ def get_quotas(year: int, producer_id: int = None):
         grouped = []
         quotas_df["quotas_progression"] = 0
     else:
-        quotas_df.set_index(["biofuel_id", "feedstock_id", "year", "producer_id", "production_site_id"], inplace=True)
+        quotas_df.set_index(["biofuel_id", "feedstock_id", "year", "certificate_id"], inplace=True)
         production_lots_df.set_index(
-            ["biofuel_id", "feedstock_id", "year", "producer_id", "production_site_id"],
+            ["biofuel_id", "feedstock_id", "year", "certificate_id"],
             inplace=True,
         )
         quotas_df = (
@@ -577,7 +582,7 @@ def get_quotas(year: int, producer_id: int = None):
         quotas_df["production_tonnes"] = round(quotas_df["production_kg"] / 1000)
         quotas_df["quotas_progression"] = round((quotas_df["production_tonnes"] / quotas_df["approved_quota"]), 2)
 
-        grouped = quotas_df.groupby(["year", "producer_id", "production_site_id", "certificate_id"]).agg(
+        grouped = quotas_df.groupby(["year", "certificate_id"]).agg(
             quotas_progression=("quotas_progression", "mean"),
         )
         grouped.reset_index(inplace=True)
