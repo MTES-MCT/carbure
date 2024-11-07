@@ -99,7 +99,7 @@ def insert_data_into_temp_table(apps, schema_editor):
             for start in range(0, len(ids_to_update), batch_size):
                 batch_ids = ids_to_update[start : start + batch_size]
                 model.objects.filter(id__in=batch_ids).update(**{field_name: None})
-                print(f"Updated {model_name} with field {field_name} - batch {start + batch_size}/{count}")
+                print(f"Emptying {field_name} field from {model_name} - batch {start + batch_size}/{count}")
 
         print("--------------------------------")
 
