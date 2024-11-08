@@ -4,6 +4,301 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
+  /api/auth/auth/activate/:
+    post:
+      operationId: auth_auth_activate_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateAccount"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActivateAccount"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActivateAccount"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: A successful activation
+                  description: The account was successfully activated.
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: Could not activate user account
+              examples:
+                BadRequest:
+                  value:
+                    message: Could not activate user account
+                  summary: Activation failed
+          description: Bad request - missing fields.
+  /api/auth/auth/login/:
+    post:
+      operationId: auth_auth_login_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: A successful activation
+                  description: The account was successfully activated.
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: Invalid login or password | Account not activated
+              examples:
+                BadRequest:
+                  value:
+                    message: Invalid login or password | Account not activated
+                  summary: login failed
+          description: Bad request - missing fields.
+  /api/auth/auth/logout/:
+    get:
+      operationId: auth_auth_logout_retrieve
+      tags:
+        - auth
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/auth/register/:
+    post:
+      operationId: auth_auth_register_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreation"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserCreation"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserCreation"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/auth/request-activation-link/:
+    post:
+      operationId: auth_auth_request_activation_link_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserResendActivationLink"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserResendActivationLink"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserResendActivationLink"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/auth/request-otp/:
+    get:
+      operationId: auth_auth_request_otp_retrieve
+      tags:
+        - auth
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    valid_until: 07/03/2024, 14:09
+                  summary: Example response.
+          description: ""
+  /api/auth/auth/request-password-reset/:
+    post:
+      operationId: auth_auth_request_password_reset_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordReset"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordReset"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordReset"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/auth/reset-password/:
+    post:
+      operationId: auth_auth_reset_password_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/auth/verify-otp/:
+    post:
+      operationId: auth_auth_verify_otp_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOTP"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/VerifyOTP"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/VerifyOTP"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
   /api/entities/{id}/enable/:
     post:
       operationId: entities_enable_create
@@ -1723,6 +2018,18 @@ paths:
           description: ""
 components:
   schemas:
+    ActivateAccount:
+      type: object
+      properties:
+        uidb64:
+          type: string
+        token:
+          type: string
+        invite:
+          type: string
+      required:
+        - token
+        - uidb64
     Biofuel:
       type: object
       properties:
@@ -2497,6 +2804,34 @@ components:
       required:
         - entity_id
         - role
+    RequestPasswordReset:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+      required:
+        - username
+    ResetPassword:
+      type: object
+      properties:
+        uidb64:
+          type: string
+        token:
+          type: string
+        password1:
+          type: string
+          writeOnly: true
+          title: Mot de passe
+        password2:
+          type: string
+          writeOnly: true
+          title: Confirmation du mot de passe
+      required:
+        - password1
+        - password2
+        - token
+        - uidb64
     ResponseSuccess:
       type: object
       properties:
@@ -3052,6 +3387,34 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    UserCreation:
+      type: object
+      description: |-
+        Serializer for creating new users. Includes required fields
+        and repeated password validation.
+      properties:
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+        name:
+          type: string
+          title: Nom
+          maxLength: 255
+        password1:
+          type: string
+          writeOnly: true
+          title: Mot de passe
+        password2:
+          type: string
+          writeOnly: true
+          title: Confirmation du mot de passe
+      required:
+        - email
+        - name
+        - password1
+        - password2
     UserEntity:
       type: object
       properties:
@@ -3160,6 +3523,29 @@ components:
         - sustainability_officer_phone_number
         - vat_number
         - website
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+      required:
+        - password
+        - username
+    UserResendActivationLink:
+      type: object
+      description: A serializer for re-sending the user activation email. Includes
+        email field only.
+      properties:
+        email:
+          type: string
+          format: email
+          title: Courriel
+      required:
+        - email
     UserRights:
       type: object
       properties:
@@ -3259,6 +3645,19 @@ components:
         - email
         - requests
         - rights
+    VerifyOTP:
+      type: object
+      description: A serializer for submitting the OTP sent via email. Includes
+        otp_token field only.
+      properties:
+        otp_token:
+          type: string
+          title: Entrez le code à 6 chiffres reçu par email
+          pattern: ^\d{6}$
+          maxLength: 6
+          minLength: 6
+      required:
+        - otp_token
     saf.filters.TicketFilter.status:
       enum:
         - PENDING

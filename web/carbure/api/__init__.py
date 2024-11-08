@@ -2,7 +2,7 @@ from django.urls import path, include
 from .home_stats import get_home_stats
 
 urlpatterns = [
-    path("auth/", include("auth.api")),
+    path("auth/", include("auth.urls")),
     path("double-counting/", include("doublecount.api")),
     path("entity/", include("entity.api")),
     path("entities/", include("entity.urls")),
