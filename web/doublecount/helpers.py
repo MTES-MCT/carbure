@@ -44,7 +44,6 @@ from doublecount.serializers import (
     DoubleCountingSourcingSerializer,
     FeedStockSerializer,
 )
-from producers.models import ProductionSite
 
 today = datetime.date.today()
 
