@@ -38,7 +38,7 @@ export const ProductionTable = ({
       cell: (p) => <Cell text={formatNumber(p.max_production_capacity ?? 0)} />,
     },
     {
-      header: t("Prod. estimée"),
+      header: t("Prod. effective"),
       cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
     },
     {
