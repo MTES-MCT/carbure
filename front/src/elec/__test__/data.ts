@@ -11,6 +11,7 @@ import {
   ElecMeterReadingsApplicationDetails,
   ElecMeterReadingsApplicationsResponse,
   ElecProvisionCertificatePreview,
+  ElecProvisionCertificateSource,
   MeterReadingsApplicationUrgencyStatus,
 } from "elec/types"
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo"
@@ -39,7 +40,7 @@ const elecProvisionCertificatePreview: ElecProvisionCertificatePreview = {
   operating_unit: "FRIONE",
   energy_amount: 200000,
   remaining_energy_amount: 200000,
-  current_type: "DC",
+  source: ElecProvisionCertificateSource.MANUAL,
 }
 
 const elecProvisionCertificatePreview2: ElecProvisionCertificatePreview = {
@@ -50,7 +51,7 @@ const elecProvisionCertificatePreview2: ElecProvisionCertificatePreview = {
   operating_unit: "ORIONE",
   energy_amount: 450000,
   remaining_energy_amount: 300000,
-  current_type: "AC",
+  source: ElecProvisionCertificateSource.MANUAL,
 }
 
 export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData =

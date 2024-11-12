@@ -1537,5 +1537,7 @@
   "Confirmer": "Confirm",
   "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.": "Identifier not found. Please check that your charge point does exist on transport.data.gouv.fr.",
   "Cet identifiant est déjà utilisé pour un autre point de charge.": "This identifier is already in use for another charge point.",
-  "Rendement estimé": "Estimated efficiency"
+  "Rendement estimé": "Estimated efficiency",
+  "Source": "Source",
+  "Manuel": "Manual"
 }
