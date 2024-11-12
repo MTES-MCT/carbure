@@ -52,3 +52,6 @@ class ElecChargePoint(models.Model):
     @property
     def measure_energy(self):
         return self.current_meter.initial_index if self.current_meter else None
+
+    def is_updatable(self):
+        return self.application.status != ElecChargePointApplication.AUDIT_IN_PROGRESS
