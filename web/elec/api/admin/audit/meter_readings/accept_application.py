@@ -12,7 +12,6 @@ from core.helpers import send_mail
 from core.models import ExternalAdminRights
 from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
-from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
@@ -73,7 +72,7 @@ def accept_application(request: HttpRequest):
             year=application.year,
             operating_unit=group["operating_unit"],
             energy_amount=group["renewable_energy"] / 1000,
-            current_type=ElecChargePoint.DC,
+            current_type=ElecProvisionCertificate.METER_READINGS,
             remaining_energy_amount=group["renewable_energy"] / 1000,
         )
         certificate_model_instances.append(certif)
