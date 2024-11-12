@@ -7,9 +7,12 @@ import {
 import styles from "./private-navigation.module.css"
 import { Text } from "common/components/text"
 import { PrivateSidebar } from "./sidebar"
+import { Button } from "common/components/button2"
+import { useTranslation } from "react-i18next"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
+  const { t } = useTranslation()
 
   return (
     <PrivateNavigationProvider>
@@ -24,6 +27,16 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
             <Text is="h1" fontWeight="bold">
               {title}
             </Text>
+            <div>
+              <Button
+                priority="tertiary"
+                iconPosition="left"
+                iconId="ri-question-line"
+                size="small"
+              >
+                {t("Aide")}
+              </Button>
+            </div>
           </div>
         </header>
         <div className={cl(styles["body"])}>
