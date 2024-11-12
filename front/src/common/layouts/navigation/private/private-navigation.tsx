@@ -9,6 +9,7 @@ import { Text } from "common/components/text"
 import { PrivateSidebar } from "./sidebar"
 import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
+import { LanguageSelector } from "common/molecules/language-selector"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
@@ -27,7 +28,7 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
             <Text is="h1" fontWeight="bold">
               {title}
             </Text>
-            <div>
+            <div className={styles["header-right-actions"]}>
               <Button
                 priority="tertiary"
                 iconPosition="left"
@@ -36,6 +37,7 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
               >
                 {t("Aide")}
               </Button>
+              <LanguageSelector />
             </div>
           </div>
         </header>
