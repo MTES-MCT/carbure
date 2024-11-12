@@ -5,12 +5,12 @@ import {
   PrivateNavigationProvider,
   usePrivateNavigation,
 } from "./private-navigation.context"
-import { okUnauthorizedUser } from "carbure/__test__/api"
 import { EntityType } from "carbure/types"
 import { mockUser } from "carbure/__test__/helpers"
 
 const meta: Meta<typeof PrivateNavigation> = {
   component: PrivateNavigation,
+  title: "layouts/navigation/private",
   decorators: [
     (Story) => (
       <PrivateNavigationProvider>
