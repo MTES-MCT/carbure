@@ -72,7 +72,7 @@ def accept_application(request: HttpRequest):
             year=application.year,
             operating_unit=group["operating_unit"],
             energy_amount=group["renewable_energy"] / 1000,
-            current_type=ElecProvisionCertificate.METER_READINGS,
+            source=ElecProvisionCertificate.METER_READINGS,
             remaining_energy_amount=group["renewable_energy"] / 1000,
         )
         certificate_model_instances.append(certif)
