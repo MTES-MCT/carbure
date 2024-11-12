@@ -25,6 +25,12 @@
   flex-grow: 1;
 }
 
+.header-right-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1w);
+}
+
 .body {
   display: flex;
   height: calc(
