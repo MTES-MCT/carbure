@@ -3,7 +3,6 @@ import { useUser } from "carbure/hooks/user"
 import { Select } from "common/components/selects2"
 import { Text } from "common/components/text"
 import styles from "./entity-selector.module.css"
-import { getEntityTypeLabel } from "carbure/utils/normalizers"
 import { EntityType } from "carbure/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -59,6 +58,7 @@ export const EntitySelector = () => {
           </Text>
         </div>
       )}
+      full
     />
   )
 }

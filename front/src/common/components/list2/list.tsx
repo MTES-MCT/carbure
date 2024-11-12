@@ -18,7 +18,7 @@ import { isInside } from "../dropdown"
 import css from "./list.module.css"
 import { Text } from "../text"
 import { CheckLine } from "../icon"
-import { SearchInput } from "../inputs"
+import { SearchInput } from "../inputs2"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>

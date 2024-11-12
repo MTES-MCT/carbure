@@ -1624,5 +1624,6 @@
   "Confirmer": "Confirmer",
   "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.": "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.",
   "Cet identifiant est déjà utilisé pour un autre point de charge.": "Cet identifiant est déjà utilisé pour un autre point de charge.",
-  "Rendement estimé": "Rendement estimé"
+  "Rendement estimé": "Rendement estimé",
+  "Aide": "Aide"
 }

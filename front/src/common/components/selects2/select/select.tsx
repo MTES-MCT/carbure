@@ -5,9 +5,11 @@ import { Dropdown, Trigger } from "../../dropdown2"
 
 import { Control } from "../../input"
 import { List } from "../../list2"
-import { Button } from "common/components/button2"
+import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
+import cl from "clsx"
+
 export interface SelectProps<T, V = T> extends Control, Trigger {
   clear?: boolean // A garder ?
   search?: boolean
@@ -22,6 +24,10 @@ export interface SelectProps<T, V = T> extends Control, Trigger {
   // Custom renderer for the displayed value
   valueRenderer?: (item: T) => React.ReactNode
   sort?: Sorter<T, V>
+  size?: ButtonProps["size"]
+
+  // If true, the select will take the full width of its container
+  full?: boolean
 }
 
 export function Select<T, V>({
@@ -39,6 +45,8 @@ export function Select<T, V>({
   normalize = defaultNormalizer,
   sort,
   valueRenderer,
+  size = "medium",
+  full,
   ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -63,7 +71,11 @@ export function Select<T, V>({
         iconId="fr-icon-arrow-down-s-line"
         iconPosition="right"
         priority="tertiary"
-        className={styles["select-button"]}
+        className={cl(
+          styles["select-button"],
+          full && styles["select-button-full"]
+        )}
+        size={size}
       >
         <Text fontWeight="semibold" is="span">
           {currentItem && valueRenderer

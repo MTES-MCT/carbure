@@ -17,7 +17,11 @@
 }
 
 .header-right {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: var(--spacing-5v) var(--spacing-3w);
+  gap: var(--spacing-1w);
   flex-grow: 1;
 }
 

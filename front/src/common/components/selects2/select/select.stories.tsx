@@ -49,6 +49,12 @@ export const Disabled: Story = {
   },
 }
 
+export const FullWidth: Story = {
+  args: {
+    full: true,
+  },
+}
+
 export const CustomRenderer: Story = {
   args: {
     value: "1",
