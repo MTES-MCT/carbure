@@ -12,6 +12,7 @@ import {
 
 const meta: Meta<typeof NavigationLayout> = {
   component: NavigationLayout,
+  title: "layouts/navigation",
   parameters: {
     layout: "fullscreen",
   },
