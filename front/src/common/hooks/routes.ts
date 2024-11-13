@@ -17,6 +17,8 @@ export const useRoutes = () => {
     ELEC: (year: number = currentYear) => ROUTE_URLS.ELEC(entity.id, year),
     SAF: (year: number = currentYear) => ROUTE_URLS.SAF(entity.id, year),
     SETTINGS: ROUTE_URLS.SETTINGS(entity.id),
+    STATISTICS: ROUTE_URLS.STATISTICS(entity.id),
+    REGISTRY: ROUTE_URLS.REGISTRY(entity.id),
   }
 
   return routes

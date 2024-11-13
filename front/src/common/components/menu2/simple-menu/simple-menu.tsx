@@ -10,6 +10,9 @@ export type SimpleMenuProps = Exclude<ButtonProps, "children" | "title"> & {
   label?: string
   anchor?: string
   children: React.ReactNode
+
+  // If provided, the dropdown will have this width (used for specific cases)
+  dropdownWidth?: string
 }
 
 /**
@@ -21,6 +24,7 @@ export const SimpleMenu = ({
   label = "Menu",
   anchor,
   children,
+  dropdownWidth,
   ...props
 }: SimpleMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -35,6 +39,7 @@ export const SimpleMenu = ({
         className={css.dropdown}
         triggerRef={triggerRef}
         anchor={anchor}
+        style={{ width: dropdownWidth }}
       >
         {children}
       </Dropdown>
