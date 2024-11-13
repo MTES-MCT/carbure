@@ -175,6 +175,7 @@ export function List<T, V>({
             onMouseOver: !disabled ? () => selection.focus(value) : undefined,
             onClick: !disabled ? () => selection.select(value) : undefined,
           }}
+          size="sm"
         >
           {render(config)}
           {config.selected && <CheckLine size="sm" />}

@@ -44,6 +44,7 @@ const Notifications = () => {
   if (entity.id === -1) return null
 
   const items = notifications.result?.data.data ?? []
+
   const pending = items.filter((n) => !n.acked).map((n) => n.id)
 
   return (
