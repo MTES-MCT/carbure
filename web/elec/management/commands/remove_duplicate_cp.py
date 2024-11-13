@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 from django.core.management.base import BaseCommand
-from django.db.models import Count, Max, OuterRef, Subquery
+from django.db.models import Count, F, Subquery
 
 from elec.models import ElecChargePoint, ElecMeterReading
 
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(" -- Executing deletion of duplicate charge points.")
 
-        # Subquery to get not delete charge points with at least 2 occurrences
+        # Subquery to get not deleted charge points with at least 2 occurrences
         duplicate_charge_points = (
             ElecChargePoint.objects.values("charge_point_id")
             .annotate(count=Count("charge_point_id"))
@@ -39,19 +39,16 @@ class Command(BaseCommand):
         self.stdout.write(f"Nombre de doublons : {charge_points.count()}")
         self.stdout.write(f"Nombre de pdc à conserver : {len(duplicate_charge_points)}")
 
-        # Subquery to get the most recent reading date for each charge point
-        latest_readings = (
-            ElecMeterReading.objects.filter(meter__charge_point_id=OuterRef("charge_point_id"))
-            .values("meter__charge_point_id")
-            .annotate(latest_reading_date=Max("reading_date"))
-            .values("latest_reading_date")
-        )
-
-        # Annotate the main query with the latest reading date
+        # Get all charge points with their meter readings if they have any, otherwise None
         queryset = (
-            charge_points.annotate(latest_reading_date=Subquery(latest_readings.values("reading_date")[:1]))
-            .values("id", "charge_point_id", "latest_reading_date")
-            .order_by("charge_point_id")
+            ElecChargePoint.objects.filter(charge_point_id__in=charge_points.values("charge_point_id"))
+            .prefetch_related("elecmeter_set__elecmeterreading_set")
+            .annotate(
+                meter_id=F("elec_meters__id"),
+                reading_date=F("elec_meters__elec_meter_readings__reading_date"),
+                reading_id=F("elec_meters__elec_meter_readings__id"),
+            )
+            .values("id", "charge_point_id", "meter_id", "reading_date", "reading_id")
         )
 
         # Group charge points by charge point ID
@@ -64,11 +61,21 @@ class Command(BaseCommand):
         # For each group of charge points, apply rules to select the one to keep
         for _, items in grouped_charge_points.items():
             # Keep charge points wiht reading
-            with_reading = [item for item in items if item["latest_reading_date"] is not None]
+            with_reading = [item for item in items if item["reading_date"] is not None]
 
             if with_reading:
                 # If there are, we keep the one with the more recent reading
-                selected_point = max(with_reading, key=lambda x: x["latest_reading_date"])
+                # And we associate meter readings to the selected charge point
+                selected_point = max(with_reading, key=lambda x: x["reading_date"])
+                non_selected_points = [item for item in with_reading if item["id"] != selected_point["id"]]
+                for old_charge_point in non_selected_points:
+                    if not dry_run:
+                        ElecMeterReading.objects.filter(id=old_charge_point["reading_id"]).update(
+                            meter=selected_point["meter_id"]
+                        )
+                    self.stdout.write(
+                        f"['meter_reading_id':{old_charge_point["reading_id"]}, 'from meter_id':{old_charge_point['meter_id']}, 'to meter_id':{selected_point['meter_id']}]"  # noqa: E501
+                    )
             else:
                 # Else we keep the one with the lowest ID (first created)
                 selected_point = min(items, key=lambda x: x["id"])
@@ -79,10 +86,10 @@ class Command(BaseCommand):
         # Delete all charge points that are not in the list of IDs to keep
         charge_points_to_delete = charge_points.exclude(id__in=ids_to_keep)
         self.stdout.write(f"Points de charge à supprimer : {charge_points_to_delete.count()}")
+        self.stdout.write(f"Points de charge à supprimer : {list(charge_points_to_delete.values_list('id', flat=True))}")
 
         if not dry_run:
-            # charge_points_to_delete.delete()
-            charge_points_to_delete.update(is_deleted=True)
+            charge_points_to_delete.delete()
             self.stdout.write("Points de charge supprimés !")
 
         self.stdout.write(f"Points de charge conservés : {len(ids_to_keep)}")
