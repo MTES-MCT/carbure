@@ -634,12 +634,12 @@
   "Matière première": "Matière première",
   "Biocarburant": "Biocarburant",
   "Prod. max": "Prod. max",
-  "Prod. estimée": "Prod. estimée",
+  "Prod. effective": "Prod. effective",
   "Quota demandé": "Quota demandé",
   "Quota approuvé": "Quota approuvé",
   "Max": "Max",
   "Nombre de lots": "Nombre de lots",
-  "Volume produit": "Volume produit",
+  "Volume incorporé": "Volume incorporé",
   "Progression": "Progression",
   "La demande a été envoyée !": "La demande a été envoyée !",
   "Impossible d'envoyer le dossier": "Impossible d'envoyer le dossier",
@@ -1624,5 +1624,7 @@
   "Confirmer": "Confirmer",
   "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.": "Identifiant non trouvé. Veuillez vérifier que votre point de recharge existe bien sur transport.data.gouv.fr.",
   "Cet identifiant est déjà utilisé pour un autre point de charge.": "Cet identifiant est déjà utilisé pour un autre point de charge.",
-  "Rendement estimé": "Rendement estimé"
+  "Rendement estimé": "Rendement estimé",
+  "Source": "Source",
+  "Manuel": "Manuel"
 }

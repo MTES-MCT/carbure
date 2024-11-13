@@ -167,7 +167,12 @@ const UpdateChargePointDialog = () => {
                       readOnly
                       {...bind("mid_id")}
                     />
-                    <Button variant="link" action={openChangeMeterDialog}>
+
+                    <Button
+                      variant="link"
+                      action={openChangeMeterDialog}
+                      disabled={isReadOnly}
+                    >
                       {t("Mon compteur MID a changé ?")}
                     </Button>
                   </Fieldset>
@@ -181,6 +186,7 @@ const UpdateChargePointDialog = () => {
                     <Button
                       variant="link"
                       action={openChangeMeasureReferencePointDialog}
+                      disabled={isReadOnly}
                     >
                       {t("Mon PRM a changé ?")}
                     </Button>
@@ -202,6 +208,7 @@ const UpdateChargePointDialog = () => {
                     />
                   ))
                 }
+                disabled={isReadOnly}
               />
               {isReadOnly ? (
                 <Button

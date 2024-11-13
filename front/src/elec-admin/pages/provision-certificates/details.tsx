@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
 import { formatNumber } from "common/utils/formatters"
+import { getElecProvisionCertificateSourceLabel } from "elec/utils/normalizers"
 
 export const ElecAdminProvisionDetailsDialog = () => {
   const { t } = useTranslation()
@@ -69,8 +70,10 @@ export const ElecAdminProvisionDetailsDialog = () => {
 
             <TextInput
               readOnly
-              label={t("Type de courant")}
-              value={provisionCertificate?.current_type}
+              label={t("Source")}
+              value={getElecProvisionCertificateSourceLabel(
+                provisionCertificate?.source
+              )}
             />
             <TextInput
               readOnly

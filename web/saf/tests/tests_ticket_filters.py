@@ -1,9 +1,9 @@
 from django.urls import reverse
 
 from core.models import MatierePremiere
-from saf.api.operator.tests.test_viewset import TestCase
 from saf.factories import SafTicketFactory
 from saf.models import SafTicket
+from saf.tests import TestCase
 
 
 class SafTicketFiltersTest(TestCase):
