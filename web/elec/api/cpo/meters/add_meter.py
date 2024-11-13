@@ -9,6 +9,7 @@ from elec.serializers.elec_meter import ElecMeterSerializer
 
 class MetersError:
     CP_NOT_FOUND_ON_CPO = "CP_NOT_FOUND_ON_CPO"
+    AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
 
 
 @require_POST
@@ -21,6 +22,9 @@ def add_elec_meter(request, entity, entity_id):
 
     if serializer.validated_data["charge_point"].cpo != entity:
         return ErrorResponse(400, MetersError.CP_NOT_FOUND_ON_CPO)
+
+    if not serializer.validated_data["charge_point"].is_updatable():
+        return ErrorResponse(400, MetersError.AUDIT_IN_PROGRESS)
 
     meter = serializer.save()
 
