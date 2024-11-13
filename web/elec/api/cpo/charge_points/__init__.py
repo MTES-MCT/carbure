@@ -10,10 +10,11 @@ from .filters import get_charge_points_filters
 from .update_charge_point import update_charge_point
 from .update_prm import update_prm
 from .delete_charge_point import delete_charge_point
-
+from .delete_application import delete_application
 urlpatterns = [
     path("", get_charge_points, name="elec-cpo-charge-points-get-charge-points"),
     path("applications", get_applications, name="elec-cpo-charge-points-get-applications"),
+    path("delete-application", delete_application, name="elec-cpo-charge-points-delete-application"),
     path("application-details", get_application_details, name="elec-cpo-charge-points-get-application-details"),
     path("check-application", check_application, name="elec-cpo-charge-points-check-application"),
     path("add-application", add_application, name="elec-cpo-charge-points-add-application"),
