@@ -11,7 +11,7 @@ import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const meta: Meta<typeof PrivateNavigation> = {
   component: PrivateNavigation,
-  title: "layouts/navigation/private",
+  title: "common/layouts/navigation/private",
   decorators: [
     (Story) => (
       <PrivateNavigationProvider>
@@ -38,10 +38,12 @@ export const PrivateLayout: Story = {
   args: {
     children: (
       <>
-        <div style={{ background: "red", height: "200px" }}>
+        <div style={{ background: "#aba6a6", height: "200px" }}>
           this is the content of my page
         </div>
-        <div style={{ background: "blue", height: "500px" }}>other content</div>
+        <div style={{ background: "#eda7a7", height: "500px" }}>
+          other content
+        </div>
       </>
     ),
   },
