@@ -3,7 +3,7 @@ import Notifications from "./notifications"
 
 const meta: Meta<typeof Notifications> = {
   component: Notifications,
-  title: "carbure/components/Notifications",
+  title: "legacy/Notifications",
   args: {},
 }
 

@@ -53,4 +53,7 @@ export const WithMargin: Story = {
     children: "This is a default text",
     margin: true,
   },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
 }

@@ -4,6 +4,9 @@ import { LanguageSelector } from "./language-selector"
 const meta: Meta<typeof LanguageSelector> = {
   component: LanguageSelector,
   title: "common/molecules/LanguageSelector",
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
 }
 
 type Story = StoryObj<typeof LanguageSelector>

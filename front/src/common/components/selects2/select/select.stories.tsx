@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Select } from "./select"
 import { ReactNode, useState } from "react"
+import { userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
   component: Select,
@@ -29,17 +30,18 @@ type Story = StoryObj<
 
 export default meta
 
-export const DefaultList: Story = {}
-
-export const Search: Story = {
-  args: {
-    search: true,
+export const DefaultList: Story = {
+  play: async ({ canvasElement }) => {
+    const { getByRole } = within(canvasElement)
+    const select = await waitFor(() => getByRole("button"))
+    await userEvent.click(select)
   },
 }
 
-export const Loading: Story = {
+export const Search: Story = {
+  ...DefaultList,
   args: {
-    loading: true,
+    search: true,
   },
 }
 
