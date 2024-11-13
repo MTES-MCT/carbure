@@ -1,4 +1,4 @@
-import { Select, SelectProps } from "common/components/selects2"
+import { Select } from "common/components/selects2"
 import useLocalStorage from "common/hooks/storage"
 import { useMatomo } from "matomo"
 import { useTranslation } from "react-i18next"
@@ -9,10 +9,6 @@ const languages = [
   { value: "fr", label: "🇫🇷 Français", displayedValue: "🇫🇷" },
   { value: "en", label: "🇬🇧 English", displayedValue: "🇬🇧" },
 ]
-
-// type LanguageSelectorProps = {
-//   size?: SelectProps<{ value: Lang; displayedValue: string }, Lang>[""]
-// }
 
 export const LanguageSelector = () => {
   const { i18n } = useTranslation()

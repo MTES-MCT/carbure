@@ -16,8 +16,6 @@ import {
 import { multipleSelection, singleSelection } from "../../utils/selection"
 import { isInside } from "../dropdown"
 import css from "./list.module.css"
-import { Text } from "../text"
-import { CheckLine } from "../icon"
 import { SearchInput } from "../inputs2"
 import { ListItem } from "./list-item"
 

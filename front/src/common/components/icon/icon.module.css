@@ -17,3 +17,7 @@
 .fr-icon--lg::after {
   --icon-size: 2rem;
 }
+
+.passthrough {
+  pointer-events: none;
+}
