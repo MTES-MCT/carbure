@@ -6,8 +6,12 @@ import {
   BuildingLine,
   CalendarCheckFill,
   CalendarCheckLine,
+  ClipboardFill,
+  ClipboardLine,
   ContrastDropFill,
   ContrastDropLine,
+  EyeFill,
+  EyeLine,
   FileTextFill,
   FileTextLine,
   InboxArchiveFill,
@@ -26,77 +30,18 @@ import { MenuSection } from "./private-sidebar.types"
 export const usePrivateSidebar = () => {
   const {
     // isAdmin,
-    // isAuditor,
-    isIndustry,
     isOperator,
-    isPowerOrHeatProducer,
     has_saf,
     isAirline,
     // isProducer,
     isCPO,
-    has_elec,
   } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
 
-  const biofuels: MenuSection = {
-    title: t("Lot de biocarburants"),
-    condition: isIndustry || isPowerOrHeatProducer,
-    children: [
-      {
-        path: routes.BIOFUELS().DRAFT,
-        title: t("Brouillons"),
-        icon: SurveyLine,
-        iconActive: SurveyFill,
-      },
-      {
-        path: routes.BIOFUELS().RECEIVED,
-        title: t("Reçus"),
-        additionalInfo: "12",
-        icon: InboxArchiveLine,
-        iconActive: InboxArchiveFill,
-      },
-      {
-        path: routes.BIOFUELS().STOCKS,
-        title: t("En stock"),
-        additionalInfo: "12",
-        icon: StackLine,
-        iconActive: StackFill,
-      },
-      {
-        path: routes.BIOFUELS().SENT,
-        title: t("Envoyés"),
-        icon: SendPlaneLine,
-        iconActive: SendPlaneFill,
-      },
-    ],
-  }
+  const biofuels = useBiofuels()
 
-  const elec: MenuSection = {
-    title: t("Certificats d'électricité"),
-    condition: (has_elec && isOperator) || isCPO,
-    children: [
-      {
-        path: routes.ELEC().CERTIFICATES,
-        title: t("Certificats"),
-        icon: FileTextLine,
-        iconActive: FileTextFill,
-        condition: has_elec && isOperator,
-      },
-      {
-        path: routes.ELEC().PROVISIONNED_ENERGY,
-        title: t("Énergie disponible"),
-        icon: ArrowGoBackLine,
-        condition: isCPO,
-      },
-      {
-        path: routes.ELEC().TRANSFERRED_ENERGY,
-        title: t("Énergie cédée"),
-        icon: ArrowGoForwardLine,
-        condition: isCPO,
-      },
-    ],
-  }
+  const elec = useElec()
 
   const chargePoints: MenuSection = {
     title: t("Point de recharge"),
@@ -172,4 +117,119 @@ export const usePrivateSidebar = () => {
         (child) => child.condition === undefined || child.condition === true
       ),
     }))
+}
+
+const useBiofuels = () => {
+  const { isAuditor, isIndustry, isPowerOrHeatProducer, has_stocks } =
+    useEntity()
+  const { t } = useTranslation()
+  const routes = useRoutes()
+
+  const biofuels: MenuSection = {
+    title: t("Lots de biocarburants"),
+    condition: isIndustry || isPowerOrHeatProducer,
+    children: [
+      {
+        path: routes.BIOFUELS().DRAFT,
+        title: t("Brouillons"),
+        icon: SurveyLine,
+        iconActive: SurveyFill,
+      },
+      {
+        path: routes.BIOFUELS().RECEIVED,
+        title: t("Reçus"),
+        additionalInfo: "12",
+        icon: InboxArchiveLine,
+        iconActive: InboxArchiveFill,
+      },
+      {
+        path: routes.BIOFUELS().STOCKS,
+        title: t("En stock"),
+        additionalInfo: "12",
+        icon: StackLine,
+        iconActive: StackFill,
+        condition: has_stocks,
+      },
+      {
+        path: routes.BIOFUELS().SENT,
+        title: t("Envoyés"),
+        icon: SendPlaneLine,
+        iconActive: SendPlaneFill,
+      },
+    ],
+  }
+
+  const biofuelsAuditor: MenuSection = {
+    title: t("Lots de biocarburants"),
+    condition: isAuditor,
+    children: [
+      {
+        path: routes.BIOFUELS_AUDITOR().ALERTS,
+        title: t("Signalements"),
+        icon: EyeLine,
+        iconActive: EyeFill,
+      },
+      {
+        path: routes.BIOFUELS_AUDITOR().LOTS,
+        title: t("Lots"),
+        icon: ClipboardLine,
+        iconActive: ClipboardFill,
+      },
+      {
+        path: routes.BIOFUELS_AUDITOR().STOCKS,
+        title: t("En stock"),
+        icon: StackLine,
+        iconActive: StackFill,
+      },
+    ],
+  }
+
+  return isAuditor ? biofuelsAuditor : biofuels
+}
+
+const useElec = () => {
+  const { has_elec, isOperator, isCPO, isAuditor } = useEntity()
+  const { t } = useTranslation()
+  const routes = useRoutes()
+
+  const elec: MenuSection = {
+    title: t("Certificats d'électricité"),
+    condition: (has_elec && isOperator) || isCPO,
+    children: [
+      {
+        path: routes.ELEC().CERTIFICATES,
+        title: t("Certificats"),
+        icon: FileTextLine,
+        iconActive: FileTextFill,
+        condition: has_elec && isOperator,
+      },
+      {
+        path: routes.ELEC().PROVISIONNED_ENERGY,
+        title: t("Énergie disponible"),
+        icon: ArrowGoBackLine,
+        condition: isCPO,
+      },
+      {
+        path: routes.ELEC().TRANSFERRED_ENERGY,
+        title: t("Énergie cédée"),
+        icon: ArrowGoForwardLine,
+        condition: isCPO,
+      },
+    ],
+  }
+
+  const elecAuditor: MenuSection = {
+    ...elec,
+    condition: isAuditor,
+    children: [
+      {
+        path: routes.ELEC_AUDITOR(),
+        title: t("Certificats"),
+        icon: FileTextLine,
+        iconActive: FileTextFill,
+      },
+    ],
+  }
+
+  return isAuditor ? elecAuditor : elec
 }

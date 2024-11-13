@@ -48,129 +48,70 @@ export const company: Entity = {
 }
 
 export const producer: Entity = {
+  ...company,
   id: 0,
   name: "Producteur Test",
   entity_type: EntityType.Producer,
-  has_mac: true,
-  has_trading: true,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const trader: Entity = {
+  ...company,
   id: 1,
   name: "Trader Test",
   entity_type: EntityType.Trader,
-  has_mac: true,
-  has_trading: true,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const operator: Entity = {
+  ...company,
   id: 2,
   name: "Opérateur Test",
   entity_type: EntityType.Operator,
-  has_mac: true,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const admin: Entity = {
+  ...company,
   id: 3,
   name: "Admin Test",
   entity_type: EntityType.Administration,
   has_mac: false,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const cpo: Entity = {
+  ...company,
   id: 4,
   name: "CPO Test",
   entity_type: EntityType.CPO,
   has_mac: false,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
 }
 
 export const airline: Entity = {
+  ...company,
   id: 5,
   name: "Airline Test",
   entity_type: EntityType.Airline,
   has_mac: false,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
+}
+
+const auditor: Entity = {
+  ...company,
+  id: 6,
+  name: "Auditeur test",
+  entity_type: EntityType.Auditor,
+  has_mac: false,
+  has_trading: false,
+}
+
+const powerOrHeatProducer: Entity = {
+  ...company,
+  id: 7,
+  name: "Producteur de chaleur test",
+  entity_type: EntityType.PowerOrHeatProducer,
+  has_mac: false,
+  has_trading: false,
 }
 
 // DELIVERY SITES
@@ -261,7 +202,9 @@ export const entities = {
   [EntityType.Operator]: operator,
   [EntityType.Trader]: trader,
   [EntityType.Producer]: producer,
+  [EntityType.PowerOrHeatProducer]: powerOrHeatProducer,
   [EntityType.Airline]: airline,
+  [EntityType.Auditor]: auditor,
 }
 
 type PartialUserParam = DeepPartial<{
