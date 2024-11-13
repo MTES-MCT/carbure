@@ -23,37 +23,7 @@
   margin-bottom: 1px;
 }
 
-.list li {
-  display: flex;
-  justify-content: space-between;
-  column-gap: var(--spacing-3v);
-  padding: var(--spacing-3v) var(--spacing-2w);
-  cursor: pointer;
-  color: var(--text-action-high-grey);
-  position: relative;
-  background: white;
-}
-
-.list li:not(:last-child):after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--spacing-2w);
-  width: calc(100% - var(--spacing-4w));
-  border-bottom: 1px solid var(--border-default-grey);
-}
-
 /* Check the usage when a list will be implemented with a dropdown*/
 [data-dropdown] li {
   padding: var(--spacing-s) var(--spacing-m);
-}
-
-.list li[data-focused] {
-  background-color: var(--background-default-grey-hover);
-  /* color: var(--text-action-high-blue-france); */
-}
-
-.list li[data-selected] {
-  color: var(--text-action-high-blue-france);
 }

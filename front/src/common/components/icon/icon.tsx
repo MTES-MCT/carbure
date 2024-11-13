@@ -170,3 +170,28 @@ export const ArrowDownSLine = ({ className, ...props }: IconProps) => {
     <Icon {...props} className={cl(fr.cx("ri-arrow-down-s-line"), className)} />
   )
 }
+
+export const AccountLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon
+      {...props}
+      className={cl(fr.cx("ri-account-circle-line"), className)}
+    />
+  )
+}
+
+export const ChartLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-line-chart-line"), className)} />
+  )
+}
+
+export const BookLine = ({ className, ...props }: IconProps) => {
+  return <Icon {...props} className={cl(fr.cx("ri-book-2-line"), className)} />
+}
+
+export const LogoutBoxLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-logout-box-r-line"), className)} />
+  )
+}

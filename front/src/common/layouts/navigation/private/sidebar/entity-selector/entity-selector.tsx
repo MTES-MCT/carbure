@@ -7,7 +7,7 @@ import { EntityType } from "carbure/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
-export const EntitySelector = () => {
+export const EntitySelector = ({ className }: { className?: string }) => {
   const user = useUser()
   const entity = useEntity()
   const { t } = useTranslation()
@@ -59,6 +59,7 @@ export const EntitySelector = () => {
         </div>
       )}
       full
+      className={className}
     />
   )
 }
