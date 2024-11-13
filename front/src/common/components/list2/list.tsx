@@ -19,6 +19,7 @@ import css from "./list.module.css"
 import { Text } from "../text"
 import { CheckLine } from "../icon"
 import { SearchInput } from "../inputs2"
+import { ListItem } from "./list-item"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>
@@ -124,7 +125,7 @@ export function List<T, V>({
       return <li>{i18next.t("Aucune entrée trouvée")}</li>
     }
 
-    return items.map(({ value, label, children, disabled, data }) => {
+    return items.map(({ value, label, children, disabled, data }, index) => {
       const config: ItemConfig<T, V> = {
         value,
         label,
@@ -163,23 +164,14 @@ export function List<T, V>({
       }
 
       return (
-        <Text
-          is="li"
-          key={label}
-          data-key={label}
-          data-disabled={disabled ? true : undefined}
-          data-level={level > 0 ? level : undefined}
-          data-selected={config.selected ? true : undefined}
-          data-focused={config.focused ? true : undefined}
-          componentProps={{
-            onMouseOver: !disabled ? () => selection.focus(value) : undefined,
-            onClick: !disabled ? () => selection.select(value) : undefined,
-          }}
-          size="sm"
+        <ListItem
+          {...config}
+          onClick={() => selection.select(value)}
+          onFocus={() => selection.focus(value)}
+          borderBottom={index < items.length - 1}
         >
           {render(config)}
-          {config.selected && <CheckLine size="sm" />}
-        </Text>
+        </ListItem>
       )
     })
   }

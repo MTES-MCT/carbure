@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next"
 import { LanguageSelector } from "common/molecules/language-selector"
 import { Notifications } from "./notifications"
 import { UserMenu } from "./user-menu"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)

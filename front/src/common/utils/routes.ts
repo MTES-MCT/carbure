@@ -48,4 +48,9 @@ export const ROUTE_URLS = {
   SETTINGS: (entity_id: number) => urlWithOrgId(entity_id, "/settings"),
 
   USER_GUIDE: "https://carbure-1.gitbook.io/faq",
+
+  MY_ACCOUNT: "/account",
+  LOGOUT: "/auth/logout",
+  STATISTICS: (entity_id: number) => urlWithOrgId(entity_id, "/stats"),
+  REGISTRY: (entity_id: number) => urlWithOrgId(entity_id, "/registry"),
 }

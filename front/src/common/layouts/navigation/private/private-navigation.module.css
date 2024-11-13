@@ -33,9 +33,7 @@
 
 .body {
   display: flex;
-  height: calc(
-    100vh - var(--private-navigation-header-height) - var(--dev-banner-height)
-  );
+  height: calc(100vh - var(--private-navigation-header-height));
 }
 
 .nav {

@@ -19,7 +19,7 @@ export const PrivateSidebar = () => {
   return (
     <div className={styles["private-sidebar"]}>
       <div className={styles["nav-wrapper"]}>
-        <EntitySelector />
+        <EntitySelector className={styles["entity-selector"]} />
         <nav className={styles["nav"]}>
           {menuItems.map((item) => (
             <div key={item.title}>
