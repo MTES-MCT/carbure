@@ -54,7 +54,7 @@ check-frontend:
   script:
     - npm run lint
     - npm run build
-    - npx chromatic
+    - npm run chromatic
   interruptible: true
 
 

@@ -82,12 +82,11 @@ const NavigationButtons = ({
     const items = await fetchIdsForPage(page)
 
     if (items && !idsMap.has(page)) {
-      setIdsMap(idsMap.set(page, getItemsIds(items)))
+      setIdsMap(new Map(idsMap.set(page, getItemsIds(items))))
     }
 
     return items
   }
-
   const { loading } = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (current: number) => fetchIdsForNavigation(page),
@@ -102,9 +101,11 @@ const NavigationButtons = ({
           pageCount
         )
 
+        // Fetch previous page only if the current id is first id of the current page and there is a previous page
         if (infos.hasPrev && !infos.hasPrevCurrentPage) {
           fetchIdsForNavigation(page - 1)
-        } else if (nav.hasNext && !infos.hasNextCurrentPage) {
+        } else if (infos.hasNext && !infos.hasNextCurrentPage) {
+          // Fetch next page only if the current id is last id of the current page and there is a next page
           fetchIdsForNavigation(page + 1)
         }
       },
