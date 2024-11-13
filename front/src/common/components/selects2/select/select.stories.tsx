@@ -61,3 +61,12 @@ export const CustomRenderer: Story = {
     valueRenderer: (item) => <div style={{ color: "red" }}>{item.label}</div>,
   },
 }
+
+export const LoadingState: Story = {
+  args: {
+    loading: true,
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+}

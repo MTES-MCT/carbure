@@ -75,3 +75,18 @@ select {
       transparent var(--default-outer)
     );
 }
+
+/* ri-loader-line will be used as the common loading icon*/
+@keyframes loading {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ri-loader-line::after {
+  will-change: transform;
+  animation: loading infinite linear 3s;
+}
