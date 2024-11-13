@@ -1,29 +1,32 @@
 import Button from "common/components/button"
 import { NumberInput } from "common/components/input"
 import { Cell, Column } from "common/components/table"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatPercentage } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { DoubleCountingProduction } from "../types"
+import { DoubleCountingProduction, DoubleCountingSourcing } from "../types"
 import YearTable from "./year-table"
+import useEntity from "carbure/hooks/entity"
+import { compact } from "common/utils/collection"
 
 type ProductionTableProps = {
   hasAgreement?: boolean
 
   quotas?: Record<string, number>
   production: DoubleCountingProduction[]
+  sourcing: DoubleCountingSourcing[]
   setQuotas?: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
   hasAgreement,
-
+  sourcing,
   quotas,
   production,
   setQuotas,
 }: ProductionTableProps) => {
   const { t } = useTranslation()
-
-  const productionColumns: Column<DoubleCountingProduction>[] = [
+  const entity = useEntity()
+  const productionColumns: Column<DoubleCountingProduction>[] = compact([
     {
       header: t("Matière première"),
       cell: (p) => <Cell text={t(p.feedstock.code, { ns: "feedstocks" })} />,
@@ -37,14 +40,42 @@ export const ProductionTable = ({
       cell: (p) => <Cell text={formatNumber(p.max_production_capacity ?? 0)} />,
     },
     {
-      header: t("Prod. estimée"),
+      header: t("Prod. effective"),
       cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
+    },
+    entity.isAdmin && {
+      header: t("Rendement estimé"),
+      cell: (p) => {
+        // Find sources related to the production
+        const sources = sourcing.filter(
+          (source) =>
+            source.feedstock.code === p.feedstock.code && p.year === source.year
+        )
+
+        // Calculate sum weight
+        const metricTonnes = sources.reduce(
+          (sum, source) => source.metric_tonnes + sum,
+          0
+        )
+
+        const estimatedEfficiency = sources.length
+          ? (p.estimated_production / metricTonnes) * 100
+          : null
+
+        return (
+          <Cell
+            text={
+              estimatedEfficiency ? formatPercentage(estimatedEfficiency) : ""
+            }
+          />
+        )
+      },
     },
     {
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
     },
-  ]
+  ])
 
   if (hasAgreement) {
     productionColumns?.push({

@@ -6,11 +6,12 @@ from .application_details import get_application_details
 from .check_application import check_application
 from .add_application import add_application
 from .applications import get_applications
-
+from .delete_application import delete_application
 urlpatterns = [
     path("application-template", get_application_template, name="elec-cpo-meter-readings-get-application-template"),
     path("application-details", get_application_details, name="elec-cpo-meter-readings-get-application-details"),
     path("check-application", check_application, name="elec-cpo-meter-readings-check-application"),
     path("add-application", add_application, name="elec-cpo-meter-readings-add-application"),
+    path("delete-application", delete_application, name="elec-cpo-meter-readings-delete-application"),
     path("applications", get_applications, name="elec-cpo-meter-readings-get-applications"),
 ]

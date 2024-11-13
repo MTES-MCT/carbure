@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from core.models import Entity, EntityCertificate, GenericCertificate, UserRights, UserRightsRequests
 from core.tests_utils import setup_current_user
-from entity.helpers import enable_entity
+from entity.services.enable_entity import enable_entity
 
 
 class EntityRegistrationAddCompanyTest(TestCase):

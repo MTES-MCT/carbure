@@ -57,6 +57,47 @@ class ElecCharginPointsTest(TestCase):
             charge_point=None,
         )
 
+    def create_charge_points_application(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 1, 5)
+        application.save()
+        application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application2.created_at = datetime.date(2023, 1, 6)
+        application2.save()
+
+        charge_point = ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="ABCDE",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            current_meter=self.meter,
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+            cpo_name="Alice",
+            cpo_siren="12345",
+        )
+
+        ElecChargePoint.objects.create(
+            application=application2,
+            cpo=self.cpo,
+            charge_point_id="BCDEF",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            current_meter=self.meter,
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="GHIJK",
+            nominal_power=40,
+            cpo_name="Bob",
+            cpo_siren="67890",
+        )
+
+        self.meter.charge_point = charge_point
+        self.meter.save()
+
     def test_check_charge_point_wrong_entity(self):
         filepath = "%s/web/elec/fixtures/full_ac_charge_points_error.xlsx" % (os.environ["CARBURE_HOME"])
 
@@ -571,6 +612,8 @@ class ElecCharginPointsTest(TestCase):
                         "cpo_name": "Alice",
                         "cpo_siren": "12345",
                         "status": "PENDING",
+                        "latitude": None,
+                        "longitude": None,
                     },
                     {
                         "id": charge_point2.id,
@@ -591,6 +634,8 @@ class ElecCharginPointsTest(TestCase):
                         "cpo_name": "Bob",
                         "cpo_siren": "67890",
                         "status": "PENDING",
+                        "latitude": None,
+                        "longitude": None,
                     },
                 ],
                 "ids": [charge_point.id, charge_point2.id],
@@ -815,6 +860,8 @@ class ElecCharginPointsTest(TestCase):
                 "cpo_name": "Alice",
                 "cpo_siren": "12345",
                 "status": "PENDING",
+                "latitude": None,
+                "longitude": None,
             },
         }
         data = response.json()
@@ -886,6 +933,8 @@ class ElecCharginPointsTest(TestCase):
                     "cpo_name": "Alice",
                     "cpo_siren": "12345",
                     "status": "PENDING",
+                    "latitude": None,
+                    "longitude": None,
                 }
             ],
         }
@@ -925,20 +974,35 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         assert data["error"] == "CP_CANNOT_BE_UPDATED"
 
-        # Working
+        # charge_point_id not in TDG
         del payload["measure_reference_point_id"]
+        response = self.client.post(url, payload)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error"] == "CP_ID_NOT_IN_TGD"
+
+        # Working
+        payload["charge_point_id"] = "FRCCCC333302"
         response = self.client.post(url, payload)
         assert response.status_code == 200
         charge_point.refresh_from_db()
-        assert charge_point.charge_point_id == "FRBBBB222204"
+        assert charge_point.charge_point_id == "FRCCCC333302"
 
-        # Bad ACCEPTED application status
-        application.status = ElecChargePointApplication.ACCEPTED
+        # Bad AUDIT_IN_PROGRESS application status
+        application.status = ElecChargePointApplication.AUDIT_IN_PROGRESS
         application.save()
         response = self.client.post(url, payload)
         assert response.status_code == 400
         data = response.json()
-        assert data["error"] == "CP_CANNOT_BE_UPDATED"
+        assert data["error"] == "AUDIT_IN_PROGRESS"
+
+        # charge_point_id already exists
+        application.status = ElecChargePointApplication.PENDING
+        application.save()
+        response = self.client.post(url, payload)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error"] == "CP_ID_ALREADY_EXISTS"
 
     def test_update_charge_point_prm(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -981,3 +1045,53 @@ class ElecCharginPointsTest(TestCase):
         assert response.status_code == 200
         charge_point.refresh_from_db()
         assert charge_point.measure_reference_point_id == "654321"
+
+    def test_delete_application_ok(self):
+        self.create_charge_points_application()
+
+        assert ElecChargePointApplication.objects.count() > 1
+        application = ElecChargePointApplication.objects.first()
+        application_id = application.id
+        charge_points = ElecChargePoint.objects.filter(application=application)
+        assert charge_points.count() > 0
+
+        application.status = ElecChargePointApplication.PENDING
+        application.save()
+
+        assert application.status == ElecChargePointApplication.PENDING
+        response = self.client.post(
+            reverse("elec-cpo-charge-points-delete-application"),
+            {"entity_id": self.cpo.id, "id": application.id},
+        )
+
+        data = response.json()
+
+        assert response.status_code == 200
+        assert data == {"status": "success"}
+
+        assert not ElecChargePointApplication.objects.filter(id=application_id).exists()
+        assert not ElecChargePoint.objects.filter(application_id=application_id).exists()
+
+    def test_delete_application_nok(self):
+        self.create_charge_points_application()
+        assert ElecChargePointApplication.objects.count() > 1
+        application = ElecChargePointApplication.objects.first()
+        application_id = application.id
+        meter_readings = ElecChargePoint.objects.filter(application=application)
+        assert meter_readings.count() > 0
+        application.status = ElecChargePointApplication.ACCEPTED
+        application.save()
+
+        assert application.status == ElecChargePointApplication.ACCEPTED
+        response = self.client.post(
+            reverse("elec-cpo-charge-points-delete-application"),
+            {"entity_id": self.cpo.id, "id": application.id},
+        )
+
+        data = response.json()
+
+        assert response.status_code == 400
+        assert "error" in data
+        assert data["error"] == "APPLICATION_NOT_PENDING"
+        assert ElecChargePointApplication.objects.filter(id=application_id).exists()
+        assert ElecChargePoint.objects.filter(application_id=application_id).exists()

@@ -274,7 +274,11 @@ class ElecMeterReadingsTest(TestCase):
                         "line": 3,
                         "meta": {"extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]},
                     },
-                    {"error": "INVALID_DATA", "line": 4, "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]}},
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 4,
+                        "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
+                    },
                     {
                         "error": "INVALID_DATA",
                         "line": 6,
@@ -385,7 +389,10 @@ class ElecMeterReadingsTest(TestCase):
         mocked_get_application_deadline = patch(
             "elec.services.meter_readings_application_quarter.get_application_deadline"
         ).start()
-        mocked_get_application_deadline.return_value = (datetime.date(2024, 10, 15), "HIGH")
+        mocked_get_application_deadline.return_value = (
+            datetime.date(2024, 10, 15),
+            "HIGH",
+        )
 
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-applications"),
@@ -403,7 +410,11 @@ class ElecMeterReadingsTest(TestCase):
                     {
                         "application_date": application_date,
                         "charge_point_count": 2,
-                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                        "cpo": {
+                            "entity_type": "Charge Point Operator",
+                            "id": self.cpo.id,
+                            "name": "CPO",
+                        },
                         "energy_total": 26.92,
                         "id": mock.ANY,
                         "quarter": 2,
@@ -413,7 +424,11 @@ class ElecMeterReadingsTest(TestCase):
                     {
                         "application_date": application_date,
                         "charge_point_count": 0,
-                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                        "cpo": {
+                            "entity_type": "Charge Point Operator",
+                            "id": self.cpo.id,
+                            "name": "CPO",
+                        },
                         "energy_total": 0,
                         "id": application.id,
                         "quarter": 3,
@@ -483,7 +498,10 @@ class ElecMeterReadingsTest(TestCase):
     def test_get_application_details(self):
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-application-details"),
-            {"entity_id": self.cpo.id, "application_id": self.meter_reading_application.id},
+            {
+                "entity_id": self.cpo.id,
+                "application_id": self.meter_reading_application.id,
+            },
         )
 
         data = response.json()
@@ -500,3 +518,49 @@ class ElecMeterReadingsTest(TestCase):
                 }
             ],
         }
+
+    def test_delete_application_ok(self):
+        assert ElecMeterReadingApplication.objects.count() > 1
+        application = ElecMeterReadingApplication.objects.filter(status=ElecMeterReadingApplication.ACCEPTED).first()
+        application_id = application.id
+        meter_readings = ElecMeterReading.objects.filter(application=application)
+        assert meter_readings.count() > 0
+
+        application.status = ElecMeterReadingApplication.PENDING
+        application.save()
+
+        assert application.status == ElecMeterReadingApplication.PENDING
+        response = self.client.post(
+            reverse("elec-cpo-meter-readings-delete-application"),
+            {"entity_id": self.cpo.id, "id": application.id},
+        )
+
+        data = response.json()
+
+        assert response.status_code == 200
+        assert data == {"status": "success"}
+
+        assert not ElecMeterReadingApplication.objects.filter(id=application_id).exists()
+        assert not ElecMeterReading.objects.filter(application_id=application_id).exists()
+
+    def test_delete_application_nok(self):
+        assert ElecMeterReadingApplication.objects.count() > 1
+        application = ElecMeterReadingApplication.objects.filter(status=ElecMeterReadingApplication.ACCEPTED).first()
+        application_id = application.id
+        meter_readings = ElecMeterReading.objects.filter(application=application)
+        assert meter_readings.count() > 0
+
+        assert application.status == ElecMeterReadingApplication.ACCEPTED
+        response = self.client.post(
+            reverse("elec-cpo-meter-readings-delete-application"),
+            {"entity_id": self.cpo.id, "id": application.id},
+        )
+
+        data = response.json()
+
+        assert response.status_code == 400
+        assert data == {"status": "error", "error": "APPLICATION_NOT_PENDING"}
+        assert "error" in data
+        assert data["error"] == "APPLICATION_NOT_PENDING"
+        assert ElecMeterReadingApplication.objects.filter(id=application_id).exists()
+        assert ElecMeterReading.objects.filter(application_id=application_id).exists()

@@ -5,7 +5,11 @@ import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { UserRightsTable } from "common/molecules/user-rights-table"
 
-const UserRights = () => {
+type UserRightsProps = {
+  readOnly?: boolean
+}
+
+const UserRights = ({ readOnly }: UserRightsProps) => {
   const { id } = useParams<"id">()
   const entity = useEntity()
   const company_id = parseInt(id ?? "", 10)
@@ -27,6 +31,7 @@ const UserRights = () => {
 
   return (
     <UserRightsTable
+      readOnly={readOnly}
       rights={rights}
       onChangeUserRole={(role, right) =>
         updateRole.execute(right.id, entity.id, role)

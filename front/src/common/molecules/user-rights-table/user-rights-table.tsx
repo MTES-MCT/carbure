@@ -21,6 +21,8 @@ import { AddUserDialog, AddUserDialogProps } from "./add-user-dialog"
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
 
+  readOnly?: boolean
+
   // Function called when the role of an user is changed
   onChangeUserRole: (
     role: UserRole,
@@ -54,6 +56,7 @@ const RIGHTS_ORDER = {
 
 export const UserRightsTable = ({
   rights,
+  readOnly,
   isSearchable = false,
   onChangeUserRole,
   onAcceptUser,
@@ -115,11 +118,13 @@ export const UserRightsTable = ({
         )}
       </section>
 
+      {rights.length === 0 && <footer />}
+
       {rights.length > 0 && (
         <Table
           order={{ column: "status", direction: "asc" }}
           rows={rights}
-          columns={[
+          columns={compact([
             {
               small: true,
               key: "status",
@@ -154,35 +159,36 @@ export const UserRightsTable = ({
                   : dateRequested
               },
             },
-            actionColumn<UserRightRequest>((request) =>
-              compact([
-                request.status === UserRightStatus.Accepted && (
-                  <ChangeUserRoleButton
-                    request={request}
-                    onChangeUserRole={handleChangeUserRole(request)}
-                  />
-                ),
-                request.status !== UserRightStatus.Accepted && (
-                  <AcceptUserButton
-                    onAcceptUser={() => onAcceptUser(request)}
-                    request={request}
-                  />
-                ),
-                request.status !== UserRightStatus.Accepted && (
-                  <RejectUserButton
-                    onRejectUser={() => onRejectUser(request)}
-                    request={request}
-                  />
-                ),
-                request.status === UserRightStatus.Accepted && (
-                  <RevokeUserButton
-                    onRevokeUser={() => onRevokeUser(request)}
-                    request={request}
-                  />
-                ),
-              ])
-            ),
-          ]}
+            !readOnly &&
+              actionColumn<UserRightRequest>((request) =>
+                compact([
+                  request.status === UserRightStatus.Accepted && (
+                    <ChangeUserRoleButton
+                      request={request}
+                      onChangeUserRole={handleChangeUserRole(request)}
+                    />
+                  ),
+                  request.status !== UserRightStatus.Accepted && (
+                    <AcceptUserButton
+                      onAcceptUser={() => onAcceptUser(request)}
+                      request={request}
+                    />
+                  ),
+                  request.status !== UserRightStatus.Accepted && (
+                    <RejectUserButton
+                      onRejectUser={() => onRejectUser(request)}
+                      request={request}
+                    />
+                  ),
+                  request.status === UserRightStatus.Accepted && (
+                    <RevokeUserButton
+                      onRevokeUser={() => onRevokeUser(request)}
+                      request={request}
+                    />
+                  ),
+                ])
+              ),
+          ])}
         />
       )}
     </Panel>

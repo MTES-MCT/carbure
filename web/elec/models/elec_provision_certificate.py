@@ -1,7 +1,5 @@
 from django.db import models
 
-from elec.models.elec_charge_point import ElecChargePoint
-
 
 class ElecProvisionCertificate(models.Model):
     class Meta:
@@ -16,10 +14,19 @@ class ElecProvisionCertificate(models.Model):
         (4, "T4"),
     )
 
+    MANUAL = "MANUAL"
+    METER_READINGS = "METER_READINGS"
+    QUALICHARGE = "QUALICHARGE"
+    SOURCES = (
+        (MANUAL, MANUAL),
+        (METER_READINGS, METER_READINGS),
+        (QUALICHARGE, QUALICHARGE),
+    )
+
     cpo = models.ForeignKey("core.Entity", on_delete=models.CASCADE)
     quarter = models.IntegerField(choices=QUARTERS)
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)
-    current_type = models.CharField(max_length=2, choices=ElecChargePoint.CURRENT_TYPES, null=True)
+    source = models.CharField(max_length=32, choices=SOURCES, null=True, default=None)
     energy_amount = models.FloatField()
     remaining_energy_amount = models.FloatField()

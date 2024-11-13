@@ -1,19 +1,25 @@
 import Button from "common/components/button"
-import { Download } from "common/components/icons"
+import { Cross, Download } from "common/components/icons"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import { ElecChargePointsApplication } from "elec/types"
+import {
+  ElecAuditApplicationStatus,
+  ElecChargePointsApplication,
+} from "elec/types"
 import { useTranslation } from "react-i18next"
 import { compact } from "common/utils/collection"
 
 import { To } from "react-router-dom"
+import { usePortal } from "common/components/portal"
+import { Confirm } from "common/components/dialog"
 
 interface ChargePointsApplicationsTableProps {
   applications: ElecChargePointsApplication[]
   onDownloadChargePointsApplication: (
     application: ElecChargePointsApplication
   ) => void
+  onDeleteChargePointsApplication?: (id: number) => Promise<unknown>
   rowLink?: (row: ElecChargePointsApplication) => To
   loading?: boolean
   displayCpo?: boolean
@@ -24,11 +30,13 @@ const ChargePointsApplicationsTable: React.FC<
 > = ({
   applications,
   onDownloadChargePointsApplication,
+  onDeleteChargePointsApplication,
   rowLink,
   loading,
   displayCpo = false,
 }) => {
   const { t } = useTranslation()
+  const portal = usePortal()
 
   return (
     <Table
@@ -75,6 +83,32 @@ const ChargePointsApplicationsTable: React.FC<
               title={t("Exporter les points de recharge")}
               action={() => onDownloadChargePointsApplication(application)}
             />,
+            application.status === ElecAuditApplicationStatus.Pending &&
+              onDeleteChargePointsApplication && (
+                <Button
+                  captive
+                  variant="icon"
+                  icon={Cross}
+                  title={t("Supprimer le dossier")}
+                  action={() =>
+                    portal((close) => (
+                      <Confirm
+                        variant="danger"
+                        icon={Cross}
+                        title={t("Supprimer le dossier")}
+                        description={t(
+                          "Voulez-vous supprimer ce dossier d'inscription de points de recharge ?"
+                        )}
+                        confirm={t("Supprimer")}
+                        onConfirm={() =>
+                          onDeleteChargePointsApplication(application.id)
+                        }
+                        onClose={close}
+                      />
+                    ))
+                  }
+                />
+              ),
           ])
         ),
       ])}
