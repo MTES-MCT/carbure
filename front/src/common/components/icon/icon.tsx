@@ -195,3 +195,23 @@ export const LogoutBoxLine = ({ className, ...props }: IconProps) => {
     <Icon {...props} className={cl(fr.cx("ri-logout-box-r-line"), className)} />
   )
 }
+
+export const EyeLine = ({ className, ...props }: IconProps) => {
+  return <Icon {...props} className={cl(fr.cx("ri-eye-line"), className)} />
+}
+
+export const EyeFill = ({ className, ...props }: IconProps) => {
+  return <Icon {...props} className={cl(fr.cx("ri-eye-fill"), className)} />
+}
+
+export const ClipboardLine = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-clipboard-line"), className)} />
+  )
+}
+
+export const ClipboardFill = ({ className, ...props }: IconProps) => {
+  return (
+    <Icon {...props} className={cl(fr.cx("ri-clipboard-fill"), className)} />
+  )
+}

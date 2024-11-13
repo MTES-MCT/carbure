@@ -127,7 +127,7 @@ const Navigation = ({ entity }: NavigationProps) => {
 
               isAuditor && {
                 key: "elec-audit",
-                path: "elec-audit", // ok
+                path: "elec-audit", // pas encore migré
                 label: t("Elec"),
               },
 

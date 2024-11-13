@@ -7,6 +7,7 @@ import {
 } from "./private-navigation.context"
 import { EntityType } from "carbure/types"
 import { mockUser } from "carbure/__test__/helpers"
+import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const meta: Meta<typeof PrivateNavigation> = {
   component: PrivateNavigation,
@@ -67,10 +68,20 @@ export const OperatorLayout: Story = {
             entity: {
               has_elec: true,
               has_saf: true,
+              has_stocks: true,
             },
           },
         }),
       ],
+    },
+  },
+}
+
+export const AuditorLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [mockUser(EntityType.Auditor)],
     },
   },
 }
@@ -83,6 +94,25 @@ export const ProducerLayout: Story = {
     },
   },
 }
+
+export const PowerOrHeatProducerLayout: Story = {
+  ...PrivateLayout,
+  parameters: {
+    msw: {
+      handlers: [mockUser(EntityType.PowerOrHeatProducer)],
+    },
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { entityId: "7", year: "2024" },
+      },
+      routing: {
+        path: "/org/:entityId/transactions/:year/drafts",
+        handle: "Profile",
+      },
+    }),
+  },
+}
+
 export const TraderLayout: Story = {
   ...PrivateLayout,
   parameters: {
