@@ -3,7 +3,13 @@
 
 from django.contrib import admin
 
-from .models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction, DoubleCountingSourcing
+from .models import (
+    DoubleCountingApplication,
+    DoubleCountingDocFile,
+    DoubleCountingProduction,
+    DoubleCountingSourcing,
+    DoubleCountingSourcingHistory,
+)
 
 
 @admin.register(DoubleCountingApplication)
@@ -51,3 +57,18 @@ class DoubleCountingProductionAdmin(admin.ModelAdmin):
 @admin.register(DoubleCountingDocFile)
 class DoubleCountingDocFileAdmin(admin.ModelAdmin):
     list_display = ("dca", "certificate_id", "url", "file_name", "created_at")
+
+
+@admin.register(DoubleCountingSourcingHistory)
+class DoubleCountingSourcingHistoryAdmin(admin.ModelAdmin):
+    list_display = (
+        "dca",
+        "year",
+        "feedstock",
+        "raw_material_supplier",
+        "supplier_certificate_name",
+        "metric_tonnes",
+    )
+    list_filter = ("year", "feedstock", "origin_country")
+    search_fields = ["raw_material_supplier", "supplier_certificate_name"]
+    autocomplete_fields = ["supplier_certificate"]

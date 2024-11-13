@@ -10,6 +10,7 @@ from elec.serializers.elec_charge_point import ElecChargePointUpdateSerializer
 class ChargePointUpdateError:
     CP_NOT_FOUND_ON_CPO = "CP_NOT_FOUND_ON_CPO"
     CP_CANNOT_BE_UPDATED = "CP_CANNOT_BE_UPDATED"
+    AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
 
 
 @require_POST
@@ -25,6 +26,9 @@ def update_prm(request, entity, entity_id):
         return ErrorResponse(400, ChargePointUpdateError.CP_NOT_FOUND_ON_CPO)
 
     validated_data = serializer.validated_data
+
+    if not cp.is_updatable():
+        return ErrorResponse(400, ChargePointUpdateError.AUDIT_IN_PROGRESS)
 
     if "charge_point_id" in validated_data:
         return ErrorResponse(400, ChargePointUpdateError.CP_CANNOT_BE_UPDATED)

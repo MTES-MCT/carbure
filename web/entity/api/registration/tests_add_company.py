@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from core.models import Entity, EntityCertificate, GenericCertificate, UserRights, UserRightsRequests
 from core.tests_utils import setup_current_user
-from entity.helpers import enable_entity
+from entity.services.enable_entity import enable_entity
 
 
 class EntityRegistrationAddCompanyTest(TestCase):
@@ -41,9 +41,9 @@ class EntityRegistrationAddCompanyTest(TestCase):
             "registered_country": "FR",
             "registered_zipcode": "75001",
             "registration_id": "542051180",
-            "sustainability_officer": "officer@test.com",
+            "sustainability_officer": "Officer Test",
             "sustainability_officer_email": "officer@test.com",
-            "sustainability_officer_phone_number": "0612345678",
+            "sustainability_officer_phone_number": "0123456789",
         }
 
         response = self.client.post(

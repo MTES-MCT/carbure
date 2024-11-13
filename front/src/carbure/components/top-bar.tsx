@@ -149,7 +149,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Électricité"),
               },
 
-              ((has_elec && isOperator) || isCPO) && {
+              isCPO && {
                 key: "charge-points",
                 path: "charge-points", // ok
                 label: t("PDC"),

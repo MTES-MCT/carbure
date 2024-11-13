@@ -18,12 +18,14 @@ import {
   normalizeEntityType,
 } from "carbure/utils/normalizers"
 import useEntity from "carbure/hooks/entity"
+import Tag from "common/components/tag"
 
 type EntitySummaryProps = {
   search?: string
 }
 
 type Operation =
+  | "authorize"
   | "user"
   | "certificate"
   | "double-counting"
@@ -85,7 +87,14 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
           label={t("Opérations en attente")}
           placeholder={t("Choisissez une opération")}
           options={compact([
-            { value: "user", label: t("Utilisateurs à autoriser") },
+            {
+              value: "authorize",
+              label: t("Sociétés à autoriser"),
+            },
+            {
+              value: "user",
+              label: t("Utilisateurs à autoriser"),
+            },
             entity.isAdmin && {
               value: "certificate",
               label: t("Certificats à valider"),
@@ -118,6 +127,20 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             rows={matchedEntities}
             rowLink={(e) => `${e.entity.id}`}
             columns={compact([
+              {
+                key: "entities",
+                header: t("Accès"),
+                small: true,
+                orderBy: (e) => e.entity.name,
+                cell: (e) => (
+                  <Tag
+                    variant={e.entity.is_enabled ? "success" : "warning"}
+                    label={
+                      e.entity.is_enabled ? t("Autorisé") : t("À autoriser")
+                    }
+                  />
+                ),
+              },
               {
                 key: "entities",
                 header: t("Société"),
@@ -315,6 +338,7 @@ function hasOperation(
   operation: Operation | undefined
 ) {
   if (operation === undefined) return true
+  if (operation === "authorize" && !details.entity.is_enabled) return true
   if (operation === "user" && details.requests > 0) return true
   if (operation === "certificate" && details.certificates_pending > 0)
     return true
