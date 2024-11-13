@@ -18,16 +18,19 @@ import CompanyInfoSirenDialog from "./company-info-siren-dialog"
 
 type CompanyInfoProps = {
   company?: Entity
+  readOnly?: boolean
 }
 
-const CompanyInfo = ({ company }: CompanyInfoProps) => {
+const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
   const { t } = useTranslation()
   const loggedEntity = useEntity()
   const portal = usePortal()
 
   const entity = company || loggedEntity
+
   const readOnly =
-    company && !loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+    _readOnly ||
+    (company && !loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite))
 
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
@@ -103,17 +106,19 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
         </section>
       )}
 
-      <section>
-        <Alert
-          icon={AlertCircle}
-          variant={companyForm.value.registration_id ? "info" : "warning"}
-        >
-          {t("Complétez vos informations à partir de votre numéro SIREN")}
-          <Button variant="primary" action={showAutofillDialog} asideX>
-            {t("Compléter mes informations")}
-          </Button>
-        </Alert>
-      </section>
+      {!readOnly && (
+        <section>
+          <Alert
+            icon={AlertCircle}
+            variant={companyForm.value.registration_id ? "info" : "warning"}
+          >
+            {t("Complétez vos informations à partir de votre numéro SIREN")}
+            <Button variant="primary" action={showAutofillDialog} asideX>
+              {t("Compléter mes informations")}
+            </Button>
+          </Alert>
+        </section>
+      )}
 
       <section>
         <Form form={companyForm} id="entity-info" onSubmit={onSubmitForm}>
@@ -213,8 +218,8 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
           />
         </Form>
       </section>
-      <section>
-        {!readOnly && (
+      {!readOnly && (
+        <section>
           <Button
             asideX
             submit="entity-info"
@@ -223,8 +228,8 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             variant="primary"
             label={t("Enregistrer les modifications")}
           />
-        )}
-      </section>
+        </section>
+      )}
       <footer />
 
       {updateEntity.loading && <LoaderOverlay />}

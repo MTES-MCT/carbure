@@ -5,7 +5,7 @@ from core.models import UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
 
-def enable_entity(entity, request):
+def enable_entity(entity, http_request):
     # get entity admin
     try:
         right_request = UserRightsRequests.objects.get(entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
@@ -45,7 +45,7 @@ def enable_entity(entity, request):
     """  # noqa: E501
 
     send_mail(
-        request=request,
+        request=http_request,
         subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
