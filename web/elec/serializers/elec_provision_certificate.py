@@ -10,7 +10,7 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "cpo",
-            "current_type",
+            "source",
             "quarter",
             "year",
             "operating_unit",
