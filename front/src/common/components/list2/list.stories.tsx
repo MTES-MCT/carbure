@@ -81,7 +81,7 @@ export const SearchList: Story = {
   },
 }
 
-export const SelectValue: Story = {
+export const UserSelectValue: Story = {
   play: async ({ canvasElement }) => {
     const { getByText } = within(canvasElement)
     const item = await waitFor(() => getByText("Item 2"))

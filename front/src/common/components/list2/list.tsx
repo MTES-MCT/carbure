@@ -167,6 +167,7 @@ export function List<T, V>({
           onClick={() => selection.select(value)}
           onFocus={() => selection.focus(value)}
           borderBottom={index < items.length - 1}
+          key={label}
         >
           {render(config)}
         </ListItem>

@@ -12,7 +12,7 @@ import {
 
 const meta: Meta<typeof NavigationLayout> = {
   component: NavigationLayout,
-  title: "layouts/navigation",
+  title: "common/layouts/navigation",
   parameters: {
     layout: "fullscreen",
   },
@@ -42,10 +42,12 @@ export const PrivateLayout: Story = {
   args: {
     children: (
       <>
-        <div style={{ background: "red", height: "200px" }}>
+        <div style={{ background: "#aba6a6", height: "200px" }}>
           this is the content of my page
         </div>
-        <div style={{ background: "blue", height: "500px" }}>other content</div>
+        <div style={{ background: "#eda7a7", height: "500px" }}>
+          other content
+        </div>
       </>
     ),
   },
