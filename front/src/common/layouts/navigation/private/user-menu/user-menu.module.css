@@ -1,0 +1,5 @@
+.user-menu-infos {
+  padding: var(--spacing-2w) var(--spacing-2w) var(--spacing-1w)
+    var(--spacing-2w);
+  color: var(--text-mention-grey);
+}
