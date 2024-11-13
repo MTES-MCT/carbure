@@ -10,6 +10,8 @@ import { PrivateSidebar } from "./sidebar"
 import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
 import { LanguageSelector } from "common/molecules/language-selector"
+import { Notifications } from "./notifications"
+import { UserMenu } from "./user-menu"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
@@ -38,6 +40,8 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
                 {t("Aide")}
               </Button>
               <LanguageSelector />
+              <Notifications />
+              <UserMenu />
             </div>
           </div>
         </header>

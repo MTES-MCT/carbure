@@ -2,7 +2,7 @@ import {
   Button as ButtonDSFR,
   ButtonProps as ButtonDSFRProps,
 } from "@codegouvfr/react-dsfr/Button"
-import { ForwardedRef, forwardRef, memo } from "react"
+import { ForwardedRef, forwardRef } from "react"
 
 export type ButtonProps = ButtonDSFRProps
 

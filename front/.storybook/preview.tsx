@@ -10,6 +10,7 @@ import useUserManager, { UserContext } from "../src/carbure/hooks/user"
 import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
+import { MatomoProvider } from "../src/matomo"
 
 // import css from our app
 import "../src/carbure/assets/css/index.css"
@@ -43,15 +44,17 @@ const withData = (Story) => {
   }
   return (
     <Suspense fallback={<LoaderOverlay />}>
-      <UserContext.Provider value={user}>
-        <EntityContext.Provider value={entity}>
-          <PortalProvider>
-            <div className="new-dsfr">
-              <Story />
-            </div>
-          </PortalProvider>
-        </EntityContext.Provider>
-      </UserContext.Provider>
+      <MatomoProvider>
+        <UserContext.Provider value={user}>
+          <EntityContext.Provider value={entity}>
+            <PortalProvider>
+              <div className="new-dsfr">
+                <Story />
+              </div>
+            </PortalProvider>
+          </EntityContext.Provider>
+        </UserContext.Provider>
+      </MatomoProvider>
     </Suspense>
   )
 }
