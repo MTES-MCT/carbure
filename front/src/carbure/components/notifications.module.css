@@ -45,7 +45,7 @@
   color: var(--gray-dark);
 }
 
-.markAllAsRead {
+.notificationMenu .markAllAsRead {
   padding: 8px 16px;
   width: 100%;
   justify-content: space-between;
