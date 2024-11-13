@@ -121,13 +121,13 @@ const Navigation = ({ entity }: NavigationProps) => {
 
               (isAdmin || isAuditor) && {
                 key: "controls",
-                path: "controls", // pas encore migré
+                path: "controls", // ok
                 label: t("Biocarburants"),
               },
 
               isAuditor && {
                 key: "elec-audit",
-                path: "elec-audit", // pas encore migré
+                path: "elec-audit", // ok
                 label: t("Elec"),
               },
 
@@ -169,7 +169,7 @@ const Navigation = ({ entity }: NavigationProps) => {
 
               (isOperator || isProducer) && {
                 key: "stats",
-                path: "stats", // pas encore migré
+                path: "stats", // ok
                 label: t("Statistiques"),
               },
 
@@ -189,13 +189,13 @@ const Navigation = ({ entity }: NavigationProps) => {
 
               entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && {
                 key: "settings",
-                path: "settings", // pas encore migré
+                path: "settings", // ok
                 label: t("Société"),
               },
 
               (isIndustry || isPowerOrHeatProducer) && {
                 key: "registry",
-                path: "registry", // pas encore migré
+                path: "registry", // ok
                 label: t("Annuaire"),
               },
             ])}

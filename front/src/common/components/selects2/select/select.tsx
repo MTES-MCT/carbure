@@ -28,6 +28,7 @@ export interface SelectProps<T, V = T> extends Control, Trigger {
 
   // If true, the select will take the full width of its container
   full?: boolean
+  className?: string
 }
 
 export function Select<T, V>({
@@ -47,6 +48,7 @@ export function Select<T, V>({
   valueRenderer,
   size = "medium",
   full,
+  className,
   ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -73,7 +75,8 @@ export function Select<T, V>({
         priority="tertiary"
         className={cl(
           styles["select-button"],
-          full && styles["select-button-full"]
+          full && styles["select-button-full"],
+          className
         )}
         size={size}
       >
