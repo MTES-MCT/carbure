@@ -18,7 +18,7 @@ import useEntity from "carbure/hooks/entity"
 import Autocomplete from "common/components/autocomplete"
 import * as norm from "carbure/utils/normalizers"
 import { getDeliverySites } from "settings/api/delivery-sites"
-import { findEntities, findMyCertificates } from "carbure/api"
+import { findBiofuelEntities, findMyCertificates } from "carbure/api"
 import Select from "common/components/select"
 import { compact } from "common/utils/collection"
 import Form from "common/components/form"
@@ -692,7 +692,7 @@ const TradingDialog = ({
               label={t("Client")}
               value={client}
               onChange={setClient}
-              getOptions={findEntities}
+              getOptions={findBiofuelEntities}
               normalize={norm.normalizeEntityOrUnknown}
               create={norm.identity}
             />
