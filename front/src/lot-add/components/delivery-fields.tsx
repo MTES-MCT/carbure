@@ -62,7 +62,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
         icon={isKnown ? UserCheck : undefined}
         create={norm.identity}
         defaultOptions={supplier ? [supplier] : undefined}
-        getOptions={api.findEntities}
+        getOptions={api.findBiofuelEntities}
         normalize={norm.normalizeEntityOrUnknown}
         {...bound}
         {...props}
@@ -156,7 +156,7 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={api.findEntities}
+      getOptions={api.findBiofuelEntities}
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}

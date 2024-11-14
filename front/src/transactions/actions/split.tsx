@@ -13,9 +13,9 @@ import { Entity, Country, Depot } from "carbure/types"
 import { DateInput, NumberInput, TextInput } from "common/components/input"
 import Autocomplete from "common/components/autocomplete"
 import {
+  findBiofuelEntities,
   findCountries,
   findDepots,
-  findEntities,
   findMyCertificates,
 } from "carbure/api"
 import * as norm from "carbure/utils/normalizers"
@@ -132,7 +132,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             />
             <Autocomplete
               label={t("Client")}
-              getOptions={findEntities}
+              getOptions={findBiofuelEntities}
               normalize={norm.normalizeEntityOrUnknown}
               create={norm.identity}
               {...bind("client")}
