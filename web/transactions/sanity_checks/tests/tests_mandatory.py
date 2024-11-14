@@ -3,9 +3,9 @@ import datetime
 from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
-from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
-from producers.models import ProductionSite
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from transactions.factories import CarbureLotFactory
+from transactions.models import Depot, ProductionSite
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
@@ -20,6 +20,7 @@ class MandatorySanityChecksTest(TestCase):
         "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):

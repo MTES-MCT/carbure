@@ -16,6 +16,7 @@ class LotsTestUnits(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -32,7 +33,7 @@ class LotsTestUnits(TestCase):
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]

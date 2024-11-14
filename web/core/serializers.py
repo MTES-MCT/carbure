@@ -8,7 +8,6 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
-    Depot,
     Entity,
     EntityCertificate,
     EntityDepot,
@@ -23,7 +22,7 @@ from doublecount.serializers import (
     EntitySummarySerializer,
     FeedStockSerializer,
 )
-from producers.models import ProductionSite
+from transactions.models import Depot, ProductionSite
 
 
 class DepotSerializer(serializers.ModelSerializer):
@@ -35,9 +34,9 @@ class DepotSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "city",
-            "depot_id",
+            "customs_id",
             "country",
-            "depot_type",
+            "site_type",
             "address",
             "postal_code",
             "gps_coordinates",
@@ -76,7 +75,7 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
             "ges_option",
             "eligible_dc",
             "dc_reference",
-            "site_id",
+            "site_siret",
             "address",
             "city",
             "postal_code",

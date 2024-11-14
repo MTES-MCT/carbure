@@ -5,8 +5,8 @@ from django.test import TestCase
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import MatierePremiere
-from producers.models import ProductionSite
 from transactions.factories import CarbureLotFactory
+from transactions.models import ProductionSite
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
@@ -21,6 +21,7 @@ class DoubleCountingSanityChecksTest(TestCase):
         "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -28,7 +29,7 @@ class DoubleCountingSanityChecksTest(TestCase):
         self.other_feedstock = MatierePremiere.objects.exclude(is_double_compte=True).first()
 
         self.production_site = ProductionSite.objects.first()
-        self.producer = self.production_site.producer
+        self.producer = self.production_site.created_by
 
         self.old_dc_cert = DoubleCountingRegistration.objects.create(
             certificate_id="FR_00999_2021",
@@ -51,7 +52,7 @@ class DoubleCountingSanityChecksTest(TestCase):
             valid_until=datetime.date(2026, 12, 31),
         )
 
-        self.other_production_site = ProductionSite.objects.exclude(producer=self.producer).last()
+        self.other_production_site = ProductionSite.objects.exclude(entitysite__entity=self.producer).last()
 
         self.other_dc_cert = DoubleCountingRegistration.objects.create(
             certificate_id="FR_09999_2023",

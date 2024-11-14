@@ -4,8 +4,8 @@ from datetime import datetime
 import factory
 
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
-from producers.models import ProductionSite
 from saf.models import SafTicketSource
+from transactions.models import ProductionSite
 
 
 class SafTicketSourceFactory(factory.django.DjangoModelFactory):
