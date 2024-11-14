@@ -193,7 +193,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
               placeholder={t("Rechercher une société...")}
               name="entity"
               value={entity}
-              getOptions={common.findEntities}
+              getOptions={common.findEnabledEntities}
               onChange={setEntity}
               normalize={normalizeEntity}
             />

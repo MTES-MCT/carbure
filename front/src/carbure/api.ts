@@ -42,21 +42,31 @@ export function findCountries(query: string) {
     .then(extract)
 }
 
-export function findEntities(query?: string, entity_type?: EntityType[]) {
+export function findEntities(
+  query?: string,
+  filters?: { is_enabled?: boolean; entity_type?: EntityType[] }
+) {
   return api
     .get<
       Api<Entity[]>
-    >("/resources/entities", { params: { query, entity_type } })
+    >("/resources/entities", { params: { query, ...filters } })
     .then(extract)
 }
 
+export function findEnabledEntities(query?: string) {
+  return findEntities(query, { is_enabled: true })
+}
+
 export function findBiofuelEntities(query?: string) {
-  return findEntities(query, [
-    EntityType.Producer,
-    EntityType.Trader,
-    EntityType.Operator,
-    EntityType.PowerOrHeatProducer,
-  ])
+  return findEntities(query, {
+    is_enabled: true,
+    entity_type: [
+      EntityType.Producer,
+      EntityType.Trader,
+      EntityType.Operator,
+      EntityType.PowerOrHeatProducer,
+    ],
+  })
 }
 
 export function findOperators(query?: string) {
