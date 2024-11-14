@@ -7,38 +7,42 @@ from core.utils import CarbureEnv
 
 def enable_entity(entity, http_request):
     # get entity admin
-    try:
-        right_request = UserRightsRequests.objects.get(entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
-    except Exception:
-        raise Exception("Cette société n'a pas de demande d'inscription en attente")
-
-    admin_user = right_request.user
-    # valid admin rights request
-    right_request.status = "ACCEPTED"
-    right_request.save()
-
-    # create user right
-    UserRights.objects.create(
-        entity=right_request.entity,
-        user=right_request.user,
-        role=right_request.role,
-        expiration_date=right_request.expiration_date,
+    right_requests = UserRightsRequests.objects.filter(
+        entity=entity,
+        role=UserRightsRequests.ADMIN,
+        status__in=["PENDING", "ACCEPTED"],
     )
 
+    # validate admin rights request
+    right_requests.update(status="ACCEPTED")
+
+    # create user rights
+    UserRights.objects.bulk_create(
+        [
+            UserRights(
+                entity=req.entity,
+                user=req.user,
+                role=req.role,
+                expiration_date=req.expiration_date,
+            )
+            for req in right_requests
+        ]
+    )
+
+    # enable entity
     entity.is_enabled = True
     entity.save()
 
     # send email to user
     subject = "Demande d'inscription de société validée"
-    subject = subject if CarbureEnv.is_prod else "TEST " + subject
-    recipient_list = [admin_user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
+    recipient_list = [req.user.email for req in right_requests] or ["carbure@beta.gouv.fr"]
     text_message = f"""
     Bonjour,
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
     Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {CarbureEnv.get_base_url()}/account
 
-    Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/affichage/traduction
+    Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/
 
     Bien cordialement,
     L'équipe CarbuRe
