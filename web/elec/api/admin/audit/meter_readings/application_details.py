@@ -6,6 +6,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.excel import ExcelResponse
 from core.models import ExternalAdminRights
+from elec.api.cpo.charge_points.charge_points import annotate_with_latest_meter_reading_date
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationDetailsSerializer
 from elec.services.export_charge_point_excel import export_charge_points_to_excel
@@ -29,6 +30,7 @@ def get_application_details(request):
 
     if export:
         charge_points = MeterReadingRepository.get_application_charge_points(application.cpo, application)
+        charge_points = annotate_with_latest_meter_reading_date(charge_points)
         excel_file = export_charge_points_to_excel(charge_points, application.cpo)
         return ExcelResponse(excel_file)
 
