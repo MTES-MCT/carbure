@@ -2,7 +2,7 @@ from django.http import JsonResponse
 
 from core.decorators import check_user_rights
 from core.models import CarbureLot, UserRights
-from producers.models import ProductionSite
+from transactions.models import ProductionSite
 
 
 @check_user_rights(role=[UserRights.ADMIN])
@@ -10,7 +10,7 @@ def delete_production_site(request, entity, entity_id):
     site = request.POST.get("production_site_id")
 
     try:
-        ps = ProductionSite.objects.get(id=site, producer=entity)
+        ps = ProductionSite.objects.get(id=site, created_by=entity)
     except Exception as e:
         print(e)
         return JsonResponse({"status": "error", "message": "Unknown Production Site"}, status=400)

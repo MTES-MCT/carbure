@@ -3,11 +3,11 @@ import datetime
 from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
-from core.models import Biocarburant, CarbureLot, Depot, Entity, EntityDepot, MatierePremiere, SustainabilityDeclaration
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, SustainabilityDeclaration
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
-from transactions.models import YearConfig
+from transactions.models import Depot, EntitySite, YearConfig
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
@@ -22,6 +22,7 @@ class GeneralSanityChecksTest(TestCase):
         "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -59,8 +60,8 @@ class GeneralSanityChecksTest(TestCase):
     def test_mac_not_efpe(self):
         error = CarbureSanityCheckErrors.MAC_NOT_EFPE
 
-        efs = Depot.objects.filter(depot_type=Depot.EFS).first()
-        efpe = Depot.objects.filter(depot_type=Depot.EFPE).first()
+        efs = Depot.objects.filter(site_type=Depot.EFS).first()
+        efpe = Depot.objects.filter(site_type=Depot.EFPE).first()
 
         lot = self.create_lot(delivery_type=CarbureLot.BLENDING, carbure_delivery_site=efs)
 
@@ -133,7 +134,7 @@ class GeneralSanityChecksTest(TestCase):
             delivery_type=CarbureLot.BLENDING,
         )
 
-        EntityDepot.objects.create(entity=self.producer, depot=depot)
+        EntitySite.objects.create(entity=self.producer, site=depot)
 
         prefetched_data = get_prefetched_data(self.producer)
 

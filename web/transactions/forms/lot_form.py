@@ -1,8 +1,8 @@
 from django import forms
 
 from core.carburetypes import CarbureUnit
-from core.models import Biocarburant, CarbureLot, Depot, Entity, MatierePremiere, Pays
-from producers.models import ProductionSite
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
+from transactions.models import Depot, ProductionSite
 
 
 class LotForm(forms.Form):
@@ -65,7 +65,7 @@ class LotForm(forms.Form):
     carbure_client_id = forms.ModelChoiceField(queryset=ENTITIES, required=False)
     unknown_client = forms.CharField(required=False)
     carbure_delivery_site_depot_id = forms.ModelMultipleChoiceField(
-        queryset=DEPOTS, to_field_name="depot_id", required=False
+        queryset=DEPOTS, to_field_name="customs_id", required=False
     )
     unknown_delivery_site = forms.CharField(required=False)
     delivery_site_country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
@@ -94,7 +94,7 @@ class LotForm(forms.Form):
             elif field == "carbure_production_site":
                 producer = form_data["carbure_producer_id"]
                 if producer:
-                    lot_data["carbure_production_site"] = form_data[field].filter(producer=producer).first()
+                    lot_data["carbure_production_site"] = form_data[field].filter(created_by=producer).first()
             elif field == "carbure_delivery_site_depot_id":
                 lot_data["carbure_delivery_site"] = form_data[field].first()
             elif field in FORM_TO_LOT_FIELD:
