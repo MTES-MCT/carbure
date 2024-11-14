@@ -44,11 +44,13 @@ export function useNavigation(
       const searchParams = new URLSearchParams(location.search)
 
       const searchParamPage = searchParams.get("page")
-      // Change page query param when the next id is on a new page
-      if (searchParamPage && parseInt(searchParamPage) - 1 === 1) {
-        searchParams.delete("page")
-      } else if (!hasPrevCurrentPage && searchParamPage) {
-        searchParams.set("page", `${parseInt(searchParamPage) - 1}`)
+
+      // Update page query param when the current id is the last id of the current page
+      if (!hasPrevCurrentPage && searchParamPage) {
+        const prevPage = parseInt(searchParamPage) - 1
+
+        if (prevPage === 1) searchParams.delete("page")
+        else searchParams.set("page", prevPage.toString())
       }
 
       navigate({

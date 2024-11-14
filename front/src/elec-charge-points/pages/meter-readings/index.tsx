@@ -14,6 +14,8 @@ import {
 import { Trans, useTranslation } from "react-i18next"
 import { useElecMeterReadingsSettings } from "./index.hooks"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
+import { useMutation } from "common/hooks/async"
+import { deleteChargePointsApplication } from "./api"
 
 type ElecMeterReadingsSettingsProps = {
   companyId: number
@@ -38,6 +40,11 @@ const ElecMeterReadingsSettings = ({
     currentApplicationPeriod,
     isApplicationsEmpty,
   } = useElecMeterReadingsSettings({ entityId: entity.id, companyId })
+
+  const deleteApplication = useMutation(
+    (id: number) => deleteChargePointsApplication(entity.id, id),
+    { invalidates: ["meter-readings-applications"] }
+  )
 
   function showUploadDialog() {
     portal((resolve) => (
@@ -111,6 +118,7 @@ const ElecMeterReadingsSettings = ({
             onDownloadMeterReadingsApplication={
               downloadMeterReadingsApplication
             }
+            onDeleteMeterReadingsApplication={deleteApplication.execute}
           />
         </>
       )}

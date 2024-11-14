@@ -37,7 +37,7 @@ from core.models import (
     UserRights,
     UserRightsRequests,
 )
-from entity.helpers import enable_entity
+from entity.services.enable_entity import enable_entity
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 

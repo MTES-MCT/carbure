@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { useNavigate, useParams } from "react-router-dom"
 import { ChevronLeft } from "common/components/icons"
 import { Button } from "common/components/button"
@@ -13,7 +14,7 @@ import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
-import { useTranslation } from "react-i18next"
+import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ const EntityDetails = () => {
   }
 
   const entityData = company.result?.data.data
+  const isEnabled = Boolean(entityData?.is_enabled)
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
 
@@ -68,8 +70,14 @@ const EntityDetails = () => {
       />
 
       <section>
-        <UserRights />
-        {entityData && <CompanyInfo company={entityData} key={entityData.id} />}
+        {!isEnabled && entityData && (
+          <AuthorizeEntityBanner company={entityData} />
+        )}
+
+        <UserRights readOnly={!isEnabled} />
+        {entityData && (
+          <CompanyInfo readOnly company={entityData} key={entityData.id} />
+        )}
         {entityData && !isAirline && (
           <DeliverySitesSettings
             readOnly
@@ -86,7 +94,9 @@ const EntityDetails = () => {
             }
           />
         )}
-        {!isAirline && <Certificates entity_id={companyId} />}
+        {!isAirline && (
+          <Certificates readOnly={!isEnabled} entity_id={companyId} />
+        )}
       </section>
     </Main>
   )

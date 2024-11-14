@@ -3,12 +3,13 @@ import Alert from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import * as apiCpo from "elec/api-cpo"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import ElecChargePointsFileUpload from "./upload-dialog"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
+import { deleteChargePointsApplication } from "./api"
 
 type ChargePointsPendingProps = {
   year: number
@@ -23,6 +24,11 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
     key: "charge-points-applications",
     params: [entity.id, entity.id, year],
   })
+
+  const deleteApplication = useMutation(
+    (id: number) => deleteChargePointsApplication(entity.id, id),
+    { invalidates: ["charge-points-applications"] }
+  )
 
   const applications = applicationsResponse.result?.data.data ?? []
 
@@ -59,6 +65,7 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
         <ChargePointsApplicationsTable
           applications={applications}
           onDownloadChargePointsApplication={downloadChargePointsApplication}
+          onDeleteChargePointsApplication={deleteApplication.execute}
         />
       )}
     </section>

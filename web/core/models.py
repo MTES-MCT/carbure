@@ -125,6 +125,7 @@ class Entity(models.Model):
             "activity_description": self.activity_description,
             "website": self.website,
             "vat_number": self.vat_number,
+            "is_enabled": self.is_enabled,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]

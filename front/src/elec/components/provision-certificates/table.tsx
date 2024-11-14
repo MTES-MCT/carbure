@@ -2,6 +2,7 @@ import Table, { Cell, Order } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { ElecCPOProvisionCertificateStatus } from "elec/types-cpo"
+import { getElecProvisionCertificateSourceLabel } from "elec/utils/normalizers"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
@@ -36,7 +37,7 @@ export const ElecCPOProvisionCertificateTable = memo(
         columns={[
           columns.quarter,
           columns.operating_unit,
-          columns.current_type,
+          columns.source,
           columns.energy_amount,
         ]}
       />
@@ -70,11 +71,19 @@ export function useColumns() {
       },
     },
 
-    current_type: {
-      key: "current_type",
-      header: t("Type de courant"),
+    source: {
+      key: "source",
+      header: t("Source"),
       cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
-        return <Cell text={provisionCertificate.current_type} />
+        return (
+          <Cell
+            text={t(
+              getElecProvisionCertificateSourceLabel(
+                provisionCertificate.source
+              )
+            )}
+          />
+        )
       },
     },
 
