@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("producers", "0005_alter_productionsiteinput_production_site_and_more"),
         ("transactions", "0007_depot_productionsite"),
@@ -15,15 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="productionsiteinput",
             name="production_site",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="transactions.site"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="transactions.site"),
         ),
         migrations.AlterField(
             model_name="productionsiteoutput",
             name="production_site",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="transactions.site"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="transactions.site"),
         ),
     ]
