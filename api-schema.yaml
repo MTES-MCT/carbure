@@ -500,13 +500,19 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - AVAILABLE
+              - HISTORY
+          description: |-
+            * `HISTORY` - HISTORY
+            * `AVAILABLE` - AVAILABLE
         - in: query
           name: suppliers
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
+          description: Comma-separated list of supplier names
           explode: false
           style: form
         - in: query
@@ -706,13 +712,19 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - AVAILABLE
+              - HISTORY
+          description: |-
+            * `HISTORY` - HISTORY
+            * `AVAILABLE` - AVAILABLE
         - in: query
           name: suppliers
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
+          description: Comma-separated list of supplier names
           explode: false
           style: form
         - in: query
@@ -849,13 +861,19 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - AVAILABLE
+              - HISTORY
+          description: |-
+            * `HISTORY` - HISTORY
+            * `AVAILABLE` - AVAILABLE
         - in: query
           name: suppliers
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
+          description: Comma-separated list of supplier names
           explode: false
           style: form
         - in: query
@@ -1049,6 +1067,14 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REJECTED
+          description: |-
+            * `PENDING` - En attente
+            * `ACCEPTED` - Accepté
+            * `REJECTED` - Refusé
         - in: query
           name: suppliers
           schema:
@@ -1379,6 +1405,14 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REJECTED
+          description: |-
+            * `PENDING` - En attente
+            * `ACCEPTED` - Accepté
+            * `REJECTED` - Refusé
         - in: query
           name: suppliers
           schema:
@@ -1525,6 +1559,14 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REJECTED
+          description: |-
+            * `PENDING` - En attente
+            * `ACCEPTED` - Accepté
+            * `REJECTED` - Refusé
         - in: query
           name: suppliers
           schema:
@@ -1599,6 +1641,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/user/:
+    get:
+      operationId: user_retrieve
+      tags:
+        - user
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettingsResponseSeriaizer"
+          description: ""
+  /api/user/request-access:
+    post:
+      operationId: user_request_access_create
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestAccess"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestAccess"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestAccess"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseSuccess"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/user/revoke-access:
+    post:
+      operationId: user_revoke_access_create
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokeAccess"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RevokeAccess"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RevokeAccess"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseSuccess"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
           description: ""
 components:
   schemas:
@@ -2282,6 +2403,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
+    Pays:
+      type: object
+      properties:
+        code_pays:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
     PreferredUnitEnum:
       enum:
         - l
@@ -2350,6 +2489,44 @@ components:
         - id
         - name
         - producer
+    RequestAccess:
+      type: object
+      properties:
+        comment:
+          type: string
+        role:
+          type: string
+        entity_id:
+          type: integer
+      required:
+        - entity_id
+        - role
+    ResponseSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    RevokeAccess:
+      type: object
+      properties:
+        entity_id:
+          type: integer
+      required:
+        - entity_id
+    RoleEnum:
+      enum:
+        - RO
+        - RW
+        - ADMIN
+        - AUDITOR
+      type: string
+      description: |-
+        * `RO` - Lecture Seule
+        * `RW` - Lecture/Écriture
+        * `ADMIN` - Administrateur
+        * `AUDITOR` - Auditeur
     SafTicket:
       type: object
       properties:
@@ -2369,7 +2546,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         status:
-          $ref: "#/components/schemas/StatusEnum"
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         agreement_date:
           type: string
           format: date
@@ -2427,7 +2604,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         status:
-          $ref: "#/components/schemas/StatusEnum"
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         created_at:
           type: string
           format: date-time
@@ -2560,7 +2737,7 @@ components:
           type: number
           format: double
         status:
-          $ref: "#/components/schemas/StatusEnum"
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         created_at:
           type: string
           format: date-time
@@ -2858,16 +3035,6 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION SITE` - PRODUCTION SITE
         * `EFCA` - EFCA
-    StatusEnum:
-      enum:
-        - PENDING
-        - ACCEPTED
-        - REJECTED
-      type: string
-      description: |-
-        * `PENDING` - En attente
-        * `ACCEPTED` - Accepté
-        * `REJECTED` - Refusé
     TransportDocumentTypeEnum:
       enum:
         - DAU
@@ -2884,6 +3051,181 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_mac:
+          type: boolean
+        has_trading:
+          type: boolean
+        has_direct_deliveries:
+          type: boolean
+        has_stocks:
+          type: boolean
+        legal_name:
+          type: string
+          maxLength: 128
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        sustainability_officer_email:
+          type: string
+          maxLength: 254
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country:
+          $ref: "#/components/schemas/Pays"
+        default_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        preferred_unit:
+          $ref: "#/components/schemas/PreferredUnitEnum"
+        has_saf:
+          type: boolean
+        has_elec:
+          type: boolean
+        activity_description:
+          type: string
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+        ext_admin_pages:
+          type: array
+          items: {}
+          readOnly: true
+      required:
+        - ext_admin_pages
+        - id
+        - name
+        - registered_country
+    UserRightsRequestsSeriaizer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          $ref: "#/components/schemas/User"
+        entity:
+          $ref: "#/components/schemas/UserEntity"
+        date_requested:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/UserRightsRequestsSeriaizerStatusEnum"
+        comment:
+          type: string
+          nullable: true
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - date_requested
+        - entity
+        - id
+        - user
+    UserRightsRequestsSeriaizerStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - REVOKED
+      type: string
+      description: |-
+        * `PENDING` - En attente de validation
+        * `ACCEPTED` - Accepté
+        * `REJECTED` - Refusé
+        * `REVOKED` - Révoqué
+    UserRightsSeriaizer:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        entity:
+          $ref: "#/components/schemas/UserEntity"
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - email
+        - entity
+        - name
+    UserSettingsResponseSeriaizer:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        rights:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRightsSeriaizer"
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRightsRequestsSeriaizer"
+      required:
+        - email
+        - requests
+        - rights
+    saf.filters.TicketFilter.status:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - En attente
+        * `ACCEPTED` - Accepté
+        * `REJECTED` - Refusé
   securitySchemes:
     basicAuth:
       type: http
