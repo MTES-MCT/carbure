@@ -26,7 +26,7 @@ export const Transactions = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshotData = snapshot.result?.data.data
+  const snapshotData = snapshot.result?.data
 
   // common props for subroutes
   const props = { year: years.selected, snapshot: snapshotData }

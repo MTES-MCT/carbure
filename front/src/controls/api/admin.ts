@@ -1,4 +1,5 @@
 import { Api, api, download } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import { Option } from "common/utils/normalize"
 import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
 import { selectionOrQuery } from "transactions/api"
@@ -25,29 +26,55 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/transactions/admin/years", {
-    params: { entity_id },
+  console.log("OKOKOK 71")
+  // return api.get<Api<number[]>>("/transactions/admin/years", {
+  //   params: { entity_id },
+  // })
+  return apiFetch.GET("/v2/transactions/years", {
+    params: {
+      query: { entity_id },
+    },
   })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/transactions/admin/snapshot", {
-    params: { entity_id, year },
+  console.log("OKOKOK 72")
+  // return api.get<Api<Snapshot>>("/v2/transactions/snapshot", {
+  //   params: { entity_id, year },
+  // })
+  return apiFetch.GET("/v2/transactions/snapshot", {
+    params: {
+      query: {  entity_id, year },
+    },
   })
 }
 
 export function getLots(query: LotQuery) {
-  return api.get<Api<LotList>>("/transactions/admin/lots", { params: query })
+  console.log("OKOKOK 73")
+  // return api.get<Api<LotList>>("/transactions/admin/lots", { params: query })
+  return apiFetch.GET("/v2/transactions/lots/", {
+    params: {
+      query:  query ,
+    },
+  })
 }
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/transactions/admin/stocks", {
-    params: query,
+  console.log("OKOKOK 74")
+  // return api.get<Api<StockList>>("/transactions/admin/stocks", {
+  //   params: query,
+  // })
+
+  return apiFetch.GET("/v2/transactions/stocks/", {
+    params: {
+      query:  query ,
+    },
   })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/transactions/admin/lots", {
+  console.log("VERYUNSURE 75")
+  return download("/v2/transactions/lots/export/", {
     ...selectionOrQuery(
       { ...query, from_idx: undefined, limit: undefined },
       selection
@@ -61,8 +88,13 @@ export function getLotsSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<LotSummary>>("/transactions/admin/lots/summary", {
-    params: { ...query, selection, ...QUERY_RESET, short },
+  console.log("OKOKOK 76")
+  // return api.get<Api<LotSummary>>("/transactions/admin/lots/summary", {
+  //   params: { ...query, selection, ...QUERY_RESET, short },
+  // })
+
+  return apiFetch.GET("/v2/transactions/lots/summary/", {
+    params: { query: { ...query, selection, ...QUERY_RESET, short } },
   })
 }
 
@@ -71,23 +103,41 @@ export function getStocksSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<StockSummary>>("/transactions/admin/stocks/summary", {
-    params: { ...query, selection, ...QUERY_RESET, short },
+  console.log("OKOKOK 77")
+  // return api.get<Api<StockSummary>>("/transactions/admin/stocks/summary", {
+  //   params: { ...query, selection, ...QUERY_RESET, short },
+  // })
+
+  return apiFetch.GET("/v2/transactions/stocks/summary/", {
+    params: { query: { ...query, selection, ...QUERY_RESET, short } },
   })
 }
 
-export function getLotFilters(field: Filter, query: LotQuery) {
-  const params = { field, ...query, ...QUERY_RESET }
-  return api
-    .get<Api<string[]>>("/transactions/admin/lots/filters", { params })
-    .then((res) => res.data.data ?? [])
+export async function getLotFilters(field: Filter, query: LotQuery) {
+  console.log("OKOKOK 78")
+  // const params = { field, ...query, ...QUERY_RESET }
+  // return api
+  //   .get<Api<string[]>>("/v2/transactions/lots/filters", { params })
+  //   .then((res) => res.data ?? [])
+  
+    const res = await apiFetch.GET("/v2/transactions/lots/filters/", {
+      params: { query: { field, ...query, ...QUERY_RESET } },
+    })
+    return res.data ?? []
 }
 
-export function getStockFilters(field: Filter, query: StockQuery) {
-  const params = { field, ...query, ...QUERY_RESET }
-  return api
-    .get<Api<Option[]>>("/transactions/admin/stocks/filters", { params })
-    .then((res) => res.data.data ?? [])
+export async function getStockFilters(field: Filter, query: StockQuery) {
+  console.log("OKOKOK 79")
+  // const params = { field, ...query, ...QUERY_RESET }
+  // return api
+  //   .get<Api<Option[]>>("/transactions/admin/stocks/filters", { params })
+  //   .then((res) => res.data.data ?? [])
+  
+  
+  const res = await apiFetch.GET("/v2/transactions/stocks/filters/", {
+    params: { query: { field, ...query, ...QUERY_RESET } },
+  })
+  return res.data ?? []
 }
 
 export function pinLots(
@@ -96,11 +146,21 @@ export function pinLots(
   notify_admin?: boolean,
   notify_auditor?: boolean
 ) {
-  return api.post("/transactions/admin/lots/pin", {
-    entity_id,
-    selection,
-    notify_admin,
-    notify_auditor,
+  console.log("VERYUNSURE 80")
+  // return api.post("/transactions/admin/lots/pin", {
+  //   entity_id,
+  //   selection,
+  //   notify_admin,
+  //   notify_auditor,
+  // })
+
+  return apiFetch.POST("/v2/transactions/lots/toggle-pin/", {
+    params: { query:  {entity_id}  },
+    body: {
+      selection,
+      notify_admin,
+      notify_auditor,
+    },
   })
 }
 
@@ -111,14 +171,26 @@ export async function commentLots(
   is_visible_by_admin?: boolean,
   is_visible_by_auditor?: boolean
 ) {
+  console.log("OKOKOK 81")
   if (!comment) return
 
-  return api.post<Api<void>>("/transactions/admin/lots/comment", {
-    entity_id: query.entity_id,
-    selection,
-    is_visible_by_admin,
-    is_visible_by_auditor,
-    comment,
+  // return api.post<Api<void>>("/v2/transactions/lots/add-comment/", {
+  //   entity_id: query.entity_id,
+  //   selection,
+  //   is_visible_by_admin,
+  //   is_visible_by_auditor,
+  //   comment,
+  // })
+
+  return apiFetch.POST("/v2/transactions/lots/add-comment/", {
+    params: { query:  query  },
+    body: {
+      entity_id: query.entity_id,
+      selection,
+      is_visible_by_admin,
+      is_visible_by_auditor,
+      comment,
+    },
   })
 }
 
@@ -129,6 +201,7 @@ export function updateLots(
   comment: string,
   dry_run?: boolean
 ) {
+  console.log("VERYUNSURE 82")
   return api.post<Api<LotsUpdateResponse>>(
     "/transactions/admin/lots/update-many",
     {
@@ -147,6 +220,7 @@ export function deleteLots(
   comment: string,
   dry_run?: boolean
 ) {
+  console.log("VERYUNSURE 83")
   return api.post<Api<LotsDeleteResponse>>(
     "/transactions/admin/lots/delete-many",
     {

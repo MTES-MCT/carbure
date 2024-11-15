@@ -47,11 +47,11 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
     },
   })
 
-  const stocksData = stocks.result?.data.data
-  const stockList = stocksData?.stocks ?? []
-  const ids = stocksData?.ids ?? EMPTY
-  const count = stocksData?.returned ?? 0
-  const total = stocksData?.total ?? 0
+  const stocksData = stocks.result?.data
+  const stockList = stocksData?.results ?? []
+  const ids = stocksData?.ids ?? []
+  const count = stocksData?.results?.length ?? 0
+  const total = stocksData?.count ?? 0
 
   const showStockDetails = (stock: Stock) => ({
     pathname: location.pathname,

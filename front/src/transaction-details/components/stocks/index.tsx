@@ -36,7 +36,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
 
   const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
-  const stockData = stock.result?.data.data
+  const stockData = stock.result?.data
   const owner = stockData?.stock.carbure_client
   const remaining = stockData?.stock.remaining_volume ?? 0
   const volume = stockData?.stock.initial_volume ?? 0

@@ -41,7 +41,7 @@ export const StockSummaryBar = ({
     params: [query, selection, true],
   })
 
-  const summaryData = summary.result?.data.data ?? {
+  const summaryData = summary.result?.data ?? {
     count: 0,
     total_remaining_volume: 0,
     total_remaining_weight: 0,
@@ -154,7 +154,7 @@ export const StockSummary = ({
     params: [query, selection],
   })
 
-  const summaryData = summary.result?.data.data
+  const summaryData = summary.result?.data
 
   const unitToField = {
     l: "remaining_volume_sum" as const,

@@ -55,7 +55,7 @@ export const LotSummaryBar = ({
   const unit = entity.preferred_unit ?? Unit.l
   const field = unitToField[unit]
 
-  const summaryData = summary.result?.data.data ?? {
+  const summaryData = summary.result?.data ?? {
     count: 0,
     total_volume: 0,
     total_weight: 0,
@@ -163,7 +163,7 @@ export const LotSummary = ({
 
   const columns = useSummaryColumns(query)
 
-  const summaryData = summary.result?.data.data
+  const summaryData = summary.result?.data
 
   const unitToField = {
     l: "volume_sum" as const,

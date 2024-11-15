@@ -102,8 +102,8 @@ export const DeclarationDialog = () => {
       notifyError(err, t("La déclaration n'a pas pu être annulée !")),
   })
 
-  const yearsData = years.result?.data.data ?? [initialYear]
-  const declarationsData = declarations.result?.data.data ?? []
+  const yearsData = years.result?.data ?? [initialYear]
+  const declarationsData = declarations.result?.data ?? []
   const declaration = declarationsData[timeline.month - 1] as DeclarationSummary | undefined // prettier-ignore
   const period = timeline.year * 100 + timeline.month
 

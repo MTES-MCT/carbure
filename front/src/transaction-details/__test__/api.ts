@@ -15,6 +15,7 @@ import {
 import { producer } from "carbure/__test__/data"
 
 export const okLotDetails = http.get("/api/transactions/lots/details", () => {
+  console.log("VERYUNSURE 7")
   return HttpResponse.json({
     status: "success",
     data: Data.get("lot-details"),
@@ -22,6 +23,7 @@ export const okLotDetails = http.get("/api/transactions/lots/details", () => {
 })
 
 export const okUpdateLot = http.post("/api/transactions/lots/update", () => {
+  console.log("VERYUNSURE 8")
   const details = Data.get("lot-details")
   details.lot.transport_document_reference = "DAETEST UPDATED"
   Data.set("lot-details", details)
@@ -34,12 +36,14 @@ export const okSendLot = http.post("/api/transactions/lots/send", () => {
   Data.set("lot-details", (details: LotDetails) => {
     details.lot.lot_status = LotStatus.Pending
   })
+  console.log("VERYUNSURE 9")
   return HttpResponse.json({
     status: "success",
   })
 })
 
 export const okDeleteLot = http.post("/api/transactions/lots/delete", () => {
+  console.log("VERYUNSURE 10")
   return HttpResponse.json({
     status: "success",
   })
@@ -48,6 +52,7 @@ export const okDeleteLot = http.post("/api/transactions/lots/delete", () => {
 export const okRequestFix = http.post(
   "/api/transactions/lots/request-fix",
   () => {
+    console.log("VERYUNSURE 11")
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.InCorrection
     })
@@ -60,6 +65,7 @@ export const okRequestFix = http.post(
 export const okMarkAsFixed = http.post(
   "/api/transactions/lots/submit-fix",
   () => {
+    console.log("VERYUNSURE 12")
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.Fixed
     })
@@ -70,6 +76,7 @@ export const okMarkAsFixed = http.post(
 )
 
 export const okRejectLot = http.post("/api/transactions/lots/reject", () => {
+  console.log("VERYUNSURE 13")
   Data.set("lot-details", (details: LotDetails) => {
     details.lot.lot_status = LotStatus.Rejected
     details.lot.correction_status = CorrectionStatus.NoProblem
@@ -82,6 +89,7 @@ export const okRejectLot = http.post("/api/transactions/lots/reject", () => {
 export const okAcceptBlending = http.post(
   "/api/transactions/lots/accept-blending",
   () => {
+    console.log("VERYUNSURE 14")
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.lot_status = LotStatus.Accepted
       details.lot.delivery_type = DeliveryType.Blending
@@ -96,6 +104,7 @@ export const okAcceptBlending = http.post(
 export const okCommentLot = http.post(
   "/api/transactions/lots/comment",
   async ({ request }) => {
+    console.log("VERYUNSURE 15")
     const body = await request.formData()
     Data.set("lot-details", (details: LotDetails) => {
       details.comments.push({

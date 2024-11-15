@@ -4,6 +4,7 @@ import { Filter } from "transactions/types"
 import { DashboardDeclaration } from "./types"
 
 export function getDeclarations(entity_id: number, period: string) {
+  console.log("VERYUNSURE 97")
   return api.get<Api<DashboardDeclaration[]>>(
     "transactions/admin/declarations",
     {
@@ -13,5 +14,5 @@ export function getDeclarations(entity_id: number, period: string) {
 }
 
 export function getPeriods(entity_id: number) {
-  return getLotFilters(Filter.Periods, { entity_id, status: "DECLARATIONS" })
+  return getLotFilters(Filter.Periods, { entity_id, status: "DECLARATION" })
 }

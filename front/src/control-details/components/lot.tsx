@@ -52,7 +52,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     params: [entity.id, parseInt(match?.params.id || "")],
   })
 
-  const lotData = lot.result?.data.data
+  const lotData = lot.result?.data
   const creator = lotData?.lot.added_by
   const comments = lotData?.comments ?? []
   const controlComments = lotData?.control_comments ?? []

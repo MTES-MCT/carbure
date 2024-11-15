@@ -12,6 +12,7 @@ import {
 import { lot } from "transaction-details/__test__/data"
 
 export const okAddLot = http.post("/api/transactions/lots/add", () => {
+  console.log("VERYUNSURE 2")
   return HttpResponse.json({
     status: "success",
     data: lot,

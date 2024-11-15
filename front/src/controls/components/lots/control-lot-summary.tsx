@@ -18,7 +18,6 @@ import { Unit } from "carbure/types"
 export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
   const entity = useEntity()
   const api = pickApi(entity)
-
   return (
     <LotSummaryBar
       {...props}
@@ -43,8 +42,8 @@ export const ControlLotSummary = ({
     params: [query, selection],
   })
 
-  const summaryData = summary.result?.data.data
-
+  const summaryData = summary.result?.data
+  
   const unitToField = {
     l: "volume_sum" as const,
     kg: "weight_sum" as const,

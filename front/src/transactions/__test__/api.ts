@@ -28,6 +28,7 @@ Data.set("snapshot", data.emptySnapshot)
 Data.set("lots", data.lots)
 
 export const okSnapshot = http.get("/api/transactions/snapshot", () => {
+  console.log("VERYUNSURE 52")
   return HttpResponse.json({
     status: "success",
     data: Data.get("snapshot"),
@@ -35,6 +36,7 @@ export const okSnapshot = http.get("/api/transactions/snapshot", () => {
 })
 
 export const okLots = http.get("/api/transactions/lots", () => {
+  console.log("VERYUNSURE 53")
   return HttpResponse.json({
     status: "success",
     data: Data.get("lots"),
@@ -42,6 +44,7 @@ export const okLots = http.get("/api/transactions/lots", () => {
 })
 
 export const okYears = http.get("/api/transactions/years", () => {
+  console.log("VERYUNSURE 54")
   return HttpResponse.json({
     status: "success",
     data: [2021],
@@ -49,6 +52,7 @@ export const okYears = http.get("/api/transactions/years", () => {
 })
 
 export const okDeclarations = http.get("/api/transactions/declarations", () => {
+  console.log("VERYUNSURE 55")
   return HttpResponse.json({
     status: "success",
     data: [
@@ -75,6 +79,7 @@ export const okDeclarations = http.get("/api/transactions/declarations", () => {
 export const okFilters = http.get(
   "/api/transactions/lots/filters",
   ({ request }) => {
+    console.log("VERYUNSURE 56")
     const searchParams = new URLSearchParams(request.url)
     return HttpResponse.json({
       status: "success",
@@ -84,6 +89,7 @@ export const okFilters = http.get(
 )
 
 export const okSummary = http.get("/api/transactions/lots/summary", () => {
+  console.log("VERYUNSURE 57")
   return HttpResponse.json({
     status: "success",
     data: data.lotSummary,
@@ -91,6 +97,7 @@ export const okSummary = http.get("/api/transactions/lots/summary", () => {
 })
 
 export const okSendLot = http.post("/api/transactions/lots/send", () => {
+  console.log("VERYUNSURE 58")
   Data.set("lots", (lots: LotList) => {
     lots.lots = []
     lots.ids = []

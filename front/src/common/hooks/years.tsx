@@ -35,7 +35,7 @@ function useYears(
 
     // select the latest year if the selected one isn't available anymore
     onSuccess: (res) => {
-      const years = listYears(res.data.data)
+      const years = listYears(res.data)
       if (!years.includes(selected)) {
         setYear(Math.max(...years))
       }
@@ -44,7 +44,7 @@ function useYears(
 
   return {
     loading: years.loading,
-    options: listYears(years.result?.data.data),
+    options: listYears(years.result?.data),
     selected,
     setYear,
   }

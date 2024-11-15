@@ -30,7 +30,7 @@ export const Controls = () => {
     return <Navigate replace to="alerts" />
   }
 
-  const snapshotData = snapshot.result?.data.data
+  const snapshotData = snapshot.result?.data
 
   // common props for subroutes
   const props = { entity, year: years.selected, snapshot: snapshotData }

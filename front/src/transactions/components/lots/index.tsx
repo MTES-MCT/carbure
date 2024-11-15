@@ -60,14 +60,15 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
     },
   })
 
-  const lotsData = lots.result?.data.data
-  const lotList = lotsData?.lots ?? []
+  const lotsData = lots.result?.data
+  const lotList = lotsData?.results ?? []
   const ids = lotsData?.ids ?? []
   const lotErrors = lotsData?.errors ?? {}
-  const count = lotsData?.returned ?? 0
-  const total = lotsData?.total ?? 0
+  const count = lotsData?.results.length ?? 0
+  const total = lotsData?.count ?? 0
   const totalErrors = lotsData?.total_errors ?? 0
   const totalDeadline = lotsData?.total_deadline ?? 0
+
 
   const trackShowLotDetails = (lot: Lot) => {
     matomo.push(["trackEvent", "lots-details", "show-lot-details", lot.id])

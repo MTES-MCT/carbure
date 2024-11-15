@@ -25,6 +25,7 @@ export const okAdminSettings = http.get("/api/user", () => {
 export const okLotsSummary = http.get(
   "/api/transactions/admin/lots/summary",
   () => {
+    console.log("VERYUNSURE 65")
     return HttpResponse.json({ status: "success", data: lotSummary })
   }
 )
@@ -32,6 +33,7 @@ export const okLotsSummary = http.get(
 export const okFilters = http.get(
   "/api/transactions/admin/lots/filters",
   ({ request }) => {
+    console.log("VERYUNSURE 66")
     const searchParams = new URLSearchParams(request.url)
     return HttpResponse.json({
       status: "success",
@@ -41,6 +43,7 @@ export const okFilters = http.get(
 )
 
 export const okSnapshot = http.get("/api/transactions/admin/snapshot", () => {
+  console.log("VERYUNSURE 67")
   return HttpResponse.json({
     status: "success",
     data: {
@@ -54,6 +57,7 @@ export const okSnapshot = http.get("/api/transactions/admin/snapshot", () => {
 })
 
 export const okLots = http.get("/api/transactions/admin/lots", () => {
+  console.log("VERYUNSURE 68")
   return HttpResponse.json({
     status: "success",
     data: {
@@ -69,12 +73,14 @@ export const okLots = http.get("/api/transactions/admin/lots", () => {
 })
 
 export const okStocks = http.get("/api/transactions/admin/stocks", () => {
+  console.log("VERYUNSURE 69")
   return HttpResponse.json({
     status: "success",
   })
 })
 
 export const okYears = http.get("/api/transactions/admin/years", () => {
+  console.log("VERYUNSURE 70")
   return HttpResponse.json({
     status: "success",
     data: [],

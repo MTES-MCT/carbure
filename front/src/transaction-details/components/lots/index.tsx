@@ -65,7 +65,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     },
   })
 
-  const lotData = lot.result?.data.data
+  const lotData = lot.result?.data
   const certificates = lotData?.certificates
   const creator = lotData?.lot?.added_by
   const comments = lotData?.comments ?? []
