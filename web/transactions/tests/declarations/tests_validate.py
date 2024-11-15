@@ -16,6 +16,7 @@ class ValidateDeclarationTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -64,7 +65,7 @@ class ValidateDeclarationTest(TestCase):
         }
 
         response = self.client.post(
-            reverse("transactions-api-lots-validate-declaration") + f"?entity_id={self.entity.id}",
+            reverse("transactions-lots-validate-declaration") + f"?entity_id={self.entity.id}",
             query,
         )
 
@@ -98,7 +99,7 @@ class ValidateDeclarationTest(TestCase):
         }
 
         response = self.client.post(
-            reverse("transactions-api-lots-validate-declaration") + f"?entity_id={self.entity.id}",
+            reverse("transactions-lots-validate-declaration") + f"?entity_id={self.entity.id}",
             query,
         )
 

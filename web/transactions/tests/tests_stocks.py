@@ -10,11 +10,11 @@ from core.models import (
     CarbureLot,
     CarbureStock,
     CarbureStockTransformation,
-    Depot,
     Entity,
 )
 from core.tests_utils import setup_current_user
 from transactions.factories import CarbureLotFactory, CarbureStockFactory
+from transactions.models import Depot
 
 
 class StocksFlowTest(TestCase):
@@ -25,12 +25,13 @@ class StocksFlowTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
 
@@ -58,7 +59,7 @@ class StocksFlowTest(TestCase):
         query = {"entity_id": self.producer.id}
 
         response = self.client.get(
-            reverse("transactions-api-stocks-list") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-list") + f"?entity_id={self.producer.id}",
             query,
         )
         stocks_data = response.json()["results"]
@@ -74,7 +75,7 @@ class StocksFlowTest(TestCase):
         )
         query = {"entity_id": self.producer.id}
         response = self.client.get(
-            reverse("transactions-api-stocks-summary") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-summary") + f"?entity_id={self.producer.id}",
             query,
         )
         summary_data = response.json()
@@ -91,7 +92,7 @@ class StocksFlowTest(TestCase):
         )
         query = {"entity_id": self.producer.id, "stock_id": stock.id}
         response = self.client.get(
-            reverse("transactions-api-stocks-detail", kwargs={"id": stock.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-detail", kwargs={"id": stock.id}) + f"?entity_id={self.producer.id}",
             query,
         )
         stock_data = response.json()["stock"]
@@ -99,10 +100,11 @@ class StocksFlowTest(TestCase):
 
     def stock_split(self, payload, fail=False):
         response = self.client.post(
-            reverse("transactions-api-stocks-split") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-split") + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "payload": payload},
             content_type="application/json",
         )
+        print("response : ", response.json(), response.status_code)
         if not fail:
             assert response.status_code == 200
             data = response.json()["data"]
@@ -148,6 +150,7 @@ class StocksFlowTest(TestCase):
             "delivery_site_country_id": "FR",
             "delivery_type": "RFC",
         }
+        print("payload : ", payload)
         lot = self.stock_split([payload])
         assert lot.lot_status == CarbureLot.DRAFT
         assert lot.delivery_type == CarbureLot.RFC
@@ -162,7 +165,7 @@ class StocksFlowTest(TestCase):
             "delivery_site_country_id": "FR",
             "delivery_type": "BLENDING",
             "transport_document_reference": "FR-BLENDING-TEST",
-            "carbure_delivery_site_id": random.choice(depots).depot_id,
+            "carbure_delivery_site_id": random.choice(depots).customs_id,
             "carbure_client_id": trader.id,
         }
         lot = self.stock_split([payload])
@@ -177,7 +180,7 @@ class StocksFlowTest(TestCase):
             "delivery_date": today,
             "delivery_site_country_id": "FR",
             "transport_document_reference": "FR-SPLIT-SEND-TEST",
-            "carbure_delivery_site_id": random.choice(depots).depot_id,
+            "carbure_delivery_site_id": random.choice(depots).customs_id,
             "carbure_client_id": operator.id,
         }
         lot = self.stock_split([payload])
@@ -223,7 +226,7 @@ class StocksFlowTest(TestCase):
             "unknown_client": "FOREIGN CLIENT",
         }
         response = self.client.post(
-            reverse("transactions-api-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
             data,
         )
         assert response.status_code == 200
@@ -236,7 +239,7 @@ class StocksFlowTest(TestCase):
         # 8 update a draft with more than volume left, ensure lot and stock are not updated
         data["volume"] = 11000
         response = self.client.post(
-            reverse("transactions-api-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
             data,
         )
         assert response.status_code == 200
@@ -247,7 +250,7 @@ class StocksFlowTest(TestCase):
 
         # 9: delete a draft, check that volume is correctly re-credited
         response = self.client.post(
-            reverse("transactions-api-lots-delete") + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-delete") + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -267,7 +270,7 @@ class StocksFlowTest(TestCase):
         stock.save()  # HACK to avoid `generate_carbure_id` later
         query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
         response = self.client.post(
-            reverse("transactions-api-stocks-flush") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-flush") + f"?entity_id={self.producer.id}",
             query,
         )
         assert response.status_code == 200
@@ -277,7 +280,7 @@ class StocksFlowTest(TestCase):
         stock.save()  # HACK to avoid `generate_carbure_id` later
         query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
         response = self.client.post(
-            reverse("transactions-api-stocks-flush") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-flush") + f"?entity_id={self.producer.id}",
             query,
         )
 
@@ -317,7 +320,7 @@ class StocksFlowTest(TestCase):
 
         # transform part of stock into etbe
         self.client.post(
-            reverse("transactions-api-stocks-transform") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-transform") + f"?entity_id={self.producer.id}",
             body,
             content_type="application/json",
         )
@@ -336,7 +339,7 @@ class StocksFlowTest(TestCase):
         # cancel transform
         body = {"entity_id": self.producer.id, "stock_ids": [dest_stock.id]}
         self.client.post(
-            reverse("transactions-api-stocks-cancel-transformation") + f"?entity_id={self.producer.id}",
+            reverse("transactions-stocks-cancel-transformation") + f"?entity_id={self.producer.id}",
             body,
         )
 

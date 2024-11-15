@@ -16,6 +16,7 @@ class InvalidateDeclarationTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -64,7 +65,7 @@ class InvalidateDeclarationTest(TestCase):
         }
 
         response = self.client.post(
-            reverse("transactions-api-lots-declarations-invalidate") + f"?entity_id={self.entity.id}",
+            reverse("transactions-lots-declarations-invalidate") + f"?entity_id={self.entity.id}",
             query,
         )
 
@@ -96,7 +97,7 @@ class InvalidateDeclarationTest(TestCase):
         }
 
         response = self.client.post(
-            reverse("transactions-api-lots-declarations-invalidate") + f"?entity_id={self.entity.id}",
+            reverse("transactions-lots-declarations-invalidate") + f"?entity_id={self.entity.id}",
             query,
         )
         assert response.status_code == 400

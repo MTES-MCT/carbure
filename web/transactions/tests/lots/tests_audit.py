@@ -13,7 +13,7 @@ class LotsAuditTest(TestCase):
     def test_mark_conform(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-mark-conform") + f"?entity_id={self.auditor.id}",
+            reverse("transactions-lots-mark-conform") + f"?entity_id={self.auditor.id}",
             {"selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -23,7 +23,7 @@ class LotsAuditTest(TestCase):
     def test_mark_non_conform(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-mark-non-conform") + f"?entity_id={self.auditor.id}",
+            reverse("transactions-lots-mark-non-conform") + f"?entity_id={self.auditor.id}",
             {"selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -33,7 +33,7 @@ class LotsAuditTest(TestCase):
     def test_toggle_pin_audit(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-toggle-pin") + f"?entity_id={self.auditor.id}",
+            reverse("transactions-lots-toggle-pin") + f"?entity_id={self.auditor.id}",
             {"selection": [lot.id], "notify_admin": True},
         )
         assert response.status_code == 200

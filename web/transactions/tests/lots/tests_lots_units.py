@@ -16,6 +16,7 @@ class LotsTestUnits(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -32,7 +33,7 @@ class LotsTestUnits(TestCase):
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
@@ -55,7 +56,7 @@ class LotsTestUnits(TestCase):
             lot = get_lot(self.producer)
             del lot["volume"]
         lot.update(kwargs)
-        response = self.client.post(reverse("transactions-api-lots-add") + f"?entity_id={self.producer.id}", lot)
+        response = self.client.post(reverse("transactions-lots-add") + f"?entity_id={self.producer.id}", lot)
         assert response.status_code == 200
         data = response.json()
         lot_id = data["id"]

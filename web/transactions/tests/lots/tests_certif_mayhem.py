@@ -16,6 +16,7 @@ class LotsCertifMayhemTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -32,11 +33,13 @@ class LotsCertifMayhemTest(TestCase):
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         self.producer.default_certificate = "PRODUCER_CERTIFICATE"
         self.producer.save()
+
+        print("producer : ", self.producer.__dict__)
 
         self.trader = Entity.objects.get(pk=18)  #  .filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
@@ -57,7 +60,7 @@ class LotsCertifMayhemTest(TestCase):
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
-        response = self.client.post(reverse("transactions-api-lots-add") + f"?entity_id={self.producer.id}", lot)
+        response = self.client.post(reverse("transactions-lots-add") + f"?entity_id={self.producer.id}", lot)
         assert response.status_code == 200
         data = response.json()
         lot_id = data["id"]
@@ -66,7 +69,7 @@ class LotsCertifMayhemTest(TestCase):
 
     def send_lot(self, lot, expected_status=200):
         response = self.client.post(
-            reverse("transactions-api-lots-send") + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-send") + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         assert response.status_code == expected_status

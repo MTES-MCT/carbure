@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from core.carburetypes import CarbureUnit
-from core.models import Biocarburant, Depot, Entity, MatierePremiere, Pays
-from producers.models import ProductionSite
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
+from transactions.models import Depot, ProductionSite
 
 FORM_TO_LOT_FIELD = {
     "biofuel_code": "biofuel",
@@ -81,7 +81,7 @@ class LotSerializer(serializers.Serializer):
     carbure_client_id = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all(), required=False)
     unknown_client = serializers.CharField(required=False)
     carbure_delivery_site_depot_id = serializers.SlugRelatedField(
-        slug_field="depot_id", queryset=Depot.objects.all(), required=False, many=True
+        slug_field="customs_id", queryset=Depot.objects.all(), required=False, many=True
     )
     unknown_delivery_site = serializers.CharField(required=False)
     delivery_site_country_code = serializers.SlugRelatedField(
@@ -108,7 +108,7 @@ class LotSerializer(serializers.Serializer):
         if not value:
             return Depot.objects.none()
 
-        carbure_delivery_site_depot = Depot.objects.filter(depot_id__in=[obj.depot_id for obj in value])
+        carbure_delivery_site_depot = Depot.objects.filter(customs_id__in=[obj.depot_id for obj in value])
         if len(carbure_delivery_site_depot) != len(value):
             raise serializers.ValidationError("Un ou plusieurs carbure_delivery_site_depot sont invalides.")
 

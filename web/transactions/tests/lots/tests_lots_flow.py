@@ -15,29 +15,29 @@ class LotsFlowTest(TestCase):
 
     def test_create_draft_on_locked_year(self, **kwargs):
         YearConfig.objects.create(year=2021, locked=True)
-        lot = get_lot(self.producer)
+        lot = get_lot(self.created_by)
         lot.update(kwargs)
-        response = self.client.post(reverse("transactions-api-lots-add") + f"?entity_id={self.producer.id}", lot)
+        response = self.client.post(reverse("transactions-lots-add") + f"?entity_id={self.created_by.id}", lot)
         assert response.status_code == 200
         lot_id = response.json()["id"]
 
         response = self.client.get(
-            reverse("transactions-api-lots-detail", kwargs={"id": lot_id}),
-            {"lot_id": lot_id, "entity_id": self.producer.id},
+            reverse("transactions-lots-detail", kwargs={"id": lot_id}),
+            {"lot_id": lot_id, "entity_id": self.created_by.id},
         )
         errors = response.json()["errors"]
         assert errors[0]["error"] == CarbureError.YEAR_LOCKED
 
     def test_update_lot(self):
         YearConfig.objects.create(year=2018, locked=True)
-        lotdata = get_lot(entity=self.producer)
+        lotdata = get_lot(entity=self.created_by)
         lot = self.create_draft(lot=lotdata)
         lotdata["lot_id"] = lot.id
         lotdata["volume"] = 42000
 
         lotdata["delivery_date"] = "2022-01-01"
         response = self.client.post(
-            reverse("transactions-api-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.created_by.id}",
             lotdata,
         )
         assert response.status_code == 200
@@ -48,16 +48,16 @@ class LotsFlowTest(TestCase):
     def test_delete_lot(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-delete") + f"?entity_id={self.producer.id}",
-            {"entity_id": self.producer.id, "selection": [lot.id]},
+            reverse("transactions-lots-delete") + f"?entity_id={self.created_by.id}",
+            {"entity_id": self.created_by.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
         assert not CarbureLot.objects.filter(id=lot.id).exists()
 
         lot = self.send_lot(self.create_draft())
         response = self.client.post(
-            reverse("transactions-api-lots-delete") + f"?entity_id={self.producer.id}",
-            {"entity_id": self.producer.id, "selection": [lot.id]},
+            reverse("transactions-lots-delete") + f"?entity_id={self.created_by.id}",
+            {"entity_id": self.created_by.id, "selection": [lot.id]},
         )  # cannot delete a lot not in draft
         assert response.status_code == 200
         lot.refresh_from_db()
@@ -65,7 +65,7 @@ class LotsFlowTest(TestCase):
 
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-delete") + f"?entity_id={self.trader.id}",
+            reverse("transactions-lots-delete") + f"?entity_id={self.trader.id}",
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )  # cannot delete someone else's lot
         assert response.status_code == 400
@@ -73,11 +73,11 @@ class LotsFlowTest(TestCase):
     def test_duplicate_lot(self):
         lot = self.create_draft()
         response = self.client.get(
-            reverse("transactions-api-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.created_by.id}",
         )
         assert response.status_code == 200
         response = self.client.get(
-            reverse("transactions-api-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.trader.id}"
+            reverse("transactions-lots-duplicate", kwargs={"id": lot.id}) + f"?entity_id={self.trader.id}"
         )
         assert response.status_code == 403
 
@@ -91,7 +91,7 @@ class LotsFlowTest(TestCase):
         lot = self.send_lot(lot)
 
         response = self.client.post(
-            reverse("transactions-api-lots-accept-in-stock") + f"?entity_id={self.trader.id}",
+            reverse("transactions-lots-accept-in-stock") + f"?entity_id={self.trader.id}",
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -107,7 +107,7 @@ class LotsFlowTest(TestCase):
         assert lot.lot_status == CarbureLot.PENDING
         assert lot.delivery_type == CarbureLot.UNKNOWN
         response = self.client.post(
-            reverse("transactions-api-lots-accept-rfc") + f"?entity_id={self.operator.id}",
+            reverse("transactions-lots-accept-rfc") + f"?entity_id={self.operator.id}",
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -128,7 +128,7 @@ class LotsFlowTest(TestCase):
         assert lot.delivery_type == CarbureLot.UNKNOWN
 
         response = self.client.post(
-            reverse("transactions-api-lots-accept-trading") + f"?entity_id={self.trader.id}",
+            reverse("transactions-lots-accept-trading") + f"?entity_id={self.trader.id}",
             {
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
@@ -150,7 +150,7 @@ class LotsFlowTest(TestCase):
         assert lot.delivery_type == CarbureLot.UNKNOWN
 
         response = self.client.post(
-            reverse("transactions-api-lots-accept-trading") + f"?entity_id={self.trader.id}",
+            reverse("transactions-lots-accept-trading") + f"?entity_id={self.trader.id}",
             {
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
@@ -172,7 +172,7 @@ class LotsFlowTest(TestCase):
         assert lot.delivery_type == CarbureLot.UNKNOWN
 
         response = self.client.post(
-            reverse("transactions-api-lots-accept-processing") + f"?entity_id={self.trader.id}",
+            reverse("transactions-lots-accept-processing") + f"?entity_id={self.trader.id}",
             {
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
@@ -193,7 +193,7 @@ class LotsFlowTest(TestCase):
         assert lot.lot_status == CarbureLot.PENDING
         assert lot.delivery_type == CarbureLot.UNKNOWN
         response = self.client.post(
-            reverse("transactions-api-lots-accept-blending") + f"?entity_id={self.operator.id}",
+            reverse("transactions-lots-accept-blending") + f"?entity_id={self.operator.id}",
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -207,7 +207,7 @@ class LotsFlowTest(TestCase):
         assert lot.lot_status == CarbureLot.PENDING
         assert lot.delivery_type == CarbureLot.UNKNOWN
         response = self.client.post(
-            reverse("transactions-api-lots-accept-export") + f"?entity_id={self.operator.id}",
+            reverse("transactions-lots-accept-export") + f"?entity_id={self.operator.id}",
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -221,7 +221,7 @@ class LotsFlowTest(TestCase):
         assert lot.lot_status == CarbureLot.PENDING
         assert lot.delivery_type == CarbureLot.UNKNOWN
         response = self.client.post(
-            reverse("transactions-api-lots-accept-direct-delivery") + f"?entity_id={self.operator.id}",
+            reverse("transactions-lots-accept-direct-delivery") + f"?entity_id={self.operator.id}",
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         assert response.status_code == 200

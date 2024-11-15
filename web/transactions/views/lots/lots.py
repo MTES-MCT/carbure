@@ -134,7 +134,7 @@ class LotsViewSet(GenericViewSet, ActionMixin):
                 "added_by",
                 "carbure_vendor",
                 "carbure_production_site",
-                "carbure_production_site__producer",
+                "carbure_production_site__created_by",
                 "carbure_production_site__country",
                 "production_country",
                 "carbure_dispatch_site",

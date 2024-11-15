@@ -16,6 +16,7 @@ class TestCase(DjangoTestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -30,9 +31,9 @@ class TestCase(DjangoTestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         assert loggedin
 
-        self.producer = (
+        self.created_by = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
@@ -42,7 +43,7 @@ class TestCase(DjangoTestCase):
 
         
         UserRights.objects.update_or_create(
-            entity=self.producer, user=self.user1, role=UserRights.RW
+            entity=self.created_by, user=self.user1, role=UserRights.RW
         )
         UserRights.objects.update_or_create(
             entity=self.trader, user=self.user1, role=UserRights.RW
@@ -62,18 +63,18 @@ class TestCase(DjangoTestCase):
         assert response.status_code == 200
 
     def create_draft_v2(self, **kwargs):
-        lot = get_lot(self.producer)
+        lot = get_lot(self.created_by)
         lot.update(kwargs)
         return self.client.post(
-            reverse("transactions-api-lots-add") + f"?entity_id={self.producer.id}", lot
+            reverse("transactions-lots-add") + f"?entity_id={self.created_by.id}", lot
         )
 
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
-            lot = get_lot(self.producer)
+            lot = get_lot(self.created_by)
         lot.update(kwargs)
         response = self.client.post(
-            reverse("transactions-api-lots-add") + f"?entity_id={self.producer.id}", lot
+            reverse("transactions-lots-add") + f"?entity_id={self.created_by.id}", lot
         )
         assert response.status_code == 200
         data = response.json()
@@ -83,8 +84,8 @@ class TestCase(DjangoTestCase):
 
     def send_lot(self, lot):
         response = self.client.post(
-            reverse("transactions-api-lots-send") + f"?entity_id={self.producer.id}",
-            {"entity_id": self.producer.id, "selection": [lot.id]},
+            reverse("transactions-lots-send") + f"?entity_id={self.created_by.id}",
+            {"entity_id": self.created_by.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)

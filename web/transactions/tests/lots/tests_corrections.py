@@ -17,12 +17,13 @@ class LotCorrectionTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
@@ -47,13 +48,13 @@ class LotCorrectionTest(TestCase):
         lot_data["carbure_supplier_id"] = supplier.id
         lot_data["carbure_client_id"] = client.id if client else self.trader.id
 
-        add_response = self.client.post(reverse("transactions-api-lots-add") + f"?entity_id={supplier.id}", lot_data)
+        add_response = self.client.post(reverse("transactions-lots-add") + f"?entity_id={supplier.id}", lot_data)
         assert add_response.status_code == 200
 
         lot_id = add_response.json()["id"]
 
         send_response = self.client.post(
-            reverse("transactions-api-lots-send") + f"?entity_id={supplier.id}",
+            reverse("transactions-lots-send") + f"?entity_id={supplier.id}",
             {"entity_id": supplier.id, "selection": [lot_id]},
         )
         assert send_response.status_code == 200
@@ -62,7 +63,7 @@ class LotCorrectionTest(TestCase):
 
     def request_fix(self, lot, entity):
         response = self.client.post(
-            reverse("transactions-api-lots-request-fix") + f"?entity_id={entity.id}",
+            reverse("transactions-lots-request-fix") + f"?entity_id={entity.id}",
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
         assert response.status_code == 200
@@ -71,7 +72,7 @@ class LotCorrectionTest(TestCase):
 
     def submit_fix(self, lot, entity):
         response = self.client.post(
-            reverse("transactions-api-lots-submit-fix") + f"?entity_id={entity.id}",
+            reverse("transactions-lots-submit-fix") + f"?entity_id={entity.id}",
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
         assert response.status_code == 200
@@ -80,7 +81,7 @@ class LotCorrectionTest(TestCase):
 
     def approve_fix(self, lot, entity):
         response = self.client.post(
-            reverse("transactions-api-lots-approve-fix") + f"?entity_id={entity.id}",
+            reverse("transactions-lots-approve-fix") + f"?entity_id={entity.id}",
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
         assert response.status_code == 200
@@ -95,7 +96,7 @@ class LotCorrectionTest(TestCase):
         assert lot.correction_status == CarbureLot.IN_CORRECTION
         assert lot.lot_status == CarbureLot.PENDING
         response = self.client.post(
-            reverse("transactions-api-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "volume": 42000},
         )
 
@@ -117,7 +118,7 @@ class LotCorrectionTest(TestCase):
 
         # we update
         response = self.client.post(
-            reverse("transactions-api-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-update-lot", kwargs={"id": lot.id}) + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "volume": 42000},
         )
         assert response.status_code == 200
@@ -136,7 +137,7 @@ class LotCorrectionTest(TestCase):
 
         # finally, accept lot
         response = self.client.post(
-            reverse("transactions-api-lots-accept-in-stock") + f"?entity_id={self.trader.id}",
+            reverse("transactions-lots-accept-in-stock") + f"?entity_id={self.trader.id}",
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         assert response.status_code == 200
@@ -152,7 +153,7 @@ class LotCorrectionTest(TestCase):
 
         # client requests correction
         response = self.client.post(
-            reverse("transactions-api-lots-request-fix") + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-request-fix") + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "lot_ids": [lot.id]},
         )
         assert response.status_code == 400

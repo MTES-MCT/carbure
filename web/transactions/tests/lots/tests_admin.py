@@ -14,7 +14,7 @@ class LotsAdminTest(TestCase):
     def test_toggle_pin_admin(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-toggle-pin") + f"?entity_id={self.admin.id}",
+            reverse("transactions-lots-toggle-pin") + f"?entity_id={self.admin.id}",
             {"selection": [lot.id], "notify_auditor": True},
         )
         assert response.status_code == 200
@@ -24,7 +24,7 @@ class LotsAdminTest(TestCase):
     def test_delete_many(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("transactions-api-lots-delete-many") + f"?entity_id={self.admin.id}",
+            reverse("transactions-lots-delete-many") + f"?entity_id={self.admin.id}",
             {"lots_ids": [lot.id], "dry_run": True, "comment": "hi"},
         )
         data = response.json()
@@ -42,7 +42,7 @@ class LotsAdminTest(TestCase):
             "transport_document_reference": "DAETEST_UPDATE",
         }
         response = self.client.post(
-            reverse("transactions-api-lots-update-many") + f"?entity_id={self.admin.id}",
+            reverse("transactions-lots-update-many") + f"?entity_id={self.admin.id}",
             data,
         )
         data = response.json()

@@ -15,6 +15,7 @@ class LotGHGTest(TestCase):
         "json/countries.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
         "json/depots.json",
         "json/ml.json",
     ]
@@ -33,7 +34,7 @@ class LotGHGTest(TestCase):
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
-            .annotate(psites=Count("productionsite"))
+            .annotate(psites=Count("entitysite__site"))
             .filter(psites__gt=0)[0]
         )
         UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
@@ -49,7 +50,7 @@ class LotGHGTest(TestCase):
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
-        response = self.client.post(reverse("transactions-api-lots-add") + f"?entity_id={self.producer.id}", lot)
+        response = self.client.post(reverse("transactions-lots-add") + f"?entity_id={self.producer.id}", lot)
         assert response.status_code == 200
         data = response.json()
         lot_id = data["id"]
@@ -58,7 +59,7 @@ class LotGHGTest(TestCase):
 
     def send_lot(self, lot):
         response = self.client.post(
-            reverse("transactions-api-lots-send") + f"?entity_id={self.producer.id}",
+            reverse("transactions-lots-send") + f"?entity_id={self.producer.id}",
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         assert response.status_code == 200

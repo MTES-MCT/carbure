@@ -11,11 +11,11 @@ from core.models import (
     CarbureLotEvent,
     CarbureStock,
     CarbureStockEvent,
-    Depot,
     Entity,
     Pays,
 )
 from transactions.helpers import try_get_date
+from transactions.models import Depot
 from transactions.sanity_checks import get_prefetched_data
 
 
@@ -139,7 +139,7 @@ class SplitMixin:
             lot.transport_document_reference = entry.get("transport_document_reference", lot.delivery_type)
             delivery_site_id = entry.get("carbure_delivery_site_id", None)
             try:
-                delivery_site = Depot.objects.get(depot_id=delivery_site_id)
+                delivery_site = Depot.objects.get(customs_id=delivery_site_id)
                 lot.carbure_delivery_site = delivery_site
                 lot.delivery_site_country = delivery_site.country
             except Exception:
