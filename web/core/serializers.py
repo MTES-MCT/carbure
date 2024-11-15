@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import (
@@ -122,6 +123,7 @@ class GenericErrorAdminSerializer(serializers.ModelSerializer):
 class CarbureLotEventSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.CharField())
     def get_user(self, obj):
         visible_users = self.context.get("visible_users")
         if visible_users is None or obj.user is None:
@@ -363,6 +365,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
             "initial_lhv_amount",
         ]
 
+    @extend_schema_field(serializers.FloatField())
     def get_initial_volume(self, obj):
         if obj.parent_lot:
             return obj.parent_lot.volume
@@ -371,6 +374,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         else:
             return 0
 
+    @extend_schema_field(serializers.FloatField())
     def get_initial_weight(self, obj):
         if obj.parent_lot:
             return obj.parent_lot.weight
@@ -379,6 +383,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         else:
             return 0
 
+    @extend_schema_field(serializers.FloatField())
     def get_initial_lhv_amount(self, obj):
         if obj.parent_lot:
             return obj.parent_lot.lhv_amount
@@ -387,9 +392,11 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         else:
             return 0
 
+    @extend_schema_field(serializers.DateField())
     def get_delivery_date(self, obj):
         return obj.get_delivery_date().strftime("%Y-%m-%d")
 
+    @extend_schema_field(serializers.IntegerField())
     def get_period(self, obj):
         date = obj.get_delivery_date()
         return date.year * 100 + date.month
@@ -613,6 +620,7 @@ class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
     entity = EntitySerializer()
     period = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.CharField())
     def get_period(self, obj):
         return obj.period.year * 100 + obj.period.month
 

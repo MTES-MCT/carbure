@@ -2,6 +2,7 @@ from django.urls import path, include
 from .home_stats import get_home_stats
 
 urlpatterns = [
+    path("apikey/", include("apikey.urls")),
     path("auth/", include("auth.api")),
     path("double-counting/", include("doublecount.api")),
     path("entity/", include("entity.api")),
@@ -10,6 +11,8 @@ urlpatterns = [
     path("resources/", include("resources.urls")),
     path("transactions/", include("transactions.api")),
     path("user/", include("user.urls")),
+    path("v2/transactions/", include("transactions.urls")),
     path("elec/", include("elec.api")),
+    # path("elec/", include("elec.urls")),
     path("home-stats", get_home_stats, name="carbure-home-stats"),
 ]

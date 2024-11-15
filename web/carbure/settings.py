@@ -99,11 +99,13 @@ INSTALLED_APPS = [
     "saf",
     "transactions",
     "elec",
+    "apikey",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
 
 MIDDLEWARE = [
+    "apikey.middleware.RemoveSessionIfAPIKeyAuthMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "csp.middleware.CSPMiddleware",
@@ -341,5 +343,6 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
     },
+    "COMPONENT_SPLIT_REQUEST": True,
     # OTHER SETTINGS
 }
