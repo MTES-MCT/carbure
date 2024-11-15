@@ -6,26 +6,35 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
+from core.utils import MultipleValueField
+from elec.api.admin.audit.charge_points.applications import filter_charge_point_applications
+from elec.api.admin.audit.meter_readings.applications import filter_meter_readings_applications
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
 class ElecAuditSnapshotForm(forms.Form):
     year = forms.IntegerField()
+    cpo = MultipleValueField(coerce=str, required=False)
+    quarter = MultipleValueField(coerce=int, required=False)
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
 def get_snapshot(request):
-    snapshot_form = ElecAuditSnapshotForm(request.GET)
+    snapshot_filter_form = ElecAuditSnapshotForm(request.GET)
 
-    if not snapshot_form.is_valid():
-        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, snapshot_form.errors)
-
-    year = snapshot_form.cleaned_data["year"]
+    if not snapshot_filter_form.is_valid():
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, snapshot_filter_form.errors)
 
     try:
-        charge_points_applications = ElecChargePointApplication.objects.filter(created_at__year=year)
-        meter_readings_applications = ElecMeterReadingApplication.objects.filter(year=year)
+        charge_points_applications = ElecChargePointApplication.objects.all()
+        charge_points_applications = filter_charge_point_applications(
+            charge_points_applications, **snapshot_filter_form.cleaned_data
+        )
+        meter_readings_applications = ElecMeterReadingApplication.objects.all()
+        meter_readings_applications = filter_meter_readings_applications(
+            meter_readings_applications, **snapshot_filter_form.cleaned_data
+        )
 
         return SuccessResponse(
             {

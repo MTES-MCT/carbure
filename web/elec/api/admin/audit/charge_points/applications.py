@@ -76,18 +76,19 @@ def filter_charge_point_applications(applications, **filters):
         "cpo",
     )
 
-    applications = applications.filter(created_at__year=filters["year"])
+    applications = applications.filter(created_at__year=filters.get("year"))
 
-    if filters["cpo"]:
-        applications = applications.filter(cpo__name__in=filters["cpo"])
+    if filters.get("cpo"):
+        applications = applications.filter(cpo__name__in=filters.get("cpo"))
 
-    if filters["status"] == "PENDING":
+    status = filters.get("status")
+    if status == "PENDING":
         applications = applications.filter(status=ElecChargePointApplication.PENDING)
-    elif filters["status"] == "AUDIT_IN_PROGRESS":
+    elif status == "AUDIT_IN_PROGRESS":
         applications = applications.filter(status=ElecChargePointApplication.AUDIT_IN_PROGRESS)
-    elif filters["status"] == "AUDIT_DONE":
+    elif status == "AUDIT_DONE":
         applications = applications.filter(status=ElecChargePointApplication.AUDIT_DONE)
-    elif filters["status"] == "HISTORY":
+    elif status == "HISTORY":
         applications = applications.filter(
             status__in=[ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED]
         )
