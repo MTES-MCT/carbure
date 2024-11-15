@@ -99,11 +99,13 @@ INSTALLED_APPS = [
     "saf",
     "transactions",
     "elec",
+    "apikey",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
 
 MIDDLEWARE = [
+    "apikey.middleware.RemoveSessionIfAPIKeyAuthMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "csp.middleware.CSPMiddleware",
