@@ -5,12 +5,13 @@ from django.urls import reverse
 
 from core.models import (
     Biocarburant,
+    Depot,
     Entity,
     MatierePremiere,
     Pays,
 )
 from core.tests_utils import setup_current_user
-from transactions.models import Depot, EntitySite, ProductionSite
+from producers.models import ProductionSite
 
 
 class ResourcesTest(TestCase):
@@ -34,12 +35,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 4
+        assert len(response.json()) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=bl")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
 
     def test_get_bcs(self):
@@ -54,12 +55,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 4
+        assert len(response.json()) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=anol")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
 
         assert len(data) == 1
 
@@ -75,12 +76,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 4
+        assert len(response.json()) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=isl")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
 
     def test_get_ges(self):
@@ -98,12 +99,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 4
+        assert len(response.json()) >= 4
         # check if querying works
         response = self.client.get(reverse(url) + "?query=op")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 4
 
     def test_get_producers(self):
@@ -119,12 +120,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 2
+        assert len(response.json()) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=od2")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
 
     def test_get_operators(self):
@@ -141,12 +142,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 2
+        assert len(response.json()) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=op2")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
 
     def test_get_traders(self):
@@ -164,33 +165,33 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 2
+        assert len(response.json()) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=tr1")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
 
     def test_get_delivery_sites(self):
         # create delivery sites
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
-        Depot.objects.update_or_create(name="Depot1", customs_id="007", country=fr)
-        Depot.objects.update_or_create(name="Gennevilliers", customs_id="042", country=fr)
-        Depot.objects.update_or_create(name="Gennevilliers 2", customs_id="043", country=fr)
-        Depot.objects.update_or_create(name="Carcassonne", customs_id="044", country=fr)
+        Depot.objects.update_or_create(name="Depot1", depot_id="007", country=fr)
+        Depot.objects.update_or_create(name="Gennevilliers", depot_id="042", country=fr)
+        Depot.objects.update_or_create(name="Gennevilliers 2", depot_id="043", country=fr)
+        Depot.objects.update_or_create(name="Carcassonne", depot_id="044", country=fr)
 
         url = "resources-depots"
         response = self.client.get(reverse(url))
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 2
+        assert len(response.json()) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=carca")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
 
     def test_get_production_sites(self):
@@ -198,53 +199,40 @@ class ResourcesTest(TestCase):
         producer, _ = Entity.objects.update_or_create(name="toto", entity_type="Producteur")
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
-
-        ps1 = ProductionSite.objects.create(
+        ProductionSite.objects.update_or_create(
             name="Usine1",
+            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
-            site_type="PRODUCTION SITE",
-            created_by=producer,
         )
-        EntitySite.objects.create(entity=producer, site=ps1)
-
-        ps2 = ProductionSite.objects.create(
+        ProductionSite.objects.update_or_create(
             name="Usine2",
+            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
-            site_type="PRODUCTION SITE",
-            created_by=producer,
         )
-        EntitySite.objects.create(entity=producer, site=ps2)
-
-        ps3 = ProductionSite.objects.create(
+        ProductionSite.objects.update_or_create(
             name="Usine3",
+            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
-            site_type="PRODUCTION SITE",
-            created_by=producer,
         )
-        EntitySite.objects.create(entity=producer, site=ps3)
-
-        ps4 = ProductionSite.objects.create(
+        ProductionSite.objects.update_or_create(
             name="Usine4",
+            producer_id=producer.id,
             country=fr,
             date_mise_en_service=today,
-            site_type="PRODUCTION SITE",
-            created_by=producer,
         )
-        EntitySite.objects.create(entity=producer, site=ps4)
 
         url = "resources-production-sites"
         response = self.client.get(reverse(url))
         # api works
-        print(response.json(), response.status_code)
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()["data"]) >= 2
+        assert len(response.json()) >= 2
         # check if querying works
         response = self.client.get(reverse(url) + "?query=ne3")
         assert response.status_code == 200
         # and returns filtered data
-        data = response.json()["data"]
+        data = response.json()
         assert len(data) == 1
