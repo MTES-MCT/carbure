@@ -1,8 +1,17 @@
+from enum import Enum
+
 import django_filters
 from django.db.models import Q
 from django.db.models.expressions import F
+from drf_spectacular.utils import extend_schema_field
+from rest_framework.serializers import CharField, ChoiceField
 
 from saf.models import SafTicketSource
+
+
+class TicketStatusEnum(Enum):
+    AVAILABLE = "Available"
+    HISTORY = "History"
 
 
 class TicketSourceFilter(django_filters.FilterSet):
@@ -15,7 +24,10 @@ class TicketSourceFilter(django_filters.FilterSet):
     countries_of_origin = django_filters.BaseInFilter(field_name="country_of_origin__code_pays", lookup_expr="in")
     production_sites = django_filters.BaseInFilter(field_name="carbure_production_site__name", lookup_expr="in")
     delivery_sites = django_filters.BaseInFilter(field_name="parent_lot__carbure_delivery_site__name", lookup_expr="in")
-    status = django_filters.CharFilter(method="filter_status")
+    status = django_filters.ChoiceFilter(
+        choices=[(item.name, item.value) for item in TicketStatusEnum],
+        method="filter_status",
+    )
     suppliers = django_filters.BaseInFilter(method="filter_suppliers")
 
     order = django_filters.OrderingFilter(
@@ -42,6 +54,7 @@ class TicketSourceFilter(django_filters.FilterSet):
             "status",
         ]
 
+    @extend_schema_field(ChoiceField(choices=["HISTORY", "AVAILABLE"]))
     def filter_status(self, queryset, name, value):
         if value == "AVAILABLE":
             return queryset.filter(assigned_volume__lt=F("total_volume"))
@@ -50,9 +63,11 @@ class TicketSourceFilter(django_filters.FilterSet):
         else:
             raise Exception(f"Status '{value}' does not exist for ticket sources")
 
+    @extend_schema_field(CharField(help_text="Comma-separated list of supplier names"))
     def filter_suppliers(self, queryset, name, value):
+        suppliers_list = value.split(",")
         return queryset.filter(
-            Q(parent_lot__carbure_supplier__name__in=value)
-            | Q(parent_lot__unknown_supplier__in=value)
-            | Q(parent_ticket__supplier__name__in=value)
+            Q(parent_lot__carbure_supplier__name__in=suppliers_list)
+            | Q(parent_lot__unknown_supplier__in=suppliers_list)
+            | Q(parent_ticket__supplier__name__in=suppliers_list)
         )

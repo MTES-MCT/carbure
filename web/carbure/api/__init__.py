@@ -9,7 +9,7 @@ urlpatterns = [
     path("saf/", include("saf.urls")),
     path("resources/", include("resources.urls")),
     path("transactions/", include("transactions.api")),
-    path("user/", include("user.api")),
+    path("user/", include("user.urls")),
     path("elec/", include("elec.api")),
     path("home-stats", get_home_stats, name="carbure-home-stats"),
 ]
