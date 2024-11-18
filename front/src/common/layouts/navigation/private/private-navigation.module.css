@@ -1,5 +1,5 @@
 :root {
-  --private-navigation-header-height: 72px;
+  --private-navigation-header-height: 73px;
   --private-navigation-nav-width: 284px;
 }
 .header {
@@ -14,6 +14,16 @@
   border-right: 1px solid var(--border-default-grey);
   width: var(--private-navigation-nav-width);
   padding: var(--spacing-5v) var(--spacing-3w);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1w);
+}
+
+.marianne {
+  height: 24px;
 }
 
 .header-right {

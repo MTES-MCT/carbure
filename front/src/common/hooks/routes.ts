@@ -11,6 +11,8 @@ export const useRoutes = () => {
   const routes = {
     ...ROUTE_URLS,
 
+    ORG: () => ROUTE_URLS.ORG(entity.id),
+
     ADMIN_COMPANY_DETAIL: (company_id: number) =>
       ROUTE_URLS.ADMIN_COMPANY_DETAIL(entity.id, company_id),
 
