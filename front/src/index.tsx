@@ -1,6 +1,6 @@
 import React, { Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { BrowserRouter } from "react-router-dom"
+import { BrowserRouter, NavLink } from "react-router-dom"
 
 import "./i18n"
 import "./carbure/assets/css/index.css"
@@ -11,7 +11,12 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { SentryProvider } from "./sentry"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 
-startReactDsfr({ defaultColorScheme: "light" })
+declare module "@codegouvfr/react-dsfr/spa" {
+  interface RegisterLink {
+    Link: typeof NavLink
+  }
+}
+startReactDsfr({ defaultColorScheme: "light", Link: NavLink })
 
 async function enableMocking() {
   if (import.meta.env.MODE !== "development") return

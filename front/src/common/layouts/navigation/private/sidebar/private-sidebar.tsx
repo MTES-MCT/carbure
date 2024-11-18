@@ -10,16 +10,32 @@ import {
   SettingsLine,
 } from "common/components/icon"
 import { EntitySelector } from "./entity-selector"
+import useEntity from "carbure/hooks/entity"
+import { useUser } from "carbure/hooks/user"
+import { Button } from "common/components/button2"
 
 export const PrivateSidebar = () => {
   const menuItems = usePrivateSidebar()
   const { t } = useTranslation()
   const routes = useRoutes()
+  const { isBlank } = useEntity()
+  const user = useUser()
+  const firstEntity = user.getFirstEntity()
 
   return (
     <div className={styles["private-sidebar"]}>
       <div className={styles["nav-wrapper"]}>
-        <EntitySelector className={styles["entity-selector"]} />
+        {isBlank && !firstEntity && (
+          <Button
+            priority="tertiary"
+            linkProps={{ to: routes.MY_ACCOUNT.ADD_COMPANY }}
+            iconId="ri-add-line"
+          >
+            {t("Lier le compte à des sociétés")}
+          </Button>
+        )}
+
+        {!isBlank && <EntitySelector className={styles["entity-selector"]} />}
         <nav className={styles["nav"]}>
           {menuItems.map((item) => (
             <div key={item.title}>
