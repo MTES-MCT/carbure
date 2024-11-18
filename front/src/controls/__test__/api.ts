@@ -2,12 +2,6 @@ import { admin, entityRight } from "carbure/__test__/data"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 
-import {
-  okTranslations,
-  okFieldsTranslations,
-  okErrorsTranslations,
-} from "carbure/__test__/api"
-
 import { getFilter } from "transactions/__test__/data"
 import { lotSummary, lots } from "./data"
 
@@ -85,9 +79,6 @@ export default setupServer(
   okSnapshot,
   okLots,
   okLotsSummary,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
   okFilters,
   okYears,
   okSnapshot,
