@@ -26,7 +26,7 @@ export const UserMenu = () => {
     const compactedItems = compact([
       {
         label: "Mon compte",
-        path: routes.MY_ACCOUNT,
+        path: routes.MY_ACCOUNT.INDEX,
         icon: AccountLine,
       },
       (isOperator || isProducer) && {
