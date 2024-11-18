@@ -12,6 +12,8 @@ import { useTranslation } from "react-i18next"
 import { LanguageSelector } from "common/molecules/language-selector"
 import { Notifications } from "./notifications"
 import { UserMenu } from "./user-menu"
+import { NavLink } from "react-router-dom"
+import marianne from "common/assets/images/Marianne.svg"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
@@ -22,9 +24,16 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
       <>
         <header className={styles.header}>
           <div className={styles["header-left"]}>
-            <Text is="h2" size="xl" fontWeight="bold">
-              Carbure
-            </Text>
+            <NavLink to="/" className={styles.logo}>
+              <img
+                src={marianne}
+                alt="marianne logo"
+                className={styles.marianne}
+              />
+              <Text is="h2" size="xl" fontWeight="bold">
+                Carbure
+              </Text>
+            </NavLink>
           </div>
           <div className={styles["header-right"]}>
             <Text is="h1" fontWeight="bold">

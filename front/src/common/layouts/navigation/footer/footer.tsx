@@ -3,24 +3,24 @@ import { Link } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 
 import styles from "./footer.module.css"
-import logoMTES from "../assets/images/MTE.svg"
-import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
-import logoBetaGouv from "../assets/images/betagouvfr.svg"
-import logoFranceRelance from "../assets/images/france-relance.webp"
-import logoEuropeanUnion from "../assets/images/union-europeenne.webp"
+import logoMTES from "common/assets/images/MTE.svg"
+import logoFabNum from "common/assets/images/logo-fabriquenumerique.svg"
+import logoBetaGouv from "common/assets/images/betagouvfr.svg"
+import logoFranceRelance from "common/assets/images/france-relance.webp"
+import logoEuropeanUnion from "common/assets/images/union-europeenne.webp"
 import { LinkedIn, Mail } from "common/components/icons"
 import { Footer } from "common/components/scaffold"
 import { MailTo } from "common/components/button"
 import { useUser } from "carbure/hooks/user"
 
-const CarbureFooter = () => {
+const CarbureFooter = ({ className }: { className?: string }) => {
   useTranslation()
   const user = useUser()
 
   return (
-    <Footer className={styles.footer}>
+    <Footer className={cl(styles.footer, className)}>
       <div className={styles.footerUpper}>
-        <ul className={styles.footerCarbureLinks}>
+        <ul>
           <li>
             <a
               href="https://carbure-1.gitbook.io/faq/"
