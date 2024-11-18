@@ -10,9 +10,6 @@ import {
   okEntitySearch,
   okMatierePremiereSearch,
   okProductionSitesSearch,
-  okTranslations,
-  okFieldsTranslations,
-  okErrorsTranslations,
 } from "carbure/__test__/api"
 
 import * as data from "./data"
@@ -122,9 +119,5 @@ export default setupServer(
   okDeliverySitesSearch,
   okEntitySearch,
   okMatierePremiereSearch,
-  okProductionSitesSearch,
-
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations
+  okProductionSitesSearch
 )
