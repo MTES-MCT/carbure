@@ -98,7 +98,7 @@ def create_sites_and_update_related_content(apps, schema_editor):
             entity=depot,
             filter_column_name="depot_id",
             site_type=depot.depot_type,
-            created_by=depot.entity,
+            created_by=depot.entitydepot_set.first().entity,
         )
 
 
