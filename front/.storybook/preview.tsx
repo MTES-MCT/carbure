@@ -12,15 +12,15 @@ import { PortalProvider } from "../src/common/components/portal"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 import { MatomoProvider } from "../src/matomo"
 
-// import css from our app
-import "../src/carbure/assets/css/index.css"
-
 import "@codegouvfr/react-dsfr/dsfr/component/stepper/stepper.min.css"
 import "@codegouvfr/react-dsfr/dsfr/component/input/input.min.css"
 import "@codegouvfr/react-dsfr/dsfr/component/search/search.min.css"
 import "@codegouvfr/react-dsfr/dsfr/component/button/button.min.css"
 import "@codegouvfr/react-dsfr/dsfr/core/core.min.css"
 import "@codegouvfr/react-dsfr/dsfr/utility/icons/icons.min.css"
+
+// import css from our app
+import "../src/carbure/assets/css/index.css"
 
 startReactDsfr({ defaultColorScheme: "light" })
 
