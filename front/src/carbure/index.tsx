@@ -61,12 +61,18 @@ const Carbure = () => {
                     <Route path="/pending" element={<Pending />} />
                     <Route path="/account/*" element={<Account />} />
                     <Route path="/org/:entity/*" element={<Org />} />
-                    {firstEntity && (
+                    {entity.isBlank && firstEntity && (
                       <Route
                         path="/"
                         element={
                           <Navigate replace to={`/org/${firstEntity.id}`} />
                         }
+                      />
+                    )}
+                    {entity.isBlank && !firstEntity && (
+                      <Route
+                        path="/"
+                        element={<Navigate replace to={`/pending`} />}
                       />
                     )}
                   </>
