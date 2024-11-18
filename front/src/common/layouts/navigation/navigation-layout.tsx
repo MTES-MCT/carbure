@@ -2,6 +2,7 @@ import { useUser } from "carbure/hooks/user"
 import { PropsWithChildren } from "react"
 import { PrivateNavigation } from "./private/private-navigation"
 import { PublicNavigation } from "./public/public-navigation"
+import { CarbureFooter } from "./footer"
 // import { DevBanner } from "common/components/dev-banner"
 
 export const NavigationLayout = ({ children }: PropsWithChildren) => {
@@ -17,6 +18,7 @@ export const NavigationLayout = ({ children }: PropsWithChildren) => {
         <>
           <PublicNavigation />
           {children}
+          <CarbureFooter />
         </>
       )}
     </>

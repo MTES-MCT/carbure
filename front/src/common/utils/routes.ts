@@ -2,6 +2,7 @@ const urlWithOrgId = (entity_id: number, url: string) =>
   `/org/${entity_id}${url}`
 
 export const ROUTE_URLS = {
+  ORG: (entity_id: number) => `/org/${entity_id}`,
   // Admin
 
   // Company detail page when the entity is admin

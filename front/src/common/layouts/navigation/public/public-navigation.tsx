@@ -6,6 +6,8 @@ import { Logo } from "./logo"
 import { LanguageSelection } from "./language-selection"
 import { Question } from "common/components/icons"
 import { ROUTE_URLS } from "common/utils/routes"
+import { fr } from "@codegouvfr/react-dsfr"
+import cn from "clsx"
 
 export const PublicNavigation = () => {
   const { t } = useTranslation()
@@ -21,7 +23,7 @@ export const PublicNavigation = () => {
         href={ROUTE_URLS.USER_GUIDE}
         target="_blank"
         rel="noreferrer"
-        className={styles.faq}
+        className={cn(styles.faq, fr.cx("fr-raw-link"))}
       >
         <Question title={t("Guide d'utilisation")} />
       </a>

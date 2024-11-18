@@ -1,7 +1,7 @@
 import { Trans } from "react-i18next"
 import { Link } from "react-router-dom"
 import css from "./logo.module.css"
-import republique from "carbure/assets/images/republique.svg"
+import republique from "common/assets/images/republique.svg"
 
 export const Logo = () => (
   <Link to="/" className={css.logo}>

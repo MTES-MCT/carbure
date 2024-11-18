@@ -6,11 +6,16 @@ import styles from "./entity-selector.module.css"
 import { EntityType } from "carbure/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { useMatomo } from "matomo"
+import { useNavigate } from "react-router-dom"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const EntitySelector = ({ className }: { className?: string }) => {
   const user = useUser()
   const entity = useEntity()
   const { t } = useTranslation()
+  const matomo = useMatomo()
+  const navigate = useNavigate()
 
   const options = user.rights.map((right) => ({
     ...right,
@@ -60,6 +65,17 @@ export const EntitySelector = ({ className }: { className?: string }) => {
       )}
       full
       className={className}
+      onChange={(entityId) => {
+        if (entityId) {
+          matomo.push([
+            "trackEvent",
+            "menu",
+            "change-entity",
+            ROUTE_URLS.ORG(entityId),
+          ])
+          navigate(ROUTE_URLS.ORG(entityId))
+        }
+      }}
     />
   )
 }
