@@ -11,6 +11,15 @@ class YearConfigAdmin(admin.ModelAdmin):
     list_display = ("year", "locked")
 
 
+class EntitySiteInline(admin.TabularInline):
+    model = EntitySite
+    extra = 0
+    fields = ("entity",)
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
     list_display = (
@@ -29,6 +38,7 @@ class SiteAdmin(admin.ModelAdmin):
     search_fields = ("name", "city", "country__name", "ges_option", "customs_id")
     list_filter = ("country", "ges_option", "eligible_dc", "site_type")
     actions = ["enable_site"]
+    inlines = [EntitySiteInline]
 
     def enable_site(self, request, queryset):
         for site in queryset:
