@@ -46,7 +46,7 @@ class SafTicket(models.Model):
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
 
     carbure_production_site = models.ForeignKey(
-        "producers.ProductionSite",
+        "transactions.Site",
         null=True,
         blank=True,
         default=None,

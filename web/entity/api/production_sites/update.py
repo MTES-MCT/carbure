@@ -2,7 +2,7 @@ from django.http import JsonResponse
 
 from core.decorators import check_user_rights
 from core.models import Pays, UserRights
-from producers.models import ProductionSite
+from transactions.models import ProductionSite
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -12,7 +12,7 @@ def update_production_site(request, entity, entity_id):
     if not production_site_id:
         return JsonResponse({"status": "error", "message": "Missing field production_site_id"}, status=400)
 
-    psite = ProductionSite.objects.get(id=production_site_id, producer=entity)
+    psite = ProductionSite.objects.get(id=production_site_id, created_by=entity)
 
     country_code = request.POST.get("country_code")
     name = request.POST.get("name")
@@ -23,7 +23,7 @@ def update_production_site(request, entity, entity_id):
     eligible_dc = eligible_dc == "true"
     dc_reference = request.POST.get("dc_reference")
 
-    site_id = request.POST.get("site_id")
+    site_siret = request.POST.get("site_id")
     city = request.POST.get("city")
     address = request.POST.get("address")
     postal_code = request.POST.get("postal_code")
@@ -41,8 +41,8 @@ def update_production_site(request, entity, entity_id):
         psite.eligible_dc = eligible_dc
     if dc_reference:
         psite.dc_reference = dc_reference
-    if site_id:
-        psite.site_id = site_id
+    if site_siret:
+        psite.site_siret = site_siret
     if city:
         psite.city = city
     if address:

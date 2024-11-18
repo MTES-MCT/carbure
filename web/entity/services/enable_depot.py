@@ -15,7 +15,7 @@ def enable_depot(depot, request):
     depot.save()
 
     # Get entity admin users
-    entity = depot.entity
+    entity = depot.created_by
     try:
         admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN)
     except Exception:

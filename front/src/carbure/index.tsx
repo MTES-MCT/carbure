@@ -25,7 +25,6 @@ import Footer from "./components/footer"
 import Home from "./components/home"
 import Pending from "./components/pending"
 import PublicStats from "./components/public-stats"
-import Topbar from "./components/top-bar"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
 import ElecAudit from "elec-auditor"
@@ -41,8 +40,6 @@ const Carbure = () => {
       <EntityContext.Provider value={entity}>
         <PortalProvider>
           <div id="app">
-            <Topbar />
-
             <Routes>
               <Route path="*" element={<Home />} />
               <Route path="/stats" element={<PublicStats />} />

@@ -47,17 +47,6 @@ export const PrivateLayout: Story = {
       </>
     ),
   },
-  // parameters: {
-  //   reactRouter: reactRouterParameters({
-  //     location: {
-  //       pathParams: { entityId: "3", year: "2024" },
-  //     },
-  //     routing: {
-  //       path: "/org/:entityId/transactions/:year/in",
-  //       handle: "Profile",
-  //     },
-  //   }),
-  // },
 }
 
 export const OperatorLayout: Story = {
