@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react"
 import { PrivateNavigation } from "./private/private-navigation"
 import { PublicNavigation } from "./public/public-navigation"
 import { CarbureFooter } from "./footer"
+import { PrivateNavigationProvider } from "./private/private-navigation.context"
 // import { DevBanner } from "common/components/dev-banner"
 
 export const NavigationLayout = ({ children }: PropsWithChildren) => {
@@ -13,7 +14,9 @@ export const NavigationLayout = ({ children }: PropsWithChildren) => {
       {/* <DevBanner /> */}
 
       {user.isAuthenticated() ? (
-        <PrivateNavigation>{children}</PrivateNavigation>
+        <PrivateNavigationProvider>
+          <PrivateNavigation>{children}</PrivateNavigation>
+        </PrivateNavigationProvider>
       ) : (
         <>
           <PublicNavigation />
