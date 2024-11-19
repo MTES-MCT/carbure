@@ -16,3 +16,8 @@ repos:
         language: system
         files: ^front/
         stages: [pre-commit]
+      - id: check-backend-schema
+        name: CheckBackendSchema
+        entry: bash -c 'npm run generate-and-check-types'
+        language: system
+        stages: [pre-push]

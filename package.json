@@ -9,7 +9,7 @@
     "test-f": "python web/manage.py test $f --keepdb",
     "generate-schema": "python web/manage.py spectacular --file api-schema.yaml",
     "generate-schema-ts": "npm run generate-schema && cd front && npm run generate-api",
-    "generate-and-check-types": "npm run generate-schema && cd front && npm run generate-and-check-types",
+    "generate-and-check-types": "npm run generate-schema",
     "migrate": "python web/manage.py makemigrations && python web/manage.py migrate",
     "restart": "docker-compose down && docker-compose up -d",
     "deploy-preview": "git push origin $branch:preview --force"
