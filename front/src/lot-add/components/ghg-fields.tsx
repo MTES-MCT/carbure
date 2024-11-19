@@ -5,7 +5,7 @@ import isAfter from "date-fns/isAfter"
 import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
 import useEntity from "carbure/hooks/entity"
-import { EntityType, type Entity, DepotType } from "carbure/types"
+import { EntityType, type Entity, SiteType } from "carbure/types"
 
 interface GHGFieldsProps {
   readOnly?: boolean
@@ -63,7 +63,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         value={formatGHG(value.ghg_total ?? 0)}
       />
 
-      {canSeePlantGHG(entity, value, DepotType.POWER_PLANT) && (
+      {canSeePlantGHG(entity, value, SiteType.POWER_PLANT) && (
         <NumberInput
           readOnly
           label="ECEL"
@@ -76,7 +76,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         />
       )}
 
-      {canSeePlantGHG(entity, value, DepotType.HEAT_PLANT) && (
+      {canSeePlantGHG(entity, value, SiteType.HEAT_PLANT) && (
         <NumberInput
           readOnly
           label="ECH"
@@ -144,7 +144,7 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         />
       )}
 
-      {canSeePlantGHG(entity, value, DepotType.POWER_PLANT) && (
+      {canSeePlantGHG(entity, value, SiteType.POWER_PLANT) && (
         <TextInput
           readOnly
           label="Réd. élec."
@@ -153,7 +153,7 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         />
       )}
 
-      {canSeePlantGHG(entity, value, DepotType.HEAT_PLANT) && (
+      {canSeePlantGHG(entity, value, SiteType.HEAT_PLANT) && (
         <TextInput
           readOnly
           label="Réd. chaleur"
@@ -173,7 +173,7 @@ export function isRedII(deliveryDate: string | undefined | null) {
 // date where RED II took effect
 const JULY_FIRST_21 = new Date("2021-07-01")
 
-function canSeePlantGHG(entity: Entity, lot: LotFormValue, type: DepotType) {
+function canSeePlantGHG(entity: Entity, lot: LotFormValue, type: SiteType) {
   const isEntityAllowed =
     entity.entity_type === EntityType.PowerOrHeatProducer ||
     entity.entity_type === EntityType.Administration
@@ -181,7 +181,7 @@ function canSeePlantGHG(entity: Entity, lot: LotFormValue, type: DepotType) {
   const isDeliverySiteForHeat =
     lot.delivery_site instanceof Object &&
     (lot.delivery_site.depot_type === type ||
-      lot.delivery_site.depot_type === DepotType.COGENERATION_PLANT)
+      lot.delivery_site.depot_type === SiteType.COGENERATION_PLANT)
 
   return isEntityAllowed && isDeliverySiteForHeat
 }

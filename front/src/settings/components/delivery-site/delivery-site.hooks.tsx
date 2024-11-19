@@ -1,21 +1,21 @@
-import { Country, DepotType, OwnershipType } from "carbure/types"
+import { Country, SiteType, OwnershipType } from "carbure/types"
 import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
 import { ReactNode, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
-export const useDeliverySiteFlags = (depotType?: DepotType) =>
+export const useDeliverySiteFlags = (depotType?: SiteType) =>
   useMemo(
     () => ({
-      isPowerPlant: depotType === DepotType.POWER_PLANT,
-      isHeatPlant: depotType === DepotType.HEAT_PLANT,
-      isCogenerationPlant: depotType === DepotType.COGENERATION_PLANT,
+      isPowerPlant: depotType === SiteType.POWER_PLANT,
+      isHeatPlant: depotType === SiteType.HEAT_PLANT,
+      isCogenerationPlant: depotType === SiteType.COGENERATION_PLANT,
     }),
     [depotType]
   )
 
 type DepotTypeTranslationItem = {
-  type: DepotType
+  type: SiteType
   label: string
   tooltip?: string
 }
@@ -26,57 +26,57 @@ const useDepotTypeTranslations = () => {
   return useMemo<DepotTypeTranslationItem[]>(
     () => [
       {
-        type: DepotType.EFS,
+        type: SiteType.EFS,
         label: t("EFS"),
         tooltip: t("Entrepôt fiscal de stockage"),
       },
       {
-        type: DepotType.EFPE,
+        type: SiteType.EFPE,
         label: t("EFPE"),
         tooltip: t("Entrepôt fiscal de produits énergétiques"),
       },
       {
-        type: DepotType.EFCA,
+        type: SiteType.EFCA,
         label: t("EFCA"),
         tooltip: t("Entrepôt fiscal de carburants d'aviation"),
       },
       {
-        type: DepotType.BIOFUEL_DEPOT,
+        type: SiteType.BIOFUEL_DEPOT,
         label: t("Biofuel Depot"),
         tooltip: t(
           "Entrepôt de biocarburants qui se situe uniquement en dehors de la France"
         ),
       },
       {
-        type: DepotType.OIL_DEPOT,
+        type: SiteType.OIL_DEPOT,
         label: t("Oil Depot"),
         tooltip: t(
           "Entrepôt de biocarburants qui se situe uniquement en dehors de la France"
         ),
       },
       {
-        type: DepotType.POWER_PLANT,
+        type: SiteType.POWER_PLANT,
         label: t("Centrale électrique"),
         tooltip: t(
           "Centrale de production d'électricité qui utilise des biocarburants"
         ),
       },
       {
-        type: DepotType.HEAT_PLANT,
+        type: SiteType.HEAT_PLANT,
         label: t("Centrale de chaleur"),
         tooltip: t(
           "Centrale de production de chaleur qui utilise des biocarburants"
         ),
       },
       {
-        type: DepotType.COGENERATION_PLANT,
+        type: SiteType.COGENERATION_PLANT,
         label: t("Centrale de cogénération"),
         tooltip: t(
           "Centrale de production d'électricité et de chaleur qui utilise des biocarburants"
         ),
       },
       {
-        type: DepotType.OTHER,
+        type: SiteType.OTHER,
         label: t("Autre"),
       },
     ],
@@ -92,7 +92,7 @@ export const useDepotTypeLabels = () => {
       ...acc,
       [item.type]: item.label,
     }),
-    {} as Record<DepotType, string>
+    {} as Record<SiteType, string>
   )
 }
 
@@ -112,7 +112,7 @@ export const useGetDepotTypeOptions = ({
     if (country?.code_pays === "FR") {
       depotTypeOptions = depotTypeOptions.filter(
         ({ type }) =>
-          ![DepotType.OIL_DEPOT, DepotType.BIOFUEL_DEPOT].includes(type)
+          ![SiteType.OIL_DEPOT, SiteType.BIOFUEL_DEPOT].includes(type)
       )
     }
 
@@ -121,12 +121,12 @@ export const useGetDepotTypeOptions = ({
       depotTypeOptions = depotTypeOptions.filter(
         ({ type }) =>
           ![
-            DepotType.EFS,
-            DepotType.EFCA,
-            DepotType.EFPE,
-            DepotType.COGENERATION_PLANT,
-            DepotType.HEAT_PLANT,
-            DepotType.POWER_PLANT,
+            SiteType.EFS,
+            SiteType.EFCA,
+            SiteType.EFPE,
+            SiteType.COGENERATION_PLANT,
+            SiteType.HEAT_PLANT,
+            SiteType.POWER_PLANT,
           ].includes(type)
       )
     }

@@ -150,7 +150,10 @@ const ProductionSitesSettings = ({
             },
             {
               header: t("Date de mise en service"),
-              cell: (ps) => <Cell text={formatDate(ps.date_mise_en_service)} />,
+              cell: (ps) =>
+                ps.date_mise_en_service && (
+                  <Cell text={formatDate(ps.date_mise_en_service)} />
+                ),
             },
             actionColumn<ProductionSiteDetails>((prodSite) =>
               compact([

@@ -121,8 +121,8 @@ const DeliverySitesSettings = ({
               cell: (ds) => (
                 <Cell
                   text={
-                    ds.depot?.depot_type
-                      ? depotTypeLabels[ds.depot?.depot_type]
+                    ds.depot?.site_type
+                      ? depotTypeLabels[ds.depot?.site_type]
                       : ""
                   }
                 />
