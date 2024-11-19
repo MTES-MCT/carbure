@@ -1731,20 +1731,19 @@ components:
           maxLength: 128
         city:
           type: string
-          nullable: true
           maxLength: 128
-        depot_id:
+        customs_id:
           type: string
           maxLength: 32
         country:
           allOf:
             - $ref: "#/components/schemas/Country"
           readOnly: true
-        depot_type:
-          $ref: "#/components/schemas/DepotTypeEnum"
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
         address:
           type: string
-          maxLength: 128
+          maxLength: 256
         postal_code:
           type: string
           maxLength: 32
@@ -1754,35 +1753,11 @@ components:
           maxLength: 64
         accise:
           type: string
-          nullable: true
           maxLength: 32
       required:
         - country
-        - depot_id
         - id
         - name
-    DepotTypeEnum:
-      enum:
-        - OTHER
-        - EFS
-        - EFPE
-        - OIL DEPOT
-        - BIOFUEL DEPOT
-        - HEAT PLANT
-        - POWER PLANT
-        - COGENERATION PLANT
-        - EFCA
-      type: string
-      description: |-
-        * `OTHER` - Autre
-        * `EFS` - EFS
-        * `EFPE` - EFPE
-        * `OIL DEPOT` - OIL DEPOT
-        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
-        * `HEAT PLANT` - HEAT PLANT
-        * `POWER PLANT` - POWER PLANT
-        * `COGENERATION PLANT` - COGENERATION PLANT
-        * `EFCA` - EFCA
     Entity:
       type: object
       properties:
@@ -2054,7 +2029,7 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          maxLength: 128
         country:
           allOf:
             - $ref: "#/components/schemas/Country"
@@ -2062,15 +2037,15 @@ components:
         date_mise_en_service:
           type: string
           format: date
+          nullable: true
         ges_option:
           $ref: "#/components/schemas/GesOptionEnum"
         eligible_dc:
           type: boolean
         dc_reference:
           type: string
-          nullable: true
           maxLength: 64
-        site_id:
+        site_siret:
           type: string
           maxLength: 64
         address:
@@ -2078,10 +2053,10 @@ components:
           maxLength: 256
         city:
           type: string
-          maxLength: 64
+          maxLength: 128
         postal_code:
           type: string
-          maxLength: 64
+          maxLength: 32
         gps_coordinates:
           type: string
           nullable: true
@@ -2097,7 +2072,6 @@ components:
           maxLength: 64
       required:
         - country
-        - date_mise_en_service
         - id
         - name
         - producer
@@ -2599,6 +2573,30 @@ components:
         - assigned_volume
         - id
         - total_volume
+    SiteTypeEnum:
+      enum:
+        - OTHER
+        - EFS
+        - EFPE
+        - OIL DEPOT
+        - BIOFUEL DEPOT
+        - HEAT PLANT
+        - POWER PLANT
+        - COGENERATION PLANT
+        - PRODUCTION SITE
+        - EFCA
+      type: string
+      description: |-
+        * `OTHER` - Autre
+        * `EFS` - EFS
+        * `EFPE` - EFPE
+        * `OIL DEPOT` - OIL DEPOT
+        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+        * `HEAT PLANT` - HEAT PLANT
+        * `POWER PLANT` - POWER PLANT
+        * `COGENERATION PLANT` - COGENERATION PLANT
+        * `PRODUCTION SITE` - PRODUCTION SITE
+        * `EFCA` - EFCA
     StatusEnum:
       enum:
         - PENDING
