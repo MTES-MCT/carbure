@@ -11,6 +11,7 @@ import { formatNumber } from "common/utils/formatters"
 import * as api from "./api-operator"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
 import OperatorTransferCertificateList from "./components/transfer-certificates/list-operator"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const defaultSnapshot: ElecOperatorSnapshot = {
   transfer_cert_pending: 0,
@@ -20,6 +21,7 @@ const defaultSnapshot: ElecOperatorSnapshot = {
 
 export const ElecOperator = () => {
   const { t } = useTranslation()
+  usePrivateNavigation(t("Certificats"))
 
   const entity = useEntity()
 
@@ -35,8 +37,6 @@ export const ElecOperator = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Électricité renouvelable")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"

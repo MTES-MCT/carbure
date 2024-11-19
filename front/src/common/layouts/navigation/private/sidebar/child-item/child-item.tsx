@@ -1,8 +1,9 @@
-import { NavLink, useMatch } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 import { MenuItem } from "../private-sidebar.types"
 import styles from "./child-item.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"
+import { useMemo } from "react"
 
 type ChildItemProps = {
   child: MenuItem
@@ -11,17 +12,24 @@ type ChildItemProps = {
 export const ChildItem = ({ child }: ChildItemProps) => {
   const Icon = child.icon
   const IconActive = child.iconActive
+  const location = useLocation()
 
-  const isActive = useMatch(child.path)
+  // Check if the current url starts with the child path
+  const isActive = useMemo(
+    () => location.pathname.startsWith(child.path),
+    [location.pathname, child.path]
+  )
 
   return (
     <NavLink
       to={child.path}
       key={child.title}
-      className={cl(
-        styles["nav-item-child"],
-        isActive && styles["nav-item-child--active"]
-      )}
+      className={({ isActive }) =>
+        cl(
+          isActive && styles["nav-item-child--active"],
+          styles["nav-item-child"]
+        )
+      }
       target={child.target}
     >
       <div className={styles["nav-item-child-content"]}>

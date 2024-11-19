@@ -23,6 +23,7 @@ import { StatusSwitcher } from "./status-switcher"
 import { ElecCPOProvisionCertificateTable } from "./table"
 import { EnergyTransferSummary } from "./transfer-summary"
 import { ElecAdminProvisionCertificateStates } from "elec-admin/pages/provision-certificates/types"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type ProvisionCertificateListProps = {
   snapshot: ElecCPOSnapshot
@@ -36,6 +37,7 @@ const ProvisionCertificateList = ({
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
+  usePrivateNavigation(t("Énergie disponible"))
 
   const [state, actions] =
     useCBQueryParamsStore<ElecAdminProvisionCertificateStates>(

@@ -33,13 +33,16 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, `/elec/${year}`)
 
     return {
-      CERTIFICATES: `${baseUrl}/certificates`,
+      CERTIFICATES: `${baseUrl}/pending`,
       PROVISIONNED_ENERGY: `${baseUrl}/provisioned`,
       TRANSFERRED_ENERGY: `${baseUrl}/transferred`,
       CHARGE_POINTS: {
-        PENDING: `${baseUrl}/charge-points/pending`,
-        METER_READINGS: `${baseUrl}/charge-points/meter-readings`,
-        LIST: `${baseUrl}/charge-points/list`,
+        PENDING: urlWithOrgId(entity_id, "/charge-points/pending"),
+        METER_READINGS: urlWithOrgId(
+          entity_id,
+          "/charge-points/meter-readings"
+        ),
+        LIST: urlWithOrgId(entity_id, "/charge-points/list"),
       },
     }
   },
