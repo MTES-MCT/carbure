@@ -10,6 +10,7 @@ import ElecChargePointsFileUpload from "./upload-dialog"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { deleteChargePointsApplication } from "./api"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type ChargePointsPendingProps = {
   year: number
@@ -18,6 +19,7 @@ type ChargePointsPendingProps = {
 const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
+  usePrivateNavigation(t("Inscription"))
   const portal = usePortal()
 
   const applicationsResponse = useQuery(apiCpo.getChargePointsApplications, {
