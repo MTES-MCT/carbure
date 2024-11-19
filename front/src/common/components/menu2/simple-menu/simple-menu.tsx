@@ -1,15 +1,15 @@
 import { useRef } from "react"
 import cl from "clsx"
 import { Button, ButtonProps } from "../../button2"
-import { Dropdown } from "../../dropdown2"
+import { Dropdown, DropdownProps } from "../../dropdown2"
 import css from "./simple-menu.module.css"
 
-export type SimpleMenuProps = Exclude<ButtonProps, "children" | "title"> & {
+export type SimpleMenuProps = Omit<ButtonProps, "children" | "title"> & {
   className?: string
   style?: React.CSSProperties
   label?: string
   anchor?: string
-  children: React.ReactNode
+  children: DropdownProps["children"]
 
   // If provided, the dropdown will have this width (used for specific cases)
   dropdownWidth?: string

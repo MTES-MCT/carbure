@@ -57,6 +57,7 @@
   border-right: 1px solid var(--border-default-grey);
   width: var(--private-navigation-nav-width);
   background: var(--background-default-grey);
+  flex-shrink: 0;
 }
 
 .page {

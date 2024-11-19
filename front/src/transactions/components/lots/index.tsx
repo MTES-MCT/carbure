@@ -32,6 +32,7 @@ import { getDefaultCategory, useAutoCategory } from "../category"
 import useTitle from "common/hooks/title"
 import { AdminStatus } from "controls/types"
 import HashRoute from "common/components/hash-route"
+import { useLotsTitleNavigation } from "./index.hooks"
 
 export interface LotsProps {
   year: number
@@ -95,7 +96,6 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
           getFilters={api.getLotFilters}
         />
       </Bar>
-
       <section>
         <SearchBar
           count={snapshot?.lots}
@@ -171,7 +171,6 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
           </>
         )}
       </section>
-
       <HashRoute path="add" element={<LotAdd />} />
       <HashRoute path="lot/:id" element={<LotDetails neighbors={ids} />} />
     </>
@@ -434,6 +433,8 @@ export function useLotTitle(state: QueryParams) {
   const category = state.status in statuses ? categories[state.category] : ""
 
   useTitle(`${entity} ∙ ${status} ${category} ${year}`)
+
+  useLotsTitleNavigation(state.status)
 }
 
 export function useLotQuery({

@@ -55,6 +55,7 @@ export const ROUTE_URLS = {
     return {
       TICKET_SOURCES: `${baseUrl}/ticket-sources`,
       TICKETS_RECEIVED: `${baseUrl}/tickets-received`,
+      TICKETS_ASSIGNED: `${baseUrl}/tickets-assigned`,
       TICKETS: `${baseUrl}/tickets`,
       TICKETS_PENDING: `${baseUrl}/tickets/pending`,
       TICKETS_ACCEPTED: `${baseUrl}/tickets/accepted`,

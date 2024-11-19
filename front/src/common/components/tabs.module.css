@@ -62,7 +62,7 @@
 
 .sticky {
   position: sticky;
-  top: 0;
+  top: calc(var(--spacing-3w) * -1);
   padding: var(--spacing-m) var(--main-spacing-x);
   background-color: var(--gray-light);
   box-shadow: var(--shadow);

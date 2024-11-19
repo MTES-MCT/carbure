@@ -6,7 +6,6 @@ import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import OperatorTabs from "./tabs"
 import TicketSources from "./ticket-sources"
 import OperatorTickets from "./tickets"
 import { SafTicketSourceStatus } from "saf/pages/operator/types"
@@ -30,8 +29,6 @@ export const SafOperator = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Carburant Durable d'Aviation")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"
@@ -41,10 +38,6 @@ export const SafOperator = () => {
             options={years.options}
             sort={(year) => -year.value}
           />
-        </section>
-
-        <section>
-          <OperatorTabs loading={snapshot.loading} count={snapshotData} />
         </section>
       </header>
 

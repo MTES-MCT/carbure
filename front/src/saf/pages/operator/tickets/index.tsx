@@ -28,6 +28,8 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
+import { useTranslation } from "react-i18next"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 export interface OperatorTicketsProps {
   type: SafQueryType
@@ -40,6 +42,11 @@ export const OperatorTickets = ({
   year,
   snapshot,
 }: OperatorTicketsProps) => {
+  const { t } = useTranslation()
+  usePrivateNavigation(
+    type === "received" ? t("Tickets reçus") : t("Tickets assignés")
+  )
+
   const location = useLocation()
 
   const entity = useEntity()

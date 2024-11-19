@@ -34,7 +34,6 @@ export const usePrivateSidebar = () => {
     has_saf,
     isAirline,
     // isProducer,
-    isCPO,
   } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
@@ -43,31 +42,7 @@ export const usePrivateSidebar = () => {
 
   const elec = useElec()
 
-  const chargePoints: MenuSection = {
-    title: t("Point de recharge"),
-    condition: isCPO,
-    children: [
-      {
-        path: routes.ELEC().CHARGE_POINTS.PENDING,
-        title: t("Inscription"),
-        icon: FileTextLine,
-        iconActive: FileTextFill,
-      },
-      {
-        path: routes.ELEC().CHARGE_POINTS.METER_READINGS,
-        title: t("Relevés trimestriels"),
-        icon: CalendarCheckLine,
-        iconActive: CalendarCheckFill,
-      },
-      {
-        path: routes.ELEC().CHARGE_POINTS.LIST,
-        title: t("Point de recharge"),
-        icon: BuildingLine,
-        iconActive: BuildingFill,
-      },
-    ],
-  }
-
+  const chargePoints = useChargePoints()
   const saf: MenuSection = {
     title: t("Aviation"),
     condition: (has_saf && isOperator) || isAirline,
@@ -80,7 +55,7 @@ export const usePrivateSidebar = () => {
         condition: has_saf && isOperator,
       },
       {
-        path: routes.SAF().TICKETS,
+        path: routes.SAF().TICKETS_ASSIGNED,
         title: t("Tickets affectés"),
         icon: ArrowGoForwardLine,
         condition: has_saf && isOperator,
@@ -188,7 +163,7 @@ const useBiofuels = () => {
 }
 
 const useElec = () => {
-  const { has_elec, isOperator, isCPO, isAuditor } = useEntity()
+  const { has_elec, isOperator, isCPO } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
 
@@ -218,18 +193,51 @@ const useElec = () => {
     ],
   }
 
-  const elecAuditor: MenuSection = {
-    ...elec,
-    condition: isAuditor,
+  return elec
+}
+
+const useChargePoints = () => {
+  const { isCPO, isAuditor } = useEntity()
+  const { t } = useTranslation()
+  const routes = useRoutes()
+
+  const chargePoints: MenuSection = {
+    title: t("Point de recharge"),
+    condition: isCPO,
     children: [
       {
-        path: routes.ELEC_AUDITOR(),
-        title: t("Certificats"),
+        path: routes.ELEC().CHARGE_POINTS.PENDING,
+        title: t("Inscription"),
         icon: FileTextLine,
         iconActive: FileTextFill,
+      },
+      {
+        path: routes.ELEC().CHARGE_POINTS.METER_READINGS,
+        title: t("Relevés trimestriels"),
+        icon: CalendarCheckLine,
+        iconActive: CalendarCheckFill,
+      },
+      {
+        path: routes.ELEC().CHARGE_POINTS.LIST,
+        title: t("Point de recharge"),
+        icon: BuildingLine,
+        iconActive: BuildingFill,
       },
     ],
   }
 
-  return isAuditor ? elecAuditor : elec
+  const chargePointsAuditor: MenuSection = {
+    title: t("Point de recharge"),
+    condition: isAuditor,
+    children: [
+      {
+        path: routes.ELEC_AUDITOR(),
+        title: t("Point de recharge"),
+        icon: BuildingLine,
+        iconActive: BuildingFill,
+      },
+    ],
+  }
+
+  return isAuditor ? chargePointsAuditor : chargePoints
 }

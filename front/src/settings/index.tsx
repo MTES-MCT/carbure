@@ -5,7 +5,6 @@ import ProductionSitesSettings from "./components/production-site"
 
 import useEntity from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
-import { getEntityTypeLabel } from "carbure/utils/normalizers"
 import { Main } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import useTitle from "common/hooks/title"
@@ -19,13 +18,14 @@ import { ApplicationDetailsDialog } from "double-counting/components/application
 import HashRoute from "common/components/hash-route"
 import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
 import useScrollToHash from "common/hooks/scroll-to-hash"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const Settings = () => {
   const { t } = useTranslation()
   useScrollToHash()
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
-
+  usePrivateNavigation(t("Paramètres de la société"))
   const { isProducer, isPowerOrHeatProducer, isIndustry } = entity
 
   const hasCertificates = isIndustry
@@ -34,12 +34,6 @@ const Settings = () => {
 
   return (
     <Main>
-      <header>
-        <h1>
-          {entity.name} · {getEntityTypeLabel(entity.entity_type)}
-        </h1>
-      </header>
-
       <Tabs
         variant="sticky"
         tabs={compact([
