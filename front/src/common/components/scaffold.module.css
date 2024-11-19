@@ -21,11 +21,7 @@
 .main > header {
   display: flex;
   flex-direction: column;
-  /* background-color: var(--gray-light); */
-  /* padding: var(--main-spacing-y) var(--main-spacing-x); */
   gap: var(--spacing-xl);
-  /* box-shadow: var(--shadow); */
-  /* border-top: var(--border); */
 }
 
 .main > header > section {

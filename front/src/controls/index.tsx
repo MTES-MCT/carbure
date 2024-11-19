@@ -4,7 +4,7 @@ import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import StatusTabs, { useStatus } from "./components/status"
+import { useStatus } from "./components/status"
 import Lots from "./components/lots"
 
 import pickApi from "./api"
@@ -39,8 +39,6 @@ export const Controls = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Transactions")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"
@@ -50,10 +48,6 @@ export const Controls = () => {
             options={years.options}
             sort={(year) => -year.value}
           />
-        </section>
-
-        <section>
-          <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
         </section>
       </header>
 

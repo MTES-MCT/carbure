@@ -76,6 +76,7 @@ export const EntitySelector = ({ className }: { className?: string }) => {
           navigate(ROUTE_URLS.ORG(entityId))
         }
       }}
+      placeholder={t("Liste des entités")}
     />
   )
 }
