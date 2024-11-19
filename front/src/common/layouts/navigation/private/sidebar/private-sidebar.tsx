@@ -35,7 +35,9 @@ export const PrivateSidebar = () => {
           </Button>
         )}
 
-        {!isBlank && <EntitySelector className={styles["entity-selector"]} />}
+        {firstEntity && (
+          <EntitySelector className={styles["entity-selector"]} />
+        )}
         <nav className={styles["nav"]}>
           {menuItems.map((item) => (
             <div key={item.title}>
@@ -65,14 +67,17 @@ export const PrivateSidebar = () => {
             icon: QuestionLine,
           }}
         />
-        <ChildItem
-          child={{
-            path: routes.SETTINGS,
-            title: t("Paramètres de la société"),
-            icon: SettingsLine,
-            iconActive: SettingsFill,
-          }}
-        />
+        {/* Display settings only if an entity is selected */}
+        {firstEntity && (
+          <ChildItem
+            child={{
+              path: routes.SETTINGS,
+              title: t("Paramètres de la société"),
+              icon: SettingsLine,
+              iconActive: SettingsFill,
+            }}
+          />
+        )}
       </div>
     </div>
   )
