@@ -25,6 +25,7 @@ import {
 } from "elec-charge-points/components/charge-point-list-table"
 import { ChargePointStatusSwitcher } from "elec-charge-points/components/charge-point-status-switcher"
 import UpdateChargePointDialog from "./charge-point/[id]/update"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type ChargePointsListProps = {
   year: number
@@ -34,6 +35,7 @@ type ChargePointsListProps = {
 const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
+  usePrivateNavigation(t("Points de recharge"))
   const status = useStatus()
   const location = useLocation()
 

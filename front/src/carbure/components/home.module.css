@@ -36,6 +36,7 @@ button.homeButton {
 .homeTitle h1 {
   margin: 0;
   font-size: 3em;
+  line-height: inherit;
 }
 
 .homeTitle p {
