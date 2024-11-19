@@ -427,7 +427,7 @@ export interface components {
      * @description * `UNKNOWN` - UNKNOWN
      *     * `RFC` - RFC
      *     * `STOCK` - STOCK
-     *     * `BLENDING` - BLENDING
+     *     * `BLENDING` - BLENDINGAAA
      *     * `EXPORT` - EXPORT
      *     * `TRADING` - TRADING
      *     * `PROCESSING` - PROCESSING
