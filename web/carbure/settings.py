@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "saf",
     "transactions",
     "elec",
+    "tiruert",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
