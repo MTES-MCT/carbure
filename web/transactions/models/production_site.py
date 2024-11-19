@@ -21,7 +21,7 @@ class ProductionSite(Site):
             "country": self.country.natural_key(),
             "id": self.id,
             "date_mise_en_service": self.date_mise_en_service,
-            "site_id": self.site_siret,
+            "site_siret": self.site_siret,
             "postal_code": self.postal_code,
             "manager_name": self.manager_name,
             "manager_phone": self.manager_phone,
