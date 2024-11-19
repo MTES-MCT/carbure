@@ -52,10 +52,10 @@ const Depots = () => {
               orderBy: (e) => e.city ?? "",
             },
             {
-              key: "depot_id",
+              key: "customs_id",
               header: t("ID"),
-              cell: (e) => e.depot_id,
-              orderBy: (e) => e.depot_id,
+              cell: (e) => e.customs_id,
+              orderBy: (e) => e.customs_id ?? "",
             },
           ]}
         />

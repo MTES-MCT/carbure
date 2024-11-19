@@ -180,8 +180,8 @@ function canSeePlantGHG(entity: Entity, lot: LotFormValue, type: SiteType) {
 
   const isDeliverySiteForHeat =
     lot.delivery_site instanceof Object &&
-    (lot.delivery_site.depot_type === type ||
-      lot.delivery_site.depot_type === SiteType.COGENERATION_PLANT)
+    (lot.delivery_site.site_type === type ||
+      lot.delivery_site.site_type === SiteType.COGENERATION_PLANT)
 
   return isEntityAllowed && isDeliverySiteForHeat
 }

@@ -155,11 +155,11 @@ export const cpo: Entity = {
 
 export const deliverySite: Depot = {
   id: 1,
-  depot_id: "10",
+  customs_id: "10",
   name: "Test Delivery Site",
   city: "Test City",
   country: country,
-  depot_type: SiteType.OTHER,
+  site_type: SiteType.OTHER,
   address: "Test Address",
   postal_code: "64430",
   electrical_efficiency: null,
@@ -174,7 +174,7 @@ export const productionSite: ProductionSiteDetails = {
   country: country,
   id: 2,
   date_mise_en_service: "2000-01-31",
-  site_id: "123456",
+  site_siret: "123456",
   address: "",
   postal_code: "64430",
   manager_name: "Bob",

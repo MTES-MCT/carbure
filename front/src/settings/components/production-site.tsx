@@ -136,7 +136,7 @@ const ProductionSitesSettings = ({
           columns={[
             {
               header: t("ID"),
-              cell: (ps) => <Cell text={`${ps.site_id}`} />,
+              cell: (ps) => <Cell text={`${ps.site_siret}`} />,
             },
             {
               header: t("Nom"),

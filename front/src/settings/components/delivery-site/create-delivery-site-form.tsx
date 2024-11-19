@@ -33,8 +33,8 @@ export type DeliverySiteFormType = Partial<
     | "name"
     | "city"
     | "country"
-    | "depot_id"
-    | "depot_type"
+    | "customs_id"
+    | "site_type"
     | "address"
     | "postal_code"
     | "electrical_efficiency"
@@ -49,8 +49,8 @@ const mapDeliverySiteToForm: (
   name: deliverySite?.depot?.name ?? "",
   city: deliverySite?.depot?.city ?? "",
   country: deliverySite?.depot?.country,
-  depot_id: deliverySite?.depot?.depot_id ?? "",
-  depot_type: deliverySite?.depot?.depot_type ?? SiteType.OTHER,
+  depot_id: deliverySite?.depot?.customs_id ?? "",
+  depot_type: deliverySite?.depot?.site_type ?? SiteType.OTHER,
   address: deliverySite?.depot?.address ?? "",
   postal_code: deliverySite?.depot?.postal_code ?? "",
   ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
@@ -73,7 +73,7 @@ export const DeliverySiteForm = ({
     mapDeliverySiteToForm(deliverySite)
   )
   const { isCogenerationPlant, isHeatPlant, isPowerPlant } =
-    useDeliverySiteFlags(value.depot_type)
+    useDeliverySiteFlags(value.site_type)
 
   const depotTypeOptions = useGetDepotTypeOptions({ country: value.country })
 
@@ -82,8 +82,8 @@ export const DeliverySiteForm = ({
       name: values.name!,
       city: values.city!,
       country: values.country!,
-      depot_id: values.depot_id!,
-      depot_type: values.depot_type!,
+      customs_id: values.customs_id!,
+      site_type: values.site_type!,
       address: values.address!,
       postal_code: values.postal_code!,
       electrical_efficiency: isPowerPlant
@@ -112,7 +112,7 @@ export const DeliverySiteForm = ({
         type="text"
         label={t("Identifiant officiel")}
         placeholder="Ex: FR1A00000580012"
-        {...bind("depot_id")}
+        {...bind("customs_id")}
         required
         readOnly={isReadOnly}
       />
@@ -127,7 +127,7 @@ export const DeliverySiteForm = ({
       <RadioGroup
         label={t("Type de dépôt")}
         options={depotTypeOptions}
-        {...bind("depot_type")}
+        {...bind("site_type")}
         required
         disabled={isReadOnly}
       />

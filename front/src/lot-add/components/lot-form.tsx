@@ -415,7 +415,7 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
     unknown_client: typeof lot.client === "string" ? lot.client : undefined,
     carbure_delivery_site_depot_id:
       lot.delivery_site instanceof Object
-        ? lot.delivery_site.depot_id
+        ? lot.delivery_site.customs_id
         : undefined,
     unknown_delivery_site:
       typeof lot.delivery_site === "string" ? lot.delivery_site : undefined,
