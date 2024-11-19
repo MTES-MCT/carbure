@@ -36,15 +36,17 @@ export const ElecCPO = () => {
   return (
     <Main>
       <header>
-        <Select
-          loading={years.loading}
-          variant="inline"
-          placeholder={t("Choisir une année")}
-          value={years.selected}
-          onChange={years.setYear}
-          options={years.options}
-          sort={(year) => -year.value}
-        />
+        <section>
+          <Select
+            loading={years.loading}
+            variant="inline"
+            placeholder={t("Choisir une année")}
+            value={years.selected}
+            onChange={years.setYear}
+            options={years.options}
+            sort={(year) => -year.value}
+          />
+        </section>
       </header>
 
       <Routes>

@@ -62,28 +62,33 @@ export const UserMenu = () => {
       label={name}
       dropdownWidth="300px"
     >
-      <div className={css["user-menu-infos"]}>
-        <Text size="sm" fontWeight="bold">
-          John Doe
-        </Text>
-        <Text size="sm" fontWeight="regular">
-          {user?.email}
-        </Text>
-      </div>
-      {items.map(({ icon: Icon, ...item }) => (
-        <ListItem
-          key={item.label}
-          label={item.label}
-          value={item.label}
-          hoverable
-          borderBottom={item.borderBottom}
-        >
-          <NavLink to={item.path} className={css["user-menu-item"]}>
-            <Icon size="sm" />
-            {item.label}
-          </NavLink>
-        </ListItem>
-      ))}
+      {({ close }) => (
+        <>
+          <div className={css["user-menu-infos"]}>
+            <Text size="sm" fontWeight="bold">
+              John Doe
+            </Text>
+            <Text size="sm" fontWeight="regular">
+              {user?.email}
+            </Text>
+          </div>
+          {items.map(({ icon: Icon, ...item }) => (
+            <ListItem
+              key={item.label}
+              label={item.label}
+              value={item.label}
+              hoverable
+              borderBottom={item.borderBottom}
+              onClick={close}
+            >
+              <NavLink to={item.path} className={css["user-menu-item"]}>
+                <Icon size="sm" />
+                {item.label}
+              </NavLink>
+            </ListItem>
+          ))}
+        </>
+      )}
     </SimpleMenu>
   )
 }
