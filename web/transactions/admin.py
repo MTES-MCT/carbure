@@ -52,16 +52,3 @@ class SiteAdmin(admin.ModelAdmin):
         return [entity_site.entity.name for entity_site in entity_sites]
 
     get_owner.short_description = "Owners"
-
-
-class DepotAdmin(admin.ModelAdmin):
-    list_filter = ("depot_type",)
-    readonly_fields = ("is_enabled",)
-    actions = ["enable_depot"]
-
-    def enable_depot(self, request, queryset):
-        for depot in queryset:
-            response = enable_depot.enable_depot(depot, request)
-            messages.add_message(request, messages.SUCCESS, response)
-
-    enable_depot.short_description = "Valider les dépôts sélectionnés"
