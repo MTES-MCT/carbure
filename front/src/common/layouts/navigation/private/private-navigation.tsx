@@ -12,18 +12,16 @@ import { UserMenu } from "./user-menu"
 import { NavLink } from "react-router-dom"
 import marianne from "common/assets/images/Marianne.svg"
 import { ROUTE_URLS } from "common/utils/routes"
-import useEntity from "carbure/hooks/entity"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
   const { t } = useTranslation()
-  const entity = useEntity()
 
   return (
     <>
       <header className={styles.header}>
         <div className={styles["header-left"]}>
-          <NavLink to={ROUTE_URLS.ORG(entity.id)} className={styles.logo}>
+          <NavLink to={ROUTE_URLS.HOME} className={styles.logo}>
             <img
               src={marianne}
               alt="marianne logo"
