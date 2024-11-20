@@ -81,7 +81,7 @@ export const usePrivateSidebar = () => {
     ],
   }
 
-  return [biofuels, elec, chargePoints, saf]
+  return [biofuels, ...elec, chargePoints, saf]
     .filter(
       (category) =>
         category.condition === undefined || category.condition === true
@@ -95,7 +95,7 @@ export const usePrivateSidebar = () => {
 }
 
 const useBiofuels = () => {
-  const { isAuditor, isIndustry, isPowerOrHeatProducer, has_stocks } =
+  const { isAuditor, isIndustry, isPowerOrHeatProducer, has_stocks, isAdmin } =
     useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
@@ -134,24 +134,24 @@ const useBiofuels = () => {
     ],
   }
 
-  const biofuelsAuditor: MenuSection = {
+  const biofuelsControls: MenuSection = {
     title: t("Lots de biocarburants"),
-    condition: isAuditor,
+    condition: isAuditor || isAdmin,
     children: [
       {
-        path: routes.BIOFUELS_AUDITOR().ALERTS,
+        path: routes.BIOFUELS_CONTROLS().ALERTS,
         title: t("Signalements"),
         icon: EyeLine,
         iconActive: EyeFill,
       },
       {
-        path: routes.BIOFUELS_AUDITOR().LOTS,
+        path: routes.BIOFUELS_CONTROLS().LOTS,
         title: t("Lots"),
         icon: ClipboardLine,
         iconActive: ClipboardFill,
       },
       {
-        path: routes.BIOFUELS_AUDITOR().STOCKS,
+        path: routes.BIOFUELS_CONTROLS().STOCKS,
         title: t("En stock"),
         icon: StackLine,
         iconActive: StackFill,
@@ -159,11 +159,11 @@ const useBiofuels = () => {
     ],
   }
 
-  return isAuditor ? biofuelsAuditor : biofuels
+  return isAuditor || isAdmin ? biofuelsControls : biofuels
 }
 
 const useElec = () => {
-  const { has_elec, isOperator, isCPO } = useEntity()
+  const { has_elec, isOperator, isCPO, isAdmin, hasAdminRight } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
 
@@ -193,7 +193,21 @@ const useElec = () => {
     ],
   }
 
-  return elec
+  const elecAdmin: MenuSection = {
+    ...elec,
+    condition: isAdmin || hasAdminRight("ELEC"),
+    children: [
+      {
+        path: routes.ELEC_ADMIN().PROVISION,
+        title: t("Certificats de fourniture"),
+      },
+      {
+        path: routes.ELEC_ADMIN().TRANSFER,
+        title: t("Energie cédée"),
+      },
+    ],
+  }
+  return [elec, elecAdmin]
 }
 
 const useChargePoints = () => {
@@ -227,7 +241,7 @@ const useChargePoints = () => {
   }
 
   const chargePointsAuditor: MenuSection = {
-    title: t("Point de recharge"),
+    ...chargePoints,
     condition: isAuditor,
     children: [
       {
@@ -238,6 +252,11 @@ const useChargePoints = () => {
       },
     ],
   }
+
+  // const chargePointsAdmin: MenuSection = {
+  //   ...chargePoints,
+  //   condition: isAdmin || hasAdminRight("ELEC"),
+  // }
 
   return isAuditor ? chargePointsAuditor : chargePoints
 }
