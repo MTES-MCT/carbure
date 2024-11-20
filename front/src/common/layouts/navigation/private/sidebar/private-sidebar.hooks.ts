@@ -81,7 +81,7 @@ export const usePrivateSidebar = () => {
     ],
   }
 
-  return [biofuels, ...elec, chargePoints, saf]
+  return [biofuels, ...elec, ...chargePoints, saf]
     .filter(
       (category) =>
         category.condition === undefined || category.condition === true
@@ -211,7 +211,7 @@ const useElec = () => {
 }
 
 const useChargePoints = () => {
-  const { isCPO, isAuditor } = useEntity()
+  const { isCPO, isAuditor, isAdmin, hasAdminRight } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
 
@@ -253,10 +253,20 @@ const useChargePoints = () => {
     ],
   }
 
-  // const chargePointsAdmin: MenuSection = {
-  //   ...chargePoints,
-  //   condition: isAdmin || hasAdminRight("ELEC"),
-  // }
+  const chargePointsAdmin: MenuSection = {
+    ...chargePoints,
+    condition: isAdmin || hasAdminRight("ELEC"),
+    children: [
+      {
+        path: routes.ELEC_ADMIN().CHARGE_POINTS.PENDING,
+        title: t("Inscription"),
+      },
+      {
+        path: routes.ELEC_ADMIN().CHARGE_POINTS.METER_READINGS,
+        title: t("Relevés trimestriels"),
+      },
+    ],
+  }
 
-  return isAuditor ? chargePointsAuditor : chargePoints
+  return [chargePoints, chargePointsAuditor, chargePointsAdmin]
 }

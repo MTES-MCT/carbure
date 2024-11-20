@@ -22,6 +22,7 @@ import * as api from "../../api"
 import { StatusSwitcher } from "./status-switcher"
 import { MeterReadingsApplicationDetailsDialog } from "./details"
 import { usePageTitle } from "./page-title"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -36,7 +37,7 @@ const MeterReadingsApplicationsList = ({
   const status = useAutoStatus()
   const location = useLocation()
   const { t } = useTranslation()
-
+  usePrivateNavigation(t("Relevés trimestriels"))
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   usePageTitle(state)
   const query = useCBQueryBuilder(state)

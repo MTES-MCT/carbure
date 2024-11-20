@@ -33,7 +33,6 @@
 .main > section {
   display: flex;
   flex-direction: column;
-  /* padding: var(--main-spacing-y) var(--main-spacing-x); */
   gap: var(--spacing-l);
 }
 
