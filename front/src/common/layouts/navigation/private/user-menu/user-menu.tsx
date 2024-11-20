@@ -58,6 +58,7 @@ export const UserMenu = () => {
       priority="tertiary"
       size="small"
       dropdownWidth="300px"
+      label={getName()}
     >
       {({ close }) => (
         <>

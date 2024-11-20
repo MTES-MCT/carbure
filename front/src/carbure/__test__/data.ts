@@ -173,6 +173,7 @@ export const biocarburant = {
 export const entityRight: UserRight = {
   entity: producer,
   role: UserRole.Admin,
+  name: "Admin Test",
   expiration_date: "",
   date_added: "2020-12-23T16:18:27.233Z",
 }
