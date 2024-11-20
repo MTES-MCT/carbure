@@ -89,4 +89,6 @@ export const ROUTE_URLS = {
   LOGOUT: "/auth/logout",
   STATISTICS: (entity_id: number) => urlWithOrgId(entity_id, "/stats"),
   REGISTRY: (entity_id: number) => urlWithOrgId(entity_id, "/registry"),
+
+  HOME: "/",
 }
