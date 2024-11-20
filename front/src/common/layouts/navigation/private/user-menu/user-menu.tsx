@@ -53,12 +53,14 @@ export const UserMenu = () => {
 
   return (
     <SimpleMenu
-      iconId="fr-icon-arrow-down-s-line"
-      iconPosition="right"
-      priority="tertiary"
-      size="small"
+      buttonProps={{
+        iconId: "fr-icon-arrow-down-s-line",
+        iconPosition: "right",
+        priority: "tertiary",
+        size: "small",
+        children: <span style={{ maxWidth: "200px" }}>{getName()}</span>,
+      }}
       dropdownWidth="300px"
-      label={getName()}
     >
       {({ close }) => (
         <>

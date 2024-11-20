@@ -42,6 +42,7 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
               iconPosition="left"
               iconId="ri-question-line"
               size="small"
+              linkProps={{ to: ROUTE_URLS.CONTACT }}
             >
               {t("Aide")}
             </Button>
