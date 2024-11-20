@@ -29,7 +29,7 @@ export const QuotasTable = ({ quotas }: QuotasTableProps) => {
       cell: (p) => <Cell text={formatNumber(p.lot_count ?? 0)} />,
     },
     {
-      header: t("Volume incorporé"),
+      header: t("Quantité incorporée"),
       cell: (p) => <Cell text={formatNumber(p.production_tonnes) + "t"} />,
     },
     {
