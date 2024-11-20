@@ -51,6 +51,7 @@ export interface UserRight {
   date_added: string
   expiration_date: string
   role: UserRole
+  name: string
 }
 
 export interface UserRightRequest {

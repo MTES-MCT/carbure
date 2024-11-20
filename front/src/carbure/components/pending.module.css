@@ -38,3 +38,10 @@ section.information > div > p {
   cursor: pointer;
   text-decoration: underline;
 }
+
+.linkEntity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2w);
+}

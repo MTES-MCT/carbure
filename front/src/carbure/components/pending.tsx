@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import { useUser } from "carbure/hooks/user"
 import css from "./pending.module.css"
@@ -7,6 +7,8 @@ import Alert from "common/components/alert"
 import { AlertTriangle, InfoCircle } from "common/components/icons"
 import useTitle from "common/hooks/title"
 import { MailTo } from "common/components/button"
+import { Button } from "common/components/button2"
+import { ROUTE_URLS } from "common/utils/routes"
 
 const Pending = () => {
   const { t } = useTranslation()
@@ -40,23 +42,24 @@ const Pending = () => {
 
       <section className={css.information}>
         <Alert variant="warning" className={css.pendingAlert}>
-          <p>
-            <AlertTriangle className={css.alertIcon} />{" "}
-            <Trans>
-              Il semblerait que votre compte ne soit lié à aucune entité
-              enregistrée sur CarbuRe.
-            </Trans>
-          </p>
+          <div className={css.linkEntity}>
+            <p>
+              <AlertTriangle className={css.alertIcon} />{" "}
+              <Trans>
+                Il semblerait que votre compte ne soit lié à aucune entité
+                enregistrée sur CarbuRe.
+              </Trans>
+            </p>
 
-          <p>
-            <Trans>
-              Veuillez vous rendre sur la page{" "}
-              <Link to="/account" className={css.link}>
-                Mon Compte
-              </Link>{" "}
-              du menu pour effectuer une demande d'accès.
-            </Trans>
-          </p>
+            <Button
+              priority="primary"
+              linkProps={{ to: ROUTE_URLS.MY_ACCOUNT.ADD_COMPANY }}
+              iconId="ri-add-line"
+              size="large"
+            >
+              {t("Lier le compte à des sociétés")}
+            </Button>
+          </div>
         </Alert>
 
         <Alert variant="info" className={css.pendingAlert}>
