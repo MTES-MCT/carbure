@@ -1,8 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import enable_entity
+from .views import EntityViewSet
 
-urlpatterns = [
-    # TODO integrate this as an action inside a bigger EntityViewset
-    path("<int:company_id>/enable/", enable_entity, name="entity-admin-enable"),
-]
+router = DefaultRouter()
+router.register(r"", EntityViewSet, basename="entity")
+
+urlpatterns = router.urls

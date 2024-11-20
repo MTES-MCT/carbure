@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  "/api/entities/{company_id}/enable/": {
+  "/api/entities/{id}/enable/": {
     parameters: {
       query?: never
       header?: never
@@ -427,7 +427,7 @@ export interface components {
      * @description * `UNKNOWN` - UNKNOWN
      *     * `RFC` - RFC
      *     * `STOCK` - STOCK
-     *     * `BLENDING` - BLENDINGAAA
+     *     * `BLENDING` - BLENDING
      *     * `EXPORT` - EXPORT
      *     * `TRADING` - TRADING
      *     * `PROCESSING` - PROCESSING
@@ -825,12 +825,18 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description The id of the company that is being enabled */
-        company_id: number
+        /** @description A unique integer value identifying this Entity. */
+        id: number
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Entity"]
+        "application/x-www-form-urlencoded": components["schemas"]["Entity"]
+        "multipart/form-data": components["schemas"]["Entity"]
+      }
+    }
     responses: {
       200: {
         headers: {
