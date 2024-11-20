@@ -17,11 +17,11 @@ class Depot(Site):
 
     def natural_key(self):
         return {
-            "depot_id": self.customs_id,
+            "customs_id": self.customs_id,
             "name": self.name,
             "city": self.city,
             "country": self.country.natural_key(),
-            "depot_type": self.site_type,
+            "site_type": self.site_type,
             "address": self.address,
             "postal_code": self.postal_code,
             "electrical_efficiency": self.electrical_efficiency,

@@ -244,7 +244,12 @@ export const ProductionSiteCommissioningDateField = (props: DateInputProps) => {
 
   const dateProps =
     value.production_site instanceof Object
-      ? { ...props, disabled: true, error: bound.error, value: value.production_site.date_mise_en_service } // prettier-ignore
+      ? {
+          ...props,
+          disabled: true,
+          error: bound.error,
+          value: value.production_site.date_mise_en_service ?? "",
+        }
       : { ...props, ...bound, required: true }
 
   return <DateInput label={t("Date de mise en service")} {...dateProps} />
