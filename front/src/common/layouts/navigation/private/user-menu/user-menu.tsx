@@ -16,12 +16,10 @@ import {
 } from "common/components/icon"
 
 export const UserMenu = () => {
-  const { user } = useUser()
+  const { user, getName } = useUser()
   const { isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
     useEntity()
   const routes = useRoutes()
-  const name = "John Doe"
-
   const items = useMemo(() => {
     const compactedItems = compact([
       {
@@ -59,14 +57,13 @@ export const UserMenu = () => {
       iconPosition="right"
       priority="tertiary"
       size="small"
-      label={name}
       dropdownWidth="300px"
     >
       {({ close }) => (
         <>
           <div className={css["user-menu-infos"]}>
             <Text size="sm" fontWeight="bold">
-              John Doe
+              {getName()}
             </Text>
             <Text size="sm" fontWeight="regular">
               {user?.email}
