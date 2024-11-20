@@ -1,8 +1,6 @@
 import useEntity from "carbure/hooks/entity"
-import { Loader } from "common/components/icons"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import Tabs from "common/components/tabs"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
@@ -44,8 +42,6 @@ export const ElecAdminAudit = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Audit des points de recharge")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"
@@ -54,13 +50,6 @@ export const ElecAdminAudit = () => {
             onChange={years.setYear}
             options={years.options}
             sort={(year) => -year.value}
-          />
-        </section>
-
-        <section>
-          <ElecAdminAuditTabs
-            loading={elecAdminAuditSnapshotResponse.loading}
-            snapshot={snapshot}
           />
         </section>
       </header>
@@ -100,60 +89,3 @@ export const ElecAdminAudit = () => {
 }
 
 export default ElecAdminAudit
-
-interface ElecAdminAuditTabsProps {
-  loading: boolean
-  snapshot: ElecAdminAuditSnapshot
-}
-
-function ElecAdminAuditTabs({ loading, snapshot }: ElecAdminAuditTabsProps) {
-  const { t } = useTranslation()
-
-  return (
-    <Tabs
-      variant="main"
-      tabs={[
-        {
-          key: "charge-points",
-          path: "charge-points",
-          label: (
-            <>
-              <p
-                style={{
-                  fontWeight: "normal",
-                }}
-              >
-                {loading ? (
-                  <Loader size={20} />
-                ) : (
-                  snapshot?.charge_points_applications
-                )}
-              </p>
-              <strong>{t("Inscriptions")}</strong>
-            </>
-          ),
-        },
-        {
-          key: "meter-readings",
-          path: "meter-readings",
-          label: (
-            <>
-              <p
-                style={{
-                  fontWeight: "normal",
-                }}
-              >
-                {loading ? (
-                  <Loader size={20} />
-                ) : (
-                  snapshot?.meter_readings_applications
-                )}
-              </p>
-              <strong>{t("Relevés")}</strong>
-            </>
-          ),
-        },
-      ]}
-    />
-  )
-}
