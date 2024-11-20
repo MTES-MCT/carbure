@@ -43,7 +43,7 @@ class EntityViewSet(ViewSet):
         methods=["post"],
         detail=True,
         url_path="enable",
-        url_name="enable",
+        url_name="admin-enable",
     )
     def enable_entity(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")

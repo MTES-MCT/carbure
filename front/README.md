@@ -119,8 +119,6 @@ During development, if certain components need to be tested, create a .stories.t
 
 You'll then need to go to Chromatic if the visual differences between the previous state and the current state of the component are no longer the same (see Chromatic documentation).
 
-## Type safety with backend
-
 ## Type safety between frontend and backend
 
 ### Schema generation
