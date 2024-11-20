@@ -48,10 +48,18 @@ export const ROUTE_URLS = {
   },
   ELEC_ADMIN: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/elec-admin/${year}`)
+    const baseChargePointsUrl = urlWithOrgId(
+      entity_id,
+      `/elec-admin-audit/${year}`
+    )
 
     return {
       PROVISION: `${baseUrl}/provision`,
       TRANSFER: `${baseUrl}/transfer`,
+      CHARGE_POINTS: {
+        PENDING: `${baseChargePointsUrl}/charge-points/pending`,
+        METER_READINGS: `${baseChargePointsUrl}/meter-readings`,
+      },
     }
   },
   ELEC_AUDITOR: (entity_id: number, year: number) =>
