@@ -4,12 +4,7 @@ import { setupServer } from "msw/node"
 import { UserRightStatus } from "carbure/types"
 import { producer, trader } from "carbure/__test__/data"
 import { clone } from "carbure/__test__/helpers"
-import {
-  okEntitySearch,
-  okErrorsTranslations,
-  okFieldsTranslations,
-  okTranslations,
-} from "carbure/__test__/api"
+import { okEntitySearch } from "carbure/__test__/api"
 
 let accessRequests: any[] = []
 
@@ -37,11 +32,4 @@ export const okAccessRequest = http.post("/api/user/request-access", () => {
   return HttpResponse.json({ status: "success" })
 })
 
-export default setupServer(
-  okSettings,
-  okAccessRequest,
-  okEntitySearch,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations
-)
+export default setupServer(okSettings, okAccessRequest, okEntitySearch)

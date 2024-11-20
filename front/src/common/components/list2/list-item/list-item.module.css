@@ -1,0 +1,23 @@
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  column-gap: var(--spacing-3v);
+  padding: var(--spacing-3v) var(--spacing-2w);
+  cursor: pointer;
+  color: var(--text-action-high-grey);
+  position: relative;
+  background: white;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.list-item[data-focused],
+.list-item.hoverable:hover {
+  background-color: var(--background-default-grey-hover);
+}
+
+.list-item[data-selected] {
+  color: var(--text-action-high-blue-france);
+}

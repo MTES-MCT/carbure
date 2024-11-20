@@ -1,0 +1,19 @@
+.noMargin {
+  margin: 0;
+}
+
+/*
+ * Remove the underline of the link defined in DSFR
+ */
+.text[href] {
+  text-decoration: none;
+  --underline-img: none;
+  --external-link-content: none;
+}
+
+/*
+ * Semibold doesnt exist in DSFR, so we define it here
+ */
+.semibold {
+  font-weight: 500;
+}

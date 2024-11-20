@@ -1,8 +1,5 @@
 import { http, HttpResponse } from "msw"
-import translations from "../../../public/locales/fr/translation.json"
-import errors from "../../../public/locales/fr/errors.json"
-import fields from "../../../public/locales/fr/fields.json"
-import { EntityType } from "carbure/types"
+import { EntityType, NotificationType } from "carbure/types"
 
 import {
   country,
@@ -34,7 +31,33 @@ export const okStats = http.get("/api/home-stats", () => {
 export const okNotifications = http.get("/api/entity/notifications", () => {
   return HttpResponse.json({
     status: "success",
-    data: [],
+    data: [
+      {
+        id: 1,
+        dest: operator,
+        datetime: "2024-01-01",
+        type: NotificationType.CertificateExpired,
+        acked: false,
+        send_by_email: false,
+        email_sent: false,
+        meta: {
+          certificate: "1234567890",
+        },
+      },
+      {
+        id: 2,
+        dest: operator,
+        datetime: "2024-01-01",
+        acked: true,
+        send_by_email: false,
+        email_sent: false,
+        type: NotificationType.LotsUpdatedByAdmin,
+        meta: {
+          updated: 10,
+          comment: "Commentaire de l'admin",
+        },
+      },
+    ],
   })
 })
 
@@ -86,26 +109,9 @@ export const okDeliverySitesSearch = http.get("/api/resources/depots", () => {
   })
 })
 
-export const okTranslations = http.get(
-  "/app/locales/fr/translations.json",
-  () => {
-    return HttpResponse.json({ translations })
-  }
-)
-
-export const okErrorsTranslations = http.get(
-  "/app/locales/fr/errors.json",
-  () => {
-    return HttpResponse.json({ errors })
-  }
-)
-
-export const okFieldsTranslations = http.get(
-  "/app/locales/fr/fields.json",
-  () => {
-    return HttpResponse.json({ fields })
-  }
-)
+export const okUnauthorizedUser = http.get("/api/user", () => {
+  return new HttpResponse(null, { status: 401 })
+})
 
 export const okDefaultUser = mockGetWithResponseData(
   "/user",

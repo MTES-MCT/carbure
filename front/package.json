@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.9.8",
+    "@codegouvfr/react-dsfr": "^1.14.1",
     "@sentry/react": "^8.30.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -78,6 +78,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
     "predev": "react-dsfr update-icons",
+    "prestorybook": "react-dsfr update-icons",
     "prebuild": "react-dsfr update-icons",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --test",

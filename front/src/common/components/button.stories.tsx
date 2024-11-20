@@ -6,6 +6,7 @@ import { Cross } from "./icons"
 
 const meta: Meta<typeof Button> = {
   component: Button,
+  title: "legacy/Button",
   args: {
     variant: "primary",
     label: "Button",
