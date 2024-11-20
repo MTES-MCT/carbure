@@ -19,7 +19,7 @@ import {
 } from "api-schema"
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator
-export interface SafOperatorSnapshot extends CBSnapshot {
+export interface SafOperatorSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
   tickets_assigned: number

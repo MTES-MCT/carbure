@@ -212,7 +212,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
     delivery_date: form.delivery_date,
     carbure_delivery_site_id:
       form.delivery_site instanceof Object
-        ? form.delivery_site.depot_id
+        ? form.delivery_site.customs_id
         : undefined,
     unknown_delivery_site:
       typeof form.delivery_site === "string" ? form.delivery_site : undefined,
