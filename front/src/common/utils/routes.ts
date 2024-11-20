@@ -91,4 +91,5 @@ export const ROUTE_URLS = {
   REGISTRY: (entity_id: number) => urlWithOrgId(entity_id, "/registry"),
 
   HOME: "/",
+  CONTACT: "/contact",
 }

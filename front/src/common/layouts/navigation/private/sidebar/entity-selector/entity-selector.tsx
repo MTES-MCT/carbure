@@ -23,6 +23,14 @@ export const EntitySelector = ({ className }: { className?: string }) => {
     value: right.entity.id,
   }))
 
+  const optionsWithAddEntity = [
+    {
+      label: t("Ajouter une entité"),
+      value: "add-entity",
+    },
+    ...options,
+  ]
+
   const shortName = useMemo(() => {
     switch (entity.entity_type) {
       case EntityType.Administration:
@@ -51,8 +59,8 @@ export const EntitySelector = ({ className }: { className?: string }) => {
 
   return (
     <Select
-      options={options}
-      value={entity.id}
+      options={optionsWithAddEntity}
+      value={entity.id || ""}
       valueRenderer={(item) => (
         <div className={styles["entity-selector"]}>
           <Text fontWeight="bold" className={styles["entity-selector-name"]}>
@@ -66,14 +74,16 @@ export const EntitySelector = ({ className }: { className?: string }) => {
       full
       className={className}
       onChange={(entityId) => {
-        if (entityId) {
+        if (entityId === "add-entity") {
+          navigate(ROUTE_URLS.MY_ACCOUNT.ADD_COMPANY)
+        } else if (entityId) {
           matomo.push([
             "trackEvent",
             "menu",
             "change-entity",
-            ROUTE_URLS.ORG(entityId),
+            ROUTE_URLS.ORG(Number(entityId)),
           ])
-          navigate(ROUTE_URLS.ORG(entityId))
+          navigate(ROUTE_URLS.ORG(Number(entityId)))
         }
       }}
       placeholder={t("Liste des entités")}

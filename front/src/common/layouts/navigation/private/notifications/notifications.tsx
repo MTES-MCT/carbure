@@ -1,12 +1,17 @@
-import { Button } from "common/components/button2"
+import { SimpleMenu } from "common/components/menu2"
 
 export const Notifications = () => {
   return (
-    <Button
-      priority="tertiary"
-      iconId="ri-notification-3-line"
-      size="small"
-      title="Notifications"
-    />
+    <SimpleMenu
+      buttonProps={{
+        priority: "tertiary",
+        iconId: "ri-notification-3-line",
+        size: "small",
+        title: "Notifications",
+      }}
+      dropdownWidth="300px"
+    >
+      My menu
+    </SimpleMenu>
   )
 }
