@@ -25,6 +25,7 @@ import ElecAdminProvisionDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -45,7 +46,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   const query = useCBQueryBuilder(state)
   const location = useLocation()
   const { t } = useTranslation()
-
+  usePrivateNavigation(t("Certificats de fourniture"))
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
     key: "elec-admin-provision-certificates",
     params: [query],

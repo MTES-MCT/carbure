@@ -19,7 +19,7 @@ export const ROUTE_URLS = {
       SENT: `${baseUrl}/out`,
     }
   },
-  BIOFUELS_AUDITOR: (entity_id: number, year: number) => {
+  BIOFUELS_CONTROLS: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/controls/${year}`)
 
     return {
@@ -44,6 +44,14 @@ export const ROUTE_URLS = {
         ),
         LIST: urlWithOrgId(entity_id, "/charge-points/list"),
       },
+    }
+  },
+  ELEC_ADMIN: (entity_id: number, year: number) => {
+    const baseUrl = urlWithOrgId(entity_id, `/elec-admin/${year}`)
+
+    return {
+      PROVISION: `${baseUrl}/provision`,
+      TRANSFER: `${baseUrl}/transfer`,
     }
   },
   ELEC_AUDITOR: (entity_id: number, year: number) =>

@@ -18,10 +18,12 @@ export const useRoutes = () => {
 
     BIOFUELS: (year: number = currentYear) =>
       ROUTE_URLS.BIOFUELS(entity.id, year),
-    BIOFUELS_AUDITOR: (year: number = currentYear) =>
-      ROUTE_URLS.BIOFUELS_AUDITOR(entity.id, year),
+    BIOFUELS_CONTROLS: (year: number = currentYear) =>
+      ROUTE_URLS.BIOFUELS_CONTROLS(entity.id, year),
 
     ELEC: (year: number = currentYear) => ROUTE_URLS.ELEC(entity.id, year),
+    ELEC_ADMIN: (year: number = currentYear) =>
+      ROUTE_URLS.ELEC_ADMIN(entity.id, year),
     ELEC_AUDITOR: (year: number = currentYear) =>
       ROUTE_URLS.ELEC_AUDITOR(entity.id, year),
 

@@ -9,7 +9,6 @@ import * as api from "./api"
 import ProvisionList from "./pages/provision-certificates"
 import { ElecAdminProvisionCertificateStatus } from "./pages/provision-certificates/types"
 import TransferList from "./pages/transfer-certificates"
-import ElecAdminTabs from "./tabs"
 import { ElecAdminSnapshot } from "./types"
 
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
@@ -42,8 +41,6 @@ export const ElecAdmin = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Électricité renouvelable")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"
@@ -52,13 +49,6 @@ export const ElecAdmin = () => {
             onChange={years.setYear}
             options={years.options}
             sort={(year) => -year.value}
-          />
-        </section>
-
-        <section>
-          <ElecAdminTabs
-            loading={elecAdminSnapshot.loading}
-            snapshot={snapshot}
           />
         </section>
       </header>
