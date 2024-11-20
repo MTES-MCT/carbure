@@ -22,18 +22,6 @@ paths:
           required: true
       tags:
         - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Entity"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/Entity"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/Entity"
-        required: true
       security:
         - cookieAuth: []
         - basicAuth: []

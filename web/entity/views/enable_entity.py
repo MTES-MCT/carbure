@@ -24,6 +24,7 @@ class EntityViewSet(ViewSet):
     serializer_class = EntitySerializer
 
     @extend_schema(
+        request=None,
         parameters=[
             OpenApiParameter(
                 "entity_id",
