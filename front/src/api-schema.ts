@@ -830,13 +830,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Entity"]
-        "application/x-www-form-urlencoded": components["schemas"]["Entity"]
-        "multipart/form-data": components["schemas"]["Entity"]
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
