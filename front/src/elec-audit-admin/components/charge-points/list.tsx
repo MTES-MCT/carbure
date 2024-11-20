@@ -76,7 +76,6 @@ const ChargePointsApplicationsList = ({
 
   const filterLabels = {
     [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
-    [ElecAdminAuditFilter.Quarter]: t("Trimestre"),
   }
 
   return (
