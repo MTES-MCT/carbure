@@ -4,13 +4,12 @@ import { Button, ButtonProps } from "../../button2"
 import { Dropdown, DropdownProps } from "../../dropdown2"
 import css from "./simple-menu.module.css"
 
-export type SimpleMenuProps = Omit<ButtonProps, "children" | "title"> & {
+export type SimpleMenuProps = {
   className?: string
-  style?: React.CSSProperties
   label?: string
   anchor?: string
   children: DropdownProps["children"]
-
+  buttonProps: ButtonProps
   // If provided, the dropdown will have this width (used for specific cases)
   dropdownWidth?: string
 }
@@ -21,19 +20,20 @@ export type SimpleMenuProps = Omit<ButtonProps, "children" | "title"> & {
  */
 export const SimpleMenu = ({
   className,
-  label = "Menu",
   anchor,
   children,
   dropdownWidth,
-  ...props
+  buttonProps,
 }: SimpleMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   return (
     <>
-      <Button {...props} ref={triggerRef} className={cl(css.menu, className)}>
-        <span style={{ maxWidth: "200px" }}>{label}</span>
-      </Button>
+      <Button
+        {...buttonProps}
+        ref={triggerRef}
+        className={cl(css.menu, className)}
+      />
 
       <Dropdown
         className={css.dropdown}

@@ -28,6 +28,7 @@ import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
 import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
+import { ContactPage } from "contact"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -44,6 +45,7 @@ const Carbure = () => {
               <Routes>
                 {!isAuth && <Route path="*" element={<Home />} />}
 
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/stats" element={<PublicStats />} />
                 <Route
                   path="/double-counting-list"
