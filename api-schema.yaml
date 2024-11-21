@@ -239,7 +239,7 @@ paths:
         - in: query
           name: producer_id
           schema:
-            type: string
+            type: integer
           description: Search within the field `producer_id`
         - in: query
           name: query
@@ -2048,24 +2048,27 @@ components:
     DepotResource:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         depot_id:
           type: string
-          maxLength: 32
+          readOnly: true
         name:
           type: string
           maxLength: 128
         city:
           type: string
-          nullable: true
           maxLength: 128
         country:
           type: integer
           nullable: true
         depot_type:
-          $ref: "#/components/schemas/DepotTypeEnum"
+          type: string
+          readOnly: true
         address:
           type: string
-          maxLength: 128
+          maxLength: 256
         postal_code:
           type: string
           maxLength: 32
@@ -2090,29 +2093,9 @@ components:
           description: En degrés Celsius
       required:
         - depot_id
+        - depot_type
+        - id
         - name
-    DepotTypeEnum:
-      enum:
-        - OTHER
-        - EFS
-        - EFPE
-        - OIL DEPOT
-        - BIOFUEL DEPOT
-        - HEAT PLANT
-        - POWER PLANT
-        - COGENERATION PLANT
-        - EFCA
-      type: string
-      description: |-
-        * `OTHER` - Autre
-        * `EFS` - EFS
-        * `EFPE` - EFPE
-        * `OIL DEPOT` - OIL DEPOT
-        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
-        * `HEAT PLANT` - HEAT PLANT
-        * `POWER PLANT` - POWER PLANT
-        * `COGENERATION PLANT` - COGENERATION PLANT
-        * `EFCA` - EFCA
     Entity:
       type: object
       properties:
@@ -2639,19 +2622,19 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          maxLength: 128
         country:
           $ref: "#/components/schemas/Pays"
         date_mise_en_service:
           type: string
           format: date
+          nullable: true
         ges_option:
           $ref: "#/components/schemas/GesOptionEnum"
         eligible_dc:
           type: boolean
         dc_reference:
           type: string
-          nullable: true
           maxLength: 64
         inputs:
           type: array
@@ -2667,7 +2650,6 @@ components:
           $ref: "#/components/schemas/Producer"
       required:
         - country
-        - date_mise_en_service
         - id
         - inputs
         - name

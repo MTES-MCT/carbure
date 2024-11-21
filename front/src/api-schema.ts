@@ -631,11 +631,12 @@ export interface components {
       accise?: string
     }
     DepotResource: {
-      depot_id: string
+      readonly id: number
+      readonly depot_id: string
       name: string
-      city?: string | null
+      city?: string
       country?: number | null
-      depot_type?: components["schemas"]["DepotTypeEnum"]
+      readonly depot_type: string
       address?: string
       postal_code?: string
       /**
@@ -654,19 +655,6 @@ export interface components {
        */
       useful_temperature?: number | null
     }
-    /**
-     * @description * `OTHER` - Autre
-     *     * `EFS` - EFS
-     *     * `EFPE` - EFPE
-     *     * `OIL DEPOT` - OIL DEPOT
-     *     * `BIOFUEL DEPOT` - BIOFUEL DEPOT
-     *     * `HEAT PLANT` - HEAT PLANT
-     *     * `POWER PLANT` - POWER PLANT
-     *     * `COGENERATION PLANT` - COGENERATION PLANT
-     *     * `EFCA` - EFCA
-     * @enum {string}
-     */
-    DepotTypeEnum: DepotTypeEnum
     Entity: {
       readonly id: number
       name: string
@@ -891,10 +879,10 @@ export interface components {
       name: string
       country: components["schemas"]["Pays"]
       /** Format: date */
-      date_mise_en_service: string
+      date_mise_en_service?: string | null
       ges_option?: components["schemas"]["GesOptionEnum"]
       eligible_dc?: boolean
-      dc_reference?: string | null
+      dc_reference?: string
       readonly inputs: components["schemas"]["ProductionSiteInput"][]
       readonly outputs: components["schemas"]["ProductionSiteOutput"][]
       producer: components["schemas"]["Producer"]
@@ -1337,7 +1325,7 @@ export interface operations {
     parameters: {
       query?: {
         /** @description Search within the field `producer_id` */
-        producer_id?: string
+        producer_id?: number
         /** @description Search within the field `name` */
         query?: string
       }
@@ -2158,17 +2146,6 @@ export enum DeliveryTypeEnum {
   DIRECT = "DIRECT",
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
-}
-export enum DepotTypeEnum {
-  OTHER = "OTHER",
-  EFS = "EFS",
-  EFPE = "EFPE",
-  OIL_DEPOT = "OIL DEPOT",
-  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
-  HEAT_PLANT = "HEAT PLANT",
-  POWER_PLANT = "POWER PLANT",
-  COGENERATION_PLANT = "COGENERATION PLANT",
-  EFCA = "EFCA",
 }
 export enum EntityTypeEnum {
   Producer = "Producteur",
