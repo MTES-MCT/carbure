@@ -59,7 +59,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Biocarburant"
+                  $ref: "#/components/schemas/Biofuel"
           description: ""
   /api/resources/certificates:
     get:
@@ -1653,35 +1653,6 @@ paths:
           description: ""
 components:
   schemas:
-    Biocarburant:
-      type: object
-      properties:
-        code:
-          type: string
-          maxLength: 16
-        name:
-          type: string
-          maxLength: 64
-        description:
-          type: string
-          maxLength: 128
-        pci_kg:
-          type: number
-          format: double
-        pci_litre:
-          type: number
-          format: double
-        masse_volumique:
-          type: number
-          format: double
-        is_alcool:
-          type: boolean
-        is_graisse:
-          type: boolean
-      required:
-        - code
-        - description
-        - name
     Biofuel:
       type: object
       properties:

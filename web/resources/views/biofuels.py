@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Biocarburant
-from resources.serializers import BiocarburantSerializer
+from doublecount.serializers import BiofuelSerializer
 
 
 @extend_schema(
@@ -17,7 +17,7 @@ from resources.serializers import BiocarburantSerializer
             type=str,
         ),
     ],
-    responses=BiocarburantSerializer(many=True),
+    responses=BiofuelSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -27,5 +27,5 @@ def get_biofuels(request, *args, **kwargs):
     bcs = Biocarburant.objects.filter(is_displayed=True).order_by("name")
     if query:
         bcs = bcs.filter(Q(name__icontains=query) | Q(name_en__icontains=query) | Q(code__icontains=query))
-    serializer = BiocarburantSerializer(bcs, many=True)
+    serializer = BiofuelSerializer(bcs, many=True)
     return Response(serializer.data)

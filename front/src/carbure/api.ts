@@ -5,7 +5,6 @@ import {
   User,
   Notification,
   Entity,
-  Biofuel,
   Country,
   Certificate,
   EntityType,
@@ -32,10 +31,12 @@ export async function findFeedstocks(
   return res.data ?? []
 }
 
-export function findBiofuels(query: string) {
-  return api
-    .get<Api<Biofuel[]>>("/resources/biofuels", { params: { query } })
-    .then(extract)
+export async function findBiofuels(query: string) {
+  const res = await apiFetch.GET("/resources/biofuels", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
 }
 
 export function findCountries(query: string) {

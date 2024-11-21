@@ -472,19 +472,6 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
-    Biocarburant: {
-      code: string
-      name: string
-      description: string
-      /** Format: double */
-      pci_kg?: number
-      /** Format: double */
-      pci_litre?: number
-      /** Format: double */
-      masse_volumique?: number
-      is_alcool?: boolean
-      is_graisse?: boolean
-    }
     Biofuel: {
       name: string
       name_en: string
@@ -1139,7 +1126,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["Biocarburant"][]
+          "application/json": components["schemas"]["Biofuel"][]
         }
       }
     }
