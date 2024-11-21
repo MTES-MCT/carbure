@@ -1,11 +1,7 @@
 from rest_framework import serializers
 
-from producers.models import (
-    Entity,
-    ProductionSite,
-    ProductionSiteInput,
-    ProductionSiteOutput,
-)
+from producers.models import Entity, ProductionSiteInput, ProductionSiteOutput
+from transactions.models import ProductionSite
 
 from .country import PaysSerializer
 

@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
-from core.models import Depot
+from transactions.models import Depot
 
 
 class DepotResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Depot
         fields = [
+            "id",
             "depot_id",
             "name",
             "city",
