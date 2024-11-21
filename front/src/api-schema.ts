@@ -1146,6 +1146,10 @@ export interface operations {
   resources_entities_list: {
     parameters: {
       query?: {
+        /** @description Only keep specific entity types */
+        entity_type?: string
+        /** @description Only show enabled entities */
+        is_enabled?: boolean
         /** @description Search within the field `name` */
         query?: string
       }

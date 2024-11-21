@@ -140,6 +140,17 @@ paths:
       operationId: resources_entities_list
       parameters:
         - in: query
+          name: entity_type
+          schema:
+            type: string
+          description: Only keep specific entity types
+          explode: true
+        - in: query
+          name: is_enabled
+          schema:
+            type: boolean
+          description: Only show enabled entities
+        - in: query
           name: query
           schema:
             type: string
