@@ -44,15 +44,15 @@ export async function findCountries(query: string) {
   return res.data ?? []
 }
 
-export function findEntities(
+export async function findEntities(
   query?: string,
   filters?: { is_enabled?: boolean; entity_type?: EntityType[] }
 ) {
-  return api
-    .get<
-      Api<Entity[]>
-    >("/resources/entities", { params: { query, ...filters } })
-    .then(extract)
+  const res = await apiFetch.GET("/resources/entities", {
+    params: { query: { query, ...filters } },
+  })
+
+  return res.data ?? []
 }
 
 export function findEnabledEntities(query?: string) {

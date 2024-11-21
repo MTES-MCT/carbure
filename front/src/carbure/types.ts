@@ -34,11 +34,7 @@ export interface Entity {
   is_enabled?: boolean
 }
 
-export interface EntityPreview {
-  id: number
-  name: string
-  entity_type: EntityType
-}
+export type EntityPreview = apiTypes["EntityPreview"]
 
 export interface User {
   email: string

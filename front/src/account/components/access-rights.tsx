@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import {
-  Entity,
   UserRightRequest,
   UserRightStatus,
   UserRole,
+  type EntityPreview,
 } from "carbure/types"
 import { useUser } from "carbure/hooks/user"
 
@@ -14,9 +14,9 @@ import { useMutation } from "common/hooks/async"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 import {
-  normalizeEntity,
   getEntityTypeLabel,
   getUserRoleLabel,
+  normalizeEntityPreview,
 } from "carbure/utils/normalizers"
 import { Button } from "common/components/button"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
@@ -151,7 +151,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const notify = useNotify()
   const navigate = useNavigate()
 
-  const [entity, setEntity] = useState<Entity | undefined>(undefined)
+  const [entity, setEntity] = useState<EntityPreview | undefined>(undefined)
   const [role, setRole] = useState<UserRole | undefined>(UserRole.ReadOnly)
 
   const requestAccess = useMutation(api.requestAccess, {
@@ -195,7 +195,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
               value={entity}
               getOptions={common.findEnabledEntities}
               onChange={setEntity}
-              normalize={normalizeEntity}
+              normalize={normalizeEntityPreview}
             />
 
             <RadioGroup
