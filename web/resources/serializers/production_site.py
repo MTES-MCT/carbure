@@ -87,7 +87,7 @@ class ProducerSerializer(serializers.ModelSerializer):
         return None
 
 
-class ProductionSiteSerializer(serializers.ModelSerializer):
+class ProductionSiteResourceSerializer(serializers.ModelSerializer):
     country = PaysSerializer()
     producer = ProducerSerializer()
     inputs = ProductionSiteInputSerializer(source="productionsiteinput_set", many=True, read_only=True)

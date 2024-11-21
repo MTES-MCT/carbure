@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from producers.models import ProductionSite
-from resources.serializers import ProductionSiteSerializer
+from resources.serializers import ProductionSiteResourceSerializer
 
 
 @extend_schema(
@@ -22,7 +22,7 @@ from resources.serializers import ProductionSiteSerializer
             type=str,
         ),
     ],
-    responses=ProductionSiteSerializer(many=True),
+    responses=ProductionSiteResourceSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -38,5 +38,5 @@ def get_production_sites(request, *args, **kwargs):
     if pid:
         psites = psites.filter(producer__id=pid)
 
-    serializer = ProductionSiteSerializer(psites, many=True)
+    serializer = ProductionSiteResourceSerializer(psites, many=True)
     return Response(serializer.data)

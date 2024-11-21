@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Depot
-from resources.serializers import DepotSerializer
+from resources.serializers import DepotResourceSerializer
 
 
 @extend_schema(
@@ -23,7 +23,7 @@ from resources.serializers import DepotSerializer
             type=bool,
         ),
     ],
-    responses=DepotSerializer(many=True),
+    responses=DepotResourceSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -37,5 +37,5 @@ def get_depots(request, *args, **kwargs):
     if query:
         dsites = dsites.filter(Q(name__icontains=query) | Q(depot_id__icontains=query) | Q(city__icontains=query))
 
-    serializer = DepotSerializer(dsites, many=True)
+    serializer = DepotResourceSerializer(dsites, many=True)
     return Response(serializer.data)

@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Entity
-from resources.serializers import EntitySerializer
+from resources.serializers import EntityResourceSerializer
 
 
 @extend_schema(
@@ -16,7 +16,7 @@ from resources.serializers import EntitySerializer
             type=str,
         )
     ],
-    responses=EntitySerializer(many=True),
+    responses=EntityResourceSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -28,5 +28,5 @@ def get_traders(request, *args, **kwargs):
     if query:
         entities = entities.filter(name__icontains=query)
 
-    serializer = EntitySerializer(entities, many=True)
+    serializer = EntityResourceSerializer(entities, many=True)
     return Response(serializer.data)
