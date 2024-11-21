@@ -116,38 +116,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/resources/operators": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["resources_operators_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/resources/producers": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["resources_producers_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/resources/production-sites": {
     parameters: {
       query?: never
@@ -156,22 +124,6 @@ export interface paths {
       cookie?: never
     }
     get: operations["resources_production_sites_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/resources/traders": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["resources_traders_list"]
     put?: never
     post?: never
     delete?: never
@@ -656,13 +608,8 @@ export interface components {
     }
     EntityPreview: {
       readonly id: number
-      name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
-    }
-    EntityResource: {
-      entity_type?: components["schemas"]["EntityTypeEnum"]
-      name: string
-      readonly id: number
+      readonly name: string
+      readonly entity_type: components["schemas"]["EntityTypeEnum"]
     }
     EntitySummary: {
       readonly id: number
@@ -1147,7 +1094,7 @@ export interface operations {
     parameters: {
       query?: {
         /** @description Only keep specific entity types */
-        entity_type?: string
+        entity_type?: string[]
         /** @description Only show enabled entities */
         is_enabled?: boolean
         /** @description Search within the field `name` */
@@ -1164,7 +1111,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["EntityResource"][]
+          "application/json": components["schemas"]["EntityPreview"][]
         }
       }
     }
@@ -1193,50 +1140,6 @@ export interface operations {
       }
     }
   }
-  resources_operators_list: {
-    parameters: {
-      query?: {
-        /** @description Search within the field `name` */
-        query?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EntityResource"][]
-        }
-      }
-    }
-  }
-  resources_producers_list: {
-    parameters: {
-      query?: {
-        /** @description Search within the field `name` */
-        query?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EntityResource"][]
-        }
-      }
-    }
-  }
   resources_production_sites_list: {
     parameters: {
       query?: {
@@ -1257,28 +1160,6 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ProductionSite"][]
-        }
-      }
-    }
-  }
-  resources_traders_list: {
-    parameters: {
-      query?: {
-        /** @description Search within the field `name` */
-        query?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EntityResource"][]
         }
       }
     }

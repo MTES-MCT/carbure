@@ -142,9 +142,10 @@ paths:
         - in: query
           name: entity_type
           schema:
-            type: string
+            type: array
+            items:
+              type: string
           description: Only keep specific entity types
-          explode: true
         - in: query
           name: is_enabled
           schema:
@@ -167,7 +168,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/EntityResource"
+                  $ref: "#/components/schemas/EntityPreview"
           description: ""
   /api/resources/feedstocks:
     get:
@@ -197,52 +198,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/FeedStock"
           description: ""
-  /api/resources/operators:
-    get:
-      operationId: resources_operators_list
-      parameters:
-        - in: query
-          name: query
-          schema:
-            type: string
-          description: Search within the field `name`
-      tags:
-        - resources
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EntityResource"
-          description: ""
-  /api/resources/producers:
-    get:
-      operationId: resources_producers_list
-      parameters:
-        - in: query
-          name: query
-          schema:
-            type: string
-          description: Search within the field `name`
-      tags:
-        - resources
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EntityResource"
-          description: ""
   /api/resources/production-sites:
     get:
       operationId: resources_production_sites_list
@@ -270,29 +225,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ProductionSite"
-          description: ""
-  /api/resources/traders:
-    get:
-      operationId: resources_traders_list
-      parameters:
-        - in: query
-          name: query
-          schema:
-            type: string
-          description: Search within the field `name`
-      tags:
-        - resources
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EntityResource"
           description: ""
   /api/saf/clients/:
     get:
@@ -2111,24 +2043,13 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          readOnly: true
         entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-      required:
-        - id
-        - name
-    EntityResource:
-      type: object
-      properties:
-        entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-        name:
-          type: string
-          maxLength: 64
-        id:
-          type: integer
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
           readOnly: true
       required:
+        - entity_type
         - id
         - name
     EntitySummary:
