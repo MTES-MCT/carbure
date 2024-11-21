@@ -3,15 +3,10 @@ import datetime
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import (
-    Biocarburant,
-    Depot,
-    Entity,
-    MatierePremiere,
-    Pays,
-)
+from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
-from producers.models import ProductionSite
+from transactions.models.depot import Depot
+from transactions.models.production_site import ProductionSite
 
 
 class ResourcesTest(TestCase):

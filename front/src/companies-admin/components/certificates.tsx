@@ -130,8 +130,13 @@ const Certificates = ({
             {
               key: "scope",
               header: t("Périmètre"),
-              orderBy: (c) => c.certificate.scope ?? "-",
-              cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
+              orderBy: (c) =>
+                c.certificate.scope ? String(c.certificate.scope) : "-",
+              cell: (c) => (
+                <Cell
+                  text={c.certificate.scope ? String(c.certificate.scope) : "-"}
+                />
+              ),
             },
             {
               key: "validity",

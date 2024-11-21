@@ -1,9 +1,10 @@
 import { api, Api } from "common/services/api"
-import { Certificate, CertificateType, EntityCertificate } from "carbure/types"
+import { api as apiFetch } from "common/services/api-fetch"
+import { CertificateType, EntityCertificate } from "carbure/types"
 
 export function getCertificates(query: string) {
-  return api.get<Api<Certificate[]>>("/resources/certificates", {
-    params: { query },
+  return apiFetch.GET("/resources/certificates", {
+    params: { query: { query } },
   })
 }
 
