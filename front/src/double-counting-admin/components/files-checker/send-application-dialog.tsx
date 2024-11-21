@@ -1,7 +1,7 @@
 import { AxiosError } from "axios"
 import { findProducers, findProductionSites } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
-import { Entity, ProductionSite } from "carbure/types"
+import { ProductionSite, type EntityPreview } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
@@ -110,7 +110,7 @@ export const SendApplicationAdminDialog = ({
             required
             label={t("Producteur")}
             getOptions={findProducers}
-            normalize={norm.normalizeEntity}
+            normalize={norm.normalizeEntityPreview}
             {...bind("producer")}
           />
           <Autocomplete
@@ -159,7 +159,7 @@ export const SendApplicationAdminDialog = ({
 
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
-  producer: undefined as Entity | undefined,
+  producer: undefined as EntityPreview | undefined,
   certificate_id: undefined as string | undefined,
 }
 

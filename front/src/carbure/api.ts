@@ -1,13 +1,7 @@
 import api, { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
 import { api as apiFetch } from "common/services/api-fetch"
-import {
-  User,
-  Notification,
-  Entity,
-  EntityType,
-  EntityCertificate,
-} from "./types"
+import { User, Notification, EntityType, EntityCertificate } from "./types"
 
 export function getUserSettings() {
   return api.get<Api<User>>("/user")
@@ -72,15 +66,17 @@ export function findBiofuelEntities(query?: string) {
 }
 
 export function findOperators(query?: string) {
-  return api
-    .get<Api<Entity[]>>("/resources/operators", { params: { query } })
-    .then(extract)
+  return findEntities(query, {
+    is_enabled: true,
+    entity_type: [EntityType.Operator],
+  })
 }
 
 export function findProducers(query?: string) {
-  return api
-    .get<Api<Entity[]>>("/resources/producers", { params: { query } })
-    .then(extract)
+  return findEntities(query, {
+    is_enabled: true,
+    entity_type: [EntityType.Producer],
+  })
 }
 
 export async function findProductionSites(
