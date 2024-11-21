@@ -649,3 +649,4 @@ class EntityPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = ["id", "name", "entity_type"]
+        read_only_fields = fields

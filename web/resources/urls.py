@@ -7,10 +7,7 @@ from resources.views import (
     get_depots,
     get_entities,
     get_feedstocks,
-    get_operators,
-    get_producers,
     get_production_sites,
-    get_traders,
 )
 
 # from .airlines import get_airlines
@@ -22,8 +19,5 @@ urlpatterns = [
     path("depots", get_depots, name="resources-depots"),
     path("entities", get_entities, name="resources-entities"),
     path("feedstocks", get_feedstocks, name="resources-feedstocks"),
-    path("producers", get_producers, name="resources-producers"),
-    path("operators", get_operators, name="resources-operators"),
     path("production-sites", get_production_sites, name="resources-production-sites"),
-    path("traders", get_traders, name="resources-traders"),  # TODO jamais utilisé en front. On supprime ?
 ]

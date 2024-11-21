@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Entity
-from resources.serializers import EntityResourceSerializer
+from core.serializers import EntityPreviewSerializer
 
 
 @extend_schema(
@@ -26,11 +26,10 @@ from resources.serializers import EntityResourceSerializer
             description="Only keep specific entity types",
             required=False,
             type=str,
-            enum=[],
-            explode=True,
+            many=True,
         ),
     ],
-    responses=EntityResourceSerializer(many=True),
+    responses=EntityPreviewSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -48,5 +47,5 @@ def get_entities(request, *args, **kwargs):
     if is_enabled:
         entities = entities.filter(is_enabled=True)
 
-    serializer = EntityResourceSerializer(entities, many=True)
+    serializer = EntityPreviewSerializer(entities, many=True)
     return Response(serializer.data)

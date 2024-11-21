@@ -4,7 +4,4 @@ from .countries import get_countries
 from .depots import get_depots
 from .entity import get_entities
 from .feedstocks import get_feedstocks
-from .operators import get_operators
-from .producers import get_producers
-from . production_sites import get_production_sites
-from .traders import get_traders
+from .production_sites import get_production_sites
