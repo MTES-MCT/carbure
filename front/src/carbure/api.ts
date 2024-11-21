@@ -5,7 +5,6 @@ import {
   User,
   Notification,
   Entity,
-  Certificate,
   EntityType,
   EntityCertificate,
 } from "./types"
@@ -103,13 +102,12 @@ export async function findDepots(query?: string, public_only?: boolean) {
   return res.data ?? []
 }
 
-export function findCertificates(query: string) {
-  return api
-    .get<Api<Certificate[]>>("/resources/certificates", {
-      params: { query },
-    })
-    .then(extract)
-    .then((certificates) => certificates.map((c) => c.certificate_id))
+export async function findCertificates(query: string) {
+  const res = await apiFetch.GET("/resources/certificates", {
+    params: { query: { query } },
+  })
+
+  return res.data?.map((c) => c.certificate_id) ?? []
 }
 
 export function findMyCertificates(
