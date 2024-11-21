@@ -184,7 +184,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/MatierePremiere"
+                  $ref: "#/components/schemas/FeedStock"
           description: ""
   /api/resources/operators:
     get:
@@ -2331,30 +2331,6 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
-    MatierePremiere:
-      type: object
-      properties:
-        code:
-          type: string
-          maxLength: 64
-        name:
-          type: string
-          maxLength: 128
-        description:
-          type: string
-          maxLength: 128
-        compatible_alcool:
-          type: boolean
-        compatible_graisse:
-          type: boolean
-        is_double_compte:
-          type: boolean
-        category:
-          $ref: "#/components/schemas/CategoryEnum"
-      required:
-        - code
-        - description
-        - name
     PaginatedSafClientList:
       type: object
       required:

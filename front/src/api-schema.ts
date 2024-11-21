@@ -751,15 +751,6 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
-    MatierePremiere: {
-      code: string
-      name: string
-      description: string
-      compatible_alcool?: boolean
-      compatible_graisse?: boolean
-      is_double_compte?: boolean
-      category?: components["schemas"]["CategoryEnum"]
-    }
     PaginatedSafClientList: {
       /** @example 123 */
       count: number
@@ -1272,7 +1263,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["MatierePremiere"][]
+          "application/json": components["schemas"]["FeedStock"][]
         }
       }
     }

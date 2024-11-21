@@ -1,11 +1,11 @@
 import api, { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
+import { api as apiFetch } from "common/services/api-fetch"
 import {
   User,
   Notification,
   Entity,
   Biofuel,
-  Feedstock,
   Country,
   Depot,
   Certificate,
@@ -22,12 +22,15 @@ export function extract<T>(res: AxiosResponse<Api<T[]>>) {
   return res.data.data ?? []
 }
 
-export function findFeedstocks(query: string, double_count_only?: boolean) {
-  return api
-    .get<Api<Feedstock[]>>("/resources/feedstocks", {
-      params: { query, double_count_only },
-    })
-    .then(extract)
+export async function findFeedstocks(
+  query: string,
+  double_count_only?: boolean
+) {
+  const res = await apiFetch.GET("/resources/feedstocks", {
+    params: { query: { query, double_count_only } },
+  })
+
+  return res.data ?? []
 }
 
 export function findBiofuels(query: string) {

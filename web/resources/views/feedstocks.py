@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import MatierePremiere
-from resources.serializers import MatierePremiereSerializer
+from doublecount.serializers import FeedStockSerializer
 
 
 @extend_schema(
@@ -23,7 +23,7 @@ from resources.serializers import MatierePremiereSerializer
             type=bool,
         ),
     ],
-    responses=MatierePremiereSerializer(many=True),
+    responses=FeedStockSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -37,5 +37,5 @@ def get_feedstocks(request, *args, **kwargs):
     if query:
         mps = mps.filter(Q(name__icontains=query) | Q(name_en__icontains=query) | Q(code__icontains=query))
 
-    serializer = MatierePremiereSerializer(mps, many=True)
+    serializer = FeedStockSerializer(mps, many=True)
     return Response(serializer.data)
