@@ -258,7 +258,7 @@ export const defaultLot = {
   production_site_double_counting_certificate: undefined as string | undefined,
   production_site_commissioning_date: undefined as string | undefined,
 
-  supplier: undefined as Entity | string | undefined,
+  supplier: undefined as EntityPreview | string | undefined,
   supplier_certificate: undefined as string | undefined,
   vendor_certificate: undefined as string | undefined,
   client: undefined as Entity | string | undefined,

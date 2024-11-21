@@ -14,7 +14,21 @@ from resources.serializers import EntityResourceSerializer
             description="Search within the field `name`",
             required=False,
             type=str,
-        )
+        ),
+        OpenApiParameter(
+            name="is_enabled",
+            description="Only show enabled entities",
+            required=False,
+            type=bool,
+        ),
+        OpenApiParameter(
+            name="entity_type",
+            description="Only keep specific entity types",
+            required=False,
+            type=str,
+            enum=[],
+            explode=True,
+        ),
     ],
     responses=EntityResourceSerializer(many=True),
 )
@@ -22,11 +36,17 @@ from resources.serializers import EntityResourceSerializer
 @permission_classes([IsAuthenticated])
 def get_entities(request, *args, **kwargs):
     query = request.query_params.get("query")
+    is_enabled = request.query_params.get("is_enabled") == "true"
+    entity_type = request.query_params.getlist("entity_type")
 
     entities = Entity.objects.all().order_by("name")
 
     if query:
         entities = entities.filter(name__icontains=query)
+    if entity_type:
+        entities = entities.filter(entity_type__in=entity_type)
+    if is_enabled:
+        entities = entities.filter(is_enabled=True)
 
     serializer = EntityResourceSerializer(entities, many=True)
     return Response(serializer.data)
