@@ -258,7 +258,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ProductionSiteResource"
+                  $ref: "#/components/schemas/ProductionSite"
           description: ""
   /api/resources/traders:
     get:
@@ -2349,78 +2349,6 @@ components:
         * `l` - litres
         * `kg` - kg
         * `MJ` - MJ
-    Producer:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 64
-        entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-        has_mac:
-          type: boolean
-        has_trading:
-          type: boolean
-        has_direct_deliveries:
-          type: boolean
-        has_stocks:
-          type: boolean
-        legal_name:
-          type: string
-          maxLength: 128
-        registration_id:
-          type: string
-          maxLength: 64
-        sustainability_officer:
-          type: string
-          maxLength: 256
-        sustainability_officer_phone_number:
-          type: string
-          maxLength: 32
-        sustainability_officer_email:
-          type: string
-          maxLength: 254
-        registered_address:
-          type: string
-          maxLength: 256
-        registered_zipcode:
-          type: string
-          maxLength: 64
-        registered_city:
-          type: string
-          maxLength: 64
-        registered_country:
-          $ref: "#/components/schemas/Country"
-        default_certificate:
-          type: string
-          nullable: true
-          maxLength: 64
-        preferred_unit:
-          $ref: "#/components/schemas/PreferredUnitEnum"
-        has_saf:
-          type: boolean
-        has_elec:
-          type: boolean
-        activity_description:
-          type: string
-        website:
-          type: string
-          format: uri
-          maxLength: 200
-        vat_number:
-          type: string
-          maxLength: 32
-        ext_admin_pages:
-          type: string
-          readOnly: true
-      required:
-        - ext_admin_pages
-        - id
-        - name
-        - registered_country
     ProductionSite:
       type: object
       properties:
@@ -2478,79 +2406,6 @@ components:
         - country
         - id
         - name
-        - producer
-    ProductionSiteInput:
-      type: object
-      properties:
-        code:
-          type: string
-          readOnly: true
-        name:
-          type: string
-          readOnly: true
-        is_double_compte:
-          type: string
-          readOnly: true
-        category:
-          type: string
-          readOnly: true
-      required:
-        - category
-        - code
-        - is_double_compte
-        - name
-    ProductionSiteOutput:
-      type: object
-      properties:
-        name:
-          type: string
-          readOnly: true
-        code:
-          type: string
-          readOnly: true
-      required:
-        - code
-        - name
-    ProductionSiteResource:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 128
-        country:
-          $ref: "#/components/schemas/Country"
-        date_mise_en_service:
-          type: string
-          format: date
-          nullable: true
-        ges_option:
-          $ref: "#/components/schemas/GesOptionEnum"
-        eligible_dc:
-          type: boolean
-        dc_reference:
-          type: string
-          maxLength: 64
-        inputs:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProductionSiteInput"
-          readOnly: true
-        outputs:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProductionSiteOutput"
-          readOnly: true
-        producer:
-          $ref: "#/components/schemas/Producer"
-      required:
-        - country
-        - id
-        - inputs
-        - name
-        - outputs
         - producer
     SafClient:
       type: object

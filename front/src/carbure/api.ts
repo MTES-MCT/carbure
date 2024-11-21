@@ -7,7 +7,6 @@ import {
   Entity,
   Certificate,
   EntityType,
-  ProductionSiteDetails,
   EntityCertificate,
 } from "./types"
 
@@ -85,12 +84,15 @@ export function findProducers(query?: string) {
     .then(extract)
 }
 
-export function findProductionSites(query?: string, producer_id?: number) {
-  return api
-    .get<Api<ProductionSiteDetails[]>>("/resources/production-sites", {
-      params: { query, producer_id },
-    })
-    .then(extract)
+export async function findProductionSites(
+  query?: string,
+  producer_id?: number
+) {
+  const res = await apiFetch.GET("/resources/production-sites", {
+    params: { query: { query, producer_id } },
+  })
+
+  return res.data ?? []
 }
 
 export async function findDepots(query?: string, public_only?: boolean) {

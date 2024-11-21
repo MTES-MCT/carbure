@@ -780,33 +780,6 @@ export interface components {
      * @enum {string}
      */
     PreferredUnitEnum: PreferredUnitEnum
-    Producer: {
-      readonly id: number
-      name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
-      has_mac?: boolean
-      has_trading?: boolean
-      has_direct_deliveries?: boolean
-      has_stocks?: boolean
-      legal_name?: string
-      registration_id?: string
-      sustainability_officer?: string
-      sustainability_officer_phone_number?: string
-      sustainability_officer_email?: string
-      registered_address?: string
-      registered_zipcode?: string
-      registered_city?: string
-      registered_country: components["schemas"]["Country"]
-      default_certificate?: string | null
-      preferred_unit?: components["schemas"]["PreferredUnitEnum"]
-      has_saf?: boolean
-      has_elec?: boolean
-      activity_description?: string
-      /** Format: uri */
-      website?: string
-      vat_number?: string
-      readonly ext_admin_pages: string
-    }
     ProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -825,29 +798,6 @@ export interface components {
       manager_name?: string
       manager_phone?: string
       manager_email?: string
-    }
-    ProductionSiteInput: {
-      readonly code: string
-      readonly name: string
-      readonly is_double_compte: string
-      readonly category: string
-    }
-    ProductionSiteOutput: {
-      readonly name: string
-      readonly code: string
-    }
-    ProductionSiteResource: {
-      readonly id: number
-      name: string
-      country: components["schemas"]["Country"]
-      /** Format: date */
-      date_mise_en_service?: string | null
-      ges_option?: components["schemas"]["GesOptionEnum"]
-      eligible_dc?: boolean
-      dc_reference?: string
-      readonly inputs: components["schemas"]["ProductionSiteInput"][]
-      readonly outputs: components["schemas"]["ProductionSiteOutput"][]
-      producer: components["schemas"]["Producer"]
     }
     SafClient: {
       readonly id: number
@@ -1302,7 +1252,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["ProductionSiteResource"][]
+          "application/json": components["schemas"]["ProductionSite"][]
         }
       }
     }
