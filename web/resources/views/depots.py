@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from core.models import Depot
 from core.serializers import DepotSerializer
+from transactions.models.depot import Depot
 
 
 @extend_schema(
@@ -35,7 +35,8 @@ def get_depots(request, *args, **kwargs):
     if public_only:
         dsites = dsites.filter(private=False)
     if query:
-        dsites = dsites.filter(Q(name__icontains=query) | Q(depot_id__icontains=query) | Q(city__icontains=query))
+        dsites = dsites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
 
     serializer = DepotSerializer(dsites, many=True)
+
     return Response(serializer.data)

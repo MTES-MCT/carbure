@@ -5,8 +5,7 @@ from django.urls import reverse
 
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
-from transactions.models.depot import Depot
-from transactions.models.production_site import ProductionSite
+from transactions.models import Site
 
 
 class ResourcesTest(TestCase):
@@ -110,14 +109,15 @@ class ResourcesTest(TestCase):
         Entity.objects.update_or_create(name="tr1", entity_type="Trader")
         Entity.objects.update_or_create(name="adm1", entity_type="Administration")
 
-        url = "resources-producers"
-        response = self.client.get(reverse(url))
+        url = "resources-entities"
+        filter = "?entity_id=Producteur"
+        response = self.client.get(reverse(url) + filter)
         # api works
         assert response.status_code == 200
         # and returns 4 entries
         assert len(response.json()) >= 2
         # check if querying works
-        response = self.client.get(reverse(url) + "?query=od2")
+        response = self.client.get(reverse(url) + filter + "&query=od2")
         assert response.status_code == 200
         # and returns filtered data
         data = response.json()
@@ -132,14 +132,15 @@ class ResourcesTest(TestCase):
         Entity.objects.update_or_create(name="tr1", entity_type="Trader")
         Entity.objects.update_or_create(name="adm1", entity_type="Administration")
 
-        url = "resources-operators"
-        response = self.client.get(reverse(url))
+        url = "resources-entities"
+        filter = "?entity_type=Opérateur"
+        response = self.client.get(reverse(url) + filter)
         # api works
         assert response.status_code == 200
         # and returns 4 entries
         assert len(response.json()) >= 2
         # check if querying works
-        response = self.client.get(reverse(url) + "?query=op2")
+        response = self.client.get(reverse(url) + filter + "&query=op2")
         assert response.status_code == 200
         # and returns filtered data
         data = response.json()
@@ -155,14 +156,15 @@ class ResourcesTest(TestCase):
         Entity.objects.update_or_create(name="tr2", entity_type="Trader")
         Entity.objects.update_or_create(name="adm1", entity_type="Administration")
 
-        url = "resources-traders"
-        response = self.client.get(reverse(url))
+        url = "resources-entities"
+        filter = "?entity_id=Trader"
+        response = self.client.get(reverse(url) + filter)
         # api works
         assert response.status_code == 200
         # and returns 4 entries
         assert len(response.json()) >= 2
         # check if querying works
-        response = self.client.get(reverse(url) + "?query=tr1")
+        response = self.client.get(reverse(url) + filter + "&query=tr1")
         assert response.status_code == 200
         # and returns filtered data
         data = response.json()
@@ -171,10 +173,10 @@ class ResourcesTest(TestCase):
     def test_get_delivery_sites(self):
         # create delivery sites
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
-        Depot.objects.update_or_create(name="Depot1", depot_id="007", country=fr)
-        Depot.objects.update_or_create(name="Gennevilliers", depot_id="042", country=fr)
-        Depot.objects.update_or_create(name="Gennevilliers 2", depot_id="043", country=fr)
-        Depot.objects.update_or_create(name="Carcassonne", depot_id="044", country=fr)
+        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Depot1", customs_id="007", country=fr)
+        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers", customs_id="042", country=fr)
+        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers 2", customs_id="043", country=fr)
+        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Carcassonne", customs_id="044", country=fr)
 
         url = "resources-depots"
         response = self.client.get(reverse(url))
@@ -192,29 +194,34 @@ class ResourcesTest(TestCase):
     def test_get_production_sites(self):
         # create production sites
         producer, _ = Entity.objects.update_or_create(name="toto", entity_type="Producteur")
+        other_producer, _ = Entity.objects.update_or_create(name="tata", entity_type="Producteur")
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
-        ProductionSite.objects.update_or_create(
+        Site.objects.update_or_create(
+            site_type=Site.PRODUCTION_SITE,
             name="Usine1",
-            producer_id=producer.id,
+            created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        ProductionSite.objects.update_or_create(
+        Site.objects.update_or_create(
+            site_type=Site.PRODUCTION_SITE,
             name="Usine2",
-            producer_id=producer.id,
+            created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        ProductionSite.objects.update_or_create(
+        Site.objects.update_or_create(
+            site_type=Site.PRODUCTION_SITE,
             name="Usine3",
-            producer_id=producer.id,
+            created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        ProductionSite.objects.update_or_create(
+        Site.objects.update_or_create(
+            site_type=Site.PRODUCTION_SITE,
             name="Usine4",
-            producer_id=producer.id,
+            created_by_id=other_producer.id,
             country=fr,
             date_mise_en_service=today,
         )
@@ -231,3 +238,9 @@ class ResourcesTest(TestCase):
         # and returns filtered data
         data = response.json()
         assert len(data) == 1
+        # check if filtering by producer works
+        response = self.client.get(reverse(url) + f"?producer_id={producer.id}")
+        assert response.status_code == 200
+        # and returns filtered data
+        data = response.json()
+        assert len(data) == 3

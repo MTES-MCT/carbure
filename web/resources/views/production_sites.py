@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.serializers import ProductionSiteSerializer
-from producers.models import ProductionSite
+from transactions.models.production_site import ProductionSite
 
 
 @extend_schema(
@@ -28,15 +28,15 @@ from producers.models import ProductionSite
 @permission_classes([IsAuthenticated])
 def get_production_sites(request, *args, **kwargs):
     query = request.query_params.get("query")
-    pid = request.query_params.get("producer_id", False)
+    producer_id = request.query_params.get("producer_id", False)
 
-    psites = ProductionSite.objects.select_related("country", "producer").all().order_by("name")
+    psites = ProductionSite.objects.select_related("country", "created_by").all().order_by("name")
 
     if query:
         psites = psites.filter(name__icontains=query)
 
-    if pid:
-        psites = psites.filter(producer__id=pid)
+    if producer_id:
+        psites = psites.filter(created_by_id=producer_id)
 
     serializer = ProductionSiteSerializer(psites, many=True)
     return Response(serializer.data)
