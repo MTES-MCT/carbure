@@ -38,6 +38,251 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/resources/biofuels:
+    get:
+      operationId: resources_biofuels_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en`, and `code`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Biocarburant"
+          description: ""
+  /api/resources/certificates:
+    get:
+      operationId: resources_certificates_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `certificate_id` and `certificate_holder`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GenericCertificate"
+          description: ""
+  /api/resources/countries:
+    get:
+      operationId: resources_countries_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code_pays`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pays"
+          description: ""
+  /api/resources/depots:
+    get:
+      operationId: resources_depots_list
+      parameters:
+        - in: query
+          name: public_only
+          schema:
+            type: boolean
+          description: Public Only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code_pays`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepotResource"
+          description: ""
+  /api/resources/entities:
+    get:
+      operationId: resources_entities_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityResource"
+          description: ""
+  /api/resources/feedstocks:
+    get:
+      operationId: resources_feedstocks_list
+      parameters:
+        - in: query
+          name: double_count_only
+          schema:
+            type: boolean
+          description: Double compte only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatierePremiere"
+          description: ""
+  /api/resources/operators:
+    get:
+      operationId: resources_operators_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityResource"
+          description: ""
+  /api/resources/producers:
+    get:
+      operationId: resources_producers_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityResource"
+          description: ""
+  /api/resources/production-sites:
+    get:
+      operationId: resources_production_sites_list
+      parameters:
+        - in: query
+          name: producer_id
+          schema:
+            type: string
+          description: Search within the field `producer_id`
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductionSiteResource"
+          description: ""
+  /api/resources/traders:
+    get:
+      operationId: resources_traders_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityResource"
+          description: ""
   /api/saf/clients/:
     get:
       operationId: saf_clients_list
@@ -1408,6 +1653,35 @@ paths:
           description: ""
 components:
   schemas:
+    Biocarburant:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 16
+        name:
+          type: string
+          maxLength: 64
+        description:
+          type: string
+          maxLength: 128
+        pci_kg:
+          type: number
+          format: double
+        pci_litre:
+          type: number
+          format: double
+        masse_volumique:
+          type: number
+          format: double
+        is_alcool:
+          type: boolean
+        is_graisse:
+          type: boolean
+      required:
+        - code
+        - description
+        - name
     Biofuel:
       type: object
       properties:
@@ -1664,6 +1938,18 @@ components:
         * `ANN-IX-B` - ANNEXE IX-B
         * `TALLOL` - Tallol
         * `OTHER` - Autre
+    CertificateTypeEnum:
+      enum:
+        - SYSTEME_NATIONAL
+        - ISCC
+        - REDCERT
+        - 2BS
+      type: string
+      description: |-
+        * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
+        * `ISCC` - ISCC
+        * `REDCERT` - REDCERT
+        * `2BS` - 2BS
     Comment:
       type: object
       properties:
@@ -1759,6 +2045,74 @@ components:
         - country
         - id
         - name
+    DepotResource:
+      type: object
+      properties:
+        depot_id:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 128
+        city:
+          type: string
+          nullable: true
+          maxLength: 128
+        country:
+          type: integer
+          nullable: true
+        depot_type:
+          $ref: "#/components/schemas/DepotTypeEnum"
+        address:
+          type: string
+          maxLength: 128
+        postal_code:
+          type: string
+          maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
+      required:
+        - depot_id
+        - name
+    DepotTypeEnum:
+      enum:
+        - OTHER
+        - EFS
+        - EFPE
+        - OIL DEPOT
+        - BIOFUEL DEPOT
+        - HEAT PLANT
+        - POWER PLANT
+        - COGENERATION PLANT
+        - EFCA
+      type: string
+      description: |-
+        * `OTHER` - Autre
+        * `EFS` - EFS
+        * `EFPE` - EFPE
+        * `OIL DEPOT` - OIL DEPOT
+        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+        * `HEAT PLANT` - HEAT PLANT
+        * `POWER PLANT` - POWER PLANT
+        * `COGENERATION PLANT` - COGENERATION PLANT
+        * `EFCA` - EFCA
     Entity:
       type: object
       properties:
@@ -1827,6 +2181,20 @@ components:
           maxLength: 64
         entity_type:
           $ref: "#/components/schemas/EntityTypeEnum"
+      required:
+        - id
+        - name
+    EntityResource:
+      type: object
+      properties:
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        name:
+          type: string
+          maxLength: 64
+        id:
+          type: integer
+          readOnly: true
       required:
         - id
         - name
@@ -1906,6 +2274,47 @@ components:
         - code
         - name
         - name_en
+    GenericCertificate:
+      type: object
+      properties:
+        certificate_id:
+          type: string
+          maxLength: 64
+        certificate_type:
+          $ref: "#/components/schemas/CertificateTypeEnum"
+        certificate_holder:
+          type: string
+          maxLength: 512
+        certificate_issuer:
+          type: string
+          nullable: true
+          maxLength: 256
+        address:
+          type: string
+          nullable: true
+          maxLength: 512
+        valid_from:
+          type: string
+          format: date
+        valid_until:
+          type: string
+          format: date
+        download_link:
+          type: string
+          nullable: true
+          maxLength: 512
+        scope:
+          nullable: true
+        input:
+          nullable: true
+        output:
+          nullable: true
+      required:
+        - certificate_holder
+        - certificate_id
+        - certificate_type
+        - valid_from
+        - valid_until
     GesOptionEnum:
       enum:
         - Default
@@ -1939,6 +2348,30 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    MatierePremiere:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+          maxLength: 128
+        compatible_alcool:
+          type: boolean
+        compatible_graisse:
+          type: boolean
+        is_double_compte:
+          type: boolean
+        category:
+          $ref: "#/components/schemas/CategoryEnum"
+      required:
+        - code
+        - description
+        - name
     PaginatedSafClientList:
       type: object
       required:
@@ -2008,6 +2441,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
+    Pays:
+      type: object
+      properties:
+        code_pays:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
     PreferredUnitEnum:
       enum:
         - l
@@ -2018,6 +2469,78 @@ components:
         * `l` - litres
         * `kg` - kg
         * `MJ` - MJ
+    Producer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_mac:
+          type: boolean
+        has_trading:
+          type: boolean
+        has_direct_deliveries:
+          type: boolean
+        has_stocks:
+          type: boolean
+        legal_name:
+          type: string
+          maxLength: 128
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        sustainability_officer_email:
+          type: string
+          maxLength: 254
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country:
+          $ref: "#/components/schemas/Pays"
+        default_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        preferred_unit:
+          $ref: "#/components/schemas/PreferredUnitEnum"
+        has_saf:
+          type: boolean
+        has_elec:
+          type: boolean
+        activity_description:
+          type: string
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+        ext_admin_pages:
+          type: string
+          readOnly: true
+      required:
+        - ext_admin_pages
+        - id
+        - name
+        - registered_country
     ProductionSite:
       type: object
       properties:
@@ -2075,6 +2598,80 @@ components:
         - country
         - id
         - name
+        - producer
+    ProductionSiteInput:
+      type: object
+      properties:
+        code:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        is_double_compte:
+          type: string
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+      required:
+        - category
+        - code
+        - is_double_compte
+        - name
+    ProductionSiteOutput:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        code:
+          type: string
+          readOnly: true
+      required:
+        - code
+        - name
+    ProductionSiteResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        country:
+          $ref: "#/components/schemas/Pays"
+        date_mise_en_service:
+          type: string
+          format: date
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          nullable: true
+          maxLength: 64
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductionSiteInput"
+          readOnly: true
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductionSiteOutput"
+          readOnly: true
+        producer:
+          $ref: "#/components/schemas/Producer"
+      required:
+        - country
+        - date_mise_en_service
+        - id
+        - inputs
+        - name
+        - outputs
         - producer
     SafClient:
       type: object

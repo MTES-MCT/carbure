@@ -20,6 +20,166 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/resources/biofuels": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_biofuels_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/certificates": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/countries": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_countries_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/depots": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_depots_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/entities": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_entities_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/feedstocks": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_feedstocks_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/operators": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_operators_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/producers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_producers_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/production-sites": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_production_sites_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/traders": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_traders_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/saf/clients/": {
     parameters: {
       query?: never
@@ -312,6 +472,19 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    Biocarburant: {
+      code: string
+      name: string
+      description: string
+      /** Format: double */
+      pci_kg?: number
+      /** Format: double */
+      pci_litre?: number
+      /** Format: double */
+      masse_volumique?: number
+      is_alcool?: boolean
+      is_graisse?: boolean
+    }
     Biofuel: {
       name: string
       name_en: string
@@ -407,6 +580,14 @@ export interface components {
      * @enum {string}
      */
     CategoryEnum: CategoryEnum
+    /**
+     * @description * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
+     *     * `ISCC` - ISCC
+     *     * `REDCERT` - REDCERT
+     *     * `2BS` - 2BS
+     * @enum {string}
+     */
+    CertificateTypeEnum: CertificateTypeEnum
     Comment: {
       comment?: string
     }
@@ -449,6 +630,43 @@ export interface components {
       gps_coordinates?: string | null
       accise?: string
     }
+    DepotResource: {
+      depot_id: string
+      name: string
+      city?: string | null
+      country?: number | null
+      depot_type?: components["schemas"]["DepotTypeEnum"]
+      address?: string
+      postal_code?: string
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      electrical_efficiency?: number | null
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      thermal_efficiency?: number | null
+      /**
+       * Format: double
+       * @description En degrés Celsius
+       */
+      useful_temperature?: number | null
+    }
+    /**
+     * @description * `OTHER` - Autre
+     *     * `EFS` - EFS
+     *     * `EFPE` - EFPE
+     *     * `OIL DEPOT` - OIL DEPOT
+     *     * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+     *     * `HEAT PLANT` - HEAT PLANT
+     *     * `POWER PLANT` - POWER PLANT
+     *     * `COGENERATION PLANT` - COGENERATION PLANT
+     *     * `EFCA` - EFCA
+     * @enum {string}
+     */
+    DepotTypeEnum: DepotTypeEnum
     Entity: {
       readonly id: number
       name: string
@@ -475,6 +693,11 @@ export interface components {
       readonly id: number
       name: string
       entity_type?: components["schemas"]["EntityTypeEnum"]
+    }
+    EntityResource: {
+      entity_type?: components["schemas"]["EntityTypeEnum"]
+      name: string
+      readonly id: number
     }
     EntitySummary: {
       readonly id: number
@@ -505,6 +728,21 @@ export interface components {
       category?: components["schemas"]["CategoryEnum"]
       is_double_compte?: boolean
     }
+    GenericCertificate: {
+      certificate_id: string
+      certificate_type: components["schemas"]["CertificateTypeEnum"]
+      certificate_holder: string
+      certificate_issuer?: string | null
+      address?: string | null
+      /** Format: date */
+      valid_from: string
+      /** Format: date */
+      valid_until: string
+      download_link?: string | null
+      scope?: unknown
+      input?: unknown
+      output?: unknown
+    }
     /**
      * @description * `Default` - Valeurs par défaut
      *     * `Actual` - Valeurs réelles
@@ -525,6 +763,15 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    MatierePremiere: {
+      code: string
+      name: string
+      description: string
+      compatible_alcool?: boolean
+      compatible_graisse?: boolean
+      is_double_compte?: boolean
+      category?: components["schemas"]["CategoryEnum"]
+    }
     PaginatedSafClientList: {
       /** @example 123 */
       count: number
@@ -570,6 +817,12 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
     }
+    Pays: {
+      code_pays: string
+      name: string
+      name_en: string
+      is_in_europe?: boolean
+    }
     /**
      * @description * `l` - litres
      *     * `kg` - kg
@@ -577,6 +830,33 @@ export interface components {
      * @enum {string}
      */
     PreferredUnitEnum: PreferredUnitEnum
+    Producer: {
+      readonly id: number
+      name: string
+      entity_type?: components["schemas"]["EntityTypeEnum"]
+      has_mac?: boolean
+      has_trading?: boolean
+      has_direct_deliveries?: boolean
+      has_stocks?: boolean
+      legal_name?: string
+      registration_id?: string
+      sustainability_officer?: string
+      sustainability_officer_phone_number?: string
+      sustainability_officer_email?: string
+      registered_address?: string
+      registered_zipcode?: string
+      registered_city?: string
+      registered_country: components["schemas"]["Pays"]
+      default_certificate?: string | null
+      preferred_unit?: components["schemas"]["PreferredUnitEnum"]
+      has_saf?: boolean
+      has_elec?: boolean
+      activity_description?: string
+      /** Format: uri */
+      website?: string
+      vat_number?: string
+      readonly ext_admin_pages: string
+    }
     ProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -595,6 +875,29 @@ export interface components {
       manager_name?: string
       manager_phone?: string
       manager_email?: string
+    }
+    ProductionSiteInput: {
+      readonly code: string
+      readonly name: string
+      readonly is_double_compte: string
+      readonly category: string
+    }
+    ProductionSiteOutput: {
+      readonly name: string
+      readonly code: string
+    }
+    ProductionSiteResource: {
+      readonly id: number
+      name: string
+      country: components["schemas"]["Pays"]
+      /** Format: date */
+      date_mise_en_service: string
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      eligible_dc?: boolean
+      dc_reference?: string | null
+      readonly inputs: components["schemas"]["ProductionSiteInput"][]
+      readonly outputs: components["schemas"]["ProductionSiteOutput"][]
+      producer: components["schemas"]["Producer"]
     }
     SafClient: {
       readonly id: number
@@ -846,6 +1149,232 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ErrorResponse"]
+        }
+      }
+    }
+  }
+  resources_biofuels_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `name`, `name_en`, and `code` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Biocarburant"][]
+        }
+      }
+    }
+  }
+  resources_certificates_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `certificate_id` and `certificate_holder` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GenericCertificate"][]
+        }
+      }
+    }
+  }
+  resources_countries_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `name`, `name_en` and `code_pays` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Pays"][]
+        }
+      }
+    }
+  }
+  resources_depots_list: {
+    parameters: {
+      query?: {
+        /** @description Public Only */
+        public_only?: boolean
+        /** @description Search within the fields `name`, `name_en` and `code_pays` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DepotResource"][]
+        }
+      }
+    }
+  }
+  resources_entities_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityResource"][]
+        }
+      }
+    }
+  }
+  resources_feedstocks_list: {
+    parameters: {
+      query?: {
+        /** @description Double compte only */
+        double_count_only?: boolean
+        /** @description Search within the fields `name`, `name_en` and `code` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MatierePremiere"][]
+        }
+      }
+    }
+  }
+  resources_operators_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityResource"][]
+        }
+      }
+    }
+  }
+  resources_producers_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityResource"][]
+        }
+      }
+    }
+  }
+  resources_production_sites_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the field `producer_id` */
+        producer_id?: string
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductionSiteResource"][]
+        }
+      }
+    }
+  }
+  resources_traders_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityResource"][]
         }
       }
     }
@@ -1607,6 +2136,12 @@ export enum CategoryEnum {
   TALLOL = "TALLOL",
   OTHER = "OTHER",
 }
+export enum CertificateTypeEnum {
+  SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
+  ISCC = "ISCC",
+  REDCERT = "REDCERT",
+  Value2BS = "2BS",
+}
 export enum CorrectionStatusEnum {
   NO_PROBLEMO = "NO_PROBLEMO",
   IN_CORRECTION = "IN_CORRECTION",
@@ -1623,6 +2158,17 @@ export enum DeliveryTypeEnum {
   DIRECT = "DIRECT",
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
+}
+export enum DepotTypeEnum {
+  OTHER = "OTHER",
+  EFS = "EFS",
+  EFPE = "EFPE",
+  OIL_DEPOT = "OIL DEPOT",
+  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
+  HEAT_PLANT = "HEAT PLANT",
+  POWER_PLANT = "POWER PLANT",
+  COGENERATION_PLANT = "COGENERATION PLANT",
+  EFCA = "EFCA",
 }
 export enum EntityTypeEnum {
   Producer = "Producteur",
