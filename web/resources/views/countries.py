@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Pays
-from resources.serializers import PaysSerializer
+from doublecount.serializers import CountrySerializer
 
 
 @extend_schema(
@@ -17,7 +17,7 @@ from resources.serializers import PaysSerializer
             type=str,
         ),
     ],
-    responses=PaysSerializer(many=True),
+    responses=CountrySerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -27,5 +27,5 @@ def get_countries(request, *args, **kwargs):
     countries = Pays.objects.all().order_by("name")
     if query:
         countries = countries.filter(Q(name__icontains=query) | Q(name_en__icontains=query) | Q(code_pays__icontains=query))
-    serializer = PaysSerializer(countries, many=True)
+    serializer = CountrySerializer(countries, many=True)
     return Response(serializer.data)

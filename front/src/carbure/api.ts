@@ -5,7 +5,6 @@ import {
   User,
   Notification,
   Entity,
-  Country,
   Certificate,
   EntityType,
   ProductionSiteDetails,
@@ -39,10 +38,12 @@ export async function findBiofuels(query: string) {
   return res.data ?? []
 }
 
-export function findCountries(query: string) {
-  return api
-    .get<Api<Country[]>>("/resources/countries", { params: { query } })
-    .then(extract)
+export async function findCountries(query: string) {
+  const res = await apiFetch.GET("/resources/countries", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
 }
 
 export function findEntities(

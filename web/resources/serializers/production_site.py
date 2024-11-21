@@ -1,9 +1,8 @@
 from rest_framework import serializers
 
+from doublecount.serializers import CountrySerializer
 from producers.models import Entity, ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
-
-from .country import PaysSerializer
 
 
 class ProductionSiteInputSerializer(serializers.ModelSerializer):
@@ -45,7 +44,7 @@ class ProductionSiteOutputSerializer(serializers.ModelSerializer):
 
 
 class ProducerSerializer(serializers.ModelSerializer):
-    registered_country = PaysSerializer()
+    registered_country = CountrySerializer()
     ext_admin_pages = serializers.SerializerMethodField()
 
     class Meta:
@@ -84,7 +83,7 @@ class ProducerSerializer(serializers.ModelSerializer):
 
 
 class ProductionSiteResourceSerializer(serializers.ModelSerializer):
-    country = PaysSerializer()
+    country = CountrySerializer()
     producer = ProducerSerializer()
     inputs = ProductionSiteInputSerializer(source="productionsiteinput_set", many=True, read_only=True)
     outputs = ProductionSiteOutputSerializer(source="productionsiteoutput_set", many=True, read_only=True)

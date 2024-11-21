@@ -773,12 +773,6 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
     }
-    Pays: {
-      code_pays: string
-      name: string
-      name_en: string
-      is_in_europe?: boolean
-    }
     /**
      * @description * `l` - litres
      *     * `kg` - kg
@@ -802,7 +796,7 @@ export interface components {
       registered_address?: string
       registered_zipcode?: string
       registered_city?: string
-      registered_country: components["schemas"]["Pays"]
+      registered_country: components["schemas"]["Country"]
       default_certificate?: string | null
       preferred_unit?: components["schemas"]["PreferredUnitEnum"]
       has_saf?: boolean
@@ -845,7 +839,7 @@ export interface components {
     ProductionSiteResource: {
       readonly id: number
       name: string
-      country: components["schemas"]["Pays"]
+      country: components["schemas"]["Country"]
       /** Format: date */
       date_mise_en_service?: string | null
       ges_option?: components["schemas"]["GesOptionEnum"]
@@ -1170,7 +1164,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["Pays"][]
+          "application/json": components["schemas"]["Country"][]
         }
       }
     }

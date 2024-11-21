@@ -105,7 +105,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Pays"
+                  $ref: "#/components/schemas/Country"
           description: ""
   /api/resources/depots:
     get:
@@ -2339,24 +2339,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
-    Pays:
-      type: object
-      properties:
-        code_pays:
-          type: string
-          maxLength: 64
-        name:
-          type: string
-          maxLength: 128
-        name_en:
-          type: string
-          maxLength: 128
-        is_in_europe:
-          type: boolean
-      required:
-        - code_pays
-        - name
-        - name_en
     PreferredUnitEnum:
       enum:
         - l
@@ -2411,7 +2393,7 @@ components:
           type: string
           maxLength: 64
         registered_country:
-          $ref: "#/components/schemas/Pays"
+          $ref: "#/components/schemas/Country"
         default_certificate:
           type: string
           nullable: true
@@ -2539,7 +2521,7 @@ components:
           type: string
           maxLength: 128
         country:
-          $ref: "#/components/schemas/Pays"
+          $ref: "#/components/schemas/Country"
         date_mise_en_service:
           type: string
           format: date
