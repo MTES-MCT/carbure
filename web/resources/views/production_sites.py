@@ -19,7 +19,7 @@ from resources.serializers import ProductionSiteResourceSerializer
             name="producer_id",
             description="Search within the field `producer_id`",
             required=False,
-            type=str,
+            type=int,
         ),
     ],
     responses=ProductionSiteResourceSerializer(many=True),
