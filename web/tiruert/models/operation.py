@@ -46,6 +46,9 @@ class Operation(models.Model):
         verbose_name = "Opération"
         verbose_name_plural = "Opérations"
 
+    def is_credit(self, entity):
+        return self.credited_entity.id == int(entity)
+
 
 @transaction.atomic
 def create_tiruert_operations_from_lots(lots):
