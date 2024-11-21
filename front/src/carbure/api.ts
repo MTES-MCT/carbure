@@ -7,7 +7,6 @@ import {
   Entity,
   Biofuel,
   Country,
-  Depot,
   Certificate,
   EntityType,
   ProductionSiteDetails,
@@ -92,12 +91,12 @@ export function findProductionSites(query?: string, producer_id?: number) {
     .then(extract)
 }
 
-export function findDepots(query?: string, public_only?: boolean) {
-  return api
-    .get<Api<Depot[]>>("/resources/depots", {
-      params: { query, public_only },
-    })
-    .then(extract)
+export async function findDepots(query?: string, public_only?: boolean) {
+  const res = await apiFetch.GET("/resources/depots", {
+    params: { query: { query, public_only } },
+  })
+
+  return res.data ?? []
 }
 
 export function findCertificates(query: string) {

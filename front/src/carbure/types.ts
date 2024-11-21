@@ -89,11 +89,7 @@ export type ProductionSiteDetails = ProductionSite & {
   certificates: Certificate[]
 }
 
-export type Depot = apiTypes["Depot"] & {
-  electrical_efficiency: number | null
-  thermal_efficiency: number | null
-  useful_temperature: number | null
-}
+export type Depot = apiTypes["Depot"]
 
 export interface EntityDepot {
   depot: Depot | null

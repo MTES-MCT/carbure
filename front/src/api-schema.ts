@@ -629,16 +629,6 @@ export interface components {
       postal_code?: string
       gps_coordinates?: string | null
       accise?: string
-    }
-    DepotResource: {
-      readonly id: number
-      readonly depot_id: string
-      name: string
-      city?: string
-      country?: number | null
-      readonly depot_type: string
-      address?: string
-      postal_code?: string
       /**
        * Format: double
        * @description Entre 0 et 1
@@ -1217,7 +1207,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["DepotResource"][]
+          "application/json": components["schemas"]["Depot"][]
         }
       }
     }

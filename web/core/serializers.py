@@ -41,6 +41,9 @@ class DepotSerializer(serializers.ModelSerializer):
             "postal_code",
             "gps_coordinates",
             "accise",
+            "electrical_efficiency",
+            "thermal_efficiency",
+            "useful_temperature",
         ]
 
 

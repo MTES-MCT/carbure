@@ -133,7 +133,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DepotResource"
+                  $ref: "#/components/schemas/Depot"
           description: ""
   /api/resources/entities:
     get:
@@ -2041,37 +2041,6 @@ components:
         accise:
           type: string
           maxLength: 32
-      required:
-        - country
-        - id
-        - name
-    DepotResource:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        depot_id:
-          type: string
-          readOnly: true
-        name:
-          type: string
-          maxLength: 128
-        city:
-          type: string
-          maxLength: 128
-        country:
-          type: integer
-          nullable: true
-        depot_type:
-          type: string
-          readOnly: true
-        address:
-          type: string
-          maxLength: 256
-        postal_code:
-          type: string
-          maxLength: 32
         electrical_efficiency:
           type: number
           format: double
@@ -2092,8 +2061,7 @@ components:
           nullable: true
           description: En degrés Celsius
       required:
-        - depot_id
-        - depot_type
+        - country
         - id
         - name
     Entity:
