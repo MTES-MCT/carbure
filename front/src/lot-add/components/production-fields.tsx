@@ -12,7 +12,7 @@ import * as api from "carbure/api"
 import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common/components/icons"
-import { Entity, Country, ProductionSite } from "carbure/types"
+import { Country, ProductionSite, type EntityPreview } from "carbure/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common/utils/collection"
 
@@ -35,7 +35,9 @@ export const ProductionFields = (props: ProductionFieldsProps) => {
   )
 }
 
-export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
+export const ProducerField = (
+  props: AutocompleteProps<EntityPreview | string>
+) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const bind = useBind<LotFormValue>()
@@ -52,7 +54,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
         create={norm.identity}
         defaultOptions={producer ? [producer] : undefined}
         getOptions={api.findProducers}
-        normalize={norm.normalizeEntityOrUnknown}
+        normalize={norm.normalizeEntityPreviewOrUnknown}
         {...bound}
         {...props}
       />
@@ -74,7 +76,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
 
   const defaultOptions = uniqueBy(
     compact([producer, entity]),
-    (v) => norm.normalizeEntityOrUnknown(v).label
+    (v) => norm.normalizeEntityPreviewOrUnknown(v).label
   )
 
   return (
@@ -84,7 +86,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={defaultOptions}
-      normalize={norm.normalizeEntityOrUnknown}
+      normalize={norm.normalizeEntityPreviewOrUnknown}
       {...bound}
       {...props}
       disabled={(!entity.has_trading && !entity.has_stocks) || bound.disabled}

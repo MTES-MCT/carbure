@@ -10,6 +10,7 @@ import {
   Feedstock,
   ProductionSite,
   Unit,
+  type EntityPreview,
 } from "carbure/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
@@ -250,7 +251,7 @@ export const defaultLot = {
   country_of_origin: undefined as Country | undefined,
   free_field: undefined as string | undefined,
 
-  producer: undefined as Entity | string | undefined,
+  producer: undefined as EntityPreview | string | undefined,
   production_site: undefined as ProductionSite | string | undefined,
   production_site_certificate: undefined as string | undefined,
   production_country: undefined as Country | undefined,
@@ -460,7 +461,7 @@ export function isLotProducer(
 ) {
   const producer = value.producer instanceof Object ? value.producer : undefined
   const isProducerEntity = producer?.id === entity.id
-  const hasTrading = !!producer?.has_stocks && !!producer.has_trading
+  const hasTrading = !!entity?.has_stocks && !!entity.has_trading
   return withTrading ? isProducerEntity && hasTrading : isProducerEntity
 }
 
