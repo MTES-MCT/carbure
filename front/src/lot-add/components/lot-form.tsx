@@ -261,7 +261,7 @@ export const defaultLot = {
   supplier: undefined as EntityPreview | string | undefined,
   supplier_certificate: undefined as string | undefined,
   vendor_certificate: undefined as string | undefined,
-  client: undefined as Entity | string | undefined,
+  client: undefined as EntityPreview | string | undefined,
   delivery_type: undefined as DeliveryType | undefined,
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,
