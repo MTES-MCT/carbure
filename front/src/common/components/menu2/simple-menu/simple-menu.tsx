@@ -4,14 +4,12 @@ import { Button, ButtonProps } from "../../button2"
 import { Dropdown, DropdownProps } from "../../dropdown2"
 import css from "./simple-menu.module.css"
 
-export type SimpleMenuProps = {
-  className?: string
+export type SimpleMenuProps = Omit<DropdownProps, "triggerRef"> & {
   label?: string
-  anchor?: string
-  children: DropdownProps["children"]
   buttonProps: ButtonProps
   // If provided, the dropdown will have this width (used for specific cases)
   dropdownWidth?: string
+  children: DropdownProps["children"]
 }
 
 /**
@@ -24,22 +22,20 @@ export const SimpleMenu = ({
   children,
   dropdownWidth,
   buttonProps,
+  ...props
 }: SimpleMenuProps) => {
-  const triggerRef = useRef<HTMLButtonElement>(null)
+  const ref = useRef<HTMLButtonElement>(null)
 
   return (
     <>
-      <Button
-        {...buttonProps}
-        ref={triggerRef}
-        className={cl(css.menu, className)}
-      />
+      <Button {...buttonProps} ref={ref} className={cl(css.menu, className)} />
 
       <Dropdown
         className={css.dropdown}
-        triggerRef={triggerRef}
+        triggerRef={ref}
         anchor={anchor}
         style={{ width: dropdownWidth }}
+        {...props}
       >
         {children}
       </Dropdown>

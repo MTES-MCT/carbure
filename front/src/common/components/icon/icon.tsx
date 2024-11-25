@@ -215,3 +215,7 @@ export const ClipboardFill = ({ className, ...props }: IconProps) => {
     <Icon {...props} className={cl(fr.cx("ri-clipboard-fill"), className)} />
   )
 }
+
+export const CircleFill = ({ className, ...props }: IconProps) => {
+  return <Icon {...props} className={cl(fr.cx("ri-circle-fill"), className)} />
+}

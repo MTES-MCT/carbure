@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw"
-import { EntityType, NotificationType } from "carbure/types"
+import { EntityType } from "carbure/types"
 
 import {
   country,
@@ -11,6 +11,7 @@ import {
   biocarburant,
   productionSite,
   generateUser,
+  notifications,
 } from "./data"
 import { mockGetWithResponseData } from "./helpers"
 
@@ -28,38 +29,42 @@ export const okStats = http.get("/api/home-stats", () => {
   })
 })
 
-export const okNotifications = http.get("/api/entity/notifications", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [
-      {
-        id: 1,
-        dest: operator,
-        datetime: "2024-01-01",
-        type: NotificationType.CertificateExpired,
-        acked: false,
-        send_by_email: false,
-        email_sent: false,
-        meta: {
-          certificate: "1234567890",
-        },
-      },
-      {
-        id: 2,
-        dest: operator,
-        datetime: "2024-01-01",
-        acked: true,
-        send_by_email: false,
-        email_sent: false,
-        type: NotificationType.LotsUpdatedByAdmin,
-        meta: {
-          updated: 10,
-          comment: "Commentaire de l'admin",
-        },
-      },
-    ],
-  })
-})
+// First time notifications are fetched, they are not acked
+export const okNotifications = http.get(
+  "/api/entity/notifications",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: notifications,
+    })
+  },
+  {
+    once: true,
+  }
+)
+
+// Second time notifications are fetched, they are acked
+export const okNotificationsAcked = http.get(
+  "/api/entity/notifications",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: notifications.map((n) => ({ ...n, acked: true })),
+    })
+  },
+  {
+    once: true,
+  }
+)
+
+export const okAckNotifications = http.post(
+  "/api/entity/notifications/ack",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+    })
+  }
+)
 
 export const okEntitySearch = http.get("/api/resources/entities", () => {
   return HttpResponse.json({

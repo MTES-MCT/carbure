@@ -24,6 +24,7 @@ export interface ListProps<T, V> {
   items: T[]
   search?: boolean
   multiple?: boolean
+  border?: boolean
   selectedValue?: V
   selectedValues?: V[]
   className?: string
@@ -41,6 +42,7 @@ export function List<T, V>({
   search,
   items,
   multiple = false,
+  border = true,
   controlRef,
   selectedValue,
   selectedValues,
@@ -166,7 +168,7 @@ export function List<T, V>({
           {...config}
           onClick={() => selection.select(value)}
           onFocus={() => selection.focus(value)}
-          borderBottom={index < items.length - 1}
+          borderBottom={border && index < items.length - 1}
           key={label}
         >
           {render(config)}
