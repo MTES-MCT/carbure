@@ -1,0 +1,38 @@
+.notification-item-link {
+  flex: 1;
+}
+
+.notifications-dropdown {
+  max-width: 424px;
+  max-height: 66vh;
+}
+
+.notification-item {
+  opacity: 0.7;
+  color: var(--text-default-grey);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-item--pending {
+  opacity: 1;
+}
+
+.notification-item__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1w);
+}
+
+.notification-item__elapsed-time::first-letter {
+  text-transform: capitalize;
+}
+
+.notification-item__text {
+  color: black;
+}
+
+.notification-item__icon {
+  color: var(--artwork-major-blue-france);
+}
