@@ -12,6 +12,7 @@ import {
   UserRightStatus,
   UserRight,
   Feedstock,
+  NotificationType,
 } from "carbure/types"
 import { DeepPartial } from "common/types"
 import { mergeDeepRight } from "ramda"
@@ -256,3 +257,31 @@ export const generateUser = (
     ],
   }
 }
+
+export const notifications = [
+  {
+    id: 1,
+    dest: operator,
+    datetime: "2024-01-01",
+    type: NotificationType.CertificateExpired,
+    acked: false,
+    send_by_email: false,
+    email_sent: false,
+    meta: {
+      certificate: "1234567890",
+    },
+  },
+  {
+    id: 2,
+    dest: operator,
+    datetime: "2024-01-01",
+    acked: true,
+    send_by_email: false,
+    email_sent: false,
+    type: NotificationType.LotsUpdatedByAdmin,
+    meta: {
+      updated: 10,
+      comment: "Commentaire de l'admin",
+    },
+  },
+]
