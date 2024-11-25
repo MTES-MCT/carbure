@@ -14,9 +14,9 @@ class VerifyOTPSerializer(serializers.Serializer):
         label="Entrez le code à 6 chiffres reçu par email",
     )
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-        self.user = user
 
     def validate_otp_token(self, value):
         # Place for any additional validation on otp_token if needed
