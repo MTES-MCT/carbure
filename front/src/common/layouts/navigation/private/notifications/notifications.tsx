@@ -41,7 +41,9 @@ export const Notifications = () => {
 
   const handleOpenMenu = () => {
     matomo.push(["trackEvent", "notifications", "open"])
-    ackNotifications.execute(entity.id, pending)
+    if (pending.length > 0) {
+      ackNotifications.execute(entity.id, pending)
+    }
   }
 
   const handleCloseMenu = () => {
