@@ -203,13 +203,13 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
 
 function formToStockPayload(form: SplitForm): StockPayload {
   return {
-    stock_id: form.stock_id,
-    volume: form.volume,
+    stock_id: form.stock_id ?? "",
+    volume: form.volume ?? 0,
     supplier_certificate: form.supplier_certificate,
     transport_document_reference: form.transport_document_reference,
     transport_document_type: undefined,
     delivery_type: form.delivery_type,
-    delivery_date: form.delivery_date,
+    delivery_date: form.delivery_date ?? "",
     carbure_delivery_site_id:
       form.delivery_site instanceof Object
         ? form.delivery_site.customs_id
@@ -217,8 +217,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
     unknown_delivery_site:
       typeof form.delivery_site === "string" ? form.delivery_site : undefined,
     delivery_site_country_id: form.delivery_site_country?.code_pays,
-    carbure_client_id:
-      form.client instanceof Object ? form.client.id : undefined,
+    carbure_client_id: form.client instanceof Object ? `${form.client.id}` : "",
     unknown_client: typeof form.client === "string" ? form.client : undefined,
   }
 }

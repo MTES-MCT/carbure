@@ -1,4 +1,5 @@
 import api, { Api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
 import { LotDetails, StockDetails } from "./types"
 
@@ -30,8 +31,20 @@ export function toggleWarning(
   })
 }
 
+// export function getStockDetails(entity_id: number, stock_id: number) {
+//   return api.get<Api<StockDetails>>("/transactions/stocks/details", {
+//     params: { entity_id, stock_id },
+//   })
+// }
+
+// BUG : le typage back de l'endpoint est incorrect
 export function getStockDetails(entity_id: number, stock_id: number) {
-  return api.get<Api<StockDetails>>("/transactions/stocks/details", {
-    params: { entity_id, stock_id },
-  })
+  return apiFetch
+    .GET("/transactions/stocks/{id}/", {
+      params: { query: { entity_id }, path: { id: stock_id } },
+    })
+    .then((res) => ({
+      ...res,
+      data: res.data as unknown as StockDetails,
+    }))
 }

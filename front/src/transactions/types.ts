@@ -310,20 +310,7 @@ export interface StockQuery {
   [Filter.DeliverySites]?: string[]
 }
 
-export interface StockPayload {
-  stock_id: string | undefined
-  volume: number | undefined
-  supplier_certificate: string | undefined
-  transport_document_type: string | undefined
-  transport_document_reference: string | undefined
-  delivery_date: string | undefined
-  carbure_delivery_site_id: string | undefined
-  unknown_delivery_site: string | undefined
-  delivery_site_country_id: string | undefined
-  delivery_type: string | undefined
-  carbure_client_id: number | undefined
-  unknown_client: string | undefined
-}
+export type StockPayload = apiTypes["SplitCreate"]
 
 export interface TransformETBEPayload {
   stock_id: number

@@ -47,10 +47,14 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
     },
   })
 
-  const stocksData = stocks.result?.data.data
-  const stockList = stocksData?.stocks ?? []
+  const stocksData = stocks.result?.data
+  // @ts-ignore temporary fix
+  const stockList = stocksData?.results ?? []
+  // @ts-ignore temporary fix
   const ids = stocksData?.ids ?? EMPTY
-  const count = stocksData?.returned ?? 0
+  // @ts-ignore temporary fix
+  const count = stocksData?.count ?? 0
+  // @ts-ignore temporary fix
   const total = stocksData?.total ?? 0
 
   const showStockDetails = (stock: Stock) => ({

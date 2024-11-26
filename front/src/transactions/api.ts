@@ -22,6 +22,7 @@ const QUERY_RESET: Partial<LotQuery> = {
   direction: undefined,
 }
 
+// BUG
 export function getYears(entity_id: number) {
   return apiFetch
     .GET("/transactions/years", {
@@ -46,15 +47,12 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 // ENDPOINTS FOR LOTS
-
+// BUG
 export function getLots(query: LotQuery) {
   return api.get<Api<LotList>>("/transactions/lots", { params: query })
 }
 
-// export function getLots(query: LotQuery) {
-//   return apiFetch.GET("/transactions/lots/", { params: { query } })
-// }
-
+// BUG
 export function importLots(entity_id: number, file: File) {
   return api.post<Api<void>>("/transactions/lots/add-excel", {
     entity_id,
@@ -62,6 +60,7 @@ export function importLots(entity_id: number, file: File) {
   })
 }
 
+// BUG
 export function downloadLots(query: LotQuery, selection: number[]) {
   return download("/transactions/lots", {
     ...selectionOrQuery(
@@ -72,6 +71,7 @@ export function downloadLots(query: LotQuery, selection: number[]) {
   })
 }
 
+// BUG
 export function getLotsSummary(
   query: LotQuery,
   selection: number[],
@@ -82,33 +82,41 @@ export function getLotsSummary(
   })
 }
 
+// BUG
 export function getDeclarations(entity_id: number, year: number) {
   return api.get<Api<DeclarationSummary[]>>("/transactions/declarations", {
     params: { entity_id, year },
   })
 }
 
+// Fonctionne mais pas testé dans des conditions réelles
 export function validateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/transactions/declarations/validate", {
-    entity_id,
-    period,
+  return apiFetch.POST("/transactions/lots/declarations-validate/", {
+    params: { query: { entity_id } },
+    body: { period },
   })
 }
 
+// Non testé
 export function invalidateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/transactions/declarations/invalidate", {
-    entity_id,
-    period,
+  return apiFetch.POST("/transactions/lots/declarations-invalidate/", {
+    params: { query: { entity_id } },
+    body: { period },
   })
 }
 
+// BUG
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
     .get<Api<string[]>>("/transactions/lots/filters", { params })
-    .then((res) => res.data.data ?? [])
+    .then((res) => {
+      // @ts-ignore temporary fix
+      return res.data ? (res.data as string[]) : []
+    })
 }
 
+// endpoint non trouvé
 export function duplicateLots(entity_id: number, lot_id: number) {
   return api.post<Api<void>>("/transactions/lots/duplicate", {
     entity_id,
@@ -116,6 +124,7 @@ export function duplicateLots(entity_id: number, lot_id: number) {
   })
 }
 
+// BUG
 export function sendLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>(
     "/transactions/lots/send",
@@ -123,6 +132,7 @@ export function sendLots(query: LotQuery, selection?: number[]) {
   )
 }
 
+// BUG
 export function acceptReleaseForConsumption(
   query: LotQuery,
   selection?: number[]
@@ -133,6 +143,7 @@ export function acceptReleaseForConsumption(
   )
 }
 
+// BUG
 export function acceptInStock(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>(
     "/transactions/lots/accept-in-stock",
@@ -140,6 +151,7 @@ export function acceptInStock(query: LotQuery, selection?: number[]) {
   )
 }
 
+// BUG
 export function acceptForTrading(
   query: LotQuery,
   selection: number[] | undefined,
@@ -158,6 +170,7 @@ export function acceptForTrading(
   })
 }
 
+// BUG
 export function acceptForProcessing(
   query: LotQuery,
   selection: number[] | undefined,
@@ -169,6 +182,7 @@ export function acceptForProcessing(
   })
 }
 
+// BUG
 export function acceptForBlending(
   query: LotQuery,
   selection: number[] | undefined
@@ -179,6 +193,7 @@ export function acceptForBlending(
   )
 }
 
+//BUG
 export function acceptForConsumption(
   query: LotQuery,
   selection: number[] | undefined
@@ -189,6 +204,7 @@ export function acceptForConsumption(
   )
 }
 
+// BUG
 export function acceptForDirectDelivery(
   query: LotQuery,
   selection: number[] | undefined
@@ -199,6 +215,7 @@ export function acceptForDirectDelivery(
   )
 }
 
+// BUG
 export function acceptForExport(
   query: LotQuery,
   selection: number[] | undefined
@@ -209,6 +226,7 @@ export function acceptForExport(
   )
 }
 
+// BUG
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>(
     "/transactions/lots/delete",
@@ -216,6 +234,7 @@ export function deleteLots(query: LotQuery, selection?: number[]) {
   )
 }
 
+// BUG
 export function rejectLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>(
     "/transactions/lots/reject",
@@ -223,34 +242,39 @@ export function rejectLots(query: LotQuery, selection?: number[]) {
   )
 }
 
+// OK
 export function requestFix(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/transactions/lots/request-fix", {
-    entity_id,
-    lot_ids,
+  return apiFetch.POST("/transactions/lots/request-fix/", {
+    params: { query: { entity_id } },
+    body: { lot_ids },
   })
 }
 
+// OK
 export function markAsFixed(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/transactions/lots/submit-fix", {
-    entity_id,
-    lot_ids,
+  return apiFetch.POST("/transactions/lots/submit-fix/", {
+    params: { query: { entity_id } },
+    body: { lot_ids },
   })
 }
 
+// OK
 export function approveFix(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/transactions/lots/approve-fix", {
-    entity_id,
-    lot_ids,
+  return apiFetch.POST("/transactions/lots/approuve-fix/", {
+    params: { query: { entity_id } },
+    body: { lot_ids },
   })
 }
 
+// Meme code que requestFix
 export function recallLots(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/transactions/lots/request-fix", {
-    entity_id,
-    lot_ids,
+  return apiFetch.POST("/transactions/lots/request-fix/", {
+    params: { query: { entity_id } },
+    body: { lot_ids },
   })
 }
 
+// BUG
 export async function commentLots(
   query: LotQuery,
   selection: number[] | undefined,
@@ -271,10 +295,12 @@ export function selectionOrQuery(query: LotQuery, selection?: number[]) {
 
 // ENDPOINTS FOR STOCKS
 
+// BUG
 export function getStocks(query: StockQuery) {
   return api.get<Api<StockList>>("/transactions/stocks", { params: query })
 }
 
+// BUG
 export function downloadStocks(query: StockQuery, selection: number[]) {
   return download("/transactions/stocks", {
     ...selectionOrQuery(
@@ -285,6 +311,7 @@ export function downloadStocks(query: StockQuery, selection: number[]) {
   })
 }
 
+// BUG
 export function getStockSummary(
   query: StockQuery,
   selection: number[],
@@ -295,6 +322,7 @@ export function getStockSummary(
   })
 }
 
+// BUG
 export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
@@ -302,6 +330,7 @@ export function getStockFilters(field: Filter, query: StockQuery) {
     .then((res) => res.data.data ?? [])
 }
 
+// BUG
 export function splitStock(entity_id: number, payload: StockPayload[]) {
   return api.post("/transactions/stocks/split", {
     entity_id,
@@ -309,35 +338,43 @@ export function splitStock(entity_id: number, payload: StockPayload[]) {
   })
 }
 
+// Non testé
 export function transformETBE(
   entity_id: number,
   payload: TransformETBEPayload[]
 ) {
-  return api.post("/transactions/stocks/transform", {
-    entity_id,
-    payload: JSON.stringify(payload),
+  return apiFetch.POST("/transactions/stocks/transform/", {
+    params: { query: { entity_id } },
+    body: { payload: JSON.stringify(payload) },
   })
 }
 
+// Non testé
 export function cancelTransformations(entity_id: number, stock_ids: number[]) {
-  return api.post("/transactions/stocks/cancel-transformation", {
-    entity_id,
-    stock_ids,
+  return apiFetch.POST("/transactions/stocks/cancel-transformation/", {
+    params: { query: { entity_id } },
+    body: { stock_ids },
   })
 }
 
+// Non testé
 export function flushStocks(
   entity_id: number,
   stock_ids: number[],
   free_field: string
 ) {
-  return api.post("/transactions/stocks/flush", {
-    entity_id,
-    stock_ids,
-    free_field,
+  return apiFetch.POST("/transactions/stocks/flush/", {
+    params: { query: { entity_id } },
+    body: { stock_ids, free_field },
   })
 }
 
+// export function cancelAcceptLots(entity_id: number, lot_ids: number[]) {
+//   return api.post("/transactions/lots/cancel-accept", { entity_id, lot_ids })
+// }
 export function cancelAcceptLots(entity_id: number, lot_ids: number[]) {
-  return api.post("/transactions/lots/cancel-accept", { entity_id, lot_ids })
+  return apiFetch.POST("/transactions/lots/cancel-accept/", {
+    params: { query: { entity_id } },
+    body: { lot_ids },
+  })
 }

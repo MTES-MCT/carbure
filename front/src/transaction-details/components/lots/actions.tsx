@@ -31,7 +31,7 @@ export const LotActions = ({
 
   const status = lot.lot_status
   const correction = lot.correction_status
-
+  console.log("lot", lot)
   return (
     <Fragment>
       {status === "DRAFT" && <SendOneButton lot={lot} disabled={!canSave} />}

@@ -60,13 +60,20 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
     },
   })
 
-  const lotsData = lots.result?.data.data
-  const lotList = lotsData?.lots ?? []
+  const lotsData = lots.result?.data
+  // @ts-ignore temporary fix
+  const lotList = lotsData?.results ?? []
+  // @ts-ignore temporary fix
   const ids = lotsData?.ids ?? []
+  // @ts-ignore temporary fix
   const lotErrors = lotsData?.errors ?? {}
-  const count = lotsData?.returned ?? 0
+  // @ts-ignore temporary fix
+  const count = lotsData?.count ?? 0
+  // @ts-ignore temporary fix
   const total = lotsData?.total ?? 0
+  // @ts-ignore temporary fix
   const totalErrors = lotsData?.total_errors ?? 0
+  // @ts-ignore temporary fix
   const totalDeadline = lotsData?.total_deadline ?? 0
 
   const trackShowLotDetails = (lot: Lot) => {
