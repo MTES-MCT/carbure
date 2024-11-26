@@ -1,0 +1,7 @@
+.navigation-layout {
+  display: flex;
+  flex-direction: column;
+}
+.navigation-layout.authenticated {
+  height: 100vh;
+}
