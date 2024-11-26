@@ -2,10 +2,10 @@ from django.http import JsonResponse
 
 from carbure.tasks import background_bulk_scoring
 from core.decorators import check_admin_rights
-from core.models import CarbureLot, EntityCertificate
+from core.models import CarbureLot, EntityCertificate, ExternalAdminRights
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def check_entity_certificate(request):
     entity_certificate_id = request.POST.get("entity_certificate_id", False)
     if not entity_certificate_id:
