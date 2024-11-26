@@ -12,6 +12,7 @@ from docx.shared import Pt
 
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.models import (
     DoubleCountingApplication,
 )
@@ -146,7 +147,7 @@ def check_has_dechets_industriels(application):
     return application.production.filter(feedstock__code="DECHETS_INDUSTRIELS").exists()
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def export_dca(request):
     application_id = request.GET.get("dca_id", False)
     dechets_industriels = request.GET.get("di", "")

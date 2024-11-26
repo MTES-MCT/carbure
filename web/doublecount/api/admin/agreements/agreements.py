@@ -10,6 +10,7 @@ from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationPublicSerializer, DoubleCountingRegistrationSerializer
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.helpers import get_quotas
 
 
@@ -23,7 +24,7 @@ class AgreementForm(forms.Form):
     direction = forms.CharField(required=False)
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def get_agreements(request, *args, **kwargs):
     sort_form = AgreementForm(request.GET)
     as_excel_file = request.GET.get("as_excel_file") == "true"

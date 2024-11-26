@@ -3,12 +3,13 @@ import json
 from django.http import JsonResponse
 
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.models import (
     DoubleCountingProduction,
 )
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def update_approved_quotas(request):
     approved_quotas = request.POST.get("approved_quotas", False)
 

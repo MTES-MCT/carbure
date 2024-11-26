@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.models import (
     DoubleCountingApplication,
 )
@@ -18,7 +19,7 @@ class DoubleCountingApplicationError:
     APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND"
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def get_application_details(request, *args, **kwargs):
     application_id = request.GET.get("dca_id", None)
     export = request.GET.get("export", False)

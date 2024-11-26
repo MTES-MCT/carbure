@@ -7,7 +7,8 @@ from django.db.models.query_utils import Q
 
 from certificates.models import DoubleCountingRegistration
 from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_user_rights
+from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.models import DoubleCountingApplication
 
 
@@ -16,7 +17,7 @@ class SafSnapshotError:
     SNAPSHOT_FAILED = "SNAPSHOT_FAILED"
 
 
-@check_user_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def get_snapshot(request, *args, **kwargs):
     current_year = datetime.now().year
 
