@@ -47,6 +47,8 @@ class Operation(models.Model):
         verbose_name_plural = "Opérations"
 
     def is_credit(self, entity):
+        if self.credited_entity is None:
+            return False
         return self.credited_entity.id == int(entity)
 
 

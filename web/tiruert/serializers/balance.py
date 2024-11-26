@@ -9,12 +9,12 @@ class BalanceSerializer(serializers.ModelSerializer):
         fields = [
             "customs_category",
             "biofuel",
-            "credit",
-            "debit",
+            "volume",
+            "ghg",
         ]
 
-    credit = serializers.FloatField()
-    debit = serializers.FloatField()
+    volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
+    ghg = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
 
     @classmethod
     def transform_balance_data(cls, balance_dict, entity_id):
@@ -22,8 +22,14 @@ class BalanceSerializer(serializers.ModelSerializer):
             {
                 "customs_category": key[0],
                 "biofuel": key[1],
-                "credit": value["credit"],
-                "debit": value["debit"],
+                "volume": {
+                    "credit": value["volume"]["credit"],
+                    "debit": value["volume"]["debit"],
+                },
+                "ghg": {
+                    "credit": value["ghg"]["credit"],
+                    "debit": value["ghg"]["debit"],
+                },
             }
             for key, value in balance_dict.items()
         ]
@@ -32,8 +38,8 @@ class BalanceSerializer(serializers.ModelSerializer):
 
 class LotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
-    credit = serializers.FloatField()
-    debit = serializers.FloatField()
+    volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
+    ghg = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
 
 
 class BalanceByLotSerializer(serializers.ModelSerializer):
@@ -63,7 +69,17 @@ class BalanceByLotSerializer(serializers.ModelSerializer):
                 }
 
             grouped_balance[group_key]["lots"].append(
-                {"lot": lot_id, "credit": value["credit"], "debit": value["debit"]},
+                {
+                    "lot": lot_id,
+                    "volume": {
+                        "credit": value["volume"]["credit"],
+                        "debit": value["volume"]["debit"],
+                    },
+                    "ghg": {
+                        "credit": value["ghg"]["credit"],
+                        "debit": value["ghg"]["debit"],
+                    },
+                },
             )
 
         return list(grouped_balance.values())

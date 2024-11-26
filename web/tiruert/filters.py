@@ -21,7 +21,7 @@ class OperationFilter(FilterSet):
         fields = ["date_from", "date_to"]
 
     def filter_entity(self, queryset, name, value):
-        return queryset.filter(Q(credited_entity=value) | Q(debited_entity__userrights__user=value)).distinct()
+        return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
 
     def filter_sector(self, queryset, name, value):
         if value == "ESSENCE":
