@@ -36,6 +36,8 @@ const EntityList = () => {
   const notify = useNotify()
   const entity = useEntity()
 
+  const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
+
   const handleEntityAdded = (name: string) => {
     notify(
       t("La société {{name}} a bien été ajoutée.", {
@@ -71,7 +73,7 @@ const EntityList = () => {
         variant="sticky"
         tabs={compact([
           { key: "entities", label: t("Récapitulatif") },
-          entity.isAdmin && {
+          (entity.isAdmin || isAdminDC) && {
             key: "certificates",
             label: t("Certificats"),
           },
@@ -87,7 +89,7 @@ const EntityList = () => {
           onChange={setSearch}
         />
         {tab === "entities" && <EntitySummary search={search} />}
-        {entity.isAdmin && tab === "certificates" && (
+        {(entity.isAdmin || isAdminDC) && tab === "certificates" && (
           <Certificates search={search} />
         )}
       </section>
