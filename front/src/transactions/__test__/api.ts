@@ -98,8 +98,8 @@ export const okSendLot = http.post("/api/transactions/lots/send", () => {
     lots.total = 0
   })
   Data.set("snapshot", (snapshot: Snapshot) => {
-    snapshot.lots.draft -= 1
-    snapshot.lots.out_total += 1
+    snapshot.draft -= 1
+    snapshot.out_total += 1
   })
   return HttpResponse.json({ status: "success" })
 })

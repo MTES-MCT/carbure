@@ -9,7 +9,7 @@ import useEntity from "carbure/hooks/entity"
 
 interface CategorySwitcherProps {
   category: string
-  count: Snapshot["lots"] | undefined
+  count: Snapshot | undefined
   onSwitch: (category: string) => void
 }
 
@@ -168,12 +168,12 @@ export function getDefaultCategory(
   if (snapshot === undefined) return "pending"
 
   if (status === "drafts") {
-    if (snapshot.lots.draft_imported > 0) return "imported"
-    else if (snapshot.lots.draft_stocks > 0) return "stocks"
+    if (snapshot.draft_imported > 0) return "imported"
+    else if (snapshot.draft_stocks > 0) return "stocks"
     else return "imported"
   }
 
-  const count = snapshot.lots
+  const count = snapshot
 
   let pending = 0
   let tofix = 0

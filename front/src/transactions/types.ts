@@ -6,7 +6,7 @@ import {
   Feedstock,
   ProductionSite,
 } from "carbure/types"
-
+import { apiTypes } from "common/services/api-fetch.types"
 export interface Lot {
   id: number
   year: number
@@ -119,21 +119,7 @@ export interface StockList {
   ids: number[]
 }
 
-export interface Snapshot {
-  lots: {
-    draft: number
-    draft_imported: number
-    draft_stocks: number
-    in_total: number
-    in_pending: number
-    in_tofix: number
-    stock_total: number
-    stock: number
-    out_total: number
-    out_pending: number
-    out_tofix: number
-  }
-}
+export type Snapshot = apiTypes["SnapshotReponse"]
 
 export interface Declaration {
   id: number

@@ -12,7 +12,8 @@ import { DeclarationButton, DeclarationDialog } from "./actions/declaration"
 import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
-import useYears from "common/hooks/years"
+import useYears from "common/hooks/years-2"
+import { apiTypes } from "common/services/api-fetch.types"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -26,7 +27,9 @@ export const Transactions = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshotData = snapshot.result?.data.data
+  // Endpoint returns a different type if we are admin or not
+  // In our case, this is not an admin page, so we can safely cast to the expected type
+  const snapshotData = snapshot.result?.data as apiTypes["SnapshotReponse"]
 
   // common props for subroutes
   const props = { year: years.selected, snapshot: snapshotData }
@@ -54,7 +57,7 @@ export const Transactions = () => {
           </section>
 
           <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
+            <StatusTabs loading={snapshot.loading} count={snapshotData} />
           </section>
         </header>
 

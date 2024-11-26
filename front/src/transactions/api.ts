@@ -1,11 +1,11 @@
 import { Entity } from "carbure/types"
 import { api, Api, download } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import { Option } from "common/utils/normalize"
 import {
   LotList,
   LotQuery,
   StockQuery,
-  Snapshot,
   Filter,
   StockList,
   LotSummary,
@@ -23,14 +23,25 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/transactions/years", {
-    params: { entity_id },
-  })
+  return apiFetch
+    .GET("/transactions/years", {
+      params: {
+        query: {
+          entity_id,
+        },
+      },
+    })
+
+    .then((res) => ({
+      ...res,
+      // @ts-ignore temporary fix
+      data: res?.data ? (res?.data as number[]) : [],
+    }))
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/transactions/snapshot", {
-    params: { entity_id, year },
+  return apiFetch.GET("/transactions/snapshot", {
+    params: { query: { entity_id, year } },
   })
 }
 
@@ -39,6 +50,10 @@ export function getSnapshot(entity_id: number, year: number) {
 export function getLots(query: LotQuery) {
   return api.get<Api<LotList>>("/transactions/lots", { params: query })
 }
+
+// export function getLots(query: LotQuery) {
+//   return apiFetch.GET("/transactions/lots/", { params: { query } })
+// }
 
 export function importLots(entity_id: number, file: File) {
   return api.post<Api<void>>("/transactions/lots/add-excel", {

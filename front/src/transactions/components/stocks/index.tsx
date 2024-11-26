@@ -73,7 +73,7 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
 
       <section>
         <SearchBar
-          count={snapshot?.lots}
+          count={snapshot}
           search={state.search}
           category={state.category}
           query={query}

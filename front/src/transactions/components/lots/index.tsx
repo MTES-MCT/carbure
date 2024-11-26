@@ -98,7 +98,7 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
 
       <section>
         <SearchBar
-          count={snapshot?.lots}
+          count={snapshot}
           search={state.search}
           category={state.category}
           query={query}

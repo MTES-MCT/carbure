@@ -4,6 +4,124 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
+  /api/apikey/:
+    get:
+      operationId: apikey_list
+      parameters:
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - apikey
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAPIKeyListList"
+          description: ""
+    post:
+      operationId: apikey_create
+      tags:
+        - apikey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIKey"
+          description: ""
+  /api/apikey/{id}/:
+    get:
+      operationId: apikey_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - apikey
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIKey"
+          description: ""
+  /api/apikey/{id}/revoke/:
+    post:
+      operationId: apikey_revoke_create
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - apikey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIKey"
+          description: ""
   /api/entities/{id}/enable/:
     post:
       operationId: entities_enable_create
@@ -1406,8 +1524,2966 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/transactions/lots/:
+    get:
+      operationId: transactions_lots_list
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - APIKeyAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedCarbureLotPublicList"
+          description: ""
+  /api/transactions/lots/{id}/:
+    get:
+      operationId: transactions_lots_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this CarbureLot.
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+          description: ""
+  /api/transactions/lots/{id}/duplicate/:
+    get:
+      operationId: transactions_lots_duplicate_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this CarbureLot.
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleOfAssignResponse.:
+                  value:
+                    status: success
+                  summary: Example of assign response.
+          description: ""
+  /api/transactions/lots/{id}/toggle-warning/:
+    post:
+      operationId: transactions_lots_toggle_warning_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this CarbureLot.
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToggleWarning"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ToggleWarning"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ToggleWarning"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleOfAssignResponse.:
+                  value:
+                    status: success
+                  summary: Example of assign response.
+          description: ""
+  /api/transactions/lots/{id}/update-lot/:
+    post:
+      operationId: transactions_lots_update_lot_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this CarbureLot.
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Lot"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Lot"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Lot"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleOfAssignResponse.:
+                  value:
+                    status: success
+                  summary: Example of assign response.
+          description: ""
+  /api/transactions/lots/accept-blending/:
+    post:
+      operationId: transactions_lots_accept_blending_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptBlending"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptBlending"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptBlending"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/accept-consumption/:
+    post:
+      operationId: transactions_lots_accept_consumption_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptConsumption"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptConsumption"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptConsumption"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleOfAssignResponse.:
+                  value:
+                    status: success
+                  summary: Example of assign response.
+          description: ""
+  /api/transactions/lots/accept-direct-delivery/:
+    post:
+      operationId: transactions_lots_accept_direct_delivery_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptDirectDelivery"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptDirectDelivery"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptDirectDelivery"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/accept-export/:
+    post:
+      operationId: transactions_lots_accept_export_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptExport"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptExport"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptExport"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/accept-in-stock/:
+    post:
+      operationId: transactions_lots_accept_in_stock_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptStock"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptStock"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptStock"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/accept-processing/:
+    post:
+      operationId: transactions_lots_accept_processing_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptProcessing"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptProcessing"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptProcessing"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/accept-rfc/:
+    post:
+      operationId: transactions_lots_accept_rfc_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptRFC"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptRFC"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptRFC"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/accept-trading/:
+    post:
+      operationId: transactions_lots_accept_trading_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptTrading"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AcceptTrading"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AcceptTrading"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/add/:
+    post:
+      operationId: transactions_lots_add_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLot"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CreateLot"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateLot"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - APIKeyAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+          description: ""
+  /api/transactions/lots/add-comment/:
+    post:
+      operationId: transactions_lots_add_comment_create
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddComment"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AddComment"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AddComment"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/add-excel/:
+    post:
+      operationId: transactions_lots_add_excel_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddExcel"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AddExcel"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AddExcel"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addExcelResponse"
+          description: ""
+  /api/transactions/lots/admin-declarations/:
+    get:
+      operationId: transactions_lots_admin_declarations_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: period
+          schema:
+            type: integer
+          description: Period
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeclarationSummary"
+          description: ""
+  /api/transactions/lots/approuve-fix/:
+    post:
+      operationId: transactions_lots_approuve_fix_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApproveFix"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApproveFix"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ApproveFix"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/bulk-create/:
+    post:
+      operationId: transactions_lots_bulk_create_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateLot"
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateLot"
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateLot"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - APIKeyAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkCreateResponse"
+          description: ""
+  /api/transactions/lots/cancel-accept/:
+    post:
+      operationId: transactions_lots_cancel_accept_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAccept"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CancelAccept"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CancelAccept"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/declarations/:
+    get:
+      operationId: transactions_lots_declarations_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    - period: 0
+                      lots: {}
+                      pending: 0
+                      declaration: {}
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/declarations-invalidate/:
+    post:
+      operationId: transactions_lots_declarations_invalidate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Invalidate"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Invalidate"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Invalidate"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/declarations-validate/:
+    post:
+      operationId: transactions_lots_declarations_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidateDeclaration"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ValidateDeclaration"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ValidateDeclaration"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/delete/:
+    post:
+      operationId: transactions_lots_delete_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteLots"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DeleteLots"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DeleteLots"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteLotsResponse"
+          description: ""
+  /api/transactions/lots/delete-many/:
+    post:
+      operationId: transactions_lots_delete_many_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteLotsMany"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DeleteLotsMany"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DeleteLotsMany"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteLotsManyResponse"
+          description: ""
+  /api/transactions/lots/export/:
+    get:
+      operationId: transactions_lots_export_retrieve
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: csv file.csv
+                  summary: Example of export response.
+          description: ""
+  /api/transactions/lots/filters/:
+    get:
+      operationId: transactions_lots_filters_retrieve
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
+  /api/transactions/lots/map/:
+    get:
+      operationId: transactions_lots_map_retrieve
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: file.html
+                  summary: Example of export response.
+          description: ""
+  /api/transactions/lots/mark-conform/:
+    post:
+      operationId: transactions_lots_mark_conform_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkConform"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/MarkConform"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MarkConform"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/mark-non-conform/:
+    post:
+      operationId: transactions_lots_mark_non_conform_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkNonConform"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/MarkNonConform"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MarkNonConform"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/reject/:
+    get:
+      operationId: transactions_lots_reject_retrieve
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/request-fix/:
+    post:
+      operationId: transactions_lots_request_fix_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestFix"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestFix"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestFix"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/send/:
+    post:
+      operationId: transactions_lots_send_create
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Send"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Send"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Send"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendResponse"
+          description: ""
+  /api/transactions/lots/submit-fix/:
+    post:
+      operationId: transactions_lots_submit_fix_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitFix"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SubmitFix"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SubmitFix"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/summary/:
+    get:
+      operationId: transactions_lots_summary_retrieve
+      parameters:
+        - in: query
+          name: added_by
+          schema:
+            type: string
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: conformity
+          schema:
+            type: string
+        - in: query
+          name: correction_status
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: deadline
+          schema:
+            type: boolean
+        - in: query
+          name: delivery_sites
+          schema:
+            type: string
+        - in: query
+          name: delivery_types
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: errors
+          schema:
+            type: string
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - in: query
+          name: invalid
+          schema:
+            type: boolean
+        - in: query
+          name: lot_status
+          schema:
+            type: string
+        - in: query
+          name: ml_scoring
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: scores
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - ALERTS
+              - DECLARATION
+              - DRAFTS
+              - IN
+              - LOTS
+              - OUT
+          description: |-
+            * `DRAFTS` - DRAFTS
+            * `IN` - IN
+            * `OUT` - OUT
+            * `DECLARATION` - DECLARATION
+            * `ALERTS` - ALERTS
+            * `LOTS` - LOTS
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SummaryResponse"
+          description: ""
+  /api/transactions/lots/template/:
+    get:
+      operationId: transactions_lots_template_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+              examples:
+                ExampleOfResponse.:
+                  value: csv file.csv
+                  summary: Example of response.
+          description: ""
+  /api/transactions/lots/toggle-pin/:
+    post:
+      operationId: transactions_lots_toggle_pin_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TogglePin"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TogglePin"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TogglePin"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/transactions/lots/update-many/:
+    post:
+      operationId: transactions_lots_update_many_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMany"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateMany"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateMany"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureLotPublic"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    updates:
+                      - node: {}
+                        diff: {}
+                    errors:
+                      - {}
+                  summary: Example of response.
+          description: ""
+  /api/transactions/snapshot:
+    get:
+      operationId: transactions_snapshot_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response200"
+          description: Response regular user or admin or auditor user
+  /api/transactions/stocks/:
+    get:
+      operationId: transactions_stocks_list
+      parameters:
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: blacklist
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: depots
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: query
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - APIKeyAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedCarbureStockPublicList"
+          description: ""
+  /api/transactions/stocks/{id}/:
+    get:
+      operationId: transactions_stocks_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this CarbureStock.
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockDetailsResponse"
+          description: ""
+  /api/transactions/stocks/cancel-transformation/:
+    post:
+      operationId: transactions_stocks_cancel_transformation_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCancelTransformation"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/StockCancelTransformation"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/StockCancelTransformation"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureStockPublic"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/transactions/stocks/filters/:
+    get:
+      operationId: transactions_stocks_filters_retrieve
+      parameters:
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: blacklist
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: depots
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: query
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureStockPublic"
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
+  /api/transactions/stocks/flush/:
+    post:
+      operationId: transactions_stocks_flush_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockFlush"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/StockFlush"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/StockFlush"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockFlush"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/transactions/stocks/split/:
+    post:
+      operationId: transactions_stocks_split_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Split"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Split"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Split"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - APIKeyAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitResponse"
+          description: ""
+  /api/transactions/stocks/summary/:
+    get:
+      operationId: transactions_stocks_summary_retrieve
+      parameters:
+        - in: query
+          name: biofuels
+          schema:
+            type: string
+        - in: query
+          name: blacklist
+          schema:
+            type: string
+        - in: query
+          name: clients
+          schema:
+            type: string
+        - in: query
+          name: countries_of_origin
+          schema:
+            type: string
+        - in: query
+          name: depots
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: feedstocks
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: periods
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - in: query
+          name: query
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: selection
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: suppliers
+          schema:
+            type: string
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StocksSummaryResponse"
+          description: ""
+  /api/transactions/stocks/template/:
+    get:
+      operationId: transactions_stocks_template_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+              examples:
+                ExampleOfResponse.:
+                  value: csv file.csv
+                  summary: Example of response.
+          description: ""
+  /api/transactions/stocks/transform/:
+    post:
+      operationId: transactions_stocks_transform_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Transform"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Transform"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Transform"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CarbureStockPublic"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/transactions/years:
+    get:
+      operationId: transactions_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - transactions
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Years"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    - "2020"
+                    - "2021"
+                    - "2022"
+                    - "2023"
+                    - "2024"
+                  summary: Example of response.
+          description: ""
 components:
   schemas:
+    APIKey:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          maxLength: 255
+    APIKeyList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 255
+        key:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        revoked:
+          type: boolean
+        last_used:
+          type: string
+          format: date-time
+          nullable: true
+        usage_count:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+      required:
+        - created_at
+        - id
+        - key
+    AcceptBlending:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    AcceptConsumption:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    AcceptDirectDelivery:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    AcceptExport:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    AcceptProcessing:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+        processing_entity_id:
+          type: integer
+      required:
+        - processing_entity_id
+        - selection
+    AcceptRFC:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    AcceptStock:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    AcceptTrading:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+        client_entity_id:
+          type: string
+        unknown_client:
+          type: string
+        certificate:
+          type: string
+      required:
+        - selection
+    AddComment:
+      type: object
+      properties:
+        comment:
+          type: string
+        is_visible_by_admin:
+          type: boolean
+          default: false
+        is_visible_by_auditor:
+          type: boolean
+          default: false
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - comment
+        - selection
+    AddExcel:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+      required:
+        - file
+    AdminSnapshotReponse:
+      type: object
+      properties:
+        alerts:
+          type: integer
+        lots:
+          type: integer
+        stocks:
+          type: integer
+      required:
+        - alerts
+        - lots
+        - stocks
+    ApproveFix:
+      type: object
+      properties:
+        lot_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - lot_ids
     Biofuel:
       type: object
       properties:
@@ -1424,6 +4500,73 @@ components:
         - code
         - name
         - name_en
+    BulkCreateResponse:
+      type: object
+      properties:
+        lots:
+          type: integer
+        valid:
+          type: integer
+        invalid:
+          type: integer
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmbeddedGenericError"
+      required:
+        - errors
+        - invalid
+        - lots
+        - valid
+    CancelAccept:
+      type: object
+      properties:
+        lot_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - lot_ids
+    CarbureLotComment:
+      type: object
+      properties:
+        entity:
+          allOf:
+            - $ref: "#/components/schemas/Entity"
+          readOnly: true
+        user:
+          type: integer
+          nullable: true
+        comment_type:
+          $ref: "#/components/schemas/CommentTypeEnum"
+        comment_dt:
+          type: string
+          format: date-time
+          readOnly: true
+        comment:
+          type: string
+      required:
+        - comment
+        - comment_dt
+        - entity
+    CarbureLotEvent:
+      type: object
+      properties:
+        user:
+          type: string
+          readOnly: true
+        event_type:
+          $ref: "#/components/schemas/EventTypeEnum"
+        event_dt:
+          type: string
+          format: date-time
+          readOnly: true
+        metadata:
+          nullable: true
+      required:
+        - event_dt
+        - event_type
+        - user
     CarbureLotPublic:
       type: object
       properties:
@@ -1650,6 +4793,135 @@ components:
         - period
         - production_country
         - year
+    CarbureStockPublic:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          maxLength: 64
+        depot:
+          allOf:
+            - $ref: "#/components/schemas/Depot"
+          readOnly: true
+        carbure_client:
+          allOf:
+            - $ref: "#/components/schemas/Entity"
+          readOnly: true
+        remaining_volume:
+          type: number
+          format: double
+        remaining_weight:
+          type: number
+          format: double
+        remaining_lhv_amount:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        carbure_production_site:
+          allOf:
+            - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        unknown_production_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        carbure_supplier:
+          allOf:
+            - $ref: "#/components/schemas/Entity"
+          readOnly: true
+        unknown_supplier:
+          type: string
+          nullable: true
+          maxLength: 64
+        ghg_reduction:
+          type: number
+          format: double
+        ghg_reduction_red_ii:
+          type: number
+          format: double
+        initial_volume:
+          type: string
+          readOnly: true
+        delivery_date:
+          type: string
+          readOnly: true
+        period:
+          type: string
+          readOnly: true
+        initial_weight:
+          type: string
+          readOnly: true
+        initial_lhv_amount:
+          type: string
+          readOnly: true
+      required:
+        - biofuel
+        - carbure_client
+        - carbure_production_site
+        - carbure_supplier
+        - country_of_origin
+        - delivery_date
+        - depot
+        - feedstock
+        - id
+        - initial_lhv_amount
+        - initial_volume
+        - initial_weight
+        - period
+        - production_country
+    CarbureStockTransformationPublic:
+      type: object
+      properties:
+        transformation_type:
+          $ref: "#/components/schemas/TransformationTypeEnum"
+        source_stock:
+          allOf:
+            - $ref: "#/components/schemas/CarbureStockPublic"
+          readOnly: true
+        dest_stock:
+          allOf:
+            - $ref: "#/components/schemas/CarbureStockPublic"
+          readOnly: true
+        volume_deducted_from_source:
+          type: number
+          format: double
+        volume_destination:
+          type: number
+          format: double
+        metadata: {}
+        transformed_by:
+          type: integer
+          nullable: true
+        entity:
+          type: integer
+          nullable: true
+        transformation_dt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - dest_stock
+        - metadata
+        - source_stock
+        - transformation_dt
     CategoryEnum:
       enum:
         - CONV
@@ -1669,6 +4941,16 @@ components:
       properties:
         comment:
           type: string
+    CommentTypeEnum:
+      enum:
+        - REGULAR
+        - AUDITOR
+        - ADMIN
+      type: string
+      description: |-
+        * `REGULAR` - REGULAR
+        * `AUDITOR` - AUDITOR
+        * `ADMIN` - ADMIN
     CorrectionStatusEnum:
       enum:
         - NO_PROBLEMO
@@ -1679,6 +4961,22 @@ components:
         * `NO_PROBLEMO` - NO_PROBLEMO
         * `IN_CORRECTION` - IN_CORRECTION
         * `FIXED` - FIXED
+    Count:
+      type: object
+      properties:
+        drafts:
+          type: integer
+        output:
+          type: integer
+        input:
+          type: integer
+        corrections:
+          type: integer
+      required:
+        - corrections
+        - drafts
+        - input
+        - output
     Country:
       type: object
       properties:
@@ -1697,6 +4995,212 @@ components:
         - code_pays
         - name
         - name_en
+    CreateLot:
+      type: object
+      properties:
+        free_field:
+          type: string
+          nullable: true
+        carbure_stock_id:
+          type: string
+          nullable: true
+        delivery_date:
+          type: string
+          format: date
+          nullable: true
+        biofuel_code:
+          type: string
+          nullable: true
+        feedstock_code:
+          type: string
+          nullable: true
+        country_code:
+          type: string
+          nullable: true
+        production_site_certificate:
+          type: string
+          nullable: true
+        production_site_certificate_type:
+          type: string
+          nullable: true
+        carbure_production_site:
+          type: string
+          nullable: true
+        unknown_producer:
+          type: string
+        unknown_production_site:
+          type: string
+        production_country_code:
+          type: string
+          nullable: true
+        production_site_commissioning_date:
+          type: string
+          format: date
+          nullable: true
+        production_site_double_counting_certificate:
+          type: string
+          nullable: true
+        eec:
+          type: number
+          format: double
+          nullable: true
+        el:
+          type: number
+          format: double
+          nullable: true
+        ep:
+          type: number
+          format: double
+          nullable: true
+        etd:
+          type: number
+          format: double
+          nullable: true
+        eu:
+          type: number
+          format: double
+          nullable: true
+        esca:
+          type: number
+          format: double
+          nullable: true
+        eccs:
+          type: number
+          format: double
+          nullable: true
+        eccr:
+          type: number
+          format: double
+          nullable: true
+        eee:
+          type: number
+          format: double
+          nullable: true
+        delivery_type:
+          type: string
+          nullable: true
+        carbure_client_id:
+          type: integer
+          nullable: true
+        unknown_client:
+          type: string
+        quantity:
+          type: number
+          format: double
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        volume:
+          type: number
+          format: double
+          nullable: true
+        weight:
+          type: number
+          format: double
+          nullable: true
+        lhv_amount:
+          type: number
+          format: double
+          nullable: true
+        unknown_supplier:
+          type: string
+        supplier_certificate:
+          type: string
+          nullable: true
+        transport_document_type:
+          type: string
+          nullable: true
+        transport_document_reference:
+          type: string
+          nullable: true
+        carbure_delivery_site_depot_id:
+          type: integer
+          nullable: true
+        unknown_delivery_site:
+          type: string
+        delivery_site_country_code:
+          type: string
+          nullable: true
+        vendor_certificate:
+          type: string
+          nullable: true
+    DeclarationSummary:
+      type: object
+      properties:
+        declaration:
+          $ref: "#/components/schemas/SustainabilityDeclaration"
+        count:
+          $ref: "#/components/schemas/Count"
+      required:
+        - count
+        - declaration
+    DeleteLots:
+      type: object
+      properties:
+        dry_run:
+          type: boolean
+          default: false
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    DeleteLotsMany:
+      type: object
+      properties:
+        dry_run:
+          type: boolean
+          default: false
+        lots_ids:
+          type: array
+          items:
+            type: integer
+        comment:
+          type: string
+      required:
+        - lots_ids
+    DeleteLotsManyResponse:
+      type: object
+      properties:
+        deletions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeleteLotsNodeDiff"
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeleteLotsNodeDiff"
+      required:
+        - deletions
+        - updates
+    DeleteLotsNodeDiff:
+      type: object
+      properties:
+        node:
+          type: object
+          additionalProperties: {}
+        diff:
+          type: object
+          additionalProperties: {}
+      required:
+        - diff
+        - node
+    DeleteLotsResponse:
+      type: object
+      properties:
+        deletions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeleteLotsNodeDiff"
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeleteLotsNodeDiff"
+      required:
+        - deletions
+        - updates
     DeliveryTypeEnum:
       enum:
         - UNKNOWN
@@ -1759,6 +5263,18 @@ components:
         - country
         - id
         - name
+    EmbeddedGenericError:
+      type: object
+      properties:
+        index:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+      required:
+        - errors
+        - index
     Entity:
       type: object
       properties:
@@ -1886,6 +5402,42 @@ components:
           type: string
       required:
         - message
+    EventTypeEnum:
+      enum:
+        - CREATED
+        - UPDATED
+        - VALIDATED
+        - FIX_REQUESTED
+        - MARKED_AS_FIXED
+        - FIX_ACCEPTED
+        - ACCEPTED
+        - REJECTED
+        - RECALLED
+        - DECLARED
+        - DELETED
+        - DECLCANCEL
+        - RESTORED
+        - CANCELLED
+        - UPDATED_BY_ADMIN
+        - DELETED_BY_ADMIN
+      type: string
+      description: |-
+        * `CREATED` - CREATED
+        * `UPDATED` - UPDATED
+        * `VALIDATED` - VALIDATED
+        * `FIX_REQUESTED` - FIX_REQUESTED
+        * `MARKED_AS_FIXED` - MARKED_AS_FIXED
+        * `FIX_ACCEPTED` - FIX_ACCEPTED
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `RECALLED` - RECALLED
+        * `DECLARED` - DECLARED
+        * `DELETED` - DELETED
+        * `DECLCANCEL` - DECLCANCEL
+        * `RESTORED` - RESTORED
+        * `CANCELLED` - CANCELLED
+        * `UPDATED_BY_ADMIN` - UPDATED_BY_ADMIN
+        * `DELETED_BY_ADMIN` - DELETED_BY_ADMIN
     FeedStock:
       type: object
       properties:
@@ -1923,6 +5475,115 @@ components:
           type: integer
       required:
         - assigned_tickets_count
+    Invalidate:
+      type: object
+      properties:
+        period:
+          type: integer
+      required:
+        - period
+    Lot:
+      type: object
+      properties:
+        transport_document_type:
+          type: string
+        transport_document_reference:
+          type: string
+        quantity:
+          type: number
+          format: double
+          minimum: 0
+        volume:
+          type: number
+          format: double
+          minimum: 0
+        unit:
+          $ref: "#/components/schemas/UnitEnum"
+        biofuel_code:
+          type: string
+        feedstock_code:
+          type: string
+        country_code:
+          type: string
+        free_field:
+          type: string
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        carbure_producer_id:
+          type: integer
+        unknown_producer:
+          type: string
+        carbure_production_site:
+          type: array
+          items:
+            type: string
+        unknown_production_site:
+          type: string
+        production_site_certificate:
+          type: string
+        production_site_certificate_type:
+          type: string
+        production_country_code:
+          type: string
+        production_site_commissioning_date:
+          type: string
+          format: date
+        production_site_double_counting_certificate:
+          type: string
+        carbure_supplier_id:
+          type: integer
+        unknown_supplier:
+          type: string
+        supplier_certificate:
+          type: string
+        supplier_certificate_type:
+          type: string
+        vendor_certificate:
+          type: string
+        vendor_certificate_type:
+          type: string
+        delivery_type:
+          type: string
+        delivery_date:
+          type: string
+          format: date
+        carbure_client_id:
+          type: integer
+        unknown_client:
+          type: string
+        carbure_delivery_site_depot_id:
+          type: array
+          items:
+            type: string
+        unknown_delivery_site:
+          type: string
+        delivery_site_country_code:
+          type: string
     LotStatusEnum:
       enum:
         - DRAFT
@@ -1939,6 +5600,129 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    LotsInOut:
+      type: object
+      properties:
+        supplier:
+          type: string
+        client:
+          type: string
+        biofuel_code:
+          type: string
+        delivery_type:
+          type: string
+        volume_sum:
+          type: number
+          format: double
+        weight_sum:
+          type: number
+          format: double
+        lhv_amount_sum:
+          type: number
+          format: double
+        avg_ghg_reduction:
+          type: number
+          format: double
+        total:
+          type: integer
+        pending:
+          type: integer
+      required:
+        - avg_ghg_reduction
+        - biofuel_code
+        - lhv_amount_sum
+        - pending
+        - supplier
+        - total
+        - volume_sum
+        - weight_sum
+    MarkConform:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    MarkNonConform:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    PaginatedAPIKeyListList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/APIKeyList"
+    PaginatedCarbureLotPublicList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureLotPublic"
+    PaginatedCarbureStockPublicList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureStockPublic"
     PaginatedSafClientList:
       type: object
       required:
@@ -2076,6 +5860,19 @@ components:
         - id
         - name
         - producer
+    RequestFix:
+      type: object
+      properties:
+        lot_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - lot_ids
+    Response200:
+      oneOf:
+        - $ref: "#/components/schemas/SnapshotReponse"
+        - $ref: "#/components/schemas/AdminSnapshotReponse"
     SafClient:
       type: object
       properties:
@@ -2574,6 +6371,34 @@ components:
         - assigned_volume
         - id
         - total_volume
+    Send:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+      required:
+        - selection
+    SendResponse:
+      type: object
+      properties:
+        submitted:
+          type: integer
+        sent:
+          type: integer
+        auto_accepted:
+          type: integer
+        ignored:
+          type: integer
+        rejected:
+          type: integer
+      required:
+        - auto_accepted
+        - ignored
+        - rejected
+        - sent
+        - submitted
     SiteTypeEnum:
       enum:
         - OTHER
@@ -2598,6 +6423,110 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION SITE` - PRODUCTION SITE
         * `EFCA` - EFCA
+    SnapshotReponse:
+      type: object
+      properties:
+        draft:
+          type: integer
+        in_total:
+          type: integer
+        in_pending:
+          type: integer
+        in_tofix:
+          type: integer
+        stock:
+          type: integer
+        stock_total:
+          type: integer
+        out_total:
+          type: integer
+        out_pending:
+          type: integer
+        out_tofix:
+          type: integer
+        draft_imported:
+          type: integer
+        draft_stocks:
+          type: integer
+      required:
+        - draft
+        - draft_imported
+        - draft_stocks
+        - in_pending
+        - in_tofix
+        - in_total
+        - out_pending
+        - out_tofix
+        - out_total
+        - stock
+        - stock_total
+    Split:
+      type: object
+      properties:
+        payload:
+          type: array
+          items:
+            $ref: "#/components/schemas/SplitCreate"
+      required:
+        - payload
+    SplitCreate:
+      type: object
+      properties:
+        stock_id:
+          type: string
+          maxLength: 255
+        volume:
+          type: number
+          format: double
+        delivery_date:
+          type: string
+          format: date
+        supplier_certificate:
+          type: string
+          maxLength: 255
+        dispatch_date:
+          type: string
+          format: date
+        unknown_client:
+          type: string
+          maxLength: 255
+        unknown_delivery_site:
+          type: string
+          maxLength: 255
+        delivery_site_country_id:
+          type: string
+          maxLength: 255
+        transport_document_type:
+          type: string
+          maxLength: 100
+        delivery_type:
+          type: string
+          maxLength: 100
+        transport_document_reference:
+          type: string
+          maxLength: 255
+        carbure_delivery_site_id:
+          type: string
+          maxLength: 255
+        carbure_client_id:
+          type: string
+          maxLength: 255
+      required:
+        - delivery_date
+        - stock_id
+        - volume
+    SplitResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          default: success
+        data:
+          type: array
+          items:
+            type: integer
+      required:
+        - data
     StatusEnum:
       enum:
         - PENDING
@@ -2608,6 +6537,230 @@ components:
         * `PENDING` - En attente
         * `ACCEPTED` - Accepté
         * `REJECTED` - Refusé
+    StockCancelTransformation:
+      type: object
+      properties:
+        stock_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - stock_ids
+    StockDetailsResponse:
+      type: object
+      properties:
+        stock:
+          $ref: "#/components/schemas/CarbureStockPublic"
+        parent_lot:
+          allOf:
+            - $ref: "#/components/schemas/CarbureLotPublic"
+          nullable: true
+        parent_transformation:
+          allOf:
+            - $ref: "#/components/schemas/CarbureStockTransformationPublic"
+          nullable: true
+        children_lot:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureLotPublic"
+        children_transformation:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureStockTransformationPublic"
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureLotComment"
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureLotComment"
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarbureLotEvent"
+      required:
+        - children_lot
+        - children_transformation
+        - comments
+        - events
+        - parent_lot
+        - parent_transformation
+        - stock
+        - updates
+    StockFlush:
+      type: object
+      properties:
+        stock_ids:
+          type: array
+          items:
+            type: integer
+        free_field:
+          type: string
+          nullable: true
+      required:
+        - stock_ids
+    StockSummary:
+      type: object
+      properties:
+        supplier:
+          type: string
+        biofuel_code:
+          type: string
+        remaining_volume_sum:
+          type: number
+          format: double
+        remaining_weight_sum:
+          type: number
+          format: double
+        remaining_lhv_amount_sum:
+          type: number
+          format: double
+        avg_ghg_reduction:
+          type: number
+          format: double
+        total:
+          type: integer
+      required:
+        - avg_ghg_reduction
+        - biofuel_code
+        - remaining_lhv_amount_sum
+        - remaining_volume_sum
+        - remaining_weight_sum
+        - supplier
+        - total
+    StocksSummaryResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        total_remaining_volume:
+          type: number
+          format: double
+        total_remaining_weight:
+          type: number
+          format: double
+        total_remaining_lhv_amount:
+          type: number
+          format: double
+        stock:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockSummary"
+      required:
+        - count
+        - stock
+        - total_remaining_lhv_amount
+        - total_remaining_volume
+        - total_remaining_weight
+    SubmitFix:
+      type: object
+      properties:
+        lot_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - lot_ids
+    SummaryResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        total_volume:
+          type: number
+          format: double
+        total_weight:
+          type: number
+          format: double
+        total_lhv_amount:
+          type: number
+          format: double
+        in_:
+          type: array
+          items:
+            $ref: "#/components/schemas/LotsInOut"
+          title: "In "
+        out:
+          type: array
+          items:
+            $ref: "#/components/schemas/LotsInOut"
+        lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/LotsInOut"
+      required:
+        - count
+        - in_
+        - lots
+        - out
+        - total_lhv_amount
+        - total_volume
+        - total_weight
+    SustainabilityDeclaration:
+      type: object
+      properties:
+        entity:
+          $ref: "#/components/schemas/Entity"
+        declared:
+          type: boolean
+        checked:
+          type: boolean
+        deadline:
+          type: string
+          format: date
+        period:
+          type: string
+          readOnly: true
+        reminder_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+        - entity
+        - period
+    TogglePin:
+      type: object
+      properties:
+        selection:
+          type: array
+          items:
+            type: integer
+        notify_admin:
+          type: boolean
+          default: false
+        notify_auditor:
+          type: boolean
+          default: false
+      required:
+        - selection
+    ToggleWarning:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+            maxLength: 255
+        checked:
+          type: boolean
+          default: false
+      required:
+        - errors
+    Transform:
+      type: object
+      properties:
+        payload: {}
+      required:
+        - payload
+    TransformationTypeEnum:
+      enum:
+        - UNKNOWN
+        - ETH_ETBE
+      type: string
+      description: |-
+        * `UNKNOWN` - UNKNOWN
+        * `ETH_ETBE` - ETH_ETBE
     TransportDocumentTypeEnum:
       enum:
         - DAU
@@ -2624,7 +6777,167 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    UnitEnum:
+      enum:
+        - l
+        - kg
+        - mj
+      type: string
+      description: |-
+        * `l` - l
+        * `kg` - kg
+        * `mj` - pci
+    UpdateMany:
+      type: object
+      properties:
+        transport_document_type:
+          type: string
+        transport_document_reference:
+          type: string
+        quantity:
+          type: number
+          format: double
+          minimum: 0
+        volume:
+          type: number
+          format: double
+          minimum: 0
+        unit:
+          $ref: "#/components/schemas/UnitEnum"
+        biofuel_code:
+          type: string
+        feedstock_code:
+          type: string
+        country_code:
+          type: string
+        free_field:
+          type: string
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        carbure_producer_id:
+          type: integer
+        unknown_producer:
+          type: string
+        carbure_production_site:
+          type: array
+          items:
+            type: string
+        unknown_production_site:
+          type: string
+        production_site_certificate:
+          type: string
+        production_site_certificate_type:
+          type: string
+        production_country_code:
+          type: string
+        production_site_commissioning_date:
+          type: string
+          format: date
+        production_site_double_counting_certificate:
+          type: string
+        carbure_supplier_id:
+          type: integer
+        unknown_supplier:
+          type: string
+        supplier_certificate:
+          type: string
+        supplier_certificate_type:
+          type: string
+        vendor_certificate:
+          type: string
+        vendor_certificate_type:
+          type: string
+        delivery_type:
+          type: string
+        delivery_date:
+          type: string
+          format: date
+        carbure_client_id:
+          type: integer
+        unknown_client:
+          type: string
+        carbure_delivery_site_depot_id:
+          type: array
+          items:
+            type: string
+        unknown_delivery_site:
+          type: string
+        delivery_site_country_code:
+          type: string
+        dry_run:
+          type: boolean
+          default: false
+        lots_ids:
+          type: array
+          items:
+            type: integer
+        comment:
+          type: string
+      required:
+        - comment
+        - lots_ids
+    ValidateDeclaration:
+      type: object
+      properties:
+        period:
+          type: integer
+      required:
+        - period
+    Years:
+      type: object
+      properties:
+        years:
+          type: array
+          items:
+            type: integer
+      required:
+        - years
+    addExcelResponse:
+      type: object
+      properties:
+        lots:
+          type: integer
+        valid:
+          type: integer
+        invalid:
+          type: integer
+      required:
+        - invalid
+        - lots
+        - valid
   securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Include your API key in the Authorization header as
+        "Authorization: Api-Key {your_api_key}"'
+      example: "Authorization: Api-Key abc123xyz"
     basicAuth:
       type: http
       scheme: basic

@@ -13,7 +13,7 @@ import { compact } from "common/utils/collection"
 
 export interface StatusTabsProps {
   loading: boolean
-  count: Snapshot["lots"] | undefined
+  count: Snapshot | undefined
 }
 
 export const StatusTabs = ({
@@ -81,7 +81,7 @@ export const StatusTabs = ({
   )
 }
 
-const defaultCount: Snapshot["lots"] = {
+const defaultCount: Snapshot = {
   draft_imported: 0,
   draft_stocks: 0,
   draft: 0,

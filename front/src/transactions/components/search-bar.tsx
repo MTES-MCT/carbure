@@ -18,7 +18,7 @@ import {
 export interface SearchBarProps {
   category: string
   search: string | undefined
-  count: Snapshot["lots"] | undefined
+  count: Snapshot | undefined
   query: LotQuery
   selection: number[]
   onSearch: (search: string | undefined) => void

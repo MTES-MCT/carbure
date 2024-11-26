@@ -2,34 +2,30 @@ import { lot } from "transaction-details/__test__/data"
 import { DeliveryType, LotList, LotSummary, Snapshot } from "transactions/types"
 
 export const emptySnapshot: Snapshot = {
-  lots: {
-    draft: 0,
-    draft_imported: 0,
-    draft_stocks: 0,
-    in_total: 0,
-    in_pending: 0,
-    in_tofix: 0,
-    stock: 0,
-    stock_total: 0,
-    out_total: 0,
-    out_pending: 0,
-    out_tofix: 0,
-  },
+  draft: 0,
+  draft_imported: 0,
+  draft_stocks: 0,
+  in_total: 0,
+  in_pending: 0,
+  in_tofix: 0,
+  stock: 0,
+  stock_total: 0,
+  out_total: 0,
+  out_pending: 0,
+  out_tofix: 0,
 }
 export const snapshot: Snapshot = {
-  lots: {
-    draft_imported: 30,
-    draft_stocks: 0,
-    draft: 30,
-    in_total: 20,
-    in_pending: 0,
-    in_tofix: 0,
-    stock: 0,
-    stock_total: 0,
-    out_total: 10,
-    out_pending: 0,
-    out_tofix: 0,
-  },
+  draft_imported: 30,
+  draft_stocks: 0,
+  draft: 30,
+  in_total: 20,
+  in_pending: 0,
+  in_tofix: 0,
+  stock: 0,
+  stock_total: 0,
+  out_total: 10,
+  out_pending: 0,
+  out_tofix: 0,
 }
 
 export const emptyLots: LotList = {
