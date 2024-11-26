@@ -16,7 +16,9 @@ class UpdateRoleForm(forms.Form):
     role = forms.CharField()
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(
+    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.DOUBLE_COUNTING]
+)
 def update_user_role(request):
     form = UpdateRoleForm(request.POST)
 
