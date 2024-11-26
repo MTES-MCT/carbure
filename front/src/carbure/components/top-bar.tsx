@@ -178,7 +178,8 @@ const Navigation = ({ entity }: NavigationProps) => {
 
               (isAdmin ||
                 entity.hasAdminRight("AIRLINE") ||
-                entity.hasAdminRight("ELEC")) && {
+                entity.hasAdminRight("ELEC") ||
+                entity.hasAdminRight("DCA")) && {
                 key: "entities",
                 path: "entities",
                 label: t("Sociétés"),
