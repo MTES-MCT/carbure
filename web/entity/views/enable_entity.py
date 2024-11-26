@@ -36,7 +36,16 @@ from saf.serializers.schema import ErrorResponseSerializer
 )
 @api_view(["POST"])
 @permission_classes(
-    [IsAuthenticated, HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])]
+    [
+        IsAuthenticated,
+        HasAdminRights(
+            allow_external=[
+                ExternalAdminRights.AIRLINE,
+                ExternalAdminRights.ELEC,
+                ExternalAdminRights.DOUBLE_COUNTING,
+            ]
+        ),
+    ]
 )
 def enable_entity(request, company_id):
     entity_id = request.query_params.get("entity_id")
