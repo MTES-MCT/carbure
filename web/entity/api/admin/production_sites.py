@@ -1,10 +1,11 @@
 from django.http import JsonResponse
 
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from transactions.models import ProductionSite
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def get_entity_production_sites(request):
     company_id = request.GET.get("company_id", False)
 
