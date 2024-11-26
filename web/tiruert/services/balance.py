@@ -54,8 +54,8 @@ class BalanceService:
         # REFERENCE_EMISSION = 67.5
 
         # Target definition
-        target_change = -0.10  # as a fraction of the reference emissions in [0; 1]
-        target_emission = (1 + target_change) * target_emission
+        # target_change = -0.10  # as a fraction of the reference emissions in [0; 1]
+        # target_emission = (1 + target_change) * REFERENCE_EMISSION
 
         if batches_volumes.sum() < target_volume:
             raise ValueError("Insufficient input volumes!")
