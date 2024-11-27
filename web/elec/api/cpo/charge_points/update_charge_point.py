@@ -4,7 +4,6 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
-from elec.models import ElecChargePointApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.serializers.elec_charge_point import ElecChargePointUpdateSerializer
 from elec.services.transport_data_gouv import TransportDataGouv
@@ -35,7 +34,7 @@ def update_charge_point(request, entity, entity_id):
     if "measure_reference_point_id" in validated_data:
         return ErrorResponse(400, ChargePointUpdateError.CP_CANNOT_BE_UPDATED)
 
-    if cp.application.status == ElecChargePointApplication.AUDIT_IN_PROGRESS:
+    if not cp.is_updatable():
         return ErrorResponse(400, ChargePointUpdateError.AUDIT_IN_PROGRESS)
 
     if not TransportDataGouv.is_check_point_in_tdg(validated_data["charge_point_id"]):

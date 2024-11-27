@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+  "/api/entities/{id}/enable/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_enable_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/saf/clients/": {
     parameters: {
       query?: never
@@ -424,28 +440,15 @@ export interface components {
     Depot: {
       readonly id: number
       name: string
-      city?: string | null
-      depot_id: string
+      city?: string
+      customs_id?: string
       readonly country: components["schemas"]["Country"]
-      depot_type?: components["schemas"]["DepotTypeEnum"]
+      site_type?: components["schemas"]["SiteTypeEnum"]
       address?: string
       postal_code?: string
       gps_coordinates?: string | null
-      accise?: string | null
+      accise?: string
     }
-    /**
-     * @description * `OTHER` - Autre
-     *     * `EFS` - EFS
-     *     * `EFPE` - EFPE
-     *     * `OIL DEPOT` - OIL DEPOT
-     *     * `BIOFUEL DEPOT` - BIOFUEL DEPOT
-     *     * `HEAT PLANT` - HEAT PLANT
-     *     * `POWER PLANT` - POWER PLANT
-     *     * `COGENERATION PLANT` - COGENERATION PLANT
-     *     * `EFCA` - EFCA
-     * @enum {string}
-     */
-    DepotTypeEnum: DepotTypeEnum
     Entity: {
       readonly id: number
       name: string
@@ -580,11 +583,11 @@ export interface components {
       name: string
       readonly country: components["schemas"]["Country"]
       /** Format: date */
-      date_mise_en_service: string
+      date_mise_en_service?: string | null
       ges_option?: components["schemas"]["GesOptionEnum"]
       eligible_dc?: boolean
-      dc_reference?: string | null
-      site_id?: string
+      dc_reference?: string
+      site_siret?: string
       address?: string
       city?: string
       postal_code?: string
@@ -775,6 +778,20 @@ export interface components {
       assigned_volume: number
     }
     /**
+     * @description * `OTHER` - Autre
+     *     * `EFS` - EFS
+     *     * `EFPE` - EFPE
+     *     * `OIL DEPOT` - OIL DEPOT
+     *     * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+     *     * `HEAT PLANT` - HEAT PLANT
+     *     * `POWER PLANT` - POWER PLANT
+     *     * `COGENERATION PLANT` - COGENERATION PLANT
+     *     * `PRODUCTION SITE` - PRODUCTION SITE
+     *     * `EFCA` - EFCA
+     * @enum {string}
+     */
+    SiteTypeEnum: SiteTypeEnum
+    /**
      * @description * `PENDING` - En attente
      *     * `ACCEPTED` - Accepté
      *     * `REJECTED` - Refusé
@@ -800,6 +817,39 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  entities_enable_create: {
+    parameters: {
+      query: {
+        /** @description The id of the admin entity enabling the company */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Entity. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"]
+        }
+      }
+    }
+  }
   saf_clients_list: {
     parameters: {
       query?: {
@@ -808,6 +858,8 @@ export interface operations {
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         /** @description A search term. */
         search?: string
       }
@@ -923,6 +975,8 @@ export interface operations {
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         periods?: number[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1179,6 +1233,8 @@ export interface operations {
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         periods?: number[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -1568,17 +1624,6 @@ export enum DeliveryTypeEnum {
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
 }
-export enum DepotTypeEnum {
-  OTHER = "OTHER",
-  EFS = "EFS",
-  EFPE = "EFPE",
-  OIL_DEPOT = "OIL DEPOT",
-  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
-  HEAT_PLANT = "HEAT PLANT",
-  POWER_PLANT = "POWER PLANT",
-  COGENERATION_PLANT = "COGENERATION PLANT",
-  EFCA = "EFCA",
-}
 export enum EntityTypeEnum {
   Producer = "Producteur",
   Operator = "Op\u00E9rateur",
@@ -1608,6 +1653,18 @@ export enum PreferredUnitEnum {
   l = "l",
   kg = "kg",
   MJ = "MJ",
+}
+export enum SiteTypeEnum {
+  OTHER = "OTHER",
+  EFS = "EFS",
+  EFPE = "EFPE",
+  OIL_DEPOT = "OIL DEPOT",
+  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
+  HEAT_PLANT = "HEAT PLANT",
+  POWER_PLANT = "POWER PLANT",
+  COGENERATION_PLANT = "COGENERATION PLANT",
+  PRODUCTION_SITE = "PRODUCTION SITE",
+  EFCA = "EFCA",
 }
 export enum StatusEnum {
   PENDING = "PENDING",

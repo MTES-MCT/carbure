@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { EntityCertificate } from "carbure/types"
-import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
+import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { actionColumn, Cell } from "common/components/table"
 import Button from "common/components/button"
 import { Check, Cross } from "common/components/icons"
@@ -18,10 +18,16 @@ import useEntity from "carbure/hooks/entity"
 type CertificatesProps = {
   search?: string
   entity_id?: number
+  readOnly?: boolean
 }
+
 type CertificatFilter = "all" | "to_checked" | "rejected" | "checked"
 
-const Certificates = ({ search = "", entity_id }: CertificatesProps) => {
+const Certificates = ({
+  search = "",
+  entity_id,
+  readOnly,
+}: CertificatesProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -46,8 +52,12 @@ const Certificates = ({ search = "", entity_id }: CertificatesProps) => {
   )
 
   return (
-    <>
-      <Grid>
+    <Panel id="certificates">
+      <header>
+        <h1>{t("Certificats")}</h1>
+      </header>
+
+      <section>
         <Select
           value={certificatsFilter}
           onChange={setCertificatsFilter}
@@ -72,80 +82,76 @@ const Certificates = ({ search = "", entity_id }: CertificatesProps) => {
             },
           ])}
         />
-      </Grid>
+      </section>
 
-      <Panel id="certificates">
-        <header>
-          <h1>{t("Certificats")}</h1>
-        </header>
-        {certData.length === 0 && (
-          <>
-            <section>
-              <NoResult />
-            </section>
-            <footer />
-          </>
-        )}
-        {certData.length > 0 && (
-          <Table
-            rows={certData}
-            onAction={(e) => {
-              if (e.certificate.download_link) {
-                window.open(e.certificate.download_link)
-              }
-            }}
-            columns={compact([
-              entity_id === undefined && {
-                key: "entities",
-                header: t("Société"),
-                orderBy: (e) => e.entity.name,
-                cell: (e) => (
-                  <Cell text={e.entity.name} sub={t(e.entity.entity_type)} />
-                ),
-              },
-              {
-                key: "id",
-                header: t("ID"),
-                orderBy: (c) => c.certificate.certificate_id,
-                cell: (c) => <Cell text={c.certificate.certificate_id} />,
-              },
-              {
-                key: "type",
-                header: t("Type"),
-                orderBy: (c) => c.certificate.certificate_type,
-                cell: (c) => <Cell text={c.certificate.certificate_type} />,
-              },
-              {
-                key: "holder",
-                header: t("Détenteur"),
-                orderBy: (c) => c.certificate.certificate_holder,
-                cell: (c) => <Cell text={c.certificate.certificate_holder} />,
-              },
-              {
-                key: "scope",
-                header: t("Périmètre"),
-                orderBy: (c) => c.certificate.scope ?? "-",
-                cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
-              },
-              {
-                key: "validity",
-                header: t("Validité"),
-                orderBy: (c) => c.certificate.valid_until,
-                cell: (c) => <Cell text={c.certificate.valid_until} />,
-              },
+      {certData.length === 0 && (
+        <>
+          <section>
+            <NoResult />
+          </section>
+          <footer />
+        </>
+      )}
+      {certData.length > 0 && (
+        <Table
+          rows={certData}
+          onAction={(e) => {
+            if (e.certificate.download_link) {
+              window.open(e.certificate.download_link)
+            }
+          }}
+          columns={compact([
+            entity_id === undefined && {
+              key: "entities",
+              header: t("Société"),
+              orderBy: (e) => e.entity.name,
+              cell: (e) => (
+                <Cell text={e.entity.name} sub={t(e.entity.entity_type)} />
+              ),
+            },
+            {
+              key: "id",
+              header: t("ID"),
+              orderBy: (c) => c.certificate.certificate_id,
+              cell: (c) => <Cell text={c.certificate.certificate_id} />,
+            },
+            {
+              key: "type",
+              header: t("Type"),
+              orderBy: (c) => c.certificate.certificate_type,
+              cell: (c) => <Cell text={c.certificate.certificate_type} />,
+            },
+            {
+              key: "holder",
+              header: t("Détenteur"),
+              orderBy: (c) => c.certificate.certificate_holder,
+              cell: (c) => <Cell text={c.certificate.certificate_holder} />,
+            },
+            {
+              key: "scope",
+              header: t("Périmètre"),
+              orderBy: (c) => c.certificate.scope ?? "-",
+              cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
+            },
+            {
+              key: "validity",
+              header: t("Validité"),
+              orderBy: (c) => c.certificate.valid_until,
+              cell: (c) => <Cell text={c.certificate.valid_until} />,
+            },
+            !readOnly &&
               actionColumn<EntityCertificate>((c) =>
                 compact([
                   !c.checked_by_admin && <CheckCertificate certificate={c} />,
                   !c.rejected_by_admin && <RejectCertificate certificate={c} />,
                 ])
               ),
-            ])}
-          />
-        )}
+          ])}
+        />
+      )}
 
-        {certificates.loading && <LoaderOverlay />}
-      </Panel>
-    </>
+      {certificates.loading && <LoaderOverlay />}
+    </Panel>
   )
 }
 

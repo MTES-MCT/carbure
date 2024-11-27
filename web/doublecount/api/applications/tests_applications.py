@@ -12,7 +12,7 @@ from doublecount.api.admin.applications.add import DoubleCountingAddError
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
-from producers.models import ProductionSite
+from transactions.models import ProductionSite
 
 
 class Endpoint:
@@ -30,6 +30,7 @@ class DoubleCountApplicationsTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -45,7 +46,7 @@ class DoubleCountApplicationsTest(TestCase):
         self.production_site.country = france
         self.production_site.city = "Paris"
         self.production_site.postal_code = "75000"
-        self.production_site.producer = self.producer
+        self.production_site.entitysite_set.update(entity=self.producer)
         self.production_site.save()
         self.requested_start_year = 2023
 

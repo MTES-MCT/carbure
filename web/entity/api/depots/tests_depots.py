@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Depot, Entity, Pays
+from core.models import Entity, Pays
 from core.tests_utils import setup_current_user
+from transactions.models import Depot
 
 
 class EntityDepotsTest(TestCase):
@@ -13,6 +14,7 @@ class EntityDepotsTest(TestCase):
         "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
@@ -31,7 +33,7 @@ class EntityDepotsTest(TestCase):
         assert len(data) == 0
         # add
         france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
-        depot, _ = Depot.objects.update_or_create(depot_id="TEST", name="toto", city="paris", country=france)
+        depot, _ = Depot.objects.update_or_create(customs_id="TEST", name="toto", city="paris", country=france)
         postdata = {
             "entity_id": self.admin.id,
             "delivery_site_id": depot.depot_id,
@@ -62,12 +64,12 @@ class EntityDepotsTest(TestCase):
             "city": "Paris",
             "country_code": self.pays.code_pays,
             "depot_type": "BIOFUEL DEPOT",
-            "depot_id": "123456789012345",
+            "depot_id": "123456789012345",  # keep "depot_id" to not change front api call (but named "customs_id" from now)
         }
         url_create = reverse("entity-depot-create")
         res = self.client.post(url_create, params)
         assert res.status_code == 200
-        new_depot = Depot.objects.get(depot_id="123456789012345")
+        new_depot = Depot.objects.get(customs_id="123456789012345")
         assert new_depot is not None
         assert new_depot.name == "Dépôt de test"
         assert new_depot.is_enabled is False

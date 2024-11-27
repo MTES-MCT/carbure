@@ -1,8 +1,8 @@
 from django.urls import reverse
 
-from saf.api.operator.tests.test_viewset import TestCase
 from saf.factories import SafTicketFactory, SafTicketSourceFactory
 from saf.models import SafTicket, SafTicketSource
+from saf.tests import TestCase
 
 
 class SafYearsTest(TestCase):

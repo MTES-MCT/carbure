@@ -1,19 +1,25 @@
 import Button from "common/components/button"
-import { Download } from "common/components/icons"
+import { Cross, Download } from "common/components/icons"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import { ElecMeterReadingsApplication } from "elec/types"
+import {
+  ElecAuditApplicationStatus,
+  ElecMeterReadingsApplication,
+} from "elec/types"
 import { useTranslation } from "react-i18next"
 import { compact } from "common/utils/collection"
 
 import { To } from "react-router-dom"
+import { Confirm } from "common/components/dialog"
+import { usePortal } from "common/components/portal"
 
 interface MeterReadingsApplicationsTableProps {
   applications: ElecMeterReadingsApplication[]
   onDownloadMeterReadingsApplication: (
     application: ElecMeterReadingsApplication
   ) => void
+  onDeleteMeterReadingsApplication?: (id: number) => Promise<unknown>
   rowLink?: (row: ElecMeterReadingsApplication) => To
   loading?: boolean
   displayCpo?: boolean
@@ -24,11 +30,13 @@ const MeterReadingsApplicationsTable: React.FC<
 > = ({
   applications,
   onDownloadMeterReadingsApplication,
+  onDeleteMeterReadingsApplication,
   rowLink,
   loading,
   displayCpo = false,
 }) => {
   const { t } = useTranslation()
+  const portal = usePortal()
 
   return (
     <Table
@@ -80,6 +88,32 @@ const MeterReadingsApplicationsTable: React.FC<
               title={t("Exporter les relevés trimestriels")}
               action={() => onDownloadMeterReadingsApplication(application)}
             />,
+            application.status === ElecAuditApplicationStatus.Pending &&
+              onDeleteMeterReadingsApplication && (
+                <Button
+                  captive
+                  variant="icon"
+                  icon={Cross}
+                  title={t("Supprimer le dossier")}
+                  action={() =>
+                    portal((close) => (
+                      <Confirm
+                        variant="danger"
+                        icon={Cross}
+                        title={t("Supprimer le dossier")}
+                        description={t(
+                          "Voulez-vous supprimer ce dossier d'inscription de relevés ?"
+                        )}
+                        confirm={t("Supprimer")}
+                        onConfirm={() =>
+                          onDeleteMeterReadingsApplication(application.id)
+                        }
+                        onClose={close}
+                      />
+                    ))
+                  }
+                />
+              ),
           ])
         ),
       ])}

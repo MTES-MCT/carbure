@@ -1,4 +1,5 @@
 import api, { Api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import {
   Entity,
   UserRightRequest,
@@ -117,5 +118,14 @@ export function rejectEntityCertificate(
   return api.post("/entity/admin/certificates/reject", {
     entity_id,
     entity_certificate_id,
+  })
+}
+
+export function enableCompany(entity_id: number, company_id: number) {
+  return apiFetch.POST("/entities/{id}/enable/", {
+    params: {
+      path: { id: company_id },
+      query: { entity_id },
+    },
   })
 }

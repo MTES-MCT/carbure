@@ -26,6 +26,12 @@ class SafTicketSourceAdmin(admin.ModelAdmin):
         "carbure_id",
         "added_by__name",
     ]
+    autocomplete_fields = [
+        "parent_lot",
+        "parent_ticket",
+        "carbure_producer",
+        "carbure_production_site",
+    ]
 
 
 @admin.register(SafTicket)

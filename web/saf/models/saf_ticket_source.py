@@ -40,7 +40,7 @@ class SafTicketSource(models.Model):
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
 
     carbure_production_site = models.ForeignKey(
-        "producers.ProductionSite", null=True, blank=True, default=None, on_delete=models.SET_NULL
+        "transactions.Site", null=True, blank=True, default=None, on_delete=models.SET_NULL
     )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(
@@ -88,6 +88,9 @@ def create_ticket_sources_from_lots(lots):
 
     # make sure we only have declared lots of SAF in the queryset
     saf_lots = lots.filter(lot_status__in=["ACCEPTED", "FROZEN"]).filter(biofuel__code__in=SAF)
+
+    if not saf_lots:
+        return []
 
     for lot in saf_lots:
         ticket_source_data.append(

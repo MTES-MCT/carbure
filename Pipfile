@@ -42,6 +42,7 @@ drf-spectacular = "*"
 drf-nested-routers = "*"
 undetected-chromedriver = "*"
 setuptools = "*"
+psutil = "*"
 
 [dev-packages]
 django-stubs = "*"

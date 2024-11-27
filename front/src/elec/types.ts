@@ -2,6 +2,11 @@ import { EntityPreview, UploadCheckReportInfo } from "carbure/types"
 import { ElecTransferCertificateStatus } from "./types-cpo"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 
+export enum ElecProvisionCertificateSource {
+  MANUAL = "MANUAL",
+  METER_READINGS = "METER_READINGS",
+  QUALICHARGE = "QUALICHARGE",
+}
 export interface ElecProvisionCertificatePreview {
   id: number
   cpo: EntityPreview
@@ -9,7 +14,7 @@ export interface ElecProvisionCertificatePreview {
   operating_unit: string
   quarter: number
   remaining_energy_amount: number
-  current_type: string
+  source?: ElecProvisionCertificateSource
   year: number
 }
 export interface ElecTransferCertificatePreview {

@@ -136,7 +136,7 @@ export const ProductionSiteForm = ({
   })
 
   const { value, bind } = useForm<ProductionSiteFormValue>({
-    site_id: productionSite?.site_id ?? "",
+    site_id: productionSite?.site_siret ?? "",
     name: productionSite?.name ?? "",
     date_mise_en_service: productionSite?.date_mise_en_service ?? "",
     ges_option: productionSite?.ges_option ?? GESOption.Default,

@@ -13,9 +13,9 @@ import { Entity, Country, Depot } from "carbure/types"
 import { DateInput, NumberInput, TextInput } from "common/components/input"
 import Autocomplete from "common/components/autocomplete"
 import {
+  findBiofuelEntities,
   findCountries,
   findDepots,
-  findEntities,
   findMyCertificates,
 } from "carbure/api"
 import * as norm from "carbure/utils/normalizers"
@@ -132,7 +132,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             />
             <Autocomplete
               label={t("Client")}
-              getOptions={findEntities}
+              getOptions={findBiofuelEntities}
               normalize={norm.normalizeEntityOrUnknown}
               create={norm.identity}
               {...bind("client")}
@@ -212,7 +212,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
     delivery_date: form.delivery_date,
     carbure_delivery_site_id:
       form.delivery_site instanceof Object
-        ? form.delivery_site.depot_id
+        ? form.delivery_site.customs_id
         : undefined,
     unknown_delivery_site:
       typeof form.delivery_site === "string" ? form.delivery_site : undefined,

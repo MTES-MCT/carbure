@@ -1,7 +1,7 @@
 import api, { Api } from "common/services/api"
 import {
   Country,
-  DepotType,
+  SiteType,
   Entity,
   EntityDepot,
   OwnershipType,
@@ -38,7 +38,7 @@ export function createNewDeliverySite(
   city: string,
   country: Country,
   depot_id: string,
-  depot_type: DepotType,
+  depot_type: SiteType,
   address: string,
   postal_code: string,
   electrical_efficiency?: number,

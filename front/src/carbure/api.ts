@@ -9,6 +9,7 @@ import {
   Country,
   Depot,
   Certificate,
+  EntityType,
   ProductionSiteDetails,
   EntityCertificate,
 } from "./types"
@@ -41,10 +42,31 @@ export function findCountries(query: string) {
     .then(extract)
 }
 
-export function findEntities(query?: string) {
+export function findEntities(
+  query?: string,
+  filters?: { is_enabled?: boolean; entity_type?: EntityType[] }
+) {
   return api
-    .get<Api<Entity[]>>("/resources/entities", { params: { query } })
+    .get<
+      Api<Entity[]>
+    >("/resources/entities", { params: { query, ...filters } })
     .then(extract)
+}
+
+export function findEnabledEntities(query?: string) {
+  return findEntities(query, { is_enabled: true })
+}
+
+export function findBiofuelEntities(query?: string) {
+  return findEntities(query, {
+    is_enabled: true,
+    entity_type: [
+      EntityType.Producer,
+      EntityType.Trader,
+      EntityType.Operator,
+      EntityType.PowerOrHeatProducer,
+    ],
+  })
 }
 
 export function findOperators(query?: string) {

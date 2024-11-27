@@ -53,7 +53,10 @@ const UpdateChargePointDialog = () => {
       })
     },
     onError: (e) => {
-      const errors = {
+      const errors: Record<
+        string,
+        { field: keyof ChargePoint; error: string }
+      > = {
         CP_ID_NOT_IN_TGD: {
           field: "charge_point_id",
           error: t(
@@ -71,7 +74,7 @@ const UpdateChargePointDialog = () => {
 
       if (error && Object.keys(errors).includes(error)) {
         const errorKey = error as keyof typeof errors
-        const currentError = errors[errorKey]
+        const currentError = errors[errorKey]!
         setFieldError(currentError.field, currentError.error)
       } else {
         notify(
@@ -167,7 +170,12 @@ const UpdateChargePointDialog = () => {
                       readOnly
                       {...bind("mid_id")}
                     />
-                    <Button variant="link" action={openChangeMeterDialog}>
+
+                    <Button
+                      variant="link"
+                      action={openChangeMeterDialog}
+                      disabled={isReadOnly}
+                    >
                       {t("Mon compteur MID a changé ?")}
                     </Button>
                   </Fieldset>
@@ -181,6 +189,7 @@ const UpdateChargePointDialog = () => {
                     <Button
                       variant="link"
                       action={openChangeMeasureReferencePointDialog}
+                      disabled={isReadOnly}
                     >
                       {t("Mon PRM a changé ?")}
                     </Button>
@@ -202,6 +211,7 @@ const UpdateChargePointDialog = () => {
                     />
                   ))
                 }
+                disabled={isReadOnly}
               />
               {isReadOnly ? (
                 <Button
