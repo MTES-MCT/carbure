@@ -3,6 +3,7 @@ import shutil
 import time
 
 import undetected_chromedriver as uc
+from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand, CommandError
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
@@ -16,6 +17,7 @@ from core.models import GenericCertificate
 DOWNLOAD_DIR = "/tmp/certificates"
 FINAL_DIR = "/tmp/certificates/final"
 URL = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"
+S3_FOLDER = "certificates/"
 
 
 class Command(BaseCommand):
@@ -42,6 +44,8 @@ class Command(BaseCommand):
         driver.quit()
 
         self.update_certificates(certificates_to_update)
+
+        self.upload_all_certs_to_S3(len(certificates_to_update))
 
         self.stdout.write(f"Time spent: {time.time() - start_time:.2f} seconds")
         self.stdout.write(self.style.SUCCESS("Script executed successfully"))
@@ -155,6 +159,9 @@ class Command(BaseCommand):
             self.stdout.write(f"Downloaded {nb_pdf_downloaded} pdfs")
             self.stdout.write(f"Skipped {nb_skipped} pdfs")
 
+            if nb_pdf_downloaded >= 5:
+                break
+
             if page_number % 10 == 0:
                 self.go_to_next_10(driver)
 
@@ -197,10 +204,14 @@ class Command(BaseCommand):
 
     def update_certificates(self, certificates_to_update):
         self.stdout.write("Updating certificates download links...")
-        for certificate in certificates_to_update:
-            certificate.download_link = f"certificates/final/certificate_{certificate.certificate_id}.pdf"
+        try:
+            for certificate in certificates_to_update:
+                s3_path = f"{S3_FOLDER}certificate_{certificate.certificate_id}.pdf"
+                certificate.download_link = default_storage.url(s3_path)
 
-        GenericCertificate.objects.bulk_update(certificates_to_update, ["download_link"])
+            GenericCertificate.objects.bulk_update(certificates_to_update, ["download_link"])
+        except Exception as e:
+            raise CommandError(f"Error updating certificates: {e}")
 
     def go_to_next_10(self, driver):
         self.stdout.write("--> Going to next ten")
@@ -248,7 +259,7 @@ class Command(BaseCommand):
                 "download.default_directory": DOWNLOAD_DIR,  # Définir le dossier de téléchargement
                 "download.prompt_for_download": False,  # Désactiver les pop-ups de confirmation de téléchargement
                 "download.directory_upgrade": True,  # Mettre à jour le dossier de téléchargement si nécessaire
-                "plugins.always_open_pdf_externally": True,  # Ouvrir les fichiers PDF directement (ne pas les ouvrir dans Chrome)
+                "plugins.always_open_pdf_externally": True,  # Ouvrir les fichiers PDF directement (ne pas les ouvrir dans Chrome) # noqa
             },
         )
 
@@ -257,7 +268,7 @@ class Command(BaseCommand):
         return driver
 
     def wait_for_download_and_move(self, new_name):
-        # Wait for the download to finish
+        # Wait for completed download
         while True:
             crdownload_files = [f for f in os.listdir(DOWNLOAD_DIR) if f.endswith(".crdownload")]
             pdf_files = [f for f in os.listdir(DOWNLOAD_DIR) if f.endswith(".pdf") or f.endswith(".PDF")]
@@ -272,3 +283,20 @@ class Command(BaseCommand):
                 break
 
             time.sleep(0.3)
+
+    def upload_all_certs_to_S3(self, counter):
+        self.stdout.write(f"Transferring {counter } files to S3...")
+
+        for idx, file_name in enumerate(os.listdir(FINAL_DIR)):
+            local_file_path = os.path.join(FINAL_DIR, file_name)
+
+            if os.path.isfile(local_file_path):
+                s3_path = f"{S3_FOLDER}{file_name}"
+
+                with open(local_file_path, "rb") as f:
+                    default_storage.save(s3_path, f)
+
+                self.stdout.write(f"\r{idx + 1}/{counter}", ending="")
+
+        self.stdout.write("\n")
+        self.stdout.write("All files transferred to S3")
