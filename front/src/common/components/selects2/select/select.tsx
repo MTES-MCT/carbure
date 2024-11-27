@@ -97,6 +97,7 @@ export function Select<T, V>({
             onOpen?.()
             asyncOptions.execute()
           }}
+          className={cl(search && styles["select-dropdown"])}
         >
           <List
             controlRef={triggerRef}
