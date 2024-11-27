@@ -8,7 +8,6 @@ import cl from "clsx"
 import styles from "./multiselect.module.css"
 import { List } from "common/components/list2"
 import { Text } from "common/components/text"
-
 export interface MultiSelectProps<T, V = T> extends Control, Trigger {
   clear?: boolean
   search?: boolean
@@ -92,7 +91,6 @@ export const MultiSelect = <T, V>({
             onOpen?.()
             asyncOptions.execute()
           }}
-          className={cl(search && styles["select-dropdown"])}
         >
           <List
             multiple
