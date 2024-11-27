@@ -1,6 +1,6 @@
 import React, { Suspense } from "react"
 import { createRoot } from "react-dom/client"
-import { BrowserRouter, NavLink } from "react-router-dom"
+import { BrowserRouter } from "react-router-dom"
 
 import "./i18n"
 import "./carbure/assets/css/index.css"
@@ -9,15 +9,7 @@ import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
 import { SentryProvider } from "./sentry"
-import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
-
-declare module "@codegouvfr/react-dsfr/spa" {
-  interface RegisterLink {
-    Link: typeof NavLink
-  }
-}
-startReactDsfr({ defaultColorScheme: "light", Link: NavLink })
-
+import "./setup-dsfr"
 async function enableMocking() {
   if (import.meta.env.MODE !== "development") return
 
