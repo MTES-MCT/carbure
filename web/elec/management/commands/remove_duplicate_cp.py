@@ -92,4 +92,5 @@ class Command(BaseCommand):
             charge_points_to_delete.delete()
             self.stdout.write("Points de charge supprimés !")
 
+        self.stdout.write(f"Points de charge conservés : {ids_to_keep}")
         self.stdout.write(f"Points de charge conservés : {len(ids_to_keep)}")
