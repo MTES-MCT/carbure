@@ -9,7 +9,6 @@ import mswHandlers from "./mocks"
 import useUserManager, { UserContext } from "../src/carbure/hooks/user"
 import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
-import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 import { MatomoProvider } from "../src/matomo"
 
 import "@codegouvfr/react-dsfr/dsfr/component/stepper/stepper.min.css"
@@ -21,8 +20,7 @@ import "@codegouvfr/react-dsfr/dsfr/utility/icons/icons.min.css"
 
 // import css from our app
 import "../src/carbure/assets/css/index.css"
-
-startReactDsfr({ defaultColorScheme: "light" })
+import "../src/setup-dsfr"
 
 // Init MSW
 initialize()
