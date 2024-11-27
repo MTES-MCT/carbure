@@ -1,0 +1,8 @@
+/* We use a button to trigger the dropdown, but we want to have a full width button with a dropdown icon fixed on the right */
+.select-button {
+  justify-content: space-between;
+}
+
+.select-button-full {
+  width: 100%;
+}
