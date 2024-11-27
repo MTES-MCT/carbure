@@ -108,13 +108,13 @@ export const Dropdown = ({
       const isInsideDropdown = isInside(dropdownRef.current, e.target)
 
       if (!isInsideTrigger && !isInsideDropdown) {
-        setOpen(false)
+        // setOpen(false)
       }
     }
 
     function onBlur(e: FocusEvent) {
       if (!isInside(dropdownRef.current, e.relatedTarget)) {
-        setOpen(false)
+        // setOpen(false)
       }
     }
 

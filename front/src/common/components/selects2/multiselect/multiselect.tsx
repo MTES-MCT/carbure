@@ -1,11 +1,13 @@
 import { Button, ButtonProps } from "common/components/button2"
-import { Trigger } from "common/components/dropdown2"
+import { Dropdown, Trigger } from "common/components/dropdown2"
 import { Control } from "common/components/input"
 import { useAsyncList } from "common/hooks/async-list"
 import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import cl from "clsx"
 import styles from "./multiselect.module.css"
+import { List } from "common/components/list2"
+import { Text } from "common/components/text"
 
 export interface MultiSelectProps<T, V = T> extends Control, Trigger {
   clear?: boolean
@@ -31,14 +33,20 @@ export const MultiSelect = <T, V>({
   placeholder = "Select options",
   options,
   getOptions,
-  // onChange,
+  onChange,
   normalize = defaultNormalizer,
   full,
   size,
   className,
+  search,
+  sort,
+  anchor,
+  onOpen,
+  onClose,
+  ...props
 }: MultiSelectProps<T, V>) => {
   const triggerRef = useRef<HTMLButtonElement>(null)
-  // const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
   const asyncOptions = useAsyncList({
     selectedValues: value,
@@ -66,8 +74,38 @@ export const MultiSelect = <T, V>({
         )}
         size={size}
       >
-        {asyncOptions.label || placeholder}
+        {value && value.length > 0 && (
+          <Text is="span" className={styles.count} size="xs">
+            {value.length}
+          </Text>
+        )}
+        {placeholder}
       </Button>
+      {!props.disabled && !props.readOnly && (
+        <Dropdown
+          open={open && asyncOptions.items.length > 0}
+          triggerRef={triggerRef}
+          anchor={anchor}
+          onClose={onClose}
+          onToggle={setOpen}
+          onOpen={() => {
+            onOpen?.()
+            asyncOptions.execute()
+          }}
+          className={cl(search && styles["select-dropdown"])}
+        >
+          <List
+            multiple
+            search={search}
+            controlRef={triggerRef}
+            items={asyncOptions.items}
+            selectedValues={value}
+            onSelectValues={onChange}
+            normalize={normalize}
+            sort={sort}
+          />
+        </Dropdown>
+      )}
     </>
   )
 }
