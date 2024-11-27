@@ -15,7 +15,11 @@ const meta: Meta<typeof PrivateNavigation> = {
   decorators: [
     (Story) => (
       <PrivateNavigationProvider>
-        <Story />
+        <div
+          style={{ height: "100vh", display: "flex", flexDirection: "column" }}
+        >
+          <Story />
+        </div>
       </PrivateNavigationProvider>
     ),
   ],
