@@ -3,20 +3,21 @@ from drf_spectacular.utils import (
     OpenApiTypes,
     extend_schema,
 )
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from core.models import Entity, ExternalAdminRights
-from doublecount.serializers import (
-    EntitySerializer,
-)
+from doublecount.serializers import EntitySerializer
 from entity.services.enable_entity import enable_entity as enable_entity_service
 from entity.services.get_administrated_entities import get_administrated_entities
 from saf.permissions.user_rights import HasAdminRights
-from saf.serializers.schema import ErrorResponseSerializer
+
+
+class EmptyResponseSerializer(serializers.Serializer):
+    empty = serializers.CharField(required=False)
 
 
 class EntityViewSet(ViewSet):
@@ -24,7 +25,6 @@ class EntityViewSet(ViewSet):
     serializer_class = EntitySerializer
 
     @extend_schema(
-        request=None,
         parameters=[
             OpenApiParameter(
                 "entity_id",
@@ -34,10 +34,14 @@ class EntityViewSet(ViewSet):
                 required=True,
             ),
         ],
-        responses={200: OpenApiTypes.ANY, 400: ErrorResponseSerializer},
+        request=EmptyResponseSerializer,
+        responses=EmptyResponseSerializer,
     )
     @permission_classes(
-        [IsAuthenticated, HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])]
+        [
+            IsAuthenticated,
+            HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC]),
+        ]
     )
     @action(
         methods=["post"],
