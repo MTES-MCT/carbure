@@ -24,27 +24,24 @@ class Command(BaseCommand):
     help = "Download redcert certificates pdfs"
 
     def add_arguments(self, parser):
-        parser.add_argument("--id", type=str, help="Download a specific certificate")
+        parser.add_argument("--ids", type=str, help="Download specific certificates")
 
     def handle(self, *args, **options):
         start_time = time.time()
-
         self.create_directories()
 
         # Instanciate the chrome driver
         driver = self.create_driver()
-
         self.load_redcert_page(driver)
 
-        if options["id"]:
-            self.get_single_certificate(driver, options["id"])
+        if options["ids"]:
+            certificates_to_update = self.get_certificates_with_id(driver, options["ids"])
         else:
             certificates_to_update = self.get_all_certificates(driver, start_time)
 
         driver.quit()
 
         self.update_certificates(certificates_to_update)
-
         self.upload_all_certs_to_S3(len(certificates_to_update))
 
         self.stdout.write(f"Time spent: {time.time() - start_time:.2f} seconds")
@@ -75,32 +72,51 @@ class Command(BaseCommand):
             )
         )
 
-    def get_single_certificate(self, driver, certificate_id):
-        self.stdout.write("Searching for certificate with id %s" % certificate_id)
-        # Fill the form
-        search_box = driver.find_element(By.XPATH, "//*[@id='ctl00_mainContentPlaceHolder_zertifikatIdentifikatorTextBox']")
-        search_box.send_keys(certificate_id)
+    def get_certificates_with_id(self, driver, certificate_ids):
+        certificate_ids = certificate_ids.split(",")
 
-        # And submit
-        search_box.send_keys(Keys.RETURN)
+        self.stdout.write("Searching for certificate with ids %s" % certificate_ids)
 
-        # Wait until results are loaded
-        time.sleep(5)
-        driver.save_screenshot("screenshot-form2.png")
-
-        # Click on input element with src="Images/Apps/documentAcrobat.svg"
-        dl_button = driver.find_element(
-            By.XPATH,
-            "//input[@type='image' and contains(@onclick, 'SelectedPDF$0')]",
+        certificates = GenericCertificate.objects.filter(
+            certificate_id__in=certificate_ids,
         )
 
-        dl_button.click()
+        certificates_to_update = []
 
-        self.stdout.write("Click !")
+        for certificate_id in certificate_ids:
+            # Fill the form
+            search_box = driver.find_element(
+                By.XPATH, "//*[@id='ctl00_mainContentPlaceHolder_zertifikatIdentifikatorTextBox']"
+            )
+            search_box.clear()
+            search_box.send_keys(certificate_id)
 
-        # Wait for the pdf to be downloaded
-        time.sleep(3)
-        self.stdout.write("PDF should be downloaded")
+            # And submit
+            search_box.send_keys(Keys.RETURN)
+
+            # Wait until results are loaded
+            time.sleep(5)
+
+            rows = driver.find_elements(By.CSS_SELECTOR, "tr")
+            rows = rows[1:]  # Remove the first row header
+
+            if not rows[0]:
+                self.stdout.write("No results found for certificate %s" % certificate_id)
+                continue
+
+            try:
+                certificates_to_update = self.download_certificate(
+                    driver,
+                    rows[0],
+                    certificates,
+                    certificates_to_update,
+                    certificate_id,
+                )
+
+            except NoSuchElementException:
+                self.stdout.write("No PDF found for certificate %s" % certificate_id)
+
+        return certificates_to_update
 
     def get_all_certificates(self, driver, start_time):
         self.stdout.write("No id provided, downloading all certificates")
@@ -186,14 +202,13 @@ class Command(BaseCommand):
                     continue
 
                 try:
-                    dl_button = row.find_element(By.CLASS_NAME, "lastColumns").find_element(By.TAG_NAME, "input")
-                    actions = ActionChains(driver)
-                    actions.move_to_element(dl_button).click().perform()
-
-                    new_name = f"certificate_{redcert_id}.pdf"
-                    self.wait_for_download_and_move(new_name)
-
-                    certificates_to_update.append(certificates.filter(certificate_id=redcert_id).first())
+                    certificates_to_update = self.download_certificate(
+                        driver,
+                        row,
+                        certificates,
+                        certificates_to_update,
+                        redcert_id,
+                    )
                     kwargs["nb_pdf_downloaded"] += 1
 
                 except NoSuchElementException:
@@ -201,6 +216,17 @@ class Command(BaseCommand):
                     kwargs["nb_skipped"] += 1
 
         return kwargs["nb_pdf_downloaded"], kwargs["nb_skipped"], certificates_to_update
+
+    def download_certificate(self, driver, row, certificates, certificates_to_update, redcert_id):
+        dl_button = row.find_element(By.CLASS_NAME, "lastColumns").find_element(By.TAG_NAME, "input")
+        actions = ActionChains(driver)
+        actions.move_to_element(dl_button).click().perform()
+
+        new_name = f"certificate_{redcert_id}.pdf"
+        self.wait_for_download_and_move(new_name)
+
+        certificates_to_update.append(certificates.filter(certificate_id=redcert_id).first())
+        return certificates_to_update
 
     def update_certificates(self, certificates_to_update):
         self.stdout.write("Updating certificates download links...")
@@ -297,6 +323,9 @@ class Command(BaseCommand):
                     default_storage.save(s3_path, f)
 
                 self.stdout.write(f"\r{idx + 1}/{counter}", ending="")
+
+        # Delete folder
+        shutil.rmtree(DOWNLOAD_DIR)
 
         self.stdout.write("\n")
         self.stdout.write("All files transferred to S3")

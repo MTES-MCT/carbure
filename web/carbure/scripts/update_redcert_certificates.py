@@ -10,6 +10,7 @@ import pandas as pd
 import requests
 from django.conf import settings
 from django.core.mail import get_connection, send_mail
+from django.core.management import call_command
 from openpyxl.cell.cell import Cell
 from openpyxl.worksheet.worksheet import Worksheet
 from pandas._typing import Scalar
@@ -31,7 +32,7 @@ def update_redcert_certificates(email: bool = False, test: bool = False) -> None
     download_redcert_certificates()
     nb_certificates, new_certificates, newly_invalidated_certificates = save_redcert_certificates()
     send_email_summary(nb_certificates, new_certificates, newly_invalidated_certificates, email)
-
+    download_pdf_certificates(new_certificates)
 
 def download_redcert_certificates() -> None:
     session = requests.Session()
@@ -100,7 +101,7 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
                 "output": None,
             }
         )
-
+        
     existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
     print("[REDcert Certificates] %d updated, %d created" % (len(existing), len(new)))
     return i, new, invalidated
@@ -181,6 +182,19 @@ def convert_cell(cell: Cell, convert_float: bool) -> Scalar:
             return float(cast(float, cell.value))
 
     return cell.value
+
+def download_pdf_certificates(new_certificates: list) -> None:
+    if not new_certificates:
+        return
+    
+    try:
+        print("Téléchargement des certificats PDF...")
+        # String of ids like "1,2,3,4"
+        ids = ",".join([str(c.certificate_id) for c in new_certificates])
+        call_command('get_redcert_pdf', ids=ids)
+        print("Commande exécutée avec succès.")
+    except Exception as e:
+        print(f"Erreur lors de l'exécution : {e}")
 
 
 if __name__ == "__main__":
