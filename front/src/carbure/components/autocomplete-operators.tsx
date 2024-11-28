@@ -1,4 +1,4 @@
-import { type EntityPreview } from "carbure/types"
+import { EntityPreview } from "carbure/types"
 import { normalizeEntityPreview } from "carbure/utils/normalizers"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
 import { useTranslation } from "react-i18next"

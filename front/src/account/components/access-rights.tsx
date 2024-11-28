@@ -4,7 +4,7 @@ import {
   UserRightRequest,
   UserRightStatus,
   UserRole,
-  type EntityPreview,
+  EntityPreview,
 } from "carbure/types"
 import { useUser } from "carbure/hooks/user"
 

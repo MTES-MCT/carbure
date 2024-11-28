@@ -12,7 +12,7 @@ import * as api from "carbure/api"
 import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common/components/icons"
-import { Country, ProductionSite, type EntityPreview } from "carbure/types"
+import { Country, ProductionSite, EntityPreview } from "carbure/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common/utils/collection"
 

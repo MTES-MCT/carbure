@@ -15,7 +15,7 @@ import {
   LotFormValue,
 } from "./lot-form"
 import { LotStatus } from "transactions/types"
-import { Country, Depot, type EntityPreview } from "carbure/types"
+import { Country, Depot, EntityPreview } from "carbure/types"
 import Select, { SelectProps } from "common/components/select"
 import { DeliveryType } from "transactions/types"
 import { compact, uniqueBy } from "common/utils/collection"

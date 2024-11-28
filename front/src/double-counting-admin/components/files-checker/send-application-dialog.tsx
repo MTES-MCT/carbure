@@ -1,7 +1,7 @@
 import { AxiosError } from "axios"
 import { findProducers, findProductionSites } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
-import { ProductionSite, type EntityPreview } from "carbure/types"
+import { ProductionSite, EntityPreview } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"

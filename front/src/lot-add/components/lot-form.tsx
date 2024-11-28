@@ -10,7 +10,7 @@ import {
   Feedstock,
   ProductionSite,
   Unit,
-  type EntityPreview,
+  EntityPreview,
 } from "carbure/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"

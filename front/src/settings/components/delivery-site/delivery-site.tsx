@@ -6,7 +6,7 @@ import {
   Depot,
   EntityDepot,
   OwnershipType,
-  type EntityPreview,
+  EntityPreview,
 } from "carbure/types"
 import * as common from "carbure/api"
 import * as api from "../../api/delivery-sites"

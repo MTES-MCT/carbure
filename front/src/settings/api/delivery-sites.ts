@@ -4,7 +4,7 @@ import {
   SiteType,
   EntityDepot,
   OwnershipType,
-  type EntityPreview,
+  EntityPreview,
 } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
