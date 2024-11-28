@@ -175,9 +175,6 @@ class Command(BaseCommand):
             self.stdout.write(f"Downloaded {nb_pdf_downloaded} pdfs")
             self.stdout.write(f"Skipped {nb_skipped} pdfs")
 
-            if nb_pdf_downloaded >= 5:
-                break
-
             if page_number % 10 == 0:
                 self.go_to_next_10(driver)
 
