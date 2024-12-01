@@ -1,16 +1,16 @@
 import { fr, FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr"
 import cl from "clsx"
 import styles from "./icon.module.css"
-export interface IconProps {
+interface BaseIconProps {
   passthrough?: boolean
   size?: "xs" | "sm" | "md" | "lg"
   className?: string
   name: FrIconClassName | RiIconClassName
 }
 
-type IconPropsWithoutName = Omit<IconProps, "name">
+export type IconProps = Omit<BaseIconProps, "name">
 
-const Icon = ({ size = "md", name, ...props }: IconProps) => {
+const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
   return (
     <span
       {...props}
@@ -19,130 +19,130 @@ const Icon = ({ size = "md", name, ...props }: IconProps) => {
   )
 }
 
-export const SurveyLine = ({ ...props }: IconPropsWithoutName) => {
+export const SurveyLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="fr-icon-survey-line" />
 }
 
-export const SurveyFill = ({ ...props }: IconPropsWithoutName) => {
+export const SurveyFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="fr-icon-survey-fill" />
 }
 
-export const InboxArchiveLine = ({ ...props }: IconPropsWithoutName) => {
+export const InboxArchiveLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-inbox-archive-line" />
 }
 
-export const InboxArchiveFill = ({ ...props }: IconPropsWithoutName) => {
+export const InboxArchiveFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-inbox-archive-fill" />
 }
 
-export const StackLine = ({ ...props }: IconPropsWithoutName) => {
+export const StackLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-stack-line" />
 }
 
-export const StackFill = ({ ...props }: IconPropsWithoutName) => {
+export const StackFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-stack-line" />
 }
 
-export const SendPlaneLine = ({ ...props }: IconPropsWithoutName) => {
+export const SendPlaneLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-send-plane-line" />
 }
 
-export const SendPlaneFill = ({ ...props }: IconPropsWithoutName) => {
+export const SendPlaneFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-send-plane-fill" />
 }
 
-export const FileTextLine = ({ ...props }: IconPropsWithoutName) => {
+export const FileTextLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-file-text-line" />
 }
 
-export const FileTextFill = ({ ...props }: IconPropsWithoutName) => {
+export const FileTextFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-file-text-fill" />
 }
 
-export const ArrowGoForwardLine = ({ ...props }: IconPropsWithoutName) => {
+export const ArrowGoForwardLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-arrow-go-forward-line" />
 }
 
-export const ArrowGoBackLine = ({ ...props }: IconPropsWithoutName) => {
+export const ArrowGoBackLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-arrow-go-back-line" />
 }
 
-export const ContrastDropLine = ({ ...props }: IconPropsWithoutName) => {
+export const ContrastDropLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-contrast-drop-line" />
 }
 
-export const ContrastDropFill = ({ ...props }: IconPropsWithoutName) => {
+export const ContrastDropFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-contrast-drop-fill" />
 }
 
-export const QuestionLine = ({ ...props }: IconPropsWithoutName) => {
+export const QuestionLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-question-line" />
 }
 
-export const SettingsLine = ({ ...props }: IconPropsWithoutName) => {
+export const SettingsLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-settings-3-line" />
 }
 
-export const SettingsFill = ({ ...props }: IconPropsWithoutName) => {
+export const SettingsFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-settings-3-line" />
 }
 
-export const CalendarCheckLine = ({ ...props }: IconPropsWithoutName) => {
+export const CalendarCheckLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-calendar-check-line" />
 }
 
-export const CalendarCheckFill = ({ ...props }: IconPropsWithoutName) => {
+export const CalendarCheckFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-calendar-check-fill" />
 }
 
-export const BuildingLine = ({ ...props }: IconPropsWithoutName) => {
+export const BuildingLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-building-4-line" />
 }
 
-export const BuildingFill = ({ ...props }: IconPropsWithoutName) => {
+export const BuildingFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-building-4-fill" />
 }
 
-export const CheckLine = ({ ...props }: IconPropsWithoutName) => {
+export const CheckLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-check-line" />
 }
 
-export const ArrowDownSLine = ({ ...props }: IconPropsWithoutName) => {
+export const ArrowDownSLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-arrow-down-s-line" />
 }
 
-export const AccountLine = ({ ...props }: IconPropsWithoutName) => {
+export const AccountLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-account-circle-line" />
 }
 
-export const ChartLine = ({ ...props }: IconPropsWithoutName) => {
+export const ChartLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-line-chart-line" />
 }
 
-export const BookLine = ({ ...props }: IconPropsWithoutName) => {
+export const BookLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-book-2-line" />
 }
 
-export const LogoutBoxLine = ({ ...props }: IconPropsWithoutName) => {
+export const LogoutBoxLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-logout-box-r-line" />
 }
 
-export const EyeLine = ({ ...props }: IconPropsWithoutName) => {
+export const EyeLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-eye-line" />
 }
 
-export const EyeFill = ({ ...props }: IconPropsWithoutName) => {
+export const EyeFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-eye-fill" />
 }
 
-export const ClipboardLine = ({ ...props }: IconPropsWithoutName) => {
+export const ClipboardLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-clipboard-line" />
 }
 
-export const ClipboardFill = ({ ...props }: IconPropsWithoutName) => {
+export const ClipboardFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-clipboard-fill" />
 }
 
-export const CircleFill = ({ ...props }: IconPropsWithoutName) => {
+export const CircleFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-circle-fill" />
 }
