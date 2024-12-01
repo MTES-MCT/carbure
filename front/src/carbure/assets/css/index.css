@@ -6,11 +6,6 @@
   box-sizing: border-box;
 }
 
-a {
-  text-decoration: none;
-  color: var(--black);
-}
-
 body {
   display: flex;
   margin: 0;
@@ -51,12 +46,6 @@ select {
 [href] {
   background-image: none;
 }
-
-/* This style overrides the default h1 style of DSFR. For now, we don't need it. */
-/* h1 {
-  line-height: inherit;
-  font-size: 24px;
-} */
 
 .fr-stepper__steps {
   background-image: repeating-linear-gradient(

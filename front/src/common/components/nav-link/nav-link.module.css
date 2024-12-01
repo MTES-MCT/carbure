@@ -1,0 +1,6 @@
+/**
+ * Allow the possibility to re-add the underline of DSFR (removed in index.css)
+ */
+.underline[href] {
+  background-image: var(--underline-img), var(--underline-img);
+}
