@@ -62,7 +62,7 @@ export type CBQueryStates<
 export interface CBQueryParams<Columns extends string[]> {
   entity_id: number
   year: number
-  status: string
+  status?: string
   type?: string
   search?: string
   page: number

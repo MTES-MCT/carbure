@@ -37,7 +37,7 @@ export function getTicketSourceFilters(
         query: {
           filter: field,
           ...query,
-          ...CBQUERY_RESET,
+          ...(CBQUERY_RESET as SafOperatorQuery),
         },
       },
     })
@@ -81,7 +81,7 @@ export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
         query: {
           filter: field,
           ...query,
-          ...CBQUERY_RESET,
+          ...(CBQUERY_RESET as SafQuery),
         },
       },
     })
