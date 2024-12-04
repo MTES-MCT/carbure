@@ -1,10 +1,10 @@
 import api, { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
 import { api as apiFetch } from "common/services/api-fetch"
-import { User, Notification, EntityType, EntityCertificate } from "./types"
+import { Notification, EntityType, EntityCertificate } from "./types"
 
 export function getUserSettings() {
-  return api.get<Api<User>>("/user")
+  return apiFetch.GET("/user/")
 }
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {

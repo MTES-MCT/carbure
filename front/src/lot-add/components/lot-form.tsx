@@ -97,12 +97,12 @@ export function useLotForm(
       isLotSupplier(entity, value) &&
       value.supplier_certificate === undefined
     ) {
-      value.supplier_certificate = entity.default_certificate
+      value.supplier_certificate = entity.default_certificate ?? undefined
       value.vendor_certificate = undefined
     }
 
     if (isLotVendor(entity, value) && value.vendor_certificate === undefined) {
-      value.vendor_certificate = entity.default_certificate
+      value.vendor_certificate = entity.default_certificate ?? undefined
     }
 
     const knownClient =

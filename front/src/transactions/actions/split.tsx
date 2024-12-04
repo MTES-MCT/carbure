@@ -127,7 +127,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               getOptions={(query) =>
                 findMyCertificates(query, { entity_id: entity.id })
               }
-              placeholder={entity.default_certificate}
+              placeholder={entity.default_certificate ?? undefined}
               {...bind("supplier_certificate")}
             />
             <Autocomplete

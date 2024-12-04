@@ -84,7 +84,7 @@ const Certificates = () => {
           disabled={!canModify}
           label={t("Certificat par défaut")}
           placeholder={t("Sélectionner un certificat")}
-          value={entity.default_certificate}
+          value={entity.default_certificate ?? undefined}
           onChange={setDefaultCertificate.execute}
           options={validCertificates}
           normalize={normalizeEntityCertificate}
