@@ -1,24 +1,12 @@
-from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from core.models import Entity, Pays, UserRights, UserRightsRequests
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = ["email"]
-
-
-class PaysSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pays
-        fields = ["code_pays", "name", "name_en", "is_in_europe"]
+from core.models import Entity, ExternalAdminRights, UserRights, UserRightsRequests
+from doublecount.serializers import CountrySerializer
 
 
 class UserEntitySerializer(serializers.ModelSerializer):
-    registered_country = PaysSerializer()
+    registered_country = CountrySerializer(required=False)
     ext_admin_pages = serializers.SerializerMethodField()
 
     class Meta:
@@ -26,6 +14,7 @@ class UserEntitySerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "is_enabled",
             "entity_type",
             "has_mac",
             "has_trading",
@@ -49,17 +38,20 @@ class UserEntitySerializer(serializers.ModelSerializer):
             "vat_number",
             "ext_admin_pages",
         ]
+        read_only_fields = fields
 
-    @extend_schema_field(serializers.ListField)
+    @extend_schema_field(
+        serializers.ListField(child=serializers.ChoiceField(choices=[r[1] for r in ExternalAdminRights.RIGHTS]))
+    )
     def get_ext_admin_pages(self, obj):
         if obj.entity_type == Entity.EXTERNAL_ADMIN:
             return [e.right for e in obj.externaladminrights_set.all()]
         return None
 
 
-class UserRightsRequestsSeriaizer(serializers.ModelSerializer):
+class UserRightsRequestsSerializer(serializers.ModelSerializer):
     entity = UserEntitySerializer()
-    user = UserSerializer()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = UserRightsRequests
@@ -73,9 +65,14 @@ class UserRightsRequestsSeriaizer(serializers.ModelSerializer):
             "role",
             "expiration_date",
         ]
+        read_only_fields = ["role", "status"]
+
+    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
+    def get_user(self, obj):
+        return [obj.user.email]
 
 
-class UserRightsSeriaizer(serializers.ModelSerializer):
+class UserRightsSerializer(serializers.ModelSerializer):
     entity = UserEntitySerializer()
     name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
@@ -83,6 +80,7 @@ class UserRightsSeriaizer(serializers.ModelSerializer):
     class Meta:
         model = UserRights
         fields = ["name", "email", "entity", "role", "expiration_date"]
+        read_only_fields = ["role"]
 
     @extend_schema_field(serializers.CharField)
     def get_name(self, obj):
@@ -95,8 +93,8 @@ class UserRightsSeriaizer(serializers.ModelSerializer):
 
 class UserSettingsResponseSeriaizer(serializers.Serializer):
     email = serializers.EmailField()
-    rights = UserRightsSeriaizer(many=True)
-    requests = UserRightsRequestsSeriaizer(many=True)
+    rights = UserRightsSerializer(many=True)
+    requests = UserRightsRequestsSerializer(many=True)
 
 
 class ResponseSuccessSerializer(serializers.Serializer):
