@@ -15,7 +15,8 @@ import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiSafTicketsGetParametersQueryOrder,
   PathsApiSafTicketSourcesGetParametersQueryOrder,
-  StatusEnum as SafTicketStatus,
+  PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
+  PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
 } from "api-schema"
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator
@@ -108,6 +109,7 @@ export type SafQueryType = "assigned" | "received"
 // Airline
 export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
 export interface SafQuery extends CBQueryParams<SafColumsOrder[]> {
+  status?: SafTicketStatus
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
@@ -118,6 +120,7 @@ export type SafOperatorColumnsOrder =
   PathsApiSafTicketSourcesGetParametersQueryOrder
 export interface SafOperatorQuery
   extends CBQueryParams<SafOperatorColumnsOrder[]> {
+  status?: SafTicketSourceSatus
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]

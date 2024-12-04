@@ -50,7 +50,7 @@ export const OperatorTickets = ({
     status,
     type
   )
-  const query = useCBQueryBuilder<SafColumsOrder[]>(state)
+  const query = useCBQueryBuilder<SafColumsOrder[]>(state) as SafQuery
   const apiGetTickets = (query: SafQuery) => api.getOperatorTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {

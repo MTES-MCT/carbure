@@ -11,6 +11,7 @@ import { compact } from "common/utils/collection"
 import {
   SafFilter,
   SafOperatorColumnsOrder,
+  SafOperatorQuery,
   SafOperatorSnapshot,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
@@ -42,7 +43,9 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const status = useAutoStatus()
 
   const [state, actions] = useCBQueryParamsStore(entity, year, status)
-  const query = useCBQueryBuilder<SafOperatorColumnsOrder[]>(state)
+  const query = useCBQueryBuilder<SafOperatorColumnsOrder[]>(
+    state
+  ) as SafOperatorQuery
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",

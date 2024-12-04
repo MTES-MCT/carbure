@@ -39,7 +39,7 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
     status
   )
 
-  const query = useCBQueryBuilder<SafColumsOrder[]>(state)
+  const query = useCBQueryBuilder<SafColumsOrder[]>(state) as SafQuery
   const apiGetTickets = (query: SafQuery) => {
     return api.getSafAirlineTickets(query)
   }
