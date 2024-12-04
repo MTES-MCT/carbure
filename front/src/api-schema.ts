@@ -684,6 +684,15 @@ export interface components {
     ErrorResponse: {
       message: string
     }
+    /**
+     * @description * `DCA` - DCA
+     *     * `AGRIMER` - AGRIMER
+     *     * `TIRIB` - TIRIB
+     *     * `AIRLINE` - AIRLINE
+     *     * `ELEC` - ELEC
+     * @enum {string}
+     */
+    ExtAdminPagesEnum: ExtAdminPagesEnum
     FeedStock: {
       name: string
       name_en: string
@@ -770,12 +779,6 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
-    }
-    Pays: {
-      code_pays: string
-      name: string
-      name_en: string
-      is_in_europe?: boolean
     }
     /**
      * @description * `l` - litres
@@ -1022,49 +1025,52 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
-    User: {
-      /**
-       * Adresse électronique
-       * Format: email
-       */
-      email: string
-    }
     UserEntity: {
       readonly id: number
-      name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
-      has_mac?: boolean
-      has_trading?: boolean
-      has_direct_deliveries?: boolean
-      has_stocks?: boolean
-      legal_name?: string
-      registration_id?: string
-      sustainability_officer?: string
-      sustainability_officer_phone_number?: string
-      sustainability_officer_email?: string
-      registered_address?: string
-      registered_zipcode?: string
-      registered_city?: string
-      registered_country: components["schemas"]["Pays"]
-      default_certificate?: string | null
-      preferred_unit?: components["schemas"]["PreferredUnitEnum"]
-      has_saf?: boolean
-      has_elec?: boolean
-      activity_description?: string
+      readonly name: string
+      readonly is_enabled: boolean
+      readonly entity_type: components["schemas"]["EntityTypeEnum"]
+      readonly has_mac: boolean
+      readonly has_trading: boolean
+      readonly has_direct_deliveries: boolean
+      readonly has_stocks: boolean
+      readonly legal_name: string
+      readonly registration_id: string
+      readonly sustainability_officer: string
+      readonly sustainability_officer_phone_number: string
+      readonly sustainability_officer_email: string
+      readonly registered_address: string
+      readonly registered_zipcode: string
+      readonly registered_city: string
+      registered_country?: components["schemas"]["Country"]
+      readonly default_certificate: string | null
+      readonly preferred_unit: components["schemas"]["PreferredUnitEnum"]
+      readonly has_saf: boolean
+      readonly has_elec: boolean
+      readonly activity_description: string
       /** Format: uri */
-      website?: string
-      vat_number?: string
-      readonly ext_admin_pages: unknown[]
+      readonly website: string
+      readonly vat_number: string
+      readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
     }
-    UserRightsRequestsSeriaizer: {
+    UserRights: {
+      readonly name: string
+      /** Format: email */
+      readonly email: string
+      entity: components["schemas"]["UserEntity"]
+      readonly role: components["schemas"]["RoleEnum"]
+      /** Format: date-time */
+      expiration_date?: string | null
+    }
+    UserRightsRequests: {
       readonly id: number
-      user: components["schemas"]["User"]
+      readonly user: string[]
       entity: components["schemas"]["UserEntity"]
       /** Format: date-time */
       readonly date_requested: string
-      status?: components["schemas"]["UserRightsRequestsSeriaizerStatusEnum"]
+      readonly status: components["schemas"]["UserRightsRequestsStatusEnum"]
       comment?: string | null
-      role?: components["schemas"]["RoleEnum"]
+      readonly role: components["schemas"]["RoleEnum"]
       /** Format: date-time */
       expiration_date?: string | null
     }
@@ -1075,21 +1081,12 @@ export interface components {
      *     * `REVOKED` - Révoqué
      * @enum {string}
      */
-    UserRightsRequestsSeriaizerStatusEnum: UserRightsRequestsSeriaizerStatusEnum
-    UserRightsSeriaizer: {
-      readonly name: string
-      /** Format: email */
-      readonly email: string
-      entity: components["schemas"]["UserEntity"]
-      role?: components["schemas"]["RoleEnum"]
-      /** Format: date-time */
-      expiration_date?: string | null
-    }
+    UserRightsRequestsStatusEnum: UserRightsRequestsStatusEnum
     UserSettingsResponseSeriaizer: {
       /** Format: email */
       email: string
-      rights: components["schemas"]["UserRightsSeriaizer"][]
-      requests: components["schemas"]["UserRightsRequestsSeriaizer"][]
+      rights: components["schemas"]["UserRights"][]
+      requests: components["schemas"]["UserRightsRequests"][]
     }
     /**
      * @description * `PENDING` - En attente
@@ -2187,6 +2184,13 @@ export enum EntityTypeEnum {
   Unknown = "Unknown",
   PowerOrHeatProducer = "Power or Heat Producer",
 }
+export enum ExtAdminPagesEnum {
+  DCA = "DCA",
+  AGRIMER = "AGRIMER",
+  TIRIB = "TIRIB",
+  AIRLINE = "AIRLINE",
+  ELEC = "ELEC",
+}
 export enum GesOptionEnum {
   Default = "Default",
   Actual = "Actual",
@@ -2206,10 +2210,10 @@ export enum PreferredUnitEnum {
   MJ = "MJ",
 }
 export enum RoleEnum {
-  RO = "RO",
-  RW = "RW",
-  ADMIN = "ADMIN",
-  AUDITOR = "AUDITOR",
+  ReadOnly = "RO",
+  ReadWrite = "RW",
+  Admin = "ADMIN",
+  Auditor = "AUDITOR",
 }
 export enum SiteTypeEnum {
   OTHER = "OTHER",
@@ -2231,9 +2235,9 @@ export enum TransportDocumentTypeEnum {
   DSP = "DSP",
   OTHER = "OTHER",
 }
-export enum UserRightsRequestsSeriaizerStatusEnum {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
-  REVOKED = "REVOKED",
+export enum UserRightsRequestsStatusEnum {
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
+  Revoked = "REVOKED",
 }
