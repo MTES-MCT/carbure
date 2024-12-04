@@ -22,6 +22,17 @@ paths:
           required: true
       tags:
         - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -30,13 +41,8 @@ paths:
         "200":
           content:
             application/json:
-              schema: {}
-          description: ""
-        "400":
-          content:
-            application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/EmptyResponse"
           description: ""
   /api/resources/biofuels:
     get:
@@ -268,7 +274,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSafClientList"
+                $ref: "#/components/schemas/PaginatedEntityPreviewList"
           description: ""
   /api/saf/clients/{id}/:
     get:
@@ -290,7 +296,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafClient"
+                $ref: "#/components/schemas/EntityPreview"
           description: ""
   /api/saf/snapshot/:
     get:
@@ -1978,6 +1984,11 @@ components:
         - country
         - id
         - name
+    EmptyResponse:
+      type: object
+      properties:
+        empty:
+          type: string
     Entity:
       type: object
       properties:
@@ -2202,7 +2213,7 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
-    PaginatedSafClientList:
+    PaginatedEntityPreviewList:
       type: object
       required:
         - count
@@ -2224,7 +2235,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/SafClient"
+            $ref: "#/components/schemas/EntityPreview"
     PaginatedSafTicketList:
       type: object
       required:
@@ -2339,20 +2350,6 @@ components:
         - id
         - name
         - producer
-    SafClient:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-        name:
-          type: string
-          maxLength: 64
-      required:
-        - id
-        - name
     SafTicket:
       type: object
       properties:

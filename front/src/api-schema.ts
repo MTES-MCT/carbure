@@ -584,6 +584,9 @@ export interface components {
        */
       useful_temperature?: number | null
     }
+    EmptyResponse: {
+      empty?: string
+    }
     Entity: {
       readonly id: number
       name: string
@@ -675,7 +678,7 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
-    PaginatedSafClientList: {
+    PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
       /**
@@ -688,7 +691,7 @@ export interface components {
        * @example http://api.example.org/accounts/?page=2
        */
       previous?: string | null
-      results: components["schemas"]["SafClient"][]
+      results: components["schemas"]["EntityPreview"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -745,11 +748,6 @@ export interface components {
       manager_name?: string
       manager_phone?: string
       manager_email?: string
-    }
-    SafClient: {
-      readonly id: number
-      entity_type?: components["schemas"]["EntityTypeEnum"]
-      name: string
     }
     SafTicket: {
       readonly id: number
@@ -980,22 +978,20 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["EmptyResponse"]
+        "application/x-www-form-urlencoded": components["schemas"]["EmptyResponse"]
+        "multipart/form-data": components["schemas"]["EmptyResponse"]
+      }
+    }
     responses: {
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": unknown
-        }
-      }
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
+          "application/json": components["schemas"]["EmptyResponse"]
         }
       }
     }
@@ -1188,7 +1184,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedSafClientList"]
+          "application/json": components["schemas"]["PaginatedEntityPreviewList"]
         }
       }
     }
@@ -1210,7 +1206,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafClient"]
+          "application/json": components["schemas"]["EntityPreview"]
         }
       }
     }
