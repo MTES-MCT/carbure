@@ -44,6 +44,13 @@ export const normalizeEntityOrUnknown: Normalizer<Entity | string> = (entity) =>
   else return normalizeEntity(entity)
 }
 
+export const normalizeEntityPreviewOrUnknown: Normalizer<
+  EntityPreview | string
+> = (entity) => {
+  if (isString(entity)) return { value: entity, label: entity }
+  else return normalizeEntityPreview(entity)
+}
+
 export const normalizeEntityPreview: Normalizer<EntityPreview> = (entity) => ({
   label: entity.name,
   value: {
@@ -52,6 +59,7 @@ export const normalizeEntityPreview: Normalizer<EntityPreview> = (entity) => ({
     entity_type: entity.entity_type,
   },
 })
+
 export const normalizeEntity: Normalizer<Entity> = (entity) => ({
   label: entity.name,
   value: {

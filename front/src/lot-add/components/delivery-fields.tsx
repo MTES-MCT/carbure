@@ -15,7 +15,7 @@ import {
   LotFormValue,
 } from "./lot-form"
 import { LotStatus } from "transactions/types"
-import { Entity, Country, Depot } from "carbure/types"
+import { Country, Depot, EntityPreview } from "carbure/types"
 import Select, { SelectProps } from "common/components/select"
 import { DeliveryType } from "transactions/types"
 import { compact, uniqueBy } from "common/utils/collection"
@@ -41,7 +41,9 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
   )
 }
 
-export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
+export const SupplierField = (
+  props: AutocompleteProps<EntityPreview | string>
+) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
@@ -51,7 +53,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
 
   const defaultOptions = uniqueBy(
     compact([supplier, entity]),
-    (v) => norm.normalizeEntityOrUnknown(v).label
+    (v) => norm.normalizeEntityPreviewOrUnknown(v).label
   )
 
   if (entity.isAdmin) {
@@ -63,7 +65,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
         create={norm.identity}
         defaultOptions={supplier ? [supplier] : undefined}
         getOptions={api.findBiofuelEntities}
-        normalize={norm.normalizeEntityOrUnknown}
+        normalize={norm.normalizeEntityPreviewOrUnknown}
         {...bound}
         {...props}
       />
@@ -78,7 +80,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       create={norm.identity}
       defaultOptions={defaultOptions}
       getOptions={async () => [entity]}
-      normalize={norm.normalizeEntityOrUnknown}
+      normalize={norm.normalizeEntityPreviewOrUnknown}
       {...bound}
       {...props}
       disabled={
@@ -141,7 +143,9 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
   )
 }
 
-export const ClientField = (props: AutocompleteProps<Entity | string>) => {
+export const ClientField = (
+  props: AutocompleteProps<EntityPreview | string>
+) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
@@ -157,7 +161,7 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findBiofuelEntities}
-      normalize={norm.normalizeEntityOrUnknown}
+      normalize={norm.normalizeEntityPreviewOrUnknown}
       {...bound}
       {...props}
       disabled={
@@ -220,7 +224,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
 
 export function getDeliveryTypes(
   entity: EntityManager,
-  client: Entity | string | undefined,
+  client: EntityPreview | string | undefined,
   status: LotStatus = LotStatus.Draft
 ) {
   if (entity.isAdmin) {

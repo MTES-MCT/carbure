@@ -313,7 +313,7 @@ const PrefetchedCompanyForm = ({
             label={t("Certificat (schéma volontaire ou national)")}
             normalize={normalizeCertificate}
             getOptions={(query) =>
-              getCertificates(query).then((res) => res.data.data ?? [])
+              getCertificates(query).then((res) => res.data ?? [])
             }
             {...companyForm.bind("certificate")}
           />

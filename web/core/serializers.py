@@ -41,6 +41,9 @@ class DepotSerializer(serializers.ModelSerializer):
             "postal_code",
             "gps_coordinates",
             "accise",
+            "electrical_efficiency",
+            "thermal_efficiency",
+            "useful_temperature",
         ]
 
 
@@ -646,3 +649,4 @@ class EntityPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = ["id", "name", "entity_type"]
+        read_only_fields = fields
