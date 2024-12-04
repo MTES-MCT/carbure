@@ -2240,6 +2240,20 @@ components:
           type: string
       required:
         - message
+    ExtAdminPagesEnum:
+      enum:
+        - DCA
+        - AGRIMER
+        - TIRIB
+        - AIRLINE
+        - ELEC
+      type: string
+      description: |-
+        * `DCA` - DCA
+        * `AGRIMER` - AGRIMER
+        * `TIRIB` - TIRIB
+        * `AIRLINE` - AIRLINE
+        * `ELEC` - ELEC
     FeedStock:
       type: object
       properties:
@@ -2403,24 +2417,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
-    Pays:
-      type: object
-      properties:
-        code_pays:
-          type: string
-          maxLength: 64
-        name:
-          type: string
-          maxLength: 128
-        name_en:
-          type: string
-          maxLength: 128
-        is_in_europe:
-          type: boolean
-      required:
-        - code_pays
-        - name
-        - name_en
     PreferredUnitEnum:
       enum:
         - l
@@ -2527,6 +2523,11 @@ components:
         * `RW` - Lecture/Écriture
         * `ADMIN` - Administrateur
         * `AUDITOR` - Auditeur
+      x-enum-varnames:
+        - ReadOnly
+        - ReadWrite
+        - Admin
+        - Auditor
     SafTicket:
       type: object
       properties:
@@ -3051,16 +3052,6 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
-    User:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
     UserEntity:
       type: object
       properties:
@@ -3069,79 +3060,142 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          readOnly: true
+        is_enabled:
+          type: boolean
+          readOnly: true
         entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
+          readOnly: true
         has_mac:
           type: boolean
+          readOnly: true
         has_trading:
           type: boolean
+          readOnly: true
         has_direct_deliveries:
           type: boolean
+          readOnly: true
         has_stocks:
           type: boolean
+          readOnly: true
         legal_name:
           type: string
-          maxLength: 128
+          readOnly: true
         registration_id:
           type: string
-          maxLength: 64
+          readOnly: true
         sustainability_officer:
           type: string
-          maxLength: 256
+          readOnly: true
         sustainability_officer_phone_number:
           type: string
-          maxLength: 32
+          readOnly: true
         sustainability_officer_email:
           type: string
-          maxLength: 254
+          readOnly: true
         registered_address:
           type: string
-          maxLength: 256
+          readOnly: true
         registered_zipcode:
           type: string
-          maxLength: 64
+          readOnly: true
         registered_city:
           type: string
-          maxLength: 64
+          readOnly: true
         registered_country:
-          $ref: "#/components/schemas/Pays"
+          $ref: "#/components/schemas/Country"
         default_certificate:
           type: string
+          readOnly: true
           nullable: true
-          maxLength: 64
         preferred_unit:
-          $ref: "#/components/schemas/PreferredUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/PreferredUnitEnum"
+          readOnly: true
         has_saf:
           type: boolean
+          readOnly: true
         has_elec:
           type: boolean
+          readOnly: true
         activity_description:
           type: string
+          readOnly: true
         website:
           type: string
           format: uri
-          maxLength: 200
+          readOnly: true
         vat_number:
           type: string
-          maxLength: 32
+          readOnly: true
         ext_admin_pages:
           type: array
-          items: {}
+          items:
+            $ref: "#/components/schemas/ExtAdminPagesEnum"
           readOnly: true
       required:
+        - activity_description
+        - default_certificate
+        - entity_type
         - ext_admin_pages
+        - has_direct_deliveries
+        - has_elec
+        - has_mac
+        - has_saf
+        - has_stocks
+        - has_trading
         - id
+        - is_enabled
+        - legal_name
         - name
-        - registered_country
-    UserRightsRequestsSeriaizer:
+        - preferred_unit
+        - registered_address
+        - registered_city
+        - registered_zipcode
+        - registration_id
+        - sustainability_officer
+        - sustainability_officer_email
+        - sustainability_officer_phone_number
+        - vat_number
+        - website
+    UserRights:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        entity:
+          $ref: "#/components/schemas/UserEntity"
+        role:
+          allOf:
+            - $ref: "#/components/schemas/RoleEnum"
+          readOnly: true
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - email
+        - entity
+        - name
+        - role
+    UserRightsRequests:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
         user:
-          $ref: "#/components/schemas/User"
+          type: array
+          items:
+            type: string
+          readOnly: true
         entity:
           $ref: "#/components/schemas/UserEntity"
         date_requested:
@@ -3149,12 +3203,16 @@ components:
           format: date-time
           readOnly: true
         status:
-          $ref: "#/components/schemas/UserRightsRequestsSeriaizerStatusEnum"
+          allOf:
+            - $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
+          readOnly: true
         comment:
           type: string
           nullable: true
         role:
-          $ref: "#/components/schemas/RoleEnum"
+          allOf:
+            - $ref: "#/components/schemas/RoleEnum"
+          readOnly: true
         expiration_date:
           type: string
           format: date-time
@@ -3163,8 +3221,10 @@ components:
         - date_requested
         - entity
         - id
+        - role
+        - status
         - user
-    UserRightsRequestsSeriaizerStatusEnum:
+    UserRightsRequestsStatusEnum:
       enum:
         - PENDING
         - ACCEPTED
@@ -3176,28 +3236,11 @@ components:
         * `ACCEPTED` - Accepté
         * `REJECTED` - Refusé
         * `REVOKED` - Révoqué
-    UserRightsSeriaizer:
-      type: object
-      properties:
-        name:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          readOnly: true
-        entity:
-          $ref: "#/components/schemas/UserEntity"
-        role:
-          $ref: "#/components/schemas/RoleEnum"
-        expiration_date:
-          type: string
-          format: date-time
-          nullable: true
-      required:
-        - email
-        - entity
-        - name
+      x-enum-varnames:
+        - Pending
+        - Accepted
+        - Rejected
+        - Revoked
     UserSettingsResponseSeriaizer:
       type: object
       properties:
@@ -3207,11 +3250,11 @@ components:
         rights:
           type: array
           items:
-            $ref: "#/components/schemas/UserRightsSeriaizer"
+            $ref: "#/components/schemas/UserRights"
         requests:
           type: array
           items:
-            $ref: "#/components/schemas/UserRightsRequestsSeriaizer"
+            $ref: "#/components/schemas/UserRightsRequests"
       required:
         - email
         - requests
