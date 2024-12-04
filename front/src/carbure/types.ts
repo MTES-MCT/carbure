@@ -3,62 +3,47 @@ import {
   SiteTypeEnum as SiteType,
   GesOptionEnum as GESOption,
   PreferredUnitEnum as Unit,
+  UserRightsRequestsStatusEnum as UserRightStatus,
+  RoleEnum as UserRole,
+  ExtAdminPagesEnum as ExternalAdminPages,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
-export interface Entity {
-  id: number
-  name: string
-  entity_type: EntityType
-  legal_name: string
-  registration_id: string
-  sustainability_officer_phone_number: string
-  sustainability_officer_email?: string
-  sustainability_officer: string
-  registered_address: string
-  registered_city: string
-  registered_zipcode: string
-  registered_country?: Country
-  has_mac: boolean
-  has_trading: boolean
-  has_stocks: boolean
-  has_direct_deliveries: boolean
-  preferred_unit?: Unit
-  default_certificate?: string
-  ext_admin_pages?: ExternalAdminPages[]
-  has_saf?: boolean
-  has_elec: boolean
-  activity_description?: string
-  website?: string
-  vat_number?: string
-  is_enabled?: boolean
-}
+export type Entity = apiTypes["UserEntity"]
+// export interface Entity {
+//   id: number
+//   name: string
+//   entity_type: EntityType
+//   legal_name: string
+//   registration_id: string
+//   sustainability_officer_phone_number: string
+//   sustainability_officer_email: string
+//   sustainability_officer: string
+//   registered_address: string
+//   registered_city: string
+//   registered_zipcode: string
+//   registered_country: Country
+//   has_mac: boolean
+//   has_trading: boolean
+//   has_stocks: boolean
+//   has_direct_deliveries: boolean
+//   preferred_unit: Unit
+//   default_certificate: string
+//   ext_admin_pages: apiTypes[]
+//   has_saf: boolean
+//   has_elec: boolean
+//   activity_description: string
+//   website: string
+//   vat_number: string
+//   is_enabled: boolean
+// }
 
 export type EntityPreview = apiTypes["EntityPreview"]
 
-export interface User {
-  email: string
-  rights: UserRight[]
-  requests: UserRightRequest[]
-}
+export type User = apiTypes["UserSettingsResponseSeriaizer"]
 
-export interface UserRight {
-  entity: Entity
-  date_added: string
-  expiration_date: string
-  role: UserRole
-}
-
-export interface UserRightRequest {
-  id: number
-  user: [string]
-  entity: Entity
-  status: UserRightStatus
-  date_requested: string
-  expiration_date: string
-  comment: string
-  role: UserRole
-}
+export type UserRight = apiTypes["UserRights"]
+export type UserRightRequest = apiTypes["UserRightsRequests"]
 
 export interface Notification {
   id: number
@@ -117,21 +102,7 @@ export interface UploadCheckReportInfo {
   error_count: number
 }
 
-export type ExternalAdminPages = "DCA" | "TIRIB" | "AIRLINE" | "ELEC"
-
-export enum UserRole {
-  ReadOnly = "RO",
-  ReadWrite = "RW",
-  Admin = "ADMIN",
-  Auditor = "AUDITOR",
-}
-
-export enum UserRightStatus {
-  Pending = "PENDING",
-  Accepted = "ACCEPTED",
-  Rejected = "REJECTED",
-  Revoked = "REVOKED",
-}
+// export type ExternalAdminPages = `${apiTypes["ExtAdminPagesEnum"]}`
 
 export enum NotificationType {
   CorrectionRequest = "CORRECTION_REQUEST",
@@ -171,3 +142,9 @@ export { EntityType }
 export { SiteType }
 
 export { GESOption, Unit }
+
+export { UserRightStatus }
+
+export { UserRole }
+
+export { ExternalAdminPages }
