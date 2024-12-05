@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # apply new migrations
-python3 ./web/manage.py migrate --noinput
+# python3 ./web/manage.py migrate --noinput
 
 # fill database with static fixtures
 python3 ./web/fixtures/load_biocarburants.py
