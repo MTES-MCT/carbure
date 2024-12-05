@@ -25,7 +25,7 @@ export const EntityUserRights = () => {
     <UserRightsTable
       rights={rights}
       onChangeUserRole={(role, request) =>
-        changeUserRole.execute(entity.id, request.user[0]!, role!)
+        changeUserRole.execute(entity.id, request.user[0]!, role)
       }
       onAcceptUser={(request) => acceptRight.execute(entity.id, request.id)}
       onRevokeUser={(request) =>

@@ -85,7 +85,7 @@ export const AccountAccesRights = () => {
             {
               small: true,
               header: "Statut",
-              cell: (r: UserRightRequest) => <RightStatus status={r.status!} />,
+              cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
             },
             {
               header: t("Organisation"),
@@ -94,12 +94,12 @@ export const AccountAccesRights = () => {
             {
               header: t("Type"),
               cell: (r) => (
-                <Cell text={getEntityTypeLabel(r.entity.entity_type!)} />
+                <Cell text={getEntityTypeLabel(r.entity.entity_type)} />
               ),
             },
             {
               header: t("Droits"),
-              cell: (r) => <Cell text={getUserRoleLabel(r.role!)} />,
+              cell: (r) => <Cell text={getUserRoleLabel(r.role)} />,
             },
             {
               header: t("Date"),
