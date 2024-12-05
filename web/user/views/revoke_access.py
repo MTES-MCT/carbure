@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import UserRights, UserRightsRequests
-from saf.permissions import HasUserRights
 from user.serializers import ResponseSuccessSerializer, RevokeAccessSerializer
 
 
@@ -21,7 +20,7 @@ from user.serializers import ResponseSuccessSerializer, RevokeAccessSerializer
     responses={200: ResponseSuccessSerializer},
 )
 @api_view(["POST"])
-@permission_classes([IsAuthenticated, HasUserRights(None, [])])
+@permission_classes([IsAuthenticated])
 def revoke_myself(request, *args, **kwargs):
     serializer = RevokeAccessSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
