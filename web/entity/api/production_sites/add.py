@@ -87,7 +87,7 @@ def add_production_site(request, entity, entity_id):
             manager_email=manager_email,
             date_mise_en_service=date_mise_en_service,
             ges_option=ges_option,
-            site_type=ProductionSite.PRODUCTION_SITE,
+            site_type=ProductionSite.PRODUCTION_BIOLIQUID,
         )
 
         if site:

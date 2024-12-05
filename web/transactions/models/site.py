@@ -17,7 +17,7 @@ class Site(models.Model):
     HEAT_PLANT = "HEAT PLANT"
     POWER_PLANT = "POWER PLANT"
     COGENERATION_PLANT = "COGENERATION PLANT"
-    PRODUCTION_SITE = "PRODUCTION SITE"
+    PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID"
     EFCA = "EFCA"
 
     SITE_TYPE = (
@@ -29,11 +29,12 @@ class Site(models.Model):
         (HEAT_PLANT, "HEAT PLANT"),
         (POWER_PLANT, "POWER PLANT"),
         (COGENERATION_PLANT, "COGENERATION PLANT"),
-        (PRODUCTION_SITE, "PRODUCTION SITE"),
+        (PRODUCTION_BIOLIQUID, "PRODUCTION BIOLIQUID"),
         (EFCA, "EFCA"),
     )
 
     DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT, EFCA]
+    PRODUCTION_SITE_TYPES = [PRODUCTION_BIOLIQUID]
 
     GES_OPTIONS = [("Default", "Valeurs par défaut"), ("Actual", "Valeurs réelles"), ("NUTS2", "Valeurs NUTS2")]
 
@@ -107,13 +108,11 @@ class Site(models.Model):
             setattr(self, field, None)
 
         # Check if date_mise_en_service is required for production site
-        if self.site_type == self.PRODUCTION_SITE and not self.date_mise_en_service:
-            raise ValidationError(
-                {"date_mise_en_service": ["Ce champ est obligatoire pour les sites de type 'PRODUCTION SITE'."]}
-            )
+        if self.site_type in self.PRODUCTION_SITE_TYPES and not self.date_mise_en_service:
+            raise ValidationError({"date_mise_en_service": ["Ce champ est obligatoire pour les sites de production."]})
 
         # Check if customs_id is required for depot
-        if self.site_type != self.PRODUCTION_SITE and not self.customs_id:
+        if self.site_type in self.DEPOT_TYPES and not self.customs_id:
             raise ValidationError({"customs_id": ["Ce champ est obligatoire pour les dépots."]})
 
         super().clean()
