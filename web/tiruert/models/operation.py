@@ -95,8 +95,13 @@ def create_tiruert_operations_from_lots(lots):
                     "operation": operation,
                     "lot": lot,
                     "energy": lot.volume,
-                    "saved_ghg": lot.ghg_reduction,
+                    "saved_ghg": calculate_saved_CO2_emissions(lot),
                 }
             )
 
         OperationDetail.objects.bulk_create([OperationDetail(**data) for data in lots_bulk])
+
+
+def calculate_saved_CO2_emissions(lot):
+    saved_co2 = (lot.ghg_reference * lot.pci * lot.volume - lot.lvh_amount * lot.ghg_total) / 1000000
+    return saved_co2

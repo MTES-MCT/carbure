@@ -287,6 +287,7 @@ class MatierePremiere(models.Model):
     IXB = "ANN-IX-B"
     TALLOL = "TALLOL"
     OTHER = "OTHER"
+    EP2AM = "EP2AM"
 
     MP_CATEGORIES = (
         (CONV, "Conventionnel"),
@@ -294,6 +295,7 @@ class MatierePremiere(models.Model):
         (IXB, "ANNEXE IX-B"),
         (TALLOL, "Tallol"),
         (OTHER, "Autre"),
+        (EP2AM, "EP2AM"),
     )
 
     name = models.CharField(max_length=128)
