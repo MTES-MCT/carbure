@@ -10,39 +10,13 @@ import {
 import { apiTypes } from "common/services/api-fetch.types"
 
 export type Entity = apiTypes["UserEntity"]
-// export interface Entity {
-//   id: number
-//   name: string
-//   entity_type: EntityType
-//   legal_name: string
-//   registration_id: string
-//   sustainability_officer_phone_number: string
-//   sustainability_officer_email: string
-//   sustainability_officer: string
-//   registered_address: string
-//   registered_city: string
-//   registered_zipcode: string
-//   registered_country: Country
-//   has_mac: boolean
-//   has_trading: boolean
-//   has_stocks: boolean
-//   has_direct_deliveries: boolean
-//   preferred_unit: Unit
-//   default_certificate: string
-//   ext_admin_pages: apiTypes[]
-//   has_saf: boolean
-//   has_elec: boolean
-//   activity_description: string
-//   website: string
-//   vat_number: string
-//   is_enabled: boolean
-// }
 
 export type EntityPreview = apiTypes["EntityPreview"]
 
 export type User = apiTypes["UserSettingsResponseSeriaizer"]
 
 export type UserRight = apiTypes["UserRights"]
+
 export type UserRightRequest = apiTypes["UserRightsRequests"]
 
 export interface Notification {
