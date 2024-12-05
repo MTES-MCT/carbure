@@ -19,7 +19,7 @@ interface MeterReadingsApplicationsTableProps {
   onDownloadMeterReadingsApplication: (
     application: ElecMeterReadingsApplication
   ) => void
-  onDeleteMeterReadingsApplication: (id: number) => Promise<unknown>
+  onDeleteMeterReadingsApplication?: (id: number) => Promise<unknown>
   rowLink?: (row: ElecMeterReadingsApplication) => To
   loading?: boolean
   displayCpo?: boolean

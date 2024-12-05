@@ -11,6 +11,8 @@ type OrderColumns<Columns extends string[]> = {
     : `-${Columns[K]}`
 }
 
+export type CBSnapshot = Record<string, number>
+
 export type CBFilterSelection = Record<string, string[]>
 
 export const CBQUERY_RESET: Partial<CBQueryParams<[]>> = {

@@ -4,24 +4,57 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
-  /api/entities/{company_id}/enable/:
+  /api/entities/{id}/enable/:
     post:
       operationId: entities_enable_create
       parameters:
-        - in: path
-          name: company_id
-          schema:
-            type: integer
-          description: The id of the company that is being enabled
-          required: true
         - in: query
           name: entity_id
           schema:
             type: integer
           description: The id of the admin entity enabling the company
           required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Entity.
+          required: true
       tags:
         - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyResponse"
+          description: ""
+  /api/resources/biofuels:
+    get:
+      operationId: resources_biofuels_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en`, and `code`
+      tags:
+        - resources
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -29,13 +62,175 @@ paths:
         "200":
           content:
             application/json:
-              schema: {}
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Biofuel"
           description: ""
-        "400":
+  /api/resources/certificates:
+    get:
+      operationId: resources_certificates_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `certificate_id` and `certificate_holder`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/GenericCertificate"
+          description: ""
+  /api/resources/countries:
+    get:
+      operationId: resources_countries_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code_pays`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Country"
+          description: ""
+  /api/resources/depots:
+    get:
+      operationId: resources_depots_list
+      parameters:
+        - in: query
+          name: public_only
+          schema:
+            type: boolean
+          description: Public Only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code_pays`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Depot"
+          description: ""
+  /api/resources/entities:
+    get:
+      operationId: resources_entities_list
+      parameters:
+        - in: query
+          name: entity_type
+          schema:
+            type: array
+            items:
+              type: string
+          description: Only keep specific entity types
+        - in: query
+          name: is_enabled
+          schema:
+            type: boolean
+          description: Only show enabled entities
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityPreview"
+          description: ""
+  /api/resources/feedstocks:
+    get:
+      operationId: resources_feedstocks_list
+      parameters:
+        - in: query
+          name: double_count_only
+          schema:
+            type: boolean
+          description: Double compte only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeedStock"
+          description: ""
+  /api/resources/production-sites:
+    get:
+      operationId: resources_production_sites_list
+      parameters:
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Search within the field `producer_id`
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductionSite"
           description: ""
   /api/saf/clients/:
     get:
@@ -79,7 +274,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSafClientList"
+                $ref: "#/components/schemas/PaginatedEntityPreviewList"
           description: ""
   /api/saf/clients/{id}/:
     get:
@@ -101,7 +296,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafClient"
+                $ref: "#/components/schemas/EntityPreview"
           description: ""
   /api/saf/snapshot/:
     get:
@@ -1663,6 +1858,18 @@ components:
         * `ANN-IX-B` - ANNEXE IX-B
         * `TALLOL` - Tallol
         * `OTHER` - Autre
+    CertificateTypeEnum:
+      enum:
+        - SYSTEME_NATIONAL
+        - ISCC
+        - REDCERT
+        - 2BS
+      type: string
+      description: |-
+        * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
+        * `ISCC` - ISCC
+        * `REDCERT` - REDCERT
+        * `2BS` - 2BS
     Comment:
       type: object
       properties:
@@ -1731,20 +1938,19 @@ components:
           maxLength: 128
         city:
           type: string
-          nullable: true
           maxLength: 128
-        depot_id:
+        customs_id:
           type: string
           maxLength: 32
         country:
           allOf:
             - $ref: "#/components/schemas/Country"
           readOnly: true
-        depot_type:
-          $ref: "#/components/schemas/DepotTypeEnum"
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
         address:
           type: string
-          maxLength: 128
+          maxLength: 256
         postal_code:
           type: string
           maxLength: 32
@@ -1754,35 +1960,35 @@ components:
           maxLength: 64
         accise:
           type: string
-          nullable: true
           maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
       required:
         - country
-        - depot_id
         - id
         - name
-    DepotTypeEnum:
-      enum:
-        - OTHER
-        - EFS
-        - EFPE
-        - OIL DEPOT
-        - BIOFUEL DEPOT
-        - HEAT PLANT
-        - POWER PLANT
-        - COGENERATION PLANT
-        - EFCA
-      type: string
-      description: |-
-        * `OTHER` - Autre
-        * `EFS` - EFS
-        * `EFPE` - EFPE
-        * `OIL DEPOT` - OIL DEPOT
-        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
-        * `HEAT PLANT` - HEAT PLANT
-        * `POWER PLANT` - POWER PLANT
-        * `COGENERATION PLANT` - COGENERATION PLANT
-        * `EFCA` - EFCA
+    EmptyResponse:
+      type: object
+      properties:
+        empty:
+          type: string
     Entity:
       type: object
       properties:
@@ -1848,10 +2054,13 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          readOnly: true
         entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
+          readOnly: true
       required:
+        - entity_type
         - id
         - name
     EntitySummary:
@@ -1930,6 +2139,47 @@ components:
         - code
         - name
         - name_en
+    GenericCertificate:
+      type: object
+      properties:
+        certificate_id:
+          type: string
+          maxLength: 64
+        certificate_type:
+          $ref: "#/components/schemas/CertificateTypeEnum"
+        certificate_holder:
+          type: string
+          maxLength: 512
+        certificate_issuer:
+          type: string
+          nullable: true
+          maxLength: 256
+        address:
+          type: string
+          nullable: true
+          maxLength: 512
+        valid_from:
+          type: string
+          format: date
+        valid_until:
+          type: string
+          format: date
+        download_link:
+          type: string
+          nullable: true
+          maxLength: 512
+        scope:
+          nullable: true
+        input:
+          nullable: true
+        output:
+          nullable: true
+      required:
+        - certificate_holder
+        - certificate_id
+        - certificate_type
+        - valid_from
+        - valid_until
     GesOptionEnum:
       enum:
         - Default
@@ -1963,7 +2213,7 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
-    PaginatedSafClientList:
+    PaginatedEntityPreviewList:
       type: object
       required:
         - count
@@ -1985,7 +2235,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/SafClient"
+            $ref: "#/components/schemas/EntityPreview"
     PaginatedSafTicketList:
       type: object
       required:
@@ -2054,7 +2304,7 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          maxLength: 128
         country:
           allOf:
             - $ref: "#/components/schemas/Country"
@@ -2062,15 +2312,15 @@ components:
         date_mise_en_service:
           type: string
           format: date
+          nullable: true
         ges_option:
           $ref: "#/components/schemas/GesOptionEnum"
         eligible_dc:
           type: boolean
         dc_reference:
           type: string
-          nullable: true
           maxLength: 64
-        site_id:
+        site_siret:
           type: string
           maxLength: 64
         address:
@@ -2078,10 +2328,10 @@ components:
           maxLength: 256
         city:
           type: string
-          maxLength: 64
+          maxLength: 128
         postal_code:
           type: string
-          maxLength: 64
+          maxLength: 32
         gps_coordinates:
           type: string
           nullable: true
@@ -2097,24 +2347,9 @@ components:
           maxLength: 64
       required:
         - country
-        - date_mise_en_service
         - id
         - name
         - producer
-    SafClient:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-        name:
-          type: string
-          maxLength: 64
-      required:
-        - id
-        - name
     SafTicket:
       type: object
       properties:
@@ -2599,6 +2834,30 @@ components:
         - assigned_volume
         - id
         - total_volume
+    SiteTypeEnum:
+      enum:
+        - OTHER
+        - EFS
+        - EFPE
+        - OIL DEPOT
+        - BIOFUEL DEPOT
+        - HEAT PLANT
+        - POWER PLANT
+        - COGENERATION PLANT
+        - PRODUCTION SITE
+        - EFCA
+      type: string
+      description: |-
+        * `OTHER` - Autre
+        * `EFS` - EFS
+        * `EFPE` - EFPE
+        * `OIL DEPOT` - OIL DEPOT
+        * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+        * `HEAT PLANT` - HEAT PLANT
+        * `POWER PLANT` - POWER PLANT
+        * `COGENERATION PLANT` - COGENERATION PLANT
+        * `PRODUCTION SITE` - PRODUCTION SITE
+        * `EFCA` - EFCA
     StatusEnum:
       enum:
         - PENDING

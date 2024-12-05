@@ -136,7 +136,7 @@ const ProductionSitesSettings = ({
           columns={[
             {
               header: t("ID"),
-              cell: (ps) => <Cell text={`${ps.site_id}`} />,
+              cell: (ps) => <Cell text={`${ps.site_siret}`} />,
             },
             {
               header: t("Nom"),
@@ -150,7 +150,10 @@ const ProductionSitesSettings = ({
             },
             {
               header: t("Date de mise en service"),
-              cell: (ps) => <Cell text={formatDate(ps.date_mise_en_service)} />,
+              cell: (ps) =>
+                ps.date_mise_en_service && (
+                  <Cell text={formatDate(ps.date_mise_en_service)} />
+                ),
             },
             actionColumn<ProductionSiteDetails>((prodSite) =>
               compact([

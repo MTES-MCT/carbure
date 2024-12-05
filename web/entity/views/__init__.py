@@ -1,1 +1,1 @@
-from .enable_entity import enable_entity
+from .enable_entity import EntityViewSet

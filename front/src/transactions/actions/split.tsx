@@ -9,7 +9,7 @@ import Dialog from "common/components/dialog"
 import { Drop, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import Form, { useForm } from "common/components/form"
-import { Entity, Country, Depot } from "carbure/types"
+import { Country, Depot, type EntityPreview } from "carbure/types"
 import { DateInput, NumberInput, TextInput } from "common/components/input"
 import Autocomplete from "common/components/autocomplete"
 import {
@@ -133,7 +133,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             <Autocomplete
               label={t("Client")}
               getOptions={findBiofuelEntities}
-              normalize={norm.normalizeEntityOrUnknown}
+              normalize={norm.normalizeEntityPreviewOrUnknown}
               create={norm.identity}
               {...bind("client")}
             />
@@ -212,7 +212,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
     delivery_date: form.delivery_date,
     carbure_delivery_site_id:
       form.delivery_site instanceof Object
-        ? form.delivery_site.depot_id
+        ? form.delivery_site.customs_id
         : undefined,
     unknown_delivery_site:
       typeof form.delivery_site === "string" ? form.delivery_site : undefined,
@@ -229,7 +229,7 @@ const defaultSplit = {
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
   supplier_certificate: undefined as string | undefined,
-  client: undefined as Entity | string | undefined,
+  client: undefined as EntityPreview | string | undefined,
   delivery_date: undefined as string | undefined,
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,

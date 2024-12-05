@@ -4,7 +4,7 @@
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from django import forms
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.db import transaction
@@ -24,10 +24,8 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
-    Depot,
     Entity,
     EntityCertificate,
-    EntityDepot,
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
@@ -39,7 +37,6 @@ from core.models import (
     UserRights,
     UserRightsRequests,
 )
-from entity.services import enable_depot
 from entity.services.enable_entity import enable_entity
 from transactions.sanity_checks.helpers import get_prefetched_data
 
@@ -131,21 +128,6 @@ class PaysAdmin(admin.ModelAdmin):
     list_filter = ("is_in_europe",)
 
 
-class DepotAdmin(admin.ModelAdmin):
-    list_display = ("name", "depot_id", "city", "depot_type", "gps_coordinates", "private", "is_enabled")
-    search_fields = ("name", "city", "depot_id")
-    list_filter = ("depot_type",)
-    readonly_fields = ("is_enabled",)
-    actions = ["enable_depot"]
-
-    def enable_depot(self, request, queryset):
-        for depot in queryset:
-            response = enable_depot.enable_depot(depot, request)
-            messages.add_message(request, messages.SUCCESS, response)
-
-    enable_depot.short_description = "Valider les dépôts sélectionnés"
-
-
 class GenericErrorAdmin(admin.ModelAdmin):
     list_display = (
         "lot",
@@ -226,10 +208,9 @@ admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(Biocarburant, BiocarburantAdmin)
 admin.site.register(MatierePremiere, MatierePremiereAdmin)
 admin.site.register(Pays, PaysAdmin)
-admin.site.register(Depot, DepotAdmin)
 admin.site.register(GenericError, GenericErrorAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
-admin.site.register(EntityDepot, EntityDepotAdmin)
+# admin.site.register(EntityDepot, EntityDepotAdmin)
 admin.site.register(TransactionDistance, TransactionDistanceAdmin)
 
 

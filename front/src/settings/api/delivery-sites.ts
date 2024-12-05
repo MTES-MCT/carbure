@@ -1,10 +1,10 @@
 import api, { Api } from "common/services/api"
 import {
   Country,
-  DepotType,
-  Entity,
+  SiteType,
   EntityDepot,
   OwnershipType,
+  EntityPreview,
 } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
@@ -21,7 +21,7 @@ export function addDeliverySite(
   delivery_site_id: string,
   ownership_type: OwnershipType,
   blending_outsourced: boolean,
-  blending_entity: Entity | undefined
+  blending_entity: EntityPreview | undefined
 ) {
   return api.post("/entity/depots/add", {
     entity_id,
@@ -38,7 +38,7 @@ export function createNewDeliverySite(
   city: string,
   country: Country,
   depot_id: string,
-  depot_type: DepotType,
+  depot_type: SiteType,
   address: string,
   postal_code: string,
   electrical_efficiency?: number,

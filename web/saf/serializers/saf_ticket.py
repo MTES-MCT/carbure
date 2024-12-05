@@ -3,16 +3,9 @@ import datetime
 from rest_framework import serializers
 
 from core.excel import export_to_excel
-from core.models import Entity
 from core.serializers import EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket
-
-
-class SafClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Entity
-        fields = ["id", "entity_type", "name"]
 
 
 class SafTicketSerializer(serializers.ModelSerializer):

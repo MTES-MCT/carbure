@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity
+from core.serializers import EntityPreviewSerializer
 from saf.filters import ClientFilter
-from saf.serializers.saf_ticket import SafClientSerializer
 
 
 class ClientViewSet(
@@ -18,7 +18,7 @@ class ClientViewSet(
 ):
     lookup_field = "id"
     permission_classes = (IsAuthenticated,)
-    serializer_class = SafClientSerializer
+    serializer_class = EntityPreviewSerializer
     filterset_class = ClientFilter
     search_fields = ["name"]
 

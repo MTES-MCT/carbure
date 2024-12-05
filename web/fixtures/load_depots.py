@@ -6,7 +6,8 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import Depot, Pays  # noqa: E402
+from core.models import Pays  # noqa: E402
+from transactions.models import Depot  # noqa: E402
 
 filename = "%s/web/fixtures/csv/depots.csv" % (os.environ["CARBURE_HOME"])
 
@@ -21,5 +22,5 @@ with open(filename) as csvfile:
             continue
         country_obj = Pays.objects.get(code_pays=country)
         obj, created = Depot.objects.update_or_create(
-            depot_id=depot_id, defaults={"name": name, "city": city, "country": country_obj}
+            customs_id=depot_id, defaults={"name": name, "city": city, "country": country_obj}
         )

@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  "/api/entities/{company_id}/enable/": {
+  "/api/entities/{id}/enable/": {
     parameters: {
       query?: never
       header?: never
@@ -14,6 +14,118 @@ export interface paths {
     get?: never
     put?: never
     post: operations["entities_enable_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/biofuels": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_biofuels_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/certificates": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/countries": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_countries_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/depots": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_depots_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/entities": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_entities_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/feedstocks": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_feedstocks_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/resources/production-sites": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_production_sites_list"]
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -407,6 +519,14 @@ export interface components {
      * @enum {string}
      */
     CategoryEnum: CategoryEnum
+    /**
+     * @description * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
+     *     * `ISCC` - ISCC
+     *     * `REDCERT` - REDCERT
+     *     * `2BS` - 2BS
+     * @enum {string}
+     */
+    CertificateTypeEnum: CertificateTypeEnum
     Comment: {
       comment?: string
     }
@@ -440,28 +560,33 @@ export interface components {
     Depot: {
       readonly id: number
       name: string
-      city?: string | null
-      depot_id: string
+      city?: string
+      customs_id?: string
       readonly country: components["schemas"]["Country"]
-      depot_type?: components["schemas"]["DepotTypeEnum"]
+      site_type?: components["schemas"]["SiteTypeEnum"]
       address?: string
       postal_code?: string
       gps_coordinates?: string | null
-      accise?: string | null
+      accise?: string
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      electrical_efficiency?: number | null
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      thermal_efficiency?: number | null
+      /**
+       * Format: double
+       * @description En degrés Celsius
+       */
+      useful_temperature?: number | null
     }
-    /**
-     * @description * `OTHER` - Autre
-     *     * `EFS` - EFS
-     *     * `EFPE` - EFPE
-     *     * `OIL DEPOT` - OIL DEPOT
-     *     * `BIOFUEL DEPOT` - BIOFUEL DEPOT
-     *     * `HEAT PLANT` - HEAT PLANT
-     *     * `POWER PLANT` - POWER PLANT
-     *     * `COGENERATION PLANT` - COGENERATION PLANT
-     *     * `EFCA` - EFCA
-     * @enum {string}
-     */
-    DepotTypeEnum: DepotTypeEnum
+    EmptyResponse: {
+      empty?: string
+    }
     Entity: {
       readonly id: number
       name: string
@@ -486,8 +611,8 @@ export interface components {
     }
     EntityPreview: {
       readonly id: number
-      name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
+      readonly name: string
+      readonly entity_type: components["schemas"]["EntityTypeEnum"]
     }
     EntitySummary: {
       readonly id: number
@@ -518,6 +643,21 @@ export interface components {
       category?: components["schemas"]["CategoryEnum"]
       is_double_compte?: boolean
     }
+    GenericCertificate: {
+      certificate_id: string
+      certificate_type: components["schemas"]["CertificateTypeEnum"]
+      certificate_holder: string
+      certificate_issuer?: string | null
+      address?: string | null
+      /** Format: date */
+      valid_from: string
+      /** Format: date */
+      valid_until: string
+      download_link?: string | null
+      scope?: unknown
+      input?: unknown
+      output?: unknown
+    }
     /**
      * @description * `Default` - Valeurs par défaut
      *     * `Actual` - Valeurs réelles
@@ -538,7 +678,7 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
-    PaginatedSafClientList: {
+    PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
       /**
@@ -551,7 +691,7 @@ export interface components {
        * @example http://api.example.org/accounts/?page=2
        */
       previous?: string | null
-      results: components["schemas"]["SafClient"][]
+      results: components["schemas"]["EntityPreview"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -596,11 +736,11 @@ export interface components {
       name: string
       readonly country: components["schemas"]["Country"]
       /** Format: date */
-      date_mise_en_service: string
+      date_mise_en_service?: string | null
       ges_option?: components["schemas"]["GesOptionEnum"]
       eligible_dc?: boolean
-      dc_reference?: string | null
-      site_id?: string
+      dc_reference?: string
+      site_siret?: string
       address?: string
       city?: string
       postal_code?: string
@@ -608,11 +748,6 @@ export interface components {
       manager_name?: string
       manager_phone?: string
       manager_email?: string
-    }
-    SafClient: {
-      readonly id: number
-      entity_type?: components["schemas"]["EntityTypeEnum"]
-      name: string
     }
     SafTicket: {
       readonly id: number
@@ -791,6 +926,20 @@ export interface components {
       assigned_volume: number
     }
     /**
+     * @description * `OTHER` - Autre
+     *     * `EFS` - EFS
+     *     * `EFPE` - EFPE
+     *     * `OIL DEPOT` - OIL DEPOT
+     *     * `BIOFUEL DEPOT` - BIOFUEL DEPOT
+     *     * `HEAT PLANT` - HEAT PLANT
+     *     * `POWER PLANT` - POWER PLANT
+     *     * `COGENERATION PLANT` - COGENERATION PLANT
+     *     * `PRODUCTION SITE` - PRODUCTION SITE
+     *     * `EFCA` - EFCA
+     * @enum {string}
+     */
+    SiteTypeEnum: SiteTypeEnum
+    /**
      * @description * `PENDING` - En attente
      *     * `ACCEPTED` - Accepté
      *     * `REJECTED` - Refusé
@@ -824,9 +973,37 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description The id of the company that is being enabled */
-        company_id: number
+        /** @description A unique integer value identifying this Entity. */
+        id: number
       }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["EmptyResponse"]
+        "application/x-www-form-urlencoded": components["schemas"]["EmptyResponse"]
+        "multipart/form-data": components["schemas"]["EmptyResponse"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EmptyResponse"]
+        }
+      }
+    }
+  }
+  resources_biofuels_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `name`, `name_en`, and `code` */
+        query?: string
+      }
+      header?: never
+      path?: never
       cookie?: never
     }
     requestBody?: never
@@ -836,15 +1013,149 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": unknown
+          "application/json": components["schemas"]["Biofuel"][]
         }
       }
-      400: {
+    }
+  }
+  resources_certificates_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `certificate_id` and `certificate_holder` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["ErrorResponse"]
+          "application/json": components["schemas"]["GenericCertificate"][]
+        }
+      }
+    }
+  }
+  resources_countries_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `name`, `name_en` and `code_pays` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Country"][]
+        }
+      }
+    }
+  }
+  resources_depots_list: {
+    parameters: {
+      query?: {
+        /** @description Public Only */
+        public_only?: boolean
+        /** @description Search within the fields `name`, `name_en` and `code_pays` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Depot"][]
+        }
+      }
+    }
+  }
+  resources_entities_list: {
+    parameters: {
+      query?: {
+        /** @description Only keep specific entity types */
+        entity_type?: string[]
+        /** @description Only show enabled entities */
+        is_enabled?: boolean
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityPreview"][]
+        }
+      }
+    }
+  }
+  resources_feedstocks_list: {
+    parameters: {
+      query?: {
+        /** @description Double compte only */
+        double_count_only?: boolean
+        /** @description Search within the fields `name`, `name_en` and `code` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FeedStock"][]
+        }
+      }
+    }
+  }
+  resources_production_sites_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the field `producer_id` */
+        producer_id?: number
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductionSite"][]
         }
       }
     }
@@ -873,7 +1184,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedSafClientList"]
+          "application/json": components["schemas"]["PaginatedEntityPreviewList"]
         }
       }
     }
@@ -895,7 +1206,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafClient"]
+          "application/json": components["schemas"]["EntityPreview"]
         }
       }
     }
@@ -1606,6 +1917,12 @@ export enum CategoryEnum {
   TALLOL = "TALLOL",
   OTHER = "OTHER",
 }
+export enum CertificateTypeEnum {
+  SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
+  ISCC = "ISCC",
+  REDCERT = "REDCERT",
+  Value2BS = "2BS",
+}
 export enum CorrectionStatusEnum {
   NO_PROBLEMO = "NO_PROBLEMO",
   IN_CORRECTION = "IN_CORRECTION",
@@ -1622,17 +1939,6 @@ export enum DeliveryTypeEnum {
   DIRECT = "DIRECT",
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
-}
-export enum DepotTypeEnum {
-  OTHER = "OTHER",
-  EFS = "EFS",
-  EFPE = "EFPE",
-  OIL_DEPOT = "OIL DEPOT",
-  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
-  HEAT_PLANT = "HEAT PLANT",
-  POWER_PLANT = "POWER PLANT",
-  COGENERATION_PLANT = "COGENERATION PLANT",
-  EFCA = "EFCA",
 }
 export enum EntityTypeEnum {
   Producer = "Producteur",
@@ -1663,6 +1969,18 @@ export enum PreferredUnitEnum {
   l = "l",
   kg = "kg",
   MJ = "MJ",
+}
+export enum SiteTypeEnum {
+  OTHER = "OTHER",
+  EFS = "EFS",
+  EFPE = "EFPE",
+  OIL_DEPOT = "OIL DEPOT",
+  BIOFUEL_DEPOT = "BIOFUEL DEPOT",
+  HEAT_PLANT = "HEAT PLANT",
+  POWER_PLANT = "POWER PLANT",
+  COGENERATION_PLANT = "COGENERATION PLANT",
+  PRODUCTION_SITE = "PRODUCTION SITE",
+  EFCA = "EFCA",
 }
 export enum StatusEnum {
   PENDING = "PENDING",

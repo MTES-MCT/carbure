@@ -6,6 +6,7 @@ import {
   Depot,
   EntityDepot,
   OwnershipType,
+  EntityPreview,
 } from "carbure/types"
 import * as common from "carbure/api"
 import * as api from "../../api/delivery-sites"
@@ -106,8 +107,8 @@ const DeliverySitesSettings = ({
             {
               key: "id",
               header: t("ID"),
-              orderBy: (ds) => ds.depot?.depot_id ?? "",
-              cell: (ds) => <Cell text={ds.depot!.depot_id} />,
+              orderBy: (ds) => ds.depot?.customs_id ?? "",
+              cell: (ds) => <Cell text={ds.depot!.customs_id} />,
             },
             {
               key: "name",
@@ -121,8 +122,8 @@ const DeliverySitesSettings = ({
               cell: (ds) => (
                 <Cell
                   text={
-                    ds.depot?.depot_type
-                      ? depotTypeLabels[ds.depot?.depot_type]
+                    ds.depot?.site_type
+                      ? depotTypeLabels[ds.depot?.site_type]
                       : ""
                   }
                 />
@@ -186,15 +187,15 @@ export const DeliverySiteFinderDialog = ({
     depot: undefined as Depot | undefined,
     ownership_type: OwnershipType.ThirdParty as OwnershipType | undefined,
     blending_is_outsourced: false,
-    blender: undefined as Entity | undefined,
+    blender: undefined as EntityPreview | undefined,
   })
 
   async function submitDepot() {
-    if (!value.depot) return
+    if (!value.depot || !value.depot.customs_id) return
 
     await addDeliverySite.execute(
       entity.id,
-      value.depot.depot_id,
+      value.depot.customs_id,
       value.ownership_type!,
       value.blending_is_outsourced,
       value.blender
@@ -311,10 +312,10 @@ const DeleteDeliverySiteButton = ({
             variant="danger"
             onClose={close}
             onConfirm={async () => {
-              if (deliverySite.depot) {
+              if (deliverySite.depot?.customs_id) {
                 await deleteDeliverySite.execute(
                   entity.id,
-                  deliverySite.depot.depot_id
+                  deliverySite.depot.customs_id
                 )
               }
             }}

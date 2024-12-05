@@ -3,12 +3,11 @@ import factory
 from core.models import (
     Biocarburant,
     CarbureStock,
-    Depot,
     Entity,
     MatierePremiere,
     Pays,
 )
-from producers.models import ProductionSite
+from transactions.models import Depot, ProductionSite
 
 
 class CarbureStockFactory(factory.django.DjangoModelFactory):

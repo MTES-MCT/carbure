@@ -10,6 +10,7 @@ import {
   Feedstock,
   ProductionSite,
   Unit,
+  EntityPreview,
 } from "carbure/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
@@ -250,17 +251,17 @@ export const defaultLot = {
   country_of_origin: undefined as Country | undefined,
   free_field: undefined as string | undefined,
 
-  producer: undefined as Entity | string | undefined,
+  producer: undefined as EntityPreview | string | undefined,
   production_site: undefined as ProductionSite | string | undefined,
   production_site_certificate: undefined as string | undefined,
   production_country: undefined as Country | undefined,
   production_site_double_counting_certificate: undefined as string | undefined,
   production_site_commissioning_date: undefined as string | undefined,
 
-  supplier: undefined as Entity | string | undefined,
+  supplier: undefined as EntityPreview | string | undefined,
   supplier_certificate: undefined as string | undefined,
   vendor_certificate: undefined as string | undefined,
-  client: undefined as Entity | string | undefined,
+  client: undefined as EntityPreview | string | undefined,
   delivery_type: undefined as DeliveryType | undefined,
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,
@@ -415,7 +416,7 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
     unknown_client: typeof lot.client === "string" ? lot.client : undefined,
     carbure_delivery_site_depot_id:
       lot.delivery_site instanceof Object
-        ? lot.delivery_site.depot_id
+        ? lot.delivery_site.customs_id
         : undefined,
     unknown_delivery_site:
       typeof lot.delivery_site === "string" ? lot.delivery_site : undefined,
@@ -460,7 +461,7 @@ export function isLotProducer(
 ) {
   const producer = value.producer instanceof Object ? value.producer : undefined
   const isProducerEntity = producer?.id === entity.id
-  const hasTrading = !!producer?.has_stocks && !!producer.has_trading
+  const hasTrading = !!entity?.has_stocks && !!entity.has_trading
   return withTrading ? isProducerEntity && hasTrading : isProducerEntity
 }
 
