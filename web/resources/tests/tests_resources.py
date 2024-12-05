@@ -198,28 +198,28 @@ class ResourcesTest(TestCase):
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
         Site.objects.update_or_create(
-            site_type=Site.PRODUCTION_SITE,
+            site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine1",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
         Site.objects.update_or_create(
-            site_type=Site.PRODUCTION_SITE,
+            site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine2",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
         Site.objects.update_or_create(
-            site_type=Site.PRODUCTION_SITE,
+            site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine3",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
         Site.objects.update_or_create(
-            site_type=Site.PRODUCTION_SITE,
+            site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine4",
             created_by_id=other_producer.id,
             country=fr,
