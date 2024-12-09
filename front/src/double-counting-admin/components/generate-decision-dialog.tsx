@@ -1,3 +1,6 @@
+/**
+ * Dialog to generate a decision for an agreement or an application
+ */
 import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import { Confirm } from "common/components/dialog"
@@ -5,42 +8,40 @@ import { AlertTriangle, Download } from "common/components/icons"
 import { Input } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { PortalInstance } from "common/components/portal"
-import { useMutation } from "common/hooks/async"
-import { hasIndustrialWastes } from "double-counting-admin/utils"
-import { DoubleCountingApplicationDetails } from "double-counting/types"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import * as api from "../../api"
+import * as api from "../api"
+import { useState } from "react"
 
-type ApplicationDetailsDialogAcceptProps = {
-  application: DoubleCountingApplicationDetails
+type GenerateDecisionDialogProps = {
+  applicationOrAgreementId: number
+  hasIndustrialWastes: boolean
   onClose: PortalInstance["close"]
-  onChangeIndustrialWastes: (value: string) => void
-  industrialWastes: string
+  // onChangeIndustrialWastes: (value: string) => void
+  // industrialWastes: string
 }
-const ApplicationDetailsDialogAccept = ({
-  application,
+const ApplicationDetailsDialogGenerateDecision = ({
+  applicationOrAgreementId,
+  hasIndustrialWastes,
   onClose,
-  onChangeIndustrialWastes,
-  industrialWastes,
-}: ApplicationDetailsDialogAcceptProps) => {
+}: GenerateDecisionDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
   const entity = useEntity()
-  const approveApplication = useMutation(api.approveDoubleCountingApplication, {
-    invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
-    onSuccess: () => {
-      api.downloadDoubleCountingApplication(
-        entity.id,
-        application.id,
-        industrialWastes
-      )
-      notify(t("La décision a bien été générée."), { variant: "success" })
-      onChangeIndustrialWastes("")
-      navigate("/org/9/double-counting/agreements")
-    },
-  })
+  const [industrialWastes, setIndustrialWastes] = useState("")
+
+  const downloadDoubleCountingApplication = () => {
+    api.downloadDoubleCountingApplication(
+      entity.id,
+      applicationOrAgreementId,
+      industrialWastes
+    )
+
+    setIndustrialWastes("")
+    notify(t("La décision a bien été générée."), { variant: "success" })
+    navigate("/org/9/double-counting/agreements")
+  }
 
   return (
     <Confirm
@@ -48,7 +49,7 @@ const ApplicationDetailsDialogAccept = ({
       title={t("Accepter la demande d'agrément")}
       description={
         <>
-          {hasIndustrialWastes(application) && (
+          {hasIndustrialWastes && (
             <div style={{ marginBottom: "8px" }}>
               <Alert
                 variant="info"
@@ -63,7 +64,7 @@ const ApplicationDetailsDialogAccept = ({
               </Alert>
               <Input
                 value={industrialWastes}
-                onChange={(e) => onChangeIndustrialWastes(e.target.value)}
+                onChange={(e) => setIndustrialWastes(e.target.value)}
                 label={t(
                   "Lister ici les déchets industriels - séparés par une virgule :"
                 )}
@@ -89,13 +90,9 @@ const ApplicationDetailsDialogAccept = ({
       confirm={t("Générer la décision")}
       icon={Download}
       onClose={onClose}
-      onConfirm={async () => {
-        if (application) {
-          await approveApplication.execute(entity.id, application.id)
-        }
-      }}
+      onConfirm={() => Promise.resolve(downloadDoubleCountingApplication())}
     />
   )
 }
 
-export default ApplicationDetailsDialogAccept
+export default ApplicationDetailsDialogGenerateDecision

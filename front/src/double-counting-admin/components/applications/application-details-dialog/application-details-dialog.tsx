@@ -3,7 +3,7 @@ import { EntityType } from "carbure/types"
 import { Button } from "common/components/button"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross, Return, Save } from "common/components/icons"
+import { Check, Cross, Download, Return, Save } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -11,12 +11,13 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
-import { DoubleCountingStatus as DCStatus } from "../../../double-counting/types"
-import { ApplicationInfo } from "./application-info"
-import ApplicationStatus from "../../../double-counting/components/application-status"
-import ApplicationTabs from "./application-tabs"
-import ApplicationDetailsDialogAccept from "./application-details-dialog-accept"
+import * as api from "../../../api"
+import { DoubleCountingStatus as DCStatus } from "../../../../double-counting/types"
+import { ApplicationInfo } from "../application-info"
+import ApplicationStatus from "../../../../double-counting/components/application-status"
+import ApplicationTabs from "../application-tabs"
+import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
+import ApplicationDetailsDialogGenerateDecision from "./application-details-dialog-generate-decision"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -29,11 +30,8 @@ export const ApplicationDetailsDialog = () => {
   const [quotasIsUpdated, setQuotasIsUpdated] = useState(false)
   const [quotas, setQuotas] = useState<Record<string, number>>({})
 
-  const [
-    displayAcceptApplicationDetailsDialog,
-    setDisplayAcceptApplicationDetailsDialog,
-  ] = useState(false)
-  const [industrialWastes, setIndustrialWastes] = useState("")
+  // hasQuotasValidated is used to check if the agreement has been validated
+  const [agreementValidated, setAgreementValidated] = useState(false)
   const match = useHashMatch("application/:id")
 
   const applicationResponse = useQuery(api.getDoubleCountingApplication, {
@@ -136,6 +134,33 @@ export const ApplicationDetailsDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
+  const displayAcceptApplicationDetailsDialog = () => {
+    if (!application) {
+      return
+    }
+
+    portal((close) => (
+      <ApplicationDetailsDialogValidateQuotas
+        application={application}
+        onClose={close}
+        onValidateQuotas={() => setAgreementValidated(true)}
+      />
+    ))
+  }
+
+  const displayGenerateDecisionDialog = () => {
+    if (!application) {
+      return
+    }
+
+    portal((close) => (
+      <ApplicationDetailsDialogGenerateDecision
+        application={application}
+        onClose={close}
+      />
+    ))
+  }
+
   if (!application) {
     return null
   }
@@ -183,10 +208,20 @@ export const ApplicationDetailsDialog = () => {
                   disabled={applicationResponse.loading || !hasQuotas}
                   variant="success"
                   icon={Check}
-                  action={() => setDisplayAcceptApplicationDetailsDialog(true)}
+                  action={displayAcceptApplicationDetailsDialog}
                 >
                   <Trans>Valider les quotas</Trans>
                 </Button>
+                {agreementValidated && (
+                  <Button
+                    icon={Download}
+                    variant="warning"
+                    action={displayGenerateDecisionDialog}
+                  >
+                    <Trans>Générer la décision</Trans>
+                  </Button>
+                )}
+
                 <Button
                   loading={rejectApplication.loading}
                   disabled={applicationResponse.loading}
@@ -206,16 +241,14 @@ export const ApplicationDetailsDialog = () => {
           {applicationResponse.loading && <LoaderOverlay />}
         </Dialog>
       </Portal>
-      <Portal>
+      {/* <Portal>
         {displayAcceptApplicationDetailsDialog && (
-          <ApplicationDetailsDialogAccept
+          <ApplicationDetailsDialogValidateQuotas
             application={application}
-            industrialWastes={industrialWastes}
-            onChangeIndustrialWastes={setIndustrialWastes}
             onClose={() => setDisplayAcceptApplicationDetailsDialog(false)}
           />
         )}
-      </Portal>
+      </Portal> */}
     </>
   )
 }
