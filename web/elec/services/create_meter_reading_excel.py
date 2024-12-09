@@ -163,7 +163,7 @@ def get_previous_readings_by_charge_point(
 
     # initialize previous readings using the first one set during the charge point registration
     for charge_point in charge_points:
-        previous_readings_by_charge_point[charge_point.charge_point_id] = charge_point.measure_energy
+        previous_readings_by_charge_point[charge_point.charge_point_id] = charge_point.current_meter.initial_index
 
     # then if there was a previous registration, use its data to specify the previous reading latest value
     if previous_application:
