@@ -1,6 +1,6 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { http, HttpResponse } from "msw"
+import { http, HttpResponse, JsonBodyType } from "msw"
 
 export async function waitWhileLoading() {
   const loaders = screen.queryAllByTestId("loader")
@@ -68,14 +68,15 @@ export function setEntity(nextEntity: any) {
   Data.set("entity", nextEntity)
 }
 
-export const mockGetWithResponseData = <T>(url: string, data: T) => {
+export const mockGetWithResponseData = <T extends JsonBodyType>(
+  url: string,
+  data: T
+) => {
   return http.get("/api" + url, () => {
-    return HttpResponse.json({
-      status: "success",
-      data,
-    })
+    return HttpResponse.json(data)
   })
 }
+
 export const mockPostWithResponseData = (
   url: string,
   data?: any,
