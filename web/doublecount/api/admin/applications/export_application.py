@@ -143,7 +143,7 @@ def format_biofuels_to_text(biofuels):
 
 
 def check_has_dechets_industriels(application):
-    return application.production.filter(feedstock__code="DECHETS_INDUSTRIELS").exists()
+    return application.production.filter(feedstock__code__in=["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]).exists()
 
 
 @check_admin_rights()
