@@ -10,6 +10,7 @@ import css from "./notice.module.css"
 import { fr } from "@codegouvfr/react-dsfr"
 import { IconProps } from "../icon"
 import { NavLink } from "../nav-link"
+import { Button } from "../button2"
 
 type CustomRenderer = (config: { close: () => void }) => React.ReactNode
 export type NoticeVariant = "info" | "warning" | "alert"
@@ -94,9 +95,9 @@ export const Notice = ({
               </NavLink>
             )}
             {linkText && onAction && (
-              <button className={css.notice__link} onClick={onAction}>
+              <Button customPriority="link" onClick={onAction}>
                 {linkText}
-              </button>
+              </Button>
             )}
           </p>
           {isClosable && (
