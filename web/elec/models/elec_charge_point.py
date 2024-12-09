@@ -47,11 +47,23 @@ class ElecChargePoint(models.Model):
 
     @property
     def measure_date(self):
-        return self.current_meter.initial_index_date if self.current_meter else None
+        if self.current_meter:
+            if self.current_meter.elec_meter_readings.all():
+                return self.current_meter.elec_meter_readings.order_by("-reading_date").first().reading_date
+            else:
+                return self.current_meter.initial_index_date
+        else:
+            return None
 
     @property
     def measure_energy(self):
-        return self.current_meter.initial_index if self.current_meter else None
+        if self.current_meter:
+            if self.current_meter.elec_meter_readings.all():
+                return self.current_meter.elec_meter_readings.order_by("-reading_date").first().extracted_energy
+            else:
+                return self.current_meter.initial_index
+        else:
+            return None
 
     def is_updatable(self):
         return self.application.status != ElecChargePointApplication.AUDIT_IN_PROGRESS

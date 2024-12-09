@@ -55,6 +55,6 @@ class ChargePointRepository:
     def get_replaced_charge_points(cpo, new_charge_points: list[str]):
         return (
             ElecChargePoint.objects.select_related("application")
-            .filter(cpo=cpo, is_deleted=False, charge_point_id__in=new_charge_points)
+            .filter(is_deleted=False, charge_point_id__in=new_charge_points)
             .order_by("charge_point_id")
         )

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import i18next from "i18next"
 import { useMatomo } from "matomo"
 import { useTranslation } from "react-i18next"
-import { Entity, EntityType, EntityDepot } from "carbure/types"
+import { EntityType, EntityDepot, EntityPreview } from "carbure/types"
 import { Lot, LotQuery } from "transactions/types"
 import Menu from "common/components/menu"
 import { Check, Return } from "common/components/icons"
@@ -619,7 +619,7 @@ const TradingDialog = ({
 
   const v = variations(selection.length)
 
-  const [client, setClient] = useState<Entity | string | undefined>()
+  const [client, setClient] = useState<EntityPreview | string | undefined>()
   const [certificate, setCertificate] = useState<string | undefined>()
 
   const acceptLots = useMutation(api.acceptForTrading, {
@@ -693,7 +693,7 @@ const TradingDialog = ({
               value={client}
               onChange={setClient}
               getOptions={findBiofuelEntities}
-              normalize={norm.normalizeEntityOrUnknown}
+              normalize={norm.normalizeEntityPreviewOrUnknown}
               create={norm.identity}
             />
             <Autocomplete

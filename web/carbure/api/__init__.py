@@ -7,7 +7,7 @@ urlpatterns = [
     path("entity/", include("entity.api")),
     path("entities/", include("entity.urls")),
     path("saf/", include("saf.urls")),
-    path("resources/", include("resources.api")),
+    path("resources/", include("resources.urls")),
     path("transactions/", include("transactions.api")),
     path("user/", include("user.api")),
     path("elec/", include("elec.api")),

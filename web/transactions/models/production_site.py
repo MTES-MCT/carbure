@@ -3,7 +3,7 @@ from transactions.models import Site, SiteManager
 
 class ProductionSiteManager(SiteManager):
     def get_queryset(self):
-        return super().get_queryset().filter(site_type=Site.PRODUCTION_SITE)
+        return super().get_queryset().filter(site_type__in=Site.PRODUCTION_SITE_TYPES)
 
 
 class ProductionSite(Site):

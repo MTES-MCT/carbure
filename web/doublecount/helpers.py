@@ -696,8 +696,8 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
             )
         sourcing.supply_country = get_country(row["supply_country"], countries)
         sourcing.transit_country = get_country(row["transit_country"], countries)
-        sourcing.raw_material_supplier = row["raw_material_supplier"]
-        sourcing.supplier_certificate_name = row["supplier_certificate_name"]
+        sourcing.raw_material_supplier = row.get("raw_material_supplier") or ""
+        sourcing.supplier_certificate_name = row.get("supplier_certificate_name") or ""
         sourcing.supplier_certificate = row["supplier_certificate"]
 
         sourcing_errors += errors

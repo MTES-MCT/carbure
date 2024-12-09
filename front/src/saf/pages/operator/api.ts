@@ -1,7 +1,5 @@
-import { extract } from "carbure/api"
 import { EntityPreview } from "carbure/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
-import { api, Api } from "common/services/api"
 import { SafFilter, SafOperatorQuery, SafQuery } from "../../types"
 import {
   api as apiFetch,
@@ -29,19 +27,6 @@ export function getOperatorSnapshot(entity_id: number, year: number) {
   })
 }
 
-// export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
-//   const params = { filter: field, ...query, ...CBQUERY_RESET }
-
-//   // TO TEST without data
-//   // return new Promise<any[]>((resolve) => {
-//   //   resolve(data.safClientFilterOptions)
-//   // })
-
-//   return api
-//     .get<Api<string[]>>("/saf/operator/ticket-sources/filters", { params })
-//     .then((res) => res.data.data ?? [])
-// }
-
 export function getTicketSourceFilters(
   field: SafFilter,
   query: SafOperatorQuery
@@ -59,12 +44,6 @@ export function getTicketSourceFilters(
     .then((res) => res.data ?? [])
 }
 
-// export function getOperatorTicketSources(query: SafQuery) {
-//   return api.get<Api<SafTicketSourcesResponse>>(
-//     "/saf/operator/ticket-sources",
-//     { params: query }
-//   )
-// }
 export function getOperatorTicketSources(query: SafOperatorQuery) {
   return apiFetch.GET("/saf/ticket-sources/", {
     params: {
@@ -73,9 +52,6 @@ export function getOperatorTicketSources(query: SafOperatorQuery) {
   })
 }
 
-// export function downloadOperatorTicketSources(query: SafQuery) {
-//   return download("/saf/operator/ticket-sources", { ...query, export: true })
-// }
 export function downloadOperatorTicketSources(query: SafOperatorQuery) {
   return downloadFetch("/saf/ticket-sources/export/", {
     ...query,
@@ -98,12 +74,6 @@ export function getOperatorTicketSourceDetails(
   })
 }
 
-// export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
-//   const params = { filter: field, ...query, ...CBQUERY_RESET }
-//   return api
-//     .get<Api<string[]>>("/saf/operator/tickets/filters", { params })
-//     .then((res) => res.data.data ?? [])
-// }
 export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
   return apiFetch
     .GET("/saf/tickets/filters/", {
@@ -118,11 +88,6 @@ export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
     .then((res) => res.data ?? [])
 }
 
-// export function getOperatorTickets(query: SafQuery) {
-//   return api.get<Api<SafTicketsResponse>>("/saf/operator/tickets", {
-//     params: query,
-//   })
-// }
 export function getOperatorTickets(query: SafQuery) {
   return apiFetch.GET("/saf/tickets/", {
     params: {
@@ -252,9 +217,14 @@ export function creditSafTicketSource(entity_id: number, ticket_id: number) {
 }
 
 export async function findClients(entity_id: number, query?: string) {
-  return api
-    .get<Api<EntityPreview[]>>("/saf/operator/clients", {
-      params: { entity_id, query },
+  return apiFetch
+    .GET("/saf/clients/", {
+      params: {
+        query: {
+          entity_id: `${entity_id}`,
+          search: query,
+        },
+      },
     })
-    .then(extract)
+    .then((res) => (res.data ? res.data.results : []))
 }

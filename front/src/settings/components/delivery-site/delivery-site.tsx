@@ -6,6 +6,7 @@ import {
   Depot,
   EntityDepot,
   OwnershipType,
+  EntityPreview,
 } from "carbure/types"
 import * as common from "carbure/api"
 import * as api from "../../api/delivery-sites"
@@ -186,7 +187,7 @@ export const DeliverySiteFinderDialog = ({
     depot: undefined as Depot | undefined,
     ownership_type: OwnershipType.ThirdParty as OwnershipType | undefined,
     blending_is_outsourced: false,
-    blender: undefined as Entity | undefined,
+    blender: undefined as EntityPreview | undefined,
   })
 
   async function submitDepot() {

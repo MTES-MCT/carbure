@@ -22,6 +22,17 @@ paths:
           required: true
       tags:
         - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EmptyResponse"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -30,13 +41,196 @@ paths:
         "200":
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: "#/components/schemas/EmptyResponse"
           description: ""
-        "400":
+  /api/resources/biofuels:
+    get:
+      operationId: resources_biofuels_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en`, and `code`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Biofuel"
+          description: ""
+  /api/resources/certificates:
+    get:
+      operationId: resources_certificates_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `certificate_id` and `certificate_holder`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GenericCertificate"
+          description: ""
+  /api/resources/countries:
+    get:
+      operationId: resources_countries_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code_pays`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Country"
+          description: ""
+  /api/resources/depots:
+    get:
+      operationId: resources_depots_list
+      parameters:
+        - in: query
+          name: public_only
+          schema:
+            type: boolean
+          description: Public Only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code_pays`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Depot"
+          description: ""
+  /api/resources/entities:
+    get:
+      operationId: resources_entities_list
+      parameters:
+        - in: query
+          name: entity_type
+          schema:
+            type: array
+            items:
+              type: string
+          description: Only keep specific entity types
+        - in: query
+          name: is_enabled
+          schema:
+            type: boolean
+          description: Only show enabled entities
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityPreview"
+          description: ""
+  /api/resources/feedstocks:
+    get:
+      operationId: resources_feedstocks_list
+      parameters:
+        - in: query
+          name: double_count_only
+          schema:
+            type: boolean
+          description: Double compte only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `name_en` and `code`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeedStock"
+          description: ""
+  /api/resources/production-sites:
+    get:
+      operationId: resources_production_sites_list
+      parameters:
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Search within the field `producer_id`
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductionSite"
           description: ""
   /api/saf/clients/:
     get:
@@ -80,7 +274,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSafClientList"
+                $ref: "#/components/schemas/PaginatedEntityPreviewList"
           description: ""
   /api/saf/clients/{id}/:
     get:
@@ -102,7 +296,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafClient"
+                $ref: "#/components/schemas/EntityPreview"
           description: ""
   /api/saf/snapshot/:
     get:
@@ -1664,6 +1858,18 @@ components:
         * `ANN-IX-B` - ANNEXE IX-B
         * `TALLOL` - Tallol
         * `OTHER` - Autre
+    CertificateTypeEnum:
+      enum:
+        - SYSTEME_NATIONAL
+        - ISCC
+        - REDCERT
+        - 2BS
+      type: string
+      description: |-
+        * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
+        * `ISCC` - ISCC
+        * `REDCERT` - REDCERT
+        * `2BS` - 2BS
     Comment:
       type: object
       properties:
@@ -1755,10 +1961,34 @@ components:
         accise:
           type: string
           maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
       required:
         - country
         - id
         - name
+    EmptyResponse:
+      type: object
+      properties:
+        empty:
+          type: string
     Entity:
       type: object
       properties:
@@ -1824,10 +2054,13 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          readOnly: true
         entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
+          readOnly: true
       required:
+        - entity_type
         - id
         - name
     EntitySummary:
@@ -1906,6 +2139,47 @@ components:
         - code
         - name
         - name_en
+    GenericCertificate:
+      type: object
+      properties:
+        certificate_id:
+          type: string
+          maxLength: 64
+        certificate_type:
+          $ref: "#/components/schemas/CertificateTypeEnum"
+        certificate_holder:
+          type: string
+          maxLength: 512
+        certificate_issuer:
+          type: string
+          nullable: true
+          maxLength: 256
+        address:
+          type: string
+          nullable: true
+          maxLength: 512
+        valid_from:
+          type: string
+          format: date
+        valid_until:
+          type: string
+          format: date
+        download_link:
+          type: string
+          nullable: true
+          maxLength: 512
+        scope:
+          nullable: true
+        input:
+          nullable: true
+        output:
+          nullable: true
+      required:
+        - certificate_holder
+        - certificate_id
+        - certificate_type
+        - valid_from
+        - valid_until
     GesOptionEnum:
       enum:
         - Default
@@ -1939,7 +2213,7 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
-    PaginatedSafClientList:
+    PaginatedEntityPreviewList:
       type: object
       required:
         - count
@@ -1961,7 +2235,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/SafClient"
+            $ref: "#/components/schemas/EntityPreview"
     PaginatedSafTicketList:
       type: object
       required:
@@ -2076,20 +2350,6 @@ components:
         - id
         - name
         - producer
-    SafClient:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-        name:
-          type: string
-          maxLength: 64
-      required:
-        - id
-        - name
     SafTicket:
       type: object
       properties:
