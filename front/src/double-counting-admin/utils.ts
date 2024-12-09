@@ -1,6 +1,9 @@
 import { DoubleCountingApplicationDetails } from "double-counting/types"
 
-const FEEDSTOCK_INDUSTRIAL_WASTES_CODE = "DECHETS_INDUSTRIELS"
+const FEEDSTOCK_INDUSTRIAL_WASTES_CODES = [
+  "DECHETS_INDUSTRIELS",
+  "AMIDON_RESIDUEL_DECHETS",
+]
 
 /**
  *
@@ -10,6 +13,6 @@ const FEEDSTOCK_INDUSTRIAL_WASTES_CODE = "DECHETS_INDUSTRIELS"
 export const hasIndustrialWastes = (
   application: DoubleCountingApplicationDetails
 ) =>
-  application.production.filter(
-    (a) => a.feedstock.code === FEEDSTOCK_INDUSTRIAL_WASTES_CODE
+  application.production.filter((a) =>
+    FEEDSTOCK_INDUSTRIAL_WASTES_CODES.includes(a.feedstock.code)
   ).length > 0

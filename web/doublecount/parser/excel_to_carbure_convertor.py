@@ -46,6 +46,7 @@ dc_feedstock_to_carbure_feedstock = {
     "tallol": "TALLOL",
     "tournesol": "TOURNESOL",
     "triticale": "TRITICALE",
+    "amidons résiduels déchets": "AMIDON_RESIDUEL_DECHETS",
 }
 
 
