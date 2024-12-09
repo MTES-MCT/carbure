@@ -7,7 +7,9 @@ from core.models import ExternalAdminRights, UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
+@check_admin_rights(
+    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.DOUBLE_COUNTING]
+)
 def update_right_request(request):
     urr_id = request.POST.get("id", False)
     status = request.POST.get("status", False)

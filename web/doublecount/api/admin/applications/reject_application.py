@@ -1,12 +1,13 @@
 from django.http import JsonResponse
 
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.models import (
     DoubleCountingApplication,
 )
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def reject_dca(request, *args, **kwargs):
     dca_id = request.POST.get("dca_id", False)
     if not dca_id:
