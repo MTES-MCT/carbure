@@ -25,6 +25,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--ids", type=str, help="Download specific certificates")
+        parser.add_argument("--no-pdf", action="store_true", help="Download certificates without pdf")
 
     def handle(self, *args, **options):
         start_time = time.time()
@@ -34,8 +35,14 @@ class Command(BaseCommand):
         driver = self.create_driver()
         self.load_redcert_page(driver)
 
+        certificates = None
         if options["ids"]:
-            certificates_to_update = self.get_certificates_with_id(driver, options["ids"])
+            certificates = self.certificates_with_ids(options["ids"])
+        elif options["no_pdf"]:
+            certificates = self.certificates_without_pdf()
+
+        if certificates:
+            certificates_to_update = self.get_pdf_for_specific_certificates(driver, certificates)
         else:
             certificates_to_update = self.get_all_certificates(driver, start_time)
 
@@ -72,24 +79,31 @@ class Command(BaseCommand):
             )
         )
 
-    def get_certificates_with_id(self, driver, certificate_ids):
-        certificate_ids = certificate_ids.split(",")
+    def certificates_without_pdf(self):
+        return GenericCertificate.objects.filter(
+            certificate_type=GenericCertificate.REDCERT,
+            download_link__isnull=True,
+            valid_until__gte=time.strftime("%Y-%m-%d"),
+        ).order_by("-valid_until")[:10]
 
-        self.stdout.write("Searching for certificate with ids %s" % certificate_ids)
+    def certificates_with_ids(self, certificate_ids):
+        return GenericCertificate.objects.filter(certificate_id__in=certificate_ids.split(","))
 
-        certificates = GenericCertificate.objects.filter(
-            certificate_id__in=certificate_ids,
-        )
+    def get_pdf_for_specific_certificates(self, driver, certificates):
+        self.stdout.write("Searching for certificate with ids %s" % [c.certificate_id for c in certificates])
 
         certificates_to_update = []
 
-        for certificate_id in certificate_ids:
+        total = len(certificates)
+
+        for i, certificate in enumerate(certificates):
+            self.stdout.write(f"{i+1}/{total}: {certificate.certificate_id}")
             # Fill the form
             search_box = driver.find_element(
                 By.XPATH, "//*[@id='ctl00_mainContentPlaceHolder_zertifikatIdentifikatorTextBox']"
             )
             search_box.clear()
-            search_box.send_keys(certificate_id)
+            search_box.send_keys(certificate.certificate_id)
 
             # And submit
             search_box.send_keys(Keys.RETURN)
@@ -101,20 +115,19 @@ class Command(BaseCommand):
             rows = rows[1:]  # Remove the first row header
 
             if not rows[0]:
-                self.stdout.write("No results found for certificate %s" % certificate_id)
+                self.stdout.write("No results found for certificate %s" % certificate.certificate_id)
                 continue
 
             try:
-                certificates_to_update = self.download_certificate(
+                self.download_certificate(
                     driver,
                     rows[0],
-                    certificates,
-                    certificates_to_update,
-                    certificate_id,
+                    certificate,
                 )
-
             except NoSuchElementException:
-                self.stdout.write("No PDF found for certificate %s" % certificate_id)
+                self.stdout.write("No PDF found for certificate %s" % certificate.certificate_id)
+            else:
+                certificates_to_update.append(certificate)
 
         return certificates_to_update
 
@@ -142,7 +155,8 @@ class Command(BaseCommand):
 
         # Get all certificates with 'valid_until' date > today
         certificates = GenericCertificate.objects.filter(
-            certificate_type=GenericCertificate.REDCERT, valid_until__gte=time.strftime("%Y-%m-%d")
+            certificate_type=GenericCertificate.REDCERT,
+            valid_until__gte=time.strftime("%Y-%m-%d"),
         )
 
         nb_pdf_downloaded = 0
@@ -199,12 +213,12 @@ class Command(BaseCommand):
                     continue
 
                 try:
-                    certificates_to_update = self.download_certificate(
+                    certificate = certificates.filter(certificate_id=redcert_id).first()
+
+                    self.download_certificate(
                         driver,
                         row,
-                        certificates,
-                        certificates_to_update,
-                        redcert_id,
+                        certificate,
                     )
                     kwargs["nb_pdf_downloaded"] += 1
 
@@ -212,18 +226,18 @@ class Command(BaseCommand):
                     self.stdout.write("No PDF found for certificate %s" % redcert_id)
                     kwargs["nb_skipped"] += 1
 
+                else:
+                    certificates_to_update.append(certificate)
+
         return kwargs["nb_pdf_downloaded"], kwargs["nb_skipped"], certificates_to_update
 
-    def download_certificate(self, driver, row, certificates, certificates_to_update, redcert_id):
+    def download_certificate(self, driver, row, certificate):
         dl_button = row.find_element(By.CLASS_NAME, "lastColumns").find_element(By.TAG_NAME, "input")
         actions = ActionChains(driver)
         actions.move_to_element(dl_button).click().perform()
 
-        new_name = f"certificate_{redcert_id}.pdf"
+        new_name = f"certificate_{certificate.certificate_id}.pdf"
         self.wait_for_download_and_move(new_name)
-
-        certificates_to_update.append(certificates.filter(certificate_id=redcert_id).first())
-        return certificates_to_update
 
     def update_certificates(self, certificates_to_update):
         self.stdout.write("Updating certificates download links...")
