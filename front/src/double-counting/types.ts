@@ -112,13 +112,9 @@ export interface DoubleCountingUploadErrors
   global?: DoubleCountingUploadError[]
 }
 
-export interface DoubleCountingApplicationDetails
-  extends DoubleCountingApplicationOverview {
-  sourcing: DoubleCountingSourcing[]
-  production: DoubleCountingProduction[]
-  aggregated_sourcing: DoubleCountingSourcingAggregation[]
-  documents: { id: number; url: string; file_type: "DECISION" | "SOURCING" }[]
-}
+export type DoubleCountingApplicationDetails =
+  apiTypes["DoubleCountingApplication"]
+
 export interface DoubleCountingApplicationSnapshot {
   applications_pending: number
   applications_rejected: number

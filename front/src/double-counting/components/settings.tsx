@@ -39,9 +39,11 @@ const DoubleCountingSettings = () => {
     application: DoubleCountingApplicationOverview
   ) {
     if (
-      [DoubleCountingStatus.PENDING, DoubleCountingStatus.REJECTED].includes(
-        application.status
-      )
+      [
+        DoubleCountingStatus.PENDING,
+        DoubleCountingStatus.INPROGRESS,
+        DoubleCountingStatus.REJECTED,
+      ].includes(application.status)
     ) {
       navigate({
         pathname: location.pathname,
@@ -103,7 +105,7 @@ const DoubleCountingSettings = () => {
             },
             {
               header: t("Site de production"),
-              cell: (dc) => <Cell text={dc.production_site} />,
+              cell: (dc) => <Cell text={dc.production_site.name} />,
             },
             {
               header: t("Période de validité"),

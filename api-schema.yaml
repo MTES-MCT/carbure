@@ -565,6 +565,12 @@ paths:
     get:
       operationId: double_counting_applications_retrieve
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
         - in: path
           name: id
           schema:
@@ -3305,7 +3311,7 @@ components:
           type: string
           maxLength: 16
         agreement_id:
-          type: string
+          type: integer
           readOnly: true
         quotas_progression:
           type: number
@@ -3349,8 +3355,7 @@ components:
           readOnly: true
         year:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         biofuel:
           allOf:
             - $ref: "#/components/schemas/Biofuel"
@@ -3361,24 +3366,24 @@ components:
           readOnly: true
         max_production_capacity:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         estimated_production:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         requested_quota:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         approved_quota:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
       required:
+        - approved_quota
         - biofuel
+        - estimated_production
         - feedstock
         - id
+        - max_production_capacity
+        - requested_quota
         - year
     DoubleCountingProductionSite:
       type: object
@@ -3556,8 +3561,7 @@ components:
           readOnly: true
         year:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         feedstock:
           allOf:
             - $ref: "#/components/schemas/FeedStock"
@@ -3576,8 +3580,7 @@ components:
           readOnly: true
         metric_tonnes:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
       required:
         - feedstock
         - id

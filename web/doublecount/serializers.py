@@ -151,6 +151,7 @@ class DoubleCountingProductionSerializer(serializers.ModelSerializer):
             "requested_quota",
             "approved_quota",
         ]
+        read_only_fields = fields
 
 
 class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
@@ -162,6 +163,7 @@ class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingSourcing
         fields = ["id", "year", "feedstock", "origin_country", "supply_country", "transit_country", "metric_tonnes"]
+        read_only_fields = fields
 
 
 class DoubleCountingSourcingHistorySerializer(serializers.ModelSerializer):
@@ -273,9 +275,9 @@ class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
             "producer_user",
         ]
 
-    @extend_schema_field(str)
+    @extend_schema_field(int)
     def get_agreement_id(self, obj):
-        return ""
+        return 0
 
     @extend_schema_field(float)
     def get_quotas_progression(self, obj):

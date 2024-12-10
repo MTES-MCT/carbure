@@ -1131,7 +1131,7 @@ export interface components {
       period_end: string
       readonly status: components["schemas"]["DoubleCountingStatus"]
       certificate_id: string
-      readonly agreement_id: string
+      readonly agreement_id: number
       /** Format: double */
       readonly quotas_progression: number
       /**
@@ -1147,13 +1147,13 @@ export interface components {
     }
     DoubleCountingProduction: {
       readonly id: number
-      year: number
+      readonly year: number
       readonly biofuel: components["schemas"]["Biofuel"]
       readonly feedstock: components["schemas"]["FeedStock"]
-      max_production_capacity?: number
-      estimated_production?: number
-      requested_quota?: number
-      approved_quota?: number
+      readonly max_production_capacity: number
+      readonly estimated_production: number
+      readonly requested_quota: number
+      readonly approved_quota: number
     }
     DoubleCountingProductionSite: {
       readonly id: number
@@ -1211,12 +1211,12 @@ export interface components {
     }
     DoubleCountingSourcing: {
       readonly id: number
-      year: number
+      readonly year: number
       readonly feedstock: components["schemas"]["FeedStock"]
       readonly origin_country: components["schemas"]["Country"]
       readonly supply_country: components["schemas"]["Country"]
       readonly transit_country: components["schemas"]["Country"]
-      metric_tonnes: number
+      readonly metric_tonnes: number
     }
     /**
      * @description * `PENDING` - PENDING
@@ -2232,7 +2232,10 @@ export interface operations {
   }
   double_counting_applications_retrieve: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Dossier Double Compte. */
