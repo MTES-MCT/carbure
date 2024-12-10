@@ -4,6 +4,7 @@ import traceback
 
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.helpers import check_dc_file
 
 
@@ -13,7 +14,7 @@ class CheckFilesError:
     FILE_CHECK_FAILED = "FILE_CHECK_FAILED"
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def check_files(request, *args, **kwargs):
     files = request.FILES.getlist("files")
 

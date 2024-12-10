@@ -36,6 +36,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
+  const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
 
   const entities = useQuery(api.getCompanies, {
     key: "entities",
@@ -95,11 +96,11 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               value: "user",
               label: t("Utilisateurs à autoriser"),
             },
-            entity.isAdmin && {
+            (entity.isAdmin || isAdminDC) && {
               value: "certificate",
               label: t("Certificats à valider"),
             },
-            entity.isAdmin && {
+            (entity.isAdmin || isAdminDC) && {
               value: "double-counting",
               label: t("Demandes d'agrément double comptage"),
             },
@@ -175,7 +176,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                     />
                   ),
                 },
-              entity.isAdmin &&
+              (entity.isAdmin || isAdminDC) &&
                 (!operation ||
                   ![
                     "double-counting",
@@ -205,7 +206,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                     />
                   ),
                 },
-              entity.isAdmin &&
+              (entity.isAdmin || isAdminDC) &&
                 operation === "double-counting" && {
                   key: "double-counting",
                   header: t("Double comptage"),

@@ -9,7 +9,7 @@ from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Entity
+from core.models import Entity, ExternalAdminRights
 from doublecount.helpers import (
     load_dc_filepath,
     load_dc_period,
@@ -44,12 +44,12 @@ class DoubleCountingAddError:
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
 
 
-@check_admin_rights()
-@transaction.atomic
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def add_application(request):
     return add_application_by_type(request, Entity.ADMIN)
 
 
+@transaction.atomic
 def add_application_by_type(request, entity_type):
     form = DoubleCountingAdminAddFrom(request.POST)
     file = request.FILES.get("file")

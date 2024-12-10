@@ -99,7 +99,7 @@ const Org = () => {
     has_saf,
     has_elec,
   } = entity
-  const hasDCA = isExternal && entity.hasAdminRight("DCA")
+  const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
 
@@ -220,16 +220,17 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="controls" />} />
       )}
 
-      {(isAdmin || hasDCA) && (
+      {(isAdmin || isAdminDC) && (
         <Route path="double-counting/*" element={<DoubleCounting />} />
       )}
-      {hasDCA && (
+      {isAdminDC && (
         <Route path="*" element={<Navigate replace to="double-counting" />} />
       )}
 
-      {(isAdmin || hasAirline || isElecAdmin) && (
+      {(isAdmin || hasAirline || isElecAdmin || isAdminDC) && (
         <Route path="entities/*" element={<Entities />} />
       )}
+
       {(isAdmin || isElecAdmin) && (
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />

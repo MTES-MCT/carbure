@@ -63,24 +63,24 @@ const Certificates = ({
           onChange={setCertificatsFilter}
           label={t("Certificats")}
           placeholder={t("Filtrer les certificats")}
-          options={compact([
-            entity.isAdmin && {
+          options={[
+            {
               value: "all",
               label: t("Tous"),
             },
-            entity.isAdmin && {
+            {
               value: "to_checked",
               label: t("À valider"),
             },
-            entity.isAdmin && {
+            {
               value: "rejected",
               label: t("Refusés"),
             },
-            entity.isAdmin && {
+            {
               value: "checked",
               label: t("Validés"),
             },
-          ])}
+          ]}
         />
       </section>
 
