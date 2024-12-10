@@ -1,0 +1,191 @@
+.table {
+  --min-cell-width: var(--spacing-xxl);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.table.compact {
+  padding-bottom: var(--spacing-xs);
+}
+
+.columns {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-m);
+  background-color: var(--blue-ecume-975-75);
+  padding: var(--spacing-3v) 0;
+}
+
+.header {
+  flex: 1 1 0%;
+  padding: 0 var(--spacing-2w);
+}
+
+.header[data-sortable] {
+  cursor: pointer;
+}
+
+.sortable {
+  color: var(--gray-medium);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  gap: 1px;
+  border: 1px solid var(--border-default-grey);
+  background: white;
+}
+
+.compact .rows {
+  gap: var(--spacing-xs);
+}
+
+.rows > li {
+  position: relative;
+}
+
+.rows > li:not(.rowLink) {
+  padding: 0 var(--spacing-2w);
+}
+
+.rows > li > a {
+  flex: 1;
+  min-width: 0;
+  padding: 0 var(--spacing-2w);
+}
+
+.rows > li,
+.rows > li > a {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+}
+
+.compact .rows > li {
+  padding: 0 var(--spacing-xs);
+  gap: var(--spacing-xs);
+}
+
+.rows > li[data-interactive] {
+  cursor: pointer;
+}
+
+.cell {
+  flex: 1 1 0%;
+  padding: var(--spacing-m) 0;
+}
+
+.compact .cell {
+  padding: 0;
+}
+
+.cell strong {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.cell strong [data-icon] {
+  width: 20px;
+}
+
+.cell .warning strong {
+  color: var(--orange-dark);
+}
+
+.cell small {
+  color: var(--gray-dark);
+}
+
+.small {
+  flex: 0.5 1;
+}
+
+.cell,
+.header {
+  min-width: 0;
+}
+
+.header,
+.cell .multiline > *,
+.cell .multiline div > * {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.cell .multiline strong > svg {
+  margin-bottom: -5px;
+}
+
+.selection {
+  align-self: stretch;
+  flex: 0 0 min-content;
+  min-width: 0;
+  padding: 0;
+  margin-left: calc(-1 * var(--spacing-l));
+  margin-right: calc(-1 * var(--spacing-s));
+}
+
+.selection [data-checkbox] {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-l);
+}
+
+.header.selection [data-checkbox] {
+  padding: var(--spacing-s) var(--spacing-l);
+}
+
+.marker {
+  display: block;
+  position: absolute;
+  min-width: 4px;
+  height: 100%;
+  padding: 0;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.marker > * {
+  width: var(--spacing-xs);
+  height: 100%;
+}
+
+.marker .warning {
+  background-color: var(--orange-medium);
+}
+
+.marker .danger {
+  background-color: var(--red-dark);
+}
+
+.marker .success {
+  background-color: var(--green-medium);
+}
+
+.marker .info {
+  background-color: var(--blue-medium);
+}
+
+.actions {
+  display: flex;
+  flex: 0.33;
+  min-width: 0;
+  justify-content: center;
+  gap: var(--spacing-s);
+}
+
+.actions button {
+  color: var(--gray-dark);
+}
