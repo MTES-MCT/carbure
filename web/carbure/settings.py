@@ -32,7 +32,7 @@ env = environ.Env(
     AWS_S3_REGION_NAME=(str, ""),
     AWS_S3_USE_SSL=(str, ""),
     AWS_STORAGE_BUCKET_NAME=(str, ""),
-    AWS_DCDOCS_STORAGE_BUCKET_NAME=(str, ""),
+    AWS_ENV_FOLDER_NAME=(str, ""),
     EMAIL_HOST=(str, ""),
     EMAIL_PORT=(str, ""),
     EMAIL_HOST_USER=(str, ""),
@@ -191,19 +191,9 @@ LOCALE_PATHS = [
 ]
 
 TIME_ZONE = "Europe/Paris"
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-STATIC_URL = "/assets/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 WHITENOISE_ALLOW_ALL_ORIGINS = False
 WHITENOISE_CUSTOM_FRONTEND_ROUTING = True
@@ -223,20 +213,31 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-# file storage
-DEFAULT_FILE_STORAGE = "carbure.storage_backends.MediaStorage"
-AWS_DCDOCS_STORAGE_BUCKET_NAME = env("AWS_DCDOCS_STORAGE_BUCKET_NAME")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL")
+AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
+AWS_LOCATION = env("AWS_ENV_FOLDER_NAME")
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "default_acl": "public-read",
+            "file_overwrite": True,
+            "querystring_auth": False,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+STATIC_URL = "/assets/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 if env("TEST") is False:
-    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
-    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
-    AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL")
-    AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
-    AWS_S3_USE_SSL = 1
-    AWS_DEFAULT_ACL = None
-    AWS_S3_SIGNATURE_VERSION = "s3v4"
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_S3_VERIFY = True
     WHITENOISE_AUTOREFRESH = True
 
 
