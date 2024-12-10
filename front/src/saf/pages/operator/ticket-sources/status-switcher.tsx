@@ -23,13 +23,13 @@ export const StatusSwitcher = ({
       onFocus={(status) => onSwitch(status as SafTicketSourceStatus)}
       tabs={[
         {
-          key: SafTicketSourceStatus.Available,
-          path: SafTicketSourceStatus.Available.toLowerCase(),
+          key: SafTicketSourceStatus.AVAILABLE,
+          path: SafTicketSourceStatus.AVAILABLE.toLowerCase(),
           label: `${t("Disponible")} (${count?.ticket_sources_available ?? 0})`,
         },
         {
-          key: SafTicketSourceStatus.History,
-          path: SafTicketSourceStatus.History.toLowerCase(),
+          key: SafTicketSourceStatus.HISTORY,
+          path: SafTicketSourceStatus.HISTORY.toLowerCase(),
           label: `${t("Historique")} (${count?.ticket_sources_history ?? 0})`,
         },
       ]}

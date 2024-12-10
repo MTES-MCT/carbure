@@ -35,7 +35,7 @@ export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
         query: {
           filter: field,
           ...query,
-          ...(CBQUERY_RESET as SafQuery),
+          ...CBQUERY_RESET,
         },
       },
     })

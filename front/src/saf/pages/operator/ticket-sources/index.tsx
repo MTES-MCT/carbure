@@ -11,13 +11,12 @@ import { compact } from "common/utils/collection"
 import {
   SafFilter,
   SafOperatorColumnsOrder,
-  SafOperatorQuery,
   SafOperatorSnapshot,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../api"
 import { SafFilters } from "../../../components/filters"
-import { useAutoStatus } from "../tabs"
+import { useAutoStatus } from "./index.hooks"
 import { OperatorTicketDetails } from "../ticket-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
@@ -42,10 +41,15 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
 
-  const [state, actions] = useCBQueryParamsStore(entity, year, status)
-  const query = useCBQueryBuilder<SafOperatorColumnsOrder[]>(
-    state
-  ) as SafOperatorQuery
+  const [state, actions] = useCBQueryParamsStore<
+    SafTicketSourceStatus,
+    undefined
+  >(entity, year, status)
+  const query = useCBQueryBuilder<
+    SafOperatorColumnsOrder[],
+    SafTicketSourceStatus,
+    undefined
+  >(state)
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",
@@ -101,7 +105,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           <StatusSwitcher
             onSwitch={actions.setStatus}
             count={snapshot}
-            status={status as SafTicketSourceStatus}
+            status={status}
           />
 
           <ExportButton
@@ -118,7 +122,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         </ActionBar>
 
         {selectedTicketSources &&
-          status === SafTicketSourceStatus.Available && (
+          status === SafTicketSourceStatus.AVAILABLE && (
             <TicketSourcesSummary
               ticketSources={compact(selectedTicketSources)}
             />
@@ -134,7 +138,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
-              status={status as SafTicketSourceStatus}
+              status={status}
             />
 
             {(state.limit || 0) < total && (

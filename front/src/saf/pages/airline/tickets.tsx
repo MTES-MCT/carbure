@@ -10,8 +10,8 @@ import {
   SafColumsOrder,
   SafFilter,
   SafQuery,
-  SafStates,
   SafTicket,
+  SafTicketStatus,
 } from "saf/types"
 import * as api from "./api"
 import { SafFilters } from "../../components/filters"
@@ -33,13 +33,15 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore<SafStates>(
+  const [state, actions] = useCBQueryParamsStore<SafTicketStatus, undefined>(
     entity,
     year,
     status
   )
 
-  const query = useCBQueryBuilder<SafColumsOrder[]>(state) as SafQuery
+  const query = useCBQueryBuilder<SafColumsOrder[], SafTicketStatus, undefined>(
+    state
+  )
   const apiGetTickets = (query: SafQuery) => {
     return api.getSafAirlineTickets(query)
   }

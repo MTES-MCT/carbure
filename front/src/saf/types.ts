@@ -10,7 +10,6 @@ import {
   CBQueryStates,
   CBSnapshot,
 } from "common/hooks/query-builder-2"
-import { SafTicketSourceStatus } from "./pages/operator/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiSafTicketsGetParametersQueryOrder,
@@ -83,13 +82,17 @@ export interface SafTicketAssignementQuery {
 
 export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
 
-export interface SafStates extends CBQueryStates {
-  //old QueryParams
-
-  status: SafTicketSourceStatus | SafTicketStatus
+export interface SafStates
+  extends CBQueryStates<SafTicketStatus, SafQueryType> {
   filters: SafFilterSelection
   snapshot?: SafOperatorSnapshot | SafAirlineSnapshot
-  type?: SafQueryType
+}
+
+export interface SafQuery
+  extends CBQueryParams<SafColumsOrder[], SafTicketStatus, SafQueryType> {
+  [SafFilter.Feedstocks]?: string[]
+  [SafFilter.Periods]?: number[]
+  [SafFilter.Clients]?: string[]
 }
 
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
@@ -108,19 +111,16 @@ export type SafQueryType = "assigned" | "received"
 
 // Airline
 export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
-export interface SafQuery extends CBQueryParams<SafColumsOrder[]> {
-  status?: SafTicketStatus
-  [SafFilter.Feedstocks]?: string[]
-  [SafFilter.Periods]?: number[]
-  [SafFilter.Clients]?: string[]
-}
 
 // Operator
 export type SafOperatorColumnsOrder =
   PathsApiSafTicketSourcesGetParametersQueryOrder
 export interface SafOperatorQuery
-  extends CBQueryParams<SafOperatorColumnsOrder[]> {
-  status?: SafTicketSourceSatus
+  extends CBQueryParams<
+    SafOperatorColumnsOrder[],
+    SafTicketSourceSatus,
+    undefined
+  > {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
