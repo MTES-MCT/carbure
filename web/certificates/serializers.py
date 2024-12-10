@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from doublecount.models import DoubleCountingProduction
@@ -50,7 +50,18 @@ class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
             "biofuel_list",
         ]
 
-    @extend_schema_field(dict)
+    @extend_schema_field(
+        inline_serializer(
+            name="FieldData",
+            fields={
+                "name": serializers.CharField(),
+                "city": serializers.CharField(),
+                "address": serializers.CharField(),
+                "postal_code": serializers.CharField(),
+                "country": serializers.CharField(),
+            },
+        )
+    )
     def get_production_site(self, obj: DoubleCountingRegistration):
         return {
             "name": obj.production_site.name if obj.production_site else None,

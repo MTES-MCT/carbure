@@ -155,18 +155,8 @@ export interface DoubleCountingAgreementOverview {
   quotas_progression: number
 }
 
-export interface DoubleCountingAgreementPublic {
-  production_site: {
-    name: string
-    country: string
-    postal_code: string
-    address: string
-  }
-  certificate_id: string
-  valid_from: Date
-  valid_until: Date
-  biofuel_list: string
-}
+export type DoubleCountingAgreementPublic =
+  apiTypes["DoubleCountingRegistrationPublic"]
 
 export interface AgreementDetails extends DoubleCountingAgreementOverview {
   application: DoubleCountingApplicationDetails
