@@ -11,7 +11,7 @@ from doublecount.views.applications.mixins import ActionMixin
 from saf.permissions import HasUserRights
 
 
-class ApplicationViwSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
+class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
     queryset = applications = DoubleCountingApplication.objects.filter(~Q(status__in=[DoubleCountingApplication.ACCEPTED]))
     serializer_class = DoubleCountingApplicationSerializer
     pagination_class = None
