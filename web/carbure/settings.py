@@ -341,5 +341,6 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
     },
+    "COMPONENT_SPLIT_REQUEST": True,
     # OTHER SETTINGS
 }

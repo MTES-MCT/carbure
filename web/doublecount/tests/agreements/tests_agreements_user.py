@@ -1,4 +1,3 @@
-# test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb  # noqa: E501
 from datetime import date
 
 from django.contrib.auth import get_user_model
@@ -76,15 +75,14 @@ class DoubleCountAgreementsTest(TestCase):
 
         # an agreement expired => Expiré
 
-        response = self.client.post(
-            reverse("doublecount-agreements"),
+        response = self.client.get(
+            reverse("double-counting-agreements-list") + f"?entity_id={self.producer.id}",
             {
                 "entity_id": self.producer.id,
             },
         )
-
-        data = response.json()["data"]
-
+        assert response.status_code == 200
+        data = response.json()
         application1 = data[0]
         application2 = data[1]
         application3 = data[2]

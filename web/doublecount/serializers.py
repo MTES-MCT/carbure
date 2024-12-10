@@ -1,4 +1,5 @@
 from django.db.models.aggregates import Count, Sum
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from certificates.models import ProductionSiteCertificate
@@ -118,16 +119,19 @@ class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
             "certificates",
         ]
 
+    @extend_schema_field(ProductionSiteCertificateSerializer(many=True))
     def get_certificates(self, obj):
         ps_certificates = ProductionSiteCertificate.objects.filter(production_site=obj)
         certificates = [ps_certificate.certificate.certificate for ps_certificate in ps_certificates]
         return ProductionSiteCertificateSerializer(certificates, many=True).data
 
+    @extend_schema_field(FeedStockSerializer(many=True))
     def get_inputs(self, obj):
         inputs = ProductionSiteInput.objects.filter(production_site=obj)
         feedstocks = [input.matiere_premiere for input in inputs]
         return FeedStockSerializer(feedstocks, many=True).data
 
+    @extend_schema_field(BiofuelSerializer(many=True))
     def get_outputs(self, obj):
         inputs = ProductionSiteOutput.objects.filter(production_site=obj)
         biofuels = [input.biocarburant for input in inputs]

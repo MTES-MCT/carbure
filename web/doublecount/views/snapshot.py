@@ -1,15 +1,25 @@
-# /api/saf/operator/snapshot
-
 import traceback
 from datetime import datetime
 
 from django.db.models.query_utils import Q
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import serializers, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
-from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_admin_rights
-from core.models import ExternalAdminRights
+from core.models import Entity
 from doublecount.models import DoubleCountingApplication
+from saf.permissions import HasUserRights
+
+
+class ApplicationSnapshotSerializer(serializers.Serializer):
+    applications_pending = serializers.IntegerField()
+    applications_rejected = serializers.IntegerField()
+    agreements_incoming = serializers.IntegerField()
+    agreements_active = serializers.IntegerField()
+    agreements_expired = serializers.IntegerField()
 
 
 class SafSnapshotError:
@@ -17,7 +27,20 @@ class SafSnapshotError:
     SNAPSHOT_FAILED = "SNAPSHOT_FAILED"
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+    responses=ApplicationSnapshotSerializer,
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN])])
 def get_snapshot(request, *args, **kwargs):
     current_year = datetime.now().year
 
@@ -25,7 +48,12 @@ def get_snapshot(request, *args, **kwargs):
         applications = DoubleCountingApplication.objects.filter()
 
         applications_pending = applications.filter(
-            ~Q(status__in=[DoubleCountingApplication.ACCEPTED, DoubleCountingApplication.REJECTED])
+            ~Q(
+                status__in=[
+                    DoubleCountingApplication.ACCEPTED,
+                    DoubleCountingApplication.REJECTED,
+                ]
+            )
         )
         applications_rejected = applications.filter(Q(status=DoubleCountingApplication.REJECTED))
 
@@ -40,7 +68,7 @@ def get_snapshot(request, *args, **kwargs):
         # agreements_active = DoubleCountingRegistration.objects.filter((Q(period_start__year=year) | Q(period_end__year=year)))  # noqa: E501
         # TODO  agreements_torenew
 
-        return SuccessResponse(
+        return Response(
             {
                 # "applications": applications_pending.count(),
                 "applications_pending": applications_pending.count(),
@@ -53,4 +81,7 @@ def get_snapshot(request, *args, **kwargs):
         )
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, SafSnapshotError.SNAPSHOT_FAILED)
+        return Response(
+            {"message": SafSnapshotError.SNAPSHOT_FAILED},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

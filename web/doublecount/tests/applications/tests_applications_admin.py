@@ -1,4 +1,3 @@
-# test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb  # noqa: E501
 import json
 import os
 from datetime import date
@@ -13,13 +12,6 @@ from docx import Document
 from certificates.models import DoubleCountingRegistration
 from core.models import Entity, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
-from doublecount.api.admin.applications.add import DoubleCountingAddError
-from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
-from doublecount.api.admin.applications.export_application import (
-    DoubleCountingApplicationExportError,
-    application_to_json,
-    check_has_dechets_industriels,
-)
 from doublecount.factories import (
     DoubleCountingApplicationFactory,
     DoubleCountingProductionFactory,
@@ -28,6 +20,13 @@ from doublecount.factories import (
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.doc_file import DoubleCountingDocFileFactory
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
+from doublecount.views.applications.mixins.add_application import DoubleCountingAddError
+from doublecount.views.applications.mixins.approve_application import DoubleCountingApplicationApproveError
+from doublecount.views.applications.mixins.export_application import (
+    DoubleCountingApplicationExportError,
+    application_to_json,
+    check_has_dechets_industriels,
+)
 from transactions.models import ProductionSite
 
 
@@ -87,7 +86,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         if additional_data is not None:
             post_data.update(additional_data)
 
-        response = self.client.post(reverse("admin-double-counting-application-add"), post_data)
+        response = self.client.post(reverse("double-counting-applications-add"), post_data)
 
         return response
 
@@ -115,7 +114,6 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # 1 - test add file
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 200
-        print("**** self.production_site.producer ", self.production_site.__dict__)
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
@@ -147,7 +145,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # 3 - test upload twice
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 400
-        error = response.json()["error"]
+        error = response.json()["message"]
         assert error == DoubleCountingAddError.APPLICATION_ALREADY_EXISTS
 
         # 4 - test should replace
@@ -163,7 +161,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         application.save()
         response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
         assert response.status_code == 400
-        error = response.json()["error"]
+        error = response.json()["message"]
         assert error == DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED
 
     def test_add_application_to_existing_agreement(self):
@@ -171,7 +169,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # agreement not existing
         response = self.add_file("dc_agreement_application_valid.xlsx", {"certificate_id": certificate_id})
         assert response.status_code == 400
-        error = response.json()["error"]
+        error = response.json()["message"]
         assert error == DoubleCountingAddError.AGREEMENT_NOT_FOUND
 
         # agreement existing
@@ -183,7 +181,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 400
-        error = response.json()["error"]
+        error = response.json()["message"]
         assert error == DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS
 
         response = self.add_file("dc_agreement_application_valid.xlsx", {"certificate_id": certificate_id})
@@ -202,19 +200,19 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.production_site.save()
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 400
-        print(response.json())
-        error = response.json()["error"]
+
+        error = response.json()["message"]
         assert error == DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED
 
     def test_list_applications(self):
         self.create_application()
 
         response = self.client.get(
-            reverse("admin-double-counting-applications"),
+            reverse("double-counting-applications-list-admin"),
             {"entity_id": self.admin.id, "year": self.requested_start_year},
         )
 
-        data = response.json()["data"]
+        data = response.json()
         pending = data["pending"]
         application = pending[0]
 
@@ -224,11 +222,11 @@ class AdminDoubleCountApplicationsTest(TestCase):
         app, sourcing, production, _, _ = self.create_application()
 
         response = self.client.get(
-            reverse("admin-double-counting-application-details"),
+            reverse("double-counting-applications-detail", kwargs={"id": app.id}),
             {"entity_id": self.admin.id, "dca_id": app.id},
         )
 
-        application = response.json()["data"]
+        application = response.json()
 
         assert application["sourcing"][0]["id"] == sourcing.id
         assert application["production"][0]["id"] == production.id
@@ -243,15 +241,15 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         # test approve without quotas
         params = {"dca_id": application.id, "entity_id": self.admin.id}
-        response = self.client.post(reverse("admin-double-counting-application-approve"), params)
+        response = self.client.post(reverse("double-counting-applications-approve"), params)
         assert response.status_code == 400
-        assert response.json()["error"] == DoubleCountingApplicationApproveError.QUOTAS_NOT_APPROVED
+        assert response.json()["message"] == DoubleCountingApplicationApproveError.QUOTAS_NOT_APPROVED
         assert application.status == DoubleCountingApplication.PENDING
 
         # update quotas
         updated_quotas = [[production1.id, 20500], [production2.id, 10000]]
         response = self.client.post(
-            reverse("admin-double-counting-application-update-approved-quotas"),
+            reverse("double-counting-applications-update-approved-quotas"),
             {"entity_id": self.admin.id, "approved_quotas": json.dumps(updated_quotas), "dca_id": application.id},
         )
         assert response.status_code == 200
@@ -265,7 +263,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         )
 
         # test approve with quotas
-        response = self.client.post(reverse("admin-double-counting-application-approve"), params)
+        response = self.client.post(reverse("double-counting-applications-approve"), params)
         assert response.status_code == 200
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
@@ -286,23 +284,25 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert application.status != DoubleCountingApplication.ACCEPTED
 
         # Malformed params
-        response = self.client.get(reverse("admin-double-counting-application-export"), {"entity_id": self.admin.id})
+        response = self.client.get(reverse("double-counting-applications-export-application"), {"entity_id": self.admin.id})
         assert response.status_code == 400
-        assert response.json()["error"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
+        assert response.json()["message"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
 
         # Application not found
         response = self.client.get(
-            reverse("admin-double-counting-application-export"), {"dca_id": application.id + 200, "entity_id": self.admin.id}
+            reverse("double-counting-applications-export-application"),
+            {"dca_id": application.id + 200, "entity_id": self.admin.id},
         )
         assert response.status_code == 400
-        assert response.json()["error"] == DoubleCountingApplicationExportError.APPLICATION_NOT_FOUND
+        assert response.json()["message"] == DoubleCountingApplicationExportError.APPLICATION_NOT_FOUND
 
         # Application not accepted
         response = self.client.get(
-            reverse("admin-double-counting-application-export"), {"dca_id": application.id, "entity_id": self.admin.id}
+            reverse("double-counting-applications-export-application"),
+            {"dca_id": application.id, "entity_id": self.admin.id},
         )
         assert response.status_code == 400
-        assert response.json()["error"] == DoubleCountingApplicationExportError.APPLICATION_NOT_ACCEPTED
+        assert response.json()["message"] == DoubleCountingApplicationExportError.APPLICATION_NOT_ACCEPTED
 
         application.status = DoubleCountingApplication.ACCEPTED
         application.save()
@@ -311,16 +311,17 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         # Di without di in application
         response = self.client.get(
-            reverse("admin-double-counting-application-export"),
+            reverse("double-counting-applications-export-application"),
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
         assert response.status_code == 400
-        assert response.json()["error"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
+        assert response.json()["message"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
 
         # Export without di
         assert not check_has_dechets_industriels(application)
         response = self.client.get(
-            reverse("admin-double-counting-application-export"), {"dca_id": application.id, "entity_id": self.admin.id}
+            reverse("double-counting-applications-export-application"),
+            {"dca_id": application.id, "entity_id": self.admin.id},
         )
         assert response.status_code == 200
         assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -369,7 +370,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert check_has_dechets_industriels(application)
 
         response = self.client.get(
-            reverse("admin-double-counting-application-export"),
+            reverse("double-counting-applications-export-application"),
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
         assert response.status_code == 200

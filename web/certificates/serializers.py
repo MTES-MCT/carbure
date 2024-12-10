@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from doublecount.models import DoubleCountingProduction
@@ -26,9 +27,11 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
             "status",
         ]
 
+    @extend_schema_field(str)
     def get_production_site(self, obj):
         return obj.production_site.name if obj.production_site else None
 
+    @extend_schema_field(str)
     def get_producer(self, obj):
         return obj.production_site.producer.name if obj.production_site else obj.certificate_holder
 
@@ -47,15 +50,17 @@ class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
             "biofuel_list",
         ]
 
+    @extend_schema_field(dict)
     def get_production_site(self, obj: DoubleCountingRegistration):
         return {
             "name": obj.production_site.name if obj.production_site else None,
-            "city": obj.production_site.city,
-            "address": obj.production_site.address,
-            "postal_code": obj.production_site.postal_code,
-            "country": obj.production_site.country.name,
+            "city": obj.production_site.city if obj.production_site else None,
+            "address": obj.production_site.address if obj.production_site else None,
+            "postal_code": obj.production_site.postal_code if obj.production_site else None,
+            "country": obj.production_site.country.name if obj.production_site else None,
         }
 
+    @extend_schema_field(str)
     def get_biofuel_list(self, obj: DoubleCountingRegistration):
         if not obj.application:
             biofuel_list = "NC"
@@ -87,8 +92,10 @@ class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
             "application",
         ]
 
+    @extend_schema_field(str)
     def get_production_site(self, obj):
         return obj.production_site.name if obj.production_site else None
 
+    @extend_schema_field(str)
     def get_producer(self, obj):
         return obj.production_site.producer.name if obj.production_site else obj.certificate_holder

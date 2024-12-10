@@ -114,9 +114,11 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         self.create_agreement()
 
-        response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "year": 2023})
+        response = self.client.get(
+            reverse("double-counting-agreements-agreement-admin"), {"entity_id": self.admin.id, "year": 2023}
+        )
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
         active_agreements = data["active"]
         assert len(active_agreements) == 2
 
@@ -132,7 +134,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         # test that the response is an excel file
         response = self.client.get(
-            reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "as_excel_file": "true", "year": 2023}
+            reverse("double-counting-agreements-export"), {"entity_id": self.admin.id, "as_excel_file": "true", "year": 2023}
         )
         assert response.status_code == 200
         assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -148,11 +150,11 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("admin-double-counting-agreements-details"),
+            reverse("double-counting-agreements-detail", kwargs={"id": agreement_id}),
             {"entity_id": self.admin.id, "agreement_id": agreement_id},
         )
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
         application = data["application"]
         quotas = data["quotas"]
         assert not data["has_dechets_industriels"]
@@ -173,11 +175,11 @@ class AdminDoubleCountAgreementsTest(TestCase):
         agreement.application = None
         agreement.save()
         response = self.client.get(
-            reverse("admin-double-counting-agreements-details"),
+            reverse("double-counting-agreements-detail", kwargs={"id": agreement_id}),
             {"entity_id": self.admin.id, "agreement_id": agreement_id},
         )
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
 
         assert data["application"] is None
         assert data["quotas"] is None
