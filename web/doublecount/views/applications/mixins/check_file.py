@@ -2,11 +2,7 @@
 import datetime
 import traceback
 
-from drf_spectacular.utils import (
-    OpenApiParameter,
-    OpenApiTypes,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -82,6 +78,6 @@ def check_has_dechets_industriels(production_data):
     if production_data is None:
         return False
     for row in production_data:
-        if row["feedstock"]["code"] == "DECHETS_INDUSTRIELS":
+        if row["feedstock"]["code"] in ["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]:
             return True
     return False
