@@ -1,4 +1,3 @@
-# test with : python web/manage.py test doublecount.api.applications.tests_applications.DoubleCountApplicationsTest --keepdb
 import os
 
 from django.contrib.auth import get_user_model
@@ -8,10 +7,10 @@ from django.urls import reverse
 
 from core.models import Entity, Pays, UserRights
 from core.tests_utils import setup_current_user
-from doublecount.api.admin.applications.add import DoubleCountingAddError
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
+from doublecount.views.applications.mixins.add_application import DoubleCountingAddError
 from transactions.models import ProductionSite
 
 
@@ -60,7 +59,7 @@ class DoubleCountApplicationsTest(TestCase):
         fh.close()
         f = SimpleUploadedFile("dca.xlsx", data)
         response = self.client.post(
-            reverse("doublecount-applications-check-file"),
+            reverse("double-counting-applications-check-file"),
             {"entity_id": self.producer.id, "file": f},
         )
         return response
@@ -71,7 +70,7 @@ class DoubleCountApplicationsTest(TestCase):
             print("Failed to upload %s" % ("dc_agreement_application_valid.xlsx"))
         assert response.status_code == 200
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 0
@@ -92,7 +91,7 @@ class DoubleCountApplicationsTest(TestCase):
         response = self.check_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 200
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         has_dechets_industriels = file_data["has_dechets_industriels"]
         assert has_dechets_industriels is True
@@ -100,7 +99,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_missing_sheet(self):
         response = self.check_file("dc_agreement_application_errors_missing_sheet.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 1
@@ -112,7 +111,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_sourcing_row(self):
         response = self.check_file("dc_agreement_application_errors_sourcing.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
 
         error_count = file_data["error_count"]
@@ -149,7 +148,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_production_integrity(self):
         response = self.check_file("dc_agreement_application_errors_prod_integrity.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 4
@@ -176,7 +175,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_production(self):
         response = self.check_file("dc_agreement_application_errors_production.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 2
@@ -193,7 +192,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_production_max(self):
         response = self.check_file("dc_agreement_application_errors_production_max.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 1
@@ -209,7 +208,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_global(self):
         response = self.check_file("dc_agreement_application_errors_global.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 1
@@ -228,7 +227,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_unknow_year(self):
         response = self.check_file("dc_agreement_application_errors_unknow_year.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 1
@@ -240,7 +239,7 @@ class DoubleCountApplicationsTest(TestCase):
     def test_invalid_year_and_missing_data(self):
         response = self.check_file("dc_agreement_application_errors_invalid_year_and_missing_data.xlsx")
 
-        data = response.json()["data"]
+        data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 3
@@ -271,11 +270,11 @@ class DoubleCountApplicationsTest(TestCase):
         app = self.create_application()
 
         response = self.client.get(
-            reverse("doublecount-applications-details"),
+            reverse("double-counting-applications-detail", kwargs={"id": app.id}),
             {"entity_id": self.producer.id, "dca_id": app.id},
         )
 
-        application = response.json()["data"]
+        application = response.json()
 
         production_site = application["production_site"]
         assert production_site["id"] == self.production_site.id
@@ -303,7 +302,7 @@ class DoubleCountApplicationsTest(TestCase):
         if additional_data is not None:
             post_data.update(additional_data)
 
-        response = self.client.post(reverse("doublecount-applications-add-application"), post_data)
+        response = self.client.post(reverse("double-counting-applications-add"), post_data)
 
         return response
 
@@ -312,8 +311,8 @@ class DoubleCountApplicationsTest(TestCase):
         self.production_site.save()
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 400
-
-        error = response.json()["error"]
+        print(response.json())
+        error = response.json()["message"]
         assert error == DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED
 
     def add_application(self):
