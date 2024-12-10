@@ -8,7 +8,9 @@ from elec.models import ElecChargePointApplication, ElecMeterReadingApplication
 from transactions.models import Depot, ProductionSite
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
+@check_admin_rights(
+    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.DOUBLE_COUNTING]
+)
 def get_entities(request, entity: Entity):
     q = request.GET.get("q", False)
     has_requests = request.GET.get("has_requests", None)
@@ -22,6 +24,10 @@ def get_entities(request, entity: Entity):
     # limit entities for Elec stuff
     if entity.has_external_admin_right("ELEC"):
         entities = entities.filter(Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True))
+
+    # limit entities related to double counting
+    if entity.has_external_admin_right(ExternalAdminRights.DOUBLE_COUNTING):
+        entities = entities.filter(entity_type=Entity.PRODUCER)
 
     # initialize counters for all expected values
     entities = entities.annotate(
