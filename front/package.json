@@ -23,7 +23,7 @@
     "i18next-http-backend": "^2.1.1",
     "iframe-resizer-react": "^1.1.0",
     "leaflet-defaulticon-compatibility": "^0.1.2",
-    "msw": "^2.4.9",
+    "msw": "^2.6.2",
     "openapi-fetch": "^0.12.2",
     "ramda": "^0.30.1",
     "react": "^18.2.0",
