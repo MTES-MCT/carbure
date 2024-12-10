@@ -1,6 +1,7 @@
 import traceback
 
 from django import forms
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Q
 
@@ -119,12 +120,14 @@ def add_application_by_type(request, entity_type):
                 agreement = None
 
     # create application
+    s3_path = f"doublecounting/application_{form.cleaned_data["certificate_id"]}.xlsx"
     dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
         production_site_id=production_site.id,
         period_start=start,
         period_end=end,
         defaults={"producer_user": request.user},
+        download_link=default_storage.url(s3_path),
     )
 
     if not created:
@@ -148,6 +151,14 @@ def add_application_by_type(request, entity_type):
         production.save()
     for sourcing_history in sourcing_history_data:
         sourcing_history.save()
+
+    # 3 - Upload file to S3
+    try:
+        default_storage.save(s3_path, file)
+    except Exception:
+        pass
+
+    # 4 - send email
 
     try:
         send_dca_confirmation_email(dca, request)
