@@ -120,14 +120,12 @@ def add_application_by_type(request, entity_type):
                 agreement = None
 
     # create application
-    s3_path = f"doublecounting/application_{form.cleaned_data["certificate_id"]}.xlsx"
     dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
         production_site_id=production_site.id,
         period_start=start,
         period_end=end,
         defaults={"producer_user": request.user},
-        download_link=default_storage.url(s3_path),
     )
 
     if not created:
@@ -138,6 +136,10 @@ def add_application_by_type(request, entity_type):
         dca.save()
         agreement.application = dca
         agreement.save()
+
+    s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
+    dca.download_link = default_storage.url(s3_path)
+    dca.save()
 
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
@@ -158,8 +160,7 @@ def add_application_by_type(request, entity_type):
     except Exception:
         pass
 
-    # 4 - send email
-
+    # 4 - send emails
     try:
         send_dca_confirmation_email(dca, request)
     except Exception:
