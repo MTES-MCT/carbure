@@ -1,4 +1,5 @@
 from django.db.models.query_utils import Q
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -31,3 +32,18 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
             return [HasAdminRights()]
 
         return super().get_permissions()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            ),
+        ],
+        responses=DoubleCountingApplicationSerializer,
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
