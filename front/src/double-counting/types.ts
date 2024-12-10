@@ -1,7 +1,6 @@
-import { DoubleCountingStatus } from "api-schema"
+import { DoubleCountingStatus, DoubleCountingAgreementStatus } from "api-schema"
 import {
   Biofuel,
-  Country,
   Entity,
   Feedstock,
   ProductionSiteDetails,
@@ -9,6 +8,7 @@ import {
 import { apiTypes } from "common/services/api-fetch.types"
 
 export { DoubleCountingStatus }
+export { DoubleCountingAgreementStatus as AgreementStatus }
 
 export enum Admin {
   DGEC = "MTE - DGEC",
@@ -16,21 +16,14 @@ export enum Admin {
   DGPE = "DGPE",
 }
 
-export enum AgreementStatus {
-  Active = "ACTIVE",
-  Expired = "EXPIRED",
-  ExpiresSoon = "EXPIRES_SOON",
-  Incoming = "INCOMING",
-}
-
 export enum DoubleCountingExtendedStatus {
   ACCEPTED = DoubleCountingStatus.ACCEPTED,
   INPROGRESS = DoubleCountingStatus.INPROGRESS,
   PENDING = DoubleCountingStatus.PENDING,
   REJECTED = DoubleCountingStatus.REJECTED,
-  EXPIRED = "EXPIRED",
-  EXPIRES_SOON = "EXPIRES_SOON",
-  INCOMING = "INCOMING",
+  EXPIRED = DoubleCountingAgreementStatus.EXPIRED,
+  EXPIRES_SOON = DoubleCountingAgreementStatus.EXPIRES_SOON,
+  INCOMING = DoubleCountingAgreementStatus.INCOMING,
 }
 
 export type DoubleCountingApplicationOverview =
@@ -43,38 +36,11 @@ export interface DoubleCountingSourcingAggregation {
   feedstock: Feedstock
 }
 
-export interface DoubleCountingSourcing {
-  id: number
-  year: number
-  metric_tonnes: number
-  feedstock: Feedstock
-  origin_country: Country
-  transit_country?: Country
-  supply_country?: Country
-}
+export type DoubleCountingSourcing = apiTypes["DoubleCountingSourcing"]
 
-export interface DoubleCountingProduction {
-  id: number
-  year: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-  max_production_capacity?: number
-  estimated_production: number
-  requested_quota: number
-  approved_quota: number
-}
+export type DoubleCountingProduction = apiTypes["DoubleCountingProduction"]
 
-export interface DoubleCountingQuota {
-  approved_quota: number
-  biofuel: Biofuel
-  feedstock: Feedstock
-  id: number
-  lot_count: number
-  production_tonnes: number
-  quotas_progression: number
-  requested_quota: number
-  year: number
-}
+export type DoubleCountingQuota = apiTypes["DoubleCountingQuota"]
 
 export enum DoubleCountingUploadErrorType {
   UnkownBiofuel = "UNKNOWN_BIOFUEL",
@@ -137,17 +103,18 @@ export interface DoubleCountingAgreementOverview {
   certificate_id: string
   valid_from: Date
   valid_until: Date
-  status: AgreementStatus
+  status: DoubleCountingAgreementStatus
   quotas_progression: number
 }
 
 export type DoubleCountingAgreementPublic =
   apiTypes["DoubleCountingRegistrationPublic"]
 
-export interface AgreementDetails extends DoubleCountingAgreementOverview {
-  application: DoubleCountingApplicationDetails
-  quotas: DoubleCountingQuota[]
-}
+export type AgreementDetails = apiTypes["DoubleCountingRegistrationDetails"]
+// export interface AgreementDetails extends DoubleCountingAgreementOverview {
+//   application: DoubleCountingApplicationDetails
+//   quotas: DoubleCountingQuota[]
+// }
 
 export interface QuotaDetails {
   volume: number

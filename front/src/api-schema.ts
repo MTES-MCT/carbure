@@ -925,6 +925,14 @@ export interface components {
       /** Format: binary */
       file: string
     }
+    /**
+     * @description * `ACTIVE` - ACTIVE
+     *     * `EXPIRED` - EXPIRED
+     *     * `EXPIRES_SOON` - EXPIRES_SOON
+     *     * `INCOMING` - INCOMING
+     * @enum {string}
+     */
+    DoubleCountingAgreementStatus: DoubleCountingAgreementStatus
     DoubleCountingApplication: {
       readonly id: number
       /** Format: date-time */
@@ -1021,6 +1029,17 @@ export interface components {
       readonly outputs: components["schemas"]["Biofuel"][]
       readonly certificates: components["schemas"]["ProductionSiteCertificate"][]
     }
+    DoubleCountingQuota: {
+      approved_quota: number
+      biofuel: components["schemas"]["Biofuel"]
+      feedstock: components["schemas"]["FeedStock"]
+      id: number
+      lot_count: number
+      production_tonnes: number
+      quotas_progression: number
+      requested_quota: number
+      year: number
+    }
     DoubleCountingRegistration: {
       readonly id: number
       certificate_id: string
@@ -1030,7 +1049,7 @@ export interface components {
       readonly production_site: string
       /** Format: date */
       valid_until: string
-      readonly status: string
+      readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
     }
     DoubleCountingRegistrationDetails: {
       readonly id: number
@@ -1039,10 +1058,11 @@ export interface components {
       valid_from: string
       /** Format: date */
       valid_until: string
-      readonly status: string
+      readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
       readonly producer: string
       readonly production_site: string
       application: components["schemas"]["DoubleCountingApplication"]
+      readonly quotas: components["schemas"]["DoubleCountingQuota"][]
     }
     DoubleCountingRegistrationPublic: {
       readonly production_site: components["schemas"]["FieldData"]
@@ -3145,6 +3165,12 @@ export enum DeliveryTypeEnum {
   DIRECT = "DIRECT",
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
+}
+export enum DoubleCountingAgreementStatus {
+  ACTIVE = "ACTIVE",
+  EXPIRED = "EXPIRED",
+  EXPIRES_SOON = "EXPIRES_SOON",
+  INCOMING = "INCOMING",
 }
 export enum DoubleCountingStatus {
   PENDING = "PENDING",

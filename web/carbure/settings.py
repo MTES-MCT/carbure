@@ -341,6 +341,7 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
         "DoubleCountingStatus": "doublecount.models.DoubleCountingApplication.DCA_STATUS_CHOICES",
+        "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     # OTHER SETTINGS

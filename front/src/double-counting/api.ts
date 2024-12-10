@@ -1,6 +1,5 @@
-import api, { Api } from "common/services/api"
+import api from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
-import { AgreementDetails } from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
   return apiFetch.GET("/double-counting/agreements/", {
@@ -40,8 +39,11 @@ export function getDoubleCountingAgreementDetails(
   entity_id: number,
   agreement_id: number
 ) {
-  return api.get<Api<AgreementDetails>>("/double-counting/agreements/details", {
-    params: { entity_id, agreement_id },
+  return apiFetch.GET("/double-counting/agreements/{id}/", {
+    params: {
+      query: { entity_id },
+      path: { id: agreement_id },
+    },
   })
 }
 
