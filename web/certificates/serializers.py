@@ -2,13 +2,9 @@ from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from doublecount.models import DoubleCountingProduction
-from doublecount.serializers import (
-    DoubleCountingApplicationSerializer,
-)
+from doublecount.serializers import BiofuelSerializer, DoubleCountingApplicationSerializer, FeedStockSerializer
 
-from .models import (
-    DoubleCountingRegistration,
-)
+from .models import DoubleCountingRegistration
 
 
 class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
@@ -85,10 +81,23 @@ class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
         return biofuel_list
 
 
+class DoubleCountingQuotaSerializer(serializers.Serializer):
+    approved_quota = serializers.IntegerField()
+    biofuel = BiofuelSerializer()
+    feedstock = FeedStockSerializer()
+    id = serializers.IntegerField()
+    lot_count = serializers.IntegerField()
+    production_tonnes = serializers.IntegerField()
+    quotas_progression = serializers.IntegerField()
+    requested_quota = serializers.IntegerField()
+    year = serializers.IntegerField()
+
+
 class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
     application = DoubleCountingApplicationSerializer()
     production_site = serializers.SerializerMethodField()
     producer = serializers.SerializerMethodField()
+    quotas = serializers.SerializerMethodField()
 
     class Meta:
         model = DoubleCountingRegistration
@@ -101,6 +110,7 @@ class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
             "producer",
             "production_site",
             "application",
+            "quotas",
         ]
 
     @extend_schema_field(str)
@@ -110,3 +120,7 @@ class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
     @extend_schema_field(str)
     def get_producer(self, obj):
         return obj.production_site.producer.name if obj.production_site else obj.certificate_holder
+
+    @extend_schema_field(serializers.ListSerializer(child=DoubleCountingQuotaSerializer()))
+    def get_quotas(self, obj):
+        return []

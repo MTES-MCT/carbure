@@ -3167,6 +3167,18 @@ components:
         - file
         - producer_id
         - production_site_id
+    DoubleCountingAgreementStatus:
+      enum:
+        - ACTIVE
+        - EXPIRED
+        - EXPIRES_SOON
+        - INCOMING
+      type: string
+      description: |-
+        * `ACTIVE` - ACTIVE
+        * `EXPIRED` - EXPIRED
+        * `EXPIRES_SOON` - EXPIRES_SOON
+        * `INCOMING` - INCOMING
     DoubleCountingApplication:
       type: object
       properties:
@@ -3448,6 +3460,37 @@ components:
         - name
         - outputs
         - producer
+    DoubleCountingQuota:
+      type: object
+      properties:
+        approved_quota:
+          type: integer
+        biofuel:
+          $ref: "#/components/schemas/Biofuel"
+        feedstock:
+          $ref: "#/components/schemas/FeedStock"
+        id:
+          type: integer
+        lot_count:
+          type: integer
+        production_tonnes:
+          type: integer
+        quotas_progression:
+          type: integer
+        requested_quota:
+          type: integer
+        year:
+          type: integer
+      required:
+        - approved_quota
+        - biofuel
+        - feedstock
+        - id
+        - lot_count
+        - production_tonnes
+        - quotas_progression
+        - requested_quota
+        - year
     DoubleCountingRegistration:
       type: object
       properties:
@@ -3470,7 +3513,8 @@ components:
           type: string
           format: date
         status:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
           readOnly: true
       required:
         - certificate_id
@@ -3496,7 +3540,8 @@ components:
           type: string
           format: date
         status:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
           readOnly: true
         producer:
           type: string
@@ -3506,12 +3551,18 @@ components:
           readOnly: true
         application:
           $ref: "#/components/schemas/DoubleCountingApplication"
+        quotas:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingQuota"
+          readOnly: true
       required:
         - application
         - certificate_id
         - id
         - producer
         - production_site
+        - quotas
         - status
         - valid_from
         - valid_until

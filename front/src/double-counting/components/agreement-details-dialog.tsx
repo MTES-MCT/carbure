@@ -30,8 +30,7 @@ export const AgreementDetailsDialog = () => {
     params: [entity.id, parseInt(match?.params.id || "")],
   })
 
-  const agreement: AgreementDetails | undefined =
-    applicationResponse.result?.data.data
+  const agreement = applicationResponse.result?.data
 
   const application = agreement?.application
 
