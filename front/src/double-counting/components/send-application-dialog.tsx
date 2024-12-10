@@ -1,4 +1,3 @@
-import { AxiosError } from "axios"
 import { findProductionSites } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
 import { ProductionSite } from "carbure/types"
@@ -22,6 +21,7 @@ import { DechetIndustrielAlert } from "./application-checker/industrial-waste-al
 import { ReplaceApplicationDialog } from "./application-checker/replace-application-dialog"
 import { useNavigate } from "react-router-dom"
 import useScrollToRef from "common/hooks/scroll-to-ref"
+import { HttpError } from "common/services/api-fetch"
 
 export type SendApplicationProducerDialogProps = {
   file: File
@@ -52,8 +52,7 @@ export const SendApplicationProducerDialog = ({
       notify(t("La demande a été envoyée !"), { variant: "success" })
     },
     onError(err) {
-      const errorCode = (err as AxiosError<{ error: string }>).response?.data
-        .error
+      const errorCode = (err as HttpError)?.data?.message
       if (errorCode === "APPLICATION_ALREADY_EXISTS") {
         portal((close) => (
           <ReplaceApplicationDialog

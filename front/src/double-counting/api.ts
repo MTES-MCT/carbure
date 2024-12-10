@@ -1,4 +1,3 @@
-import api from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
 
 export function getDoubleCountingAgreements(entity_id: number) {
@@ -27,11 +26,6 @@ export function checkDoubleCountingApplication(entity_id: number, file: File) {
   return apiFetch.POST("/double-counting/applications/check-file/", {
     params: { query: { entity_id } },
     body: { file: file as unknown as string }, // hack for file upload :/
-    bodySerializer: (body) => {
-      const formData = new FormData()
-      formData.set("file", body?.file ?? "")
-      return formData
-    },
   })
 }
 
@@ -54,11 +48,14 @@ export function producerAddDoubleCountingApplication(
   file: File,
   should_replace = false
 ) {
-  return api.post("/double-counting/applications/add", {
-    entity_id,
-    producer_id,
-    production_site_id,
-    file,
-    should_replace,
+  return apiFetch.POST("/double-counting/applications/add/", {
+    params: { query: { entity_id } },
+    body: {
+      entity_id,
+      producer_id,
+      production_site_id,
+      should_replace,
+      file: file as unknown as string, // file upload hack again :/
+    },
   })
 }
