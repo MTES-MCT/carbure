@@ -3527,8 +3527,8 @@ components:
       type: object
       properties:
         production_site:
-          type: object
-          additionalProperties: {}
+          allOf:
+            - $ref: "#/components/schemas/FieldData"
           readOnly: true
         certificate_id:
           type: string
@@ -3776,6 +3776,25 @@ components:
         - code
         - name
         - name_en
+    FieldData:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+      required:
+        - address
+        - city
+        - country
+        - name
+        - postal_code
     File:
       type: object
       properties:

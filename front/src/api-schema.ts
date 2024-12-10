@@ -1201,9 +1201,7 @@ export interface components {
       application: components["schemas"]["DoubleCountingApplication"]
     }
     DoubleCountingRegistrationPublic: {
-      readonly production_site: {
-        [key: string]: unknown
-      }
+      readonly production_site: components["schemas"]["FieldData"]
       certificate_id: string
       /** Format: date */
       valid_from: string
@@ -1298,6 +1296,13 @@ export interface components {
       code: string
       category?: components["schemas"]["CategoryEnum"]
       is_double_compte?: boolean
+    }
+    FieldData: {
+      name: string
+      city: string
+      address: string
+      postal_code: string
+      country: string
     }
     File: {
       file_name: string
