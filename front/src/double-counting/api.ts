@@ -1,19 +1,16 @@
 import api, { Api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import {
   AgreementDetails,
   DoubleCountingAgreementPublic,
   DoubleCountingApplicationDetails,
-  DoubleCountingApplicationOverview,
   DoubleCountingFileInfo,
 } from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
-  return api.get<Api<DoubleCountingApplicationOverview[]>>(
-    "/double-counting/agreements",
-    {
-      params: { entity_id },
-    }
-  )
+  return apiFetch.GET("/double-counting/agreements/", {
+    params: { query: { entity_id } },
+  })
 }
 
 export function getDoubleCountingAgreementsPublicList() {
