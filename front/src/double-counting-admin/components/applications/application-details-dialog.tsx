@@ -74,7 +74,7 @@ export const ApplicationDetailsDialog = () => {
   })
 
   const application = applicationResponse.result?.data.data
-  const dcaStatus = application?.status ?? DCStatus.Pending
+  const dcaStatus = application?.status ?? DCStatus.PENDING
 
   const isAdmin = entity?.entity_type === EntityType.Administration
   const hasQuotas = !application?.production.some(

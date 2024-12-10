@@ -1,3 +1,4 @@
+import { DoubleCountingStatus } from "api-schema"
 import {
   Biofuel,
   Country,
@@ -5,21 +6,14 @@ import {
   Feedstock,
   ProductionSiteDetails,
 } from "carbure/types"
+import { apiTypes } from "common/services/api-fetch.types"
+
+export { DoubleCountingStatus }
 
 export enum Admin {
   DGEC = "MTE - DGEC",
   DGDDI = "DGDDI",
   DGPE = "DGPE",
-}
-
-export enum DoubleCountingStatus {
-  Pending = "PENDING",
-  InProgress = "INPROGRESS",
-  Rejected = "REJECTED",
-  Accepted = "ACCEPTED",
-  Expired = "EXPIRED",
-  ExpiresSoon = "EXPIRES_SOON",
-  Incoming = "INCOMING",
 }
 
 export enum AgreementStatus {
@@ -29,19 +23,18 @@ export enum AgreementStatus {
   Incoming = "INCOMING",
 }
 
-export interface DoubleCountingApplicationOverview {
-  id: number
-  certificate_id: string
-  agreement_id: string
-  producer: Entity
-  production_site: ProductionSiteDetails
-  period_start: string
-  period_end: string
-  status: DoubleCountingStatus
-  producer_user: string
-  created_at: string
-  quotas_progression?: number
+export enum DoubleCountingExtendedStatus {
+  ACCEPTED = DoubleCountingStatus.ACCEPTED,
+  INPROGRESS = DoubleCountingStatus.INPROGRESS,
+  PENDING = DoubleCountingStatus.PENDING,
+  REJECTED = DoubleCountingStatus.REJECTED,
+  EXPIRED = "EXPIRED",
+  EXPIRES_SOON = "EXPIRES_SOON",
+  INCOMING = "INCOMING",
 }
+
+export type DoubleCountingApplicationOverview =
+  apiTypes["DoubleCountingApplicationPartial"]
 
 export interface DoubleCountingSourcingAggregation {
   year: number
