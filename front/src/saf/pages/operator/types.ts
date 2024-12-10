@@ -1,9 +1,8 @@
 import { Biofuel, Feedstock } from "carbure/types"
 import { apiTypes } from "common/services/api-fetch.types"
-export enum SafTicketSourceStatus {
-  Available = "AVAILABLE",
-  History = "HISTORY",
-}
+import { PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus } from "api-schema"
+
+export { SafTicketSourceStatus }
 
 export type SafTicketSource = apiTypes["SafTicketSource"]
 

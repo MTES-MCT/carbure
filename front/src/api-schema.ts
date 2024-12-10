@@ -420,6 +420,54 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/user/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["user_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/user/request-access": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["user_request_access_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/user/revoke-access": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["user_revoke_access_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -636,6 +684,15 @@ export interface components {
     ErrorResponse: {
       message: string
     }
+    /**
+     * @description * `DCA` - DCA
+     *     * `AGRIMER` - AGRIMER
+     *     * `TIRIB` - TIRIB
+     *     * `AIRLINE` - AIRLINE
+     *     * `ELEC` - ELEC
+     * @enum {string}
+     */
+    ExtAdminPagesEnum: ExtAdminPagesEnum
     FeedStock: {
       name: string
       name_en: string
@@ -749,12 +806,31 @@ export interface components {
       manager_phone?: string
       manager_email?: string
     }
+    RequestAccess: {
+      comment?: string
+      role: string
+      entity_id: number
+    }
+    ResponseSuccess: {
+      status: string
+    }
+    RevokeAccess: {
+      entity_id: number
+    }
+    /**
+     * @description * `RO` - Lecture Seule
+     *     * `RW` - Lecture/Écriture
+     *     * `ADMIN` - Administrateur
+     *     * `AUDITOR` - Auditeur
+     * @enum {string}
+     */
+    RoleEnum: RoleEnum
     SafTicket: {
       readonly id: number
       carbure_id?: string | null
       year: number
       assignment_period: number
-      status?: components["schemas"]["StatusEnum"]
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
       /** Format: date */
       agreement_date?: string | null
       readonly supplier: string
@@ -772,7 +848,7 @@ export interface components {
       carbure_id?: string | null
       year: number
       assignment_period: number
-      status?: components["schemas"]["StatusEnum"]
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
       /** Format: date-time */
       readonly created_at: string | null
       readonly supplier: string
@@ -825,7 +901,7 @@ export interface components {
       agreement_date?: string | null
       /** Format: double */
       volume: number
-      status?: components["schemas"]["StatusEnum"]
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
       /** Format: date-time */
       readonly created_at: string | null
     }
@@ -940,13 +1016,6 @@ export interface components {
      */
     SiteTypeEnum: SiteTypeEnum
     /**
-     * @description * `PENDING` - En attente
-     *     * `ACCEPTED` - Accepté
-     *     * `REJECTED` - Refusé
-     * @enum {string}
-     */
-    StatusEnum: StatusEnum
-    /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
      *     * `DSA` - DSA
@@ -956,6 +1025,76 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
+    UserEntity: {
+      readonly id: number
+      readonly name: string
+      readonly is_enabled: boolean
+      readonly entity_type: components["schemas"]["EntityTypeEnum"]
+      readonly has_mac: boolean
+      readonly has_trading: boolean
+      readonly has_direct_deliveries: boolean
+      readonly has_stocks: boolean
+      readonly legal_name: string
+      readonly registration_id: string
+      readonly sustainability_officer: string
+      readonly sustainability_officer_phone_number: string
+      readonly sustainability_officer_email: string
+      readonly registered_address: string
+      readonly registered_zipcode: string
+      readonly registered_city: string
+      registered_country?: components["schemas"]["Country"]
+      readonly default_certificate: string | null
+      readonly preferred_unit: components["schemas"]["PreferredUnitEnum"]
+      readonly has_saf: boolean
+      readonly has_elec: boolean
+      readonly activity_description: string
+      /** Format: uri */
+      readonly website: string
+      readonly vat_number: string
+      readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
+    }
+    UserRights: {
+      readonly name: string
+      /** Format: email */
+      readonly email: string
+      entity: components["schemas"]["UserEntity"]
+      readonly role: components["schemas"]["RoleEnum"]
+      /** Format: date-time */
+      expiration_date?: string | null
+    }
+    UserRightsRequests: {
+      readonly id: number
+      readonly user: string[]
+      entity: components["schemas"]["UserEntity"]
+      /** Format: date-time */
+      readonly date_requested: string
+      readonly status: components["schemas"]["UserRightsRequestsStatusEnum"]
+      comment?: string | null
+      readonly role: components["schemas"]["RoleEnum"]
+      /** Format: date-time */
+      expiration_date?: string | null
+    }
+    /**
+     * @description * `PENDING` - En attente de validation
+     *     * `ACCEPTED` - Accepté
+     *     * `REJECTED` - Refusé
+     *     * `REVOKED` - Révoqué
+     * @enum {string}
+     */
+    UserRightsRequestsStatusEnum: UserRightsRequestsStatusEnum
+    UserSettingsResponseSeriaizer: {
+      /** Format: email */
+      email: string
+      rights: components["schemas"]["UserRights"][]
+      requests: components["schemas"]["UserRightsRequests"][]
+    }
+    /**
+     * @description * `PENDING` - En attente
+     *     * `ACCEPTED` - Accepté
+     *     * `REJECTED` - Refusé
+     * @enum {string}
+     */
+    "saf.filters.TicketFilter.status": PathsApiSafTicketsGetParametersQueryStatus
   }
   responses: never
   parameters: never
@@ -1293,8 +1432,10 @@ export interface operations {
         production_sites?: string[]
         /** @description A search term. */
         search?: string
-        status?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description * `HISTORY` - HISTORY
+         *     * `AVAILABLE` - AVAILABLE */
+        status?: PathsApiSafTicketSourcesGetParametersQueryStatus
+        /** @description Comma-separated list of supplier names */
         suppliers?: string[]
         year?: number
       }
@@ -1401,8 +1542,10 @@ export interface operations {
         production_sites?: string[]
         /** @description A search term. */
         search?: string
-        status?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description * `HISTORY` - HISTORY
+         *     * `AVAILABLE` - AVAILABLE */
+        status?: PathsApiSafTicketSourcesGetParametersQueryStatus
+        /** @description Comma-separated list of supplier names */
         suppliers?: string[]
         year?: number
       }
@@ -1455,8 +1598,10 @@ export interface operations {
         production_sites?: string[]
         /** @description A search term. */
         search?: string
-        status?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description * `HISTORY` - HISTORY
+         *     * `AVAILABLE` - AVAILABLE */
+        status?: PathsApiSafTicketSourcesGetParametersQueryStatus
+        /** @description Comma-separated list of supplier names */
         suppliers?: string[]
         year?: number
       }
@@ -1551,7 +1696,10 @@ export interface operations {
         production_sites?: string[]
         /** @description A search term. */
         search?: string
-        status?: string
+        /** @description * `PENDING` - En attente
+         *     * `ACCEPTED` - Accepté
+         *     * `REJECTED` - Refusé */
+        status?: PathsApiSafTicketsGetParametersQueryStatus
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         suppliers?: string[]
         year?: number
@@ -1774,7 +1922,10 @@ export interface operations {
         production_sites?: string[]
         /** @description A search term. */
         search?: string
-        status?: string
+        /** @description * `PENDING` - En attente
+         *     * `ACCEPTED` - Accepté
+         *     * `REJECTED` - Refusé */
+        status?: PathsApiSafTicketsGetParametersQueryStatus
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         suppliers?: string[]
         year?: number
@@ -1832,7 +1983,10 @@ export interface operations {
         production_sites?: string[]
         /** @description A search term. */
         search?: string
-        status?: string
+        /** @description * `PENDING` - En attente
+         *     * `ACCEPTED` - Accepté
+         *     * `REJECTED` - Refusé */
+        status?: PathsApiSafTicketsGetParametersQueryStatus
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         suppliers?: string[]
         year?: number
@@ -1883,6 +2037,75 @@ export interface operations {
       }
     }
   }
+  user_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserSettingsResponseSeriaizer"]
+        }
+      }
+    }
+  }
+  user_request_access_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RequestAccess"]
+        "application/x-www-form-urlencoded": components["schemas"]["RequestAccess"]
+        "multipart/form-data": components["schemas"]["RequestAccess"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ResponseSuccess"]
+        }
+      }
+    }
+  }
+  user_revoke_access_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RevokeAccess"]
+        "application/x-www-form-urlencoded": components["schemas"]["RevokeAccess"]
+        "multipart/form-data": components["schemas"]["RevokeAccess"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ResponseSuccess"]
+        }
+      }
+    }
+  }
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
   ValueMinusfeedstock = "-feedstock",
@@ -1893,6 +2116,10 @@ export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
   ghg_reduction = "ghg_reduction",
   period = "period",
   volume = "volume",
+}
+export enum PathsApiSafTicketSourcesGetParametersQueryStatus {
+  AVAILABLE = "AVAILABLE",
+  HISTORY = "HISTORY",
 }
 export enum PathsApiSafTicketsGetParametersQueryOrder {
   ValueMinusclient = "-client",
@@ -1909,6 +2136,11 @@ export enum PathsApiSafTicketsGetParametersQueryOrder {
   period = "period",
   suppliers = "suppliers",
   volume = "volume",
+}
+export enum PathsApiSafTicketsGetParametersQueryStatus {
+  ACCEPTED = "ACCEPTED",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
 }
 export enum CategoryEnum {
   CONV = "CONV",
@@ -1952,6 +2184,13 @@ export enum EntityTypeEnum {
   Unknown = "Unknown",
   PowerOrHeatProducer = "Power or Heat Producer",
 }
+export enum ExtAdminPagesEnum {
+  DCA = "DCA",
+  AGRIMER = "AGRIMER",
+  TIRIB = "TIRIB",
+  AIRLINE = "AIRLINE",
+  ELEC = "ELEC",
+}
 export enum GesOptionEnum {
   Default = "Default",
   Actual = "Actual",
@@ -1970,6 +2209,12 @@ export enum PreferredUnitEnum {
   kg = "kg",
   MJ = "MJ",
 }
+export enum RoleEnum {
+  ReadOnly = "RO",
+  ReadWrite = "RW",
+  Admin = "ADMIN",
+  Auditor = "AUDITOR",
+}
 export enum SiteTypeEnum {
   OTHER = "OTHER",
   EFS = "EFS",
@@ -1982,11 +2227,6 @@ export enum SiteTypeEnum {
   PRODUCTION_SITE = "PRODUCTION SITE",
   EFCA = "EFCA",
 }
-export enum StatusEnum {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
-}
 export enum TransportDocumentTypeEnum {
   DAU = "DAU",
   DAE = "DAE",
@@ -1994,4 +2234,10 @@ export enum TransportDocumentTypeEnum {
   DSAC = "DSAC",
   DSP = "DSP",
   OTHER = "OTHER",
+}
+export enum UserRightsRequestsStatusEnum {
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
+  Revoked = "REVOKED",
 }

@@ -337,5 +337,9 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Carbure",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "DEBUG": True,
+    "ENUM_NAME_OVERRIDES": {
+        "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
+    },
     # OTHER SETTINGS
 }

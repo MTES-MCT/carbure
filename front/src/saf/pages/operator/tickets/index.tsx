@@ -12,7 +12,6 @@ import {
   SafOperatorSnapshot,
   SafQuery,
   SafQueryType,
-  SafStates,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
@@ -44,13 +43,12 @@ export const OperatorTickets = ({
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useCBQueryParamsStore<SafStates>(
-    entity,
-    year,
-    status,
-    type
-  )
-  const query = useCBQueryBuilder<SafColumsOrder[]>(state)
+  const [state, actions] = useCBQueryParamsStore(entity, year, status, type)
+  const query = useCBQueryBuilder<
+    SafColumsOrder[],
+    SafTicketStatus,
+    SafQueryType
+  >(state)
   const apiGetTickets = (query: SafQuery) => api.getOperatorTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {
@@ -69,7 +67,7 @@ export const OperatorTickets = ({
     }
   }
 
-  const getTicketFilter = (filter: any) =>
+  const getTicketFilter = (filter: SafFilter) =>
     api.getOperatorTicketFilters(filter, query)
 
   const fetchIdsForPage = async (page: number) => {
@@ -101,7 +99,7 @@ export const OperatorTickets = ({
             onSwitch={actions.setStatus}
             type={type}
             count={snapshot}
-            status={status as SafTicketStatus}
+            status={status}
           />
 
           <ExportButton
@@ -122,7 +120,7 @@ export const OperatorTickets = ({
           state={state}
           actions={actions}
           order={state.order}
-          status={status as SafTicketStatus}
+          status={status}
           ticketsData={ticketsData}
           client={type === "received"}
           rowLink={showTicketDetail}

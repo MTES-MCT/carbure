@@ -22,7 +22,7 @@ export function useUserManager(): UserManager {
     params: [],
   })
 
-  const res = settings.result?.data.data
+  const res = settings.result?.data
   const email = res?.email ?? ""
   const rights = res?.rights ?? []
   const requests = res?.requests ?? []
@@ -40,7 +40,7 @@ export function useUserManager(): UserManager {
   }
 
   function getFirstEntity() {
-    return rights[0]?.entity ?? null
+    return (rights[0]?.entity as Entity) ?? null
   }
 
   function isAuthenticated() {

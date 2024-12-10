@@ -1,6 +1,6 @@
 services:
   carbure-mariadb:
-    image: mysql:latest
+    image: mysql:8.0.28
     container_name: carbure_mariadb
     environment:
       ENV: ${IMAGE_TAG}
