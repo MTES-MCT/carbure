@@ -1,1 +1,1 @@
-from .application import ApplicationViwSet
+from .application import ApplicationViewSet
