@@ -45,11 +45,8 @@ class EntitySerializer(serializers.ModelSerializer):
 class EntitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = [
-            "id",
-            "name",
-            "entity_type",
-        ]
+        fields = ["id", "name", "entity_type"]
+        read_only_fields = fields
 
 
 class FeedStockSerializer(serializers.ModelSerializer):
@@ -253,11 +250,15 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
 
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
-    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    producer = EntitySerializer(read_only=True)
+    production_site = DoubleCountingProductionSiteSerializer(read_only=True)
+    producer = EntitySummarySerializer(read_only=True)
+    agreement_id = serializers.SerializerMethodField()
+    quotas_progression = serializers.SerializerMethodField()
+    producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
 
     class Meta:
         model = DoubleCountingApplication
+        read_only_fields = ["status"]
         fields = [
             "id",
             "created_at",
@@ -267,7 +268,18 @@ class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
             "period_end",
             "status",
             "certificate_id",
+            "agreement_id",
+            "quotas_progression",
+            "producer_user",
         ]
+
+    @extend_schema_field(str)
+    def get_agreement_id(self, obj):
+        return ""
+
+    @extend_schema_field(float)
+    def get_quotas_progression(self, obj):
+        return 0.0
 
 
 class DoubleCountingApplicationPartialSerializerWithForeignKeys(serializers.ModelSerializer):
