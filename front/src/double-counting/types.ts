@@ -96,20 +96,10 @@ export enum DoubleCountingUploadErrorType {
   UnknownCountryOfOrigin = "UNKNOWN_COUNTRY_OF_ORIGIN",
 }
 
-export interface DoubleCountingUploadError {
-  error: string
-  is_blocking: boolean
-  line_number: number | null
-  line_merged?: string
-  meta?: null | any
-}
+export type DoubleCountingUploadErrors = apiTypes["FileErrors"]
 
-export interface DoubleCountingUploadErrors
-  extends DoubleCountingApplicationOverview {
-  // sourcing_history?: DoubleCountingUploadError[]
-  sourcing_forecast?: DoubleCountingUploadError[]
-  production?: DoubleCountingUploadError[]
-  global?: DoubleCountingUploadError[]
+export type DoubleCountingUploadError = apiTypes["FileError"] & {
+  meta?: any | null
 }
 
 export type DoubleCountingApplicationDetails =
@@ -168,17 +158,7 @@ export interface QuotaDetails {
   nb_lots: number
 }
 
-export interface DoubleCountingFileInfo {
-  has_dechets_industriels: boolean
-  errors?: DoubleCountingUploadErrors
-  start_year: string
-  file_name: string
-  producer_email: string
-  production_site: string
-  error_count: number
-  production: DoubleCountingProduction[]
-  sourcing: DoubleCountingSourcing[]
-}
+export type DoubleCountingFileInfo = apiTypes["CheckFileResponse"]["file"]
 
 export interface CheckDoubleCountingFilesResponse {
   files: DoubleCountingFileInfo[]

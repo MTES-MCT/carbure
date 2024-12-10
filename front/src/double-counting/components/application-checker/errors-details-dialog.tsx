@@ -76,7 +76,7 @@ export const ErrorsDetailsDialog = ({
               },
               {
                 key: "global",
-                label: `${t("Global")} (${fileData.errors?.global?.length || 0})`,
+                label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
               },
             ]}
             focus={focus}

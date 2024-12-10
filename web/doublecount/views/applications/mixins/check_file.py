@@ -3,7 +3,7 @@ import datetime
 import traceback
 
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -18,10 +18,6 @@ class CheckFilesError:
     FILE_CHECK_FAILED = "FILE_CHECK_FAILED"
 
 
-class CheckFileSerializer(serializers.Serializer):
-    files = serializers.ListField(child=serializers.FileField())
-
-
 class CheckFileActionMixin:
     @extend_schema(
         parameters=[
@@ -33,7 +29,9 @@ class CheckFileActionMixin:
                 required=True,
             )
         ],
-        request=CheckFileSerializer,
+        request={
+            "multipart/form-data": {"type": "object", "properties": {"file": {"type": "string", "format": "binary"}}},
+        },
         responses=CheckFileResponseSerializer,
     )
     @action(methods=["post"], detail=False, url_path="check-file")
