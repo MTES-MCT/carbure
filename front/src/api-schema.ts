@@ -943,7 +943,7 @@ export interface components {
       period_start: string
       /** Format: date */
       period_end: string
-      status?: components["schemas"]["Status2e8Enum"]
+      status?: components["schemas"]["DoubleCountingStatus"]
       readonly sourcing: components["schemas"]["DoubleCountingSourcing"][]
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
@@ -964,20 +964,28 @@ export interface components {
       period_start: string
       /** Format: date */
       period_end: string
-      status?: components["schemas"]["Status2e8Enum"]
+      status?: components["schemas"]["DoubleCountingStatus"]
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
       /** Format: date-time */
       readonly created_at: string
-      readonly producer: components["schemas"]["Entity"]
-      readonly production_site: string
+      readonly producer: components["schemas"]["EntitySummary"]
+      readonly production_site: components["schemas"]["DoubleCountingProductionSite"]
       /** Format: date */
       period_start: string
       /** Format: date */
       period_end: string
-      status?: components["schemas"]["Status2e8Enum"]
+      readonly status: components["schemas"]["DoubleCountingStatus"]
       certificate_id: string
+      readonly agreement_id: string
+      /** Format: double */
+      readonly quotas_progression: number
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      readonly producer_user: string
     }
     DoubleCountingDocFile: {
       readonly id: number
@@ -1059,6 +1067,14 @@ export interface components {
       readonly transit_country: components["schemas"]["Country"]
       metric_tonnes: number
     }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `INPROGRESS` - INPROGRESS
+     *     * `REJECTED` - REJECTED
+     *     * `ACCEPTED` - ACCEPTED
+     * @enum {string}
+     */
+    DoubleCountingStatus: DoubleCountingStatus
     EmptyResponse: {
       empty?: string
     }
@@ -1094,8 +1110,8 @@ export interface components {
     }
     EntitySummary: {
       readonly id: number
-      name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
+      readonly name: string
+      readonly entity_type: components["schemas"]["EntityTypeEnum"]
     }
     /**
      * @description * `Producteur` - Producteur
@@ -1513,14 +1529,6 @@ export interface components {
       /** Format: date */
       last_update: string
     }
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `INPROGRESS` - INPROGRESS
-     *     * `REJECTED` - REJECTED
-     *     * `ACCEPTED` - ACCEPTED
-     * @enum {string}
-     */
-    Status2e8Enum: Status2e8Enum
     /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
@@ -3137,6 +3145,12 @@ export enum DeliveryTypeEnum {
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
 }
+export enum DoubleCountingStatus {
+  PENDING = "PENDING",
+  INPROGRESS = "INPROGRESS",
+  REJECTED = "REJECTED",
+  ACCEPTED = "ACCEPTED",
+}
 export enum EntityTypeEnum {
   Producer = "Producteur",
   Operator = "Op\u00E9rateur",
@@ -3195,12 +3209,6 @@ export enum SiteTypeEnum {
   COGENERATION_PLANT = "COGENERATION PLANT",
   PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
   EFCA = "EFCA",
-}
-export enum Status2e8Enum {
-  PENDING = "PENDING",
-  INPROGRESS = "INPROGRESS",
-  REJECTED = "REJECTED",
-  ACCEPTED = "ACCEPTED",
 }
 export enum TransportDocumentTypeEnum {
   DAU = "DAU",
