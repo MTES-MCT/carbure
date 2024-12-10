@@ -3204,7 +3204,7 @@ components:
           type: string
           format: date
         status:
-          $ref: "#/components/schemas/Status2e8Enum"
+          $ref: "#/components/schemas/DoubleCountingStatus"
         sourcing:
           type: array
           items:
@@ -3263,7 +3263,7 @@ components:
           type: string
           format: date
         status:
-          $ref: "#/components/schemas/Status2e8Enum"
+          $ref: "#/components/schemas/DoubleCountingStatus"
       required:
         - certificate_id
         - created_at
@@ -3285,10 +3285,11 @@ components:
           readOnly: true
         producer:
           allOf:
-            - $ref: "#/components/schemas/Entity"
+            - $ref: "#/components/schemas/EntitySummary"
           readOnly: true
         production_site:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingProductionSite"
           readOnly: true
         period_start:
           type: string
@@ -3297,18 +3298,36 @@ components:
           type: string
           format: date
         status:
-          $ref: "#/components/schemas/Status2e8Enum"
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingStatus"
+          readOnly: true
         certificate_id:
           type: string
           maxLength: 16
+        agreement_id:
+          type: string
+          readOnly: true
+        quotas_progression:
+          type: number
+          format: double
+          readOnly: true
+        producer_user:
+          type: string
+          format: email
+          title: Adresse électronique
+          readOnly: true
       required:
+        - agreement_id
         - certificate_id
         - created_at
         - id
         - period_end
         - period_start
         - producer
+        - producer_user
         - production_site
+        - quotas_progression
+        - status
     DoubleCountingDocFile:
       type: object
       properties:
@@ -3567,6 +3586,18 @@ components:
         - supply_country
         - transit_country
         - year
+    DoubleCountingStatus:
+      enum:
+        - PENDING
+        - INPROGRESS
+        - REJECTED
+        - ACCEPTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `INPROGRESS` - INPROGRESS
+        * `REJECTED` - REJECTED
+        * `ACCEPTED` - ACCEPTED
     EmptyResponse:
       type: object
       properties:
@@ -3660,10 +3691,13 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          readOnly: true
         entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
+          readOnly: true
       required:
+        - entity_type
         - id
         - name
     EntityTypeEnum:
@@ -4728,18 +4762,6 @@ components:
       required:
         - changes
         - last_update
-    Status2e8Enum:
-      enum:
-        - PENDING
-        - INPROGRESS
-        - REJECTED
-        - ACCEPTED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `INPROGRESS` - INPROGRESS
-        * `REJECTED` - REJECTED
-        * `ACCEPTED` - ACCEPTED
     TransportDocumentTypeEnum:
       enum:
         - DAU
