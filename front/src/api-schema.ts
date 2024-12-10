@@ -1006,9 +1006,6 @@ export interface components {
     CheckAdminFileRequest: {
       files: string[]
     }
-    CheckFileRequest: {
-      files: string[]
-    }
     CheckFileResponse: {
       file: components["schemas"]["File"]
       /** Format: date-time */
@@ -1312,15 +1309,24 @@ export interface components {
       production_site: string
       /** Format: email */
       producer_email: string
-      production: components["schemas"]["Production"][]
-      sourcing: components["schemas"]["Sourcing"][]
-      sourcing_history: components["schemas"]["SourcingHistory"][]
+      production: components["schemas"]["DoubleCountingProduction"][]
+      sourcing: components["schemas"]["DoubleCountingSourcing"][]
+      readonly has_dechets_industriels: boolean
+    }
+    FileError: {
+      error: string
+      is_blocking: boolean
+      line_number: number
+      line_merged: string
+      meta: {
+        [key: string]: unknown
+      }
     }
     FileErrors: {
-      sourcing_forecast: string[]
-      sourcing_history: string[]
-      production: string[]
-      global_errors: string[]
+      sourcing_forecast: components["schemas"]["FileError"][]
+      sourcing_history: components["schemas"]["FileError"][]
+      production: components["schemas"]["FileError"][]
+      global_errors: components["schemas"]["FileError"][]
     }
     /**
      * @description * `SOURCING` - SOURCING
@@ -1418,11 +1424,6 @@ export interface components {
      * @enum {string}
      */
     PreferredUnitEnum: PreferredUnitEnum
-    Production: {
-      /** Format: double */
-      volume: number
-      unit: string
-    }
     ProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -1692,15 +1693,6 @@ export interface components {
      * @enum {string}
      */
     SiteTypeEnum: SiteTypeEnum
-    Sourcing: {
-      country: string
-      method: string
-    }
-    SourcingHistory: {
-      changes: number
-      /** Format: date */
-      last_update: string
-    }
     /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
@@ -2378,11 +2370,12 @@ export interface operations {
       path?: never
       cookie?: never
     }
-    requestBody: {
+    requestBody?: {
       content: {
-        "application/json": components["schemas"]["CheckFileRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["CheckFileRequest"]
-        "multipart/form-data": components["schemas"]["CheckFileRequest"]
+        "multipart/form-data": {
+          /** Format: binary */
+          file?: string
+        }
       }
     }
     responses: {

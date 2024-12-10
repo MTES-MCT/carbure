@@ -761,16 +761,13 @@ paths:
         - double-counting
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CheckFileRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/CheckFileRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/CheckFileRequest"
-        required: true
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -3022,16 +3019,6 @@ components:
             format: binary
       required:
         - files
-    CheckFileRequest:
-      type: object
-      properties:
-        files:
-          type: array
-          items:
-            type: string
-            format: binary
-      required:
-        - files
     CheckFileResponse:
       type: object
       properties:
@@ -3817,44 +3804,63 @@ components:
         production:
           type: array
           items:
-            $ref: "#/components/schemas/Production"
+            $ref: "#/components/schemas/DoubleCountingProduction"
         sourcing:
           type: array
           items:
-            $ref: "#/components/schemas/Sourcing"
-        sourcing_history:
-          type: array
-          items:
-            $ref: "#/components/schemas/SourcingHistory"
+            $ref: "#/components/schemas/DoubleCountingSourcing"
+        has_dechets_industriels:
+          type: boolean
+          readOnly: true
       required:
         - error_count
         - errors
         - file_name
+        - has_dechets_industriels
         - producer_email
         - production
         - production_site
         - sourcing
-        - sourcing_history
         - start_year
+    FileError:
+      type: object
+      properties:
+        error:
+          type: string
+        is_blocking:
+          type: boolean
+        line_number:
+          type: integer
+        line_merged:
+          type: string
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+        - error
+        - is_blocking
+        - line_merged
+        - line_number
+        - meta
     FileErrors:
       type: object
       properties:
         sourcing_forecast:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/FileError"
         sourcing_history:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/FileError"
         production:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/FileError"
         global_errors:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/FileError"
       required:
         - global_errors
         - production
@@ -4028,17 +4034,6 @@ components:
         * `l` - litres
         * `kg` - kg
         * `MJ` - MJ
-    Production:
-      type: object
-      properties:
-        volume:
-          type: number
-          format: double
-        unit:
-          type: string
-      required:
-        - unit
-        - volume
     ProductionSite:
       type: object
       properties:
@@ -4763,27 +4758,6 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
-    Sourcing:
-      type: object
-      properties:
-        country:
-          type: string
-        method:
-          type: string
-      required:
-        - country
-        - method
-    SourcingHistory:
-      type: object
-      properties:
-        changes:
-          type: integer
-        last_update:
-          type: string
-          format: date
-      required:
-        - changes
-        - last_update
     TransportDocumentTypeEnum:
       enum:
         - DAU

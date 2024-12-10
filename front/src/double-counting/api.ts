@@ -1,6 +1,6 @@
 import api, { Api } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
-import { AgreementDetails, DoubleCountingFileInfo } from "double-counting/types"
+import { AgreementDetails } from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
   return apiFetch.GET("/double-counting/agreements/", {
@@ -25,11 +25,15 @@ export function getDoubleCountingApplicationDetails(
 }
 
 export function checkDoubleCountingApplication(entity_id: number, file: File) {
-  const res = api.post<Api<{ file: DoubleCountingFileInfo }>>(
-    "/double-counting/applications/check-file",
-    { entity_id, file }
-  )
-  return res
+  return apiFetch.POST("/double-counting/applications/check-file/", {
+    params: { query: { entity_id } },
+    body: { file: file as unknown as string }, // hack for file upload :/
+    bodySerializer: (body) => {
+      const formData = new FormData()
+      formData.set("file", body?.file ?? "")
+      return formData
+    },
+  })
 }
 
 export function getDoubleCountingAgreementDetails(
