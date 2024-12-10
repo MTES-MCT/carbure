@@ -158,7 +158,7 @@ def add_application_by_type(request, entity_type):
     try:
         default_storage.save(s3_path, file)
     except Exception:
-        pass
+        traceback.print_exc()
 
     # 4 - send emails
     try:

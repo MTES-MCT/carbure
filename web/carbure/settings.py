@@ -240,6 +240,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 if env("TEST") is False:
     WHITENOISE_AUTOREFRESH = True
 
+if env("TEST"):
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 LOGGING = {
     "version": 1,
