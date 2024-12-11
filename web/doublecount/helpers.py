@@ -26,6 +26,7 @@ from doublecount.errors import DoubleCountingError, error
 from doublecount.models import (
     DoubleCountingApplication,
     DoubleCountingProduction,
+    DoubleCountingProductionHistory,
     DoubleCountingSourcing,
     DoubleCountingSourcingHistory,
 )
@@ -39,6 +40,7 @@ from doublecount.parser.dc_parser import (
 )
 from doublecount.serializers import (
     BiofuelSerializer,
+    DoubleCountingProductionHistorySerializer,
     DoubleCountingProductionSerializer,
     DoubleCountingSourcingHistorySerializer,
     DoubleCountingSourcingSerializer,
@@ -217,7 +219,6 @@ def load_dc_production_data(
         return production_data, production_errors
 
     # merge rows
-
     requested_quota_rows = merge_rows(requested_quota_rows, "requested_quota")
     production_forecast_rows = merge_rows(production_forecast_rows, "estimated_production")
     production_max_rows = merge_rows(production_max_rows, "max_production_capacity")
@@ -310,6 +311,71 @@ def load_dc_production_data(
     return production_data, production_errors
 
 
+def load_dc_production_history_data(
+    dca: DoubleCountingApplication,
+    production_max_history_rows: List[ProductionMaxRow],
+    production_effective_history_rows: List[ProductionForecastRow],
+):
+    production_history_data = []
+    production_errors = []
+
+    # preload data
+    feedstocks = MatierePremiere.objects.all()
+    biofuels = Biocarburant.objects.all()
+
+    # check rows integrity
+    for index, production_base_rows in enumerate([production_max_history_rows, production_effective_history_rows]):
+        tab_name = ["Capacité maximale de production", "Production effective"][index]
+
+        if len(production_base_rows) < 2:
+            production_errors.append(
+                error(
+                    DoubleCountingError.MISSING_DATA,
+                    meta={"tab_name": tab_name},
+                )
+            )
+            continue
+
+        for production_row in production_base_rows:
+            feedstock = get_material(production_row["feedstock"], feedstocks)
+            biofuel = get_material(production_row["biofuel"], biofuels)
+            meta = {"tab_name": tab_name, "year": production_row["year"]}
+            if not biofuel:
+                production_errors.append(error(DoubleCountingError.MISSING_BIOFUEL, production_row["line"], meta))
+            if not feedstock:
+                production_errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, production_row["line"], meta))
+
+    if len(production_errors) > 0:
+        return production_history_data, production_errors
+
+    # merge rows
+    production_max_history_rows = merge_rows(production_max_history_rows, "max_production_capacity")
+    production_effective_history_rows = merge_rows(production_effective_history_rows, "effective_production")
+
+    production_history = DoubleCountingProductionHistory(dca=dca)
+
+    for production_row in production_max_history_rows:
+        production_history.year = production_row["year"]
+        production_history.feedstock = get_material(production_row["feedstock"], feedstocks)
+        production_history.biofuel = get_material(production_row["biofuel"], biofuels)
+        production_history.max_production_capacity = production_row["max_production_capacity"]
+
+        # check in production_effective_history_rows if there is a corresponding row
+        # set effective_production
+        for prod_effective_row in production_effective_history_rows:
+            if (
+                production_row["year"] == prod_effective_row["year"]
+                and production_row["feedstock"] == prod_effective_row["feedstock"]
+                and production_row["biofuel"] == prod_effective_row["biofuel"]
+            ):
+                production_history.effective_production = prod_effective_row["estimated_production"]
+                break
+
+    production_history_data.append(production_history)
+
+    return production_history_data, production_errors
+
+
 def get_material(code, list):
     try:
         return list.get(code=code)
@@ -372,6 +438,8 @@ def check_dc_file(file):
             production_forecast_rows,
             requested_quota_rows,
             sourcing_history_rows,
+            production_max_history_rows,
+            production_effective_history_rows,
         ) = parse_dc_excel(filepath)
         start, end, global_errors = load_dc_period(info["start_year"])
 
@@ -387,6 +455,10 @@ def check_dc_file(file):
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
 
+        production_history_data, production_history_errors = load_dc_production_history_data(
+            dca, production_max_history_rows, production_effective_history_rows
+        )
+
         sourcing_history_data, sourcing_history_errors = load_dc_sourcing_history_data(dca, sourcing_history_rows)
 
         global_errors += check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
@@ -397,11 +469,13 @@ def check_dc_file(file):
                 "sourcing_forecast": sourcing_forecast_errors,
                 "sourcing_history": sourcing_history_errors,
                 "production": production_errors,
+                "production_history": production_history_errors,
                 "global": global_errors,
             },
             DoubleCountingSourcingSerializer(sourcing_forecast_data, many=True).data,
             DoubleCountingProductionSerializer(production_data, many=True).data,
             DoubleCountingSourcingHistorySerializer(sourcing_history_data, many=True).data,
+            DoubleCountingProductionHistorySerializer(production_history_data, many=True).data,
         )
 
     except CarbureException as e:
@@ -433,8 +507,10 @@ def check_dc_file(file):
             "sourcing_forecast": [],
             "sourcing_history": [],
             "production": [],
+            "production_history": [],
             "global": [excel_error],
         },
+        None,
         None,
         None,
         None,

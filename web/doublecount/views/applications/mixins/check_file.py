@@ -45,8 +45,21 @@ class CheckFileActionMixin:
             )
 
         try:
-            info, errors, sourcing_data, production_data, sourcing_history_data = check_dc_file(file)
-            error_count = +len(errors["sourcing_forecast"]) + len(errors["production"]) + len(errors["global"])
+            (
+                info,
+                errors,
+                sourcing_data,
+                production_data,
+                sourcing_history_data,
+                production_history_data,
+            ) = check_dc_file(file)
+
+            error_count = (
+                +len(errors["sourcing_forecast"])
+                + len(errors["production"])
+                + len(errors["global"])
+                + len(errors["production_history"])
+            )
 
             has_dechets_industriels = check_has_dechets_industriels(production_data)
 
@@ -61,6 +74,7 @@ class CheckFileActionMixin:
                 "production": production_data,
                 "sourcing": sourcing_data,
                 "sourcing_history": sourcing_history_data,
+                "production_history": production_history_data,
             }
 
             return Response({"file": file_info, "checked_at": datetime.datetime.now().isoformat()})

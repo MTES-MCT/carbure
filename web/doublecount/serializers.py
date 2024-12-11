@@ -11,6 +11,7 @@ from .models import (
     DoubleCountingApplication,
     DoubleCountingDocFile,
     DoubleCountingProduction,
+    DoubleCountingProductionHistory,
     DoubleCountingSourcing,
     DoubleCountingSourcingHistory,
 )
@@ -150,6 +151,23 @@ class DoubleCountingProductionSerializer(serializers.ModelSerializer):
             "estimated_production",
             "requested_quota",
             "approved_quota",
+        ]
+        read_only_fields = fields
+
+
+class DoubleCountingProductionHistorySerializer(serializers.ModelSerializer):
+    biofuel = BiofuelSerializer(read_only=True)
+    feedstock = FeedStockSerializer(read_only=True)
+
+    class Meta:
+        model = DoubleCountingProductionHistory
+        fields = [
+            "id",
+            "year",
+            "biofuel",
+            "feedstock",
+            "max_production_capacity",
+            "effective_production",
         ]
         read_only_fields = fields
 

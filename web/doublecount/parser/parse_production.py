@@ -49,7 +49,6 @@ def parse_requested_quota(excel_file: Workbook) -> List[RequestedQuotaRow]:
         other_required=True,
         other_alternative_index=10,  # outside of france production
     )
-
     return requested_quota_rows
 
 

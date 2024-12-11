@@ -100,6 +100,7 @@ class DoubleCountApplicationsTest(TestCase):
         response = self.check_file("dc_agreement_application_errors_missing_sheet.xlsx")
 
         data = response.json()
+        print("****data*****", data)
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 1

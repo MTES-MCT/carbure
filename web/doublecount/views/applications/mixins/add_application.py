@@ -20,6 +20,7 @@ from doublecount.helpers import (
     load_dc_filepath,
     load_dc_period,
     load_dc_production_data,
+    load_dc_production_history_data,
     load_dc_sourcing_data,
     load_dc_sourcing_history_data,
     send_dca_confirmation_email,
@@ -112,6 +113,8 @@ class AddActionMixin:
             production_forecast_rows,
             requested_quota_rows,
             sourcing_history_rows,
+            production_max_history_rows,
+            production_effective_history_rows,
         ) = parse_dc_excel(filepath)
 
         start, end, _ = load_dc_period(info["start_year"])
@@ -180,15 +183,24 @@ class AddActionMixin:
         production_data, _ = load_dc_production_data(
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
+        production_history_data, _ = load_dc_production_history_data(
+            dca, production_max_history_rows, production_effective_history_rows
+        )
         sourcing_history_data, _ = load_dc_sourcing_history_data(dca, sourcing_history_rows)
+
         DoubleCountingSourcing.objects.filter(dca=dca).delete()
         for sourcing in sourcing_forecast_data:
             sourcing.save()
+
         DoubleCountingProduction.objects.filter(dca=dca).delete()
         for production in production_data:
             production.save()
+
         for sourcing_history in sourcing_history_data:
             sourcing_history.save()
+
+        for production_history in production_history_data:
+            production_history.save()
 
         try:
             send_dca_confirmation_email(dca, request)
