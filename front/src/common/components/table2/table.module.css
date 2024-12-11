@@ -12,7 +12,6 @@
 .columns {
   display: flex;
   align-items: center;
-  gap: var(--spacing-m);
   background-color: var(--blue-ecume-975-75);
 }
 
@@ -48,7 +47,7 @@
 }
 
 .rows > li:not(.rowLink) {
-  padding: 0 var(--spacing-2w);
+  padding-bottom: 0;
 }
 
 .rows > li:not(.rowLink):not(:last-child) {
@@ -58,7 +57,6 @@
 .rows > li > a {
   flex: 1;
   min-width: 0;
-  padding: 0 var(--spacing-2w);
 }
 
 .rows > li > a:not(:last-child) {
@@ -69,12 +67,10 @@
 .rows > li > a {
   display: flex;
   align-items: center;
-  gap: var(--spacing-m);
 }
 
 .compact .rows > li {
   padding: 0 var(--spacing-xs);
-  gap: var(--spacing-xs);
 }
 
 .rows > li[data-interactive] {
@@ -83,7 +79,7 @@
 
 .cell {
   flex: 1 1 0%;
-  padding: var(--spacing-m) 0;
+  padding: var(--spacing-3v) var(--spacing-2w);
 }
 
 .compact .cell {
@@ -146,7 +142,8 @@
 }
 
 .rows .selection {
-  margin-left: calc(-1 * (var(--spacing-2w) + 1px));
+  /* margin-left: calc(-1 * (var(--spacing-2w) + 1px)); */
+  margin-left: -1px;
 }
 
 .header.selection [data-checkbox],
