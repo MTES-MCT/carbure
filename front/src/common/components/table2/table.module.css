@@ -11,15 +11,14 @@
 
 .columns {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--spacing-m);
   background-color: var(--blue-ecume-975-75);
-  padding: var(--spacing-3v) 0;
 }
 
 .header {
   flex: 1 1 0%;
-  padding: 0 var(--spacing-2w);
+  padding: var(--spacing-3v) var(--spacing-2w);
 }
 
 .header[data-sortable] {
@@ -36,7 +35,6 @@
   padding: 0;
   margin: 0;
   list-style-type: none;
-  gap: 1px;
   border: 1px solid var(--border-default-grey);
   background: white;
 }
@@ -53,10 +51,18 @@
   padding: 0 var(--spacing-2w);
 }
 
+.rows > li:not(.rowLink):not(:last-child) {
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
 .rows > li > a {
   flex: 1;
   min-width: 0;
   padding: 0 var(--spacing-2w);
+}
+
+.rows > li > a:not(:last-child) {
+  border-bottom: 1px solid var(--border-default-grey);
 }
 
 .rows > li,
@@ -130,8 +136,6 @@
   flex: 0 0 min-content;
   min-width: 0;
   padding: 0;
-  margin-left: calc(-1 * var(--spacing-l));
-  margin-right: calc(-1 * var(--spacing-s));
 }
 
 .selection [data-checkbox] {
@@ -139,11 +143,16 @@
   height: 100%;
   justify-content: center;
   align-items: center;
-  padding: var(--spacing-l);
 }
 
-.header.selection [data-checkbox] {
-  padding: var(--spacing-s) var(--spacing-l);
+.rows .selection {
+  margin-left: calc(-1 * (var(--spacing-2w) + 1px));
+}
+
+.header.selection [data-checkbox],
+.rows .selection {
+  border-right: 1px solid var(--border-default-grey);
+  padding: var(--spacing-2w) var(--spacing-3w);
 }
 
 .marker {
@@ -188,4 +197,24 @@
 
 .actions button {
   color: var(--gray-dark);
+}
+
+/*
+ * When there are selected rows, a list of actions is displayed at the top of the table
+ */
+.columns.topActions {
+  background-color: white;
+  border: 1px solid var(--border-default-grey);
+  border-bottom: none;
+  width: fit-content;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.top-actions__count {
+  padding: var(--spacing-1w) var(--spacing-2w);
+}
+
+.top-actions__item:not(:last-child) {
+  border-right: 1px solid var(--border-default-grey);
 }

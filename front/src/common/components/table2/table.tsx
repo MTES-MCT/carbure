@@ -8,6 +8,7 @@ import { Col, LoaderOverlay } from "../scaffold"
 import css from "./table.module.css"
 import Tooltip from "../tooltip"
 import { Text } from "../text"
+import { useTranslation } from "react-i18next"
 
 export type TableVariant = "spaced" | "compact"
 
@@ -17,9 +18,24 @@ export interface TableProps<T> {
   variant?: TableVariant
   loading?: boolean
   headless?: boolean
+  // If true, the table will have a selection column
+  hasSelectionColumn?: boolean
   columns: Column<T>[]
   rows: T[]
   order?: Order
+
+  // List of selected rows
+  selected?: number[]
+
+  // Callback to update the list of selected rows
+  onSelect?: (selected: number[]) => void
+
+  // Function that determines if a row is selected by comparing its identifier with the array of selected values
+  identify?: (item: T) => number
+
+  // Actions to display at the top of the table when there are selected rows
+  topActions?: React.ReactNode[]
+
   onOrder?: (order: Order | undefined) => void
   onAction?: (value: T, index: number) => void
   rowProps?: (row: T, i?: number) => JSX.IntrinsicElements["li"]
@@ -32,17 +48,27 @@ export function Table<T>({
   variant,
   loading,
   headless,
-  columns,
+  hasSelectionColumn,
+  selected = [],
+  topActions,
+  identify,
+  columns: _columns,
   rows,
   order: controlledOrder,
   rowProps,
   rowLink,
   onOrder,
   onAction,
+  onSelect,
 }: TableProps<T>) {
+  const columns =
+    hasSelectionColumn && onSelect && identify
+      ? [selectionColumn(rows, selected, onSelect, identify), ..._columns]
+      : _columns
+
   const { order, orderBy } = useOrderBy(controlledOrder, onOrder)
   const compare = useCompare(columns, order)
-
+  const { t } = useTranslation()
   return (
     <div
       data-list
@@ -51,38 +77,71 @@ export function Table<T>({
       style={style}
     >
       {!headless && (
-        <header className={css.columns}>
-          {columns.filter(isVisible).map((column, i) => (
-            <Text
-              is="div"
-              key={column.key ?? i}
-              data-sortable={column.key ? true : undefined}
-              componentProps={{
-                onClick: column.key ? () => orderBy(column.key!) : undefined,
-                title:
-                  typeof column.header === "string" ? column.header : undefined,
-              }}
-              style={column.style}
-              className={cl(
-                css.header,
-                column.className,
-                column.small && css.small
-              )}
-              size="sm"
-              fontWeight="bold"
-            >
-              {column.key && (
-                <span
-                  className={cl(column.key !== order?.column && css.sortable)}
+        <header
+          className={cl(css.columns, selected.length > 0 && css.topActions)}
+        >
+          {selected.length > 0 ? (
+            <>
+              <span
+                className={cl(
+                  css["top-actions__count"],
+                  css["top-actions__item"]
+                )}
+              >
+                <Checkbox
+                  captive
+                  value={selected.length > 0}
+                  onChange={() => onSelect?.([])}
                 >
-                  {column.key !== order?.column || order?.direction === "asc"
-                    ? " ▲"
-                    : " ▼"}
-                </span>
-              )}{" "}
-              {column.header}
-            </Text>
-          ))}
+                  {t("{{count}} lignes sélectionnées", {
+                    count: selected.length,
+                  })}
+                </Checkbox>
+              </span>
+              {topActions?.map((action, i) => (
+                <div
+                  className={css["top-actions__item"]}
+                  key={`top-actions-item${i}`}
+                >
+                  {action}
+                </div>
+              ))}
+            </>
+          ) : (
+            columns.filter(isVisible).map((column, i) => (
+              <Text
+                is="div"
+                key={column.key ?? i}
+                data-sortable={column.key ? true : undefined}
+                componentProps={{
+                  onClick: column.key ? () => orderBy(column.key!) : undefined,
+                  title:
+                    typeof column.header === "string"
+                      ? column.header
+                      : undefined,
+                }}
+                style={column.style}
+                className={cl(
+                  css.header,
+                  column.className,
+                  column.small && css.small
+                )}
+                size="sm"
+                fontWeight="bold"
+              >
+                {column.key && (
+                  <span
+                    className={cl(column.key !== order?.column && css.sortable)}
+                  >
+                    {column.key !== order?.column || order?.direction === "asc"
+                      ? " ▲"
+                      : " ▼"}
+                  </span>
+                )}{" "}
+                {column.header}
+              </Text>
+            ))
+          )}
         </header>
       )}
       <ul className={css.rows}>
@@ -126,7 +185,7 @@ function isVisible(column: Column<any>) {
   return !column.hidden
 }
 
-export function selectionColumn<T, V>(
+function selectionColumn<T, V>(
   rows: T[],
   selected: V[],
   onSelect: (selected: V[]) => void,
