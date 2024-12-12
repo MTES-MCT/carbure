@@ -1,7 +1,6 @@
-import api, { Api, download } from "common/services/api"
+import { download } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
 import { PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by } from "api-schema"
-import { CheckDoubleCountingFilesResponse } from "../double-counting/types"
 
 // GLOBAL
 
@@ -71,6 +70,7 @@ export function downloadDoubleCountingApplication(
   dca_id: number,
   industrial_wastes?: string
 ) {
+  // TODO: find out how to typecheck download() for endpoints with variable paths
   return download(`/double-counting/applications/${dca_id}/export`, {
     entity_id,
     dca_id,
@@ -101,9 +101,8 @@ export function rejectDoubleCountingApplication(
 // AGREEMENTS
 
 export function downloadDoubleCountingAgreementList(entity_id: number) {
-  return download("/double-counting/admin/agreements", {
+  return download("/double-counting/agreements/export/", {
     entity_id,
-    as_excel_file: true,
   })
 }
 
@@ -140,9 +139,8 @@ export function getDoubleCountingAgreement(
 }
 
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
-  const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
-    "/double-counting/admin/applications/check-files",
-    { entity_id, files }
-  )
-  return res
+  return apiFetch.POST("/double-counting/applications/check-admin-files/", {
+    params: { query: { entity_id } },
+    body: { files: files as unknown as string[] }, // type hack for file upload
+  })
 }
