@@ -184,7 +184,6 @@ export const entityRight: UserRight = {
   name: "Admin Test",
   expiration_date: "",
   email: "test@test.test",
-  name: "test",
 }
 
 export const entityRequest: UserRightRequest = {
