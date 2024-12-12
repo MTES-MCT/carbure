@@ -78,7 +78,9 @@ export const MultiSelect = <T, V>({
             {value.length}
           </Text>
         )}
-        {placeholder}
+        <span className={styles.label}>
+          {asyncOptions.label || placeholder}
+        </span>
       </Button>
       {!props.disabled && !props.readOnly && (
         <Dropdown

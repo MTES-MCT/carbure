@@ -4,6 +4,12 @@
   position: relative;
 }
 
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .count {
   position: absolute;
   top: -8px;

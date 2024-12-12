@@ -80,7 +80,11 @@ export function Select<T, V>({
         )}
         size={size}
       >
-        <Text fontWeight="semibold" is="span">
+        <Text
+          fontWeight="semibold"
+          is="span"
+          className={cl(!valueRenderer && styles.label)}
+        >
           {currentItem && valueRenderer
             ? valueRenderer(currentItem)
             : asyncOptions.label || placeholder}

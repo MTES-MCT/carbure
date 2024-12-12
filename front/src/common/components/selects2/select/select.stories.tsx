@@ -64,6 +64,19 @@ export const CustomRenderer: Story = {
   },
 }
 
+export const OverflowValues: Story = {
+  args: {
+    options: [
+      {
+        label:
+          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
+        value: "10",
+      },
+    ],
+    value: "10",
+  },
+}
+
 export const LoadingState: Story = {
   args: {
     loading: true,
