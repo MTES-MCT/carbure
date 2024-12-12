@@ -95,9 +95,9 @@ export function rejectDoubleCountingApplication(
   entity_id: number,
   dca_id: number
 ) {
-  return api.post("/double-counting/admin/applications/reject", {
-    entity_id,
-    dca_id: dca_id,
+  return apiFetch.POST("/double-counting/applications/reject/", {
+    params: { query: { entity_id } },
+    body: { dca_id },
   })
 }
 
