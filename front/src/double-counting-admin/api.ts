@@ -57,15 +57,14 @@ export function adminAddDoubleCountingApplication(
 
 export function approveDoubleCountingQuotas(
   entity_id: number,
-  dca_id: number,
+  // dca_id: number,
   approved_quotas: number[][]
 ) {
-  return api.post(
-    "/double-counting/admin/applications/update-approved-quotas",
+  return apiFetch.POST(
+    "/double-counting/applications/update-approved-quotas/",
     {
-      entity_id,
-      dca_id,
-      approved_quotas: JSON.stringify(approved_quotas),
+      params: { query: { entity_id } },
+      body: { approved_quotas },
     }
   )
 }
