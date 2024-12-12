@@ -3462,11 +3462,9 @@ components:
           type: string
           format: date
         producer:
-          type: string
-          readOnly: true
+          $ref: "#/components/schemas/EntitySummary"
         production_site:
-          type: string
-          readOnly: true
+          $ref: "#/components/schemas/DoubleCountingProductionSite"
         valid_until:
           type: string
           format: date
@@ -3474,11 +3472,16 @@ components:
           allOf:
             - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
           readOnly: true
+        quotas_progression:
+          type: number
+          format: double
+          readOnly: true
       required:
         - certificate_id
         - id
         - producer
         - production_site
+        - quotas_progression
         - status
         - valid_from
         - valid_until

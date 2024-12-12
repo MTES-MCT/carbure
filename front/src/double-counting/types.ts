@@ -1,10 +1,5 @@
 import { DoubleCountingStatus, DoubleCountingAgreementStatus } from "api-schema"
-import {
-  Biofuel,
-  Entity,
-  Feedstock,
-  ProductionSiteDetails,
-} from "carbure/types"
+import { Biofuel, Feedstock } from "carbure/types"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export { DoubleCountingStatus }
@@ -94,16 +89,9 @@ export interface DoubleCountingAgreementsOverview {
   incoming: DoubleCountingAgreementOverview[]
   expired: DoubleCountingAgreementOverview[]
 }
-export interface DoubleCountingAgreementOverview {
-  id: number
-  producer: Entity
-  production_site: ProductionSiteDetails
-  certificate_id: string
-  valid_from: Date
-  valid_until: Date
-  status: DoubleCountingAgreementStatus
-  quotas_progression: number
-}
+
+export type DoubleCountingAgreementOverview =
+  apiTypes["DoubleCountingRegistration"]
 
 export type DoubleCountingAgreementPublic =
   apiTypes["DoubleCountingRegistrationPublic"]

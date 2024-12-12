@@ -1180,11 +1180,13 @@ export interface components {
       certificate_id: string
       /** Format: date */
       valid_from: string
-      readonly producer: string
-      readonly production_site: string
+      producer: components["schemas"]["EntitySummary"]
+      production_site: components["schemas"]["DoubleCountingProductionSite"]
       /** Format: date */
       valid_until: string
       readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
+      /** Format: double */
+      readonly quotas_progression: number
     }
     DoubleCountingRegistrationDetails: {
       readonly id: number

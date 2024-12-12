@@ -2,14 +2,21 @@ from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from doublecount.models import DoubleCountingProduction
-from doublecount.serializers import BiofuelSerializer, DoubleCountingApplicationSerializer, FeedStockSerializer
+from doublecount.serializers import (
+    BiofuelSerializer,
+    DoubleCountingApplicationSerializer,
+    DoubleCountingProductionSiteSerializer,
+    EntitySummarySerializer,
+    FeedStockSerializer,
+)
 
 from .models import DoubleCountingRegistration
 
 
 class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
-    production_site = serializers.SerializerMethodField()
-    producer = serializers.SerializerMethodField()
+    production_site = DoubleCountingProductionSiteSerializer()
+    producer = EntitySummarySerializer()
+    quotas_progression = serializers.SerializerMethodField()
 
     class Meta:
         model = DoubleCountingRegistration
@@ -21,6 +28,7 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
             "production_site",
             "valid_until",
             "status",
+            "quotas_progression",
         ]
 
     @extend_schema_field(str)
@@ -30,6 +38,10 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
     @extend_schema_field(str)
     def get_producer(self, obj):
         return obj.production_site.producer.name if obj.production_site else obj.certificate_holder
+
+    @extend_schema_field(float)
+    def get_quotas_progression(self, obj):
+        return 0.0
 
 
 class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):

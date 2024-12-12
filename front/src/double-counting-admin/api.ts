@@ -1,9 +1,9 @@
 import api, { Api, download } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
+import { PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by } from "api-schema"
 import {
   AgreementDetails,
   CheckDoubleCountingFilesResponse,
-  DoubleCountingAgreementsOverview,
 } from "../double-counting/types"
 
 // GLOBAL
@@ -113,12 +113,21 @@ export function downloadDoubleCountingAgreementList(entity_id: number) {
 export function getDoubleCountingAgreementList(
   entity_id: number,
   order_by?: string,
-  direction?: string
+  ordering?: string
 ) {
-  return api.get<Api<DoubleCountingAgreementsOverview>>(
-    "/double-counting/admin/agreements",
-    { params: { entity_id, order_by, direction } }
-  )
+  return apiFetch.GET("/double-counting/agreements/agreement-admin/", {
+    params: {
+      query: {
+        entity_id,
+        ordering,
+        order_by: order_by
+          ? [
+              order_by as PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by,
+            ]
+          : undefined,
+      },
+    },
+  })
 }
 
 export function getDoubleCountingAgreement(
