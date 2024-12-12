@@ -4,7 +4,6 @@ import {
   AgreementDetails,
   CheckDoubleCountingFilesResponse,
   DoubleCountingAgreementsOverview,
-  DoubleCountingApplicationDetails,
 } from "../double-counting/types"
 
 // GLOBAL
@@ -27,12 +26,12 @@ export function getDoubleCountingApplication(
   entity_id: number,
   dca_id: number
 ) {
-  return api.get<Api<DoubleCountingApplicationDetails>>(
-    "/double-counting/admin/applications/details",
-    {
-      params: { entity_id, dca_id },
-    }
-  )
+  return apiFetch.GET("/double-counting/applications/{id}/", {
+    params: {
+      path: { id: dca_id },
+      query: { entity_id },
+    },
+  })
 }
 
 export function adminAddDoubleCountingApplication(
