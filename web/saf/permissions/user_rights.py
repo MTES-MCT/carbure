@@ -11,7 +11,7 @@ class BaseEntityPermission(BasePermission):
 
         try:
             entity = Entity.objects.get(pk=entity_id)
-        except Entity.DoesNotExist:
+        except Exception:
             return None
 
         return entity
@@ -19,7 +19,7 @@ class BaseEntityPermission(BasePermission):
     def get_user_rights(self, request, entity):
         try:
             rights = UserRights.objects.get(entity=entity, user=request.user)
-        except UserRights.DoesNotExist:
+        except Exception:
             return None
         return rights
 
@@ -102,7 +102,7 @@ class HasAdminRights(BaseEntityPermission):
         elif entity.entity_type == Entity.EXTERNAL_ADMIN:
             try:
                 ExternalAdminRights.objects.get(entity=entity, right__in=allow_external)
-            except ExternalAdminRights.DoesNotExist:
+            except Exception:
                 return False
 
         if isinstance(self.role, list) and rights.role not in self.role:

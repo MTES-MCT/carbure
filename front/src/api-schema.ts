@@ -4,6 +4,38 @@
  */
 
 export interface paths {
+  "/api/entities/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_list"]
+    put?: never
+    post: operations["entities_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/entities/{id}/enable/": {
     parameters: {
       query?: never
@@ -14,6 +46,614 @@ export interface paths {
     get?: never
     put?: never
     post: operations["entities_enable_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/add-company": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_add_company_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/add/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_certificates_add_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/check-entity/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_certificates_check_entity_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/delete/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_certificates_delete_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/reject-entity/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_certificates_reject_entity_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/set-default/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_certificates_set_default_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/certificates/update-certificate/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_certificates_update_certificate_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/depots/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_depots_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/depots/add/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_depots_add_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/depots/create-depot/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_depots_create_depot_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/depots/delete-depot/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_depots_delete_depot_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/direct-deliveries/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_direct_deliveries_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/elec/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_elec_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/notifications/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_notifications_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/notifications/ack/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_notifications_ack_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/production-sites/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_production_sites_list"]
+    put?: never
+    post: operations["entities_production_sites_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/production-sites/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: operations["entities_production_sites_destroy"]
+    options?: never
+    head?: never
+    patch: operations["entities_production_sites_partial_update"]
+    trace?: never
+  }
+  "/api/entities/production-sites/{id}/set-biofuels/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_production_sites_set_biofuels_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/production-sites/{id}/set-certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_production_sites_set_certificates_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/production-sites/{id}/set-feedstocks/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_production_sites_set_feedstocks_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/release-for-consumption/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_release_for_consumption_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/search-company": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_search_company_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/stats/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_stats_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/stocks/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_stocks_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/trading/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_trading_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/unit/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_unit_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/update-entity-info/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_update_entity_info_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_users_list"]
+    put?: never
+    post: operations["entities_users_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put: operations["entities_users_update"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/accept-user/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_users_accept_user_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/change-role/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_users_change_role_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/entity-rights-requests/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_users_entity_rights_requests_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/invite-user/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_users_invite_user_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/revoke-access/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_users_revoke_access_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/rights-requests/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["entities_users_rights_requests_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/update-right-request/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_users_update_right_request_create"]
     delete?: never
     options?: never
     head?: never
@@ -472,6 +1112,17 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    AddCertificate: {
+      certificate_id: number
+      certificate_type: string
+    }
+    AddDepot: {
+      delivery_site_id: string
+      ownership_type: components["schemas"]["OwnershipTypeEnum"]
+      /** @default false */
+      blending_is_outsourced: boolean
+      blending_entity_id?: string
+    }
     Biofuel: {
       name: string
       name_en: string
@@ -558,6 +1209,17 @@ export interface components {
       vendor_certificate_type?: string | null
       data_reliability_score?: string
     }
+    CarbureNotification: {
+      readonly id: number
+      dest: components["schemas"]["Entity"]
+      /** Format: date-time */
+      readonly datetime: string
+      type: components["schemas"]["TypeEnum"]
+      acked?: boolean
+      send_by_email?: boolean
+      email_sent?: boolean
+      meta?: unknown
+    }
     /**
      * @description * `CONV` - Conventionnel
      *     * `ANN-IX-A` - ANNEXE IX-A
@@ -575,8 +1237,25 @@ export interface components {
      * @enum {string}
      */
     CertificateTypeEnum: CertificateTypeEnum
+    ChangeRole: {
+      /** Format: email */
+      email: string
+      role: string
+    }
+    CheckCertificate: {
+      certificate_id: number
+    }
     Comment: {
       comment?: string
+    }
+    CompanyPreview: {
+      name: string
+      legal_name: string
+      registration_id: string
+      registered_address: string
+      registered_city: string
+      registered_zipcode: string
+      registered_country: components["schemas"]["RegistrationCountry"]
     }
     /**
      * @description * `NO_PROBLEMO` - NO_PROBLEMO
@@ -590,6 +1269,63 @@ export interface components {
       name_en: string
       code_pays: string
       is_in_europe?: boolean
+    }
+    CreateDepot: {
+      readonly id: number
+      country_code: string
+      entity_id: number
+      depot_id: string
+      depot_type: string
+      name: string
+      site_siret?: string
+      customs_id?: string
+      site_type?: components["schemas"]["SiteTypeEnum"]
+      address?: string
+      postal_code?: string
+      city?: string
+      gps_coordinates?: string | null
+      accise?: string
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      electrical_efficiency?: number | null
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      thermal_efficiency?: number | null
+      /**
+       * Format: double
+       * @description En degrés Celsius
+       */
+      useful_temperature?: number | null
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      eligible_dc?: boolean
+      dc_number?: string
+      dc_reference?: string
+      manager_name?: string
+      manager_phone?: string
+      manager_email?: string
+      private?: boolean
+      is_enabled?: boolean
+      /** Format: date */
+      date_mise_en_service?: string | null
+      country?: number | null
+      created_by?: number | null
+    }
+    CreateEntity: {
+      name: string
+      entity_type?: components["schemas"]["EntityTypeEnum"]
+      has_saf?: boolean
+      has_elec?: boolean
+    }
+    DeleteCertificate: {
+      certificate_id: number
+      certificate_type: string
+    }
+    DeleteDepot: {
+      delivery_site_id: string
     }
     /**
      * @description * `UNKNOWN` - UNKNOWN
@@ -632,6 +1368,29 @@ export interface components {
        */
       useful_temperature?: number | null
     }
+    DepotProductionSite: {
+      address?: string
+      name: string
+      country: components["schemas"]["Pays"]
+      readonly id: number
+      /** Format: date */
+      date_mise_en_service?: string | null
+      site_siret?: string
+      postal_code?: string
+      manager_name?: string
+      manager_phone?: string
+      manager_email?: string
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      eligible_dc?: boolean
+      dc_reference?: string
+      dc_number?: string
+      city?: string
+      certificates: components["schemas"]["ProductionSiteCertificateSertificate"][]
+    }
+    DirectDeliveries: {
+      /** @default false */
+      has_direct_deliveries: boolean
+    }
     EmptyResponse: {
       empty?: string
     }
@@ -657,10 +1416,98 @@ export interface components {
       website?: string
       vat_number?: string
     }
+    EntityBiofuel: {
+      name: string
+      name_en: string
+      code: string
+    }
+    EntityCertificate: {
+      readonly id: number
+      entity: components["schemas"]["Entity"]
+      certificate: components["schemas"]["GenericCertificate"]
+      has_been_updated?: boolean
+      checked_by_admin?: boolean
+      rejected_by_admin?: boolean
+      /** Format: date-time */
+      readonly added_dt: string
+    }
+    EntityCompany: {
+      certificate_type?: components["schemas"]["CertificateTypeEnum"]
+      certificate_id?: string
+      activity_description?: string
+      entity_type?: components["schemas"]["EntityTypeEnum"]
+      name: string
+      legal_name?: string
+      registered_address?: string
+      registered_city?: string
+      registered_country_code?: string
+      registered_zipcode?: string
+      registration_id?: string
+      sustainability_officer?: string
+      sustainability_officer_email?: string
+      sustainability_officer_phone_number?: string
+      /** Format: uri */
+      website?: string
+      vat_number?: string
+    }
+    EntityCountry: {
+      name: string
+      name_en: string
+      code_pays: string
+      is_in_europe?: boolean
+    }
+    EntityFeedStock: {
+      name: string
+      name_en: string
+      code: string
+      category?: components["schemas"]["CategoryEnum"]
+      is_double_compte?: boolean
+    }
+    EntityMetrics: {
+      entity: components["schemas"]["EntityUserEntity"]
+      users: number
+      requests: number
+      depots: number
+      production_sites: number
+      certificates: number
+      certificates_pending: number
+      double_counting: number
+      double_counting_requests: number
+      charge_points_accepted: number
+      charge_points_pending: number
+      meter_readings_accepted: number
+      meter_readings_pending: number
+    }
     EntityPreview: {
       readonly id: number
       readonly name: string
       readonly entity_type: components["schemas"]["EntityTypeEnum"]
+    }
+    EntityProductionSite: {
+      readonly id: number
+      address?: string
+      name: string
+      readonly country: components["schemas"]["EntityCountry"]
+      /** Format: date */
+      date_mise_en_service?: string | null
+      site_siret?: string
+      postal_code?: string
+      manager_name?: string
+      manager_phone?: string
+      manager_email?: string
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      eligible_dc?: boolean
+      dc_reference?: string
+      dc_number?: string
+      city?: string
+      certificates: components["schemas"]["GenericCertificate"][]
+      readonly inputs: components["schemas"]["EntityFeedStock"][]
+      readonly outputs: components["schemas"]["EntityBiofuel"][]
+    }
+    EntitySite: {
+      ownership_type: string
+      blending_is_outsourced: boolean
+      blender: components["schemas"]["EntityUserEntity"]
     }
     EntitySummary: {
       readonly id: number
@@ -681,6 +1528,42 @@ export interface components {
      * @enum {string}
      */
     EntityTypeEnum: EntityTypeEnum
+    EntityUser: {
+      readonly id: number
+      readonly name: string
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      email: string
+    }
+    EntityUserEntity: {
+      readonly id: number
+      name: string
+      entity_type?: components["schemas"]["EntityTypeEnum"]
+      has_mac?: boolean
+      has_trading?: boolean
+      has_direct_deliveries?: boolean
+      has_stocks?: boolean
+      legal_name?: string
+      registration_id?: string
+      sustainability_officer?: string
+      sustainability_officer_phone_number?: string
+      sustainability_officer_email?: string
+      registered_address?: string
+      registered_zipcode?: string
+      registered_city?: string
+      registered_country: components["schemas"]["Pays"]
+      default_certificate?: string | null
+      preferred_unit?: components["schemas"]["PreferredUnitEnum"]
+      has_saf?: boolean
+      has_elec?: boolean
+      activity_description?: string
+      /** Format: uri */
+      website?: string
+      vat_number?: string
+      readonly ext_admin_pages: unknown[]
+    }
     ErrorResponse: {
       message: string
     }
@@ -722,8 +1605,16 @@ export interface components {
      * @enum {string}
      */
     GesOptionEnum: GesOptionEnum
+    GrantAccess: {
+      request_id: number
+    }
     GroupAssignmentResponse: {
       assigned_tickets_count: number
+    }
+    InviteUser: {
+      /** Format: email */
+      email: string
+      role: string
     }
     /**
      * @description * `DRAFT` - DRAFT
@@ -735,6 +1626,16 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    Notification: {
+      notification_ids: number[]
+    }
+    /**
+     * @description * `OWN` - Propre
+     *     * `THIRD_PARTY` - Tiers
+     *     * `PROCESSING` - Processing
+     * @enum {string}
+     */
+    OwnershipTypeEnum: OwnershipTypeEnum
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -780,6 +1681,29 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
     }
+    PatchedUpdateProductionSiteModel: {
+      country_code?: string
+      name?: string
+      /** Format: date */
+      date_mise_en_service?: string | null
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      site_siret?: string
+      postal_code?: string
+      manager_name?: string
+      manager_phone?: string
+      manager_email?: string
+      city?: string
+      address?: string
+      eligible_dc?: boolean
+      dc_reference?: string
+      created_by?: number | null
+    }
+    Pays: {
+      code_pays: string
+      name: string
+      name_en: string
+      is_in_europe?: boolean
+    }
     /**
      * @description * `l` - litres
      *     * `kg` - kg
@@ -806,16 +1730,55 @@ export interface components {
       manager_phone?: string
       manager_email?: string
     }
+    ProductionSiteCertificateSertificate: {
+      readonly type: string
+      readonly certificate_id: string
+    }
+    ProductionSiteModel: {
+      country_code: string
+      country?: number | null
+      name: string
+      /** Format: date */
+      date_mise_en_service: string | null
+      ges_option: components["schemas"]["GesOptionEnum"]
+      site_siret: string
+      postal_code: string
+      manager_name: string
+      manager_phone: string
+      manager_email: string
+      city: string
+      address: string
+      eligible_dc: boolean
+      dc_reference?: string
+      created_by?: number | null
+    }
+    RegistrationCountry: {
+      name: string
+      name_en: string
+      code_pays: string
+      is_in_europe: boolean
+    }
+    RejectCertificate: {
+      certificate_id: number
+    }
     RequestAccess: {
       comment?: string
       role: string
       entity_id: number
+    }
+    ResponseData: {
+      company_preview: components["schemas"]["CompanyPreview"]
+      warning?: components["schemas"]["Warning"]
     }
     ResponseSuccess: {
       status: string
     }
     RevokeAccess: {
       entity_id: number
+    }
+    RevokeUser: {
+      /** Format: email */
+      email: string
     }
     /**
      * @description * `RO` - Lecture Seule
@@ -1001,6 +1964,22 @@ export interface components {
       /** Format: double */
       assigned_volume: number
     }
+    SeachCompany: {
+      registration_id: string
+    }
+    SetBioFuels: {
+      /** @description List of biocarburant codes. */
+      biocarburant_codes: string[]
+    }
+    SetCertificate: {
+      certificate_ids: string[]
+    }
+    SetDefaultCertificate: {
+      certificate_id: number
+    }
+    SetFeedstocks: {
+      matiere_premiere_codes: string[]
+    }
     /**
      * @description * `OTHER` - Autre
      *     * `EFS` - EFS
@@ -1016,6 +1995,30 @@ export interface components {
      */
     SiteTypeEnum: SiteTypeEnum
     /**
+     * @description * `PENDING` - En attente de validation
+     *     * `ACCEPTED` - Accepté
+     *     * `REJECTED` - Refusé
+     *     * `REVOKED` - Révoqué
+     * @enum {string}
+     */
+    Status1ecEnum: Status1ecEnum
+    ToggleElec: {
+      /** @default false */
+      has_elec: boolean
+    }
+    ToggleRFC: {
+      /** @default false */
+      has_mac: boolean
+    }
+    ToggleStocks: {
+      /** @default false */
+      has_stocks: boolean
+    }
+    ToggleTrading: {
+      /** @default false */
+      has_trading: boolean
+    }
+    /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
      *     * `DSA` - DSA
@@ -1025,6 +2028,72 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
+    /**
+     * @description * `CORRECTION_REQUEST` - CORRECTION_REQUEST
+     *     * `CORRECTION_DONE` - CORRECTION_DONE
+     *     * `LOTS_REJECTED` - LOTS_REJECTED
+     *     * `LOTS_RECEIVED` - LOTS_RECEIVED
+     *     * `LOTS_RECALLED` - LOTS_RECALLED
+     *     * `CERTIFICATE_EXPIRED` - CERTIFICATE_EXPIRED
+     *     * `CERTIFICATE_REJECTED` - CERTIFICATE_REJECTED
+     *     * `DECLARATION_VALIDATED` - DECLARATION_VALIDATED
+     *     * `DECLARATION_CANCELLED` - DECLARATION_CANCELLED
+     *     * `METER_READINGS_APP_STARTED` - METER_READINGS_APP_STARTED
+     *     * `METER_READINGS_APP_ENDING_SOON` - METER_READINGS_APP_ENDING_SOON
+     *     * `DECLARATION_REMINDER` - DECLARATION_REMINDER
+     *     * `SAF_TICKET_REJECTED` - SAF_TICKET_REJECTED
+     *     * `SAF_TICKET_ACCEPTED` - SAF_TICKET_ACCEPTED
+     *     * `SAF_TICKET_RECEIVED` - SAF_TICKET_RECEIVED
+     *     * `LOTS_UPDATED_BY_ADMIN` - LOTS_UPDATED_BY_ADMIN
+     *     * `LOTS_DELETED_BY_ADMIN` - LOTS_DELETED_BY_ADMIN
+     *     * `ELEC_TRANSFER_CERTIFICATE` - ELEC_TRANSFER_CERTIFICATE
+     * @enum {string}
+     */
+    TypeEnum: TypeEnum
+    Unit: {
+      /** @default l */
+      unit: components["schemas"]["UnitEnum"]
+    }
+    /**
+     * @description * `l` - litres
+     *     * `kg` - kg
+     *     * `MJ` - MJ
+     * @enum {string}
+     */
+    UnitEnum: PreferredUnitEnum
+    UpdateCertificate: {
+      old_certificate_id: number
+      old_certificate_type: string
+      new_certificate_id: number
+      new_certificate_type: string
+    }
+    UpdateEntityInfo: {
+      activity_description?: string
+      legal_name?: string
+      registered_address?: string
+      registered_city?: string
+      registered_country_code?: string
+      registered_zipcode?: string
+      registration_id?: string
+      sustainability_officer?: string
+      /** Format: email */
+      sustainability_officer_email?: string
+      sustainability_officer_phone_number?: string
+      vat_number?: string
+      /** Format: uri */
+      website?: string
+    }
+    UpdateRightsRequests: {
+      id: number
+      status: components["schemas"]["Status1ecEnum"]
+    }
+    User: {
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      email: string
+    }
     UserEntity: {
       readonly id: number
       readonly name: string
@@ -1068,25 +2137,48 @@ export interface components {
       entity: components["schemas"]["UserEntity"]
       /** Format: date-time */
       readonly date_requested: string
-      readonly status: components["schemas"]["UserRightsRequestsStatusEnum"]
+      readonly status: components["schemas"]["Status1ecEnum"]
       comment?: string | null
       readonly role: components["schemas"]["RoleEnum"]
       /** Format: date-time */
       expiration_date?: string | null
     }
-    /**
-     * @description * `PENDING` - En attente de validation
-     *     * `ACCEPTED` - Accepté
-     *     * `REJECTED` - Refusé
-     *     * `REVOKED` - Révoqué
-     * @enum {string}
-     */
-    UserRightsRequestsStatusEnum: UserRightsRequestsStatusEnum
+    UserRightsRequestsSeriaizer: {
+      readonly id: number
+      user: components["schemas"]["User"]
+      entity: components["schemas"]["EntityUserEntity"]
+      /** Format: date-time */
+      readonly date_requested: string
+      status?: components["schemas"]["Status1ecEnum"]
+      comment?: string | null
+      role?: components["schemas"]["RoleEnum"]
+      /** Format: date-time */
+      expiration_date?: string | null
+    }
+    UserRightsResponseSeriaizer: {
+      rights: components["schemas"]["UserRightsSeriaizer"][]
+      requests: components["schemas"]["UserRightsRequestsSeriaizer"][]
+    }
+    UserRightsSeriaizer: {
+      readonly name: string
+      /** Format: email */
+      readonly email: string
+      entity: components["schemas"]["EntityUserEntity"]
+      role?: components["schemas"]["RoleEnum"]
+      /** Format: date-time */
+      expiration_date?: string | null
+    }
     UserSettingsResponseSeriaizer: {
       /** Format: email */
       email: string
       rights: components["schemas"]["UserRights"][]
       requests: components["schemas"]["UserRightsRequests"][]
+    }
+    Warning: {
+      code: string
+      meta: {
+        [key: string]: unknown
+      }
     }
     /**
      * @description * `PENDING` - En attente
@@ -1095,6 +2187,7 @@ export interface components {
      * @enum {string}
      */
     "saf.filters.TicketFilter.status": PathsApiSafTicketsGetParametersQueryStatus
+    UserRightsRequestsStatusEnum: unknown
   }
   responses: never
   parameters: never
@@ -1104,6 +2197,95 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  entities_list: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Has requests */
+        has_requests: boolean
+        /** @description Search query */
+        q: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityMetrics"][]
+        }
+      }
+    }
+  }
+  entities_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateEntity"]
+        "application/x-www-form-urlencoded": components["schemas"]["CreateEntity"]
+        "multipart/form-data": components["schemas"]["CreateEntity"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_retrieve: {
+    parameters: {
+      query: {
+        /** @description The id of the admin entity enabling the company */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Entity. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityUserEntity"]
+        }
+      }
+    }
+  }
   entities_enable_create: {
     parameters: {
       query: {
@@ -1131,6 +2313,1403 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["EmptyResponse"]
+        }
+      }
+    }
+  }
+  entities_add_company_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EntityCompany"]
+        "application/x-www-form-urlencoded": components["schemas"]["EntityCompany"]
+        "multipart/form-data": components["schemas"]["EntityCompany"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_certificates_list: {
+    parameters: {
+      query: {
+        /** @description Compay ID, Admin only */
+        company_id: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Production site ID */
+        production_site_id: number
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityCertificate"][]
+        }
+      }
+    }
+  }
+  entities_certificates_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this CarbureEntityCertificates. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityCertificate"]
+        }
+      }
+    }
+  }
+  entities_certificates_add_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AddCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["AddCertificate"]
+        "multipart/form-data": components["schemas"]["AddCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_certificates_check_entity_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CheckCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["CheckCertificate"]
+        "multipart/form-data": components["schemas"]["CheckCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_certificates_delete_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["DeleteCertificate"]
+        "multipart/form-data": components["schemas"]["DeleteCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_certificates_reject_entity_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RejectCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["RejectCertificate"]
+        "multipart/form-data": components["schemas"]["RejectCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_certificates_set_default_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetDefaultCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["SetDefaultCertificate"]
+        "multipart/form-data": components["schemas"]["SetDefaultCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_certificates_update_certificate_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdateCertificate"]
+        "multipart/form-data": components["schemas"]["UpdateCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_depots_list: {
+    parameters: {
+      query: {
+        /** @description Compay ID, Admin only */
+        company_id: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntitySite"][]
+        }
+      }
+    }
+  }
+  entities_depots_add_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AddDepot"]
+        "application/x-www-form-urlencoded": components["schemas"]["AddDepot"]
+        "multipart/form-data": components["schemas"]["AddDepot"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_depots_create_depot_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateDepot"]
+        "application/x-www-form-urlencoded": components["schemas"]["CreateDepot"]
+        "multipart/form-data": components["schemas"]["CreateDepot"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_depots_delete_depot_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteDepot"]
+        "application/x-www-form-urlencoded": components["schemas"]["DeleteDepot"]
+        "multipart/form-data": components["schemas"]["DeleteDepot"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_direct_deliveries_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["DirectDeliveries"]
+        "application/x-www-form-urlencoded": components["schemas"]["DirectDeliveries"]
+        "multipart/form-data": components["schemas"]["DirectDeliveries"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_elec_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ToggleElec"]
+        "application/x-www-form-urlencoded": components["schemas"]["ToggleElec"]
+        "multipart/form-data": components["schemas"]["ToggleElec"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_notifications_list: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CarbureNotification"][]
+        }
+      }
+    }
+  }
+  entities_notifications_ack_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Notification"]
+        "application/x-www-form-urlencoded": components["schemas"]["Notification"]
+        "multipart/form-data": components["schemas"]["Notification"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_production_sites_list: {
+    parameters: {
+      query: {
+        /** @description Compay ID, Admin only */
+        company_id: number
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityProductionSite"][]
+        }
+      }
+    }
+  }
+  entities_production_sites_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProductionSiteModel"]
+        "application/x-www-form-urlencoded": components["schemas"]["ProductionSiteModel"]
+        "multipart/form-data": components["schemas"]["ProductionSiteModel"]
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DepotProductionSite"]
+        }
+      }
+    }
+  }
+  entities_production_sites_destroy: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Site de Production. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_production_sites_partial_update: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Site de Production. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedUpdateProductionSiteModel"]
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedUpdateProductionSiteModel"]
+        "multipart/form-data": components["schemas"]["PatchedUpdateProductionSiteModel"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_production_sites_set_biofuels_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Site de Production. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetBioFuels"]
+        "application/x-www-form-urlencoded": components["schemas"]["SetBioFuels"]
+        "multipart/form-data": components["schemas"]["SetBioFuels"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_production_sites_set_certificates_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Site de Production. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetCertificate"]
+        "application/x-www-form-urlencoded": components["schemas"]["SetCertificate"]
+        "multipart/form-data": components["schemas"]["SetCertificate"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_production_sites_set_feedstocks_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Site de Production. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetFeedstocks"]
+        "application/x-www-form-urlencoded": components["schemas"]["SetFeedstocks"]
+        "multipart/form-data": components["schemas"]["SetFeedstocks"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_release_for_consumption_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ToggleRFC"]
+        "application/x-www-form-urlencoded": components["schemas"]["ToggleRFC"]
+        "multipart/form-data": components["schemas"]["ToggleRFC"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_search_company_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description SIREN */
+        registration_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SeachCompany"]
+        "application/x-www-form-urlencoded": components["schemas"]["SeachCompany"]
+        "multipart/form-data": components["schemas"]["SeachCompany"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ResponseData"]
+        }
+      }
+    }
+  }
+  entities_stats_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_stocks_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ToggleStocks"]
+        "application/x-www-form-urlencoded": components["schemas"]["ToggleStocks"]
+        "multipart/form-data": components["schemas"]["ToggleStocks"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_trading_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ToggleTrading"]
+        "application/x-www-form-urlencoded": components["schemas"]["ToggleTrading"]
+        "multipart/form-data": components["schemas"]["ToggleTrading"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_unit_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Unit"]
+        "application/x-www-form-urlencoded": components["schemas"]["Unit"]
+        "multipart/form-data": components["schemas"]["Unit"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_update_entity_info_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateEntityInfo"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdateEntityInfo"]
+        "multipart/form-data": components["schemas"]["UpdateEntityInfo"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_users_list: {
+    parameters: {
+      query: {
+        /** @description Compay ID, Admin only */
+        company_id: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Search in user email or entity name. */
+        q?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityUser"][]
+        }
+      }
+    }
+  }
+  entities_users_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EntityUser"]
+        "application/x-www-form-urlencoded": components["schemas"]["EntityUser"]
+        "multipart/form-data": components["schemas"]["EntityUser"]
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityUser"]
+        }
+      }
+    }
+  }
+  entities_users_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this utilisateur. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EntityUser"]
+        "application/x-www-form-urlencoded": components["schemas"]["EntityUser"]
+        "multipart/form-data": components["schemas"]["EntityUser"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityUser"]
+        }
+      }
+    }
+  }
+  entities_users_accept_user_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GrantAccess"]
+        "application/x-www-form-urlencoded": components["schemas"]["GrantAccess"]
+        "multipart/form-data": components["schemas"]["GrantAccess"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_users_change_role_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChangeRole"]
+        "application/x-www-form-urlencoded": components["schemas"]["ChangeRole"]
+        "multipart/form-data": components["schemas"]["ChangeRole"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_users_entity_rights_requests_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserRightsResponseSeriaizer"]
+        }
+      }
+    }
+  }
+  entities_users_invite_user_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InviteUser"]
+        "application/x-www-form-urlencoded": components["schemas"]["InviteUser"]
+        "multipart/form-data": components["schemas"]["InviteUser"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_users_revoke_access_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RevokeUser"]
+        "application/x-www-form-urlencoded": components["schemas"]["RevokeUser"]
+        "multipart/form-data": components["schemas"]["RevokeUser"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_users_rights_requests_list: {
+    parameters: {
+      query: {
+        /** @description Filter by entity ID. */
+        company_id?: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Search in user email or entity name. */
+        q?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Comma-separated list of statuses (e.g., active,pending). */
+        statuses?: string[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserRightsRequestsSeriaizer"][]
+        }
+      }
+    }
+  }
+  entities_users_update_right_request_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateRightsRequests"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdateRightsRequests"]
+        "multipart/form-data": components["schemas"]["UpdateRightsRequests"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
         }
       }
     }
@@ -2204,6 +4783,11 @@ export enum LotStatusEnum {
   FROZEN = "FROZEN",
   DELETED = "DELETED",
 }
+export enum OwnershipTypeEnum {
+  OWN = "OWN",
+  THIRD_PARTY = "THIRD_PARTY",
+  PROCESSING = "PROCESSING",
+}
 export enum PreferredUnitEnum {
   l = "l",
   kg = "kg",
@@ -2227,6 +4811,12 @@ export enum SiteTypeEnum {
   PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
   EFCA = "EFCA",
 }
+export enum Status1ecEnum {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+  REVOKED = "REVOKED",
+}
 export enum TransportDocumentTypeEnum {
   DAU = "DAU",
   DAE = "DAE",
@@ -2235,9 +4825,23 @@ export enum TransportDocumentTypeEnum {
   DSP = "DSP",
   OTHER = "OTHER",
 }
-export enum UserRightsRequestsStatusEnum {
-  Pending = "PENDING",
-  Accepted = "ACCEPTED",
-  Rejected = "REJECTED",
-  Revoked = "REVOKED",
+export enum TypeEnum {
+  CORRECTION_REQUEST = "CORRECTION_REQUEST",
+  CORRECTION_DONE = "CORRECTION_DONE",
+  LOTS_REJECTED = "LOTS_REJECTED",
+  LOTS_RECEIVED = "LOTS_RECEIVED",
+  LOTS_RECALLED = "LOTS_RECALLED",
+  CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED",
+  CERTIFICATE_REJECTED = "CERTIFICATE_REJECTED",
+  DECLARATION_VALIDATED = "DECLARATION_VALIDATED",
+  DECLARATION_CANCELLED = "DECLARATION_CANCELLED",
+  METER_READINGS_APP_STARTED = "METER_READINGS_APP_STARTED",
+  METER_READINGS_APP_ENDING_SOON = "METER_READINGS_APP_ENDING_SOON",
+  DECLARATION_REMINDER = "DECLARATION_REMINDER",
+  SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED",
+  SAF_TICKET_ACCEPTED = "SAF_TICKET_ACCEPTED",
+  SAF_TICKET_RECEIVED = "SAF_TICKET_RECEIVED",
+  LOTS_UPDATED_BY_ADMIN = "LOTS_UPDATED_BY_ADMIN",
+  LOTS_DELETED_BY_ADMIN = "LOTS_DELETED_BY_ADMIN",
+  ELEC_TRANSFER_CERTIFICATE = "ELEC_TRANSFER_CERTIFICATE",
 }
