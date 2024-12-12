@@ -342,6 +342,8 @@ SPECTACULAR_SETTINGS = {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
         "DoubleCountingStatus": "doublecount.models.DoubleCountingApplication.DCA_STATUS_CHOICES",
         "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
+        "UserRightsRequestsStatusEnum": "core.models.UserRightsRequests.STATUS_TYPES",
+        "PreferredUnitEnum": "core.models.Entity.UNIT_CHOICE",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     # OTHER SETTINGS

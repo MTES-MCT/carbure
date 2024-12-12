@@ -1,11 +1,14 @@
 from django.core.exceptions import ValidationError
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import Entity, Pays
-from transactions.models import Depot
+from transactions.models import Depot, ProductionSite
+
+from .users import EntityUserEntitySerializer, PaysSerializer
 
 
-class DepotSerializer(serializers.ModelSerializer):
+class CreateDepotSerializer(serializers.ModelSerializer):
     country_code = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all(), write_only=True)
     entity_id = serializers.SlugRelatedField(slug_field="id", queryset=Entity.objects.all(), write_only=True)
     depot_id = serializers.CharField(source="customs_id")
@@ -29,3 +32,80 @@ class DepotSerializer(serializers.ModelSerializer):
 
         depot_instance.save()
         return depot_instance
+
+
+class EntityDepotSerializer(serializers.ModelSerializer):
+    country = PaysSerializer()
+
+    class Meta:
+        model = Depot
+        fields = [
+            "customs_id",
+            "name",
+            "city",
+            "country",
+            "site_type",
+            "address",
+            "postal_code",
+            "electrical_efficiency",
+            "thermal_efficiency",
+            "useful_temperature",
+        ]
+
+
+class ProductionSiteCertificateSertificate(serializers.ModelSerializer):
+    certificate_id = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Depot
+        fields = ["type", "certificate_id"]
+
+    @extend_schema_field(serializers.CharField())
+    def get_type(self, obj):
+        return obj.certificate.certificate.certificate_type
+
+    @extend_schema_field(serializers.CharField())
+    def get_certificate_id(self, obj):
+        return obj.certificate.certificate.certificate_id
+
+
+class DepotProductionSiteSerializer(serializers.ModelSerializer):
+    country = PaysSerializer()
+    certificates = ProductionSiteCertificateSertificate(source="productionsitecertificate_set", many=True)
+
+    class Meta:
+        model = ProductionSite
+        fields = [
+            "address",
+            "name",
+            "country",
+            "id",
+            "date_mise_en_service",
+            "site_siret",
+            "postal_code",
+            "manager_name",
+            "manager_phone",
+            "manager_email",
+            "ges_option",
+            "eligible_dc",
+            "dc_reference",
+            "dc_number",
+            "city",
+            "certificates",
+        ]
+
+
+class EntitySiteSerializer(serializers.Serializer):
+    ownership_type = serializers.CharField()
+    blending_is_outsourced = serializers.BooleanField()
+    blender = EntityUserEntitySerializer()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if instance.site.is_depot():
+            representation["depot"] = EntityDepotSerializer(instance.site).data
+        else:
+            representation["site"] = DepotProductionSiteSerializer(instance.site).data
+        return representation

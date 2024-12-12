@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_http_methods
 
-from auth.views.mixins.register import UserCreationAction
+from auth.views.mixins.register import send_email
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests
@@ -66,7 +66,6 @@ def invite_user(request, entity, entity_id):
 
     # Send email
     email_context = {"invitation": True, "entity_name": entity.name}
-    action = UserCreationAction()
-    action.send_email(user, request, email_subject, email_type, email_context)
+    send_email(user, request, email_subject, email_type, email_context)
 
     return SuccessResponse()

@@ -10,14 +10,14 @@ from core.decorators import check_user_rights
 from core.helpers import send_mail
 from core.models import UserRights
 from core.utils import CarbureEnv
-from entity.serializers.depot import DepotSerializer
+from entity.serializers.depot import CreateDepotSerializer
 from entity.services.geolocation import get_coordinates
 
 
 @require_POST
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def create_depot(request, entity, entity_id):
-    serializer = DepotSerializer(data=request.POST)
+    serializer = CreateDepotSerializer(data=request.POST)
 
     try:
         serializer.is_valid(raise_exception=True)

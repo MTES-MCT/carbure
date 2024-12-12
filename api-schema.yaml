@@ -943,6 +943,119 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
           description: ""
+  /api/entities/:
+    get:
+      operationId: entities_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: has_requests
+          schema:
+            type: boolean
+          description: Has requests
+          required: true
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search query
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityMetrics"
+          description: ""
+    post:
+      operationId: entities_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEntityRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CreateEntityRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateEntityRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/{id}/:
+    get:
+      operationId: entities_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: The id of the admin entity enabling the company
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Entity.
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityUserEntity"
+          description: ""
   /api/entities/{id}/enable/:
     post:
       operationId: entities_enable_create
@@ -983,6 +1096,1813 @@ paths:
               schema:
                 $ref: "#/components/schemas/EmptyResponse"
           description: ""
+  /api/entities/add-company:
+    post:
+      operationId: entities_add_company_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityCompanyRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EntityCompanyRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EntityCompanyRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/certificates/:
+    get:
+      operationId: entities_certificates_list
+      parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Compay ID, Admin only
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: production_site_id
+          schema:
+            type: integer
+          description: Production site ID
+          required: true
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityCertificate"
+          description: ""
+  /api/entities/certificates/{id}/:
+    get:
+      operationId: entities_certificates_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this CarbureEntityCertificates.
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityCertificate"
+          description: ""
+  /api/entities/certificates/add/:
+    post:
+      operationId: entities_certificates_add_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AddCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AddCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/certificates/check-entity/:
+    post:
+      operationId: entities_certificates_check_entity_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CheckCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CheckCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/certificates/delete/:
+    post:
+      operationId: entities_certificates_delete_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DeleteCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DeleteCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/certificates/reject-entity/:
+    post:
+      operationId: entities_certificates_reject_entity_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RejectCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RejectCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/certificates/set-default/:
+    post:
+      operationId: entities_certificates_set_default_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetDefaultCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SetDefaultCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SetDefaultCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/certificates/update-certificate/:
+    post:
+      operationId: entities_certificates_update_certificate_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/depots/:
+    get:
+      operationId: entities_depots_list
+      parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Compay ID, Admin only
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntitySite"
+          description: ""
+  /api/entities/depots/add/:
+    post:
+      operationId: entities_depots_add_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddDepotRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AddDepotRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AddDepotRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/depots/create-depot/:
+    post:
+      operationId: entities_depots_create_depot_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDepotRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CreateDepotRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateDepotRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/depots/delete-depot/:
+    post:
+      operationId: entities_depots_delete_depot_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteDepotRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DeleteDepotRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DeleteDepotRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/direct-deliveries/:
+    post:
+      operationId: entities_direct_deliveries_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectDeliveriesRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DirectDeliveriesRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DirectDeliveriesRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/elec/:
+    post:
+      operationId: entities_elec_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToggleElecRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ToggleElecRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ToggleElecRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/notifications/:
+    get:
+      operationId: entities_notifications_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CarbureNotification"
+          description: ""
+  /api/entities/notifications/ack/:
+    post:
+      operationId: entities_notifications_ack_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/NotificationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/NotificationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+                updated_count: 0
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                    updated_count: 0
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/production-sites/:
+    get:
+      operationId: entities_production_sites_list
+      parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Compay ID, Admin only
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityProductionSite"
+          description: ""
+    post:
+      operationId: entities_production_sites_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductionSiteModelRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ProductionSiteModelRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProductionSiteModelRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DepotProductionSite"
+          description: ""
+  /api/entities/production-sites/{id}/:
+    patch:
+      operationId: entities_production_sites_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Site de Production.
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedUpdateProductionSiteModelRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedUpdateProductionSiteModelRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedUpdateProductionSiteModelRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+    delete:
+      operationId: entities_production_sites_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Site de Production.
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/production-sites/{id}/set-biofuels/:
+    post:
+      operationId: entities_production_sites_set_biofuels_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Site de Production.
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetBioFuelsRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SetBioFuelsRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SetBioFuelsRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/production-sites/{id}/set-certificates/:
+    post:
+      operationId: entities_production_sites_set_certificates_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Site de Production.
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SetCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SetCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/production-sites/{id}/set-feedstocks/:
+    post:
+      operationId: entities_production_sites_set_feedstocks_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Site de Production.
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetFeedstocksRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SetFeedstocksRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SetFeedstocksRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/release-for-consumption/:
+    post:
+      operationId: entities_release_for_consumption_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToggleRFCRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ToggleRFCRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ToggleRFCRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/search-company:
+    post:
+      operationId: entities_search_company_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: registration_id
+          schema:
+            type: integer
+          description: SIREN
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeachCompanyRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SeachCompanyRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SeachCompanyRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseData"
+          description: ""
+  /api/entities/stats/:
+    get:
+      operationId: entities_stats_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                metabase_iframe_url: https://metabase.carbure.beta.gouv.fr/embed/dashboard/...#bordered=false&titled=false
+              examples:
+                SuccessExample:
+                  value:
+                    metabase_iframe_url: https://metabase.carbure.beta.gouv.fr/embed/dashboard/...#bordered=false&titled=false
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/stocks/:
+    post:
+      operationId: entities_stocks_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToggleStocksRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ToggleStocksRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ToggleStocksRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/trading/:
+    post:
+      operationId: entities_trading_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToggleTradingRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ToggleTradingRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ToggleTradingRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/unit/:
+    post:
+      operationId: entities_unit_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnitRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UnitRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UnitRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/update-entity-info/:
+    post:
+      operationId: entities_update_entity_info_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEntityInfoRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateEntityInfoRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateEntityInfoRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/users/:
+    get:
+      operationId: entities_users_list
+      parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Compay ID, Admin only
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search in user email or entity name.
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityUser"
+          description: ""
+    post:
+      operationId: entities_users_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityUserRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EntityUserRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EntityUserRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityUser"
+          description: ""
+  /api/entities/users/{id}/:
+    put:
+      operationId: entities_users_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this utilisateur.
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityUserRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EntityUserRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EntityUserRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityUser"
+          description: ""
+  /api/entities/users/accept-user/:
+    post:
+      operationId: entities_users_accept_user_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrantAccessRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/GrantAccessRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/GrantAccessRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/users/change-role/:
+    post:
+      operationId: entities_users_change_role_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeRoleRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ChangeRoleRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ChangeRoleRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/users/entity-rights-requests/:
+    get:
+      operationId: entities_users_entity_rights_requests_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRightsResponseSeriaizer"
+          description: ""
+  /api/entities/users/invite-user/:
+    post:
+      operationId: entities_users_invite_user_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/InviteUserRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/InviteUserRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/users/revoke-access/:
+    post:
+      operationId: entities_users_revoke_access_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokeUserRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RevokeUserRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RevokeUserRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/users/rights-requests/:
+    get:
+      operationId: entities_users_rights_requests_list
+      parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Filter by entity ID.
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search in user email or entity name.
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: statuses
+          schema:
+            type: array
+            items:
+              type: string
+          description: Comma-separated list of statuses (e.g., active,pending).
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserRightsRequestsSeriaizer"
+          description: ""
+  /api/entities/users/update-right-request/:
+    post:
+      operationId: entities_users_update_right_request_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
   /api/resources/biofuels:
     get:
       operationId: resources_biofuels_list
@@ -2688,6 +4608,34 @@ components:
           type: string
       required:
         - message
+    AddCertificateRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: integer
+        certificate_type:
+          type: string
+          minLength: 1
+      required:
+        - certificate_id
+        - certificate_type
+    AddDepotRequest:
+      type: object
+      properties:
+        delivery_site_id:
+          type: string
+          minLength: 1
+        ownership_type:
+          $ref: "#/components/schemas/OwnershipTypeEnum"
+        blending_is_outsourced:
+          type: boolean
+          default: false
+        blending_entity_id:
+          type: string
+          minLength: 1
+      required:
+        - delivery_site_id
+        - ownership_type
     AgreementLists:
       type: object
       properties:
@@ -2989,6 +4937,33 @@ components:
         - period
         - production_country
         - year
+    CarbureNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        dest:
+          $ref: "#/components/schemas/Entity"
+        datetime:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          $ref: "#/components/schemas/TypeEnum"
+        acked:
+          type: boolean
+        send_by_email:
+          type: boolean
+        email_sent:
+          type: boolean
+        meta:
+          nullable: true
+      required:
+        - datetime
+        - dest
+        - id
+        - type
     CategoryEnum:
       enum:
         - CONV
@@ -3015,6 +4990,19 @@ components:
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+    ChangeRoleRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        role:
+          type: string
+          minLength: 1
+      required:
+        - email
+        - role
     CheckAdminFileRequest:
       type: object
       properties:
@@ -3025,6 +5013,13 @@ components:
             format: binary
       required:
         - files
+    CheckCertificateRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: integer
+      required:
+        - certificate_id
     CheckFileResponse:
       type: object
       properties:
@@ -3042,6 +5037,37 @@ components:
         comment:
           type: string
           minLength: 1
+    CompanyPreview:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        legal_name:
+          type: string
+          maxLength: 255
+        registration_id:
+          type: string
+          maxLength: 50
+        registered_address:
+          type: string
+          maxLength: 500
+        registered_city:
+          type: string
+          maxLength: 255
+        registered_zipcode:
+          type: string
+          maxLength: 20
+        registered_country:
+          $ref: "#/components/schemas/RegistrationCountry"
+      required:
+        - legal_name
+        - name
+        - registered_address
+        - registered_city
+        - registered_country
+        - registered_zipcode
+        - registration_id
     CorrectionStatusEnum:
       enum:
         - NO_PROBLEMO
@@ -3070,6 +5096,142 @@ components:
         - code_pays
         - name
         - name_en
+    CreateDepotRequest:
+      type: object
+      properties:
+        country_code:
+          type: string
+          minLength: 1
+          writeOnly: true
+        entity_id:
+          type: integer
+          writeOnly: true
+        depot_id:
+          type: string
+          minLength: 1
+        depot_type:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        site_siret:
+          type: string
+          maxLength: 64
+        customs_id:
+          type: string
+          maxLength: 32
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
+          type: string
+          maxLength: 256
+        postal_code:
+          type: string
+          maxLength: 32
+        city:
+          type: string
+          maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        accise:
+          type: string
+          maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_number:
+          type: string
+          maxLength: 64
+        dc_reference:
+          type: string
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        country:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          nullable: true
+      required:
+        - country_code
+        - depot_id
+        - depot_type
+        - entity_id
+        - name
+    CreateEntityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_saf:
+          type: boolean
+        has_elec:
+          type: boolean
+      required:
+        - name
+    DeleteCertificateRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: integer
+        certificate_type:
+          type: string
+          minLength: 1
+      required:
+        - certificate_id
+        - certificate_type
+    DeleteDepotRequest:
+      type: object
+      properties:
+        delivery_site_id:
+          type: string
+          minLength: 1
+      required:
+        - delivery_site_id
     DeliveryTypeEnum:
       enum:
         - UNKNOWN
@@ -3151,6 +5313,67 @@ components:
         - country
         - id
         - name
+    DepotProductionSite:
+      type: object
+      properties:
+        address:
+          type: string
+          maxLength: 256
+        name:
+          type: string
+          maxLength: 128
+        country:
+          $ref: "#/components/schemas/Pays"
+        id:
+          type: integer
+          readOnly: true
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        site_siret:
+          type: string
+          maxLength: 64
+        postal_code:
+          type: string
+          maxLength: 32
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        dc_number:
+          type: string
+          maxLength: 64
+        city:
+          type: string
+          maxLength: 128
+        certificates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductionSiteCertificateSertificate"
+      required:
+        - certificates
+        - country
+        - id
+        - name
+    DirectDeliveriesRequest:
+      type: object
+      properties:
+        has_direct_deliveries:
+          type: boolean
+          default: false
     DoubleCountingAdminAddRequest:
       type: object
       properties:
@@ -3753,6 +5976,180 @@ components:
       required:
         - id
         - name
+    EntityBiofuel:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        name_en:
+          type: string
+          maxLength: 64
+        code:
+          type: string
+          maxLength: 16
+      required:
+        - code
+        - name
+        - name_en
+    EntityCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entity:
+          $ref: "#/components/schemas/Entity"
+        certificate:
+          $ref: "#/components/schemas/GenericCertificate"
+        has_been_updated:
+          type: boolean
+        checked_by_admin:
+          type: boolean
+        rejected_by_admin:
+          type: boolean
+        added_dt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - added_dt
+        - certificate
+        - entity
+        - id
+    EntityCompanyRequest:
+      type: object
+      properties:
+        certificate_type:
+          $ref: "#/components/schemas/CertificateTypeEnum"
+        certificate_id:
+          type: string
+          minLength: 1
+        activity_description:
+          type: string
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        legal_name:
+          type: string
+          maxLength: 128
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country_code:
+          type: string
+          minLength: 1
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        sustainability_officer_email:
+          type: string
+          maxLength: 254
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+      required:
+        - name
+    EntityCountry:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        code_pays:
+          type: string
+          maxLength: 64
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
+    EntityFeedStock:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        code:
+          type: string
+          maxLength: 64
+        category:
+          $ref: "#/components/schemas/CategoryEnum"
+        is_double_compte:
+          type: boolean
+      required:
+        - code
+        - name
+        - name_en
+    EntityMetrics:
+      type: object
+      properties:
+        entity:
+          $ref: "#/components/schemas/EntityUserEntity"
+        users:
+          type: integer
+        requests:
+          type: integer
+        depots:
+          type: integer
+        production_sites:
+          type: integer
+        certificates:
+          type: integer
+        certificates_pending:
+          type: integer
+        double_counting:
+          type: integer
+        double_counting_requests:
+          type: integer
+        charge_points_accepted:
+          type: integer
+        charge_points_pending:
+          type: integer
+        meter_readings_accepted:
+          type: integer
+        meter_readings_pending:
+          type: integer
+      required:
+        - certificates
+        - certificates_pending
+        - charge_points_accepted
+        - charge_points_pending
+        - depots
+        - double_counting
+        - double_counting_requests
+        - entity
+        - meter_readings_accepted
+        - meter_readings_pending
+        - production_sites
+        - requests
+        - users
     EntityPreview:
       type: object
       properties:
@@ -3770,6 +6167,88 @@ components:
         - entity_type
         - id
         - name
+    EntityProductionSite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        address:
+          type: string
+          maxLength: 256
+        name:
+          type: string
+          maxLength: 128
+        country:
+          allOf:
+            - $ref: "#/components/schemas/EntityCountry"
+          readOnly: true
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        site_siret:
+          type: string
+          maxLength: 64
+        postal_code:
+          type: string
+          maxLength: 32
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        dc_number:
+          type: string
+          maxLength: 64
+        city:
+          type: string
+          maxLength: 128
+        certificates:
+          type: array
+          items:
+            $ref: "#/components/schemas/GenericCertificate"
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntityFeedStock"
+          readOnly: true
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntityBiofuel"
+          readOnly: true
+      required:
+        - certificates
+        - country
+        - id
+        - inputs
+        - name
+        - outputs
+    EntitySite:
+      type: object
+      properties:
+        ownership_type:
+          type: string
+        blending_is_outsourced:
+          type: boolean
+        blender:
+          $ref: "#/components/schemas/EntityUserEntity"
+      required:
+        - blender
+        - blending_is_outsourced
+        - ownership_type
     EntitySummary:
       type: object
       properties:
@@ -3822,6 +6301,108 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
+    EntityUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
+        - id
+        - name
+    EntityUserEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_mac:
+          type: boolean
+        has_trading:
+          type: boolean
+        has_direct_deliveries:
+          type: boolean
+        has_stocks:
+          type: boolean
+        legal_name:
+          type: string
+          maxLength: 128
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        sustainability_officer_email:
+          type: string
+          maxLength: 254
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country:
+          $ref: "#/components/schemas/Pays"
+        default_certificate:
+          type: string
+          nullable: true
+          maxLength: 64
+        preferred_unit:
+          $ref: "#/components/schemas/PreferredUnitEnum"
+        has_saf:
+          type: boolean
+        has_elec:
+          type: boolean
+        activity_description:
+          type: string
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+        ext_admin_pages:
+          type: array
+          items: {}
+          readOnly: true
+      required:
+        - ext_admin_pages
+        - id
+        - name
+        - registered_country
+    EntityUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
     ErrorResponse:
       type: object
       properties:
@@ -4037,6 +6618,13 @@ components:
         * `Default` - Valeurs par défaut
         * `Actual` - Valeurs réelles
         * `NUTS2` - Valeurs NUTS2
+    GrantAccessRequest:
+      type: object
+      properties:
+        request_id:
+          type: integer
+      required:
+        - request_id
     GroupAssignmentResponse:
       type: object
       properties:
@@ -4044,6 +6632,19 @@ components:
           type: integer
       required:
         - assigned_tickets_count
+    InviteUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        role:
+          type: string
+          minLength: 1
+      required:
+        - email
+        - role
     LotStatusEnum:
       enum:
         - DRAFT
@@ -4060,6 +6661,15 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    NotificationRequest:
+      type: object
+      properties:
+        notification_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - notification_ids
     OtpResponse:
       type: object
       properties:
@@ -4067,6 +6677,16 @@ components:
           type: string
       required:
         - valid_until
+    OwnershipTypeEnum:
+      enum:
+        - OWN
+        - THIRD_PARTY
+        - PROCESSING
+      type: string
+      description: |-
+        * `OWN` - Propre
+        * `THIRD_PARTY` - Tiers
+        * `PROCESSING` - Processing
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -4136,6 +6756,69 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
+    PatchedUpdateProductionSiteModelRequest:
+      type: object
+      properties:
+        country_code:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        site_siret:
+          type: string
+          maxLength: 64
+        postal_code:
+          type: string
+          maxLength: 32
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        city:
+          type: string
+          maxLength: 128
+        address:
+          type: string
+          maxLength: 256
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        created_by:
+          type: integer
+          nullable: true
+    Pays:
+      type: object
+      properties:
+        code_pays:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 128
+        name_en:
+          type: string
+          maxLength: 128
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
     PreferredUnitEnum:
       enum:
         - l
@@ -4245,6 +6928,105 @@ components:
         - certificate_type
         - valid_from
         - valid_until
+    ProductionSiteCertificateSertificate:
+      type: object
+      properties:
+        type:
+          type: string
+          readOnly: true
+        certificate_id:
+          type: string
+          readOnly: true
+      required:
+        - certificate_id
+        - type
+    ProductionSiteModelRequest:
+      type: object
+      properties:
+        country_code:
+          type: string
+          minLength: 1
+        country:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        site_siret:
+          type: string
+          maxLength: 64
+        postal_code:
+          type: string
+          maxLength: 32
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        city:
+          type: string
+          maxLength: 128
+        address:
+          type: string
+          maxLength: 256
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        created_by:
+          type: integer
+          nullable: true
+      required:
+        - address
+        - city
+        - country_code
+        - date_mise_en_service
+        - eligible_dc
+        - ges_option
+        - manager_email
+        - manager_name
+        - manager_phone
+        - name
+        - postal_code
+        - site_siret
+    RegistrationCountry:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        name_en:
+          type: string
+          maxLength: 255
+        code_pays:
+          type: string
+          maxLength: 10
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - is_in_europe
+        - name
+        - name_en
+    RejectCertificateRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: integer
+      required:
+        - certificate_id
     RejectDoubleCountingRequest:
       type: object
       properties:
@@ -4306,6 +7088,15 @@ components:
           type: string
       required:
         - status
+    ResponseData:
+      type: object
+      properties:
+        company_preview:
+          $ref: "#/components/schemas/CompanyPreview"
+        warning:
+          $ref: "#/components/schemas/Warning"
+      required:
+        - company_preview
     ResponseSuccess:
       type: object
       properties:
@@ -4320,6 +7111,15 @@ components:
           type: integer
       required:
         - entity_id
+    RevokeUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+        - email
     RoleEnum:
       enum:
         - RO
@@ -4846,6 +7646,53 @@ components:
         - assigned_volume
         - id
         - total_volume
+    SeachCompanyRequest:
+      type: object
+      properties:
+        registration_id:
+          type: string
+          minLength: 1
+          maxLength: 9
+      required:
+        - registration_id
+    SetBioFuelsRequest:
+      type: object
+      properties:
+        biocarburant_codes:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: List of biocarburant codes.
+      required:
+        - biocarburant_codes
+    SetCertificateRequest:
+      type: object
+      properties:
+        certificate_ids:
+          type: array
+          items:
+            type: string
+            minLength: 1
+      required:
+        - certificate_ids
+    SetDefaultCertificateRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: integer
+      required:
+        - certificate_id
+    SetFeedstocksRequest:
+      type: object
+      properties:
+        matiere_premiere_codes:
+          type: array
+          items:
+            type: string
+            minLength: 1
+      required:
+        - matiere_premiere_codes
     SiteTypeEnum:
       enum:
         - OTHER
@@ -4870,6 +7717,30 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
+    ToggleElecRequest:
+      type: object
+      properties:
+        has_elec:
+          type: boolean
+          default: false
+    ToggleRFCRequest:
+      type: object
+      properties:
+        has_mac:
+          type: boolean
+          default: false
+    ToggleStocksRequest:
+      type: object
+      properties:
+        has_stocks:
+          type: boolean
+          default: false
+    ToggleTradingRequest:
+      type: object
+      properties:
+        has_trading:
+          type: boolean
+          default: false
     TransportDocumentTypeEnum:
       enum:
         - DAU
@@ -4886,6 +7757,117 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeEnum:
+      enum:
+        - CORRECTION_REQUEST
+        - CORRECTION_DONE
+        - LOTS_REJECTED
+        - LOTS_RECEIVED
+        - LOTS_RECALLED
+        - CERTIFICATE_EXPIRED
+        - CERTIFICATE_REJECTED
+        - DECLARATION_VALIDATED
+        - DECLARATION_CANCELLED
+        - METER_READINGS_APP_STARTED
+        - METER_READINGS_APP_ENDING_SOON
+        - DECLARATION_REMINDER
+        - SAF_TICKET_REJECTED
+        - SAF_TICKET_ACCEPTED
+        - SAF_TICKET_RECEIVED
+        - LOTS_UPDATED_BY_ADMIN
+        - LOTS_DELETED_BY_ADMIN
+        - ELEC_TRANSFER_CERTIFICATE
+      type: string
+      description: |-
+        * `CORRECTION_REQUEST` - CORRECTION_REQUEST
+        * `CORRECTION_DONE` - CORRECTION_DONE
+        * `LOTS_REJECTED` - LOTS_REJECTED
+        * `LOTS_RECEIVED` - LOTS_RECEIVED
+        * `LOTS_RECALLED` - LOTS_RECALLED
+        * `CERTIFICATE_EXPIRED` - CERTIFICATE_EXPIRED
+        * `CERTIFICATE_REJECTED` - CERTIFICATE_REJECTED
+        * `DECLARATION_VALIDATED` - DECLARATION_VALIDATED
+        * `DECLARATION_CANCELLED` - DECLARATION_CANCELLED
+        * `METER_READINGS_APP_STARTED` - METER_READINGS_APP_STARTED
+        * `METER_READINGS_APP_ENDING_SOON` - METER_READINGS_APP_ENDING_SOON
+        * `DECLARATION_REMINDER` - DECLARATION_REMINDER
+        * `SAF_TICKET_REJECTED` - SAF_TICKET_REJECTED
+        * `SAF_TICKET_ACCEPTED` - SAF_TICKET_ACCEPTED
+        * `SAF_TICKET_RECEIVED` - SAF_TICKET_RECEIVED
+        * `LOTS_UPDATED_BY_ADMIN` - LOTS_UPDATED_BY_ADMIN
+        * `LOTS_DELETED_BY_ADMIN` - LOTS_DELETED_BY_ADMIN
+        * `ELEC_TRANSFER_CERTIFICATE` - ELEC_TRANSFER_CERTIFICATE
+    UnitRequest:
+      type: object
+      properties:
+        unit:
+          allOf:
+            - $ref: "#/components/schemas/PreferredUnitEnum"
+          default: l
+    UpdateCertificateRequest:
+      type: object
+      properties:
+        old_certificate_id:
+          type: integer
+        old_certificate_type:
+          type: string
+          minLength: 1
+        new_certificate_id:
+          type: integer
+        new_certificate_type:
+          type: string
+          minLength: 1
+      required:
+        - new_certificate_id
+        - new_certificate_type
+        - old_certificate_id
+        - old_certificate_type
+    UpdateEntityInfoRequest:
+      type: object
+      properties:
+        activity_description:
+          type: string
+          maxLength: 5000
+        legal_name:
+          type: string
+          maxLength: 128
+        registered_address:
+          type: string
+        registered_city:
+          type: string
+        registered_country_code:
+          type: string
+          minLength: 1
+        registered_zipcode:
+          type: string
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        sustainability_officer_email:
+          type: string
+          format: email
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        vat_number:
+          type: string
+          maxLength: 32
+        website:
+          type: string
+          format: uri
+    UpdateRightsRequestsRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
+      required:
+        - id
+        - status
     UpdatedQuotasRequest:
       type: object
       properties:
@@ -4899,6 +7881,16 @@ components:
             minItems: 2
       required:
         - approved_quotas
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
     UserCreation:
       type: object
       description: |-
@@ -5147,6 +8139,36 @@ components:
         - role
         - status
         - user
+    UserRightsRequestsSeriaizer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          $ref: "#/components/schemas/User"
+        entity:
+          $ref: "#/components/schemas/EntityUserEntity"
+        date_requested:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
+        comment:
+          type: string
+          nullable: true
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - date_requested
+        - entity
+        - id
+        - user
     UserRightsRequestsStatusEnum:
       enum:
         - PENDING
@@ -5164,6 +8186,42 @@ components:
         - Accepted
         - Rejected
         - Revoked
+    UserRightsResponseSeriaizer:
+      type: object
+      properties:
+        rights:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRightsSeriaizer"
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRightsRequestsSeriaizer"
+      required:
+        - requests
+        - rights
+    UserRightsSeriaizer:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        entity:
+          $ref: "#/components/schemas/EntityUserEntity"
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - email
+        - entity
+        - name
     UserSettingsResponseSeriaizer:
       type: object
       properties:
@@ -5195,6 +8253,18 @@ components:
           maxLength: 6
       required:
         - otp_token
+    Warning:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 50
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+        - code
+        - meta
     saf.filters.TicketFilter.status:
       enum:
         - PENDING
