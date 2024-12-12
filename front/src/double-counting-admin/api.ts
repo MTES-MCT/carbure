@@ -74,7 +74,7 @@ export function downloadDoubleCountingApplication(
   dca_id: number,
   industrial_wastes?: string
 ) {
-  return download("/double-counting/admin/applications/export", {
+  return download(`/double-counting/applications/${dca_id}/export`, {
     entity_id,
     dca_id,
     ...(industrial_wastes ? { di: industrial_wastes } : {}),
@@ -82,12 +82,12 @@ export function downloadDoubleCountingApplication(
 }
 
 export function approveDoubleCountingApplication(
-  entity_id: number | undefined,
+  entity_id: number,
   dca_id: number
 ) {
-  return api.post("/double-counting/admin/applications/approve", {
-    entity_id,
-    dca_id,
+  return apiFetch.POST("/double-counting/applications/approve/", {
+    params: { query: { entity_id } },
+    body: { dca_id },
   })
 }
 
