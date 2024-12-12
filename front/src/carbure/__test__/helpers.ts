@@ -1,5 +1,6 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+
 import { http, HttpResponse, JsonBodyType } from "msw"
 import { generateUser } from "./data"
 

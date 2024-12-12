@@ -28,7 +28,9 @@ export const ContactPage = () => {
       document
         .querySelectorAll("iframe[data-tally-src]:not([src])")
         .forEach((iframeEl) => {
-          iframeEl.src = iframeEl.dataset.tallySrc
+          if (iframeEl instanceof HTMLIFrameElement) {
+            iframeEl.src = iframeEl.dataset.tallySrc ?? ""
+          }
         })
     }
 
