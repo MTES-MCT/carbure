@@ -339,11 +339,8 @@ def load_dc_production_history_data(
         for production_row in production_base_rows:
             feedstock = get_material(production_row["feedstock"], feedstocks)
             biofuel = get_material(production_row["biofuel"], biofuels)
-            meta = {"tab_name": tab_name, "year": production_row["year"]}
-            if not biofuel:
-                production_errors.append(error(DoubleCountingError.MISSING_BIOFUEL, production_row["line"], meta))
-            if not feedstock:
-                production_errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, production_row["line"], meta))
+            errors = check_production_row_integrity(feedstock, biofuel, production_row, tab_name, dca, False)
+            production_errors += errors
 
     if len(production_errors) > 0:
         return production_history_data, production_errors
@@ -352,9 +349,8 @@ def load_dc_production_history_data(
     production_max_history_rows = merge_rows(production_max_history_rows, "max_production_capacity")
     production_effective_history_rows = merge_rows(production_effective_history_rows, "effective_production")
 
-    production_history = DoubleCountingProductionHistory(dca=dca)
-
     for production_row in production_max_history_rows:
+        production_history = DoubleCountingProductionHistory(dca=dca)
         production_history.year = production_row["year"]
         production_history.feedstock = get_material(production_row["feedstock"], feedstocks)
         production_history.biofuel = get_material(production_row["biofuel"], biofuels)
@@ -371,7 +367,7 @@ def load_dc_production_history_data(
                 production_history.effective_production = prod_effective_row["estimated_production"]
                 break
 
-    production_history_data.append(production_history)
+        production_history_data.append(production_history)
 
     return production_history_data, production_errors
 

@@ -165,11 +165,11 @@ class DoubleCountingProductionHistory(models.Model):
     effective_production = models.IntegerField(blank=False, null=False, default=0)
 
     def __str__(self):
-        return "%s - %s / %s - %st estimées (%st max)" % (
+        return "%s - %s / %s - %st produites (%st max)" % (
             self.year,
             self.feedstock,
             self.biofuel,
-            self.estimated_production,
+            self.effective_production,
             self.max_production_capacity,
         )
 

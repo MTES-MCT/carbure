@@ -83,9 +83,13 @@ class DoubleCountApplicationsTest(TestCase):
         production = file_data["production"]
         assert len(production) == 4
 
-        # check sourcing data
+        # check sourcing history data
         sourcing_history = file_data["sourcing_history"]
         assert len(sourcing_history) == 14
+
+        # check production history data
+        production_history = file_data["production_history"]
+        assert len(production_history) == 6
 
     def test_has_dechets_industriels(self):
         response = self.check_file("dc_agreement_application_valid.xlsx")
@@ -100,7 +104,6 @@ class DoubleCountApplicationsTest(TestCase):
         response = self.check_file("dc_agreement_application_errors_missing_sheet.xlsx")
 
         data = response.json()
-        print("****data*****", data)
         file_data = data["file"]
         error_count = file_data["error_count"]
         assert error_count == 1
@@ -152,7 +155,7 @@ class DoubleCountApplicationsTest(TestCase):
         data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
-        assert error_count == 4
+        assert error_count == 8
         errors = file_data["errors"]
 
         error1 = errors["production"][0]
@@ -172,6 +175,22 @@ class DoubleCountApplicationsTest(TestCase):
         error4 = errors["production"][3]
         assert error4["error"] == DoubleCountingError.MISSING_FEEDSTOCK
         assert error4["line_number"] == 27
+
+        error5 = errors["production_history"][0]
+        assert error5["error"] == DoubleCountingError.MISSING_BIOFUEL
+        assert error5["line_number"] == 5
+
+        error6 = errors["production_history"][1]
+        assert error6["error"] == DoubleCountingError.MISSING_BIOFUEL
+        assert error6["line_number"] == 6
+
+        error7 = errors["production_history"][2]
+        assert error7["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error7["line_number"] == 7
+
+        error8 = errors["production_history"][3]
+        assert error8["error"] == DoubleCountingError.MP_BC_INCOHERENT
+        assert error8["line_number"] == 12
 
     def test_production(self):
         response = self.check_file("dc_agreement_application_errors_production.xlsx")
@@ -312,7 +331,6 @@ class DoubleCountApplicationsTest(TestCase):
         self.production_site.save()
         response = self.add_file("dc_agreement_application_valid.xlsx")
         assert response.status_code == 400
-        print(response.json())
         error = response.json()["message"]
         assert error == DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED
 
