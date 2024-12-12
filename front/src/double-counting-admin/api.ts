@@ -42,13 +42,16 @@ export function adminAddDoubleCountingApplication(
   certificate_id?: string,
   should_replace = false
 ) {
-  return api.post("/double-counting/admin/applications/add", {
-    entity_id,
-    production_site_id,
-    producer_id,
-    certificate_id,
-    file,
-    should_replace,
+  return apiFetch.POST("/double-counting/applications/add/", {
+    params: { query: { entity_id } },
+    body: {
+      entity_id,
+      producer_id,
+      production_site_id,
+      certificate_id,
+      should_replace,
+      file: file as unknown as string, // hacky cast for file upload
+    },
   })
 }
 
