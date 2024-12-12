@@ -1,28 +1,19 @@
 import api, { Api, download } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import {
   AgreementDetails,
   CheckDoubleCountingFilesResponse,
   DoubleCountingAgreementsOverview,
   DoubleCountingApplicationDetails,
   DoubleCountingApplicationsOverview,
-  DoubleCountingSnapshot,
 } from "../double-counting/types"
 
 // GLOBAL
 
-export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/double-counting/admin/years", {
-    params: { entity_id },
-  })
-}
-
 export function getSnapshot(entity_id: number) {
-  return api.get<Api<DoubleCountingSnapshot>>(
-    "/double-counting/admin/snapshot",
-    {
-      params: { entity_id },
-    }
-  )
+  return apiFetch.GET("/double-counting/snapshot/", {
+    params: { query: { entity_id } },
+  })
 }
 
 // APPLICATIONS

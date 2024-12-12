@@ -82,9 +82,7 @@ export interface DoubleCountingAgreementsSnapshot {
   agreements_incoming: number
 }
 
-export interface DoubleCountingSnapshot
-  extends DoubleCountingAgreementsSnapshot,
-    DoubleCountingApplicationSnapshot {}
+export type DoubleCountingSnapshot = apiTypes["ApplicationSnapshot"]
 
 export interface DoubleCountingApplicationsOverview {
   rejected: DoubleCountingApplicationOverview[]
