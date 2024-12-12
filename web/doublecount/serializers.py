@@ -218,26 +218,6 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
         fields = ["year", "feedstock", "sum"]
 
 
-class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
-    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
-    producer = EntitySerializer(read_only=True)
-
-    class Meta:
-        model = DoubleCountingApplication
-        fields = [
-            "id",
-            "certificate_id",
-            "created_at",
-            "producer",
-            "producer_user",
-            "production_site",
-            "period_start",
-            "period_end",
-            "status",
-        ]
-
-
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingDocFile

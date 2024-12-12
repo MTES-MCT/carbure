@@ -55,7 +55,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     },
   ]
 
-  const applications = applicationsResponse.result?.data.data
+  const applications = applicationsResponse.result?.data
 
   function showApplicationDialog(
     application: DoubleCountingApplicationOverview

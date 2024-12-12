@@ -2707,11 +2707,11 @@ components:
         rejected:
           type: array
           items:
-            $ref: "#/components/schemas/DoubleCountingApplicationFull"
+            $ref: "#/components/schemas/DoubleCountingApplicationPartial"
         pending:
           type: array
           items:
-            $ref: "#/components/schemas/DoubleCountingApplicationFull"
+            $ref: "#/components/schemas/DoubleCountingApplicationPartial"
       required:
         - pending
         - rejected
@@ -3236,48 +3236,6 @@ components:
         - production
         - production_site
         - sourcing
-    DoubleCountingApplicationFull:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        certificate_id:
-          type: string
-          maxLength: 16
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        producer:
-          allOf:
-            - $ref: "#/components/schemas/Entity"
-          readOnly: true
-        producer_user:
-          type: string
-          format: email
-          title: Adresse électronique
-          readOnly: true
-        production_site:
-          type: string
-          readOnly: true
-        period_start:
-          type: string
-          format: date
-        period_end:
-          type: string
-          format: date
-        status:
-          $ref: "#/components/schemas/DoubleCountingStatus"
-      required:
-        - certificate_id
-        - created_at
-        - id
-        - period_end
-        - period_start
-        - producer
-        - producer_user
-        - production_site
     DoubleCountingApplicationPartial:
       type: object
       properties:

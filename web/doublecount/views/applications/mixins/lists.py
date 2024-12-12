@@ -5,12 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from doublecount.models import DoubleCountingApplication
-from doublecount.serializers import DoubleCountingApplicationFullSerializer
+from doublecount.serializers import DoubleCountingApplicationPartialSerializer
 
 
 class ApplicationListeSerializer(serializers.Serializer):
-    rejected = DoubleCountingApplicationFullSerializer(many=True)
-    pending = DoubleCountingApplicationFullSerializer(many=True)
+    rejected = DoubleCountingApplicationPartialSerializer(many=True)
+    pending = DoubleCountingApplicationPartialSerializer(many=True)
 
 
 class ListActionMixin:
@@ -39,8 +39,8 @@ class ListActionMixin:
                 ]
             )
         )
-        rejected = DoubleCountingApplicationFullSerializer(rejected_data, many=True)
-        pending = DoubleCountingApplicationFullSerializer(pending_data, many=True)
+        rejected = DoubleCountingApplicationPartialSerializer(rejected_data, many=True)
+        pending = DoubleCountingApplicationPartialSerializer(pending_data, many=True)
 
         data = {
             "rejected": rejected.data,

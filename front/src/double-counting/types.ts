@@ -109,10 +109,6 @@ export type DoubleCountingAgreementPublic =
   apiTypes["DoubleCountingRegistrationPublic"]
 
 export type AgreementDetails = apiTypes["DoubleCountingRegistrationDetails"]
-// export interface AgreementDetails extends DoubleCountingAgreementOverview {
-//   application: DoubleCountingApplicationDetails
-//   quotas: DoubleCountingQuota[]
-// }
 
 export interface QuotaDetails {
   volume: number

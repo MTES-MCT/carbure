@@ -887,8 +887,8 @@ export interface components {
       expired: components["schemas"]["DoubleCountingRegistration"][]
     }
     ApplicationListe: {
-      rejected: components["schemas"]["DoubleCountingApplicationFull"][]
-      pending: components["schemas"]["DoubleCountingApplicationFull"][]
+      rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
+      pending: components["schemas"]["DoubleCountingApplicationPartial"][]
     }
     ApplicationSnapshot: {
       applications_pending: number
@@ -1105,24 +1105,6 @@ export interface components {
       readonly sourcing: components["schemas"]["DoubleCountingSourcing"][]
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
-    }
-    DoubleCountingApplicationFull: {
-      readonly id: number
-      certificate_id: string
-      /** Format: date-time */
-      readonly created_at: string
-      readonly producer: components["schemas"]["Entity"]
-      /**
-       * Adresse électronique
-       * Format: email
-       */
-      readonly producer_user: string
-      readonly production_site: string
-      /** Format: date */
-      period_start: string
-      /** Format: date */
-      period_end: string
-      status?: components["schemas"]["DoubleCountingStatus"]
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
