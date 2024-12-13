@@ -275,7 +275,7 @@ class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(int)
     def get_agreement_id(self, obj):
-        return 0
+        return None
 
     @extend_schema_field(float)
     def get_quotas_progression(self, obj):

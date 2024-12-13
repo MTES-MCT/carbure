@@ -1,4 +1,3 @@
-from django.db.models.query_utils import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +12,7 @@ from saf.permissions import HasUserRights
 
 
 class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = applications = DoubleCountingApplication.objects.filter(~Q(status__in=[DoubleCountingApplication.ACCEPTED]))
+    queryset = DoubleCountingApplication.objects.none()
     serializer_class = DoubleCountingApplicationSerializer
     pagination_class = None
     lookup_field = "id"
@@ -28,10 +27,23 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
             return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.PRODUCER, Entity.ADMIN])]
         # if self.action == "agreements_public_list":
         #     return [AllowAny()]
-        if self.action in ["list_admin", "export", "approve"]:
+        if self.action in ["list_admin", "export", "approve", "update-approved-quotas"]:
             return [HasAdminRights()]
 
         return super().get_permissions()
+
+    def get_queryset(self):
+        queryset = DoubleCountingApplication.objects.none()
+        entity_id = self.request.query_params.get("entity_id", self.request.data.get("entity_id"))
+        entity = Entity.objects.get(pk=int(entity_id))
+
+        if entity.entity_type == Entity.ADMIN:
+            queryset = DoubleCountingApplication.objects.all()
+        elif entity.entity_type == Entity.PRODUCER:
+            queryset = DoubleCountingApplication.objects.filter(producer=entity)
+
+        self.applications = queryset
+        return queryset
 
     @extend_schema(
         parameters=[
