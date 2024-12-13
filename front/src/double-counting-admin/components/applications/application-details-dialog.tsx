@@ -101,7 +101,7 @@ export const ApplicationDetailsDialog = () => {
     ])
     const done = await approveQuotas.execute(
       entity.id,
-      // application.id,
+      application.id,
       updatedQuotas
     )
 

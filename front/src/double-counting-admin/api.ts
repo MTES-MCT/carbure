@@ -1,5 +1,8 @@
 import { download } from "common/services/api"
-import { api as apiFetch } from "common/services/api-fetch"
+import {
+  api as apiFetch,
+  download as downloadFetch,
+} from "common/services/api-fetch"
 import { PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by } from "api-schema"
 
 // GLOBAL
@@ -53,14 +56,15 @@ export function adminAddDoubleCountingApplication(
 
 export function approveDoubleCountingQuotas(
   entity_id: number,
-  // dca_id: number,
+  dca_id: number,
   approved_quotas: number[][]
 ) {
   return apiFetch.POST(
-    "/double-counting/applications/update-approved-quotas/",
+    "/double-counting/applications/{id}/update-approved-quotas/",
     {
-      params: { query: { entity_id } },
+      params: { query: { entity_id }, path: { id: dca_id } },
       body: { approved_quotas },
+      bodySerializer: JSON.stringify,
     }
   )
 }
@@ -70,8 +74,8 @@ export function downloadDoubleCountingApplication(
   dca_id: number,
   industrial_wastes?: string
 ) {
-  // TODO: find out how to typecheck download() for endpoints with variable paths
-  return download(`/double-counting/applications/${dca_id}/export`, {
+  // TODO: rework downloadFetch() to typecheck for endpoints with variable paths
+  return download(`/double-counting/applications/export-application`, {
     entity_id,
     dca_id,
     ...(industrial_wastes ? { di: industrial_wastes } : {}),
@@ -101,7 +105,7 @@ export function rejectDoubleCountingApplication(
 // AGREEMENTS
 
 export function downloadDoubleCountingAgreementList(entity_id: number) {
-  return download("/double-counting/agreements/export/", {
+  return downloadFetch("/double-counting/agreements/export/", {
     entity_id,
   })
 }
