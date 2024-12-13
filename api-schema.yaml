@@ -3348,6 +3348,36 @@ components:
         - max_production_capacity
         - requested_quota
         - year
+    DoubleCountingProductionHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        max_production_capacity:
+          type: integer
+          readOnly: true
+        effective_production:
+          type: integer
+          readOnly: true
+      required:
+        - biofuel
+        - effective_production
+        - feedstock
+        - id
+        - max_production_capacity
+        - year
     DoubleCountingProductionSite:
       type: object
       properties:
@@ -3596,6 +3626,53 @@ components:
         - supply_country
         - transit_country
         - year
+    DoubleCountingSourcingHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        origin_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        supply_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        transit_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        metric_tonnes:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        raw_material_supplier:
+          type: string
+          maxLength: 128
+        supplier_certificate_name:
+          type: string
+          maxLength: 64
+        supplier_certificate:
+          type: integer
+          nullable: true
+      required:
+        - feedstock
+        - id
+        - metric_tonnes
+        - origin_country
+        - supply_country
+        - transit_country
+        - year
     DoubleCountingStatus:
       enum:
         - PENDING
@@ -3829,6 +3906,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DoubleCountingSourcing"
+        sourcing_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingSourcingHistory"
+        production_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingProductionHistory"
         has_dechets_industriels:
           type: boolean
           readOnly: true
@@ -3839,8 +3924,10 @@ components:
         - has_dechets_industriels
         - producer_email
         - production
+        - production_history
         - production_site
         - sourcing
+        - sourcing_history
         - start_year
     FileError:
       type: object
@@ -3877,6 +3964,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FileError"
+        production_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileError"
         global_errors:
           type: array
           items:
@@ -3884,6 +3975,7 @@ components:
       required:
         - global_errors
         - production
+        - production_history
         - sourcing_forecast
         - sourcing_history
     FileTypeEnum:

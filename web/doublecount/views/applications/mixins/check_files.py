@@ -53,7 +53,9 @@ class CheckAdminFilesActionMixin:
         try:
             file_infos = []
             for file in files:
-                info, errors, sourcing_data, production_data, sourcing_history_data, _ = check_dc_file(file)
+                info, errors, sourcing_data, production_data, sourcing_history_data, production_history_data = check_dc_file(
+                    file
+                )
                 error_count = +len(errors["sourcing_forecast"]) + len(errors["production"]) + len(errors["global"])
 
                 file_infos.append(
@@ -67,6 +69,7 @@ class CheckAdminFilesActionMixin:
                         "production": production_data,
                         "sourcing": sourcing_data,
                         "sourcing_history": sourcing_history_data,
+                        "production_history": production_history_data,
                     }
                 )
 

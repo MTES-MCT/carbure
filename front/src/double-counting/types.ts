@@ -37,6 +37,9 @@ export type DoubleCountingProduction = apiTypes["DoubleCountingProduction"]
 
 export type DoubleCountingQuota = apiTypes["DoubleCountingQuota"]
 
+export type DoubleCountingProductionHistory =
+  apiTypes["DoubleCountingProductionHistory"]
+
 export enum DoubleCountingUploadErrorType {
   UnkownBiofuel = "UNKNOWN_BIOFUEL",
   MissingBiofuel = "MISSING_BIOFUEL",

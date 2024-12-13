@@ -1142,6 +1142,14 @@ export interface components {
       readonly requested_quota: number
       readonly approved_quota: number
     }
+    DoubleCountingProductionHistory: {
+      readonly id: number
+      readonly year: number
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly max_production_capacity: number
+      readonly effective_production: number
+    }
     DoubleCountingProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -1218,6 +1226,18 @@ export interface components {
       readonly supply_country: components["schemas"]["Country"]
       readonly transit_country: components["schemas"]["Country"]
       readonly metric_tonnes: number
+    }
+    DoubleCountingSourcingHistory: {
+      readonly id: number
+      year: number
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly origin_country: components["schemas"]["Country"]
+      readonly supply_country: components["schemas"]["Country"]
+      readonly transit_country: components["schemas"]["Country"]
+      metric_tonnes: number
+      raw_material_supplier?: string
+      supplier_certificate_name?: string
+      supplier_certificate?: number | null
     }
     /**
      * @description * `PENDING` - PENDING
@@ -1315,6 +1335,8 @@ export interface components {
       producer_email: string
       production: components["schemas"]["DoubleCountingProduction"][]
       sourcing: components["schemas"]["DoubleCountingSourcing"][]
+      sourcing_history: components["schemas"]["DoubleCountingSourcingHistory"][]
+      production_history: components["schemas"]["DoubleCountingProductionHistory"][]
       readonly has_dechets_industriels: boolean
     }
     FileError: {
@@ -1330,6 +1352,7 @@ export interface components {
       sourcing_forecast: components["schemas"]["FileError"][]
       sourcing_history: components["schemas"]["FileError"][]
       production: components["schemas"]["FileError"][]
+      production_history: components["schemas"]["FileError"][]
       global_errors: components["schemas"]["FileError"][]
     }
     /**

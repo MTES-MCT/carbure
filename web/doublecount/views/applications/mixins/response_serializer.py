@@ -1,7 +1,12 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from doublecount.serializers import DoubleCountingProductionSerializer, DoubleCountingSourcingSerializer
+from doublecount.serializers import (
+    DoubleCountingProductionHistorySerializer,
+    DoubleCountingProductionSerializer,
+    DoubleCountingSourcingHistorySerializer,
+    DoubleCountingSourcingSerializer,
+)
 
 
 class FileErrorSerializer(serializers.Serializer):
@@ -16,6 +21,7 @@ class FileErrorsSerializer(serializers.Serializer):
     sourcing_forecast = serializers.ListField(child=FileErrorSerializer())
     sourcing_history = serializers.ListField(child=FileErrorSerializer())
     production = serializers.ListField(child=FileErrorSerializer())
+    production_history = serializers.ListField(child=FileErrorSerializer())
     global_errors = serializers.ListField(child=FileErrorSerializer())
 
 
@@ -28,7 +34,8 @@ class FileSerializer(serializers.Serializer):
     producer_email = serializers.EmailField()
     production = serializers.ListField(child=DoubleCountingProductionSerializer())
     sourcing = serializers.ListField(child=DoubleCountingSourcingSerializer())
-    # sourcing_history = serializers.ListField(child=DoubleCountingSourcingHistorySerializer())
+    sourcing_history = serializers.ListField(child=DoubleCountingSourcingHistorySerializer())
+    production_history = serializers.ListField(child=DoubleCountingProductionHistorySerializer())
     has_dechets_industriels = serializers.SerializerMethodField()
 
     @extend_schema_field(bool)
