@@ -15,7 +15,7 @@ from .models import DoubleCountingRegistration
 
 class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
     production_site = DoubleCountingProductionSiteSerializer()
-    producer = EntitySummarySerializer()
+    producer = serializers.SerializerMethodField()
     quotas_progression = serializers.SerializerMethodField()
 
     class Meta:
@@ -35,9 +35,9 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
     def get_production_site(self, obj):
         return obj.production_site.name if obj.production_site else None
 
-    @extend_schema_field(str)
+    @extend_schema_field(EntitySummarySerializer())
     def get_producer(self, obj):
-        return obj.production_site.producer.name if obj.production_site else obj.certificate_holder
+        return EntitySummarySerializer(obj.production_site.producer).data if obj.production_site else None
 
     @extend_schema_field(float)
     def get_quotas_progression(self, obj):

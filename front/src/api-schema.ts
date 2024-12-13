@@ -1180,7 +1180,7 @@ export interface components {
       certificate_id: string
       /** Format: date */
       valid_from: string
-      producer: components["schemas"]["EntitySummary"]
+      readonly producer: components["schemas"]["EntitySummary"]
       production_site: components["schemas"]["DoubleCountingProductionSite"]
       /** Format: date */
       valid_until: string

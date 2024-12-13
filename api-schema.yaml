@@ -3462,7 +3462,9 @@ components:
           type: string
           format: date
         producer:
-          $ref: "#/components/schemas/EntitySummary"
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
         production_site:
           $ref: "#/components/schemas/DoubleCountingProductionSite"
         valid_until:
