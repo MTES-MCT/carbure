@@ -279,7 +279,7 @@ class DoubleCountApplicationsTest(TestCase):
 
     def create_application(self):
         app = DoubleCountingApplicationFactory.create(
-            producer=self.production_site.producer,
+            producer=self.producer,
             production_site=self.production_site,
             period_start__year=self.requested_start_year,
             status=DoubleCountingApplication.PENDING,

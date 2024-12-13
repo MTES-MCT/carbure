@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import date
 from io import BytesIO
@@ -249,8 +248,13 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # update quotas
         updated_quotas = [[production1.id, 20500], [production2.id, 10000]]
         response = self.client.post(
-            reverse("double-counting-applications-update-approved-quotas"),
-            {"entity_id": self.admin.id, "approved_quotas": json.dumps(updated_quotas), "dca_id": application.id},
+            reverse(
+                "double-counting-applications-update-approved-quotas",
+                kwargs={"id": application.id},
+            )
+            + f"?entity_id={self.admin.id}",
+            data={"approved_quotas": updated_quotas},
+            content_type="application/json",
         )
         assert response.status_code == 200
 
