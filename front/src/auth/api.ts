@@ -18,7 +18,9 @@ export function register(
 }
 
 export function login(username: string, password: string) {
-  return api.post("auth/login", { username, password })
+  return apiFetch.POST("/auth/login/", {
+    body: { username, password },
+  })
 }
 
 export function logout() {
