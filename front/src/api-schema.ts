@@ -91,9 +91,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    get: operations["auth_request_otp_retrieve"]
     put?: never
-    post: operations["auth_request_otp_create"]
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -1442,7 +1442,7 @@ export interface operations {
       }
     }
   }
-  auth_request_otp_create: {
+  auth_request_otp_retrieve: {
     parameters: {
       query?: never
       header?: never

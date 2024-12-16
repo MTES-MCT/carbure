@@ -31,7 +31,7 @@ class RequestOTPAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"], url_path="request-otp")
+    @action(detail=False, methods=["get"], url_path="request-otp")
     def request_otp(self, request):
         # send token by email and display form
         if not user_has_device(request.user):
