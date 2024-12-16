@@ -64,7 +64,9 @@ export function resetPassword(
 }
 
 export function requestActivateAccount(email: string) {
-  return api.post("auth/request-activation-link", { email })
+  return apiFetch.POST("/auth/request-activation-link/", {
+    body: { email },
+  })
 }
 
 export function activateAccount(
