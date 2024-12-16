@@ -53,11 +53,13 @@ export function resetPassword(
     throw new Error("Missing token for password reset")
   }
 
-  return api.post("auth/reset-password", {
-    uidb64,
-    token,
-    password1,
-    password2,
+  return apiFetch.POST("/auth/reset-password/", {
+    body: {
+      uidb64,
+      token,
+      password1,
+      password2,
+    },
   })
 }
 
