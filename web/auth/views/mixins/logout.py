@@ -1,11 +1,18 @@
 from django.contrib.auth import logout as django_logout
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 
 class UserLogoutAction:
     @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(
+                response={"status": "success"},
+                description="Request successful.",
+            ),
+        },
         examples=[
             OpenApiExample(
                 "Example response.",
@@ -15,7 +22,7 @@ class UserLogoutAction:
             ),
         ],
     )
-    @action(detail=False, methods=["get"], url_path="logout")
+    @action(detail=False, methods=["post"], url_path="logout")
     def logout(self, request):
         django_logout(request)
         return Response({"status": "success"})

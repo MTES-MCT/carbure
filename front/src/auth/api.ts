@@ -1,4 +1,5 @@
 import { api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 
 export function register(
   email: string,
@@ -6,7 +7,14 @@ export function register(
   password1: string,
   password2: string
 ) {
-  return api.post("/auth/register", { email, name, password1, password2 })
+  return apiFetch.POST("/auth/register/", {
+    body: {
+      email,
+      name,
+      password1,
+      password2,
+    },
+  })
 }
 
 export function login(username: string, password: string) {
@@ -14,7 +22,7 @@ export function login(username: string, password: string) {
 }
 
 export function logout() {
-  return api.post("auth/logout")
+  return apiFetch.POST("/auth/logout/")
 }
 
 export function requestOTP() {

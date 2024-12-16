@@ -4,9 +4,9 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
-  /api/auth/auth/activate/:
+  /api/auth/activate/:
     post:
-      operationId: auth_auth_activate_create
+      operationId: auth_activate_create
       tags:
         - auth
       requestBody:
@@ -49,9 +49,9 @@ paths:
                     message: Could not activate user account
                   summary: Activation failed
           description: Bad request - missing fields.
-  /api/auth/auth/login/:
+  /api/auth/login/:
     post:
-      operationId: auth_auth_login_create
+      operationId: auth_login_create
       tags:
         - auth
       requestBody:
@@ -94,9 +94,9 @@ paths:
                     message: Invalid login or password | Account not activated
                   summary: login failed
           description: Bad request - missing fields.
-  /api/auth/auth/logout/:
-    get:
-      operationId: auth_auth_logout_retrieve
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
       tags:
         - auth
       security:
@@ -108,16 +108,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserCreation"
+                status: success
               examples:
                 ExampleResponse.:
                   value:
                     status: success
                   summary: Example response.
-          description: ""
-  /api/auth/auth/register/:
+          description: Request successful.
+  /api/auth/register/:
     post:
-      operationId: auth_auth_register_create
+      operationId: auth_register_create
       tags:
         - auth
       requestBody:
@@ -148,9 +148,9 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
-  /api/auth/auth/request-activation-link/:
+  /api/auth/request-activation-link/:
     post:
-      operationId: auth_auth_request_activation_link_create
+      operationId: auth_request_activation_link_create
       tags:
         - auth
       requestBody:
@@ -181,9 +181,9 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
-  /api/auth/auth/request-otp/:
+  /api/auth/request-otp/:
     get:
-      operationId: auth_auth_request_otp_retrieve
+      operationId: auth_request_otp_retrieve
       tags:
         - auth
       security:
@@ -201,9 +201,9 @@ paths:
                     valid_until: 07/03/2024, 14:09
                   summary: Example response.
           description: ""
-  /api/auth/auth/request-password-reset/:
+  /api/auth/request-password-reset/:
     post:
-      operationId: auth_auth_request_password_reset_create
+      operationId: auth_request_password_reset_create
       tags:
         - auth
       requestBody:
@@ -234,9 +234,9 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
-  /api/auth/auth/reset-password/:
+  /api/auth/reset-password/:
     post:
-      operationId: auth_auth_reset_password_create
+      operationId: auth_reset_password_create
       tags:
         - auth
       requestBody:
@@ -267,9 +267,9 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
-  /api/auth/auth/verify-otp/:
+  /api/auth/verify-otp/:
     post:
-      operationId: auth_auth_verify_otp_create
+      operationId: auth_verify_otp_create
       tags:
         - auth
       requestBody:

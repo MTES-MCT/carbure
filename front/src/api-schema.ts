@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  "/api/auth/auth/activate/": {
+  "/api/auth/activate/": {
     parameters: {
       query?: never
       header?: never
@@ -13,14 +13,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["auth_auth_activate_create"]
+    post: operations["auth_activate_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/auth/auth/login/": {
+  "/api/auth/login/": {
     parameters: {
       query?: never
       header?: never
@@ -29,21 +29,69 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["auth_auth_login_create"]
+    post: operations["auth_login_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/auth/auth/logout/": {
+  "/api/auth/logout/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["auth_auth_logout_retrieve"]
+    get?: never
+    put?: never
+    post: operations["auth_logout_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/register/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_register_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-activation-link/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_request_activation_link_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-otp/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["auth_request_otp_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -52,7 +100,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/auth/register/": {
+  "/api/auth/request-password-reset/": {
     parameters: {
       query?: never
       header?: never
@@ -61,14 +109,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["auth_auth_register_create"]
+    post: operations["auth_request_password_reset_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/auth/auth/request-activation-link/": {
+  "/api/auth/reset-password/": {
     parameters: {
       query?: never
       header?: never
@@ -77,30 +125,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["auth_auth_request_activation_link_create"]
+    post: operations["auth_reset_password_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/auth/auth/request-otp/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["auth_auth_request_otp_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/auth/auth/request-password-reset/": {
+  "/api/auth/verify-otp/": {
     parameters: {
       query?: never
       header?: never
@@ -109,39 +141,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["auth_auth_request_password_reset_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/auth/auth/reset-password/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["auth_auth_reset_password_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/auth/auth/verify-otp/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["auth_auth_verify_otp_create"]
+    post: operations["auth_verify_otp_create"]
     delete?: never
     options?: never
     head?: never
@@ -1296,7 +1296,7 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  auth_auth_activate_create: {
+  auth_activate_create: {
     parameters: {
       query?: never
       header?: never
@@ -1331,7 +1331,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_login_create: {
+  auth_login_create: {
     parameters: {
       query?: never
       header?: never
@@ -1366,7 +1366,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_logout_retrieve: {
+  auth_logout_create: {
     parameters: {
       query?: never
       header?: never
@@ -1375,17 +1375,18 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Request successful. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserCreation"]
+          "application/json": unknown
         }
       }
     }
   }
-  auth_auth_register_create: {
+  auth_register_create: {
     parameters: {
       query?: never
       header?: never
@@ -1410,7 +1411,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_request_activation_link_create: {
+  auth_request_activation_link_create: {
     parameters: {
       query?: never
       header?: never
@@ -1435,7 +1436,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_request_otp_retrieve: {
+  auth_request_otp_retrieve: {
     parameters: {
       query?: never
       header?: never
@@ -1454,7 +1455,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_request_password_reset_create: {
+  auth_request_password_reset_create: {
     parameters: {
       query?: never
       header?: never
@@ -1479,7 +1480,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_reset_password_create: {
+  auth_reset_password_create: {
     parameters: {
       query?: never
       header?: never
@@ -1504,7 +1505,7 @@ export interface operations {
       }
     }
   }
-  auth_auth_verify_otp_create: {
+  auth_verify_otp_create: {
     parameters: {
       query?: never
       header?: never
