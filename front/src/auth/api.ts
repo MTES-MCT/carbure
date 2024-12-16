@@ -28,7 +28,7 @@ export function logout() {
 }
 
 export function requestOTP() {
-  return api.post("auth/request-otp")
+  return apiFetch.POST("/auth/request-otp/")
 }
 
 export function verifyOTP(otp_token: string) {

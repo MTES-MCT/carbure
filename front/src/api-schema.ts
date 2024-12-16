@@ -91,9 +91,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["auth_request_otp_retrieve"]
+    get?: never
     put?: never
-    post?: never
+    post: operations["auth_request_otp_create"]
     delete?: never
     options?: never
     head?: never
@@ -884,6 +884,9 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    OtpResponse: {
+      valid_until: string
+    }
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -1436,7 +1439,7 @@ export interface operations {
       }
     }
   }
-  auth_request_otp_retrieve: {
+  auth_request_otp_create: {
     parameters: {
       query?: never
       header?: never
@@ -1450,7 +1453,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserCreation"]
+          "application/json": components["schemas"]["OtpResponse"]
         }
       }
     }

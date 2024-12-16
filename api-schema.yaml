@@ -182,8 +182,8 @@ paths:
                   summary: Example response.
           description: ""
   /api/auth/request-otp/:
-    get:
-      operationId: auth_request_otp_retrieve
+    post:
+      operationId: auth_request_otp_create
       tags:
         - auth
       security:
@@ -194,7 +194,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserCreation"
+                $ref: "#/components/schemas/OtpResponse"
               examples:
                 ExampleResponse.:
                   value:
@@ -2655,6 +2655,13 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    OtpResponse:
+      type: object
+      properties:
+        valid_until:
+          type: string
+      required:
+        - valid_until
     PaginatedEntityPreviewList:
       type: object
       required:

@@ -5,15 +5,23 @@ from django.template import loader
 from django.utils import timezone
 from django_otp import user_has_device
 from django_otp.plugins.otp_email.models import EmailDevice
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.serializers import CharField
 
 from core.helpers import send_mail
 
 
 class RequestOTPAction:
     @extend_schema(
+        request=None,
+        responses={
+            200: inline_serializer(
+                name="OtpResponse",
+                fields={"valid_until": CharField()},
+            ),
+        },
         examples=[
             OpenApiExample(
                 "Example response.",
@@ -23,7 +31,7 @@ class RequestOTPAction:
             ),
         ],
     )
-    @action(detail=False, methods=["get"], url_path="request-otp")
+    @action(detail=False, methods=["post"], url_path="request-otp")
     def request_otp(self, request):
         # send token by email and display form
         if not user_has_device(request.user):
