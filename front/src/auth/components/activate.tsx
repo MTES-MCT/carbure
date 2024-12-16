@@ -48,7 +48,7 @@ export const Activate = () => {
 
   const userInvitedSearchParams = createSearchParams({
     uidb64: uidb64 || "",
-    token: activate.result?.data.data.token || "",
+    token: activate.result?.data?.token || "",
   })
 
   return (

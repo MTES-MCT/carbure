@@ -30,14 +30,14 @@ paths:
           content:
             application/json:
               schema:
-                status: success
+                $ref: "#/components/schemas/ActivateResponse"
               examples:
                 SuccessExample:
                   value:
                     status: success
                   summary: A successful activation
                   description: The account was successfully activated.
-          description: Request successful.
+          description: ""
         "400":
           content:
             application/json:
@@ -2026,10 +2026,19 @@ components:
         token:
           type: string
         invite:
-          type: string
+          type: integer
       required:
         - token
         - uidb64
+    ActivateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        token:
+          type: string
+      required:
+        - message
     Biofuel:
       type: object
       properties:

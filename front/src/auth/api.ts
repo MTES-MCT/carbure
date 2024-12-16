@@ -1,4 +1,3 @@
-import { api } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
 
 export function register(
@@ -81,9 +80,11 @@ export function activateAccount(
     throw new Error("Missing token for account activation")
   }
 
-  return api.post("auth/activate", {
-    uidb64,
-    token,
-    ...(inviteUser ? { invite: 1 } : {}),
+  return apiFetch.POST("/auth/activate/", {
+    body: {
+      uidb64,
+      token,
+      ...(inviteUser ? { invite: 1 } : {}),
+    },
   })
 }

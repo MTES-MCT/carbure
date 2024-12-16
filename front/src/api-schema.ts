@@ -619,7 +619,11 @@ export interface components {
     ActivateAccount: {
       uidb64: string
       token: string
-      invite?: string
+      invite?: number
+    }
+    ActivateResponse: {
+      message: string
+      token?: string
     }
     Biofuel: {
       name: string
@@ -1314,13 +1318,12 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Request successful. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": unknown
+          "application/json": components["schemas"]["ActivateResponse"]
         }
       }
       /** @description Bad request - missing fields. */

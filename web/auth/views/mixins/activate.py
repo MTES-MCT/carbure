@@ -2,10 +2,11 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.serializers import CharField
 
 from auth.serializers import ActivateAccountSerializer
 from auth.tokens import account_activation_token
@@ -16,10 +17,17 @@ class ActivateAccountAction:
     @extend_schema(
         request=ActivateAccountSerializer,
         responses={
-            200: OpenApiResponse(
-                response={"status": "success"},
-                description="Request successful.",
+            200: inline_serializer(
+                name="ActivateResponse",
+                fields={
+                    "message": CharField(),
+                    "token": CharField(required=False),
+                },
             ),
+            # OpenApiResponse(
+            #     response={"status": "success"},
+            #     description="Request successful.",
+            # )
             400: OpenApiResponse(
                 response={"message": CarbureError.ACTIVATION_COULD_NOT_ACTIVATE_USER},
                 description="Bad request - missing fields.",
