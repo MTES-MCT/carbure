@@ -26,19 +26,14 @@ def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[Sourci
         raw_material_supplier = row[6].value
         supplier_certificate_id = row[7].value
 
-        # skip row if no year or feedstock is defined
-        # TO DELETE : if not feedstock_name or not origin_country_cell or feedstock_name == origin_country_cell:
-        if not feedstock_name or feedstock_name == origin_country_cell:
+        # If not feedstock_name and not origin_country_cell or feedstock_name == origin_country_cell:
+        if (not feedstock_name and not origin_country_cell) or feedstock_name == origin_country_cell:
             continue
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
         # skip row if no feedstock is recognized and no origin country is defined
         if not feedstock and not origin_country_cell:
             continue
-
-        # this allow to accept row without year but only when feedstock recognized
-        # if current_year == -1 and feedstock is None:
-        #    continue
 
         origin_country = extract_country_code(origin_country_cell)
         supply_country = extract_country_code(supply_country_cell)

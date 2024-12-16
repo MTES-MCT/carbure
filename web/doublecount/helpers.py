@@ -117,10 +117,6 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
     for row in sourcing_rows:
         line = row["line"]
         meta = {"year": row["year"]}
-        metric_tonnes = row["metric_tonnes"]
-
-        if not metric_tonnes:
-            continue
 
         errors = check_sourcing_row(row)
         if len(errors) > 0:
@@ -728,10 +724,6 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
     for row in sourcing_history_rows:
         line = row["line"]
         meta = {"year": row["year"]}
-        metric_tonnes = row["metric_tonnes"]
-
-        if not metric_tonnes:
-            continue
 
         errors = check_sourcing_row(row)
         if len(errors) > 0:

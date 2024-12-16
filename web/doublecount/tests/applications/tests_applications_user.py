@@ -119,24 +119,32 @@ class DoubleCountApplicationsTest(TestCase):
         file_data = data["file"]
 
         error_count = file_data["error_count"]
-        assert error_count == 4
+        assert error_count == 6
         errors = file_data["errors"]
 
         # sourcing
         sourcing_errors = errors["sourcing_forecast"]
-        assert len(sourcing_errors) == 3
+        assert len(sourcing_errors) == 5
 
         error1 = sourcing_errors[0]
-        assert error1["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error1["line_number"] == 8
+        assert error1["error"] == DoubleCountingError.MISSING_QUANTITY
+        assert error1["line_number"] == 7
 
         error2 = sourcing_errors[1]
-        assert error2["error"] == DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN
-        assert error2["line_number"] == 12
+        assert error2["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error2["line_number"] == 8
 
         error3 = sourcing_errors[2]
-        assert error3["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
-        assert error3["line_number"] == 15
+        assert error3["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error3["line_number"] == 9
+
+        error4 = sourcing_errors[3]
+        assert error4["error"] == DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN
+        assert error4["line_number"] == 12
+
+        error5 = sourcing_errors[4]
+        assert error5["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
+        assert error5["line_number"] == 15
 
         # global
         prod_errors = errors["production"]
@@ -149,13 +157,41 @@ class DoubleCountApplicationsTest(TestCase):
         assert error1["meta"]["estimated_production"] == 10500
         assert error1["meta"]["requested_quota"] == 20500
 
+    def test_sourcing_history(self):
+        response = self.check_file("dc_agreement_application_errors_sourcing_history.xlsx")
+
+        data = response.json()
+        file_data = data["file"]
+
+        errors = file_data["errors"]
+
+        # sourcing history
+        sourcing_errors = errors["sourcing_history"]
+        assert len(sourcing_errors) == 4
+
+        error1 = sourcing_errors[0]
+        assert error1["error"] == DoubleCountingError.MISSING_QUANTITY
+        assert error1["line_number"] == 19
+
+        error2 = sourcing_errors[1]
+        assert error2["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
+        assert error2["line_number"] == 20
+
+        error3 = sourcing_errors[2]
+        assert error3["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error3["line_number"] == 21
+
+        error4 = sourcing_errors[3]
+        assert error4["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error4["line_number"] == 22
+
     def test_production_integrity(self):
         response = self.check_file("dc_agreement_application_errors_prod_integrity.xlsx")
 
         data = response.json()
         file_data = data["file"]
         error_count = file_data["error_count"]
-        assert error_count == 8
+        assert error_count == 4
         errors = file_data["errors"]
 
         error1 = errors["production"][0]
@@ -175,22 +211,6 @@ class DoubleCountApplicationsTest(TestCase):
         error4 = errors["production"][3]
         assert error4["error"] == DoubleCountingError.MISSING_FEEDSTOCK
         assert error4["line_number"] == 27
-
-        error5 = errors["production_history"][0]
-        assert error5["error"] == DoubleCountingError.MISSING_BIOFUEL
-        assert error5["line_number"] == 5
-
-        error6 = errors["production_history"][1]
-        assert error6["error"] == DoubleCountingError.MISSING_BIOFUEL
-        assert error6["line_number"] == 6
-
-        error7 = errors["production_history"][2]
-        assert error7["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error7["line_number"] == 7
-
-        error8 = errors["production_history"][3]
-        assert error8["error"] == DoubleCountingError.MP_BC_INCOHERENT
-        assert error8["line_number"] == 12
 
     def test_production(self):
         response = self.check_file("dc_agreement_application_errors_production.xlsx")
@@ -224,6 +244,34 @@ class DoubleCountApplicationsTest(TestCase):
         meta = error1["meta"]
         assert meta["max_production_capacity"] == 5000
         assert meta["estimated_production"] == 8200
+
+    def test_production_history(self):
+        response = self.check_file("dc_agreement_application_errors_production_history.xlsx")
+
+        data = response.json()
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        assert error_count == 4
+        errors = file_data["errors"]
+
+        production_errors = errors["production_history"]
+        assert len(production_errors) == 4
+
+        error5 = production_errors[0]
+        assert error5["error"] == DoubleCountingError.MISSING_BIOFUEL
+        assert error5["line_number"] == 5
+
+        error6 = production_errors[1]
+        assert error6["error"] == DoubleCountingError.MISSING_BIOFUEL
+        assert error6["line_number"] == 6
+
+        error7 = production_errors[2]
+        assert error7["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error7["line_number"] == 7
+
+        error8 = production_errors[3]
+        assert error8["error"] == DoubleCountingError.MP_BC_INCOHERENT
+        assert error8["line_number"] == 12
 
     def test_global(self):
         response = self.check_file("dc_agreement_application_errors_global.xlsx")

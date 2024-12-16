@@ -20,6 +20,10 @@ def check_sourcing_row(data: SourcingRow) -> List[DcError]:
         meta["feedstock"] = data["feedstock"]
         errors.append(error(DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN, line, meta))
 
+    if not data["metric_tonnes"]:
+        meta["feedstock"] = data["feedstock"]
+        errors.append(error(DoubleCountingError.MISSING_QUANTITY, line, meta))
+
     return errors
 
 
