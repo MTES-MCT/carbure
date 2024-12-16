@@ -23,7 +23,7 @@ export function login(username: string, password: string) {
 }
 
 export function logout() {
-  return apiFetch.POST("/auth/logout/")
+  return apiFetch.GET("/auth/logout/")
 }
 
 export function requestOTP() {

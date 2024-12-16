@@ -95,8 +95,8 @@ paths:
                   summary: login failed
           description: Bad request - missing fields.
   /api/auth/logout/:
-    post:
-      operationId: auth_logout_create
+    get:
+      operationId: auth_logout_retrieve
       tags:
         - auth
       security:

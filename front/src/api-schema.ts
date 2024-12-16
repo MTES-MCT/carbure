@@ -43,9 +43,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    get: operations["auth_logout_retrieve"]
     put?: never
-    post: operations["auth_logout_create"]
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -1372,7 +1372,7 @@ export interface operations {
       }
     }
   }
-  auth_logout_create: {
+  auth_logout_retrieve: {
     parameters: {
       query?: never
       header?: never

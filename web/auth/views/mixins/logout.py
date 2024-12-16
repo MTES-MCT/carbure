@@ -22,7 +22,7 @@ class UserLogoutAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"], url_path="logout")
+    @action(detail=False, methods=["get"], url_path="logout")
     def logout(self, request):
         django_logout(request)
         return Response({"status": "success"})
