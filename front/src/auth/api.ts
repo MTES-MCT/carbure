@@ -38,7 +38,9 @@ export function verifyOTP(otp_token: string) {
 }
 
 export function requestResetPassword(username: string) {
-  return api.post("auth/request-password-reset", { username })
+  return apiFetch.POST("/auth/request-password-reset/", {
+    body: { username },
+  })
 }
 
 export function resetPassword(
