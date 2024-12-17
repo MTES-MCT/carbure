@@ -3,7 +3,7 @@ from typing import List
 from openpyxl import Workbook
 
 from doublecount.parser.excel_to_carbure_convertor import get_feedstock_from_dc_feedstock
-from doublecount.parser.helpers import extract_year
+from doublecount.parser.helpers import extract_country_code, extract_year, intOrZero
 from doublecount.parser.types import SourcingRow
 
 
@@ -47,18 +47,9 @@ def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[Sourc
             "origin_country": origin_country,
             "supply_country": supply_country,
             "transit_country": transit_country,
-            "metric_tonnes": 0,
+            "metric_tonnes": intOrZero(row[6].value),
         }
-
-        sourcing["metric_tonnes"] = row[6].value
 
         sourcing_rows.append(sourcing)
 
     return sourcing_rows
-
-
-def extract_country_code(country_str: str) -> str | None:
-    if country_str:
-        return (country_str or "").split(" - ")[0].strip()
-    else:
-        return None

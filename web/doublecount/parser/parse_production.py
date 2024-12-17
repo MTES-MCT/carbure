@@ -4,7 +4,7 @@ from openpyxl import Workbook
 from pyparsing import Any
 
 from doublecount.parser.excel_to_carbure_convertor import get_biofuel_from_dc_biofuel, get_feedstock_from_dc_feedstock
-from doublecount.parser.helpers import extract_year
+from doublecount.parser.helpers import extract_year, intOrZero
 from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow
 
 
@@ -97,10 +97,3 @@ def parse_production_data(
         data_rows.append(production)
 
     return data_rows
-
-
-def intOrZero(value):
-    try:
-        return int(value)
-    except Exception:
-        return 0

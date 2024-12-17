@@ -1,5 +1,7 @@
 import os
 import time
+import traceback
+import warnings
 
 from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
@@ -15,11 +17,17 @@ TMP_FOLDER = "/tmp/doublecounting/"
 class Command(BaseCommand):
     help = "Download redcert certificates pdfs"
 
+    warnings.simplefilter("ignore", UserWarning)
+
     def add_arguments(self, parser):
-        pass
+        parser.add_argument("--id", type=str, help="DCA certificate_id")
 
     def handle(self, *args, **options):
         start_time = time.time()
+
+        if options["id"]:
+            self.process_dc_application(f"{TMP_FOLDER}{options["id"]}.xlsx", f"{options["id"]}.xlsx")
+            return
 
         self.download_files_from_S3(S3_FOLDER)
         self.process_xlsx_files(TMP_FOLDER)
@@ -41,10 +49,11 @@ class Command(BaseCommand):
         for file_name in os.listdir(folder):
             if file_name.endswith(".xlsx"):
                 file_path = os.path.join(folder, file_name)
+                self.stdout.write("\n")
                 self.process_dc_application(file_path, file_name)
 
     def process_dc_application(self, file_path, filename):
-        print(f"Processing file: {file_path}")
+        self.stdout.write(f"Processing file: {file_path}")
 
         dca = self.get_dca_from_filename(filename)
 
@@ -68,19 +77,41 @@ class Command(BaseCommand):
 
         sourcing_history_data, sourcing_history_errors = load_dc_sourcing_history_data(dca, sourcing_history_rows)
 
+        errors = False
+
         if production_history_errors:
-            self.stdout.write("production history errors", production_history_errors)
-            return
+            self.stdout.write(f"production history errors: {production_history_errors}")
+            self.stdout.write(self.style.ERROR(f"Error processing DCA: {dca.certificate_id}"))
+            errors = True
 
         if sourcing_history_errors:
-            self.stdout.write("sourcing history errors", sourcing_history_errors)
+            self.stdout.write(f"sourcing history errors: {sourcing_history_errors}")
+            self.stdout.write(self.style.ERROR(f"Error processing DCA: {dca.certificate_id}"))
+            errors = True
+
+        if errors:
             return
 
-        for sourcing_history in sourcing_history_data:
-            sourcing_history.save()
+        # Chek if sourcing history already exists for this dca
+        if not dca.history_sourcing.exists():
+            for sourcing_history in sourcing_history_data:
+                sourcing_history.save()
+                self.stdout.write("Sourcing history saved")
+        else:
+            self.stdout.write("Sourcing history already exists")
 
-        for production_history in production_history_data:
-            production_history.save()
+        # Chek if production history already exists for this dca
+        if not dca.history_production.exists():
+            for production_history in production_history_data:
+                production_history.save()
+                self.stdout.write("Production history saved")
+        else:
+            self.stdout.write("Production history already exists")
+
+        s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
+
+        self.update_dca_download_link(dca, s3_path)
+        self.upload_dca_to_s3(s3_path, open(file_path, "rb"))
 
         self.stdout.write(self.style.SUCCESS(f"Processed DCA: {dca.certificate_id}"))
 
@@ -89,10 +120,27 @@ class Command(BaseCommand):
         dca_id = filename.split(".")[0]
 
         try:
-            dca = DoubleCountingApplication.objects.filter(certificate_id=dca_id).first()
+            dca = DoubleCountingApplication.objects.get(certificate_id=dca_id)
             self.stdout.write(f"DCA: {dca}")
         except DoubleCountingApplication.DoesNotExist:
             self.stdout.write(self.style.ERROR(f"DCA not found for certificate_id: {dca_id}"))
             return None
+        except DoubleCountingApplication.MultipleObjectsReturned:
+            self.stdout.write(self.style.ERROR(f"Multiple DCA found for certificate_id: {dca_id}"))
+            return None
 
         return dca
+
+    def update_dca_download_link(self, dca, s3_path):
+        if dca.download_link:
+            return
+
+        dca.download_link = default_storage.url(s3_path)
+        dca.save()
+
+    def upload_dca_to_s3(self, s3_path, file):
+        try:
+            default_storage.save(s3_path, file)
+        except Exception:
+            traceback.print_exc()
+            self.stdout.write(self.style.ERROR(f"Error uploading file to S3: {s3_path}"))

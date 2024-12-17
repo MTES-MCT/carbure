@@ -119,32 +119,28 @@ class DoubleCountApplicationsTest(TestCase):
         file_data = data["file"]
 
         error_count = file_data["error_count"]
-        assert error_count == 6
+        assert error_count == 5
         errors = file_data["errors"]
 
         # sourcing
         sourcing_errors = errors["sourcing_forecast"]
-        assert len(sourcing_errors) == 5
+        assert len(sourcing_errors) == 4
 
         error1 = sourcing_errors[0]
-        assert error1["error"] == DoubleCountingError.MISSING_QUANTITY
-        assert error1["line_number"] == 7
+        assert error1["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error1["line_number"] == 8
 
         error2 = sourcing_errors[1]
         assert error2["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error2["line_number"] == 8
+        assert error2["line_number"] == 9
 
         error3 = sourcing_errors[2]
-        assert error3["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error3["line_number"] == 9
+        assert error3["error"] == DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN
+        assert error3["line_number"] == 12
 
         error4 = sourcing_errors[3]
-        assert error4["error"] == DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN
-        assert error4["line_number"] == 12
-
-        error5 = sourcing_errors[4]
-        assert error5["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
-        assert error5["line_number"] == 15
+        assert error4["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
+        assert error4["line_number"] == 15
 
         # global
         prod_errors = errors["production"]
@@ -167,23 +163,19 @@ class DoubleCountApplicationsTest(TestCase):
 
         # sourcing history
         sourcing_errors = errors["sourcing_history"]
-        assert len(sourcing_errors) == 4
+        assert len(sourcing_errors) == 3
 
         error1 = sourcing_errors[0]
-        assert error1["error"] == DoubleCountingError.MISSING_QUANTITY
-        assert error1["line_number"] == 19
+        assert error1["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
+        assert error1["line_number"] == 20
 
         error2 = sourcing_errors[1]
-        assert error2["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
-        assert error2["line_number"] == 20
+        assert error2["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert error2["line_number"] == 21
 
         error3 = sourcing_errors[2]
         assert error3["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error3["line_number"] == 21
-
-        error4 = sourcing_errors[3]
-        assert error4["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error4["line_number"] == 22
+        assert error3["line_number"] == 22
 
     def test_production_integrity(self):
         response = self.check_file("dc_agreement_application_errors_prod_integrity.xlsx")

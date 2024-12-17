@@ -343,7 +343,7 @@ def load_dc_production_history_data(
 
     # merge rows
     production_max_history_rows = merge_rows(production_max_history_rows, "max_production_capacity")
-    production_effective_history_rows = merge_rows(production_effective_history_rows, "effective_production")
+    production_effective_history_rows = merge_rows(production_effective_history_rows, "estimated_production")
 
     for production_row in production_max_history_rows:
         production_history = DoubleCountingProductionHistory(dca=dca)
