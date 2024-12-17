@@ -12,7 +12,8 @@
     "generate-and-check-types": "npm run generate-schema && cd front && npm run generate-and-check-types",
     "migrate": "python web/manage.py makemigrations && python web/manage.py migrate",
     "restart": "docker-compose down && docker-compose up -d",
-    "deploy-preview": "git push origin $branch:preview --force"
+    "deploy-preview": "git push origin $branch:preview --force",
+    "check-types": "cd front; npm run check-types"
   },
   "engines": {
     "node": "16.16.0",

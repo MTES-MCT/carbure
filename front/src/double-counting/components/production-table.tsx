@@ -44,7 +44,7 @@ export const ProductionTable = ({
       cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
     },
     entity.isAdmin && {
-      header: t("Rendement estimé"),
+      header: t("Ratio prod."),
       cell: (p) => {
         // Find sources related to the production
         const sources = sourcing.filter(

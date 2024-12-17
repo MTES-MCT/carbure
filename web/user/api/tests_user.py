@@ -31,8 +31,9 @@ class UserTest(TestCase):
     def test_get_settings(self):
         response = self.client.get(reverse("user"))
         # api works
+
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
         assert "rights" in data
         assert "email" in data
         assert "requests" in data
@@ -51,7 +52,7 @@ class UserTest(TestCase):
         url = "user"
         response = self.client.get(reverse(url))
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
         assert "requests" in data
         prev_len = len(data["requests"])
 
@@ -63,6 +64,6 @@ class UserTest(TestCase):
         # get settings - 1 pending request
         response = self.client.get(reverse(url))
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
         new_len = len(data["requests"])
         assert prev_len + 1 == new_len

@@ -84,7 +84,7 @@ const Certificates = () => {
           disabled={!canModify}
           label={t("Certificat par défaut")}
           placeholder={t("Sélectionner un certificat")}
-          value={entity.default_certificate}
+          value={entity.default_certificate ?? undefined}
           onChange={setDefaultCertificate.execute}
           options={validCertificates}
           normalize={normalizeEntityCertificate}
@@ -138,8 +138,13 @@ const Certificates = () => {
             {
               key: "scope",
               header: t("Périmètre"),
-              orderBy: (c) => c.certificate.scope ?? "-",
-              cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
+              orderBy: (c) =>
+                c.certificate.scope ? String(c.certificate.scope) : "-",
+              cell: (c) => (
+                <Cell
+                  text={c.certificate.scope ? String(c.certificate.scope) : "-"}
+                />
+              ),
             },
             {
               key: "expiration",
@@ -237,7 +242,7 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
               value={certificate}
               onChange={setCertificate}
               getOptions={(query) =>
-                api.getCertificates(query).then((res) => res.data.data ?? [])
+                api.getCertificates(query).then((res) => res.data ?? [])
               }
               normalize={normalizeCertificate}
             />
@@ -396,7 +401,7 @@ const CertificateUpdateDialog = ({
               value={certificate}
               onChange={setCertificate}
               getOptions={(query) =>
-                api.getCertificates(query).then((res) => res.data.data ?? [])
+                api.getCertificates(query).then((res) => res.data ?? [])
               }
               normalize={normalizeCertificate}
             />

@@ -51,6 +51,6 @@ def check_has_dechets_industriels(production_data):
     if production_data is None:
         return False
     for row in production_data:
-        if row["feedstock"]["code"] == "DECHETS_INDUSTRIELS":
+        if row["feedstock"]["code"] in ["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]:
             return True
     return False

@@ -1,56 +1,52 @@
 import api, { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
-import {
-  User,
-  Notification,
-  Entity,
-  Biofuel,
-  Feedstock,
-  Country,
-  Depot,
-  Certificate,
-  EntityType,
-  ProductionSiteDetails,
-  EntityCertificate,
-} from "./types"
+import { api as apiFetch } from "common/services/api-fetch"
+import { Notification, EntityType, EntityCertificate } from "./types"
 
 export function getUserSettings() {
-  return api.get<Api<User>>("/user")
+  return apiFetch.GET("/user/")
 }
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {
   return res.data.data ?? []
 }
 
-export function findFeedstocks(query: string, double_count_only?: boolean) {
-  return api
-    .get<Api<Feedstock[]>>("/resources/feedstocks", {
-      params: { query, double_count_only },
-    })
-    .then(extract)
+export async function findFeedstocks(
+  query: string,
+  double_count_only?: boolean
+) {
+  const res = await apiFetch.GET("/resources/feedstocks", {
+    params: { query: { query, double_count_only } },
+  })
+
+  return res.data ?? []
 }
 
-export function findBiofuels(query: string) {
-  return api
-    .get<Api<Biofuel[]>>("/resources/biofuels", { params: { query } })
-    .then(extract)
+export async function findBiofuels(query: string) {
+  const res = await apiFetch.GET("/resources/biofuels", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
 }
 
-export function findCountries(query: string) {
-  return api
-    .get<Api<Country[]>>("/resources/countries", { params: { query } })
-    .then(extract)
+export async function findCountries(query: string) {
+  const res = await apiFetch.GET("/resources/countries", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
 }
 
-export function findEntities(
+export async function findEntities(
   query?: string,
   filters?: { is_enabled?: boolean; entity_type?: EntityType[] }
 ) {
-  return api
-    .get<
-      Api<Entity[]>
-    >("/resources/entities", { params: { query, ...filters } })
-    .then(extract)
+  const res = await apiFetch.GET("/resources/entities", {
+    params: { query: { query, ...filters } },
+  })
+
+  return res.data ?? []
 }
 
 export function findEnabledEntities(query?: string) {
@@ -70,40 +66,44 @@ export function findBiofuelEntities(query?: string) {
 }
 
 export function findOperators(query?: string) {
-  return api
-    .get<Api<Entity[]>>("/resources/operators", { params: { query } })
-    .then(extract)
+  return findEntities(query, {
+    is_enabled: true,
+    entity_type: [EntityType.Operator],
+  })
 }
 
 export function findProducers(query?: string) {
-  return api
-    .get<Api<Entity[]>>("/resources/producers", { params: { query } })
-    .then(extract)
+  return findEntities(query, {
+    is_enabled: true,
+    entity_type: [EntityType.Producer],
+  })
 }
 
-export function findProductionSites(query?: string, producer_id?: number) {
-  return api
-    .get<Api<ProductionSiteDetails[]>>("/resources/production-sites", {
-      params: { query, producer_id },
-    })
-    .then(extract)
+export async function findProductionSites(
+  query?: string,
+  producer_id?: number
+) {
+  const res = await apiFetch.GET("/resources/production-sites", {
+    params: { query: { query, producer_id } },
+  })
+
+  return res.data ?? []
 }
 
-export function findDepots(query?: string, public_only?: boolean) {
-  return api
-    .get<Api<Depot[]>>("/resources/depots", {
-      params: { query, public_only },
-    })
-    .then(extract)
+export async function findDepots(query?: string, public_only?: boolean) {
+  const res = await apiFetch.GET("/resources/depots", {
+    params: { query: { query, public_only } },
+  })
+
+  return res.data ?? []
 }
 
-export function findCertificates(query: string) {
-  return api
-    .get<Api<Certificate[]>>("/resources/certificates", {
-      params: { query },
-    })
-    .then(extract)
-    .then((certificates) => certificates.map((c) => c.certificate_id))
+export async function findCertificates(query: string) {
+  const res = await apiFetch.GET("/resources/certificates", {
+    params: { query: { query } },
+  })
+
+  return res.data?.map((c) => c.certificate_id) ?? []
 }
 
 export function findMyCertificates(

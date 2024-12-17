@@ -1,6 +1,7 @@
 from certificates.models import DoubleCountingRegistration
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+from core.models import ExternalAdminRights
 from doublecount.models import (
     DoubleCountingApplication,
     DoubleCountingProduction,
@@ -13,7 +14,7 @@ class DoubleCountingApplicationApproveError:
     QUOTAS_NOT_APPROVED = "QUOTAS_NOT_APPROVED"
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def approve_dca(request, *args, **kwargs):
     dca_id = request.POST.get("dca_id", False)
     if not dca_id:

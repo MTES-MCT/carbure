@@ -34,6 +34,7 @@ class DoubleCountingApplication(models.Model):
     period_end = models.DateField(null=False, blank=False)
     certificate_id = models.CharField(max_length=16)  # FR_123456789_2020
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
+    download_link = models.CharField(max_length=512, default=None, null=True)
 
     def __str__(self):
         producer = self.producer.name if self.producer else ""

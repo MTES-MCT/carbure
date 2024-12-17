@@ -1,6 +1,7 @@
 import traceback
 
 from django import forms
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Q
 
@@ -8,7 +9,7 @@ from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Entity
+from core.models import Entity, ExternalAdminRights
 from doublecount.helpers import (
     load_dc_filepath,
     load_dc_period,
@@ -43,12 +44,12 @@ class DoubleCountingAddError:
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
 
 
-@check_admin_rights()
-@transaction.atomic
+@check_admin_rights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])
 def add_application(request):
     return add_application_by_type(request, Entity.ADMIN)
 
 
+@transaction.atomic
 def add_application_by_type(request, entity_type):
     form = DoubleCountingAdminAddFrom(request.POST)
     file = request.FILES.get("file")
@@ -136,6 +137,10 @@ def add_application_by_type(request, entity_type):
         agreement.application = dca
         agreement.save()
 
+    s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
+    dca.download_link = default_storage.url(s3_path)
+    dca.save()
+
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
     production_data, _ = load_dc_production_data(dca, production_max_rows, production_forecast_rows, requested_quota_rows)
@@ -149,6 +154,13 @@ def add_application_by_type(request, entity_type):
     for sourcing_history in sourcing_history_data:
         sourcing_history.save()
 
+    # 3 - Upload file to S3
+    try:
+        default_storage.save(s3_path, file)
+    except Exception:
+        traceback.print_exc()
+
+    # 4 - send emails
     try:
         send_dca_confirmation_email(dca, request)
     except Exception:

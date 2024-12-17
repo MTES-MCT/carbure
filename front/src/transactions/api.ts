@@ -1,4 +1,4 @@
-import { Entity } from "carbure/types"
+import { EntityPreview } from "carbure/types"
 import { api, Api, download } from "common/services/api"
 import { Option } from "common/utils/normalize"
 import {
@@ -128,7 +128,7 @@ export function acceptInStock(query: LotQuery, selection?: number[]) {
 export function acceptForTrading(
   query: LotQuery,
   selection: number[] | undefined,
-  client: Entity | string,
+  client: EntityPreview | string,
   certificate: string
 ) {
   const params =

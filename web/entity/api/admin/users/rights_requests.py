@@ -5,7 +5,9 @@ from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights, UserRightsRequests
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
+@check_admin_rights(
+    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.DOUBLE_COUNTING]
+)
 def get_rights_requests(request):
     q = request.GET.get("q", False)
     statuses = request.GET.getlist("statuses", False)

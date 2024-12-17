@@ -44,6 +44,13 @@ export const normalizeEntityOrUnknown: Normalizer<Entity | string> = (entity) =>
   else return normalizeEntity(entity)
 }
 
+export const normalizeEntityPreviewOrUnknown: Normalizer<
+  EntityPreview | string
+> = (entity) => {
+  if (isString(entity)) return { value: entity, label: entity }
+  else return normalizeEntityPreview(entity)
+}
+
 export const normalizeEntityPreview: Normalizer<EntityPreview> = (entity) => ({
   label: entity.name,
   value: {
@@ -52,6 +59,7 @@ export const normalizeEntityPreview: Normalizer<EntityPreview> = (entity) => ({
     entity_type: entity.entity_type,
   },
 })
+
 export const normalizeEntity: Normalizer<Entity> = (entity) => ({
   label: entity.name,
   value: {
@@ -72,6 +80,15 @@ export const normalizeEntity: Normalizer<Entity> = (entity) => ({
     sustainability_officer: entity.sustainability_officer,
     sustainability_officer_phone_number:
       entity.sustainability_officer_phone_number,
+    ext_admin_pages: entity.ext_admin_pages,
+    activity_description: entity.activity_description,
+    default_certificate: entity.default_certificate,
+    has_saf: entity.has_saf,
+    is_enabled: entity.is_enabled,
+    preferred_unit: entity.preferred_unit,
+    sustainability_officer_email: entity.sustainability_officer,
+    vat_number: entity.vat_number,
+    website: entity.website,
   },
 })
 
