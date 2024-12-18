@@ -282,12 +282,13 @@ class Biocarburant(models.Model):
 
 
 class MatierePremiere(models.Model):
-    CONV = "CONV"
-    IXA = "ANN-IX-A"
-    IXB = "ANN-IX-B"
-    TALLOL = "TALLOL"
+    CONV = "CONV"  # CONV
+    IXA = "ANN-IX-A"  # Av DC
+    IXB = "ANN-IX-B"  # HuHa DC
+    TALLOL = "TALLOL"  # Tall
     OTHER = "OTHER"
-    EP2AM = "EP2AM"
+    EP2AM = "EP2AM"  # EP2 résiduel
+    AM = "AM"  # AM résiduel
 
     MP_CATEGORIES = (
         (CONV, "Conventionnel"),
@@ -296,6 +297,7 @@ class MatierePremiere(models.Model):
         (TALLOL, "Tallol"),
         (OTHER, "Autre"),
         (EP2AM, "EP2AM"),
+        (AM, "AM"),
     )
 
     name = models.CharField(max_length=128)

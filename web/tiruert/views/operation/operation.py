@@ -26,6 +26,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
         return super().get_permissions()
 
+    def get_serializer(self, *args, **kwargs):
+        entity_id = self.request.GET.get("entity_id")
+        kwargs["context"] = self.get_serializer_context()
+        kwargs["context"]["entity_id"] = entity_id
+        return super().get_serializer(*args, **kwargs)
+
     def create(self, request):
         serializer = OperationInputSerializer(
             data=request.data,

@@ -30,6 +30,14 @@ class OperationOutputSerializer(serializers.ModelSerializer):
         ]
 
     sector = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, instance):
+        entity_id = self.context.get("entity_id")
+        if instance.credited_entity and instance.credited_entity.id == int(entity_id) and instance.type == Operation.CESSION:
+            return Operation.ACQUISITION
+        else:
+            return instance.type
 
     def get_sector(self, instance):
         if instance.biofuel.compatible_essence:
@@ -47,6 +55,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
         model = Operation
         fields = [
             "type",
+            "status",
             "customs_category",
             "biofuel",
             "credited_entity",
@@ -66,6 +75,17 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
     target_volume = serializers.FloatField()
     target_emission = serializers.FloatField()
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, instance):
+        if instance["type"] in [
+            Operation.INCORPORATION,
+            Operation.MAC_BIO,
+            Operation.LIVRAISON_DIRECTE,
+            Operation.TENEUR,
+            Operation.DEVALUATION,
+        ]:
+            return Operation.ACCEPTED
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -112,7 +132,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
                     {
                         "operation": operation,
                         "lot_id": lot_ids[idx],
-                        "energy": lot_volume,
+                        "volume": lot_volume,
                         "saved_ghg": emissions[idx] * lot_volume / volumes[idx],
                     }
                 )

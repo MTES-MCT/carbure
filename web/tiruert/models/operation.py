@@ -41,6 +41,15 @@ class Operation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     validity_date = models.DateField(null=False, blank=False)
 
+    @property
+    def sector(self):
+        if self.biofuel.compatible_essence:
+            return "ESSENCE"
+        elif self.biofuel.compatible_diesel:
+            return "DIESEL"
+        elif self.biofuel.code in models.Operation.SAF_BIOFUEL_TYPES:
+            return "SAF"
+
     class Meta:
         db_table = "tiruert_operations"
         verbose_name = "Opération"

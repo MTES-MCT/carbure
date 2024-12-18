@@ -8,7 +8,7 @@ class BalanceService:
     @staticmethod
     def calculate_balance(operations, entity_id, by_lot=False):
         # Group by customs_category and biofuel
-        # Sum energy and ghg: credit when entity is credited, debit when entity is debited
+        # Sum volume and ghg: credit when entity is credited, debit when entity is debited
         balance = defaultdict(lambda: {"volume": {"credit": 0, "debit": 0}, "ghg": {"credit": 0, "debit": 0}})
         for operation in operations:
             grouped_by = (operation.customs_category, operation.biofuel)
@@ -24,12 +24,12 @@ class BalanceService:
                 ghg_balance = balance[key]["ghg"]
 
                 if operation.is_credit(entity_id):
-                    # Add the energy of the detail to the volume balance
-                    volume_balance["credit"] += detail.energy
+                    # Add the volume of the detail to the volume balance
+                    volume_balance["credit"] += detail.volume
                     # Add the saved_ghg of the detail to the ghg balance
                     ghg_balance["credit"] += detail.saved_ghg
                 else:
-                    volume_balance["debit"] += detail.energy
+                    volume_balance["debit"] += detail.volume
                     ghg_balance["debit"] += detail.saved_ghg
 
         return balance
