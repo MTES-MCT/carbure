@@ -20,6 +20,7 @@ class BalanceSerializer(serializers.ModelSerializer):
     volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
     ghg = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
     pending = serializers.IntegerField()
+    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
 
     def get_sector(self, instance):
         if instance.get("biofuel").compatible_essence:
@@ -66,6 +67,7 @@ class BalanceByLotSerializer(serializers.ModelSerializer):
         ]
 
     lots = LotSerializer(many=True, required=False)
+    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
 
     @classmethod
     def transform_balance_data(cls, balance_dict, entity_id):

@@ -9,8 +9,6 @@ from tiruert.services.balance import BalanceService
 
 
 class OperationOutputSerializer(serializers.ModelSerializer):
-    details = OperationDetailSerializer(many=True, required=False)
-
     class Meta:
         model = Operation
         fields = [
@@ -28,8 +26,10 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "details",
         ]
 
+    details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
 
     def get_type(self, instance):
         entity_id = self.context.get("entity_id")
@@ -70,6 +70,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
     target_volume = serializers.FloatField()
     target_emission = serializers.FloatField()
     status = serializers.SerializerMethodField()
+    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
 
     def get_status(self, instance):
         if instance["type"] in [

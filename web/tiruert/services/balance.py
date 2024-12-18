@@ -3,14 +3,17 @@ from collections import defaultdict
 import numpy as np
 import scipy.optimize
 
+from tiruert.models import Operation
+
 
 class BalanceService:
     @staticmethod
     def calculate_balance(operations, entity_id, by_lot=False):
+        # Keep only PENDING and ACCEPTED operations
         # Group by customs_category and biofuel
         # Sum volume and ghg: credit when entity is credited, debit when entity is debited
         balance = defaultdict(lambda: {"volume": {"credit": 0, "debit": 0}, "ghg": {"credit": 0, "debit": 0}, "pending": 0})
-        for operation in operations:
+        for operation in operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED]):
             grouped_by = (operation.customs_category, operation.biofuel)
             for detail in operation.details.all():
                 key = grouped_by
@@ -32,7 +35,7 @@ class BalanceService:
                     volume_balance["debit"] += detail.volume
                     ghg_balance["debit"] += detail.saved_ghg
 
-            if operation.PENDING:
+            if not by_lot and operation.PENDING:
                 balance[grouped_by]["pending"] += 1
 
         return balance
