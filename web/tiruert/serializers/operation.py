@@ -2,7 +2,6 @@ import numpy as np
 from django.db import transaction
 from rest_framework import serializers
 
-from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
@@ -40,12 +39,7 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             return instance.type
 
     def get_sector(self, instance):
-        if instance.biofuel.compatible_essence:
-            return "ESSENCE"
-        elif instance.biofuel.compatible_diesel:
-            return "DIESEL"
-        elif instance.biofuel.code in SAF_BIOFUEL_TYPES:
-            return "SAF"
+        return instance.sector
 
 
 class OperationInputSerializer(serializers.ModelSerializer):

@@ -1,6 +1,7 @@
 from django.db import models, transaction
 
 from core.models import CarbureLot, MatierePremiere
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation_detail import OperationDetail
 
 
@@ -8,10 +9,12 @@ class Operation(models.Model):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
+    CANCELED = "CANCELED"
     OPERATION_STATUSES = (
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
         (REJECTED, REJECTED),
+        (CANCELED, CANCELED),
     )
 
     INCORPORATION = "INCORPORATION"
@@ -19,12 +22,17 @@ class Operation(models.Model):
     TENEUR = "TENEUR"
     LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE"
     MAC_BIO = "MAC_BIO"
+    ACQUISITION = "ACQUISITION"  # Only for display purposes
+    EXPORTATION = "EXPORTATION"
+    DEVALUATION = "DEVALUATION"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
         (TENEUR, TENEUR),
         (LIVRAISON_DIRECTE, LIVRAISON_DIRECTE),
         (MAC_BIO, MAC_BIO),
+        (EXPORTATION, EXPORTATION),
+        (DEVALUATION, DEVALUATION),
     )
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
@@ -47,7 +55,7 @@ class Operation(models.Model):
             return "ESSENCE"
         elif self.biofuel.compatible_diesel:
             return "DIESEL"
-        elif self.biofuel.code in models.Operation.SAF_BIOFUEL_TYPES:
+        elif self.biofuel.code in SAF_BIOFUEL_TYPES:
             return "SAF"
 
     class Meta:
