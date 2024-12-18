@@ -4,6 +4,8 @@ from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from drf_spectacular.utils import extend_schema_field
+from rest_framework.serializers import ChoiceField
 
 from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere
 from doublecount.models import DoubleCountingApplication
@@ -59,6 +61,7 @@ class DoubleCountingRegistration(models.Model):
         }
 
     @property
+    @extend_schema_field(ChoiceField(choices=AGREEMENT_STATUS))
     def status(self):
         ENDING_MONTH_DELAY = 6
         current_date = datetime.datetime.now().date()

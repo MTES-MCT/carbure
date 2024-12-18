@@ -148,6 +148,262 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/agreements/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/agreements/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/agreements/agreement-admin/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_agreement_admin_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/agreements/agreement-public/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_agreement_public_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/agreements/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/update-approved-quotas/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_update_approved_quotas_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/add/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_add_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/approve/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_approve_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/check-admin-files/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_check_admin_files_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/check-file/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_check_file_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/export-application/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_export_application_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/list-admin/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_list_admin_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/reject/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_reject_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/snapshot/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_snapshot_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/entities/{id}/enable/": {
     parameters: {
       query?: never
@@ -616,7 +872,7 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
-    ActivateAccount: {
+    ActivateAccountRequest: {
       uidb64: string
       token: string
       invite?: number
@@ -624,6 +880,25 @@ export interface components {
     ActivateResponse: {
       message: string
       token?: string
+    }
+    AgreementLists: {
+      active: components["schemas"]["DoubleCountingRegistration"][]
+      incoming: components["schemas"]["DoubleCountingRegistration"][]
+      expired: components["schemas"]["DoubleCountingRegistration"][]
+    }
+    ApplicationListe: {
+      rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
+      pending: components["schemas"]["DoubleCountingApplicationPartial"][]
+    }
+    ApplicationSnapshot: {
+      applications_pending: number
+      applications_rejected: number
+      agreements_incoming: number
+      agreements_active: number
+      agreements_expired: number
+    }
+    ApprouveDoubleCountingRequest: {
+      dca_id: number
     }
     Biofuel: {
       name: string
@@ -728,7 +1003,15 @@ export interface components {
      * @enum {string}
      */
     CertificateTypeEnum: CertificateTypeEnum
-    Comment: {
+    CheckAdminFileRequest: {
+      files: string[]
+    }
+    CheckFileResponse: {
+      file: components["schemas"]["File"]
+      /** Format: date-time */
+      checked_at: string
+    }
+    CommentRequest: {
       comment?: string
     }
     /**
@@ -785,7 +1068,189 @@ export interface components {
        */
       useful_temperature?: number | null
     }
+    DoubleCountingAdminAddRequest: {
+      certificate_id?: string
+      entity_id: number
+      producer_id: number
+      production_site_id: number
+      /** @default false */
+      should_replace: boolean
+      /** Format: binary */
+      file: string
+    }
+    /**
+     * @description * `ACTIVE` - ACTIVE
+     *     * `EXPIRED` - EXPIRED
+     *     * `EXPIRES_SOON` - EXPIRES_SOON
+     *     * `INCOMING` - INCOMING
+     * @enum {string}
+     */
+    DoubleCountingAgreementStatus: DoubleCountingAgreementStatus
+    DoubleCountingApplication: {
+      readonly id: number
+      /** Format: date-time */
+      readonly created_at: string
+      readonly producer: components["schemas"]["Entity"]
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      readonly producer_user: string
+      readonly production_site: components["schemas"]["DoubleCountingProductionSite"]
+      /** Format: date */
+      period_start: string
+      /** Format: date */
+      period_end: string
+      status?: components["schemas"]["DoubleCountingStatus"]
+      readonly sourcing: components["schemas"]["DoubleCountingSourcing"][]
+      readonly production: components["schemas"]["DoubleCountingProduction"][]
+      readonly documents: components["schemas"]["DoubleCountingDocFile"][]
+    }
+    DoubleCountingApplicationPartial: {
+      readonly id: number
+      /** Format: date-time */
+      readonly created_at: string
+      readonly producer: components["schemas"]["EntitySummary"]
+      readonly production_site: components["schemas"]["DoubleCountingProductionSite"]
+      /** Format: date */
+      period_start: string
+      /** Format: date */
+      period_end: string
+      readonly status: components["schemas"]["DoubleCountingStatus"]
+      certificate_id: string
+      readonly agreement_id: number
+      /** Format: double */
+      readonly quotas_progression: number
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      readonly producer_user: string
+    }
+    DoubleCountingDocFile: {
+      readonly id: number
+      file_name?: string
+      file_type?: components["schemas"]["FileTypeEnum"]
+    }
+    DoubleCountingProduction: {
+      readonly id: number
+      readonly year: number
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly max_production_capacity: number
+      readonly estimated_production: number
+      readonly requested_quota: number
+      readonly approved_quota: number
+    }
+    DoubleCountingProductionHistory: {
+      readonly id: number
+      readonly year: number
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly max_production_capacity: number
+      readonly effective_production: number
+    }
+    DoubleCountingProductionSite: {
+      readonly id: number
+      readonly producer: components["schemas"]["Entity"]
+      name: string
+      readonly country: components["schemas"]["Country"]
+      /** Format: date */
+      date_mise_en_service?: string | null
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      eligible_dc?: boolean
+      dc_reference?: string
+      site_siret?: string
+      address?: string
+      city?: string
+      postal_code?: string
+      gps_coordinates?: string | null
+      manager_name?: string
+      manager_phone?: string
+      manager_email?: string
+      readonly inputs: components["schemas"]["FeedStock"][]
+      readonly outputs: components["schemas"]["Biofuel"][]
+      readonly certificates: components["schemas"]["ProductionSiteCertificate"][]
+    }
+    DoubleCountingQuota: {
+      approved_quota: number
+      biofuel: components["schemas"]["Biofuel"]
+      feedstock: components["schemas"]["FeedStock"]
+      id: number
+      lot_count: number
+      production_tonnes: number
+      quotas_progression: number
+      requested_quota: number
+      year: number
+    }
+    DoubleCountingRegistration: {
+      readonly id: number
+      certificate_id: string
+      /** Format: date */
+      valid_from: string
+      readonly producer: components["schemas"]["EntitySummary"]
+      production_site: components["schemas"]["DoubleCountingProductionSite"]
+      /** Format: date */
+      valid_until: string
+      readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
+      /** Format: double */
+      readonly quotas_progression: number
+    }
+    DoubleCountingRegistrationDetails: {
+      readonly id: number
+      certificate_id: string
+      /** Format: date */
+      valid_from: string
+      /** Format: date */
+      valid_until: string
+      readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
+      readonly producer: string
+      readonly production_site: string
+      application: components["schemas"]["DoubleCountingApplication"]
+      readonly quotas: components["schemas"]["DoubleCountingQuota"][]
+    }
+    DoubleCountingRegistrationPublic: {
+      readonly production_site: components["schemas"]["FieldData"]
+      certificate_id: string
+      /** Format: date */
+      valid_from: string
+      /** Format: date */
+      valid_until: string
+      readonly biofuel_list: string
+    }
+    DoubleCountingSourcing: {
+      readonly id: number
+      readonly year: number
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly origin_country: components["schemas"]["Country"]
+      readonly supply_country: components["schemas"]["Country"]
+      readonly transit_country: components["schemas"]["Country"]
+      readonly metric_tonnes: number
+    }
+    DoubleCountingSourcingHistory: {
+      readonly id: number
+      year: number
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly origin_country: components["schemas"]["Country"]
+      readonly supply_country: components["schemas"]["Country"]
+      readonly transit_country: components["schemas"]["Country"]
+      metric_tonnes: number
+      raw_material_supplier?: string
+      supplier_certificate_name?: string
+      supplier_certificate?: number | null
+    }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `INPROGRESS` - INPROGRESS
+     *     * `REJECTED` - REJECTED
+     *     * `ACCEPTED` - ACCEPTED
+     * @enum {string}
+     */
+    DoubleCountingStatus: DoubleCountingStatus
     EmptyResponse: {
+      empty?: string
+    }
+    EmptyResponseRequest: {
       empty?: string
     }
     Entity: {
@@ -817,8 +1282,8 @@ export interface components {
     }
     EntitySummary: {
       readonly id: number
-      name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
+      readonly name: string
+      readonly entity_type: components["schemas"]["EntityTypeEnum"]
     }
     /**
      * @description * `Producteur` - Producteur
@@ -853,6 +1318,49 @@ export interface components {
       category?: components["schemas"]["CategoryEnum"]
       is_double_compte?: boolean
     }
+    FieldData: {
+      name: string
+      city: string
+      address: string
+      postal_code: string
+      country: string
+    }
+    File: {
+      file_name: string
+      errors: components["schemas"]["FileErrors"]
+      error_count: number
+      start_year: number
+      production_site: string
+      /** Format: email */
+      producer_email: string
+      production: components["schemas"]["DoubleCountingProduction"][]
+      sourcing: components["schemas"]["DoubleCountingSourcing"][]
+      sourcing_history: components["schemas"]["DoubleCountingSourcingHistory"][]
+      production_history: components["schemas"]["DoubleCountingProductionHistory"][]
+      readonly has_dechets_industriels: boolean
+    }
+    FileError: {
+      error: string
+      is_blocking: boolean
+      line_number: number
+      line_merged: string
+      meta: {
+        [key: string]: unknown
+      }
+    }
+    FileErrors: {
+      sourcing_forecast: components["schemas"]["FileError"][]
+      sourcing_history: components["schemas"]["FileError"][]
+      production: components["schemas"]["FileError"][]
+      production_history: components["schemas"]["FileError"][]
+      global_errors: components["schemas"]["FileError"][]
+    }
+    /**
+     * @description * `SOURCING` - SOURCING
+     *     * `DECISION` - DECISION
+     * @enum {string}
+     */
+    FileTypeEnum: FileTypeEnum
     GenericCertificate: {
       certificate_id: string
       certificate_type: components["schemas"]["CertificateTypeEnum"]
@@ -962,15 +1470,33 @@ export interface components {
       manager_phone?: string
       manager_email?: string
     }
-    RequestAccess: {
+    ProductionSiteCertificate: {
+      certificate_id: string
+      certificate_type: components["schemas"]["CertificateTypeEnum"]
+      certificate_holder: string
+      certificate_issuer?: string | null
+      address?: string | null
+      /** Format: date */
+      valid_from: string
+      /** Format: date */
+      valid_until: string
+      download_link?: string | null
+      scope?: unknown
+      input?: unknown
+      output?: unknown
+    }
+    RejectDoubleCountingRequest: {
+      dca_id: number
+    }
+    RequestAccessRequest: {
       comment?: string
       role: string
       entity_id: number
     }
-    RequestPasswordReset: {
+    RequestPasswordResetRequest: {
       username: string
     }
-    ResetPassword: {
+    ResetPasswordRequest: {
       uidb64: string
       token: string
       /** Mot de passe */
@@ -978,10 +1504,13 @@ export interface components {
       /** Confirmation du mot de passe */
       password2: string
     }
+    Response: {
+      status: string
+    }
     ResponseSuccess: {
       status: string
     }
-    RevokeAccess: {
+    RevokeAccessRequest: {
       entity_id: number
     }
     /**
@@ -1100,6 +1629,15 @@ export interface components {
       free_field?: string | null
       assignment_period: number
     }
+    SafTicketSourceAssignmentRequest: {
+      client_id: number
+      /** Format: double */
+      volume: number
+      agreement_reference?: string
+      agreement_date?: string
+      free_field?: string | null
+      assignment_period: number
+    }
     SafTicketSourceDetails: {
       readonly id: number
       carbure_id?: string | null
@@ -1146,7 +1684,7 @@ export interface components {
       ghg_total?: number
       parent_lot: components["schemas"]["CarbureLotPublic"]
     }
-    SafTicketSourceGroupAssignment: {
+    SafTicketSourceGroupAssignmentRequest: {
       client_id: number
       /** Format: double */
       volume: number
@@ -1192,9 +1730,23 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
+    UpdatedQuotasRequest: {
+      approved_quotas: number[][]
+    }
     /** @description Serializer for creating new users. Includes required fields
      *     and repeated password validation. */
     UserCreation: {
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      email: string
+      /** Nom */
+      name: string
+    }
+    /** @description Serializer for creating new users. Includes required fields
+     *     and repeated password validation. */
+    UserCreationRequest: {
       /**
        * Adresse électronique
        * Format: email
@@ -1235,12 +1787,12 @@ export interface components {
       readonly vat_number: string
       readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
     }
-    UserLogin: {
+    UserLoginRequest: {
       username: string
       password: string
     }
     /** @description A serializer for re-sending the user activation email. Includes email field only. */
-    UserResendActivationLink: {
+    UserResendActivationLinkRequest: {
       /**
        * Courriel
        * Format: email
@@ -1283,7 +1835,7 @@ export interface components {
       requests: components["schemas"]["UserRightsRequests"][]
     }
     /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
-    VerifyOTP: {
+    VerifyOTPRequest: {
       /** Entrez le code à 6 chiffres reçu par email */
       otp_token: string
     }
@@ -1312,9 +1864,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ActivateAccount"]
-        "application/x-www-form-urlencoded": components["schemas"]["ActivateAccount"]
-        "multipart/form-data": components["schemas"]["ActivateAccount"]
+        "application/json": components["schemas"]["ActivateAccountRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ActivateAccountRequest"]
+        "multipart/form-data": components["schemas"]["ActivateAccountRequest"]
       }
     }
     responses: {
@@ -1346,9 +1898,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UserLogin"]
-        "application/x-www-form-urlencoded": components["schemas"]["UserLogin"]
-        "multipart/form-data": components["schemas"]["UserLogin"]
+        "application/json": components["schemas"]["UserLoginRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UserLoginRequest"]
+        "multipart/form-data": components["schemas"]["UserLoginRequest"]
       }
     }
     responses: {
@@ -1401,9 +1953,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UserCreation"]
-        "application/x-www-form-urlencoded": components["schemas"]["UserCreation"]
-        "multipart/form-data": components["schemas"]["UserCreation"]
+        "application/json": components["schemas"]["UserCreationRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UserCreationRequest"]
+        "multipart/form-data": components["schemas"]["UserCreationRequest"]
       }
     }
     responses: {
@@ -1426,9 +1978,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UserResendActivationLink"]
-        "application/x-www-form-urlencoded": components["schemas"]["UserResendActivationLink"]
-        "multipart/form-data": components["schemas"]["UserResendActivationLink"]
+        "application/json": components["schemas"]["UserResendActivationLinkRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UserResendActivationLinkRequest"]
+        "multipart/form-data": components["schemas"]["UserResendActivationLinkRequest"]
       }
     }
     responses: {
@@ -1470,9 +2022,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RequestPasswordReset"]
-        "application/x-www-form-urlencoded": components["schemas"]["RequestPasswordReset"]
-        "multipart/form-data": components["schemas"]["RequestPasswordReset"]
+        "application/json": components["schemas"]["RequestPasswordResetRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RequestPasswordResetRequest"]
+        "multipart/form-data": components["schemas"]["RequestPasswordResetRequest"]
       }
     }
     responses: {
@@ -1495,9 +2047,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ResetPassword"]
-        "application/x-www-form-urlencoded": components["schemas"]["ResetPassword"]
-        "multipart/form-data": components["schemas"]["ResetPassword"]
+        "application/json": components["schemas"]["ResetPasswordRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ResetPasswordRequest"]
+        "multipart/form-data": components["schemas"]["ResetPasswordRequest"]
       }
     }
     responses: {
@@ -1520,9 +2072,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["VerifyOTP"]
-        "application/x-www-form-urlencoded": components["schemas"]["VerifyOTP"]
-        "multipart/form-data": components["schemas"]["VerifyOTP"]
+        "application/json": components["schemas"]["VerifyOTPRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["VerifyOTPRequest"]
+        "multipart/form-data": components["schemas"]["VerifyOTPRequest"]
       }
     }
     responses: {
@@ -1532,6 +2084,463 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
+  double_counting_agreements_list: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Year */
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DoubleCountingApplicationPartial"][]
+        }
+      }
+    }
+  }
+  double_counting_agreements_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DoubleCountingRegistrationDetails"]
+        }
+      }
+    }
+  }
+  double_counting_agreements_agreement_admin_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Year */
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AgreementLists"]
+        }
+      }
+    }
+  }
+  double_counting_agreements_agreement_public_list: {
+    parameters: {
+      query?: {
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DoubleCountingRegistrationPublic"][]
+        }
+      }
+    }
+  }
+  double_counting_agreements_export_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Year */
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
+      }
+    }
+  }
+  double_counting_applications_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DoubleCountingApplication"]
+        }
+      }
+    }
+  }
+  double_counting_applications_export_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/force-download": string
+        }
+      }
+    }
+  }
+  double_counting_applications_update_approved_quotas_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdatedQuotasRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdatedQuotasRequest"]
+        "multipart/form-data": components["schemas"]["UpdatedQuotasRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_applications_add_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DoubleCountingAdminAddRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["DoubleCountingAdminAddRequest"]
+        "multipart/form-data": components["schemas"]["DoubleCountingAdminAddRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_applications_approve_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApprouveDoubleCountingRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApprouveDoubleCountingRequest"]
+        "multipart/form-data": components["schemas"]["ApprouveDoubleCountingRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_applications_check_admin_files_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CheckAdminFileRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["CheckAdminFileRequest"]
+        "multipart/form-data": components["schemas"]["CheckAdminFileRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CheckFileResponse"][]
+        }
+      }
+    }
+  }
+  double_counting_applications_check_file_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "multipart/form-data": {
+          /** Format: binary */
+          file?: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CheckFileResponse"]
+        }
+      }
+    }
+  }
+  double_counting_applications_export_application_retrieve: {
+    parameters: {
+      query: {
+        /** @description Doublecount application ID */
+        dca_id: number
+        /** @description Dechet industriel */
+        di?: string
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string
+        }
+      }
+    }
+  }
+  double_counting_applications_list_admin_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApplicationListe"]
+        }
+      }
+    }
+  }
+  double_counting_applications_reject_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RejectDoubleCountingRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RejectDoubleCountingRequest"]
+        "multipart/form-data": components["schemas"]["RejectDoubleCountingRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_snapshot_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApplicationSnapshot"]
         }
       }
     }
@@ -1551,9 +2560,9 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["EmptyResponse"]
-        "application/x-www-form-urlencoded": components["schemas"]["EmptyResponse"]
-        "multipart/form-data": components["schemas"]["EmptyResponse"]
+        "application/json": components["schemas"]["EmptyResponseRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["EmptyResponseRequest"]
+        "multipart/form-data": components["schemas"]["EmptyResponseRequest"]
       }
     }
     responses: {
@@ -1927,9 +2936,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SafTicketSourceAssignment"]
-        "application/x-www-form-urlencoded": components["schemas"]["SafTicketSourceAssignment"]
-        "multipart/form-data": components["schemas"]["SafTicketSourceAssignment"]
+        "application/json": components["schemas"]["SafTicketSourceAssignmentRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["SafTicketSourceAssignmentRequest"]
+        "multipart/form-data": components["schemas"]["SafTicketSourceAssignmentRequest"]
       }
     }
     responses: {
@@ -2065,9 +3074,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SafTicketSourceGroupAssignment"]
-        "application/x-www-form-urlencoded": components["schemas"]["SafTicketSourceGroupAssignment"]
-        "multipart/form-data": components["schemas"]["SafTicketSourceGroupAssignment"]
+        "application/json": components["schemas"]["SafTicketSourceGroupAssignmentRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["SafTicketSourceGroupAssignmentRequest"]
+        "multipart/form-data": components["schemas"]["SafTicketSourceGroupAssignmentRequest"]
       }
     }
     responses: {
@@ -2192,9 +3201,9 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["Comment"]
-        "application/x-www-form-urlencoded": components["schemas"]["Comment"]
-        "multipart/form-data": components["schemas"]["Comment"]
+        "application/json": components["schemas"]["CommentRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["CommentRequest"]
+        "multipart/form-data": components["schemas"]["CommentRequest"]
       }
     }
     responses: {
@@ -2231,9 +3240,9 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["Comment"]
-        "application/x-www-form-urlencoded": components["schemas"]["Comment"]
-        "multipart/form-data": components["schemas"]["Comment"]
+        "application/json": components["schemas"]["CommentRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["CommentRequest"]
+        "multipart/form-data": components["schemas"]["CommentRequest"]
       }
     }
     responses: {
@@ -2295,9 +3304,9 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["Comment"]
-        "application/x-www-form-urlencoded": components["schemas"]["Comment"]
-        "multipart/form-data": components["schemas"]["Comment"]
+        "application/json": components["schemas"]["CommentRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["CommentRequest"]
+        "multipart/form-data": components["schemas"]["CommentRequest"]
       }
     }
     responses: {
@@ -2497,9 +3506,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RequestAccess"]
-        "application/x-www-form-urlencoded": components["schemas"]["RequestAccess"]
-        "multipart/form-data": components["schemas"]["RequestAccess"]
+        "application/json": components["schemas"]["RequestAccessRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RequestAccessRequest"]
+        "multipart/form-data": components["schemas"]["RequestAccessRequest"]
       }
     }
     responses: {
@@ -2522,9 +3531,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RevokeAccess"]
-        "application/x-www-form-urlencoded": components["schemas"]["RevokeAccess"]
-        "multipart/form-data": components["schemas"]["RevokeAccess"]
+        "application/json": components["schemas"]["RevokeAccessRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RevokeAccessRequest"]
+        "multipart/form-data": components["schemas"]["RevokeAccessRequest"]
       }
     }
     responses: {
@@ -2538,6 +3547,12 @@ export interface operations {
       }
     }
   }
+}
+export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
+  ValueMinusproduction_site = "-production_site",
+  ValueMinusvalid_until = "-valid_until",
+  production_site = "production_site",
+  valid_until = "valid_until",
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
   ValueMinusfeedstock = "-feedstock",
@@ -2604,6 +3619,18 @@ export enum DeliveryTypeEnum {
   FLUSHED = "FLUSHED",
   CONSUMPTION = "CONSUMPTION",
 }
+export enum DoubleCountingAgreementStatus {
+  ACTIVE = "ACTIVE",
+  EXPIRED = "EXPIRED",
+  EXPIRES_SOON = "EXPIRES_SOON",
+  INCOMING = "INCOMING",
+}
+export enum DoubleCountingStatus {
+  PENDING = "PENDING",
+  INPROGRESS = "INPROGRESS",
+  REJECTED = "REJECTED",
+  ACCEPTED = "ACCEPTED",
+}
 export enum EntityTypeEnum {
   Producer = "Producteur",
   Operator = "Op\u00E9rateur",
@@ -2622,6 +3649,10 @@ export enum ExtAdminPagesEnum {
   TIRIB = "TIRIB",
   AIRLINE = "AIRLINE",
   ELEC = "ELEC",
+}
+export enum FileTypeEnum {
+  SOURCING = "SOURCING",
+  DECISION = "DECISION",
 }
 export enum GesOptionEnum {
   Default = "Default",

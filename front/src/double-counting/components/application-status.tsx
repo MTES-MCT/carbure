@@ -1,15 +1,18 @@
 import Tag, { TagVariant } from "common/components/tag"
 import { useTranslation } from "react-i18next"
-import { DoubleCountingStatus as DCStatus } from "double-counting/types"
+import {
+  DoubleCountingStatus as DCStatus,
+  DoubleCountingExtendedStatus as DCStatusExt,
+} from "double-counting/types"
 
-const statusToVariant: Record<DCStatus, TagVariant> = {
-  [DCStatus.Accepted]: "success",
-  [DCStatus.InProgress]: "info",
-  [DCStatus.Pending]: "info",
-  [DCStatus.Rejected]: "danger",
-  [DCStatus.Expired]: "none",
-  [DCStatus.ExpiresSoon]: "warning",
-  [DCStatus.Incoming]: "success",
+const statusToVariant: Record<DCStatusExt, TagVariant> = {
+  [DCStatusExt.ACCEPTED]: "success",
+  [DCStatusExt.INPROGRESS]: "info",
+  [DCStatusExt.PENDING]: "info",
+  [DCStatusExt.REJECTED]: "danger",
+  [DCStatusExt.EXPIRED]: "none",
+  [DCStatusExt.EXPIRES_SOON]: "warning",
+  [DCStatusExt.INCOMING]: "success",
 }
 
 const ApplicationStatus = ({
@@ -23,20 +26,22 @@ const ApplicationStatus = ({
 }) => {
   const { t } = useTranslation()
 
+  let extStatus = status as unknown as DCStatusExt
+
   const statusLabels = {
-    [DCStatus.Pending]: t("En attente"),
-    [DCStatus.InProgress]: t("En attente"),
-    [DCStatus.Accepted]: t("Acceptée"),
-    [DCStatus.Rejected]: t("Refusée"),
-    [DCStatus.Expired]: t("Expirée"),
-    [DCStatus.ExpiresSoon]: t("À renouveller"),
-    [DCStatus.Incoming]: t("À venir"),
+    [DCStatusExt.PENDING]: t("En attente"),
+    [DCStatusExt.INPROGRESS]: t("En attente"),
+    [DCStatusExt.ACCEPTED]: t("Acceptée"),
+    [DCStatusExt.REJECTED]: t("Refusée"),
+    [DCStatusExt.EXPIRED]: t("Expirée"),
+    [DCStatusExt.EXPIRES_SOON]: t("À renouveller"),
+    [DCStatusExt.INCOMING]: t("À venir"),
   }
 
-  if (expirationDate && status !== DCStatus.Rejected) {
+  if (expirationDate && extStatus !== DCStatusExt.REJECTED) {
     const expirationDateFormated = new Date(expirationDate)
     if (expirationDateFormated < new Date()) {
-      status = DCStatus.Expired
+      extStatus = DCStatusExt.EXPIRED
     } else {
       const ENDING_MONTH_DELAY = 6
       const expires_soon_date = new Date(expirationDate)
@@ -44,17 +49,17 @@ const ApplicationStatus = ({
         expires_soon_date.getMonth() - ENDING_MONTH_DELAY
       )
       if (expires_soon_date < new Date()) {
-        status = DCStatus.ExpiresSoon
+        extStatus = DCStatusExt.EXPIRES_SOON
       }
-      //  else if (status === DCStatus.Accepted) {
-      //   status = DCStatus.Incoming
+      //  else if (extStatus === DCStatus.Accepted) {
+      //   extStatus = DCStatus.Incoming
       // }
     }
   }
 
   return (
-    <Tag big={big} variant={statusToVariant[status]}>
-      {statusLabels[status]}
+    <Tag big={big} variant={statusToVariant[extStatus]}>
+      {statusLabels[extStatus]}
     </Tag>
   )
 }

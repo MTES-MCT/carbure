@@ -24,6 +24,8 @@ def parse_dc_excel(
     List[ProductionForecastRow],
     List[RequestedQuotaRow],
     List[SourcingHistoryRow],
+    List[ProductionMaxRow],
+    List[ProductionForecastRow],
 ]:
     excel_file = load_workbook(filename, data_only=True)
 
@@ -38,9 +40,17 @@ def parse_dc_excel(
 
     # tracability = parse_traceability(excel_file)
     sourcing_forecast_rows = parse_sourcing_forecast(excel_file, start_year=start_year)
-    production_max_rows = parse_production_max(excel_file, start_year=start_year)
-    production_forecast_rows = parse_production_forecast(excel_file, start_year=start_year)
+    production_max_rows = parse_production_max(excel_file, start_year=0)  # start_year=0 to get all production max rows
+    production_forecast_rows = parse_production_forecast(excel_file, start_year=0)  # =0 to get all production rows
     sourcing_history_rows = parse_sourcing_history(excel_file, start_year=start_year)
+
+    # Keep rows with year < start_year (history)
+    production_max_history_rows = [row for row in production_max_rows if row["year"] < start_year]
+    production_effective_history_rows = [row for row in production_forecast_rows if row["year"] < start_year]
+
+    # Keep rows with year >= start_year
+    production_max_rows = [row for row in production_max_rows if row["year"] >= start_year]
+    production_forecast_rows = [row for row in production_forecast_rows if row["year"] >= start_year]
 
     info["start_year"] = start_year
     return (
@@ -50,4 +60,6 @@ def parse_dc_excel(
         production_forecast_rows,
         requested_quota_rows,
         sourcing_history_rows,
+        production_max_history_rows,
+        production_effective_history_rows,
     )

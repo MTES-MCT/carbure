@@ -38,16 +38,13 @@ class EntityViewSet(ViewSet):
         responses=EmptyResponseSerializer,
     )
     @permission_classes(
-        [
-            IsAuthenticated,
-            HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC]),
-        ]
+        [IsAuthenticated, HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])]
     )
     @action(
         methods=["post"],
         detail=True,
         url_path="enable",
-        url_name="admin-enable",
+        url_name="enable",
     )
     def enable_entity(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")

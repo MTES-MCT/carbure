@@ -3,10 +3,10 @@ import { AgreementStatus } from "../../../double-counting/types"
 import Tag, { TagVariant } from "common/components/tag"
 
 const statusToVariant: Record<AgreementStatus, TagVariant> = {
-  [AgreementStatus.Active]: "info",
-  [AgreementStatus.ExpiresSoon]: "warning",
-  [AgreementStatus.Expired]: "none",
-  [AgreementStatus.Incoming]: "success",
+  [AgreementStatus.ACTIVE]: "info",
+  [AgreementStatus.EXPIRES_SOON]: "warning",
+  [AgreementStatus.EXPIRED]: "none",
+  [AgreementStatus.INCOMING]: "success",
 }
 
 const AgreementStatusTag = ({
@@ -19,10 +19,10 @@ const AgreementStatusTag = ({
   const { t } = useTranslation()
 
   const statusLabels = {
-    [AgreementStatus.Active]: t("En cours"),
-    [AgreementStatus.ExpiresSoon]: t("À renouveler"),
-    [AgreementStatus.Expired]: t("Expiré"),
-    [AgreementStatus.Incoming]: t("À venir"),
+    [AgreementStatus.ACTIVE]: t("En cours"),
+    [AgreementStatus.EXPIRES_SOON]: t("À renouveler"),
+    [AgreementStatus.EXPIRED]: t("Expiré"),
+    [AgreementStatus.INCOMING]: t("À venir"),
   }
 
   return (

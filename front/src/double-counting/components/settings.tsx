@@ -31,7 +31,7 @@ const DoubleCountingSettings = () => {
     params: [entity.id],
   })
 
-  const applications = applicationsData.result?.data.data ?? []
+  const applications = applicationsData.result?.data ?? []
   const isEmpty = applications.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
@@ -39,9 +39,11 @@ const DoubleCountingSettings = () => {
     application: DoubleCountingApplicationOverview
   ) {
     if (
-      [DoubleCountingStatus.Pending, DoubleCountingStatus.Rejected].includes(
-        application.status
-      )
+      [
+        DoubleCountingStatus.PENDING,
+        DoubleCountingStatus.INPROGRESS,
+        DoubleCountingStatus.REJECTED,
+      ].includes(application.status)
     ) {
       navigate({
         pathname: location.pathname,
@@ -103,7 +105,7 @@ const DoubleCountingSettings = () => {
             },
             {
               header: t("Site de production"),
-              cell: (dc) => <Cell text={dc.production_site} />,
+              cell: (dc) => <Cell text={dc.production_site.name} />,
             },
             {
               header: t("Période de validité"),
@@ -117,11 +119,11 @@ const DoubleCountingSettings = () => {
               header: t("N° d'agrément"),
               cell: (dc) => (
                 <span>
-                  {dc.status === DoubleCountingStatus.Rejected && <>-</>}
-                  {dc.status === DoubleCountingStatus.Pending &&
+                  {dc.status === DoubleCountingStatus.REJECTED && <>-</>}
+                  {dc.status === DoubleCountingStatus.PENDING &&
                     t("En cours de traitement...")}
 
-                  {dc.status === DoubleCountingStatus.Accepted && (
+                  {dc.status === DoubleCountingStatus.ACCEPTED && (
                     <>{dc.certificate_id}</>
                   )}
                 </span>
