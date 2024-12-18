@@ -4,6 +4,150 @@
  */
 
 export interface paths {
+  "/api/auth/activate/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_activate_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/login/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_login_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/logout/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["auth_logout_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/register/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_register_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-activation-link/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_request_activation_link_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-otp/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["auth_request_otp_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-password-reset/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_request_password_reset_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/reset-password/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_reset_password_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/verify-otp/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_verify_otp_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/entities/{id}/enable/": {
     parameters: {
       query?: never
@@ -472,6 +616,15 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    ActivateAccount: {
+      uidb64: string
+      token: string
+      invite?: number
+    }
+    ActivateResponse: {
+      message: string
+      token?: string
+    }
     Biofuel: {
       name: string
       name_en: string
@@ -735,6 +888,9 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    OtpResponse: {
+      valid_until: string
+    }
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -810,6 +966,17 @@ export interface components {
       comment?: string
       role: string
       entity_id: number
+    }
+    RequestPasswordReset: {
+      username: string
+    }
+    ResetPassword: {
+      uidb64: string
+      token: string
+      /** Mot de passe */
+      password1: string
+      /** Confirmation du mot de passe */
+      password2: string
     }
     ResponseSuccess: {
       status: string
@@ -1025,6 +1192,21 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
+    /** @description Serializer for creating new users. Includes required fields
+     *     and repeated password validation. */
+    UserCreation: {
+      /**
+       * Adresse électronique
+       * Format: email
+       */
+      email: string
+      /** Nom */
+      name: string
+      /** Mot de passe */
+      password1: string
+      /** Confirmation du mot de passe */
+      password2: string
+    }
     UserEntity: {
       readonly id: number
       readonly name: string
@@ -1052,6 +1234,18 @@ export interface components {
       readonly website: string
       readonly vat_number: string
       readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
+    }
+    UserLogin: {
+      username: string
+      password: string
+    }
+    /** @description A serializer for re-sending the user activation email. Includes email field only. */
+    UserResendActivationLink: {
+      /**
+       * Courriel
+       * Format: email
+       */
+      email: string
     }
     UserRights: {
       readonly name: string
@@ -1088,6 +1282,11 @@ export interface components {
       rights: components["schemas"]["UserRights"][]
       requests: components["schemas"]["UserRightsRequests"][]
     }
+    /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
+    VerifyOTP: {
+      /** Entrez le code à 6 chiffres reçu par email */
+      otp_token: string
+    }
     /**
      * @description * `PENDING` - En attente
      *     * `ACCEPTED` - Accepté
@@ -1104,6 +1303,239 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  auth_activate_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ActivateAccount"]
+        "application/x-www-form-urlencoded": components["schemas"]["ActivateAccount"]
+        "multipart/form-data": components["schemas"]["ActivateAccount"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ActivateResponse"]
+        }
+      }
+      /** @description Bad request - missing fields. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  auth_login_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserLogin"]
+        "application/x-www-form-urlencoded": components["schemas"]["UserLogin"]
+        "multipart/form-data": components["schemas"]["UserLogin"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request - missing fields. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  auth_logout_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  auth_register_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserCreation"]
+        "application/x-www-form-urlencoded": components["schemas"]["UserCreation"]
+        "multipart/form-data": components["schemas"]["UserCreation"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
+  auth_request_activation_link_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserResendActivationLink"]
+        "application/x-www-form-urlencoded": components["schemas"]["UserResendActivationLink"]
+        "multipart/form-data": components["schemas"]["UserResendActivationLink"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
+  auth_request_otp_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OtpResponse"]
+        }
+      }
+    }
+  }
+  auth_request_password_reset_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RequestPasswordReset"]
+        "application/x-www-form-urlencoded": components["schemas"]["RequestPasswordReset"]
+        "multipart/form-data": components["schemas"]["RequestPasswordReset"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
+  auth_reset_password_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResetPassword"]
+        "application/x-www-form-urlencoded": components["schemas"]["ResetPassword"]
+        "multipart/form-data": components["schemas"]["ResetPassword"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
+  auth_verify_otp_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VerifyOTP"]
+        "application/x-www-form-urlencoded": components["schemas"]["VerifyOTP"]
+        "multipart/form-data": components["schemas"]["VerifyOTP"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
   entities_enable_create: {
     parameters: {
       query: {

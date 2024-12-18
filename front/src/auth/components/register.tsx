@@ -7,9 +7,8 @@ import { TextInput } from "common/components/input"
 import { Container, Switcher } from "./login"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
+import { HttpError } from "common/services/api-fetch"
 import * as api from "../api"
-import { AxiosError } from "axios"
-import { Api } from "common/services/api"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -31,8 +30,7 @@ export const Register = () => {
 
     onError: (error) => {
       const errors = []
-      const errorData =
-        (error as AxiosError<Api<any>>).response?.data?.data ?? {}
+      const errorData = (error as HttpError)?.data
 
       for (const field in errorData) {
         const fieldErrors = errorData[field]
