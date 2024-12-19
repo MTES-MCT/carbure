@@ -43,3 +43,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             operation = serializer.save()
             return Response(OperationOutputSerializer(operation).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.type == Operation.CESSION and instance.status in [Operation.PENDING, Operation.REJECTED]:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_403_FORBIDDEN)

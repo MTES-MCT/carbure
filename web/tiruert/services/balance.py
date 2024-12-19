@@ -51,7 +51,6 @@ class BalanceService:
                 initial_balances[key] = 0
 
             for detail in operation.details.all():
-                # print("detail : ", detail.id)
                 if operation.is_credit(entity_id):
                     initial_balances[key] += detail.volume
                 else:
