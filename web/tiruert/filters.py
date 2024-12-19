@@ -15,6 +15,7 @@ class OperationFilter(FilterSet):
     customs_category = BaseInFilter(field_name="customs_category", lookup_expr="in")
     biofuel = BaseInFilter(field_name="biofuel__name", lookup_expr="in")
     sector = CharFilter(method="filter_sector")
+    from_to = CharFilter(method="filter_from_to")
 
     class Meta:
         model = Operation
@@ -30,3 +31,6 @@ class OperationFilter(FilterSet):
             return queryset.filter(biofuel__compatible_diesel=True)
         elif value == "SAF":
             return queryset.filter(biofuel__code__in=SAF_BIOFUEL_TYPES)
+
+    def filter_from_to(self, queryset, name, value):
+        return queryset.filter(Q(credited_entity__name=value) | Q(debited_entity__name=value)).distinct()
