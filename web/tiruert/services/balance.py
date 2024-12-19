@@ -41,6 +41,32 @@ class BalanceService:
         return balance
 
     @staticmethod
+    def calculate_initial_balance(balance, entity_id, until_date):
+        operations = Operation.objects.filter(created_at__lt=until_date)
+
+        initial_balances = {}
+        for operation in operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED]):
+            key = (operation.customs_category, operation.biofuel)
+            if key not in initial_balances:
+                initial_balances[key] = 0
+
+            for detail in operation.details.all():
+                # print("detail : ", detail.id)
+                if operation.is_credit(entity_id):
+                    initial_balances[key] += detail.volume
+                else:
+                    initial_balances[key] -= detail.volume
+
+        for key, _ in initial_balances.items():
+            if not balance.get(key):
+                balance[key] = {"volume": {"credit": 0, "debit": 0}, "ghg": {"credit": 0, "debit": 0}, "pending": 0}
+
+        for key, item in balance.items():
+            item["initial_balance"] = initial_balances.get(key, 0)
+
+        return balance
+
+    @staticmethod
     def optimize_biofuel_blending(batches_volumes, batches_emissions, target_volume, target_emission):
         """Prototype for biofuel batches optimal blending.
 

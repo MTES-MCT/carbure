@@ -12,6 +12,7 @@ class BalanceSerializer(serializers.ModelSerializer):
             "customs_category",
             "biofuel",
             "pending",
+            "initial_balance",
             "volume",
             "ghg",
         ]
@@ -21,6 +22,7 @@ class BalanceSerializer(serializers.ModelSerializer):
     ghg = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
     pending = serializers.IntegerField()
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
+    initial_balance = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
 
     def get_sector(self, instance):
         if instance.get("biofuel").compatible_essence:
@@ -36,6 +38,7 @@ class BalanceSerializer(serializers.ModelSerializer):
             {
                 "customs_category": key[0],
                 "biofuel": key[1],
+                **({"initial_balance": value["initial_balance"]} if "initial_balance" in value else {}),
                 "volume": {
                     "credit": value["volume"]["credit"],
                     "debit": value["volume"]["debit"],
