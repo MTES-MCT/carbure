@@ -19,36 +19,18 @@ from rest_framework.response import Response
 from doublecount.models import DoubleCountingApplication
 
 from .utils import (
+    DoubleCountingApplicationExportError,
+    WordKey,
     application_to_json,
     check_has_dechets_industriels,
     delete_paragraph,
     format_to_word,
+    name_to_dc_decision_name,
     replace_and_bold,
     set_bold_text,
     set_cell_border,
     set_font,
 )
-
-
-class WordKey:
-    CITY = "«Ville»"
-    COUNTRY = "«Pays»"
-    OPERATOR_NAME = "«Nom_Opérateur»"
-    ADDRESS = "«Adresse»"
-    POSTAL_CODE = "«Code_Postal»"
-    CERTIFICATE_ID = "«Numéro_valide»"
-    YEAR_N = "«Année n»"
-    YEAR_N_1 = "«Année n+1»"
-    ID = "«ID»"
-    DECHETS_INDUSTRIELS = "«DECHETS_INDUSTRIELS»"
-    BIOFUELS = "«YYYY»"
-
-
-class DoubleCountingApplicationExportError:
-    MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND"
-    APPLICATION_NOT_ACCEPTED = "APPLICATION_NOT_ACCEPTED"
-    DECHETS_INDUSTRIELS_NOT_FOUND = "DECHETS_INDUSTRIELS_NOT_FOUND"
 
 
 class ExportApplicationActionMixin:
@@ -184,7 +166,7 @@ class ExportApplicationActionMixin:
         # ... row
         for item in table_data:
             cell = table.add_row().cells
-            cell[0].text = item.get("biofuel__name")
+            cell[0].text = name_to_dc_decision_name.get(item.get("biofuel__name"), (item.get("biofuel__name"), None))[0]
             cell[1].text = item.get("feedstock__name")
             cell[2].text = str(item.get("approved_quota_year_n"))
             cell[3].text = str(item.get("approved_quota_year_n_1"))
