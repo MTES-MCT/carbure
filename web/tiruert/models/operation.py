@@ -100,7 +100,7 @@ def create_tiruert_operations_from_lots(lots):
     for key, lots in lots_by_delivery_type.items():
         operation = Operation.objects.create(
             type=matching_types[key[0]],
-            status=Operation.PENDING,
+            status=Operation.ACCEPTED,
             customs_category=key[1],
             biofuel=lots[0].biofuel,
             credited_entity=lots[0].carbure_client,
