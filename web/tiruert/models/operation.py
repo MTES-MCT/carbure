@@ -105,7 +105,8 @@ def create_tiruert_operations_from_lots(lots):
             biofuel=lots[0].biofuel,
             credited_entity=lots[0].carbure_client,
             debited_entity=None,
-            depot=lots[0].carbure_delivery_site,
+            from_depot=None,
+            to_depot=lots[0].carbure_delivery_site,
             validity_date=lots[0].delivery_date,
         )
 
@@ -116,7 +117,7 @@ def create_tiruert_operations_from_lots(lots):
                 {
                     "operation": operation,
                     "lot": lot,
-                    "energy": lot.volume,
+                    "volume": lot.volume,
                     "saved_ghg": calculate_saved_CO2_emissions(lot),
                 }
             )
@@ -125,5 +126,5 @@ def create_tiruert_operations_from_lots(lots):
 
 
 def calculate_saved_CO2_emissions(lot):
-    saved_co2 = (lot.ghg_reference * lot.pci * lot.volume - lot.lvh_amount * lot.ghg_total) / 1000000
+    saved_co2 = (lot.ghg_reference * lot.lhv_amount - lot.lhv_amount * lot.ghg_total) / 1000000
     return saved_co2

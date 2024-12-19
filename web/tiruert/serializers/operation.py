@@ -20,7 +20,8 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "biofuel",
             "credited_entity",
             "debited_entity",
-            "depot",
+            "from_depot",
+            "to_depot",
             "created_at",
             "validity_date",
             "total",
@@ -50,6 +51,12 @@ class OperationOutputSerializer(serializers.ModelSerializer):
         total_saved_ghg = sum(detail.saved_ghg for detail in instance.details.all())
         return {"volume": total_volume, "saved_ghg": total_saved_ghg}
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not self.context.get("details"):
+            representation.pop("details", None)
+        return representation
+
 
 class OperationInputSerializer(serializers.ModelSerializer):
     NO_SUITABLE_LOTS_FOUND = "NO_SUITABLE_LOTS_FOUND"
@@ -63,7 +70,8 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "biofuel",
             "credited_entity",
             "debited_entity",
-            "depot",
+            "from_depot",
+            "to_depot",
             "validity_date",
             "target_volume",
             "target_emission",

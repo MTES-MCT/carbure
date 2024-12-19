@@ -28,8 +28,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
 
     def get_serializer(self, *args, **kwargs):
         entity_id = self.request.GET.get("entity_id")
+        details = self.request.GET.get("details", "0") == "1"
         kwargs["context"] = self.get_serializer_context()
         kwargs["context"]["entity_id"] = entity_id
+        kwargs["context"]["details"] = details
         return super().get_serializer(*args, **kwargs)
 
     def create(self, request):
