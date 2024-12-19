@@ -23,6 +23,7 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "depot",
             "created_at",
             "validity_date",
+            "total",
             "details",
         ]
 
@@ -30,6 +31,9 @@ class OperationOutputSerializer(serializers.ModelSerializer):
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
+    credited_entity = serializers.CharField(source="credited_entity.name", read_only=True)
+    debited_entity = serializers.CharField(source="debited_entity.name", read_only=True)
+    total = serializers.SerializerMethodField()
 
     def get_type(self, instance):
         entity_id = self.context.get("entity_id")
@@ -40,6 +44,11 @@ class OperationOutputSerializer(serializers.ModelSerializer):
 
     def get_sector(self, instance):
         return instance.sector
+
+    def get_total(self, instance):
+        total_volume = sum(detail.volume for detail in instance.details.all())
+        total_saved_ghg = sum(detail.saved_ghg for detail in instance.details.all())
+        return {"volume": total_volume, "saved_ghg": total_saved_ghg}
 
 
 class OperationInputSerializer(serializers.ModelSerializer):
