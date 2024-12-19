@@ -45,7 +45,12 @@ class Operation(models.Model):
     debited_entity = models.ForeignKey(
         "core.Entity", null=True, on_delete=models.deletion.CASCADE, related_name="to_operations"
     )
-    depot = models.ForeignKey("transactions.Depot", null=True, on_delete=models.SET_NULL, related_name="operations")
+    from_depot = models.ForeignKey(
+        "transactions.Depot", null=True, on_delete=models.SET_NULL, related_name="operations_from_depot"
+    )
+    to_depot = models.ForeignKey(
+        "transactions.Depot", null=True, on_delete=models.SET_NULL, related_name="operations_to_depot"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     validity_date = models.DateField(null=False, blank=False)
 
