@@ -3,33 +3,73 @@ from docx.oxml.ns import qn
 from docx.shared import Pt
 
 name_to_dc_decision_name = {
-    "Éthanol pour ED9": ("Éthanol", None),
-    "EEHA": ("Ester Ethylique d'Huiles Animales", "Esther Ethylique"),
-    "EEHU": ("Ester Ethylique d'Huiles Usagées", "Esther Ethylique"),
-    "EEHV": ("Ester Ethylique d'Huiles Végétales", "Esther Ethylique"),
-    "EMAG de POME": ("Ester Méthylique d'Acides Gras", "Esther Méthylique"),
-    "EMAG": ("Ester Méthylique d'Acides Gras", "Esther Méthylique"),
-    "EMHA": ("Ester Méthylique d'Huiles Animales", "Esther Méthylique"),
-    "EMHU": ("Ester Méthylique d'Huiles Usagées", "Esther Méthylique"),
-    "EMHV": ("Ester Méthylique d'Huiles Végétales", "Esther Méthylique"),
-    "ETBE": ("Ethyl Tert-Butyl Ether", "Esther Méthylique"),
-    "Éthanol": ("Éthanol", "Éthanol"),
-    "Huiles co-traitées - Kérosène": ("Huiles co-traitées carburéacteurs", "Huiles co-traitées"),
-    "Huile cotraitée - Carburéacteur": ("Huiles co-traitées carburéacteurs", "Huiles co-traitées"),  # 2nd version
-    "Huiles co-traitées - Essence": ("Huiles co-traitées essences", "Huiles co-traitées"),
-    "Huile cotraitée - Essence": ("Huiles co-traitées essences", "Huiles co-traitées"),  # 2nd version
-    "Huiles co-traitées - Gazole": ("Huiles co-traitées gazoles", "Huiles co-traitées"),
-    "Huile cotraitée - Gazole": ("Huiles co-traitées gazoles", "Huiles co-traitées"),  # 2nd version
-    "Autres Huiles Hydrotraitées - Kérosène": ("Huiles hydrotraitées carburéacteurs", "Huiles hydrotraitées"),
-    "Autres Huiles Hydrotraitées - Essence": ("Huiles hydrotraitées essences", "Huiles hydrotraitées"),
-    "Autres Huiles Hydrotraitées - Gazole": ("Huiles hydrotraitées gazoles", "Huiles hydrotraitées"),
-    "Huiles Végétales Hydrotraitées - Kérosène": ("Huiles Végétales hydrotraitées carburéacteurs" "Huiles hydrotraitées"),
-    "Huiles Végétales Hydrotraitées - Essence": ("Huiles Végétales hydrotraitées essences", "Huiles hydrotraitées"),
-    "Huiles Végétales Hydrotraitées - Gazole": ("Huiles Végétales hydrotraitées gazoles" "Huiles hydrotraitées"),
-    "Méthanol": ("Méthanol", None),
-    "MTBE": ("Methyl Tert-Butyl Ether", None),
-    "TAEE": ("Tert-Amyl Ethyl Ether", None),
-    "TAME": ("Tert-Amyl Methyl Ether", None),
+    "Éthanol pour ED9": ("Éthanol", "Éthanols", None),
+    "EEHA": ("Ester Éthylique d'Huiles Animales", "Esters Éthyliques d'Huiles Animales", "Esters Éthyliques"),
+    "EEHU": ("Ester Éthylique d'Huiles Usagées", "Esters Éthyliques d'Huiles Usagées", "Esters Éthyliques"),
+    "EEHV": ("Ester Éthylique d'Huiles Végétales", "Esters Éthyliques d'Huiles Végétales", "Esters Éthyliques"),
+    "EMAG de POME": ("Ester Méthylique d'Acides Gras", "Esters Méthyliques d'Acides Gras", "Esters Méthyliques"),
+    "EMAG": ("Ester Méthylique d'Acides Gras", "Esters Méthyliques d'Acides Gras", "Esters Méthyliques"),
+    "EMHA": ("Ester Méthylique d'Huiles Animales", "Esters Méthyliques d'Huiles Animales", "Esters Méthyliques"),
+    "EMHU": ("Ester Méthylique d'Huiles Usagées", "Esters Méthyliques d'Huiles Usagées", "Esters Méthyliques"),
+    "EMHV": ("Ester Méthylique d'Huiles Végétales", "Esters Méthyliques d'Huiles Végétales", "Esters Méthyliques"),
+    "ETBE": ("Éthyl Tert-Butyl Éther", "Éthyl Tert-Butyl Éthers", "Esters Méthyliques"),
+    "Éthanol": ("Éthanol", "Éthanols", "Éthanols"),
+    "Huiles co-traitées - Kérosène": (
+        "Huiles co-traitées carburéacteurs",
+        "Huiles co-traitées carburéacteurs",
+        "Huiles co-traitées",
+    ),
+    "Huile cotraitée - Carburéacteur": (
+        "Huiles co-traitées carburéacteurs",
+        "Huiles co-traitées carburéacteurs",
+        "Huiles co-traitées",
+    ),  # 2nd version
+    "Huiles co-traitées - Essence": ("Huiles co-traitées essences", "Huiles co-traitées essences", "Huiles co-traitées"),
+    "Huile cotraitée - Essence": (
+        "Huiles co-traitées essences",
+        "Huiles co-traitées essences",
+        "Huiles co-traitées",
+    ),  # 2nd version
+    "Huiles co-traitées - Gazole": ("Huiles co-traitées gazoles", "Huiles co-traitées gazoles", "Huiles co-traitées"),
+    "Huile cotraitée - Gazole": (
+        "Huiles co-traitées gazoles",
+        "Huiles co-traitées gazoles",
+        "Huiles co-traitées",
+    ),  # 2nd version
+    "Autres Huiles Hydrotraitées - Kérosène": (
+        "Huiles hydrotraitées carburéacteurs",
+        "Huiles hydrotraitées carburéacteurs",
+        "Huiles hydrotraitées",
+    ),
+    "Autres Huiles Hydrotraitées - Essence": (
+        "Huiles hydrotraitées essences",
+        "Huiles hydrotraitées essences",
+        "Huiles hydrotraitées",
+    ),
+    "Autres Huiles Hydrotraitées - Gazole": (
+        "Huiles hydrotraitées gazoles",
+        "Huiles hydrotraitées gazoles",
+        "Huiles hydrotraitées",
+    ),
+    "Huiles Végétales Hydrotraitées - Kérosène": (
+        "Huiles Végétales hydrotraitées carburéacteurs",
+        "Huiles Végétales hydrotraitées carburéacteurs",
+        "Huiles hydrotraitées",
+    ),
+    "Huiles Végétales Hydrotraitées - Essence": (
+        "Huiles Végétales hydrotraitées essences",
+        "Huiles Végétales hydrotraitées essences",
+        "Huiles hydrotraitées",
+    ),
+    "Huiles Végétales Hydrotraitées - Gazole": (
+        "Huiles Végétales hydrotraitées gazoles",
+        "Huiles Végétales hydrotraitées gazoles",
+        "Huiles hydrotraitées",
+    ),
+    "Méthanol": ("Méthanol", "Méthanols", None),
+    "MTBE": ("Méthyl Tert-Butyl Éther", "Méthyl Tert-Butyl Éthers", None),
+    "TAEE": ("Tert-Amyl Éthyl Éther", "Tert-Amyl Éthyl Éthers", None),
+    "TAME": ("Tert-Amyl Méthyl Éther", "Tert-Amyl Méthyl Éthers", None),
 }
 
 
@@ -121,13 +161,18 @@ def application_to_json(application, dechets_industriels="-"):
     )
     reformatted_biofuels_article_2 = set()
     for biofuel in biofuels:
-        biofuel = name_to_dc_decision_name.get(biofuel, (biofuel, None))[0]
+        if biofuel in name_to_dc_decision_name:
+            biofuel = name_to_dc_decision_name.get(biofuel)[1]
         reformatted_biofuels_article_2.add(biofuel)
     reformatted_biofuels_article_2 = list(reformatted_biofuels_article_2)
 
     reformatted_biofuels_article_3 = set()
     for biofuel in biofuels:
-        biofuel = name_to_dc_decision_name.get(biofuel, (None, biofuel))[1]
+        biofuel_tmp = None
+        if biofuel in name_to_dc_decision_name:
+            biofuel_tmp = name_to_dc_decision_name.get(biofuel)[2]
+        if biofuel_tmp:
+            biofuel = biofuel_tmp
         reformatted_biofuels_article_3.add(biofuel)
     reformatted_biofuels_article_3 = list(reformatted_biofuels_article_3)
 
