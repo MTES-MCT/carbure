@@ -2,6 +2,36 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt
 
+name_to_dc_decision_name = {
+    "Éthanol pour ED9": ("Éthanol", None),
+    "EEHA": ("Ester Ethylique d'Huiles Animales", "Esther Ethylique"),
+    "EEHU": ("Ester Ethylique d'Huiles Usagées", "Esther Ethylique"),
+    "EEHV": ("Ester Ethylique d'Huiles Végétales", "Esther Ethylique"),
+    "EMAG de POME": ("Ester Méthylique d'Acides Gras", "Esther Méthylique"),
+    "EMAG": ("Ester Méthylique d'Acides Gras", "Esther Méthylique"),
+    "EMHA": ("Ester Méthylique d'Huiles Animales", "Esther Méthylique"),
+    "EMHU": ("Ester Méthylique d'Huiles Usagées", "Esther Méthylique"),
+    "EMHV": ("Ester Méthylique d'Huiles Végétales", "Esther Méthylique"),
+    "ETBE": ("Ethyl Tert-Butyl Ether", "Esther Méthylique"),
+    "Éthanol": ("Éthanol", "Éthanol"),
+    "Huiles co-traitées - Kérosène": ("Huiles co-traitées carburéacteurs", "Huiles co-traitées"),
+    "Huile cotraitée - Carburéacteur": ("Huiles co-traitées carburéacteurs", "Huiles co-traitées"),  # 2nd version
+    "Huiles co-traitées - Essence": ("Huiles co-traitées essences", "Huiles co-traitées"),
+    "Huile cotraitée - Essence": ("Huiles co-traitées essences", "Huiles co-traitées"),  # 2nd version
+    "Huiles co-traitées - Gazole": ("Huiles co-traitées gazoles", "Huiles co-traitées"),
+    "Huile cotraitée - Gazole": ("Huiles co-traitées gazoles", "Huiles co-traitées"),  # 2nd version
+    "Autres Huiles Hydrotraitées - Kérosène": ("Huiles hydrotraitées carburéacteurs", "Huiles hydrotraitées"),
+    "Autres Huiles Hydrotraitées - Essence": ("Huiles hydrotraitées essences", "Huiles hydrotraitées"),
+    "Autres Huiles Hydrotraitées - Gazole": ("Huiles hydrotraitées gazoles", "Huiles hydrotraitées"),
+    "Huiles Végétales Hydrotraitées - Kérosène": ("Huiles Végétales hydrotraitées carburéacteurs" "Huiles hydrotraitées"),
+    "Huiles Végétales Hydrotraitées - Essence": ("Huiles Végétales hydrotraitées essences", "Huiles hydrotraitées"),
+    "Huiles Végétales Hydrotraitées - Gazole": ("Huiles Végétales hydrotraitées gazoles" "Huiles hydrotraitées"),
+    "Méthanol": ("Méthanol", None),
+    "MTBE": ("Methyl Tert-Butyl Ether", None),
+    "TAEE": ("Tert-Amyl Ethyl Ether", None),
+    "TAME": ("Tert-Amyl Methyl Ether", None),
+}
+
 
 def delete_paragraph(paragraph):
     p = paragraph._element
@@ -74,7 +104,8 @@ class WordKey:
     YEAR_N_1 = "«Année n+1»"
     ID = "«ID»"
     DECHETS_INDUSTRIELS = "«DECHETS_INDUSTRIELS»"
-    BIOFUELS = "«YYYY»"
+    BIOFUELS_ARTICLE_2 = "«YYYY1»"
+    BIOFUELS_ARTICLE_3 = "«YYYY2»"
 
 
 def application_to_json(application, dechets_industriels="-"):
@@ -82,8 +113,23 @@ def application_to_json(application, dechets_industriels="-"):
     year_n_1 = year_n + 1
     has_dechets_industriels = check_has_dechets_industriels(application)
     biofuels = list(
-        application.production.filter(year__in=[year_n, year_n_1]).values_list("biofuel__name", flat=True).distinct()
+        application.production.filter(
+            year__in=[year_n, year_n_1], feedstock__code__in=["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]
+        )
+        .values_list("biofuel__name", flat=True)
+        .distinct()
     )
+    reformatted_biofuels_article_2 = set()
+    for biofuel in biofuels:
+        biofuel = name_to_dc_decision_name.get(biofuel, (biofuel, None))[0]
+        reformatted_biofuels_article_2.add(biofuel)
+    reformatted_biofuels_article_2 = list(reformatted_biofuels_article_2)
+
+    reformatted_biofuels_article_3 = set()
+    for biofuel in biofuels:
+        biofuel = name_to_dc_decision_name.get(biofuel, (None, biofuel))[1]
+        reformatted_biofuels_article_3.add(biofuel)
+    reformatted_biofuels_article_3 = list(reformatted_biofuels_article_3)
 
     return {
         "id": str(application.id),
@@ -97,7 +143,8 @@ def application_to_json(application, dechets_industriels="-"):
         "year_n_1": str(application.period_start.year + 1),
         "has_dechets_industriels": has_dechets_industriels,
         "dechets_industriels": dechets_industriels,
-        "biofuels": format_biofuels_to_text(biofuels),
+        "biofuels_article_2": format_biofuels_to_text(reformatted_biofuels_article_2),
+        "biofuels_article_3": format_biofuels_to_text(reformatted_biofuels_article_3),
     }
 
 
@@ -112,7 +159,8 @@ def format_to_word(data):
         WordKey.YEAR_N: data.get("year_n"),
         WordKey.YEAR_N_1: data.get("year_n_1"),
         WordKey.ID: data.get("id"),
-        WordKey.BIOFUELS: data.get("biofuels"),
+        WordKey.BIOFUELS_ARTICLE_2: data.get("biofuels_article_2"),
+        WordKey.BIOFUELS_ARTICLE_3: data.get("biofuels_article_3"),
         WordKey.DECHETS_INDUSTRIELS: data.get("dechets_industriels").lower(),
     }
 
