@@ -6,6 +6,7 @@ interface BaseIconProps {
   size?: "xs" | "sm" | "md" | "lg"
   className?: string
   name: FrIconClassName | RiIconClassName
+  style?: React.CSSProperties
 }
 
 export type IconName = FrIconClassName | RiIconClassName
@@ -146,4 +147,8 @@ export const ClipboardFill = ({ ...props }: IconProps) => {
 
 export const CircleFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-circle-fill" />
+}
+
+export const InformationLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-information-line" />
 }

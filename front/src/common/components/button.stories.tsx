@@ -1,4 +1,3 @@
-// Change a comment that triggers rebuild
 import type { Meta, StoryObj } from "@storybook/react"
 
 import { Button } from "./button"
