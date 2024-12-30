@@ -7,7 +7,8 @@
 import cl from "clsx"
 import styles from "./title.module.css"
 type HeadingTags = "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
-type TitleProps = {
+
+export type TitleProps = {
   // The tag to use for the title
   is: React.ElementType
 

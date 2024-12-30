@@ -29,7 +29,7 @@ type TextOwnProps<T extends React.ElementType> = {
 }
 
 // Make mandatory the componentProps property if there are mandatory props for the generic component
-type TextProps<T extends React.ElementType> = TextOwnProps<T> &
+export type TextProps<T extends React.ElementType> = TextOwnProps<T> &
   (object extends React.ComponentProps<T>
     ? { componentProps?: React.ComponentProps<T> }
     : { componentProps: React.ComponentProps<T> })

@@ -5,11 +5,13 @@ import {
 import { ForwardedRef, forwardRef } from "react"
 import cl from "clsx"
 import css from "./button.module.css"
+import { layout, Layout } from "../scaffold"
 
-export type ButtonProps = ButtonDSFRProps & {
-  // For our cases, we want to use the link style with a button
-  customPriority?: "link"
-}
+export type ButtonProps = ButtonDSFRProps &
+  Layout & {
+    // For our cases, we want to use the link style with a button
+    customPriority?: "link"
+  }
 
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
@@ -21,6 +23,7 @@ export const Button = forwardRef<
         {...props}
         ref={ref as ForwardedRef<HTMLButtonElement>}
         className={cl(props.className, css["button-as-link-style"])}
+        {...layout(props)}
       >
         {props.children}
       </button>
@@ -28,8 +31,16 @@ export const Button = forwardRef<
   }
 
   return props.linkProps ? (
-    <ButtonDSFR {...props} ref={ref as ForwardedRef<HTMLAnchorElement>} />
+    <ButtonDSFR
+      {...props}
+      ref={ref as ForwardedRef<HTMLAnchorElement>}
+      {...layout(props)}
+    />
   ) : (
-    <ButtonDSFR {...props} ref={ref as ForwardedRef<HTMLButtonElement>} />
+    <ButtonDSFR
+      {...props}
+      ref={ref as ForwardedRef<HTMLButtonElement>}
+      {...layout(props)}
+    />
   )
 })
