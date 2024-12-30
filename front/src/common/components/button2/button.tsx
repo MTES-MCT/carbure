@@ -11,7 +11,20 @@ export type ButtonProps = ButtonDSFRProps &
   Layout & {
     // For our cases, we want to use the link style with a button
     customPriority?: "link"
+    loading?: boolean
   }
+
+export const BaseButton = forwardRef<HTMLButtonElement, ButtonProps>(
+  (props, ref) =>
+    !props.linkProps ? (
+      <ButtonDSFR
+        {...props}
+        ref={ref}
+        {...layout(props)}
+        disabled={Boolean(props.disabled || props.loading)}
+      />
+    ) : null
+)
 
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
@@ -33,14 +46,16 @@ export const Button = forwardRef<
   return props.linkProps ? (
     <ButtonDSFR
       {...props}
-      ref={ref as ForwardedRef<HTMLAnchorElement>}
       {...layout(props)}
+      ref={ref as ForwardedRef<HTMLAnchorElement>}
+    />
+  ) : // Couldn't find a better way to specify the iconId for the loading state
+  props.iconId ? (
+    <BaseButton
+      {...props}
+      iconId={props.loading ? "ri-loader-line" : props.iconId}
     />
   ) : (
-    <ButtonDSFR
-      {...props}
-      ref={ref as ForwardedRef<HTMLButtonElement>}
-      {...layout(props)}
-    />
+    <BaseButton {...props} />
   )
 })

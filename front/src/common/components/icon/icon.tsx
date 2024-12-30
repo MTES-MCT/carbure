@@ -8,6 +8,7 @@ interface BaseIconProps {
   name: FrIconClassName | RiIconClassName
 }
 
+export type IconName = FrIconClassName | RiIconClassName
 export type IconProps = Omit<BaseIconProps, "name">
 
 const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {

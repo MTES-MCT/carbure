@@ -24,3 +24,13 @@ export const LinkStyle: Story = {
     customPriority: "link",
   },
 }
+
+export const Loading: Story = {
+  args: {
+    disabled: true,
+    iconId: "ri-loader-line",
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+}

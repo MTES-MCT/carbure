@@ -74,6 +74,7 @@ select {
   }
 }
 
+.ri-loader-line::before,
 .ri-loader-line::after {
   will-change: transform;
   animation: loading infinite linear 3s;

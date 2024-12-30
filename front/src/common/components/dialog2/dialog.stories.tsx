@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Dialog } from "./dialog"
+import { Confirm, Dialog } from "./dialog"
+import { Button } from "../button2"
 
 const meta: Meta<typeof Dialog> = {
   component: Dialog,
@@ -14,6 +15,12 @@ const meta: Meta<typeof Dialog> = {
       </>
     ),
     children: <>une section</>,
+    footer: (
+      <>
+        <Button>Valider</Button>
+        <Button priority="secondary">Refuser</Button>
+      </>
+    ),
   },
 }
 
@@ -22,3 +29,12 @@ type Story = StoryObj<typeof Dialog>
 export default meta
 
 export const Default: Story = {}
+
+export const ConfirmDialog: StoryObj<typeof Confirm> = {
+  args: {
+    confirm: "Valider",
+    description: "avec une description",
+    title: "Titre de la dialog",
+  },
+  render: (args) => <Confirm {...args} />,
+}

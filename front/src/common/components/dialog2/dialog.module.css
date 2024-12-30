@@ -41,10 +41,26 @@
   margin: var(--spacing-3w) 0;
 }
 
+.dialog__close-button {
+  margin-bottom: var(--spacing-2w);
+}
+
+.dialog__wrapper {
+  padding: 0 var(--spacing-2w) var(--spacing-2w) var(--spacing-2w);
+}
+
 .dialog__title {
   color: var(--blue-france-sun-113-625);
 }
 
 .dialog__description {
   color: var(--light-text-default-grey);
+}
+
+.dialog__footer {
+  margin-top: var(--spacing-4w);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-2w);
 }
