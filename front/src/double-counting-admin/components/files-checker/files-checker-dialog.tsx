@@ -58,7 +58,7 @@ const DoubleCountingFilesCheckerDialog = ({
       entity.id,
       value.doubleCountingFiles as FileList
     )
-    const checkedFiles = resp.data.data
+    const checkedFiles = resp.data
     if (checkedFiles) {
       onClose()
       navigate("/org/9/double-counting/files-checker", {

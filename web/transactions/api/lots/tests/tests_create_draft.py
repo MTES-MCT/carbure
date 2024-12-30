@@ -47,7 +47,7 @@
 #         # UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
 
 #         # # pass otp verification
-#         # response = self.client.post(reverse('auth-request-otp'))
+#         # response = self.client.get(reverse('auth-request-otp'))
 #         # self.assertEqual(response.status_code, 200)
 #         # device, created = EmailDevice.objects.get_or_create(user=self.user1)
 #         # response = self.client.post(reverse('auth-verify-otp'), {'otp_token': device.token})

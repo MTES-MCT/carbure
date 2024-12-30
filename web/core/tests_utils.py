@@ -17,7 +17,7 @@ def setup_current_user(test, email, name, password, entity_rights=None, is_staff
         UserRights.objects.update_or_create(entity=entity, user=user, role=role)
         UserRightsRequests.objects.update_or_create(entity=entity, user=user, role=role)
 
-    response = test.client.post(reverse("auth-request-otp"))
+    response = test.client.get(reverse("auth-request-otp"))
     assert response.status_code == 200
     device, _ = EmailDevice.objects.get_or_create(user=user)
     response = test.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})

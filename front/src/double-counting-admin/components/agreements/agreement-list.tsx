@@ -47,11 +47,11 @@ const AgreementList = ({
       header: t("N° d'agrément"),
       cell: (a) => <span>{a.certificate_id}</span>,
     },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer} /> },
+    { header: t("Producteur"), cell: (a) => <Cell text={a.producer?.name} /> },
     {
       header: t("Site de production"),
       key: "production_site",
-      cell: (a) => <Cell text={a.production_site || "-"} />,
+      cell: (a) => <Cell text={a.production_site?.name || "-"} />,
     },
     {
       header: t("Validité"),
@@ -79,7 +79,7 @@ const AgreementList = ({
     })
   }
 
-  const agreements = agreementsResponse.result?.data.data
+  const agreements = agreementsResponse.result?.data
 
   return (
     <>

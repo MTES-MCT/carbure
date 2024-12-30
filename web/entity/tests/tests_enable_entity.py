@@ -61,7 +61,7 @@ class EntityEnableSourceTest(TestCase):
         setup_current_user(self, "user@elec-admin.local", "Elec admin user", "gogogo", [(self.elec_admin, UserRights.ADMIN)])
 
         response = self.client.post(
-            reverse("entity-admin-enable", kwargs={"pk": producer.pk}) + f"?entity_id={self.elec_admin.pk}"
+            reverse("entity-enable", kwargs={"pk": producer.pk}) + f"?entity_id={self.elec_admin.pk}"
         )
 
         assert response.status_code == 400
@@ -76,9 +76,7 @@ class EntityEnableSourceTest(TestCase):
         # 2. try to enable producer with as a saf admin
         setup_current_user(self, "user@saf-admin.local", "Saf admin user", "gogogo", [(self.saf_admin, UserRights.ADMIN)])
 
-        response = self.client.post(
-            reverse("entity-admin-enable", kwargs={"pk": producer.pk}) + f"?entity_id={self.saf_admin.pk}"
-        )
+        response = self.client.post(reverse("entity-enable", kwargs={"pk": producer.pk}) + f"?entity_id={self.saf_admin.pk}")
 
         assert response.status_code == 400
 
@@ -92,9 +90,7 @@ class EntityEnableSourceTest(TestCase):
         # 3. try to enable producer with as a super admin
         setup_current_user(self, "user@admin.local", "Saf admin user", "gogogo", [(self.admin, UserRights.ADMIN)], True)
 
-        response = self.client.post(
-            reverse("entity-admin-enable", kwargs={"pk": producer.pk}) + f"?entity_id={self.admin.pk}"
-        )
+        response = self.client.post(reverse("entity-enable", kwargs={"pk": producer.pk}) + f"?entity_id={self.admin.pk}")
 
         assert response.status_code == 200
 

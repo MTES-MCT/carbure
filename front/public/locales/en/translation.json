@@ -585,6 +585,8 @@
   "Correction du dossier double comptage": "Correction du dossier double comptage",
   "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau._one": "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.",
   "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau._other": "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.",
+  "Historique d'approvisionnement": "Historique d'approvisionnement",
+  "Historique de production": "Historique de production",
   "Global": "Global",
   "Aucune erreur dans cet onglet": "Aucune erreur dans cet onglet",
   "Envoyer la demande": "Envoyer la demande",

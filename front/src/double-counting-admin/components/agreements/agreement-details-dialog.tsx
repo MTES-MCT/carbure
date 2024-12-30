@@ -37,7 +37,7 @@ export const AgreementDetailsDialog = () => {
   })
 
   const agreement: AgreementDetails | undefined =
-    applicationResponse.result?.data.data
+    applicationResponse.result?.data
 
   const application = agreement?.application
 
@@ -95,7 +95,7 @@ export const AgreementDetailsDialog = () => {
             </section>
           )}
           {application &&
-            application.status !== DoubleCountingStatus.Accepted && (
+            application.status !== DoubleCountingStatus.ACCEPTED && (
               <section>
                 <p>La demande est en cours de traitement...</p>
                 <Button
@@ -113,7 +113,7 @@ export const AgreementDetailsDialog = () => {
             )}
 
           {application &&
-            application.status === DoubleCountingStatus.Accepted && (
+            application.status === DoubleCountingStatus.ACCEPTED && (
               <AgreementTabs
                 agreement={agreement}
                 productionSite={application.production_site}

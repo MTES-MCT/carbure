@@ -2,8 +2,8 @@ from django.urls import path, include
 from .home_stats import get_home_stats
 
 urlpatterns = [
-    path("auth/", include("auth.api")),
-    path("double-counting/", include("doublecount.api")),
+    path("auth/", include("auth.urls")),
+    path("double-counting/", include("doublecount.urls")),
     path("entity/", include("entity.api")),
     path("entities/", include("entity.urls")),
     path("saf/", include("saf.urls")),
