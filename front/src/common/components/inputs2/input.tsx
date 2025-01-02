@@ -18,7 +18,16 @@ export const Input = forwardRef<
   InputPropsDSFR.RegularInput & ExtendedInputProps
 >(
   (
-    { autoFocus, name, pattern, placeholder, type, nativeInputProps, ...props },
+    {
+      autoFocus,
+      name,
+      pattern,
+      placeholder,
+      type,
+      nativeInputProps,
+      readOnly,
+      ...props
+    },
     ref
   ) => {
     return (
@@ -32,6 +41,7 @@ export const Input = forwardRef<
           pattern,
           placeholder,
           type,
+          readOnly,
         }}
         textArea={false}
       />
