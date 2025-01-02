@@ -100,7 +100,7 @@ class ElecAdminAuditTest(TestCase):
         # no snapshot
         response = self.client.get(
             reverse("elec-admin-transactions-audit-snapshot"),
-            {"entity_id": self.admin.id, "year": 2024},
+            {"entity_id": self.admin.id, "year": datetime.date.today().year},
         )
         data = response.json()
         snapshot = data["data"]
@@ -110,7 +110,7 @@ class ElecAdminAuditTest(TestCase):
         self.create_application()
         response = self.client.get(
             reverse("elec-admin-transactions-audit-snapshot"),
-            {"entity_id": self.admin.id, "year": 2024},
+            {"entity_id": self.admin.id, "year": datetime.date.today().year},
         )
         data = response.json()
         snapshot = data["data"]
