@@ -8,9 +8,10 @@ import "./carbure/assets/css/index.css"
 import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
-import { SentryProvider } from "./sentry"
+import { SentryProvider, initSentry } from "./sentry"
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
 
+initSentry()
 startReactDsfr({ defaultColorScheme: "system" })
 
 async function enableMocking() {

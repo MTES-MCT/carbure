@@ -2844,7 +2844,7 @@ components:
         - HEAT PLANT
         - POWER PLANT
         - COGENERATION PLANT
-        - PRODUCTION SITE
+        - PRODUCTION BIOLIQUID
         - EFCA
       type: string
       description: |-
@@ -2856,7 +2856,7 @@ components:
         * `HEAT PLANT` - HEAT PLANT
         * `POWER PLANT` - POWER PLANT
         * `COGENERATION PLANT` - COGENERATION PLANT
-        * `PRODUCTION SITE` - PRODUCTION SITE
+        * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
     StatusEnum:
       enum:
