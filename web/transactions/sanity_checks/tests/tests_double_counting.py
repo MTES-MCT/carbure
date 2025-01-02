@@ -162,7 +162,7 @@ class DoubleCountingSanityChecksTest(TestCase):
         assert has_error(error, error_list)
 
         # case 1: dc reference is up to date
-        lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
+        lot.production_site_double_counting_certificate = self.future_dc_cert.certificate_id
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 

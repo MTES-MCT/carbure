@@ -89,7 +89,6 @@ class StocksFlowTest(TestCase):
             reverse("transactions-stocks-split"),
             {"entity_id": self.producer.id, "payload": json.dumps(payload)},
         )
-        print("response : ", response.json(), response.status_code)
         if not fail:
             assert response.status_code == 200
             data = response.json()["data"]
@@ -149,10 +148,9 @@ class StocksFlowTest(TestCase):
             "delivery_site_country_id": "FR",
             "delivery_type": "BLENDING",
             "transport_document_reference": "FR-BLENDING-TEST",
-            "carbure_delivery_site_id": random.choice(depots).customs_id,
+            "carbure_delivery_site_id": random.choice(depots).id,
             "carbure_client_id": trader.id,
         }
-        print("payload : ", payload)
         lot = self.stock_split([payload])
         assert lot.lot_status == CarbureLot.DRAFT
         assert lot.delivery_type == CarbureLot.BLENDING
