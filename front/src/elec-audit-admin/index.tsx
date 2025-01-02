@@ -106,15 +106,9 @@ interface ElecAdminAuditTabsProps {
   snapshot: ElecAdminAuditSnapshot
 }
 
-function ElecAdminAuditTabs({
-  loading,
-  snapshot: snapshot2,
-}: ElecAdminAuditTabsProps) {
+function ElecAdminAuditTabs({ loading, snapshot }: ElecAdminAuditTabsProps) {
   const { t } = useTranslation()
 
-  const snapshot = { ...snapshot2 }
-  // @ts-ignore test sentry
-  snapshot.charge_points_applications = undefined
   return (
     <Tabs
       variant="main"
@@ -132,8 +126,7 @@ function ElecAdminAuditTabs({
                 {loading ? (
                   <Loader size={20} />
                 ) : (
-                  // @ts-ignore test sentry
-                  snapshot?.charge_points_applications.test
+                  snapshot?.charge_points_applications
                 )}
               </p>
               <strong>{t("Inscriptions")}</strong>
