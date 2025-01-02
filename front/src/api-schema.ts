@@ -934,7 +934,7 @@ export interface components {
      *     * `HEAT PLANT` - HEAT PLANT
      *     * `POWER PLANT` - POWER PLANT
      *     * `COGENERATION PLANT` - COGENERATION PLANT
-     *     * `PRODUCTION SITE` - PRODUCTION SITE
+     *     * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
      *     * `EFCA` - EFCA
      * @enum {string}
      */
@@ -1979,7 +1979,7 @@ export enum SiteTypeEnum {
   HEAT_PLANT = "HEAT PLANT",
   POWER_PLANT = "POWER PLANT",
   COGENERATION_PLANT = "COGENERATION PLANT",
-  PRODUCTION_SITE = "PRODUCTION SITE",
+  PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
   EFCA = "EFCA",
 }
 export enum StatusEnum {
