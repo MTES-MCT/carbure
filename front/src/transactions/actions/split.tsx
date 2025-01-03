@@ -57,7 +57,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   const matomo = useMatomo()
   const entity = useEntity()
 
-  const { value, bind, setValue, setField } = useForm<SplitForm>(
+  const { value, bind, setField } = useForm<SplitForm>(
     { ...defaultSplit, stock_id: stock.carbure_id },
     {
       setValue: (form) => {
@@ -81,7 +81,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
 
     onSuccess: () => {
       notify(t("Le lot a bien été ajouté à vos brouillons !"), { variant: "success" }) // prettier-ignore
-      setValue(defaultSplit)
+      onClose()
     },
 
     onError: () => {
@@ -211,9 +211,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
     delivery_type: form.delivery_type,
     delivery_date: form.delivery_date,
     carbure_delivery_site_id:
-      form.delivery_site instanceof Object
-        ? form.delivery_site.customs_id
-        : undefined,
+      form.delivery_site instanceof Object ? form.delivery_site.id : undefined,
     unknown_delivery_site:
       typeof form.delivery_site === "string" ? form.delivery_site : undefined,
     delivery_site_country_id: form.delivery_site_country?.code_pays,
