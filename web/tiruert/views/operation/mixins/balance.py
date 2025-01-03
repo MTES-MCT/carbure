@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -19,11 +21,17 @@ class BalanceActionMixin:
         date_from = request.query_params.get("date_from")
         operations = OperationFilter(request.GET, queryset=self.get_queryset()).qs
 
+        # Beginning of the current year by default
+        if not date_from:
+            current_year = datetime.now().year
+            date_from = f"{current_year}-01-01"
+            operations = operations.filter(created_at__gte=date_from)
+
         # Calculate the balance
         balance = BalanceService.calculate_balance(operations, entity_id, group_by)
 
-        # Add initial balance to the balance if needed (can't be done for lot)
-        if date_from and group_by != "lot":
+        # Add initial balance to the balance (can't be done for lot)
+        if group_by != "lot":
             balance = BalanceService.calculate_initial_balance(balance, entity_id, date_from, group_by)
 
         # Convert balance to a list of dictionaries for serialization

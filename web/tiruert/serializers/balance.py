@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from rest_framework import serializers
 
 
@@ -8,12 +10,29 @@ class BalanceSerializer(serializers.Serializer):
     initial_balance = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
     volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
     ghg = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
+    available_balance = serializers.SerializerMethodField()
+    teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
     pending = serializers.IntegerField()
+    final_balance = serializers.SerializerMethodField()
 
     def to_representation(self, instance):
         # Overrides the default representation to remove fields with null values.
         representation = super().to_representation(instance)
         return {key: value for key, value in representation.items() if value is not None}
+
+    def get_available_balance(self, instance):
+        return str(self.calcul_available_balance(instance))
+
+    def get_final_balance(self, instance):
+        return str(round(self.calcul_available_balance(instance) - Decimal(instance["teneur"]), 2))
+
+    def calcul_available_balance(self, instance):
+        return round(
+            Decimal(instance["initial_balance"])
+            + Decimal(instance["volume"]["credit"])
+            - Decimal(instance["volume"]["debit"]),
+            2,
+        )
 
 
 class LotSerializer(serializers.Serializer):

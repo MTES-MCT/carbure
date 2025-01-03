@@ -23,6 +23,7 @@ class BalanceService:
                 "biofuel": None,
                 "volume": {"credit": 0, "debit": 0},
                 "ghg": {"credit": 0, "debit": 0},
+                "teneur": 0,
                 "pending": 0,
             }
         )
@@ -44,12 +45,15 @@ class BalanceService:
                     balance[key]["customs_category"] = operation.customs_category
                     balance[key]["biofuel"] = operation.biofuel.code
 
-                if operation.is_credit(entity_id):
-                    balance[key]["volume"]["credit"] += detail.volume
-                    balance[key]["ghg"]["credit"] += detail.saved_ghg
+                if operation.type == Operation.TENEUR:
+                    balance[key]["teneur"] = detail.volume
                 else:
-                    balance[key]["volume"]["debit"] += detail.volume
-                    balance[key]["ghg"]["debit"] += detail.saved_ghg
+                    if operation.is_credit(entity_id):
+                        balance[key]["volume"]["credit"] += detail.volume
+                        balance[key]["ghg"]["credit"] += detail.saved_ghg
+                    else:
+                        balance[key]["volume"]["debit"] += detail.volume
+                        balance[key]["ghg"]["debit"] += detail.saved_ghg
 
             if group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
@@ -85,6 +89,7 @@ class BalanceService:
                     "ghg": {"credit": 0, "debit": 0},
                     "pending": 0,
                     "sector": operation.sector,
+                    "teneur": 0,
                 }
                 if group_by != "sector":
                     balance[key]["customs_category"] = operation.customs_category

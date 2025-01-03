@@ -3,8 +3,6 @@ from django_filters import BaseInFilter, CharFilter, DateFilter, FilterSet
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
 
-from .models import Operation
-
 
 class OperationFilter(FilterSet):
     entity_id = CharFilter(method="filter_entity")
@@ -16,10 +14,6 @@ class OperationFilter(FilterSet):
     biofuel = BaseInFilter(field_name="biofuel__name", lookup_expr="in")
     sector = CharFilter(method="filter_sector")
     from_to = CharFilter(method="filter_from_to")
-
-    class Meta:
-        model = Operation
-        fields = ["date_from", "date_to"]
 
     def filter_entity(self, queryset, name, value):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
