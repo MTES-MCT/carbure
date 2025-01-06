@@ -8,8 +8,11 @@ import "./carbure/assets/css/index.css"
 import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
-import { SentryProvider } from "./sentry"
+import { SentryProvider, initSentry } from "./sentry"
 import "./setup-dsfr"
+
+initSentry()
+
 async function enableMocking() {
   if (import.meta.env.MODE !== "development") return
 

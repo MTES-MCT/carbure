@@ -461,7 +461,7 @@ class ElecMeterReadingsTest(TestCase):
 
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-applications"),
-            {"entity_id": self.cpo.id, "year": 2024},
+            {"entity_id": self.cpo.id, "year": datetime.date.today().year},
         )
         data = response.json()
         assert response.status_code == 200
