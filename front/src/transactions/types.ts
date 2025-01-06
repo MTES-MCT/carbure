@@ -331,7 +331,7 @@ export interface StockPayload {
   transport_document_type: string | undefined
   transport_document_reference: string | undefined
   delivery_date: string | undefined
-  carbure_delivery_site_id: string | undefined
+  carbure_delivery_site_id: number | undefined
   unknown_delivery_site: string | undefined
   delivery_site_country_id: string | undefined
   delivery_type: string | undefined

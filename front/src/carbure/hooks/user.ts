@@ -2,7 +2,7 @@ import { createContext, useContext } from "react"
 import { useQuery } from "common/hooks/async"
 import { Entity, User, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"
-
+import * as Sentry from "@sentry/react"
 export interface UserManager {
   loading: boolean
   email: string
@@ -20,6 +20,11 @@ export function useUserManager(): UserManager {
   const settings = useQuery(api.getUserSettings, {
     key: "user-settings",
     params: [],
+    onSuccess: (response) => {
+      if (response.data?.data?.email) {
+        Sentry.setUser({ email: response.data.data.email })
+      }
+    },
   })
 
   const res = settings.result?.data
