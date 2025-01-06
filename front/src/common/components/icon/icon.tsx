@@ -146,3 +146,19 @@ export const ClipboardFill = ({ ...props }: IconPropsWithoutName) => {
 export const CircleFill = ({ ...props }: IconPropsWithoutName) => {
   return <Icon {...props} name="ri-circle-fill" />
 }
+
+export const DashboardLine = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-dashboard-line" />
+}
+
+export const DashboardFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-dashboard-fill" />
+}
+
+export const HotelLine = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-hotel-line" />
+}
+
+export const HotelFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-hotel-fill" />
+}

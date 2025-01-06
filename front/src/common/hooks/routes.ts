@@ -13,8 +13,7 @@ export const useRoutes = () => {
 
     ORG: () => ROUTE_URLS.ORG(entity.id),
 
-    ADMIN_COMPANY_DETAIL: (company_id: number) =>
-      ROUTE_URLS.ADMIN_COMPANY_DETAIL(entity.id, company_id),
+    ADMIN: () => ROUTE_URLS.ADMIN(entity.id),
 
     BIOFUELS: (year: number = currentYear) =>
       ROUTE_URLS.BIOFUELS(entity.id, year),

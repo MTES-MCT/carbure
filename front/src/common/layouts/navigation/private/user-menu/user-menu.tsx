@@ -17,7 +17,7 @@ import {
 
 export const UserMenu = () => {
   const { user, getName } = useUser()
-  const { isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
+  const { isAdmin, isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
     useEntity()
   const routes = useRoutes()
   const items = useMemo(() => {
@@ -35,6 +35,11 @@ export const UserMenu = () => {
       (isIndustry || isPowerOrHeatProducer) && {
         label: "Annuaire",
         path: routes.REGISTRY,
+        icon: BookLine,
+      },
+      isAdmin && {
+        label: "Annuaire",
+        path: routes.ADMIN().COMPANIES,
         icon: BookLine,
       },
       {
