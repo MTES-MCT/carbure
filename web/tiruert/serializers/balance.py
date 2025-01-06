@@ -8,12 +8,13 @@ class BalanceSerializer(serializers.Serializer):
     customs_category = serializers.CharField(required=False, allow_null=True)
     biofuel = serializers.CharField(required=False, allow_null=True)
     initial_balance = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
+    available_balance = serializers.SerializerMethodField()
+    final_balance = serializers.SerializerMethodField()
     volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
     ghg = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
-    available_balance = serializers.SerializerMethodField()
     teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
+    yearly_teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
     pending = serializers.IntegerField()
-    final_balance = serializers.SerializerMethodField()
 
     def to_representation(self, instance):
         # Overrides the default representation to remove fields with null values.

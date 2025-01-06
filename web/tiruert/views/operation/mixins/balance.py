@@ -18,21 +18,23 @@ class BalanceActionMixin:
     def balance(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
-        date_from = request.query_params.get("date_from")
+        date_from_str = request.query_params.get("date_from")
+        date_from = datetime.strptime(date_from_str, "%Y-%m-%d") if date_from_str else None
         operations = self.filter_queryset(self.get_queryset())
 
         # Beginning of the current year by default
         if not date_from and group_by != "lot":
             current_year = datetime.now().year
-            date_from = f"{current_year}-01-01"
+            date_from = datetime(current_year, 1, 1)
             operations = operations.filter(created_at__gte=date_from)
 
         # Calculate the balance
         balance = BalanceService.calculate_balance(operations, entity_id, group_by)
 
-        # Add initial balance to the balance (can't be done for lot)
+        # Add initial balance and yearly teneur to the balance (can't be done for lot)
         if group_by != "lot":
             balance = BalanceService.calculate_initial_balance(balance, entity_id, date_from, group_by)
+            balance = BalanceService.calculate_yearly_teneur(balance, entity_id, date_from, group_by)
 
         # Convert balance to a list of dictionaries for serialization
         if group_by == "lot":
