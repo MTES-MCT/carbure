@@ -30,8 +30,6 @@ export const ApplicationDetailsDialog = () => {
   const [quotasIsUpdated, setQuotasIsUpdated] = useState(false)
   const [quotas, setQuotas] = useState<Record<string, number>>({})
 
-  // hasQuotasValidated is used to check if the agreement has been validated
-  const [agreementValidated, setAgreementValidated] = useState(false)
   const match = useHashMatch("application/:id")
 
   const applicationResponse = useQuery(api.getDoubleCountingApplication, {
@@ -143,7 +141,6 @@ export const ApplicationDetailsDialog = () => {
       <ApplicationDetailsDialogValidateQuotas
         application={application}
         onClose={close}
-        onValidateQuotas={() => setAgreementValidated(true)}
       />
     ))
   }
@@ -166,89 +163,78 @@ export const ApplicationDetailsDialog = () => {
   }
 
   return (
-    <>
-      <Portal onClose={closeDialog}>
-        <Dialog fullscreen onClose={closeDialog}>
-          <header>
-            <ApplicationStatus big status={dcaStatus} />
-            <h1>{t("Demande d'agrément double comptage")} </h1>
-          </header>
+    <Portal onClose={closeDialog}>
+      <Dialog fullscreen onClose={closeDialog}>
+        <header>
+          <ApplicationStatus big status={dcaStatus} />
+          <h1>{t("Demande d'agrément double comptage")} </h1>
+        </header>
 
-          <main>
-            <ApplicationInfo application={application} />
+        <main>
+          <ApplicationInfo application={application} />
 
-            {application && (
-              <ApplicationTabs
-                productionSite={application.production_site}
-                sourcing={application.sourcing}
-                production={application.production}
-                quotas={quotas}
-                setQuotas={onUpdateQuotas}
-              />
-            )}
-          </main>
+          {application && (
+            <ApplicationTabs
+              productionSite={application.production_site}
+              sourcing={application.sourcing}
+              production={application.production}
+              quotas={quotas}
+              setQuotas={onUpdateQuotas}
+            />
+          )}
+        </main>
 
-          <footer>
-            {!applicationResponse.loading && (
-              <>
-                {isAdmin && (
-                  <Button
-                    loading={approveQuotas.loading}
-                    disabled={!quotasIsUpdated}
-                    variant="primary"
-                    icon={Save}
-                    action={submitQuotas}
-                  >
-                    <Trans>Enregistrer</Trans>
-                  </Button>
-                )}
-
+        <footer>
+          {!applicationResponse.loading && (
+            <>
+              {isAdmin && (
                 <Button
                   loading={approveQuotas.loading}
-                  disabled={applicationResponse.loading || !hasQuotas}
-                  variant="success"
-                  icon={Check}
-                  action={displayAcceptApplicationDetailsDialog}
+                  disabled={!quotasIsUpdated}
+                  variant="primary"
+                  icon={Save}
+                  action={submitQuotas}
                 >
-                  <Trans>Valider les quotas</Trans>
+                  <Trans>Enregistrer</Trans>
                 </Button>
-                {agreementValidated && (
-                  <Button
-                    icon={Download}
-                    variant="warning"
-                    action={displayGenerateDecisionDialog}
-                  >
-                    <Trans>Générer la décision</Trans>
-                  </Button>
-                )}
+              )}
 
-                <Button
-                  loading={rejectApplication.loading}
-                  disabled={applicationResponse.loading}
-                  variant="danger"
-                  icon={Cross}
-                  action={submitReject}
-                >
-                  <Trans>Refuser</Trans>
-                </Button>
-              </>
-            )}
-            <Button icon={Return} action={closeDialog}>
-              <Trans>Retour</Trans>
-            </Button>
-          </footer>
+              <Button
+                icon={Download}
+                variant="warning"
+                action={displayGenerateDecisionDialog}
+                disabled={applicationResponse.loading || !hasQuotas}
+              >
+                <Trans>Générer la décision</Trans>
+              </Button>
 
-          {applicationResponse.loading && <LoaderOverlay />}
-        </Dialog>
-      </Portal>
-      {/* <Portal>
-        {displayAcceptApplicationDetailsDialog && (
-          <ApplicationDetailsDialogValidateQuotas
-            application={application}
-            onClose={() => setDisplayAcceptApplicationDetailsDialog(false)}
-          />
-        )}
-      </Portal> */}
-    </>
+              <Button
+                disabled={applicationResponse.loading || !hasQuotas}
+                variant="success"
+                icon={Check}
+                action={displayAcceptApplicationDetailsDialog}
+              >
+                <Trans>Valider les quotas</Trans>
+              </Button>
+
+              <Button
+                loading={rejectApplication.loading}
+                disabled={applicationResponse.loading}
+                variant="danger"
+                icon={Cross}
+                action={submitReject}
+              >
+                <Trans>Refuser</Trans>
+              </Button>
+            </>
+          )}
+          <Button icon={Return} action={closeDialog}>
+            <Trans>Retour</Trans>
+          </Button>
+        </footer>
+
+        {applicationResponse.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }

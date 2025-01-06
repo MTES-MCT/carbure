@@ -8,25 +8,19 @@ import { PortalInstance } from "common/components/portal"
 import { hasIndustrialWastes } from "double-counting-admin/utils"
 import { DoubleCountingApplicationDetails } from "double-counting/types"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
 import * as api from "../../../api"
 import { useState } from "react"
 
 type ApplicationDetailsDialogGenerateDecisionProps = {
   application: DoubleCountingApplicationDetails
   onClose: PortalInstance["close"]
-  // onChangeIndustrialWastes: (value: string) => void
-  // industrialWastes: string
 }
 const ApplicationDetailsDialogGenerateDecision = ({
   application,
   onClose,
-  // onChangeIndustrialWastes,
-  // industrialWastes,
 }: ApplicationDetailsDialogGenerateDecisionProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
-  const navigate = useNavigate()
   const entity = useEntity()
   const [industrialWastes, setIndustrialWastes] = useState("")
 
@@ -37,15 +31,14 @@ const ApplicationDetailsDialogGenerateDecision = ({
       industrialWastes
     )
 
-    setIndustrialWastes("")
     notify(t("La décision a bien été générée."), { variant: "success" })
-    navigate("/org/9/double-counting/agreements")
+    onClose()
   }
 
   return (
     <Confirm
       variant="primary"
-      title={t("Accepter la demande d'agrément")}
+      title={t("Générer la décision double comptage")}
       description={
         <>
           {hasIndustrialWastes(application) && (
@@ -70,20 +63,20 @@ const ApplicationDetailsDialogGenerateDecision = ({
                 placeholder={t(
                   "Ex: huile de blanchiment, huile acide contaminée par du souffre"
                 )}
+                required
               />
             </div>
           )}
           <p>
             {t(
-              "Voulez-vous vraiment accepter cette demande d'agrément double comptage ?"
+              "Voulez-vous vraiment télécharger la décision double comptage ?"
             )}
           </p>
           <p>
             {t(
-              "Une fois accepté, vous retrouverez l'agrément correspondant dans la liste des agréments actifs."
+              "Une fois la demande d'agrément validée, la décision sera disponible sur la page de l'agrément actif."
             )}
           </p>
-          <p>{t("La décision sera directement téléchargée au format word.")}</p>
         </>
       }
       confirm={t("Générer la décision")}

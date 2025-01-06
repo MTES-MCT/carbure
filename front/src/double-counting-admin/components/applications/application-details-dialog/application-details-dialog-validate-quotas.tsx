@@ -11,12 +11,10 @@ import * as api from "../../../api"
 type ApplicationDetailsDialogValidateQuotasProps = {
   application: DoubleCountingApplicationDetails
   onClose: PortalInstance["close"]
-  onValidateQuotas: () => void
 }
 const ApplicationDetailsDialogValidateQuotas = ({
   application,
   onClose,
-  onValidateQuotas,
 }: ApplicationDetailsDialogValidateQuotasProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -24,7 +22,6 @@ const ApplicationDetailsDialogValidateQuotas = ({
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
     invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
     onSuccess: () => {
-      onValidateQuotas()
       notify(t("Les quotas ont bien été validés."), { variant: "success" })
       onClose()
     },
