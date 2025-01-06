@@ -23,3 +23,9 @@ class SimulationInputSerializer(serializers.ModelSerializer):
 
     target_volume = serializers.FloatField()
     target_emission = serializers.FloatField()
+
+
+class SimulationOutputSerializer(serializers.Serializer):
+    lot_id = serializers.IntegerField()
+    volume = serializers.DecimalField(max_digits=20, decimal_places=2)
+    saved_ghg = serializers.DecimalField(max_digits=20, decimal_places=2)

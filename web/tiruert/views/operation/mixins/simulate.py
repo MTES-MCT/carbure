@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from tiruert.serializers.operation import OperationInputSerializer
-from tiruert.serializers.teneur import SimulationInputSerializer
+from tiruert.serializers.teneur import SimulationInputSerializer, SimulationOutputSerializer
 from tiruert.services.teneur import TeneurService
 
 
@@ -15,7 +15,7 @@ class SimulateActionMixin:
     )
     def simulate(self, request):
         input_serializer_class = SimulationInputSerializer
-        # output_serializer_class = SimulationOutputSerializer
+        output_serializer_class = SimulationOutputSerializer
 
         serializer = input_serializer_class(data=request.data)
 
@@ -49,5 +49,7 @@ class SimulateActionMixin:
                     }
                 )
 
-            return Response(detail_operations_data, status=status.HTTP_200_OK)
+            output_serializer = output_serializer_class(detail_operations_data, many=True)
+            return Response(output_serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
