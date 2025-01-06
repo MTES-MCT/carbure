@@ -21,8 +21,8 @@ export function useUserManager(): UserManager {
     key: "user-settings",
     params: [],
     onSuccess: (response) => {
-      if (response.data?.data?.email) {
-        Sentry.setUser({ email: response.data.data.email })
+      if (response.data?.email) {
+        Sentry.setUser({ email: response.data.email })
       }
     },
   })
