@@ -1,20 +1,10 @@
-import api, { Api } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
-import {
-  Entity,
-  UserRightRequest,
-  UserRightStatus,
-  ProductionSiteDetails,
-  EntityDepot,
-  EntityCertificate,
-  EntityType,
-  UserRole,
-} from "carbure/types"
-import { EntityDetails } from "./types"
+import { UserRightStatus, EntityType, UserRole } from "carbure/types"
 
 export function getCompanies(entity_id: number) {
-  return api.get<Api<EntityDetails[]>>("/entity/admin", {
-    params: { entity_id },
+  console.log("OKOKOK 60, removed admin")
+  return apiFetch.GET("/entities/", {
+    params: { query: { entity_id } },
   })
 }
 
@@ -25,24 +15,28 @@ export function addCompany(
   has_saf: boolean,
   has_elec: boolean
 ) {
-  return api.post("/entity/admin/create", {
-    entity_id,
-    name,
-    entity_type,
-    has_saf,
-    has_elec,
+  console.log("VERYUNSURE 61")
+  return apiFetch.POST("/entities/create/", {
+    params: { query: { entity_id } },
+    body: {
+      name,
+      has_saf,
+      has_elec,
+    },
   })
 }
 
 export function getCompanyDetails(entity_id: number, company_id: number) {
-  return api.get<Api<Entity>>("/entity/admin/details", {
-    params: { entity_id, company_id },
+  console.log("VERYUNSURE 62")
+  return apiFetch.GET("/entities/details/", {
+    params: { query: { entity_id, company_id } },
   })
 }
 
 export function getCompanyDepots(entity_id: number, company_id: number) {
-  return api.get<Api<EntityDepot[]>>("/entity/admin/depots", {
-    params: { entity_id, company_id },
+  console.log("VERYUNSURE 63")
+  return apiFetch.GET("/entities/depots/", {
+    params: { query: { entity_id, company_id } },
   })
 }
 
@@ -50,12 +44,10 @@ export function getCompanyProductionSites(
   entity_id: number,
   company_id: number
 ) {
-  return api.get<Api<ProductionSiteDetails[]>>(
-    "/entity/admin/production_sites",
-    {
-      params: { entity_id, company_id },
-    }
-  )
+  console.log("VERYUNSURE 64")
+  return apiFetch.GET("/entities/production_sites/", {
+    params: { queyr: { entity_id, company_id } },
+  })
 }
 
 export function getUsersRightRequests(
@@ -64,12 +56,10 @@ export function getUsersRightRequests(
   company_id: number,
   statuses?: UserRightStatus[]
 ) {
-  return api.get<Api<UserRightRequest[]>>(
-    "/entity/admin/users/rights-requests",
-    {
-      params: { entity_id, q: query, company_id, statuses },
-    }
-  )
+  console.log("VERYUNSURE 65")
+  return apiFetch.GET("/entities/users/rights-requests/", {
+    params: { query: { entity_id, q: query, company_id, statuses } },
+  })
 }
 
 export function updateUsersRights(
@@ -77,10 +67,10 @@ export function updateUsersRights(
   entity_id: number,
   status?: UserRightStatus
 ) {
-  return api.post("/entity/admin/users/update-right-request", {
-    id: request_id,
-    entity_id,
-    status,
+  console.log("VERYUNSURE 66")
+  return apiFetch.POST("/entities/users/update-right-request/", {
+    params: { query: { entity_id } },
+    body: { id: request_id, status },
   })
 }
 export function updateUserRole(
@@ -88,16 +78,17 @@ export function updateUserRole(
   entity_id: number,
   role: UserRole
 ) {
-  return api.post("/entity/admin/users/update-user-role", {
-    entity_id,
-    request_id,
-    role,
+  console.log("VERYUNSURE 67")
+  return apiFetch.POST("/entities/users/update-user-role/", {
+    params: { query: { entity_id } },
+    body: { request_id, role },
   })
 }
 
 export function getEntityCertificates(entity_id: number, company_id?: number) {
-  return api.get<Api<EntityCertificate[]>>("/entity/admin/certificates", {
-    params: { entity_id, company_id },
+  console.log("VERYUNSURE 68", company_id, "remove admin permission bug")
+  return apiFetch.GET("/entities/certificates/", {
+    params: { query: { entity_id, company_id } },
   })
 }
 
@@ -105,9 +96,10 @@ export function checkEntityCertificate(
   entity_id: number,
   entity_certificate_id: number
 ) {
-  return api.post("/entity/admin/certificates/check", {
-    entity_id,
-    entity_certificate_id,
+  console.log("VERYUNSURE 69")
+  return apiFetch.POST("/entities/certificates/check/", {
+    params: { query: { entity_id } },
+    body: { entity_certificate_id },
   })
 }
 
@@ -115,17 +107,19 @@ export function rejectEntityCertificate(
   entity_id: number,
   entity_certificate_id: number
 ) {
-  return api.post("/entity/admin/certificates/reject", {
-    entity_id,
-    entity_certificate_id,
+  console.log("VERYUNSURE 70")
+  return apiFetch.POST("/entities/certificates/reject/", {
+    params: { query: { entity_id } },
+    body: { entity_certificate_id },
   })
 }
 
 export function enableCompany(entity_id: number, company_id: number) {
+  console.log("VERYUNSURE 71")
   return apiFetch.POST("/entities/{id}/enable/", {
     params: {
       path: { id: company_id },
-      query: { entity_id },
+      params: { query: { entity_id } },
     },
   })
 }

@@ -1,7 +1,7 @@
-import api, { Api } from "common/services/api"
+import { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
 import { api as apiFetch } from "common/services/api-fetch"
-import { Notification, EntityType, EntityCertificate } from "./types"
+import { EntityType } from "./types"
 
 export function getUserSettings() {
   return apiFetch.GET("/user/")
@@ -113,8 +113,9 @@ export function findMyCertificates(
     production_site_id?: number | null | undefined
   }
 ) {
-  return api
-    .get<Api<EntityCertificate[]>>("/entity/certificates", {
+  console.log("VERYUNSURE 90", query, options)
+  return apiFetch
+    .GET("/entities/certificates/", {
       params: { query, ...options },
     })
     .then(extract)
@@ -125,8 +126,9 @@ export function findMyCertificates(
 
 export async function getNotifications(entity_id: number) {
   if (entity_id === -1) return
-  return api.get<Api<Notification[]>>("/entity/notifications", {
-    params: { entity_id },
+  console.log("OKOKOKOKOK 91")
+  return apiFetch.GET("/entities/notifications/", {
+    params: { query: { entity_id } },
   })
 }
 
@@ -134,8 +136,9 @@ export function ackNotifications(
   entity_id: number,
   notification_ids: number[]
 ) {
-  return api.post("/entity/notifications/ack", {
-    entity_id,
-    notification_ids,
+  console.log("VERYUNSURE 92")
+  return apiFetch.POST("/entities/notifications/ack/", {
+    params: { query: { entity_id } },
+    body: { notification_ids },
   })
 }

@@ -7,6 +7,7 @@ from drf_spectacular.utils import (
 )
 from rest_framework import serializers, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from core.models import Pays
 from transactions.models import ProductionSite
@@ -76,7 +77,8 @@ class UpdateProductionSiteMixin:
             ),
         ],
     )
-    def partial_update(self, request, id=None):
+    @action(detail=True, methods=["post"], url_path="update")
+    def update_item(self, request, id=None):
         # Retrieve related models
         psite = ProductionSite.objects.get(id=id)
         serializer = UpdateProductionSiteModelSerializer(instance=psite, data=request.data, partial=True)

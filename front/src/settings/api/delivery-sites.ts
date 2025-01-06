@@ -1,4 +1,5 @@
-import api, { Api } from "common/services/api"
+import { Api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 import {
   Country,
   SiteType,
@@ -8,7 +9,8 @@ import {
 } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
-  return api.get<Api<EntityDepot[]>>("/entity/depots", {
+  console.log("VERYUNSURE 21")
+  return apiFetch.GET("/entities/depots/", {
     params: { entity_id },
   })
 }
@@ -23,12 +25,15 @@ export function addDeliverySite(
   blending_outsourced: boolean,
   blending_entity: EntityPreview | undefined
 ) {
-  return api.post("/entity/depots/add", {
-    entity_id,
-    delivery_site_id,
-    ownership_type,
-    blending_outsourced,
-    blending_entity_id: blending_entity?.id,
+  console.log("VERYUNSURE 22")
+  return apiFetch.POST("/entities/depots/add", {
+    params: { query: { entity_id } },
+    body: {
+      delivery_site_id,
+      ownership_type,
+      blending_outsourced,
+      blending_entity_id: blending_entity?.id,
+    },
   })
 }
 
@@ -45,18 +50,21 @@ export function createNewDeliverySite(
   thermal_efficiency?: number,
   useful_temperature?: number
 ) {
-  return api.post("/entity/depots/create", {
-    entity_id,
-    name,
-    city,
-    country_code: country.code_pays,
-    depot_id,
-    depot_type,
-    address,
-    postal_code,
-    electrical_efficiency,
-    thermal_efficiency,
-    useful_temperature,
+  console.log("VERYUNSURE 23")
+  return apiFetch.POST("/entities/depots/create", {
+    params: { query: { entity_id } },
+    body: {
+      name,
+      city,
+      country_code: country.code_pays,
+      depot_id,
+      depot_type,
+      address,
+      postal_code,
+      electrical_efficiency,
+      thermal_efficiency,
+      useful_temperature,
+    },
   })
 }
 
@@ -64,8 +72,11 @@ export function deleteDeliverySite(
   entity_id: number,
   delivery_site_id: string
 ) {
-  return api.post("/entity/depots/delete", {
-    entity_id,
-    delivery_site_id,
+  console.log("VERYUNSURE 24")
+  return apiFetch.POST("/entities/depots/delete", {
+    params: { query: { entity_id } },
+    body: {
+      delivery_site_id,
+    },
   })
 }

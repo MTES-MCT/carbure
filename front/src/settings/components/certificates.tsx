@@ -59,7 +59,7 @@ const Certificates = () => {
   )
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
-  const certificateData = certificates.result?.data.data ?? []
+  const certificateData = certificates.result?.data ?? []
   const validCertificates = certificateData.filter(e => !isExpired(e.certificate.valid_until)) // prettier-ignore
 
   return (

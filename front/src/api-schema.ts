@@ -740,7 +740,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/entities/production-sites/{id}/": {
+  "/api/entities/production-sites/{id}/delete/": {
     parameters: {
       query?: never
       header?: never
@@ -749,11 +749,11 @@ export interface paths {
     }
     get?: never
     put?: never
-    post?: never
-    delete: operations["entities_production_sites_destroy"]
+    post: operations["entities_production_sites_delete_create"]
+    delete?: never
     options?: never
     head?: never
-    patch: operations["entities_production_sites_partial_update"]
+    patch?: never
     trace?: never
   }
   "/api/entities/production-sites/{id}/set-biofuels/": {
@@ -798,6 +798,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["entities_production_sites_set_feedstocks_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/production-sites/{id}/update/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_production_sites_update_create"]
     delete?: never
     options?: never
     head?: never
@@ -2351,23 +2367,6 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
     }
-    PatchedUpdateProductionSiteModelRequest: {
-      country_code?: string
-      name?: string
-      /** Format: date */
-      date_mise_en_service?: string | null
-      ges_option?: components["schemas"]["GesOptionEnum"]
-      site_siret?: string
-      postal_code?: string
-      manager_name?: string
-      manager_phone?: string
-      manager_email?: string
-      city?: string
-      address?: string
-      eligible_dc?: boolean
-      dc_reference?: string
-      created_by?: number | null
-    }
     Pays: {
       code_pays: string
       name: string
@@ -2778,6 +2777,23 @@ export interface components {
       vat_number?: string
       /** Format: uri */
       website?: string
+    }
+    UpdateProductionSiteModelRequest: {
+      country_code: string
+      name: string
+      /** Format: date */
+      date_mise_en_service?: string | null
+      ges_option?: components["schemas"]["GesOptionEnum"]
+      site_siret?: string
+      postal_code?: string
+      manager_name?: string
+      manager_phone?: string
+      manager_email?: string
+      city?: string
+      address?: string
+      eligible_dc?: boolean
+      dc_reference?: string
+      created_by?: number | null
     }
     UpdateRightsRequestsRequest: {
       id: number
@@ -3848,7 +3864,10 @@ export interface operations {
   }
   entities_certificates_add_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -4390,7 +4409,7 @@ export interface operations {
       }
     }
   }
-  entities_production_sites_destroy: {
+  entities_production_sites_delete_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -4404,47 +4423,6 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
-    responses: {
-      /** @description Request successful. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": unknown
-        }
-      }
-      /** @description Bad request. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": unknown
-        }
-      }
-    }
-  }
-  entities_production_sites_partial_update: {
-    parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Site de Production. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedUpdateProductionSiteModelRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedUpdateProductionSiteModelRequest"]
-        "multipart/form-data": components["schemas"]["PatchedUpdateProductionSiteModelRequest"]
-      }
-    }
     responses: {
       /** @description Request successful. */
       200: {
@@ -4566,6 +4544,47 @@ export interface operations {
         "application/json": components["schemas"]["SetFeedstocksRequest"]
         "application/x-www-form-urlencoded": components["schemas"]["SetFeedstocksRequest"]
         "multipart/form-data": components["schemas"]["SetFeedstocksRequest"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_production_sites_update_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Site de Production. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProductionSiteModelRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdateProductionSiteModelRequest"]
+        "multipart/form-data": components["schemas"]["UpdateProductionSiteModelRequest"]
       }
     }
     responses: {
@@ -4926,7 +4945,10 @@ export interface operations {
   }
   entities_users_accept_user_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -4961,7 +4983,10 @@ export interface operations {
   }
   entities_users_change_role_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -5018,7 +5043,10 @@ export interface operations {
   }
   entities_users_invite_user_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -5053,7 +5081,10 @@ export interface operations {
   }
   entities_users_revoke_access_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never

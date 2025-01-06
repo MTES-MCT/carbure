@@ -31,7 +31,7 @@ export const okStats = http.get("/api/home-stats", () => {
   })
 })
 
-export const okNotifications = http.get("/api/entity/notifications", () => {
+export const okNotifications = http.get("/api/entities/notifications", () => {
   return HttpResponse.json({
     status: "success",
     data: [],

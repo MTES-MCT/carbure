@@ -1220,6 +1220,13 @@ paths:
   /api/entities/certificates/add/:
     post:
       operationId: entities_certificates_add_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -1916,63 +1923,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/DepotProductionSite"
           description: ""
-  /api/entities/production-sites/{id}/:
-    patch:
-      operationId: entities_production_sites_partial_update
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Site de Production.
-          required: true
-      tags:
-        - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PatchedUpdateProductionSiteModelRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/PatchedUpdateProductionSiteModelRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/PatchedUpdateProductionSiteModelRequest"
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
-    delete:
-      operationId: entities_production_sites_destroy
+  /api/entities/production-sites/{id}/delete/:
+    post:
+      operationId: entities_production_sites_delete_create
       parameters:
         - in: query
           name: entity_id
@@ -2155,6 +2108,62 @@ paths:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/SetFeedstocksRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/production-sites/{id}/update/:
+    post:
+      operationId: entities_production_sites_update_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Site de Production.
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductionSiteModelRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateProductionSiteModelRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateProductionSiteModelRequest"
         required: true
       security:
         - cookieAuth: []
@@ -2616,6 +2625,13 @@ paths:
   /api/entities/users/accept-user/:
     post:
       operationId: entities_users_accept_user_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -2659,6 +2675,13 @@ paths:
   /api/entities/users/change-role/:
     post:
       operationId: entities_users_change_role_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -2724,6 +2747,13 @@ paths:
   /api/entities/users/invite-user/:
     post:
       operationId: entities_users_invite_user_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -2767,6 +2797,13 @@ paths:
   /api/entities/users/revoke-access/:
     post:
       operationId: entities_users_revoke_access_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -6756,51 +6793,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
-    PatchedUpdateProductionSiteModelRequest:
-      type: object
-      properties:
-        country_code:
-          type: string
-          minLength: 1
-        name:
-          type: string
-          minLength: 1
-          maxLength: 128
-        date_mise_en_service:
-          type: string
-          format: date
-          nullable: true
-        ges_option:
-          $ref: "#/components/schemas/GesOptionEnum"
-        site_siret:
-          type: string
-          maxLength: 64
-        postal_code:
-          type: string
-          maxLength: 32
-        manager_name:
-          type: string
-          maxLength: 64
-        manager_phone:
-          type: string
-          maxLength: 64
-        manager_email:
-          type: string
-          maxLength: 64
-        city:
-          type: string
-          maxLength: 128
-        address:
-          type: string
-          maxLength: 256
-        eligible_dc:
-          type: boolean
-        dc_reference:
-          type: string
-          maxLength: 64
-        created_by:
-          type: integer
-          nullable: true
     Pays:
       type: object
       properties:
@@ -7858,6 +7850,54 @@ components:
         website:
           type: string
           format: uri
+    UpdateProductionSiteModelRequest:
+      type: object
+      properties:
+        country_code:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        site_siret:
+          type: string
+          maxLength: 64
+        postal_code:
+          type: string
+          maxLength: 32
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        city:
+          type: string
+          maxLength: 128
+        address:
+          type: string
+          maxLength: 256
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        created_by:
+          type: integer
+          nullable: true
+      required:
+        - country_code
+        - name
     UpdateRightsRequestsRequest:
       type: object
       properties:

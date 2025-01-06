@@ -40,7 +40,7 @@ const Certificates = ({
     params: [entity.id, entity_id],
   })
 
-  const certData = (certificates.result?.data?.data ?? []).filter(
+  const certData = (certificates.result?.data ?? []).filter(
     (c) =>
       matchesSearch(search, [
         c.certificate.certificate_id,

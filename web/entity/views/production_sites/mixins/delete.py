@@ -5,6 +5,7 @@ from drf_spectacular.utils import (
     OpenApiTypes,
     extend_schema,
 )
+from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -48,7 +49,8 @@ class DeleteActionMixin:
             ),
         ],
     )
-    def destroy(self, request, id=None):
+    @action(detail=True, methods=["post"])
+    def delete(self, request, id=None):
         entity_id = self.request.query_params.get("entity_id")
         entity = Entity.objects.get(id=entity_id)
 

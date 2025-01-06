@@ -56,7 +56,7 @@ const DeliverySitesSettings = ({
     params: [entity.id],
   })
 
-  const deliverySitesData = deliverySites.result?.data.data ?? []
+  const deliverySitesData = deliverySites.result?.data ?? []
   const isEmpty = deliverySitesData.length === 0
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)

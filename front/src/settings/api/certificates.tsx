@@ -1,4 +1,4 @@
-import { api, Api } from "common/services/api"
+import { Api } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
 import { CertificateType, EntityCertificate } from "carbure/types"
 
@@ -12,35 +12,39 @@ export function getMyCertificates(
   entity_id: number,
   production_site_id?: number
 ) {
-  return api.get<Api<EntityCertificate[]>>("/entity/certificates", {
-    params: {
-      entity_id,
-      production_site_id,
-    },
+  console.log("OKOKOKOKOK 40 empty array")
+  return apiFetch.GET("/entities/certificates/", {
+    params: { query: { entity_id, production_site_id } },
   })
 }
 
 export function addCertificate(
-  entityID: number,
+  entity_id: number,
   certificate_id: string,
   certificate_type: CertificateType
 ) {
-  return api.post("/entity/certificates/add", {
-    entity_id: entityID,
-    certificate_id: certificate_id,
-    certificate_type: certificate_type,
+  console.log("VERYUNSURE 41")
+  return apiFetch.POST("/entities/certificates/add/", {
+    params: { query: { entity_id } },
+    body: {
+      certificate_id: certificate_id,
+      certificate_type: certificate_type,
+    },
   })
 }
 
 export function deleteCertificate(
-  entityID: number,
+  entity_id: number,
   certificate_id: string,
   certificate_type: CertificateType
 ) {
-  return api.post("/entity/certificates/delete", {
-    entity_id: entityID,
-    certificate_id: certificate_id,
-    certificate_type: certificate_type,
+  console.log("VERYUNSURE 42")
+  return apiFetch.POST("/entities/certificates/delete/", {
+    params: { query: { entity_id } },
+    body: {
+      certificate_id: certificate_id,
+      certificate_type: certificate_type,
+    },
   })
 }
 
@@ -51,12 +55,15 @@ export function updateCertificate(
   new_certificate_id: string,
   new_certificate_type: CertificateType
 ) {
-  return api.post("/entity/certificates/update", {
-    entity_id,
-    old_certificate_id,
-    old_certificate_type,
-    new_certificate_id,
-    new_certificate_type,
+  console.log("VERYUNSURE 43")
+  return apiFetch.POST("/entities/certificates/update/", {
+    params: { query: { entity_id } },
+    body: {
+      old_certificate_id,
+      old_certificate_type,
+      new_certificate_id,
+      new_certificate_type,
+    },
   })
 }
 
@@ -64,8 +71,11 @@ export function setDefaultCertificate(
   entity_id: number,
   certificate_id: string
 ) {
-  return api.post("/entity/certificates/set-default", {
-    entity_id,
-    certificate_id,
+  console.log("VERYUNSURE 44")
+  return apiFetch.POST("/entities/certificates/set-default/", {
+    params: { query: { entity_id } },
+    body: {
+      certificate_id,
+    },
   })
 }

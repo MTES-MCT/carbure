@@ -1,14 +1,11 @@
-import api, { Api } from "common/services/api"
-import { SearchCompanyResult } from "./types"
+import { api as apiFetch } from "common/services/api-fetch"
 import { EntityType } from "carbure/types"
 
 export function searchCompanyDataBySiren(registration_id: string) {
-  return api.post<Api<SearchCompanyResult>>(
-    "/entity/registration/search-company",
-    {
-      registration_id,
-    }
-  )
+  console.log("VERYUNSURE 50")
+  return apiFetch.POST("/entities/search-company/", {
+    body: { registration_id },
+  })
 }
 
 export function registerCompany(
@@ -29,22 +26,25 @@ export function registerCompany(
   certificate_id?: string,
   certificate_type?: string
 ) {
-  return api.post("/entity/registration/add-company", {
-    activity_description,
-    entity_type,
-    legal_name,
-    name,
-    registered_address,
-    registered_city,
-    registered_country_code,
-    registered_zipcode,
-    registration_id,
-    sustainability_officer_email,
-    sustainability_officer_phone_number,
-    sustainability_officer,
-    website,
-    vat_number,
-    certificate_id,
-    certificate_type,
+  console.log("VERYUNSURE 51")
+  return apiFetch.POST("/entities/add-company/", {
+    body: {
+      activity_description,
+      entity_type,
+      legal_name,
+      name,
+      registered_address,
+      registered_city,
+      registered_country_code,
+      registered_zipcode,
+      registration_id,
+      sustainability_officer_email,
+      sustainability_officer_phone_number,
+      sustainability_officer,
+      website,
+      vat_number,
+      certificate_id,
+      certificate_type,
+    },
   })
 }

@@ -32,7 +32,7 @@ const EntityDetails = () => {
     return api.getCompanyDepots(entity.id, company_id)
   }
 
-  const entityData = company.result?.data.data
+  const entityData = company.result?.data
   const isEnabled = Boolean(entityData?.is_enabled)
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
