@@ -19,10 +19,10 @@ class BalanceActionMixin:
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
         date_from = request.query_params.get("date_from")
-        operations = OperationFilter(request.GET, queryset=self.get_queryset()).qs
+        operations = self.filter_queryset(self.get_queryset())
 
         # Beginning of the current year by default
-        if not date_from:
+        if not date_from and group_by != "lot":
             current_year = datetime.now().year
             date_from = f"{current_year}-01-01"
             operations = operations.filter(created_at__gte=date_from)
@@ -36,10 +36,11 @@ class BalanceActionMixin:
 
         # Convert balance to a list of dictionaries for serialization
         if group_by == "lot":
-            data = BalanceByLotSerializer.prepare_data(balance)
-            serializer = BalanceByLotSerializer(data, many=True)
+            serializer_class = BalanceByLotSerializer
+            data = serializer_class.prepare_data(balance)
         else:
             data = list(balance.values())
-            serializer = BalanceSerializer(data, many=True)
+            serializer_class = self.get_serializer_class()
 
+        serializer = serializer_class(data, many=True)
         return Response(serializer.data)

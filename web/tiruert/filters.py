@@ -11,7 +11,7 @@ class OperationFilter(FilterSet):
     type = BaseInFilter(field_name="type", lookup_expr="in")
     status = BaseInFilter(field_name="status", lookup_expr="in")
     customs_category = BaseInFilter(field_name="customs_category", lookup_expr="in")
-    biofuel = BaseInFilter(field_name="biofuel__name", lookup_expr="in")
+    biofuel = BaseInFilter(field_name="biofuel__code", lookup_expr="in")
     sector = CharFilter(method="filter_sector")
     from_to = CharFilter(method="filter_from_to")
 
