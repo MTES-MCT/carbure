@@ -1,4 +1,5 @@
 from django.db.models.aggregates import Count, Sum
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from certificates.models import ProductionSiteCertificate
@@ -10,6 +11,7 @@ from .models import (
     DoubleCountingApplication,
     DoubleCountingDocFile,
     DoubleCountingProduction,
+    DoubleCountingProductionHistory,
     DoubleCountingSourcing,
     DoubleCountingSourcingHistory,
 )
@@ -44,11 +46,8 @@ class EntitySerializer(serializers.ModelSerializer):
 class EntitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = [
-            "id",
-            "name",
-            "entity_type",
-        ]
+        fields = ["id", "name", "entity_type"]
+        read_only_fields = fields
 
 
 class FeedStockSerializer(serializers.ModelSerializer):
@@ -118,16 +117,19 @@ class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
             "certificates",
         ]
 
+    @extend_schema_field(ProductionSiteCertificateSerializer(many=True))
     def get_certificates(self, obj):
         ps_certificates = ProductionSiteCertificate.objects.filter(production_site=obj)
         certificates = [ps_certificate.certificate.certificate for ps_certificate in ps_certificates]
         return ProductionSiteCertificateSerializer(certificates, many=True).data
 
+    @extend_schema_field(FeedStockSerializer(many=True))
     def get_inputs(self, obj):
         inputs = ProductionSiteInput.objects.filter(production_site=obj)
         feedstocks = [input.matiere_premiere for input in inputs]
         return FeedStockSerializer(feedstocks, many=True).data
 
+    @extend_schema_field(BiofuelSerializer(many=True))
     def get_outputs(self, obj):
         inputs = ProductionSiteOutput.objects.filter(production_site=obj)
         biofuels = [input.biocarburant for input in inputs]
@@ -150,6 +152,24 @@ class DoubleCountingProductionSerializer(serializers.ModelSerializer):
             "requested_quota",
             "approved_quota",
         ]
+        read_only_fields = fields
+
+
+class DoubleCountingProductionHistorySerializer(serializers.ModelSerializer):
+    biofuel = BiofuelSerializer(read_only=True)
+    feedstock = FeedStockSerializer(read_only=True)
+
+    class Meta:
+        model = DoubleCountingProductionHistory
+        fields = [
+            "id",
+            "year",
+            "biofuel",
+            "feedstock",
+            "max_production_capacity",
+            "effective_production",
+        ]
+        read_only_fields = fields
 
 
 class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
@@ -161,6 +181,7 @@ class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingSourcing
         fields = ["id", "year", "feedstock", "origin_country", "supply_country", "transit_country", "metric_tonnes"]
+        read_only_fields = fields
 
 
 class DoubleCountingSourcingHistorySerializer(serializers.ModelSerializer):
@@ -197,26 +218,6 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
         fields = ["year", "feedstock", "sum"]
 
 
-class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
-    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
-    producer = EntitySerializer(read_only=True)
-
-    class Meta:
-        model = DoubleCountingApplication
-        fields = [
-            "id",
-            "certificate_id",
-            "created_at",
-            "producer",
-            "producer_user",
-            "production_site",
-            "period_start",
-            "period_end",
-            "status",
-        ]
-
-
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingDocFile
@@ -249,11 +250,15 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
 
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
-    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    producer = EntitySerializer(read_only=True)
+    production_site = DoubleCountingProductionSiteSerializer(read_only=True)
+    producer = EntitySummarySerializer(read_only=True)
+    agreement_id = serializers.SerializerMethodField()
+    quotas_progression = serializers.SerializerMethodField()
+    producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
 
     class Meta:
         model = DoubleCountingApplication
+        read_only_fields = ["status"]
         fields = [
             "id",
             "created_at",
@@ -263,7 +268,18 @@ class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
             "period_end",
             "status",
             "certificate_id",
+            "agreement_id",
+            "quotas_progression",
+            "producer_user",
         ]
+
+    @extend_schema_field(int)
+    def get_agreement_id(self, obj):
+        return None
+
+    @extend_schema_field(float)
+    def get_quotas_progression(self, obj):
+        return 0.0
 
 
 class DoubleCountingApplicationPartialSerializerWithForeignKeys(serializers.ModelSerializer):

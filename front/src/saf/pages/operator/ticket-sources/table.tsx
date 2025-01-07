@@ -42,7 +42,7 @@ export const TicketSourcesTable = memo(
         rowLink={rowLink}
         rows={ticketSources}
         columns={compact([
-          status === SafTicketSourceStatus.Available &&
+          status === SafTicketSourceStatus.AVAILABLE &&
             selectionColumn(
               ticketSources,
               selected,

@@ -30,8 +30,8 @@ export const ApplicationDetailsDialog = () => {
     }
   )
 
-  const application = applicationResponse.result?.data.data
-  const dcaStatus = application?.status ?? DCStatus.Pending
+  const application = applicationResponse.result?.data
+  const dcaStatus = application?.status ?? DCStatus.PENDING
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#double-counting" })

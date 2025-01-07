@@ -30,6 +30,22 @@ const res = mergeDeepRight(parsed, {
           "PowerOrHeatProducer",
         ],
       },
+      UserRightsRequestsStatusEnum: {
+        "x-enum-varnames": [
+          "Pending", //
+          "Accepted",
+          "Rejected",
+          "Revoked",
+        ],
+      },
+      RoleEnum: {
+        "x-enum-varnames": [
+          "ReadOnly", //
+          "ReadWrite",
+          "Admin",
+          "Auditor",
+        ],
+      },
     },
   },
 })

@@ -15,7 +15,7 @@ export type CBSnapshot = Record<string, number>
 
 export type CBFilterSelection = Record<string, string[]>
 
-export const CBQUERY_RESET: Partial<CBQueryParams<[]>> = {
+export const CBQUERY_RESET: Partial<CBQueryParams<[], undefined, undefined>> = {
   limit: undefined,
   page: 1,
   order: undefined,
@@ -33,37 +33,30 @@ const formatOrder = <Columns extends string[]>(
   return [mapping[order.direction]] as Columns
 }
 
-interface BaseCBQueryStates {
+export type CBQueryStates<
+  S extends string | undefined,
+  T extends string | undefined,
+> = {
   entity: Entity
   year: number
   filters: CBFilterSelection
   search?: string
-  status: string
-  type?: string // Extra info used when we have to call the same endpoint for two different views (See saf operator page)
+  status?: S
+  type?: T // Extra info used when we have to call the same endpoint for two different views (See saf operator page)
   selection: number[]
   page: number
   limit?: number
   order?: Order
 }
-export type CBQueryStates<
-  GenericCBQueryStates extends BaseCBQueryStates = BaseCBQueryStates,
-> = {
-  entity: GenericCBQueryStates["entity"]
-  year: GenericCBQueryStates["year"]
-  filters: GenericCBQueryStates["filters"]
-  search?: GenericCBQueryStates["search"]
-  status: GenericCBQueryStates["status"]
-  type?: GenericCBQueryStates["type"]
-  page: GenericCBQueryStates["page"]
-  selection: GenericCBQueryStates["selection"]
-  limit?: GenericCBQueryStates["limit"]
-  order?: GenericCBQueryStates["order"]
-}
-export interface CBQueryParams<Columns extends string[]> {
+export interface CBQueryParams<
+  Columns extends string[],
+  Status extends string | undefined,
+  Type extends string | undefined,
+> {
   entity_id: number
   year: number
-  status: string
-  type?: string
+  status?: Status
+  type?: Type
   search?: string
   page: number
   limit?: number
@@ -71,10 +64,11 @@ export interface CBQueryParams<Columns extends string[]> {
 }
 
 /* Hooks */
-
-export function useCBQueryBuilder<Columns extends string[]>(
-  params: CBQueryStates
-): CBQueryParams<Columns> {
+export function useCBQueryBuilder<
+  Columns extends string[],
+  Status extends string | undefined,
+  Type extends string | undefined,
+>(params: CBQueryStates<Status, Type>): CBQueryParams<Columns, Status, Type> {
   const {
     entity,
     year,
@@ -87,7 +81,7 @@ export function useCBQueryBuilder<Columns extends string[]>(
     filters,
   } = params
 
-  return useMemo<CBQueryParams<Columns>>(
+  return useMemo<CBQueryParams<Columns, Status, Type>>(
     () => ({
       entity_id: entity.id,
       year,
@@ -104,8 +98,9 @@ export function useCBQueryBuilder<Columns extends string[]>(
 }
 
 export function useCBQueryParamsStore<
-  GenericCBQueryStates extends BaseCBQueryStates = BaseCBQueryStates,
->(entity: Entity, year: number, status: string, type?: string) {
+  S extends string,
+  T extends string | undefined,
+>(entity: Entity, year: number, status: S, type?: T) {
   const [limit, saveLimit] = useLimit()
   const [{ page, ...filtersParams }, setFiltersParams] = useFilterSearchParams()
 
@@ -123,7 +118,7 @@ export function useCBQueryParamsStore<
       selection: [],
       page: computedPage,
       limit,
-    } as CBQueryStates<GenericCBQueryStates>,
+    } as CBQueryStates<S, T>,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -139,7 +134,7 @@ export function useCBQueryParamsStore<
         page: 1,
       }),
 
-      setStatus: (status: string) => {
+      setStatus: (status: S) => {
         return {
           status,
           filters: filtersParams,
@@ -148,7 +143,7 @@ export function useCBQueryParamsStore<
         }
       },
 
-      setType: (type: string) => {
+      setType: (type: T) => {
         return {
           type,
           filters: filtersParams,

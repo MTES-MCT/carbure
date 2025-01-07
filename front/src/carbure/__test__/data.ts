@@ -44,6 +44,13 @@ export const company: Entity = {
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
   preferred_unit: PreferredUnitEnum.l,
+  is_enabled: true,
+  sustainability_officer_email: "",
+  vat_number: "",
+  website: "",
+  activity_description: "",
+  has_saf: false,
+  ext_admin_pages: [],
 }
 
 export const producer: Entity = {
@@ -65,6 +72,13 @@ export const producer: Entity = {
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
   preferred_unit: PreferredUnitEnum.l,
+  is_enabled: true,
+  sustainability_officer_email: "",
+  vat_number: "",
+  website: "",
+  activity_description: "",
+  has_saf: false,
+  ext_admin_pages: [],
 }
 
 export const trader: Entity = {
@@ -86,6 +100,13 @@ export const trader: Entity = {
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
   preferred_unit: PreferredUnitEnum.l,
+  is_enabled: true,
+  sustainability_officer_email: "",
+  vat_number: "",
+  website: "",
+  activity_description: "",
+  has_saf: false,
+  ext_admin_pages: [],
 }
 
 export const operator: Entity = {
@@ -107,6 +128,13 @@ export const operator: Entity = {
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
   preferred_unit: PreferredUnitEnum.l,
+  is_enabled: true,
+  sustainability_officer_email: "",
+  vat_number: "",
+  website: "",
+  activity_description: "",
+  has_saf: false,
+  ext_admin_pages: [],
 }
 
 export const admin: Entity = {
@@ -128,6 +156,13 @@ export const admin: Entity = {
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
   preferred_unit: PreferredUnitEnum.l,
+  is_enabled: true,
+  sustainability_officer_email: "",
+  vat_number: "",
+  website: "",
+  activity_description: "",
+  has_saf: false,
+  ext_admin_pages: [],
 }
 
 export const cpo: Entity = {
@@ -149,6 +184,13 @@ export const cpo: Entity = {
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
   preferred_unit: PreferredUnitEnum.l,
+  is_enabled: true,
+  sustainability_officer_email: "",
+  vat_number: "",
+  website: "",
+  activity_description: "",
+  has_saf: false,
+  ext_admin_pages: [],
 }
 
 // DELIVERY SITES
@@ -211,7 +253,8 @@ export const entityRight: UserRight = {
   entity: producer,
   role: UserRole.Admin,
   expiration_date: "",
-  date_added: "2020-12-23T16:18:27.233Z",
+  email: "test@test.test",
+  name: "test",
 }
 
 export const entityRequest: UserRightRequest = {

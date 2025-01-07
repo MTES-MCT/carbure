@@ -34,6 +34,9 @@ def bulk_update_or_create(Model, id_field, rows, batch=1000):
 
     paginator = Paginator(rows, batch)
 
+    existing_objects_total = []
+    new_objects_total = []
+
     for page_number in paginator.page_range:
         page = paginator.page(page_number)
         page_rows = page.object_list
@@ -66,7 +69,10 @@ def bulk_update_or_create(Model, id_field, rows, batch=1000):
         Model.objects.bulk_update(existing_objects, update_keys)
         Model.objects.bulk_create(new_objects)
 
-    return existing_objects, new_objects
+        new_objects_total.extend(new_objects)
+        existing_objects_total.extend(existing_objects)
+
+    return existing_objects_total, new_objects_total
 
 
 def generate_reports(name, entity_lots, include_partners=False):

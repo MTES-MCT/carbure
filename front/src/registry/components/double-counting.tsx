@@ -14,7 +14,7 @@ const DoubleCounting = () => {
       params: [],
     }
   )
-  const agreements = agreementsResponse.result?.data.data
+  const agreements = agreementsResponse.result?.data
 
   return (
     <>

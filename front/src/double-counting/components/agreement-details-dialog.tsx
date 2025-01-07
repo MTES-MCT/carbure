@@ -30,8 +30,7 @@ export const AgreementDetailsDialog = () => {
     params: [entity.id, parseInt(match?.params.id || "")],
   })
 
-  const agreement: AgreementDetails | undefined =
-    applicationResponse.result?.data.data
+  const agreement = applicationResponse.result?.data
 
   const application = agreement?.application
 
@@ -76,7 +75,7 @@ export const AgreementDetailsDialog = () => {
             </section>
           )}
           {application &&
-            application.status !== DoubleCountingStatus.Accepted && (
+            application.status !== DoubleCountingStatus.ACCEPTED && (
               <section>
                 <p>La demande est en cours de traitement...</p>
                 <Button
@@ -94,7 +93,7 @@ export const AgreementDetailsDialog = () => {
             )}
 
           {application &&
-            application.status === DoubleCountingStatus.Accepted && (
+            application.status === DoubleCountingStatus.ACCEPTED && (
               <>
                 <AgreementTabs agreement={agreement} />
               </>

@@ -1,10 +1,9 @@
-import {
-  Biofuel,
-  Country,
-  Entity,
-  Feedstock,
-  ProductionSiteDetails,
-} from "carbure/types"
+import { DoubleCountingStatus, DoubleCountingAgreementStatus } from "api-schema"
+import { Biofuel, Feedstock } from "carbure/types"
+import { apiTypes } from "common/services/api-fetch.types"
+
+export { DoubleCountingStatus }
+export { DoubleCountingAgreementStatus as AgreementStatus }
 
 export enum Admin {
   DGEC = "MTE - DGEC",
@@ -12,36 +11,18 @@ export enum Admin {
   DGPE = "DGPE",
 }
 
-export enum DoubleCountingStatus {
-  Pending = "PENDING",
-  InProgress = "INPROGRESS",
-  Rejected = "REJECTED",
-  Accepted = "ACCEPTED",
-  Expired = "EXPIRED",
-  ExpiresSoon = "EXPIRES_SOON",
-  Incoming = "INCOMING",
+export enum DoubleCountingExtendedStatus {
+  ACCEPTED = DoubleCountingStatus.ACCEPTED,
+  INPROGRESS = DoubleCountingStatus.INPROGRESS,
+  PENDING = DoubleCountingStatus.PENDING,
+  REJECTED = DoubleCountingStatus.REJECTED,
+  EXPIRED = DoubleCountingAgreementStatus.EXPIRED,
+  EXPIRES_SOON = DoubleCountingAgreementStatus.EXPIRES_SOON,
+  INCOMING = DoubleCountingAgreementStatus.INCOMING,
 }
 
-export enum AgreementStatus {
-  Active = "ACTIVE",
-  Expired = "EXPIRED",
-  ExpiresSoon = "EXPIRES_SOON",
-  Incoming = "INCOMING",
-}
-
-export interface DoubleCountingApplicationOverview {
-  id: number
-  certificate_id: string
-  agreement_id: string
-  producer: Entity
-  production_site: ProductionSiteDetails
-  period_start: string
-  period_end: string
-  status: DoubleCountingStatus
-  producer_user: string
-  created_at: string
-  quotas_progression?: number
-}
+export type DoubleCountingApplicationOverview =
+  apiTypes["DoubleCountingApplicationPartial"]
 
 export interface DoubleCountingSourcingAggregation {
   year: number
@@ -50,38 +31,14 @@ export interface DoubleCountingSourcingAggregation {
   feedstock: Feedstock
 }
 
-export interface DoubleCountingSourcing {
-  id: number
-  year: number
-  metric_tonnes: number
-  feedstock: Feedstock
-  origin_country: Country
-  transit_country?: Country
-  supply_country?: Country
-}
+export type DoubleCountingSourcing = apiTypes["DoubleCountingSourcing"]
 
-export interface DoubleCountingProduction {
-  id: number
-  year: number
-  feedstock: Feedstock
-  biofuel: Biofuel
-  max_production_capacity?: number
-  estimated_production: number
-  requested_quota: number
-  approved_quota: number
-}
+export type DoubleCountingProduction = apiTypes["DoubleCountingProduction"]
 
-export interface DoubleCountingQuota {
-  approved_quota: number
-  biofuel: Biofuel
-  feedstock: Feedstock
-  id: number
-  lot_count: number
-  production_tonnes: number
-  quotas_progression: number
-  requested_quota: number
-  year: number
-}
+export type DoubleCountingQuota = apiTypes["DoubleCountingQuota"]
+
+export type DoubleCountingProductionHistory =
+  apiTypes["DoubleCountingProductionHistory"]
 
 export enum DoubleCountingUploadErrorType {
   UnkownBiofuel = "UNKNOWN_BIOFUEL",
@@ -103,29 +60,15 @@ export enum DoubleCountingUploadErrorType {
   UnknownCountryOfOrigin = "UNKNOWN_COUNTRY_OF_ORIGIN",
 }
 
-export interface DoubleCountingUploadError {
-  error: string
-  is_blocking: boolean
-  line_number: number | null
-  line_merged?: string
-  meta?: null | any
+export type DoubleCountingUploadErrors = apiTypes["FileErrors"]
+
+export type DoubleCountingUploadError = apiTypes["FileError"] & {
+  meta?: any | null
 }
 
-export interface DoubleCountingUploadErrors
-  extends DoubleCountingApplicationOverview {
-  // sourcing_history?: DoubleCountingUploadError[]
-  sourcing_forecast?: DoubleCountingUploadError[]
-  production?: DoubleCountingUploadError[]
-  global?: DoubleCountingUploadError[]
-}
+export type DoubleCountingApplicationDetails =
+  apiTypes["DoubleCountingApplication"]
 
-export interface DoubleCountingApplicationDetails
-  extends DoubleCountingApplicationOverview {
-  sourcing: DoubleCountingSourcing[]
-  production: DoubleCountingProduction[]
-  aggregated_sourcing: DoubleCountingSourcingAggregation[]
-  documents: { id: number; url: string; file_type: "DECISION" | "SOURCING" }[]
-}
 export interface DoubleCountingApplicationSnapshot {
   applications_pending: number
   applications_rejected: number
@@ -137,9 +80,7 @@ export interface DoubleCountingAgreementsSnapshot {
   agreements_incoming: number
 }
 
-export interface DoubleCountingSnapshot
-  extends DoubleCountingAgreementsSnapshot,
-    DoubleCountingApplicationSnapshot {}
+export type DoubleCountingSnapshot = apiTypes["ApplicationSnapshot"]
 
 export interface DoubleCountingApplicationsOverview {
   rejected: DoubleCountingApplicationOverview[]
@@ -151,34 +92,14 @@ export interface DoubleCountingAgreementsOverview {
   incoming: DoubleCountingAgreementOverview[]
   expired: DoubleCountingAgreementOverview[]
 }
-export interface DoubleCountingAgreementOverview {
-  id: number
-  producer: Entity
-  production_site: ProductionSiteDetails
-  certificate_id: string
-  valid_from: Date
-  valid_until: Date
-  status: AgreementStatus
-  quotas_progression: number
-}
 
-export interface DoubleCountingAgreementPublic {
-  production_site: {
-    name: string
-    country: string
-    postal_code: string
-    address: string
-  }
-  certificate_id: string
-  valid_from: Date
-  valid_until: Date
-  biofuel_list: string
-}
+export type DoubleCountingAgreementOverview =
+  apiTypes["DoubleCountingRegistration"]
 
-export interface AgreementDetails extends DoubleCountingAgreementOverview {
-  application: DoubleCountingApplicationDetails
-  quotas: DoubleCountingQuota[]
-}
+export type DoubleCountingAgreementPublic =
+  apiTypes["DoubleCountingRegistrationPublic"]
+
+export type AgreementDetails = apiTypes["DoubleCountingRegistrationDetails"]
 
 export interface QuotaDetails {
   volume: number
@@ -189,17 +110,7 @@ export interface QuotaDetails {
   nb_lots: number
 }
 
-export interface DoubleCountingFileInfo {
-  has_dechets_industriels: boolean
-  errors?: DoubleCountingUploadErrors
-  start_year: string
-  file_name: string
-  producer_email: string
-  production_site: string
-  error_count: number
-  production: DoubleCountingProduction[]
-  sourcing: DoubleCountingSourcing[]
-}
+export type DoubleCountingFileInfo = apiTypes["CheckFileResponse"]["file"]
 
 export interface CheckDoubleCountingFilesResponse {
   files: DoubleCountingFileInfo[]
