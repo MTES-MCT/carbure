@@ -45,7 +45,7 @@ class BalanceService:
                     balance[key]["biofuel"] = operation.biofuel.code
 
                 if operation.type == Operation.TENEUR and group_by != "lot":
-                    balance[key]["teneur"] = detail.volume
+                    balance[key]["teneur"] += detail.volume
                 else:
                     if operation.is_credit(entity_id):
                         balance[key]["volume"]["credit"] += detail.volume
