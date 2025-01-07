@@ -54,7 +54,7 @@ class BalanceService:
                         balance[key]["volume"]["debit"] += detail.volume
                         balance[key]["ghg"]["debit"] += detail.saved_ghg
 
-            if group_by != "lot" and operation.status == Operation.PENDING:
+            if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
 
         return balance
