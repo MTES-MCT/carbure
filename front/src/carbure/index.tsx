@@ -29,6 +29,7 @@ import useUserManager, { UserContext } from "./hooks/user"
 import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { ContactPage } from "contact"
+import { YearsProvider } from "common/providers/years-provider"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -37,60 +38,62 @@ const Carbure = () => {
   const isAuth = user.isAuthenticated()
 
   return (
-    <UserContext.Provider value={user}>
-      <EntityContext.Provider value={entity}>
-        <PortalProvider>
-          <div id="app">
-            <NavigationLayout>
-              <Routes>
-                {!isAuth && <Route path="*" element={<Home />} />}
+    <YearsProvider>
+      <UserContext.Provider value={user}>
+        <EntityContext.Provider value={entity}>
+          <PortalProvider>
+            <div id="app">
+              <NavigationLayout>
+                <Routes>
+                  {!isAuth && <Route path="*" element={<Home />} />}
 
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/stats" element={<PublicStats />} />
-                <Route
-                  path="/double-counting-list"
-                  element={<AgreementPublicList />}
-                />
-                <Route
-                  path="/accessibilite"
-                  element={<AccessibilityDeclaration />}
-                />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/stats" element={<PublicStats />} />
+                  <Route
+                    path="/double-counting-list"
+                    element={<AgreementPublicList />}
+                  />
+                  <Route
+                    path="/accessibilite"
+                    element={<AccessibilityDeclaration />}
+                  />
 
-                <Route path="/auth/*" element={<Auth />} />
+                  <Route path="/auth/*" element={<Auth />} />
 
-                {isAuth && (
-                  <>
-                    <Route path="/pending" element={<Pending />} />
-                    <Route path="/account/*" element={<Account />} />
-                    <Route path="/org/:entity/*" element={<Org />} />
-                    {entity.isBlank && firstEntity && (
-                      <Route
-                        path="/"
-                        element={
-                          <Navigate replace to={`/org/${firstEntity.id}`} />
-                        }
-                      />
-                    )}
-                    {entity.isBlank && !firstEntity && (
-                      <Route
-                        path="/"
-                        element={<Navigate replace to={`/pending`} />}
-                      />
-                    )}
-                  </>
-                )}
+                  {isAuth && (
+                    <>
+                      <Route path="/pending" element={<Pending />} />
+                      <Route path="/account/*" element={<Account />} />
+                      <Route path="/org/:entity/*" element={<Org />} />
+                      {entity.isBlank && firstEntity && (
+                        <Route
+                          path="/"
+                          element={
+                            <Navigate replace to={`/org/${firstEntity.id}`} />
+                          }
+                        />
+                      )}
+                      {entity.isBlank && !firstEntity && (
+                        <Route
+                          path="/"
+                          element={<Navigate replace to={`/pending`} />}
+                        />
+                      )}
+                    </>
+                  )}
 
-                {!user.loading && (
-                  <Route path="*" element={<Navigate replace to="/" />} />
-                )}
-              </Routes>
-            </NavigationLayout>
+                  {!user.loading && (
+                    <Route path="*" element={<Navigate replace to="/" />} />
+                  )}
+                </Routes>
+              </NavigationLayout>
 
-            {user.loading && <LoaderOverlay />}
-          </div>
-        </PortalProvider>
-      </EntityContext.Provider>
-    </UserContext.Provider>
+              {user.loading && <LoaderOverlay />}
+            </div>
+          </PortalProvider>
+        </EntityContext.Provider>
+      </UserContext.Provider>
+    </YearsProvider>
   )
 }
 

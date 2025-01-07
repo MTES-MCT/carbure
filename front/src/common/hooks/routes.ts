@@ -1,12 +1,13 @@
 import useEntity from "carbure/hooks/entity"
 import { ROUTE_URLS } from "common/utils/routes"
 
+const currentYear = new Date().getFullYear()
+
 /**
  * Prepare the routes with custom logic to avoid using same parameters multiple times
  */
 export const useRoutes = () => {
   const entity = useEntity()
-  const currentYear = new Date().getFullYear()
 
   const routes = {
     ...ROUTE_URLS,

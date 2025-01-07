@@ -54,7 +54,14 @@ export const UserMenu = () => {
       ...item,
       borderBottom: index === compactedItems.length - 2,
     }))
-  }, [isIndustry, isOperator, isPowerOrHeatProducer, isProducer, routes])
+  }, [
+    isIndustry,
+    isOperator,
+    isPowerOrHeatProducer,
+    isProducer,
+    routes,
+    isAdmin,
+  ])
 
   return (
     <SimpleMenu

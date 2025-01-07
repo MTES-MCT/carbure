@@ -4,6 +4,7 @@ import styles from "./child-item.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"
 import { useMemo } from "react"
+import { useYearsProvider } from "common/providers/years-provider"
 
 type ChildItemProps = {
   child: MenuItem
@@ -13,6 +14,7 @@ export const ChildItem = ({ child }: ChildItemProps) => {
   const Icon = child.icon
   const IconActive = child.iconActive
   const location = useLocation()
+  const { selectedYear, root } = useYearsProvider()
 
   // Check if the current url starts with the child path
   const isActive = useMemo(
@@ -20,9 +22,19 @@ export const ChildItem = ({ child }: ChildItemProps) => {
     [location.pathname, child.path]
   )
 
+  // Replace the year in the url for all subpages of a section
+  const url = useMemo(() => {
+    const rx = new RegExp(`${root}/[0-9]+`)
+    const replacement = `${root}/${selectedYear}`
+
+    return child.path.includes(root)
+      ? child.path.replace(rx, replacement)
+      : child.path
+  }, [child.path, root, selectedYear])
+
   return (
     <NavLink
-      to={child.path}
+      to={url}
       key={child.title}
       className={({ isActive }) =>
         cl(
