@@ -1,7 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from tiruert.filters import OperationFilter
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.teneur import TeneurService
@@ -86,7 +85,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
     target_volume = serializers.FloatField()
     target_emission = serializers.FloatField()
     status = serializers.SerializerMethodField()
-    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
 
     def get_status(self, instance):
         if instance["type"] in [
@@ -102,10 +100,10 @@ class OperationInputSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             request = self.context.get("request")
             entity_id = request.query_params.get("entity_id")
-            operations = OperationFilter(request.GET, queryset=Operation.objects.all()).qs
 
             selected_lots, lot_ids, emissions, volumes = TeneurService.prepare_data_and_optimize(
-                operations, entity_id, validated_data
+                entity_id,
+                validated_data,
             )
 
             if not selected_lots:

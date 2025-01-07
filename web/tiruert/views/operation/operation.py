@@ -41,7 +41,9 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         )
         if serializer.is_valid():
             operation = serializer.save()
-            return Response(OperationOutputSerializer(operation).data, status=status.HTTP_201_CREATED)
+            return Response(
+                OperationOutputSerializer(operation, context={"details": 1}).data, status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):

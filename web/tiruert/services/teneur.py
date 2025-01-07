@@ -1,6 +1,8 @@
 import numpy as np
 import scipy.optimize
+from django.db.models import Q
 
+from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
 
@@ -60,7 +62,17 @@ class TeneurService:
         return selected_batches_volumes
 
     @staticmethod
-    def prepare_data_and_optimize(operations, entity_id, validated_data):
+    def prepare_data_and_optimize(entity_id, data):
+        operations = (
+            Operation.objects.filter(
+                biofuel=data["biofuel"],
+                customs_category=data["customs_category"],
+                # created_at__gte=data["date_from"],
+            )
+            .filter((Q(credited_entity=data["debited_entity"]) | Q(debited_entity=data["debited_entity"])))
+            .distinct()
+        )
+
         # Calculate balance of debited entity
         group_by = "lot"
         balance = BalanceService.calculate_balance(operations, entity_id, group_by)
@@ -83,8 +95,8 @@ class TeneurService:
         selected_lots = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
-            validated_data.pop("target_volume"),
-            validated_data.pop("target_emission"),
+            data.pop("target_volume"),
+            data.pop("target_emission"),
         )
 
         return selected_lots, lot_ids, emissions, volumes

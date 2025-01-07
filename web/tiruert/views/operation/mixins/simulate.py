@@ -1,4 +1,3 @@
-from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,19 +21,9 @@ class SimulateActionMixin:
         if serializer.is_valid():
             data = serializer.validated_data
 
-            operations = (
-                self.get_queryset()
-                .filter(
-                    biofuel=data["biofuel"],
-                    customs_category=data["customs_category"],
-                    # created_at__gte=data["date_from"],
-                )
-                .filter((Q(credited_entity=data["debited_entity"]) | Q(debited_entity=data["debited_entity"])))
-                .distinct()
-            )
-
             selected_lots, lot_ids, emissions, volumes = TeneurService.prepare_data_and_optimize(
-                operations, data["debited_entity"].id, data
+                data["debited_entity"].id,
+                data,
             )
             if not selected_lots:
                 return serializer.ValidationError(OperationInputSerializer.NO_SUITABLE_LOTS_FOUND)
