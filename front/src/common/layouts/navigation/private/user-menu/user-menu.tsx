@@ -74,7 +74,7 @@ export const UserMenu = () => {
           </div>
           {items.map(({ icon: Icon, ...item }) => (
             <ListItem
-              key={item.label}
+              key={item.path}
               label={item.label}
               value={item.label}
               hoverable

@@ -15,6 +15,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -22,6 +23,7 @@ const EntityDetails = () => {
   const { id = "" } = useParams<"id">()
   const companyId = parseInt(id, 10)
   const { t } = useTranslation()
+  usePrivateNavigation(t("Sociétés"))
 
   const company = useQuery(api.getCompanyDetails, {
     key: "entity-details",

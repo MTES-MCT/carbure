@@ -51,17 +51,6 @@ export const PrivateLayout: Story = {
       </>
     ),
   },
-  // parameters: {
-  //   reactRouter: reactRouterParameters({
-  //     location: {
-  //       pathParams: { entityId: "3", year: "2024" },
-  //     },
-  //     routing: {
-  //       path: "/org/:entityId/transactions/:year/in",
-  //       handle: "Profile",
-  //     },
-  //   }),
-  // },
 }
 
 export const OperatorLayout: Story = {
@@ -96,7 +85,15 @@ export const ProducerLayout: Story = {
   ...PrivateLayout,
   parameters: {
     msw: {
-      handlers: [mockUser(EntityType.Producer)],
+      handlers: [
+        mockUser(EntityType.Producer, {
+          right: {
+            entity: {
+              has_stocks: true,
+            },
+          },
+        }),
+      ],
     },
   },
 }

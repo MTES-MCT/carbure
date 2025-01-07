@@ -5,6 +5,9 @@ import { userEvent, waitFor, within } from "@storybook/test"
 const meta: Meta<typeof Notifications> = {
   component: Notifications,
   title: "common/layouts/navigation/private/notifications",
+  parameters: {
+    mockingDate: new Date(2024, 3, 1),
+  },
 }
 
 type Story = StoryObj<typeof Notifications>

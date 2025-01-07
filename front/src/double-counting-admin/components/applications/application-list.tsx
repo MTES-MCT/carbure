@@ -17,6 +17,7 @@ import {
 import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "../../../double-counting/components/application-status"
 import FilesCheckerUploadButton from "../files-checker/upload-button"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type ApplicationListProps = {
   snapshot: DoubleCountingApplicationSnapshot | undefined
@@ -24,6 +25,8 @@ type ApplicationListProps = {
 
 const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const { t } = useTranslation()
+  usePrivateNavigation(t("En attente"))
+
   const [tab, setTab] = useState("pending")
   const navigate = useNavigate()
   const location = useLocation()

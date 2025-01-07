@@ -12,10 +12,12 @@ import { UserMenu } from "./user-menu"
 import { NavLink } from "react-router-dom"
 import marianne from "common/assets/images/Marianne.svg"
 import { ROUTE_URLS } from "common/utils/routes"
+import { useRoutes } from "common/hooks/routes"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
   const { t } = useTranslation()
+  const routes = useRoutes()
 
   return (
     <>
@@ -42,7 +44,7 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
               iconPosition="left"
               iconId="ri-question-line"
               size="small"
-              linkProps={{ to: ROUTE_URLS.CONTACT }}
+              linkProps={{ to: routes.CONTACT }}
             >
               {t("Aide")}
             </Button>
