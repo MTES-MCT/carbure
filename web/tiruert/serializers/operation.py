@@ -32,7 +32,8 @@ class OperationOutputSerializer(serializers.ModelSerializer):
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
     credited_entity = serializers.CharField(source="credited_entity.name", read_only=True)
     debited_entity = serializers.CharField(source="debited_entity.name", read_only=True)
-    total = serializers.SerializerMethodField()
+    volume = serializers.SerializerMethodField()
+    emission_rate_per_mj = serializers.DecimalField(max_digits=20, decimal_places=2)
 
     def get_type(self, instance):
         entity_id = self.context.get("entity_id")
@@ -44,10 +45,8 @@ class OperationOutputSerializer(serializers.ModelSerializer):
     def get_sector(self, instance):
         return instance.sector
 
-    def get_total(self, instance):
-        total_volume = sum(detail.volume for detail in instance.details.all())
-        total_saved_ghg = sum(detail.saved_ghg for detail in instance.details.all())
-        return {"volume": total_volume, "saved_ghg": total_saved_ghg}
+    def get_volume(self, instance):
+        return sum(detail.volume for detail in instance.details.all())
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -101,7 +100,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             request = self.context.get("request")
             entity_id = request.query_params.get("entity_id")
 
-            selected_lots, lot_ids, emissions, volumes = TeneurService.prepare_data_and_optimize(
+            selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
                 entity_id,
                 validated_data,
             )
@@ -120,7 +119,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
                         "operation": operation,
                         "lot_id": lot_ids[idx],
                         "volume": lot_volume,
-                        "saved_ghg": emissions[idx] * lot_volume / volumes[idx],
+                        "emission_rate_per_mj": emissions[idx] + fun,
                     }
                 )
 

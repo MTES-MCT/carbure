@@ -28,4 +28,4 @@ class SimulationInputSerializer(serializers.ModelSerializer):
 class SimulationOutputSerializer(serializers.Serializer):
     lot_id = serializers.IntegerField()
     volume = serializers.DecimalField(max_digits=20, decimal_places=2)
-    saved_ghg = serializers.DecimalField(max_digits=20, decimal_places=2)
+    emission_rate_per_mj = serializers.DecimalField(max_digits=20, decimal_places=2)

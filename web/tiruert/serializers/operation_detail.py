@@ -6,4 +6,4 @@ from tiruert.models import OperationDetail
 class OperationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = OperationDetail
-        fields = ["lot", "volume", "saved_ghg"]
+        fields = ["lot", "volume", "emission_rate_per_mj"]

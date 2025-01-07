@@ -12,7 +12,7 @@ class BalanceService:
         """
         Keep only PENDING and ACCEPTED operations
         Group by sector, customs_category and biofuel (and lot if needed)
-        Sum volume and ghg: credit when entity is credited, debit when entity is debited
+        Sum volume: credit when entity is credited, debit when entity is debited
         """
 
         balance = defaultdict(
@@ -21,7 +21,7 @@ class BalanceService:
                 "customs_category": None,
                 "biofuel": None,
                 "volume": {"credit": 0, "debit": 0},
-                "ghg": {"credit": 0, "debit": 0},
+                "emission_rate_per_mj": 0,
                 "teneur": 0,
                 "pending": 0,
             }
@@ -44,15 +44,15 @@ class BalanceService:
                     balance[key]["customs_category"] = operation.customs_category
                     balance[key]["biofuel"] = operation.biofuel.code
 
+                balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
+
                 if operation.type == Operation.TENEUR and group_by != "lot":
                     balance[key]["teneur"] += detail.volume
                 else:
                     if operation.is_credit(entity_id):
                         balance[key]["volume"]["credit"] += detail.volume
-                        balance[key]["ghg"]["credit"] += detail.saved_ghg
                     else:
                         balance[key]["volume"]["debit"] += detail.volume
-                        balance[key]["ghg"]["debit"] += detail.saved_ghg
 
             if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
@@ -131,7 +131,7 @@ class BalanceService:
         if key not in balance:
             balance[key] = {
                 "volume": {"credit": 0, "debit": 0},
-                "ghg": {"credit": 0, "debit": 0},
+                "emission_rate_per_mj": 0,
                 "pending": 0,
                 "sector": operation.sector,
                 "teneur": 0,

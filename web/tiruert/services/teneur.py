@@ -50,6 +50,8 @@ class TeneurService:
 
         result_array = res.x
 
+        # retourner res.fun + target_emission
+
         if not res.success:
             return False
 
@@ -59,7 +61,7 @@ class TeneurService:
         # Create a dictionary of selected batches with their respective index and volume
         selected_batches_volumes = {idx: result_array[idx] for idx in nonzero_indices}
 
-        return selected_batches_volumes
+        return selected_batches_volumes, res.fun
 
     @staticmethod
     def prepare_data_and_optimize(entity_id, data):
@@ -92,11 +94,11 @@ class TeneurService:
         # print(emissions)
         # print(lot_ids)
 
-        selected_lots = TeneurService.optimize_biofuel_blending(
+        selected_lots, fun = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
             data.pop("target_volume"),
             data.pop("target_emission"),
         )
 
-        return selected_lots, lot_ids, emissions, volumes
+        return selected_lots, lot_ids, emissions, fun

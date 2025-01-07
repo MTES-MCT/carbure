@@ -21,7 +21,7 @@ class SimulateActionMixin:
         if serializer.is_valid():
             data = serializer.validated_data
 
-            selected_lots, lot_ids, emissions, volumes = TeneurService.prepare_data_and_optimize(
+            selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
                 data["debited_entity"].id,
                 data,
             )
@@ -34,7 +34,7 @@ class SimulateActionMixin:
                     {
                         "lot_id": lot_ids[idx],
                         "volume": lot_volume,
-                        "saved_ghg": emissions[idx] * lot_volume / volumes[idx],
+                        "emission_rate_per_mj": emissions[idx] + fun,
                     }
                 )
 
