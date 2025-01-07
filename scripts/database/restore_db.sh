@@ -8,6 +8,10 @@ else
   SOURCE_ENV=$1
 fi
 
+if [ "$2" ]; then
+  DATABASE_URL=$2
+fi
+
 if [ "$SOURCE_ENV" = "carbure-prod" ]; then
   SCALINGO_MYSQL_UUID="ad-5fac8322-ec5b-4fe3-89ed-468e9895f180"
   SCALINGO_MYSQL_DB="carbure_pro_"
