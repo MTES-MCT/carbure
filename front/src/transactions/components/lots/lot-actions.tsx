@@ -54,12 +54,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
 
       {status === "out" && (
         <Fragment>
-          {category === "correction" && (
-            <Fragment>
-              <MarkManyAsFixedButton {...props} />
-              <DeleteManyButton {...props} />
-            </Fragment>
-          )}
+          {category === "correction" && <MarkManyAsFixedButton {...props} />}
           <RecallManyButton {...props} />
           <DeleteManyButton {...props} />
         </Fragment>
