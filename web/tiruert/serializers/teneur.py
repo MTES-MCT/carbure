@@ -28,4 +28,29 @@ class SimulationInputSerializer(serializers.ModelSerializer):
 class SimulationOutputSerializer(serializers.Serializer):
     lot_id = serializers.IntegerField()
     volume = serializers.DecimalField(max_digits=20, decimal_places=2)
-    emission_rate_per_mj = serializers.DecimalField(max_digits=20, decimal_places=2)
+    emission_rate_per_mj = serializers.FloatField()
+    fun = serializers.FloatField()
+
+
+class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Operation
+        fields = [
+            "customs_category",
+            "biofuel",
+            "debited_entity",
+            "target_volume",
+        ]
+        extra_kwargs = {
+            "biofuel": {"required": True},
+            "customs_category": {"required": True},
+            "debited_entity": {"required": True},
+            "target_volume": {"required": True},
+        }
+
+    target_volume = serializers.FloatField()
+
+
+class SimulationMinMaxOutputSerializer(serializers.Serializer):
+    min_emission_rate_per_mj = serializers.FloatField()
+    max_emission_rate_per_mj = serializers.FloatField()

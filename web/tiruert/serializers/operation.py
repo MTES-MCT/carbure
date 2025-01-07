@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
@@ -22,7 +23,8 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "to_depot",
             "created_at",
             "validity_date",
-            "total",
+            "volume",
+            # "emission_rate_per_mj",
             "details",
         ]
 
@@ -33,7 +35,7 @@ class OperationOutputSerializer(serializers.ModelSerializer):
     credited_entity = serializers.CharField(source="credited_entity.name", read_only=True)
     debited_entity = serializers.CharField(source="debited_entity.name", read_only=True)
     volume = serializers.SerializerMethodField()
-    emission_rate_per_mj = serializers.DecimalField(max_digits=20, decimal_places=2)
+    # emission_rate_per_mj = serializers.SerializerMethodField()
 
     def get_type(self, instance):
         entity_id = self.context.get("entity_id")
@@ -47,6 +49,9 @@ class OperationOutputSerializer(serializers.ModelSerializer):
 
     def get_volume(self, instance):
         return sum(detail.volume for detail in instance.details.all())
+
+    # def get_emission_rate_per_mj(self, instance):
+    #    return instance.details.first().emission_rate_per_mj
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -106,7 +111,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             )
 
             if not selected_lots:
-                raise serializers.ValidationError(self.NO_SUITABLE_LOTS_FOUND)
+                raise ValidationError(OperationInputSerializer.NO_SUITABLE_LOTS_FOUND)
 
             # Create the operation
             operation = Operation.objects.create(**validated_data)

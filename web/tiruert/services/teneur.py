@@ -53,7 +53,7 @@ class TeneurService:
         # retourner res.fun + target_emission
 
         if not res.success:
-            return False
+            return [], res.fun
 
         # Find the indices of the nonzero elements
         nonzero_indices = np.nonzero(result_array[:-1])[0]  # [:-1] excludes the last element, always 1
@@ -65,6 +65,58 @@ class TeneurService:
 
     @staticmethod
     def prepare_data_and_optimize(entity_id, data):
+        volumes, emissions, lot_ids = TeneurService.prepare_data(entity_id, data)
+
+        selected_lots, fun = TeneurService.optimize_biofuel_blending(
+            volumes,
+            emissions,
+            data.pop("target_volume"),
+            data.pop("target_emission"),
+        )
+
+        return selected_lots, lot_ids, emissions, fun
+
+    @staticmethod
+    def get_min_and_max_emissions(entity_id, data):
+        """
+        Compute minimum and maximum feasible mix emissions.
+        Return emission rates per MJ
+        """
+        volumes, emissions, lot_ids = TeneurService.prepare_data(entity_id, data)
+
+        emissions_sorter = np.argsort(emissions)
+        emissions_inv_sorter = emissions_sorter[::-1]
+        thresh_min = (data["target_volume"] < volumes[emissions_sorter].cumsum()).argmax()
+        thresh_max = (data["target_volume"] < volumes[emissions_inv_sorter].cumsum()).argmax()
+        blend_emission_min = (
+            np.dot(
+                volumes[emissions_sorter][:thresh_min],
+                emissions[emissions_sorter][:thresh_min],
+            )
+            + (
+                (data["target_volume"] - volumes[emissions_sorter][:thresh_min].sum())
+                * emissions[emissions_sorter][thresh_min]
+            )
+        ) / data["target_volume"]
+
+        blend_emission_max = (
+            np.dot(
+                volumes[emissions_inv_sorter][:thresh_max],
+                emissions[emissions_inv_sorter][:thresh_max],
+            )
+            + (
+                (data["target_volume"] - volumes[emissions_inv_sorter][:thresh_max].sum())
+                * emissions[emissions_inv_sorter][thresh_max]
+            )
+        ) / data["target_volume"]
+
+        return blend_emission_min, blend_emission_max
+
+    @staticmethod
+    def prepare_data(entity_id, data):
+        """
+        Prepare data for optimization
+        """
         operations = (
             Operation.objects.filter(
                 biofuel=data["biofuel"],
@@ -76,8 +128,7 @@ class TeneurService:
         )
 
         # Calculate balance of debited entity
-        group_by = "lot"
-        balance = BalanceService.calculate_balance(operations, entity_id, group_by)
+        balance = BalanceService.calculate_balance(operations, entity_id, "lot")
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
         # For each we have something like:
@@ -87,18 +138,7 @@ class TeneurService:
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
             volumes = np.append(volumes, value["volume"]["credit"] - value["volume"]["debit"])
-            emissions = np.append(emissions, value["ghg"]["credit"] - value["ghg"]["debit"])
+            emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)
 
-        # print(volumes)
-        # print(emissions)
-        # print(lot_ids)
-
-        selected_lots, fun = TeneurService.optimize_biofuel_blending(
-            volumes,
-            emissions,
-            data.pop("target_volume"),
-            data.pop("target_emission"),
-        )
-
-        return selected_lots, lot_ids, emissions, fun
+        return volumes, emissions, lot_ids

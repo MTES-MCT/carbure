@@ -11,7 +11,7 @@ class BalanceSerializer(serializers.Serializer):
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
     volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
-    emission_rate_per_mj = serializers.DecimalField(max_digits=20, decimal_places=2)
+    # avg_emission_rate_per_mj = serializers.FloatField()
     teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
     yearly_teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
     pending = serializers.IntegerField()
@@ -39,7 +39,7 @@ class BalanceSerializer(serializers.Serializer):
 class LotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
     volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
-    emission_rate_per_mj = serializers.DecimalField(max_digits=20, decimal_places=2)
+    emission_rate_per_mj = serializers.FloatField()
 
 
 class BalanceByLotSerializer(serializers.Serializer):
