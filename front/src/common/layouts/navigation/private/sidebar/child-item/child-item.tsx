@@ -16,27 +16,27 @@ export const ChildItem = ({ child }: ChildItemProps) => {
   const location = useLocation()
   const { selectedYear, root } = useYearsProvider()
 
-  // Check if the current url starts with the child path
-  const isActive = useMemo(
-    () => location.pathname.startsWith(child.path),
-    [location.pathname, child.path]
-  )
-
   // Replace the year in the url for all subpages of a section
   const url = useMemo(() => {
     const rx = new RegExp(`${root}/[0-9]+`)
     const replacement = `${root}/${selectedYear}`
 
-    return child.path.includes(root)
+    return root && child.path.includes(root)
       ? child.path.replace(rx, replacement)
       : child.path
   }, [child.path, root, selectedYear])
+
+  // Check if the current url starts with the child path
+  const isActive = useMemo(
+    () => location.pathname.startsWith(url),
+    [location.pathname, url]
+  )
 
   return (
     <NavLink
       to={url}
       key={child.title}
-      className={({ isActive }) =>
+      className={() =>
         cl(
           isActive && styles["nav-item-child--active"],
           styles["nav-item-child"]

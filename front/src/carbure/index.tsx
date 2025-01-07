@@ -123,11 +123,11 @@ const Org = () => {
   return (
     <Routes>
       <Route path="settings" element={<Settings />} />
-
+      <Route path="registry" element={<Registry />} />
       {(isIndustry || isPowerOrHeatProducer) && (
         <>
           <Route path="transactions/:year/*" element={<Transactions />} />
-          <Route path="registry" element={<Registry />} />
+
           <Route
             path="transactions"
             element={<Navigate replace to={`${currentYear}`} />}
@@ -163,13 +163,6 @@ const Org = () => {
             path="*"
             element={<Navigate replace to={`saf/${currentYear}/tickets`} />}
           />
-        </>
-      )}
-
-      {isAdmin && (
-        <>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate replace to="dashboard" />} />
         </>
       )}
 

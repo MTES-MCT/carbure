@@ -17,7 +17,7 @@ import {
 
 export const UserMenu = () => {
   const { user, getName } = useUser()
-  const { isAdmin, isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
+  const { isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
     useEntity()
   const routes = useRoutes()
   const items = useMemo(() => {
@@ -37,11 +37,6 @@ export const UserMenu = () => {
         path: routes.REGISTRY,
         icon: BookLine,
       },
-      isAdmin && {
-        label: "Annuaire",
-        path: routes.ADMIN().COMPANIES,
-        icon: BookLine,
-      },
       {
         label: "Déconnexion",
         path: routes.LOGOUT,
@@ -54,14 +49,7 @@ export const UserMenu = () => {
       ...item,
       borderBottom: index === compactedItems.length - 2,
     }))
-  }, [
-    isIndustry,
-    isOperator,
-    isPowerOrHeatProducer,
-    isProducer,
-    routes,
-    isAdmin,
-  ])
+  }, [isIndustry, isOperator, isPowerOrHeatProducer, isProducer, routes])
 
   return (
     <SimpleMenu
@@ -86,7 +74,7 @@ export const UserMenu = () => {
           </div>
           {items.map(({ icon: Icon, ...item }) => (
             <ListItem
-              key={item.label}
+              key={item.path}
               label={item.label}
               value={item.label}
               hoverable

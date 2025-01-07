@@ -57,7 +57,18 @@ const EntityList = () => {
     <Main>
       <header>
         <section>
-          <h1>Informations sur les sociétés</h1>
+          <Tabs
+            focus={tab}
+            onFocus={setTab}
+            variant="header"
+            tabs={compact([
+              { key: "entities", label: t("Récapitulatif") },
+              (entity.isAdmin || isAdminDC) && {
+                key: "certificates",
+                label: t("Certificats"),
+              },
+            ])}
+          />
           <Button
             asideX
             variant="primary"
@@ -67,18 +78,7 @@ const EntityList = () => {
           />
         </section>
       </header>
-      <Tabs
-        focus={tab}
-        onFocus={setTab}
-        variant="sticky"
-        tabs={compact([
-          { key: "entities", label: t("Récapitulatif") },
-          (entity.isAdmin || isAdminDC) && {
-            key: "certificates",
-            label: t("Certificats"),
-          },
-        ])}
-      />
+
       <section>
         <SearchInput
           clear

@@ -7,14 +7,19 @@ import { DashboardFill, DashboardLine } from "common/components/icon"
 export const useAdmin = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { isAdmin } = useEntity()
+  const { isAdmin, hasAdminRight, isExternal } = useEntity()
+  const isAdminDC = isExternal && hasAdminRight("DCA")
+  const isAdminAirline = isExternal && hasAdminRight("AIRLINE")
+  const isElecAdmin = isExternal && hasAdminRight("ELEC")
+
   const admin: MenuSection = {
     title: t("Admin"),
     condition: isAdmin,
     children: [
       {
-        path: routes.ADMIN().DASHBOARD,
-        title: t("Tableau de bord"),
+        path: routes.ADMIN().COMPANIES,
+        title: t("Sociétés"),
+        condition: isAdmin || isAdminAirline || isElecAdmin || isAdminDC,
         icon: DashboardLine,
         iconActive: DashboardFill,
       },
