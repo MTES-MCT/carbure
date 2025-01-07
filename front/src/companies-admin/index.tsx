@@ -15,10 +15,12 @@ import AddEntityDialog from "./components/add-entity-dialog"
 import { useNotify } from "common/components/notifications"
 import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const Entities = () => {
   const { t } = useTranslation()
   useTitle(t("Sociétés"))
+  usePrivateNavigation(t("Sociétés"))
 
   return (
     <Routes>

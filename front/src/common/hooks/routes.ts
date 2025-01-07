@@ -32,6 +32,9 @@ export const useRoutes = () => {
     SETTINGS: ROUTE_URLS.SETTINGS(entity.id),
     STATISTICS: ROUTE_URLS.STATISTICS(entity.id),
     REGISTRY: ROUTE_URLS.REGISTRY(entity.id),
+    CONTACT: entity.name
+      ? `${ROUTE_URLS.CONTACT}?company=${entity.name}`
+      : ROUTE_URLS.CONTACT,
   }
 
   return routes

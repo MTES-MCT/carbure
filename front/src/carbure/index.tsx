@@ -5,7 +5,6 @@ import { LoaderOverlay } from "common/components/scaffold"
 import Entities from "companies-admin"
 import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
 import Controls from "controls"
-import Dashboard from "dashboard"
 import DoubleCounting from "double-counting-admin"
 import AgreementPublicList from "double-counting/components/agreement-public-list"
 import ElecAdmin from "elec-admin"
@@ -166,13 +165,6 @@ const Org = () => {
         </>
       )}
 
-      {isAdmin && (
-        <>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate replace to="dashboard" />} />
-        </>
-      )}
-
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
       {isCPO && (
@@ -238,7 +230,10 @@ const Org = () => {
       )}
 
       {(isAdmin || hasAirline || isElecAdmin || isAdminDC) && (
-        <Route path="entities/*" element={<Entities />} />
+        <>
+          <Route path="entities/*" element={<Entities />} />
+          <Route path="*" element={<Navigate replace to="entities" />} />
+        </>
       )}
 
       {(isAdmin || isElecAdmin) && (
