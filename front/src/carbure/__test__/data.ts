@@ -57,21 +57,21 @@ export const company: Entity = {
 
 export const producer: Entity = {
   ...company,
-  id: 0,
+  id: 1,
   name: "Producteur Test",
   entity_type: EntityType.Producer,
 }
 
 export const trader: Entity = {
   ...company,
-  id: 1,
+  id: 2,
   name: "Trader Test",
   entity_type: EntityType.Trader,
 }
 
 export const operator: Entity = {
   ...company,
-  id: 2,
+  id: 3,
   name: "Opérateur Test",
   entity_type: EntityType.Operator,
   has_trading: false,
@@ -79,7 +79,7 @@ export const operator: Entity = {
 
 export const admin: Entity = {
   ...company,
-  id: 3,
+  id: 4,
   name: "Admin Test",
   entity_type: EntityType.Administration,
   has_mac: false,
@@ -88,7 +88,7 @@ export const admin: Entity = {
 
 export const cpo: Entity = {
   ...company,
-  id: 4,
+  id: 5,
   name: "CPO Test",
   entity_type: EntityType.CPO,
   has_mac: false,
@@ -97,7 +97,7 @@ export const cpo: Entity = {
 
 export const airline: Entity = {
   ...company,
-  id: 5,
+  id: 6,
   name: "Airline Test",
   entity_type: EntityType.Airline,
   has_mac: false,
@@ -106,7 +106,7 @@ export const airline: Entity = {
 
 const auditor: Entity = {
   ...company,
-  id: 6,
+  id: 7,
   name: "Auditeur test",
   entity_type: EntityType.Auditor,
   has_mac: false,
@@ -115,7 +115,7 @@ const auditor: Entity = {
 
 const powerOrHeatProducer: Entity = {
   ...company,
-  id: 7,
+  id: 8,
   name: "Producteur de chaleur test",
   entity_type: EntityType.PowerOrHeatProducer,
   has_mac: false,
