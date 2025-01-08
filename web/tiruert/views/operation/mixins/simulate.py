@@ -40,7 +40,7 @@ class SimulateActionMixin:
                     {
                         "lot_id": lot_ids[idx],
                         "volume": lot_volume,
-                        "emission_rate_per_mj": emissions[idx] + fun,
+                        "emission_rate_per_mj": emissions[idx],
                         "fun": fun,
                     }
                 )
