@@ -1,0 +1,14 @@
+.fileplaceholder {
+  width: 400px;
+  height: 400px;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-m);
+  background-color: rgba(254, 254, 254, 0.66);
+  padding: var(--spacing-xl);
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 600;
+  line-height: 1.5em;
+  border: 4px dashed var(--gray-dark);
+}
