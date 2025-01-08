@@ -22,7 +22,7 @@ export type ExtendedInputProps = {
 type BaseInputProps = InputPropsDSFR & ExtendedInputProps
 
 /**
- * Base component for all inputs, including textarea
+ * Base component for all inputs, including textarea and file inputs
  * It manages loading state, tooltip and custom label
  */
 export const BaseInput = forwardRef<HTMLDivElement, BaseInputProps>(
@@ -49,7 +49,7 @@ type LabelProps = Pick<
   BaseInputProps,
   "label" | "hasTooltip" | "required" | "title"
 >
-const Label = ({ label, hasTooltip, required, title }: LabelProps) => {
+export const Label = ({ label, hasTooltip, required, title }: LabelProps) => {
   let baseLabel = label
 
   // Add an icon if the input is required
