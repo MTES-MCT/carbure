@@ -61,8 +61,6 @@ class OperationOutputSerializer(serializers.ModelSerializer):
 
 
 class OperationInputSerializer(serializers.ModelSerializer):
-    NO_SUITABLE_LOTS_FOUND = "NO_SUITABLE_LOTS_FOUND"
-
     class Meta:
         model = Operation
         fields = [
@@ -105,13 +103,13 @@ class OperationInputSerializer(serializers.ModelSerializer):
             request = self.context.get("request")
             entity_id = request.query_params.get("entity_id")
 
-            selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
+            selected_lots, lot_ids, emissions, fun, error = TeneurService.prepare_data_and_optimize(
                 entity_id,
                 validated_data,
             )
 
-            if not selected_lots:
-                raise ValidationError(OperationInputSerializer.NO_SUITABLE_LOTS_FOUND)
+            if error:
+                raise ValidationError(error)
 
             # Create the operation
             operation = Operation.objects.create(**validated_data)

@@ -52,5 +52,5 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
 
 
 class SimulationMinMaxOutputSerializer(serializers.Serializer):
-    min_emission_rate_per_mj = serializers.FloatField()
-    max_emission_rate_per_mj = serializers.FloatField()
+    blending_min_emission_rate_per_mj = serializers.FloatField()
+    blending_max_emission_rate_per_mj = serializers.FloatField()

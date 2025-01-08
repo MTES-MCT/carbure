@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from tiruert.serializers.operation import OperationInputSerializer
 from tiruert.serializers.teneur import (
     SimulationInputSerializer,
     SimulationMinMaxInputSerializer,
@@ -27,12 +26,12 @@ class SimulateActionMixin:
         if serializer.is_valid():
             data = serializer.validated_data
 
-            selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
+            selected_lots, lot_ids, emissions, fun, error = TeneurService.prepare_data_and_optimize(
                 data["debited_entity"].id,
                 data,
             )
-            if not selected_lots:
-                raise ValidationError(OperationInputSerializer.NO_SUITABLE_LOTS_FOUND)
+            if error:
+                raise ValidationError(error)
 
             detail_operations_data = []
             for idx, lot_volume in selected_lots.items():
@@ -64,15 +63,18 @@ class SimulateActionMixin:
         if serializer.is_valid():
             data = serializer.validated_data
 
-            min, max = TeneurService.get_min_and_max_emissions(
+            min, max, error = TeneurService.get_min_and_max_emissions(
                 data["debited_entity"].id,
                 data,
             )
 
+            if error:
+                raise ValidationError(error)
+
             output_serializer = output_serializer_class(
                 {
-                    "min_emission_rate_per_mj": min,
-                    "max_emission_rate_per_mj": max,
+                    "blending_min_emission_rate_per_mj": min,
+                    "blending_max_emission_rate_per_mj": max,
                 }
             )
             return Response(output_serializer.data, status=status.HTTP_200_OK)

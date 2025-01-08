@@ -6,6 +6,11 @@ from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
 
+class TeneurServiceErrors:
+    NO_SUITABLE_LOTS_FOUND = "NO_SUITABLE_LOTS_FOUND"
+    INSUFFICIENT_INPUT_VOLUME = "INSUFFICIENT_INPUT_VOLUME"
+
+
 class TeneurService:
     @staticmethod
     def optimize_biofuel_blending(batches_volumes, batches_emissions, target_volume, target_emission):
@@ -30,8 +35,11 @@ class TeneurService:
         # target_change = -0.10  # as a fraction of the reference emissions in [0; 1]
         # target_emission = (1 + target_change) * REFERENCE_EMISSION
 
+        error = None
+
         if batches_volumes.sum() < target_volume:
-            raise ValueError("Insufficient input volumes!")
+            error = TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME
+            return None, None, error
 
         # Optimization objective
         c = np.concat((-1 / target_volume * batches_emissions, [target_emission]))
@@ -53,7 +61,8 @@ class TeneurService:
         # retourner res.fun + target_emission
 
         if not res.success:
-            return [], res.fun
+            error = TeneurServiceErrors.NO_SUITABLE_LOTS_FOUND
+            return None, res.fun, error
 
         # Find the indices of the nonzero elements
         nonzero_indices = np.nonzero(result_array[:-1])[0]  # [:-1] excludes the last element, always 1
@@ -61,20 +70,20 @@ class TeneurService:
         # Create a dictionary of selected batches with their respective index and volume
         selected_batches_volumes = {idx: result_array[idx] for idx in nonzero_indices}
 
-        return selected_batches_volumes, res.fun
+        return selected_batches_volumes, res.fun, error
 
     @staticmethod
     def prepare_data_and_optimize(entity_id, data):
         volumes, emissions, lot_ids = TeneurService.prepare_data(entity_id, data)
 
-        selected_lots, fun = TeneurService.optimize_biofuel_blending(
+        selected_lots, fun, error = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
             data.pop("target_volume"),
             data.pop("target_emission"),
         )
 
-        return selected_lots, lot_ids, emissions, fun
+        return selected_lots, lot_ids, emissions, fun, error
 
     @staticmethod
     def get_min_and_max_emissions(entity_id, data):
@@ -83,6 +92,11 @@ class TeneurService:
         Return emission rates per MJ
         """
         volumes, emissions, lot_ids = TeneurService.prepare_data(entity_id, data)
+        error = None
+
+        if volumes.sum() < data["target_volume"]:
+            error = TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME
+            return None, None, error
 
         emissions_sorter = np.argsort(emissions)
         emissions_inv_sorter = emissions_sorter[::-1]
@@ -110,7 +124,7 @@ class TeneurService:
             )
         ) / data["target_volume"]
 
-        return blend_emission_min, blend_emission_max
+        return blend_emission_min, blend_emission_max, error
 
     @staticmethod
     def prepare_data(entity_id, data):
