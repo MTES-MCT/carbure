@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.utils.timezone import make_aware
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -19,13 +20,13 @@ class BalanceActionMixin:
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
         date_from_str = request.query_params.get("date_from")
-        date_from = datetime.strptime(date_from_str, "%Y-%m-%d") if date_from_str else None
+        date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
         operations = self.filter_queryset(self.get_queryset())
 
         # Beginning of the current year by default
         if not date_from and group_by != "lot":
             current_year = datetime.now().year
-            date_from = datetime(current_year, 1, 1)
+            date_from = make_aware(datetime(current_year, 1, 1))
             operations = operations.filter(created_at__gte=date_from)
 
         # Calculate the balance

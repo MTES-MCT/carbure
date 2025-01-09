@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from django.db.models import Q
+from django.utils.timezone import make_aware
 
 from tiruert.models import Operation
 
@@ -90,11 +91,10 @@ class BalanceService:
         to the until_date given, and add them to the balance dict
         """
 
-        current_year = datetime.now().year
-        if until_date == datetime(current_year, 1, 1):  # No need to calculate yearly teneur
-            return balance
+        beginning_of_year = make_aware(datetime(until_date.year, 1, 1))
 
-        beginning_of_year = datetime(until_date.year, 1, 1)
+        if until_date == beginning_of_year:  # No need to calculate yearly teneur
+            return balance
 
         operations = Operation.objects.filter(
             created_at__gte=beginning_of_year,
