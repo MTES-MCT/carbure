@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from rest_framework import serializers
 
 
@@ -7,13 +5,13 @@ class BalanceSerializer(serializers.Serializer):
     sector = serializers.CharField()
     customs_category = serializers.CharField(required=False, allow_null=True)
     biofuel = serializers.CharField(required=False, allow_null=True)
-    initial_balance = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
+    initial_balance = serializers.FloatField(required=False)
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
-    volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
+    volume = serializers.DictField(child=serializers.FloatField())
     # avg_emission_rate_per_mj = serializers.FloatField()
-    teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
-    yearly_teneur = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
+    teneur = serializers.FloatField(required=False)
+    yearly_teneur = serializers.FloatField(required=False)
     pending = serializers.IntegerField()
 
     def to_representation(self, instance):
@@ -22,23 +20,18 @@ class BalanceSerializer(serializers.Serializer):
         return {key: value for key, value in representation.items() if value is not None}
 
     def get_available_balance(self, instance):
-        return str(self.calcul_available_balance(instance))
+        return self.calcul_available_balance(instance)
 
     def get_final_balance(self, instance):
-        return str(round(self.calcul_available_balance(instance) - Decimal(instance["teneur"]), 2))
+        return self.calcul_available_balance(instance) - instance["teneur"]
 
     def calcul_available_balance(self, instance):
-        return round(
-            Decimal(instance["initial_balance"])
-            + Decimal(instance["volume"]["credit"])
-            - Decimal(instance["volume"]["debit"]),
-            2,
-        )
+        return instance["initial_balance"] + instance["volume"]["credit"] - instance["volume"]["debit"]
 
 
 class LotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
-    volume = serializers.DictField(child=serializers.DecimalField(max_digits=20, decimal_places=2))
+    volume = serializers.DictField(child=serializers.FloatField())
     emission_rate_per_mj = serializers.FloatField()
 
 
