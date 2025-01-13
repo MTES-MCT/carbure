@@ -8,6 +8,7 @@ import {
 import { EntityType } from "carbure/types"
 import { mockUser } from "carbure/__test__/helpers"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
+import { ExtAdminPagesEnum } from "api-schema"
 
 const meta: Meta<typeof PrivateNavigation> = {
   component: PrivateNavigation,
@@ -31,7 +32,7 @@ type Story = StoryObj<typeof PrivateNavigation>
 
 export default meta
 
-export const PrivateLayout: Story = {
+export const AdminLayout: Story = {
   decorators: [
     (Story) => {
       usePrivateNavigation("this is a title")
@@ -53,8 +54,42 @@ export const PrivateLayout: Story = {
   },
 }
 
+export const ExternalAdminElec: Story = {
+  ...AdminLayout,
+  parameters: {
+    msw: {
+      handlers: [
+        mockUser(EntityType.ExternalAdmin, {
+          right: {
+            entity: {
+              ext_admin_pages: [ExtAdminPagesEnum.ELEC],
+            },
+          },
+        }),
+      ],
+    },
+  },
+}
+
+export const ExternalAdminDCA: Story = {
+  ...AdminLayout,
+  parameters: {
+    msw: {
+      handlers: [
+        mockUser(EntityType.ExternalAdmin, {
+          right: {
+            entity: {
+              ext_admin_pages: [ExtAdminPagesEnum.DCA],
+            },
+          },
+        }),
+      ],
+    },
+  },
+}
+
 export const OperatorLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [
@@ -73,7 +108,7 @@ export const OperatorLayout: Story = {
 }
 
 export const AuditorLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [mockUser(EntityType.Auditor)],
@@ -82,7 +117,7 @@ export const AuditorLayout: Story = {
 }
 
 export const ProducerLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [
@@ -99,7 +134,7 @@ export const ProducerLayout: Story = {
 }
 
 export const PowerOrHeatProducerLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [mockUser(EntityType.PowerOrHeatProducer)],
@@ -117,7 +152,7 @@ export const PowerOrHeatProducerLayout: Story = {
 }
 
 export const TraderLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [mockUser(EntityType.Trader)],
@@ -126,7 +161,7 @@ export const TraderLayout: Story = {
 }
 
 export const AirlineLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [mockUser(EntityType.Airline)],
@@ -135,7 +170,7 @@ export const AirlineLayout: Story = {
 }
 
 export const ChargePointOperatorLayout: Story = {
-  ...PrivateLayout,
+  ...AdminLayout,
   parameters: {
     msw: {
       handlers: [mockUser(EntityType.CPO)],

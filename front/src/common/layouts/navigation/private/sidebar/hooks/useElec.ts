@@ -1,14 +1,14 @@
 import useEntity from "carbure/hooks/entity"
 import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
-import { MenuSection } from "../private-sidebar.types"
+import { MenuSection } from "../sidebar.types"
 import {
   ArrowGoBackLine,
   ArrowGoForwardLine,
   FileTextFill,
   FileTextLine,
-  HotelFill,
-  HotelLine,
+  NewsPaperFill,
+  NewsPaperLine,
 } from "common/components/icon"
 
 export const useElec = () => {
@@ -49,14 +49,13 @@ export const useElec = () => {
       {
         path: routes.ELEC_ADMIN().PROVISION,
         title: t("Certificats"),
-        icon: FileTextLine,
-        iconActive: FileTextFill,
+        icon: NewsPaperLine,
+        iconActive: NewsPaperFill,
       },
       {
         path: routes.ELEC_ADMIN().TRANSFER,
         title: t("Energie cédée"),
-        icon: HotelLine,
-        iconActive: HotelFill,
+        icon: ArrowGoForwardLine,
       },
     ],
   }
