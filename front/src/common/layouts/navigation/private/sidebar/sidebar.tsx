@@ -1,6 +1,6 @@
 import { Text } from "common/components/text"
-import { usePrivateSidebar } from "./private-sidebar.hooks"
-import styles from "./private-sidebar.module.css"
+import { usePrivateSidebar } from "./sidebar.hooks"
+import styles from "./sidebar.module.css"
 import { ChildItem } from "./child-item"
 import { useTranslation } from "react-i18next"
 import { useRoutes } from "common/hooks/routes"
@@ -20,7 +20,7 @@ export const PrivateSidebar = () => {
   const firstEntity = user.getFirstEntity()
 
   return (
-    <div className={styles["private-sidebar"]}>
+    <div className={styles["sidebar"]}>
       <div className={styles["nav-wrapper"]}>
         {firstEntity && (
           <EntitySelector className={styles["entity-selector"]} />

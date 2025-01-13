@@ -123,6 +123,10 @@ export const BookLine = ({ ...props }: IconPropsWithoutName) => {
   return <Icon {...props} name="ri-book-2-line" />
 }
 
+export const BookFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-book-2-fill" />
+}
+
 export const LogoutBoxLine = ({ ...props }: IconPropsWithoutName) => {
   return <Icon {...props} name="ri-logout-box-r-line" />
 }
@@ -161,4 +165,36 @@ export const HotelLine = ({ ...props }: IconPropsWithoutName) => {
 
 export const HotelFill = ({ ...props }: IconPropsWithoutName) => {
   return <Icon {...props} name="ri-hotel-fill" />
+}
+
+export const HomeLine = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-home-4-line" />
+}
+
+export const HomeFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-home-4-fill" />
+}
+
+export const FileDownloadLine = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-file-download-line" />
+}
+
+export const FileDownloadFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-file-download-fill" />
+}
+
+export const NewsPaperLine = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-newspaper-line" />
+}
+
+export const NewsPaperFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-newspaper-fill" />
+}
+
+export const TodoLine = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-todo-line" />
+}
+
+export const TodoFill = ({ ...props }: IconPropsWithoutName) => {
+  return <Icon {...props} name="ri-todo-fill" />
 }

@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom"
-import { MenuItem } from "../private-sidebar.types"
+import { MenuItem } from "../sidebar.types"
 import styles from "./child-item.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"

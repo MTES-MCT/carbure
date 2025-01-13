@@ -122,6 +122,15 @@ const powerOrHeatProducer: Entity = {
   has_trading: false,
 }
 
+export const externalAdmin: Entity = {
+  ...admin,
+  id: 9,
+  name: "External admin",
+  entity_type: EntityType.ExternalAdmin,
+  has_mac: false,
+  has_trading: false,
+}
+
 // DELIVERY SITES
 
 export const deliverySite: Depot = {
@@ -208,6 +217,7 @@ export const entityRights = {
 export const entities = {
   [EntityType.CPO]: cpo,
   [EntityType.Administration]: admin,
+  [EntityType.ExternalAdmin]: externalAdmin,
   [EntityType.Operator]: operator,
   [EntityType.Trader]: trader,
   [EntityType.Producer]: producer,
@@ -234,7 +244,7 @@ export const generateUser = (
 ) => {
   const currentEntity = entities[entityType]
 
-  return {
+  const res = {
     email: partialUser?.email ?? "user@company.com",
     requests: [
       mergeDeepRight(
@@ -255,6 +265,8 @@ export const generateUser = (
       ),
     ],
   }
+  console.log("res", res)
+  return res
 }
 
 export const notifications = [

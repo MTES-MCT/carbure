@@ -1,1 +1,1 @@
-export * from "./private-sidebar"
+export * from "./sidebar"

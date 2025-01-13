@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next"
-import { MenuSection } from "../private-sidebar.types"
+import { MenuSection } from "../sidebar.types"
 import { useRoutes } from "common/hooks/routes"
 import useEntity from "carbure/hooks/entity"
-import { DashboardFill, DashboardLine } from "common/components/icon"
+import { BookFill, BookLine } from "common/components/icon"
 
 export const useAdmin = () => {
   const { t } = useTranslation()
@@ -20,8 +20,8 @@ export const useAdmin = () => {
         path: routes.ADMIN().COMPANIES,
         title: t("Sociétés"),
         condition: isAdmin || isAdminAirline || isElecAdmin || isAdminDC,
-        icon: DashboardLine,
-        iconActive: DashboardFill,
+        icon: BookLine,
+        iconActive: BookFill,
       },
     ],
   }
