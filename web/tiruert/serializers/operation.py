@@ -65,7 +65,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
         model = Operation
         fields = [
             "type",
-            "status",
             "customs_category",
             "biofuel",
             "credited_entity",
@@ -86,17 +85,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
     target_volume = serializers.FloatField()
     target_emission = serializers.FloatField()
-    status = serializers.SerializerMethodField()
-
-    def get_status(self, instance):
-        if instance["type"] in [
-            Operation.INCORPORATION,
-            Operation.MAC_BIO,
-            Operation.LIVRAISON_DIRECTE,
-            Operation.TENEUR,
-            Operation.DEVALUATION,
-        ]:
-            return Operation.ACCEPTED
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -110,6 +98,17 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             if error:
                 raise ValidationError(error)
+
+            if validated_data["type"] in [
+                Operation.INCORPORATION,
+                Operation.MAC_BIO,
+                Operation.LIVRAISON_DIRECTE,
+                Operation.TENEUR,
+                Operation.DEVALUATION,
+            ]:
+                validated_data["status"] = Operation.ACCEPTED
+            else:
+                validated_data["status"] = Operation.PENDING
 
             # Create the operation
             operation = Operation.objects.create(**validated_data)
