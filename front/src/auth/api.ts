@@ -1,4 +1,4 @@
-import { api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 
 export function register(
   email: string,
@@ -6,27 +6,40 @@ export function register(
   password1: string,
   password2: string
 ) {
-  return api.post("/auth/register", { email, name, password1, password2 })
+  return apiFetch.POST("/auth/register/", {
+    body: {
+      email,
+      name,
+      password1,
+      password2,
+    },
+  })
 }
 
 export function login(username: string, password: string) {
-  return api.post("auth/login", { username, password })
+  return apiFetch.POST("/auth/login/", {
+    body: { username, password },
+  })
 }
 
 export function logout() {
-  return api.post("auth/logout")
+  return apiFetch.GET("/auth/logout/")
 }
 
 export function requestOTP() {
-  return api.post("auth/request-otp")
+  return apiFetch.GET("/auth/request-otp/")
 }
 
 export function verifyOTP(otp_token: string) {
-  return api.post("auth/verify-otp", { otp_token })
+  return apiFetch.POST("/auth/verify-otp/", {
+    body: { otp_token },
+  })
 }
 
 export function requestResetPassword(username: string) {
-  return api.post("auth/request-password-reset", { username })
+  return apiFetch.POST("/auth/request-password-reset/", {
+    body: { username },
+  })
 }
 
 export function resetPassword(
@@ -39,16 +52,20 @@ export function resetPassword(
     throw new Error("Missing token for password reset")
   }
 
-  return api.post("auth/reset-password", {
-    uidb64,
-    token,
-    password1,
-    password2,
+  return apiFetch.POST("/auth/reset-password/", {
+    body: {
+      uidb64,
+      token,
+      password1,
+      password2,
+    },
   })
 }
 
 export function requestActivateAccount(email: string) {
-  return api.post("auth/request-activation-link", { email })
+  return apiFetch.POST("/auth/request-activation-link/", {
+    body: { email },
+  })
 }
 
 export function activateAccount(
@@ -63,9 +80,11 @@ export function activateAccount(
     throw new Error("Missing token for account activation")
   }
 
-  return api.post("auth/activate", {
-    uidb64,
-    token,
-    ...(inviteUser ? { invite: 1 } : {}),
+  return apiFetch.POST("/auth/activate/", {
+    body: {
+      uidb64,
+      token,
+      ...(inviteUser ? { invite: 1 } : {}),
+    },
   })
 }

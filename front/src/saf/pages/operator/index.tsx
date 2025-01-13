@@ -60,7 +60,7 @@ export const SafOperator = () => {
           element={
             <Navigate
               replace
-              to={SafTicketSourceStatus.Available.toLocaleLowerCase()}
+              to={SafTicketSourceStatus.AVAILABLE.toLocaleLowerCase()}
             />
           }
         />
@@ -92,7 +92,7 @@ export const SafOperator = () => {
           element={
             <Navigate
               replace
-              to={`ticket-sources/${SafTicketSourceStatus.Available.toLocaleLowerCase()}`}
+              to={`ticket-sources/${SafTicketSourceStatus.AVAILABLE.toLocaleLowerCase()}`}
             />
           }
         />

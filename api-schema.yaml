@@ -4,6 +4,945 @@ info:
   version: 1.0.0
   description: Carbure
 paths:
+  /api/auth/activate/:
+    post:
+      operationId: auth_activate_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateAccountRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActivateAccountRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActivateAccountRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivateResponse"
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: A successful activation
+                  description: The account was successfully activated.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                message: Could not activate user account
+              examples:
+                BadRequest:
+                  value:
+                    message: Could not activate user account
+                  summary: Activation failed
+          description: Bad request - missing fields.
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserLoginRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserLoginRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: A successful activation
+                  description: The account was successfully activated.
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: Invalid login or password | Account not activated
+              examples:
+                BadRequest:
+                  value:
+                    message: Invalid login or password | Account not activated
+                  summary: login failed
+          description: Bad request - missing fields.
+  /api/auth/logout/:
+    get:
+      operationId: auth_logout_retrieve
+      tags:
+        - auth
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: Request successful.
+  /api/auth/register/:
+    post:
+      operationId: auth_register_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserCreationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserCreationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/request-activation-link/:
+    post:
+      operationId: auth_request_activation_link_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserResendActivationLinkRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserResendActivationLinkRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserResendActivationLinkRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/request-otp/:
+    get:
+      operationId: auth_request_otp_retrieve
+      tags:
+        - auth
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpResponse"
+              examples:
+                ExampleResponse.:
+                  value:
+                    valid_until: 07/03/2024, 14:09
+                  summary: Example response.
+          description: ""
+  /api/auth/request-password-reset/:
+    post:
+      operationId: auth_request_password_reset_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordResetRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordResetRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordResetRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/reset-password/:
+    post:
+      operationId: auth_reset_password_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/auth/verify-otp/:
+    post:
+      operationId: auth_verify_otp_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOTPRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/VerifyOTPRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/VerifyOTPRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreation"
+              examples:
+                ExampleResponse.:
+                  value:
+                    status: success
+                  summary: Example response.
+          description: ""
+  /api/double-counting/agreements/:
+    get:
+      operationId: double_counting_agreements_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DoubleCountingApplicationPartial"
+          description: ""
+  /api/double-counting/agreements/{id}/:
+    get:
+      operationId: double_counting_agreements_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
+          description: ""
+  /api/double-counting/agreements/agreement-admin/:
+    get:
+      operationId: double_counting_agreements_agreement_admin_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementLists"
+          description: ""
+  /api/double-counting/agreements/agreement-public/:
+    get:
+      operationId: double_counting_agreements_agreement_public_list
+      parameters:
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DoubleCountingRegistrationPublic"
+          description: ""
+  /api/double-counting/agreements/export/:
+    get:
+      operationId: double_counting_agreements_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: csv file.csv
+                  summary: Example of export response.
+          description: ""
+  /api/double-counting/applications/{id}/:
+    get:
+      operationId: double_counting_applications_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoubleCountingApplication"
+          description: ""
+  /api/double-counting/applications/{id}/export/:
+    get:
+      operationId: double_counting_applications_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/force-download:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: csv file.*
+                  summary: Example of export response.
+          description: ""
+  /api/double-counting/applications/{id}/update-approved-quotas/:
+    post:
+      operationId: double_counting_applications_update_approved_quotas_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatedQuotasRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdatedQuotasRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdatedQuotasRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/double-counting/applications/add/:
+    post:
+      operationId: double_counting_applications_add_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingAdminAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingAdminAddRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingAdminAddRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/double-counting/applications/approve/:
+    post:
+      operationId: double_counting_applications_approve_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/double-counting/applications/check-admin-files/:
+    post:
+      operationId: double_counting_applications_check_admin_files_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckAdminFileRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CheckAdminFileRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CheckAdminFileRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CheckFileResponse"
+          description: ""
+  /api/double-counting/applications/check-file/:
+    post:
+      operationId: double_counting_applications_check_file_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckFileResponse"
+          description: ""
+  /api/double-counting/applications/export-application/:
+    get:
+      operationId: double_counting_applications_export_application_retrieve
+      parameters:
+        - in: query
+          name: dca_id
+          schema:
+            type: integer
+          description: Doublecount application ID
+          required: true
+        - in: query
+          name: di
+          schema:
+            type: string
+          description: Dechet industriel
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: file.docx
+                  summary: Example of export response.
+          description: ""
+  /api/double-counting/applications/list-admin/:
+    get:
+      operationId: double_counting_applications_list_admin_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationListe"
+          description: ""
+  /api/double-counting/applications/reject/:
+    post:
+      operationId: double_counting_applications_reject_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectDoubleCountingRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RejectDoubleCountingRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RejectDoubleCountingRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/double-counting/snapshot/:
+    get:
+      operationId: double_counting_snapshot_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationSnapshot"
+          description: ""
   /api/entities/{id}/enable/:
     post:
       operationId: entities_enable_create
@@ -26,13 +965,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EmptyResponse"
+              $ref: "#/components/schemas/EmptyResponseRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/EmptyResponse"
+              $ref: "#/components/schemas/EmptyResponseRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/EmptyResponse"
+              $ref: "#/components/schemas/EmptyResponseRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -500,13 +1439,20 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - AVAILABLE
+              - HISTORY
+          description: |-
+            * `HISTORY` - HISTORY
+            * `AVAILABLE` - AVAILABLE
         - in: query
           name: suppliers
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
+              minLength: 1
+          description: Comma-separated list of supplier names
           explode: false
           style: form
         - in: query
@@ -575,13 +1521,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SafTicketSourceAssignment"
+              $ref: "#/components/schemas/SafTicketSourceAssignmentRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/SafTicketSourceAssignment"
+              $ref: "#/components/schemas/SafTicketSourceAssignmentRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/SafTicketSourceAssignment"
+              $ref: "#/components/schemas/SafTicketSourceAssignmentRequest"
         required: true
       security:
         - cookieAuth: []
@@ -706,13 +1652,20 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - AVAILABLE
+              - HISTORY
+          description: |-
+            * `HISTORY` - HISTORY
+            * `AVAILABLE` - AVAILABLE
         - in: query
           name: suppliers
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
+              minLength: 1
+          description: Comma-separated list of supplier names
           explode: false
           style: form
         - in: query
@@ -849,13 +1802,20 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - AVAILABLE
+              - HISTORY
+          description: |-
+            * `HISTORY` - HISTORY
+            * `AVAILABLE` - AVAILABLE
         - in: query
           name: suppliers
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
+              minLength: 1
+          description: Comma-separated list of supplier names
           explode: false
           style: form
         - in: query
@@ -901,13 +1861,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SafTicketSourceGroupAssignment"
+              $ref: "#/components/schemas/SafTicketSourceGroupAssignmentRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/SafTicketSourceGroupAssignment"
+              $ref: "#/components/schemas/SafTicketSourceGroupAssignmentRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/SafTicketSourceGroupAssignment"
+              $ref: "#/components/schemas/SafTicketSourceGroupAssignmentRequest"
         required: true
       security:
         - cookieAuth: []
@@ -1049,6 +2009,14 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REJECTED
+          description: |-
+            * `PENDING` - En attente
+            * `ACCEPTED` - Accepté
+            * `REJECTED` - Refusé
         - in: query
           name: suppliers
           schema:
@@ -1124,13 +2092,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1168,13 +2136,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1245,13 +2213,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1379,6 +2347,14 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REJECTED
+          description: |-
+            * `PENDING` - En attente
+            * `ACCEPTED` - Accepté
+            * `REJECTED` - Refusé
         - in: query
           name: suppliers
           schema:
@@ -1525,6 +2501,14 @@ paths:
           name: status
           schema:
             type: string
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REJECTED
+          description: |-
+            * `PENDING` - En attente
+            * `ACCEPTED` - Accepté
+            * `REJECTED` - Refusé
         - in: query
           name: suppliers
           schema:
@@ -1600,8 +2584,169 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/user/:
+    get:
+      operationId: user_retrieve
+      tags:
+        - user
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettingsResponseSeriaizer"
+          description: ""
+  /api/user/request-access:
+    post:
+      operationId: user_request_access_create
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestAccessRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestAccessRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestAccessRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseSuccess"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
+  /api/user/revoke-access:
+    post:
+      operationId: user_revoke_access_create
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokeAccessRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RevokeAccessRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RevokeAccessRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseSuccess"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
 components:
   schemas:
+    ActivateAccountRequest:
+      type: object
+      properties:
+        uidb64:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        invite:
+          type: integer
+      required:
+        - token
+        - uidb64
+    ActivateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        token:
+          type: string
+      required:
+        - message
+    AgreementLists:
+      type: object
+      properties:
+        active:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingRegistration"
+        incoming:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingRegistration"
+        expired:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingRegistration"
+      required:
+        - active
+        - expired
+        - incoming
+    ApplicationListe:
+      type: object
+      properties:
+        rejected:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingApplicationPartial"
+        pending:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingApplicationPartial"
+      required:
+        - pending
+        - rejected
+    ApplicationSnapshot:
+      type: object
+      properties:
+        applications_pending:
+          type: integer
+        applications_rejected:
+          type: integer
+        agreements_incoming:
+          type: integer
+        agreements_active:
+          type: integer
+        agreements_expired:
+          type: integer
+      required:
+        - agreements_active
+        - agreements_expired
+        - agreements_incoming
+        - applications_pending
+        - applications_rejected
+    ApprouveDoubleCountingRequest:
+      type: object
+      properties:
+        dca_id:
+          type: integer
+      required:
+        - dca_id
     Biofuel:
       type: object
       properties:
@@ -1870,11 +3015,33 @@ components:
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
-    Comment:
+    CheckAdminFileRequest:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - files
+    CheckFileResponse:
+      type: object
+      properties:
+        file:
+          $ref: "#/components/schemas/File"
+        checked_at:
+          type: string
+          format: date-time
+      required:
+        - checked_at
+        - file
+    CommentRequest:
       type: object
       properties:
         comment:
           type: string
+          minLength: 1
     CorrectionStatusEnum:
       enum:
         - NO_PROBLEMO
@@ -1984,11 +3151,551 @@ components:
         - country
         - id
         - name
+    DoubleCountingAdminAddRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: string
+        entity_id:
+          type: integer
+        producer_id:
+          type: integer
+        production_site_id:
+          type: integer
+        should_replace:
+          type: boolean
+          default: false
+        file:
+          type: string
+          format: binary
+      required:
+        - entity_id
+        - file
+        - producer_id
+        - production_site_id
+    DoubleCountingAgreementStatus:
+      enum:
+        - ACTIVE
+        - EXPIRED
+        - EXPIRES_SOON
+        - INCOMING
+      type: string
+      description: |-
+        * `ACTIVE` - ACTIVE
+        * `EXPIRED` - EXPIRED
+        * `EXPIRES_SOON` - EXPIRES_SOON
+        * `INCOMING` - INCOMING
+    DoubleCountingApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/Entity"
+          readOnly: true
+        producer_user:
+          type: string
+          format: email
+          title: Adresse électronique
+          readOnly: true
+        production_site:
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingProductionSite"
+          readOnly: true
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
+        sourcing:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingSourcing"
+          readOnly: true
+        production:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingProduction"
+          readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingDocFile"
+          readOnly: true
+      required:
+        - created_at
+        - documents
+        - id
+        - period_end
+        - period_start
+        - producer
+        - producer_user
+        - production
+        - production_site
+        - sourcing
+    DoubleCountingApplicationPartial:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        production_site:
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingProductionSite"
+          readOnly: true
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        status:
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingStatus"
+          readOnly: true
+        certificate_id:
+          type: string
+          maxLength: 16
+        agreement_id:
+          type: integer
+          readOnly: true
+        quotas_progression:
+          type: number
+          format: double
+          readOnly: true
+        producer_user:
+          type: string
+          format: email
+          title: Adresse électronique
+          readOnly: true
+      required:
+        - agreement_id
+        - certificate_id
+        - created_at
+        - id
+        - period_end
+        - period_start
+        - producer
+        - producer_user
+        - production_site
+        - quotas_progression
+        - status
+    DoubleCountingDocFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_name:
+          type: string
+          maxLength: 128
+        file_type:
+          $ref: "#/components/schemas/FileTypeEnum"
+      required:
+        - id
+    DoubleCountingProduction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        max_production_capacity:
+          type: integer
+          readOnly: true
+        estimated_production:
+          type: integer
+          readOnly: true
+        requested_quota:
+          type: integer
+          readOnly: true
+        approved_quota:
+          type: integer
+          readOnly: true
+      required:
+        - approved_quota
+        - biofuel
+        - estimated_production
+        - feedstock
+        - id
+        - max_production_capacity
+        - requested_quota
+        - year
+    DoubleCountingProductionHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        max_production_capacity:
+          type: integer
+          readOnly: true
+        effective_production:
+          type: integer
+          readOnly: true
+      required:
+        - biofuel
+        - effective_production
+        - feedstock
+        - id
+        - max_production_capacity
+        - year
+    DoubleCountingProductionSite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/Entity"
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        site_siret:
+          type: string
+          maxLength: 64
+        address:
+          type: string
+          maxLength: 256
+        city:
+          type: string
+          maxLength: 128
+        postal_code:
+          type: string
+          maxLength: 32
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        certificates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductionSiteCertificate"
+          readOnly: true
+      required:
+        - certificates
+        - country
+        - id
+        - inputs
+        - name
+        - outputs
+        - producer
+    DoubleCountingQuota:
+      type: object
+      properties:
+        approved_quota:
+          type: integer
+        biofuel:
+          $ref: "#/components/schemas/Biofuel"
+        feedstock:
+          $ref: "#/components/schemas/FeedStock"
+        id:
+          type: integer
+        lot_count:
+          type: integer
+        production_tonnes:
+          type: integer
+        quotas_progression:
+          type: integer
+        requested_quota:
+          type: integer
+        year:
+          type: integer
+      required:
+        - approved_quota
+        - biofuel
+        - feedstock
+        - id
+        - lot_count
+        - production_tonnes
+        - quotas_progression
+        - requested_quota
+        - year
+    DoubleCountingRegistration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        certificate_id:
+          type: string
+          maxLength: 64
+        valid_from:
+          type: string
+          format: date
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        production_site:
+          $ref: "#/components/schemas/DoubleCountingProductionSite"
+        valid_until:
+          type: string
+          format: date
+        status:
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
+          readOnly: true
+        quotas_progression:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - certificate_id
+        - id
+        - producer
+        - production_site
+        - quotas_progression
+        - status
+        - valid_from
+        - valid_until
+    DoubleCountingRegistrationDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        certificate_id:
+          type: string
+          maxLength: 64
+        valid_from:
+          type: string
+          format: date
+        valid_until:
+          type: string
+          format: date
+        status:
+          allOf:
+            - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
+          readOnly: true
+        producer:
+          type: string
+          readOnly: true
+        production_site:
+          type: string
+          readOnly: true
+        application:
+          $ref: "#/components/schemas/DoubleCountingApplication"
+        quotas:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingQuota"
+          readOnly: true
+      required:
+        - application
+        - certificate_id
+        - id
+        - producer
+        - production_site
+        - quotas
+        - status
+        - valid_from
+        - valid_until
+    DoubleCountingRegistrationPublic:
+      type: object
+      properties:
+        production_site:
+          allOf:
+            - $ref: "#/components/schemas/FieldData"
+          readOnly: true
+        certificate_id:
+          type: string
+          maxLength: 64
+        valid_from:
+          type: string
+          format: date
+        valid_until:
+          type: string
+          format: date
+        biofuel_list:
+          type: string
+          readOnly: true
+      required:
+        - biofuel_list
+        - certificate_id
+        - production_site
+        - valid_from
+        - valid_until
+    DoubleCountingSourcing:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        origin_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        supply_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        transit_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        metric_tonnes:
+          type: integer
+          readOnly: true
+      required:
+        - feedstock
+        - id
+        - metric_tonnes
+        - origin_country
+        - supply_country
+        - transit_country
+        - year
+    DoubleCountingSourcingHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        origin_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        supply_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        transit_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        metric_tonnes:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        raw_material_supplier:
+          type: string
+          maxLength: 128
+        supplier_certificate_name:
+          type: string
+          maxLength: 64
+        supplier_certificate:
+          type: integer
+          nullable: true
+      required:
+        - feedstock
+        - id
+        - metric_tonnes
+        - origin_country
+        - supply_country
+        - transit_country
+        - year
+    DoubleCountingStatus:
+      enum:
+        - PENDING
+        - INPROGRESS
+        - REJECTED
+        - ACCEPTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `INPROGRESS` - INPROGRESS
+        * `REJECTED` - REJECTED
+        * `ACCEPTED` - ACCEPTED
     EmptyResponse:
       type: object
       properties:
         empty:
           type: string
+    EmptyResponseRequest:
+      type: object
+      properties:
+        empty:
+          type: string
+          minLength: 1
     Entity:
       type: object
       properties:
@@ -2071,10 +3778,13 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 64
+          readOnly: true
         entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
+          readOnly: true
       required:
+        - entity_type
         - id
         - name
     EntityTypeEnum:
@@ -2119,6 +3829,20 @@ components:
           type: string
       required:
         - message
+    ExtAdminPagesEnum:
+      enum:
+        - DCA
+        - AGRIMER
+        - TIRIB
+        - AIRLINE
+        - ELEC
+      type: string
+      description: |-
+        * `DCA` - DCA
+        * `AGRIMER` - AGRIMER
+        * `TIRIB` - TIRIB
+        * `AIRLINE` - AIRLINE
+        * `ELEC` - ELEC
     FeedStock:
       type: object
       properties:
@@ -2139,6 +3863,129 @@ components:
         - code
         - name
         - name_en
+    FieldData:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+      required:
+        - address
+        - city
+        - country
+        - name
+        - postal_code
+    File:
+      type: object
+      properties:
+        file_name:
+          type: string
+        errors:
+          $ref: "#/components/schemas/FileErrors"
+        error_count:
+          type: integer
+        start_year:
+          type: integer
+        production_site:
+          type: string
+        producer_email:
+          type: string
+          format: email
+        production:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingProduction"
+        sourcing:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingSourcing"
+        sourcing_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingSourcingHistory"
+        production_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingProductionHistory"
+        has_dechets_industriels:
+          type: boolean
+          readOnly: true
+      required:
+        - error_count
+        - errors
+        - file_name
+        - has_dechets_industriels
+        - producer_email
+        - production
+        - production_history
+        - production_site
+        - sourcing
+        - sourcing_history
+        - start_year
+    FileError:
+      type: object
+      properties:
+        error:
+          type: string
+        is_blocking:
+          type: boolean
+        line_number:
+          type: integer
+        line_merged:
+          type: string
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+        - error
+        - is_blocking
+        - line_merged
+        - line_number
+        - meta
+    FileErrors:
+      type: object
+      properties:
+        sourcing_forecast:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileError"
+        sourcing_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileError"
+        production:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileError"
+        production_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileError"
+        global_errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileError"
+      required:
+        - global_errors
+        - production
+        - production_history
+        - sourcing_forecast
+        - sourcing_history
+    FileTypeEnum:
+      enum:
+        - SOURCING
+        - DECISION
+      type: string
+      description: |-
+        * `SOURCING` - SOURCING
+        * `DECISION` - DECISION
     GenericCertificate:
       type: object
       properties:
@@ -2213,6 +4060,13 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    OtpResponse:
+      type: object
+      properties:
+        valid_until:
+          type: string
+      required:
+        - valid_until
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -2350,6 +4204,139 @@ components:
         - id
         - name
         - producer
+    ProductionSiteCertificate:
+      type: object
+      properties:
+        certificate_id:
+          type: string
+          maxLength: 64
+        certificate_type:
+          $ref: "#/components/schemas/CertificateTypeEnum"
+        certificate_holder:
+          type: string
+          maxLength: 512
+        certificate_issuer:
+          type: string
+          nullable: true
+          maxLength: 256
+        address:
+          type: string
+          nullable: true
+          maxLength: 512
+        valid_from:
+          type: string
+          format: date
+        valid_until:
+          type: string
+          format: date
+        download_link:
+          type: string
+          nullable: true
+          maxLength: 512
+        scope:
+          nullable: true
+        input:
+          nullable: true
+        output:
+          nullable: true
+      required:
+        - certificate_holder
+        - certificate_id
+        - certificate_type
+        - valid_from
+        - valid_until
+    RejectDoubleCountingRequest:
+      type: object
+      properties:
+        dca_id:
+          type: integer
+      required:
+        - dca_id
+    RequestAccessRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+        role:
+          type: string
+          minLength: 1
+        entity_id:
+          type: integer
+      required:
+        - entity_id
+        - role
+    RequestPasswordResetRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+      required:
+        - username
+    ResetPasswordRequest:
+      type: object
+      properties:
+        uidb64:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        password1:
+          type: string
+          writeOnly: true
+          minLength: 1
+          title: Mot de passe
+        password2:
+          type: string
+          writeOnly: true
+          minLength: 1
+          title: Confirmation du mot de passe
+      required:
+        - password1
+        - password2
+        - token
+        - uidb64
+    Response:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ResponseSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    RevokeAccessRequest:
+      type: object
+      properties:
+        entity_id:
+          type: integer
+      required:
+        - entity_id
+    RoleEnum:
+      enum:
+        - RO
+        - RW
+        - ADMIN
+        - AUDITOR
+      type: string
+      description: |-
+        * `RO` - Lecture Seule
+        * `RW` - Lecture/Écriture
+        * `ADMIN` - Administrateur
+        * `AUDITOR` - Auditeur
+      x-enum-varnames:
+        - ReadOnly
+        - ReadWrite
+        - Admin
+        - Auditor
     SafTicket:
       type: object
       properties:
@@ -2369,7 +4356,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         status:
-          $ref: "#/components/schemas/StatusEnum"
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         agreement_date:
           type: string
           format: date
@@ -2427,7 +4414,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         status:
-          $ref: "#/components/schemas/StatusEnum"
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         created_at:
           type: string
           format: date-time
@@ -2560,7 +4547,7 @@ components:
           type: number
           format: double
         status:
-          $ref: "#/components/schemas/StatusEnum"
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         created_at:
           type: string
           format: date-time
@@ -2648,6 +4635,29 @@ components:
           type: string
         agreement_date:
           type: string
+        free_field:
+          type: string
+          nullable: true
+        assignment_period:
+          type: integer
+      required:
+        - assignment_period
+        - client_id
+        - volume
+    SafTicketSourceAssignmentRequest:
+      type: object
+      properties:
+        client_id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        agreement_reference:
+          type: string
+          minLength: 1
+        agreement_date:
+          type: string
+          minLength: 1
         free_field:
           type: string
           nullable: true
@@ -2777,7 +4787,7 @@ components:
         - parent_lot
         - total_volume
         - year
-    SafTicketSourceGroupAssignment:
+    SafTicketSourceGroupAssignmentRequest:
       type: object
       properties:
         client_id:
@@ -2787,8 +4797,10 @@ components:
           format: double
         agreement_reference:
           type: string
+          minLength: 1
         agreement_date:
           type: string
+          minLength: 1
         free_field:
           type: string
           nullable: true
@@ -2858,16 +4870,6 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
-    StatusEnum:
-      enum:
-        - PENDING
-        - ACCEPTED
-        - REJECTED
-      type: string
-      description: |-
-        * `PENDING` - En attente
-        * `ACCEPTED` - Accepté
-        * `REJECTED` - Refusé
     TransportDocumentTypeEnum:
       enum:
         - DAU
@@ -2884,6 +4886,325 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    UpdatedQuotasRequest:
+      type: object
+      properties:
+        approved_quotas:
+          type: array
+          items:
+            type: array
+            items:
+              type: integer
+            maxItems: 2
+            minItems: 2
+      required:
+        - approved_quotas
+    UserCreation:
+      type: object
+      description: |-
+        Serializer for creating new users. Includes required fields
+        and repeated password validation.
+      properties:
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+        name:
+          type: string
+          title: Nom
+          maxLength: 255
+      required:
+        - email
+        - name
+    UserCreationRequest:
+      type: object
+      description: |-
+        Serializer for creating new users. Includes required fields
+        and repeated password validation.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Adresse électronique
+          maxLength: 255
+        name:
+          type: string
+          minLength: 1
+          title: Nom
+          maxLength: 255
+        password1:
+          type: string
+          writeOnly: true
+          minLength: 1
+          title: Mot de passe
+        password2:
+          type: string
+          writeOnly: true
+          minLength: 1
+          title: Confirmation du mot de passe
+      required:
+        - email
+        - name
+        - password1
+        - password2
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        is_enabled:
+          type: boolean
+          readOnly: true
+        entity_type:
+          allOf:
+            - $ref: "#/components/schemas/EntityTypeEnum"
+          readOnly: true
+        has_mac:
+          type: boolean
+          readOnly: true
+        has_trading:
+          type: boolean
+          readOnly: true
+        has_direct_deliveries:
+          type: boolean
+          readOnly: true
+        has_stocks:
+          type: boolean
+          readOnly: true
+        legal_name:
+          type: string
+          readOnly: true
+        registration_id:
+          type: string
+          readOnly: true
+        sustainability_officer:
+          type: string
+          readOnly: true
+        sustainability_officer_phone_number:
+          type: string
+          readOnly: true
+        sustainability_officer_email:
+          type: string
+          readOnly: true
+        registered_address:
+          type: string
+          readOnly: true
+        registered_zipcode:
+          type: string
+          readOnly: true
+        registered_city:
+          type: string
+          readOnly: true
+        registered_country:
+          $ref: "#/components/schemas/Country"
+        default_certificate:
+          type: string
+          readOnly: true
+          nullable: true
+        preferred_unit:
+          allOf:
+            - $ref: "#/components/schemas/PreferredUnitEnum"
+          readOnly: true
+        has_saf:
+          type: boolean
+          readOnly: true
+        has_elec:
+          type: boolean
+          readOnly: true
+        activity_description:
+          type: string
+          readOnly: true
+        website:
+          type: string
+          format: uri
+          readOnly: true
+        vat_number:
+          type: string
+          readOnly: true
+        ext_admin_pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExtAdminPagesEnum"
+          readOnly: true
+      required:
+        - activity_description
+        - default_certificate
+        - entity_type
+        - ext_admin_pages
+        - has_direct_deliveries
+        - has_elec
+        - has_mac
+        - has_saf
+        - has_stocks
+        - has_trading
+        - id
+        - is_enabled
+        - legal_name
+        - name
+        - preferred_unit
+        - registered_address
+        - registered_city
+        - registered_zipcode
+        - registration_id
+        - sustainability_officer
+        - sustainability_officer_email
+        - sustainability_officer_phone_number
+        - vat_number
+        - website
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - password
+        - username
+    UserResendActivationLinkRequest:
+      type: object
+      description: A serializer for re-sending the user activation email. Includes
+        email field only.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Courriel
+      required:
+        - email
+    UserRights:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        entity:
+          $ref: "#/components/schemas/UserEntity"
+        role:
+          allOf:
+            - $ref: "#/components/schemas/RoleEnum"
+          readOnly: true
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - email
+        - entity
+        - name
+        - role
+    UserRightsRequests:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        entity:
+          $ref: "#/components/schemas/UserEntity"
+        date_requested:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          allOf:
+            - $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
+          readOnly: true
+        comment:
+          type: string
+          nullable: true
+        role:
+          allOf:
+            - $ref: "#/components/schemas/RoleEnum"
+          readOnly: true
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - date_requested
+        - entity
+        - id
+        - role
+        - status
+        - user
+    UserRightsRequestsStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - REVOKED
+      type: string
+      description: |-
+        * `PENDING` - En attente de validation
+        * `ACCEPTED` - Accepté
+        * `REJECTED` - Refusé
+        * `REVOKED` - Révoqué
+      x-enum-varnames:
+        - Pending
+        - Accepted
+        - Rejected
+        - Revoked
+    UserSettingsResponseSeriaizer:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        rights:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRights"
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRightsRequests"
+      required:
+        - email
+        - requests
+        - rights
+    VerifyOTPRequest:
+      type: object
+      description: A serializer for submitting the OTP sent via email. Includes
+        otp_token field only.
+      properties:
+        otp_token:
+          type: string
+          minLength: 6
+          title: Entrez le code à 6 chiffres reçu par email
+          pattern: ^\d{6}$
+          maxLength: 6
+      required:
+        - otp_token
+    saf.filters.TicketFilter.status:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - En attente
+        * `ACCEPTED` - Accepté
+        * `REJECTED` - Refusé
   securitySchemes:
     basicAuth:
       type: http

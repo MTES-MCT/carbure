@@ -1,12 +1,12 @@
 import django_filters
 
 from core.models import Entity
-from saf.models import SafTicket, constants
+from saf.models import SafTicket
 
 
 class TicketFilter(django_filters.FilterSet):
     entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_entity_id", required=True)
-    status = django_filters.ChoiceFilter(choices=constants.TicketStatus)
+    status = django_filters.ChoiceFilter(choices=SafTicket.ticket_statuses)
     year = django_filters.NumberFilter(field_name="year")
     periods = django_filters.BaseInFilter(field_name="assignment_period", lookup_expr="in")
     feedstocks = django_filters.BaseInFilter(field_name="feedstock__code", lookup_expr="in")

@@ -2,6 +2,7 @@ import datetime
 import subprocess
 from os import environ as env
 
+from django.core.management import call_command
 from django.db.models.query import QuerySet
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, db_task, periodic_task
@@ -55,6 +56,10 @@ if env.get("IMAGE_TAG") == "prod":
     def periodic_update_redcert_certificates() -> None:
         update_redcert_certificates(email=True)
 
+    @db_periodic_task(crontab(day_of_week=7, hour=5, minute=10))
+    def periodic_get_redcert_pdf_certificates() -> None:
+        call_command("get_redcert_pdf", "--no-pdf")
+
     @db_periodic_task(crontab(hour="19,20,21,22,23", minute=30))
     def periodic_send_notification_emails() -> None:
         send_notification_emails()
@@ -75,7 +80,7 @@ if env.get("IMAGE_TAG") == "prod":
         period = last_month.year * 100 + last_month.month
         calc_ml_score(period=period)
 
-    @db_periodic_task(crontab(day_of_week=7, hour=6, minute=0))
+    @db_periodic_task(crontab(day_of_week=7, hour=2, minute=0))
     def periodic_link_dgac_to_airlines() -> None:
         link_dgac_to_airlines()
 
@@ -91,6 +96,11 @@ if env.get("IMAGE_TAG") == "prod":
     @db_periodic_task(crontab(month="1,4,7,10", day=15, hour=8, minute=0))
     def periodic_send_meter_readings_application_deadline_reminder() -> None:
         create_meter_readings_application_deadline_reminder()
+
+    # Read replica
+    @periodic_task(crontab(hour=0, minute=45))
+    def populate_read_replica() -> None:
+        subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", "$READ_REPLICA_DATABASE_URL"])
 
 
 if env.get("IMAGE_TAG") == "staging":

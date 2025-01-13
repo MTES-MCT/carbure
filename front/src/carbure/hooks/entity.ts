@@ -17,7 +17,7 @@ export interface EntityManager extends Entity {
   isIndustry: boolean
   isCPO: boolean
   canTrade: boolean
-  hasAdminRight: (page: ExternalAdminPages) => boolean
+  hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) => boolean
   hasRights: (...roles: UserRole[]) => boolean
 }
 
@@ -35,6 +35,7 @@ export function useEntityManager(
   return {
     id: entityID,
     name: entity?.name ?? "",
+    is_enabled: entity?.is_enabled ?? false,
     entity_type: entity?.entity_type ?? EntityType.Operator,
     activity_description: entity?.activity_description ?? "",
     legal_name: entity?.legal_name ?? "",
@@ -71,8 +72,8 @@ export function useEntityManager(
     website: entity?.website ?? "",
     vat_number: entity?.vat_number ?? "",
 
-    hasAdminRight: (page: ExternalAdminPages) =>
-      entity?.ext_admin_pages?.includes(page) ?? false,
+    hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) =>
+      entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false,
 
     hasRights: (...roles: UserRole[]) =>
       (entityRights && roles.includes(entityRights.role)) ?? false,

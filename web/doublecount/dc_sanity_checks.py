@@ -62,20 +62,15 @@ def check_production_row_integrity(
     data: ProductionBaseRow,
     tab_name: str,
     dca: DoubleCountingApplication,
+    check_year: bool = True,
 ) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]
     year = data["year"]
     meta = {"tab_name": tab_name, "year": year}
 
-    if year not in [dca.period_start.year, dca.period_end.year]:
+    if check_year and year not in [dca.period_start.year, dca.period_end.year]:
         errors.append(error(DoubleCountingError.INVALID_YEAR, line, meta))
-
-    # if not data["biofuel"]:
-    #     errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line, meta))
-
-    # if not data["feedstock"]:
-    #     errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
 
     if not biofuel:
         errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line, meta))

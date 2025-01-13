@@ -34,6 +34,7 @@ class DoubleCountingApplication(models.Model):
     period_end = models.DateField(null=False, blank=False)
     certificate_id = models.CharField(max_length=16)  # FR_123456789_2020
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
+    download_link = models.CharField(max_length=512, default=None, null=True)
 
     def __str__(self):
         producer = self.producer.name if self.producer else ""
@@ -126,7 +127,7 @@ class DoubleCountingSourcingHistory(models.Model):
     class Meta:
         db_table = "double_counting_sourcing_history"
         verbose_name = "Sourcing Double Compte Historique"
-        verbose_name_plural = "Sourcing Double Compte Historique"
+        verbose_name_plural = "Sourcing Double Compte Historiques"
 
 
 class DoubleCountingProduction(models.Model):
@@ -153,6 +154,29 @@ class DoubleCountingProduction(models.Model):
         db_table = "double_counting_production"
         verbose_name = "Production Double Compte"
         verbose_name_plural = "Production Double Compte"
+
+
+class DoubleCountingProductionHistory(models.Model):
+    dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="history_production")
+    year = models.IntegerField(blank=False, null=False)
+    biofuel = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
+    feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
+    max_production_capacity = models.IntegerField(blank=False, null=False, default=0)
+    effective_production = models.IntegerField(blank=False, null=False, default=0)
+
+    def __str__(self):
+        return "%s - %s / %s - %st produites (%st max)" % (
+            self.year,
+            self.feedstock,
+            self.biofuel,
+            self.effective_production,
+            self.max_production_capacity,
+        )
+
+    class Meta:
+        db_table = "double_counting_production_history"
+        verbose_name = "Production Double Compte Historique"
+        verbose_name_plural = "Production Double Compte Historiques"
 
 
 class DoubleCountingDocFile(models.Model):

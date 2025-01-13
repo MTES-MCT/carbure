@@ -21,13 +21,13 @@ export function useUserManager(): UserManager {
     key: "user-settings",
     params: [],
     onSuccess: (response) => {
-      if (response.data?.data?.email) {
-        Sentry.setUser({ email: response.data.data.email })
+      if (response.data?.email) {
+        Sentry.setUser({ email: response.data.email })
       }
     },
   })
 
-  const res = settings.result?.data.data
+  const res = settings.result?.data
   const email = res?.email ?? ""
   const rights = res?.rights ?? []
   const requests = res?.requests ?? []
@@ -45,7 +45,7 @@ export function useUserManager(): UserManager {
   }
 
   function getFirstEntity() {
-    return rights[0]?.entity ?? null
+    return (rights[0]?.entity as Entity) ?? null
   }
 
   function isAuthenticated() {

@@ -32,7 +32,6 @@ def update_redcert_certificates(email: bool = False, test: bool = False) -> None
     nb_certificates, new_certificates, newly_invalidated_certificates = save_redcert_certificates()
     send_email_summary(nb_certificates, new_certificates, newly_invalidated_certificates, email)
 
-
 def download_redcert_certificates() -> None:
     session = requests.Session()
     # first, load the page showing the list of redcert certs -> it sets a session cookie
@@ -100,7 +99,7 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
                 "output": None,
             }
         )
-
+        
     existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
     print("[REDcert Certificates] %d updated, %d created" % (len(existing), len(new)))
     return i, new, invalidated
@@ -181,7 +180,6 @@ def convert_cell(cell: Cell, convert_float: bool) -> Scalar:
             return float(cast(float, cell.value))
 
     return cell.value
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load REDCert certificates in database")
