@@ -72,7 +72,7 @@
     "open": "open http://carbure.local:8090/",
     "stop-server": "docker-compose down",
     "start": "vite",
-    "build": "vite build",
+    "build": "vite build && ./scripts/redirect-index.sh",
     "serve": "vite preview",
     "translate": "i18next",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
