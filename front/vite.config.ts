@@ -1,11 +1,22 @@
-import { defineConfig } from "vite"
+import { defineConfig, Plugin } from "vite"
 import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
+
+const htmlHashPlugin: Plugin = {
+  name: "html-hash",
+  enforce: "post",
+  generateBundle(options, bundle) {
+    const date = new Date().getTime()
+
+    const indexHtml = bundle["index.html"]
+    indexHtml.fileName = `index.${date}.html`
+  },
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/",
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react(), tsconfigPaths(), htmlHashPlugin],
   server: {
     host: true,
     port: 3000,
