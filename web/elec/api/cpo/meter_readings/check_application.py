@@ -51,7 +51,7 @@ def check_application(request: HttpRequest, entity):
     renewable_share = MeterReadingRepository.get_renewable_share(year)
     previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
 
-    meter_reading_data, errors, __ = import_meter_reading_excel(
+    meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
         previous_readings,

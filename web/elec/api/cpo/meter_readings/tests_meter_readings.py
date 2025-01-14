@@ -264,10 +264,9 @@ class ElecMeterReadingsTest(TestCase):
             "error": "VALIDATION_FAILED",
             "data": {
                 "file_name": "readings.xlsx",
+                "meter_reading_count": 1,
                 "quarter": 3,
                 "year": 2024,
-                "meter_reading_count": 1,
-                "error_count": 3,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -277,7 +276,12 @@ class ElecMeterReadingsTest(TestCase):
                     {
                         "error": "INVALID_DATA",
                         "line": 4,
-                        "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
+                        "meta": {"charge_point_id": ["Ce point de recharge a été défini 2 fois (lignes 4, 5)"]},
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 5,
+                        "meta": {"charge_point_id": ["Ce point de recharge a été défini 2 fois (lignes 4, 5)"]},
                     },
                     {
                         "error": "INVALID_DATA",
@@ -285,6 +289,7 @@ class ElecMeterReadingsTest(TestCase):
                         "meta": {"charge_point_id": ["Le point de recharge n'a pas encore été inscrit sur la plateforme."]},
                     },
                 ],
+                "error_count": 4,
             },
         }
 

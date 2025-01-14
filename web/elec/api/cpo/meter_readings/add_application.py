@@ -56,7 +56,7 @@ def add_application(request: HttpRequest, entity: Entity):
     renewable_share = MeterReadingRepository.get_renewable_share(year)
     previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
 
-    meter_reading_data, errors, original = import_meter_reading_excel(
+    meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
         previous_readings,
@@ -74,20 +74,6 @@ def add_application(request: HttpRequest, entity: Entity):
     meter_readings = ElecMeterReading.objects.filter(
         cpo=entity, meter__charge_point__charge_point_id__in=charge_points_by_id
     )
-
-    previous_date = {}
-    for item in meter_readings:
-        previous_date[item.charge_point.charge_point_id] = item.reading_date
-
-    duplicate = False
-    for row in original:
-        reading_date = row["reading_date"]
-        if previous_date.get(row["charge_point_id"]) == reading_date:
-            duplicate = True
-            break
-
-    if duplicate:
-        return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
 
     [data.pop("charge_point_id", None) for data in meter_reading_data]
 
