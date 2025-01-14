@@ -66,6 +66,7 @@ class ElecChargePointSampleSerializer(serializers.ModelSerializer):
 
 class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=ElecChargePoint.objects.filter(is_deleted=False), required=True)
+    initial_index = serializers.FloatField()
 
     class Meta:
         model = ElecChargePoint
@@ -73,6 +74,7 @@ class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
             "id",
             "charge_point_id",
             "measure_reference_point_id",
+            "initial_index",
         ]
 
 
