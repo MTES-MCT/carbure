@@ -27,6 +27,7 @@ class AddMeterReadingApplicationError:
     MISSING_FILE = "MISSING_FILE"
     NO_READING_FOUND = "NO_READING_FOUND"
     VALIDATION_FAILED = "VALIDATION_FAILED"
+    METER_READINGS_FOR_QUARTER_ALREADY_EXISTS = "METER_READINGS_FOR_QUARTER_ALREADY_EXISTS"
 
 
 @require_POST
@@ -50,6 +51,9 @@ def add_application(request: HttpRequest, entity: Entity):
 
     if not quarter or not year:
         return ErrorResponse(400, AddMeterReadingApplicationError.TOO_LATE)
+
+    if MeterReadingRepository.get_cpo_application_for_quarter(cpo=entity, year=year, quarter=quarter) is not None:
+        return ErrorResponse(400, AddMeterReadingApplicationError.METER_READINGS_FOR_QUARTER_ALREADY_EXISTS)
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)

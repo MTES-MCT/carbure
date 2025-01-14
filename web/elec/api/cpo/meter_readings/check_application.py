@@ -25,6 +25,7 @@ class CheckMeterReadingApplicationError:
     MISSING_FILE = "MISSING_FILE"
     NO_READING_FOUND = "NO_READING_FOUND"
     VALIDATION_FAILED = "VALIDATION_FAILED"
+    METER_READINGS_FOR_QUARTER_ALREADY_EXISTS = "METER_READINGS_FOR_QUARTER_ALREADY_EXISTS"
 
 
 @require_POST
@@ -45,6 +46,9 @@ def check_application(request: HttpRequest, entity):
     auto_year, auto_quarter = get_application_quarter(date.today())
     quarter = form.cleaned_data["quarter"] or auto_quarter
     year = form.cleaned_data["year"] or auto_year
+
+    if MeterReadingRepository.get_cpo_application_for_quarter(cpo=entity, year=year, quarter=quarter) is not None:
+        return ErrorResponse(400, CheckMeterReadingApplicationError.METER_READINGS_FOR_QUARTER_ALREADY_EXISTS)
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
