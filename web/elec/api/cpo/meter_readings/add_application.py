@@ -14,7 +14,7 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
-from elec.services.meter_readings_application_quarter import get_application_quarter
+from elec.services.meter_readings_application_quarter import first_day_of_quarter, get_application_quarter
 
 
 class AddMeterReadingApplicationForm(forms.Form):
@@ -60,12 +60,16 @@ def add_application(request: HttpRequest, entity: Entity):
     renewable_share = MeterReadingRepository.get_renewable_share(year)
     previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
 
+    # get the first day of this quarter so we can verify that the readings are for the current quarter
+    beginning_of_quarter = first_day_of_quarter(year, quarter)
+
     meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
         previous_readings,
         previous_application,
         renewable_share,
+        beginning_of_quarter,
     )
 
     if len(errors) > 0:

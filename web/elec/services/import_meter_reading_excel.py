@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import date
 from typing import Iterable
 
 import pandas as pd
@@ -21,6 +22,7 @@ def import_meter_reading_excel(
     previous_readings: QuerySet[ElecMeterReading],
     previous_application: ElecMeterReadingApplication = None,
     renewable_share: int = 1,
+    beginning_of_quarter: date = None,
 ):
     parsed_meter_readings_data = ExcelMeterReadings.parse_meter_reading_excel(excel_file)
 
@@ -30,6 +32,7 @@ def import_meter_reading_excel(
         previous_readings,
         previous_application,
         renewable_share,
+        beginning_of_quarter,
     )
 
     return meter_readings_data[0], meter_readings_data[1]
@@ -62,6 +65,7 @@ class ExcelMeterReadings:
         previous_readings: QuerySet[ElecMeterReading],
         previous_application: ElecMeterReadingApplication = None,
         renewable_share: int = 1,
+        beginning_of_quarter: date = None,
     ):
         charge_point_by_id = {cp.charge_point_id: cp for cp in registered_charge_points}
         previous_readings_by_charge_point = get_previous_readings_by_charge_point(
@@ -71,8 +75,6 @@ class ExcelMeterReadings:
         lines_by_charge_point = defaultdict(list)
         for reading in meter_readings:
             lines_by_charge_point[reading.get("charge_point_id")].append(reading.get("line"))
-
-        print(lines_by_charge_point)
 
         previous_reading_dates_by_charge_point = defaultdict(list)
         for reading in previous_readings:
@@ -84,6 +86,7 @@ class ExcelMeterReadings:
             "previous_readings_by_charge_point": previous_readings_by_charge_point,
             "previous_reading_dates_by_charge_point": previous_reading_dates_by_charge_point,
             "lines_by_charge_point": lines_by_charge_point,
+            "beginning_of_quarter": beginning_of_quarter,
         }
 
         return ExcelMeterReadingValidator.bulk_validate(meter_readings, context)
@@ -135,3 +138,8 @@ class ExcelMeterReadingValidator(Validator):
                 "charge_point_id",
                 _(f"Ce point de recharge a été défini {len(lines)} fois (lignes {', '.join(str(num) for num in lines)})"),
             )
+
+        reading_date = meter_reading.get("reading_date")
+        beginning_of_quarter = self.context.get("beginning_of_quarter")
+        if reading_date and beginning_of_quarter and reading_date < beginning_of_quarter:
+            self.add_error("reading_date", _("La date du relevé ne correspond pas au trimestre traité actuellement."))

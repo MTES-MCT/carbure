@@ -68,6 +68,12 @@ ERROR_METER_READINGS = [
         "current_reading": 900,
         "reading_date": datetime.date(2024, 9, 29),
     },
+    {
+        "charge_point_id": "FR00MNOP",
+        "previous_reading": 1000,
+        "current_reading": 2000,
+        "reading_date": datetime.date(2024, 6, 29),
+    },
 ]
 
 
@@ -179,6 +185,23 @@ class ElecMeterReadingsTest(TestCase):
             is_article_2=True,
         )
 
+        self.charge_point_4 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR00MNOP",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=self.meter3,
+            measure_reference_point_id="PRM_MNOP",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=500,
+            cpo_name="CPO",
+            cpo_siren="SIREN_MNOP",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
+
         self.meter3.charge_point = self.charge_point_3
         self.meter3.save()
 
@@ -239,6 +262,8 @@ class ElecMeterReadingsTest(TestCase):
         assert sheet["A4"].value is None
 
     def test_check_application_error(self):
+        ElecMeterReadingApplication.objects.all().delete()
+
         excel_file = create_meter_readings_excel(
             name="readings",
             quarter=3,
@@ -267,6 +292,7 @@ class ElecMeterReadingsTest(TestCase):
                 "meter_reading_count": 1,
                 "quarter": 3,
                 "year": 2024,
+                "error_count": 5,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -288,8 +314,12 @@ class ElecMeterReadingsTest(TestCase):
                         "line": 6,
                         "meta": {"charge_point_id": ["Le point de recharge n'a pas encore été inscrit sur la plateforme."]},
                     },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 7,
+                        "meta": {"reading_date": ["La date du relevé ne correspond pas au trimestre traité actuellement."]},
+                    },
                 ],
-                "error_count": 4,
             },
         }
 
