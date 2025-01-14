@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Pagination } from "./pagination"
+import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const meta: Meta<typeof Pagination> = {
   component: Pagination,
@@ -18,7 +19,14 @@ export const Default: Story = {
     defaultPage: 1,
     count: 100,
     getPageLinkProps: (page) => ({
-      href: `/page/${page}`,
+      to: `page=${page}`,
+    }),
+  },
+  parameters: {
+    reactRouter: reactRouterParameters({
+      location: {
+        searchParams: { test: "url" },
+      },
     }),
   },
 }

@@ -12,6 +12,7 @@ import { PortalProvider } from "../src/common/components/portal"
 import { MatomoProvider } from "../src/matomo"
 
 import "../src/setup-dsfr"
+import "@codegouvfr/react-dsfr/main.css"
 // import css from our app
 import "../src/carbure/assets/css/index.css"
 
