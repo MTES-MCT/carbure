@@ -420,6 +420,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/nav-stats/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["nav_stats_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/resources/biofuels": {
     parameters: {
       query?: never
@@ -2572,6 +2588,30 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["EmptyResponse"]
+        }
+      }
+    }
+  }
+  nav_stats_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            [key: string]: unknown
+          }
         }
       }
     }
