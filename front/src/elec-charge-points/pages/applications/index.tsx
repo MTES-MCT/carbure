@@ -11,11 +11,11 @@ import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { deleteChargePointsApplication } from "./api"
 
-type ChargePointsPendingProps = {
+type ChargePointsApplicationsProps = {
   year: number
 }
 
-const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
+const ChargePointsApplications = ({ year }: ChargePointsApplicationsProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
@@ -72,4 +72,4 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   )
 }
 
-export default ChargePointsPending
+export default ChargePointsApplications

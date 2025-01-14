@@ -8,7 +8,7 @@ import { ChargePointsTabs } from "./charge-points-tabs"
 import { ChargePointsSnapshot } from "./types"
 import ElecMeterReadingsSettings from "./pages/meter-readings"
 import ChargePointsList from "./pages/list"
-import ChargePointsPending from "./pages/pending"
+import ChargePointsApplications from "./pages/applications"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -60,11 +60,11 @@ const ChargePoints = () => {
         />
 
         <Route
-          path="pending"
-          element={<ChargePointsPending year={currentYear} />}
+          path="applications"
+          element={<ChargePointsApplications year={currentYear} />}
         />
 
-        <Route path="*" element={<Navigate replace to="pending" />} />
+        <Route path="*" element={<Navigate replace to="applications" />} />
       </Routes>
     </Main>
   )
