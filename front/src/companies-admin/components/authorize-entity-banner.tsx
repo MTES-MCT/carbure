@@ -9,6 +9,7 @@ import * as api from "../api"
 import { Confirm } from "common/components/dialog"
 import type { Entity } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
+import { Title } from "common/components/title"
 
 type AuthorizeEntityBannerProps = {
   company: Entity
@@ -26,7 +27,9 @@ export function AuthorizeEntityBanner({ company }: AuthorizeEntityBannerProps) {
   return (
     <Alert variant="warning" icon={AlertCircle} label={t("Attention")}>
       <Col style={{ gap: "var(--spacing-m)", padding: "var(--spacing-m) 0" }}>
-        <h1>{t("Cette société n'est pas encore autorisée")}</h1>
+        <Title is="h1" as="h5">
+          {t("Cette société n'est pas encore autorisée")}
+        </Title>
         <p>
           {t(
             "Si les informations ci-dessous vous semblent correctes, vous pouvez autoriser cette société en cliquant sur le bouton suivant :"
