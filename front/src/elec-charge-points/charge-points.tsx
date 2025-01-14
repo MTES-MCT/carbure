@@ -59,10 +59,7 @@ const ChargePoints = () => {
           element={<ChargePointsList year={currentYear} snapshot={snapshot} />}
         />
 
-        <Route
-          path="applications"
-          element={<ChargePointsApplications year={currentYear} />}
-        />
+        <Route path="applications" element={<ChargePointsApplications />} />
 
         <Route path="*" element={<Navigate replace to="applications" />} />
       </Routes>

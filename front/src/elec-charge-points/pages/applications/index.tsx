@@ -11,18 +11,14 @@ import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { deleteChargePointsApplication } from "./api"
 
-type ChargePointsApplicationsProps = {
-  year: number
-}
-
-const ChargePointsApplications = ({ year }: ChargePointsApplicationsProps) => {
+const ChargePointsApplications = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
 
   const applicationsResponse = useQuery(apiCpo.getChargePointsApplications, {
     key: "charge-points-applications",
-    params: [entity.id, entity.id, year],
+    params: [entity.id, entity.id],
   })
 
   const deleteApplication = useMutation(
