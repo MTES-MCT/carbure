@@ -1,17 +1,16 @@
 .button-as-link-style {
-  background-image: var(--underline-img), var(--underline-img);
-  background-position:
-    var(--underline-x) 100%,
-    var(--underline-x) calc(100% - var(--underline-thickness));
-  background-repeat: no-repeat, no-repeat;
-  transition: background-size 0s;
-  background-size:
-    var(--underline-hover-width) calc(var(--underline-thickness) * 2),
-    var(--underline-idle-width) var(--underline-thickness);
   padding: 0;
-}
-
-.button-as-link-style:hover {
-  --underline-hover-width: var(--underline-max-width);
+  position: relative;
+  color: var(--text-action-high-blue-france);
   background-color: transparent !important;
+  min-height: auto;
+  box-shadow: 0 1px 0 0 var(--text-action-high-blue-france);
+  font-weight: 400;
+}
+.button-as-link-style:hover {
+  background-color: transparent !important;
+  box-shadow: 0 2px 0 0 var(--text-action-high-blue-france);
+}
+.button-as-link-style:disabled {
+  box-shadow: none;
 }

@@ -29,17 +29,17 @@ export const BaseButton = forwardRef<HTMLButtonElement, ButtonProps>(
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   ButtonProps
->((props, ref) => {
-  if (props.customPriority === "link") {
+>(({ customPriority, ...props }, ref) => {
+  if (customPriority === "link") {
     return (
-      <button
+      <BaseButton
         {...props}
         ref={ref as ForwardedRef<HTMLButtonElement>}
         className={cl(props.className, css["button-as-link-style"])}
         {...layout(props)}
       >
         {props.children}
-      </button>
+      </BaseButton>
     )
   }
 

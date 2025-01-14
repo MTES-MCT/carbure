@@ -10,19 +10,27 @@ import { Button } from "../button2"
 import cl from "clsx"
 
 type ShowMoreProps = {
-  children: ReactNode[]
-  text: string
+  children: ReactNode
+  showMoreText?: string
+  showLessText?: string
 }
+
 export const ShowMore = ({
   children,
-  text = "voir plus de filtres",
+  showMoreText = "Voir plus de filtres",
+  showLessText = "Voir moins",
 }: ShowMoreProps) => {
+  if (!Array.isArray(children)) {
+    throw new Error("Children must be a list of elements to work")
+  }
+
   const containerRef = useRef<HTMLDivElement>(null)
   const hiddenElementsRef = useRef<HTMLDivElement>(null)
   const showMoreButtonRef = useRef<HTMLButtonElement>(null)
   const [visibleItems, _setVisibleItems] = useState<ReactNode[]>(children)
   const [isVisible, setIsVisible] = useState(false)
 
+  // Return the index of the first overflow item to slice the children array
   const getFirstOverflowIndex = useCallback(() => {
     if (
       !containerRef?.current ||
@@ -34,81 +42,100 @@ export const ShowMore = ({
     const containerWidth = containerRef?.current?.offsetWidth ?? 0
     const showMoreButtonWidth = showMoreButtonRef?.current?.offsetWidth ?? 0
 
-    let totalWidth = showMoreButtonWidth
-    const firstOverflowIndex = Array.from(
-      hiddenElementsRef?.current?.children
-    ).findIndex((child) => {
-      const width = (child as HTMLElement)?.offsetWidth ?? 0
-      const overflow = containerWidth < totalWidth + width + 8
-      console.log({
-        containerWidth,
-        showMoreButtonWidth,
-        totalWidth,
-        width,
-        overflow,
+    const findOverflow = (defaultWidth = 0) => {
+      if (!hiddenElementsRef?.current?.children) return -1
+
+      let totalWidth = defaultWidth
+
+      // Check how many items can be displayed in the container
+      const firstOverflowIndex = Array.from(
+        hiddenElementsRef?.current?.children
+      ).findIndex((child, index) => {
+        const width = (child as HTMLElement)?.offsetWidth ?? 0
+
+        // add gap only if it's not the last item
+        const widthWithGap =
+          index !== hiddenElementsRef?.current?.children.length
+            ? width + 8
+            : width
+
+        const overflow = containerWidth < totalWidth + widthWithGap
+        totalWidth += widthWithGap
+        return overflow
       })
-      totalWidth += width + 8
-      return overflow
-    })
+
+      return firstOverflowIndex
+    }
+
+    const firstOverflowIndex = findOverflow()
+
+    // If only some items can be displayed, recalculate how many items can be displayed with the button show more
+    if (firstOverflowIndex !== -1) {
+      return findOverflow(showMoreButtonWidth)
+    }
 
     return firstOverflowIndex
   }, [containerRef, hiddenElementsRef])
 
   const setVisibleItems = useCallback(() => {
-    console.log("SET VISIBLE ITEMS")
     const firstOverflowIndex = getFirstOverflowIndex()
 
-    _setVisibleItems(
-      firstOverflowIndex === -1
-        ? children
-        : children.slice(0, firstOverflowIndex - 1)
-    )
+    if (firstOverflowIndex !== -1) {
+      _setVisibleItems(children.slice(0, firstOverflowIndex))
+    }
   }, [getFirstOverflowIndex, _setVisibleItems, children])
 
   useEffect(() => {
-    if (containerRef.current) {
-      console.log("USE EFFECT")
-      setVisibleItems()
-    }
-  }, [])
+    if (!containerRef.current || !hiddenElementsRef.current) return
 
-  useEffect(() => {
-    window.addEventListener("resize", setVisibleItems)
+    const resizeObserver = new ResizeObserver(() => {
+      setVisibleItems()
+    })
+
+    // Define a observer on the hidden element div to trigger the setVisibleItems function when the size of the hidden element div changes
+    resizeObserver.observe(hiddenElementsRef.current)
+
     return () => {
-      window.removeEventListener("resize", setVisibleItems)
+      resizeObserver.disconnect()
     }
   }, [setVisibleItems])
 
   return (
     <div ref={containerRef} className={styles["show-more-container"]}>
       <div
-        ref={hiddenElementsRef}
         className={styles["show-more-hidden-items"]}
         style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
       >
-        {children}
+        <div
+          style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
+          ref={hiddenElementsRef}
+        >
+          {children}
+        </div>
         <Button
           ref={showMoreButtonRef}
           priority="tertiary no outline"
           customPriority="link"
+          nativeButtonProps={{ role: "none" }}
         >
-          {text}
+          {showMoreText}
         </Button>
       </div>
       <div
         className={cl(styles["visible-items"], isVisible && styles["visible"])}
       >
-        {visibleItems}
+        {visibleItems.length !== children.length && !isVisible
+          ? visibleItems
+          : children}
         {visibleItems.length !== children.length && (
           <Button
             customPriority="link"
             onClick={() => {
-              _setVisibleItems(children)
-              setIsVisible(true)
+              setIsVisible(!isVisible)
             }}
             className={styles["show-more-button"]}
           >
-            {text}
+            {isVisible ? showLessText : showMoreText}
           </Button>
         )}
       </div>
