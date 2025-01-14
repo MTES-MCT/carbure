@@ -12,23 +12,27 @@ class SimulationInputSerializer(serializers.ModelSerializer):
             "debited_entity",
             "target_volume",
             "target_emission",
+            "max_n_batches",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
             "customs_category": {"required": True},
             "debited_entity": {"required": True},
-            "target_volume": {"required": True},
-            "target_emission": {"required": True},
         }
 
-    target_volume = serializers.FloatField()
-    target_emission = serializers.FloatField()
+    target_volume = serializers.FloatField(required=True)
+    target_emission = serializers.FloatField(required=True)
+    max_n_batches = serializers.IntegerField(required=False)
 
 
-class SimulationOutputSerializer(serializers.Serializer):
+class SimulationLotOutputSerializer(serializers.Serializer):
     lot_id = serializers.IntegerField()
     volume = serializers.FloatField()
     emission_rate_per_mj = serializers.FloatField()
+
+
+class SimulationOutputSerializer(serializers.Serializer):
+    selected_lots = SimulationLotOutputSerializer(many=True)
     fun = serializers.FloatField()
 
 

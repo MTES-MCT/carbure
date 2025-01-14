@@ -40,11 +40,11 @@ class SimulateActionMixin:
                         "lot_id": lot_ids[idx],
                         "volume": lot_volume,
                         "emission_rate_per_mj": emissions[idx],
-                        "fun": fun,
                     }
                 )
+            result_data = {"selected_lots": detail_operations_data, "fun": fun}
 
-            output_serializer = output_serializer_class(detail_operations_data, many=True)
+            output_serializer = output_serializer_class(result_data, many=False)
             return Response(output_serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
