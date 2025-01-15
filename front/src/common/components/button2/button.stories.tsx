@@ -19,6 +19,18 @@ export const Tertiary: Story = {
   },
 }
 
+export const Danger: Story = {
+  args: {
+    customPriority: "danger",
+  },
+}
+
+export const Success: Story = {
+  args: {
+    customPriority: "success",
+  },
+}
+
 export const LinkStyle: Story = {
   args: {
     customPriority: "link",

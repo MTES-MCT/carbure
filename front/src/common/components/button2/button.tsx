@@ -10,7 +10,7 @@ import { layout, Layout } from "../scaffold"
 export type ButtonProps = ButtonDSFRProps &
   Layout & {
     // For our cases, we want to use the link style with a button
-    customPriority?: "link"
+    customPriority?: "link" | "danger" | "success"
     loading?: boolean
   }
 
@@ -43,8 +43,16 @@ export const Button = forwardRef<
     )
   }
 
+  const baseProps = {
+    className: cl(props.className, {
+      [css["button-danger"]]: customPriority === "danger",
+      [css["button-success"]]: customPriority === "success",
+    }),
+  }
+
   return props.linkProps ? (
     <ButtonDSFR
+      {...baseProps}
       {...props}
       {...layout(props)}
       ref={ref as ForwardedRef<HTMLAnchorElement>}
@@ -52,10 +60,11 @@ export const Button = forwardRef<
   ) : // Couldn't find a better way to specify the iconId for the loading state
   props.iconId ? (
     <BaseButton
+      {...baseProps}
       {...props}
       iconId={props.loading ? "ri-loader-line" : props.iconId}
     />
   ) : (
-    <BaseButton {...props} />
+    <BaseButton {...baseProps} {...props} />
   )
 })
