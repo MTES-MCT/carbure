@@ -5,22 +5,19 @@ from typing import Iterable
 import pandas as pd
 from django import forms
 from django.core.files.uploadedfile import UploadedFile
-from django.db.models import QuerySet
+from django.db.models import Max, QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
-from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
 
 
 def import_meter_reading_excel(
     excel_file: UploadedFile,
     existing_charge_points: Iterable[ElecChargePoint],
-    previous_readings: QuerySet[ElecMeterReading],
-    previous_application: ElecMeterReadingApplication = None,
+    past_readings: QuerySet[ElecMeterReading],
     renewable_share: int = 1,
     beginning_of_quarter: date = None,
 ):
@@ -29,8 +26,7 @@ def import_meter_reading_excel(
     meter_readings_data = ExcelMeterReadings.validate_meter_readings(
         parsed_meter_readings_data,
         existing_charge_points,
-        previous_readings,
-        previous_application,
+        past_readings,
         renewable_share,
         beginning_of_quarter,
     )
@@ -62,29 +58,31 @@ class ExcelMeterReadings:
     def validate_meter_readings(
         meter_readings: list[dict],
         registered_charge_points: Iterable[ElecChargePoint],
-        previous_readings: QuerySet[ElecMeterReading],
-        previous_application: ElecMeterReadingApplication = None,
+        past_readings: QuerySet[ElecMeterReading],
         renewable_share: int = 1,
         beginning_of_quarter: date = None,
     ):
         charge_point_by_id = {cp.charge_point_id: cp for cp in registered_charge_points}
-        previous_readings_by_charge_point = get_previous_readings_by_charge_point(
-            registered_charge_points, previous_application
+
+        previous_readings = (
+            past_readings.order_by("-reading_date")
+            .values("meter_id")
+            .annotate(Max("reading_date"))
+            .values("meter__charge_point__charge_point_id", "extracted_energy", "reading_date")
         )
+
+        previous_readings_by_charge_point = {}
+        for previous_reading in previous_readings:
+            previous_readings_by_charge_point[previous_reading["meter__charge_point__charge_point_id"]] = previous_reading
 
         lines_by_charge_point = defaultdict(list)
         for reading in meter_readings:
             lines_by_charge_point[reading.get("charge_point_id")].append(reading.get("line"))
 
-        previous_reading_dates_by_charge_point = defaultdict(list)
-        for reading in previous_readings:
-            previous_reading_dates_by_charge_point[reading.charge_point_id].append(reading.reading_date)
-
         context = {
             "renewable_share": renewable_share,
             "charge_point_by_id": charge_point_by_id,
             "previous_readings_by_charge_point": previous_readings_by_charge_point,
-            "previous_reading_dates_by_charge_point": previous_reading_dates_by_charge_point,
             "lines_by_charge_point": lines_by_charge_point,
             "beginning_of_quarter": beginning_of_quarter,
         }
@@ -96,30 +94,57 @@ class ExcelMeterReadingValidator(Validator):
     meter = forms.ModelChoiceField(queryset=ElecMeter.objects.all())
     extracted_energy = forms.FloatField(min_value=0)
     reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
+    energy_used_since_last_reading = forms.FloatField()
     renewable_energy = forms.FloatField()
     charge_point_id = forms.CharField()
 
-    def extend(self, meter_reading):
+    def extend(self, new_reading):
         renewable_share = self.context.get("renewable_share")
-
-        charge_point_id = meter_reading.get("charge_point_id")
         charge_point_by_id = self.context.get("charge_point_by_id")
+
+        charge_point_id = new_reading.get("charge_point_id")
         charge_point = charge_point_by_id.get(charge_point_id)
 
+        meter = charge_point.current_meter
+
+        # prepare an object that looks like previous_readings_by_charge_point, based on the inital meter data,
+        # in case there was no registered reading for this charge point yet
+        initial_meter_reading = {
+            "extracted_energy": meter.initial_index if meter else 0,
+            "reading_date": meter.initial_index_date if meter else date.today(),  # not sure about date.today() here
+        }
+
         previous_readings_by_charge_point = self.context.get("previous_readings_by_charge_point")
-        previous_extracted_energy = previous_readings_by_charge_point.get(charge_point_id) or 0
+        previous_reading = previous_readings_by_charge_point.get(charge_point_id, initial_meter_reading)
+
+        previous_extracted_energy = previous_reading["extracted_energy"]
+        new_extracted_energy = new_reading["extracted_energy"]
+        energy_used_since_last_reading = new_extracted_energy - previous_extracted_energy
+
+        previous_reading_date = previous_reading["reading_date"]
+        new_reading_date = new_reading["reading_date"]
+        days_since_last_reading = (new_reading_date - previous_reading_date).days
+
+        charge_point_power = charge_point.nominal_power if charge_point else 0
+        facteur_de_charge = energy_used_since_last_reading / (charge_point_power * days_since_last_reading * 24)
+
+        new_reading["meter"] = meter
+        new_reading["energy_used_since_last_reading"] = energy_used_since_last_reading
+        new_reading["days_since_last_reading"] = days_since_last_reading
+        new_reading["facteur_de_charge"] = facteur_de_charge
+        new_reading["renewable_energy"] = energy_used_since_last_reading * renewable_share
 
         self.context["charge_point"] = charge_point
         self.context["previous_extracted_energy"] = previous_extracted_energy
+        self.context["previous_reading_date"] = previous_reading_date
 
-        meter_reading["meter"] = charge_point.current_meter if charge_point else None
-        meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share
-
-        return meter_reading
+        return new_reading
 
     def validate(self, meter_reading):
         charge_point = self.context.get("charge_point")
         previous_extracted_energy = self.context.get("previous_extracted_energy")
+        previous_reading_date = self.context.get("previous_reading_date")
+        reading_date = meter_reading.get("reading_date")
         lines = self.context.get("lines_by_charge_point").get(meter_reading.get("charge_point_id"))
 
         if charge_point is None:
@@ -139,7 +164,14 @@ class ExcelMeterReadingValidator(Validator):
                 _(f"Ce point de recharge a été défini {len(lines)} fois (lignes {', '.join(str(num) for num in lines)})"),
             )
 
-        reading_date = meter_reading.get("reading_date")
+        if reading_date < previous_reading_date:
+            self.add_error(
+                "reading_date",
+                _(
+                    f"Un relevé plus récent est déjà enregistré pour ce point de recharge: {previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"  # noqa
+                ),
+            )
+
         beginning_of_quarter = self.context.get("beginning_of_quarter")
         if reading_date and beginning_of_quarter and reading_date < beginning_of_quarter:
             self.add_error("reading_date", _("La date du relevé ne correspond pas au trimestre traité actuellement."))
