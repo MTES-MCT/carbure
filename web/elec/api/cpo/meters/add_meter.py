@@ -27,11 +27,17 @@ def add_elec_meter(request, entity, entity_id):
     if not serializer.validated_data["charge_point"].is_updatable():
         return ErrorResponse(400, MetersError.AUDIT_IN_PROGRESS)
 
-    last_meter_reading_date = serializer.validated_data["charge_point"].current_meter.elec_meter_readings.last().reading_date
-    new_initial_index_date = serializer.validated_data["initial_index_date"]
+    if (
+        serializer.validated_data["charge_point"].current_meter
+        and serializer.validated_data["charge_point"].current_meter.elec_meter_readings.exists()
+    ):
+        last_meter_reading_date = (
+            serializer.validated_data["charge_point"].current_meter.elec_meter_readings.last().reading_date
+        )
+        new_initial_index_date = serializer.validated_data["initial_index_date"]
 
-    if new_initial_index_date <= last_meter_reading_date:
-        return ErrorResponse(400, MetersError.NEW_INITIAL_INDEX_DATE_KO)
+        if new_initial_index_date <= last_meter_reading_date:
+            return ErrorResponse(400, MetersError.NEW_INITIAL_INDEX_DATE_KO)
 
     meter = serializer.save()
 
