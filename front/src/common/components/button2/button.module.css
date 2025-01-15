@@ -4,12 +4,12 @@
   color: var(--text-action-high-blue-france);
   background-color: transparent !important;
   min-height: auto;
-  box-shadow: 0 1px 0 0 var(--text-action-high-blue-france);
+  box-shadow: 0 1px 0 0 var(--shadow-link-color);
   font-weight: 400;
 }
 .button-as-link-style:hover {
   background-color: transparent !important;
-  box-shadow: 0 2px 0 0 var(--text-action-high-blue-france);
+  box-shadow: 0 2px 0 0 var(--shadow-link-color);
 }
 .button-as-link-style:disabled {
   box-shadow: none;

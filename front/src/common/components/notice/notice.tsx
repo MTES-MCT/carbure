@@ -9,7 +9,6 @@ import cl from "clsx"
 import css from "./notice.module.css"
 import { fr } from "@codegouvfr/react-dsfr"
 import { IconProps } from "../icon"
-import { NavLink } from "../nav-link"
 import { Button } from "../button2"
 
 type CustomRenderer = (config: { close: () => void }) => React.ReactNode
@@ -68,7 +67,8 @@ export const Notice = ({
     <div
       className={cl(
         fr.cx("fr-notice"),
-        variant && fr.cx(`fr-notice--${variant}`),
+        variant &&
+          cl(fr.cx(`fr-notice--${variant}`), css[`notice--${variant}`]),
         className
       )}
       style={style}
@@ -77,25 +77,33 @@ export const Notice = ({
         <div className="fr-notice__body">
           <p>
             {Icon && <Icon size="md" className={css.notice__icon} />}
-            <span className={cl(fr.cx("fr-notice__title"), css.notice__title)}>
-              {title}
-            </span>
+            {title && (
+              <span
+                className={cl(fr.cx("fr-notice__title"), css.notice__title)}
+              >
+                {title}
+              </span>
+            )}
             {child && (
               <span className={cl(fr.cx("fr-notice__desc"), css.notice__desc)}>
                 {child}
               </span>
             )}
             {linkText && linkHref && (
-              <NavLink
-                to={linkHref}
-                className={fr.cx("fr-notice__link")}
-                underline
+              <Button
+                customPriority="link"
+                linkProps={{ to: linkHref }}
+                className={css["notice__link"]}
               >
                 {linkText}
-              </NavLink>
+              </Button>
             )}
             {linkText && onAction && (
-              <Button customPriority="link" onClick={onAction}>
+              <Button
+                customPriority="link"
+                onClick={onAction}
+                className={css["notice__link"]}
+              >
                 {linkText}
               </Button>
             )}

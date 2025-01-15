@@ -94,6 +94,8 @@
   --shadow: 0 1px 2px var(--gray-medium);
   --border: 1px solid var(--gray-highlight);
   --border-radius: var(--spacing-1v);
+
+  --shadow-link-color: var(--text-action-high-blue-france);
 }
 
 @media screen and (min-width: 1600px) {

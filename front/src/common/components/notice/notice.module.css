@@ -10,20 +10,17 @@
   margin-right: var(--spacing-1w);
 }
 
-/* Notice component doesnt allow button instead of link, so we have to copy the link styles */
-.notice__link {
-  background-image: var(--underline-img), var(--underline-img);
-  background-position:
-    var(--underline-x) 100%,
-    var(--underline-x) calc(100% - var(--underline-thickness));
-  background-repeat: no-repeat, no-repeat;
-  transition: background-size 0s;
-  background-size:
-    var(--underline-hover-width) calc(var(--underline-thickness) * 2),
-    var(--underline-idle-width) var(--underline-thickness);
-  padding: 0;
+.notice--info .notice__link {
+  color: var(--text-default-info);
+  --shadow-link-color: var(--text-default-info);
 }
-.notice__link:hover {
-  --underline-hover-width: var(--underline-max-width);
-  background-color: transparent !important;
+
+.notice--warning .notice__link {
+  color: var(--text-default-warning);
+  --shadow-link-color: var(--text-default-warning);
+}
+
+.notice--alert .notice__link {
+  color: var(--text-default-error);
+  --shadow-link-color: var(--text-default-error);
 }

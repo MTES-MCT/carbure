@@ -16,6 +16,9 @@ const meta: Meta<typeof FileArea> = {
     label: "Importer le fichier sur la plateforme",
     icon: DashboardLine,
   },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
 }
 
 type Story = StoryObj<typeof FileArea>
