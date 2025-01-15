@@ -2,9 +2,10 @@ import os
 from io import BytesIO
 
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db.models import Sum
 from django.db.models.query_utils import Q
-from django.http import HttpResponse
 from docx import Document
 from drf_spectacular.utils import (
     OpenApiExample,
@@ -18,6 +19,7 @@ from rest_framework.response import Response
 
 from doublecount.models import DoubleCountingApplication
 
+from .response_serializer import LinkResponseSerializer
 from .utils import (
     DoubleCountingApplicationExportError,
     WordKey,
@@ -58,21 +60,15 @@ class ExportApplicationActionMixin:
                 required=False,
             ),
         ],
+        responses={200: LinkResponseSerializer},
         examples=[
             OpenApiExample(
-                "Example of export response.",
-                value="file.docx",
+                "Example of response.",
+                value={"link": "https://foobar.s3.amazonaws.com/exports/FR_126_2024.docx?...."},
                 request_only=False,
                 response_only=True,
-                media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             ),
         ],
-        responses={
-            (
-                200,
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            ): OpenApiTypes.STR,
-        },
     )
     @action(methods=["get"], detail=False, url_path="export-application")
     def export_application(self, request, *args, **kwargs):
@@ -240,12 +236,21 @@ class ExportApplicationActionMixin:
 
             i += 1
 
-        response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-        response["Content-Disposition"] = f"attachment; filename={application.certificate_id}.docx"
-
         doc_io = BytesIO()
         doc.save(doc_io)
         doc_io.seek(0)
-        response.write(doc_io.read())
 
-        return response
+        file_key = f"application/exports/{application.id}/{application.certificate_id}.docx"
+
+        file_content = ContentFile(doc_io.getvalue())
+        saved_path = default_storage.save(file_key, file_content)
+
+        file_url = default_storage.url(saved_path)
+
+        return Response(
+            {
+                "message": "File generated and successfully uploaded",
+                "file_url": file_url,
+            },
+            status=status.HTTP_200_OK,
+        )

@@ -1,8 +1,8 @@
 import os
 from datetime import date
-from io import BytesIO
 
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
@@ -328,12 +328,15 @@ class AdminDoubleCountApplicationsTest(TestCase):
             {"dca_id": application.id, "entity_id": self.admin.id},
         )
         assert response.status_code == 200
-        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        assert response.data["message"] == "File generated and successfully uploaded"
+        file_key = f"application/exports/{application.id}/{application.certificate_id}.docx"
+        assert response.data["file_url"] == f"/{file_key}"
 
         # ... check doc content
         application_data = application_to_json(application)
 
-        file_stream = BytesIO(response.content)
+        file_key = response.data["file_url"][1:]
+        file_stream = default_storage.open(file_key, "rb")
         doc = Document(file_stream)
 
         full_text = []
@@ -378,11 +381,12 @@ class AdminDoubleCountApplicationsTest(TestCase):
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
         assert response.status_code == 200
-        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        assert response.data["message"] == "File generated and successfully uploaded"
 
         application_data = application_to_json(application)
 
-        file_stream = BytesIO(response.content)
+        file_key = response.data["file_url"][1:]
+        file_stream = default_storage.open(file_key, "rb")
         doc = Document(file_stream)
 
         full_text = []

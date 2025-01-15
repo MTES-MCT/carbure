@@ -50,3 +50,7 @@ class CheckFileResponseSerializer(serializers.Serializer):
 
 class ResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
+
+
+class LinkResponseSerializer(serializers.Serializer):
+    link = serializers.URLField()

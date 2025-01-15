@@ -260,6 +260,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/applications/{id}/get-link/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_get_link_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/applications/{id}/update-approved-quotas/": {
     parameters: {
       query?: never
@@ -1386,6 +1402,10 @@ export interface components {
     GroupAssignmentResponse: {
       assigned_tickets_count: number
     }
+    LinkResponse: {
+      /** Format: uri */
+      link: string
+    }
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -2299,6 +2319,31 @@ export interface operations {
       }
     }
   }
+  double_counting_applications_get_link_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["LinkResponse"]
+        }
+      }
+    }
+  }
   double_counting_applications_update_approved_quotas_create: {
     parameters: {
       query: {
@@ -2468,7 +2513,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string
+          "application/json": components["schemas"]["LinkResponse"]
         }
       }
     }
