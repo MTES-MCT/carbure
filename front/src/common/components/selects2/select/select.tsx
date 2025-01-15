@@ -3,15 +3,13 @@ import { useAsyncList } from "common/hooks/async-list"
 import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
 import { Dropdown, Trigger } from "../../dropdown2"
 
-import { Control } from "../../input"
 import { List } from "../../list2"
 import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
 import cl from "clsx"
 
-export interface SelectProps<T, V = T> extends Control, Trigger {
-  clear?: boolean // A garder ?
+export interface SelectProps<T, V = T> extends Trigger {
   search?: boolean
   value?: V | undefined
   options?: T[]
@@ -29,6 +27,9 @@ export interface SelectProps<T, V = T> extends Control, Trigger {
   // If true, the select will take the full width of its container
   full?: boolean
   className?: string
+  loading?: boolean
+  readOnly?: boolean
+  disabled?: boolean
 }
 
 export function Select<T, V>({

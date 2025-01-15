@@ -8,7 +8,7 @@ export type TextAreaProps = {
   value: string | undefined
   onChange: (value: string | undefined) => void
 } & ExtendedInputProps &
-  InputPropsDSFR.TextArea
+  InputPropsDSFR.TextArea & { inputRef?: React.RefObject<HTMLTextAreaElement> }
 
 export const TextArea = ({
   rows,
@@ -22,6 +22,7 @@ export const TextArea = ({
   disabled,
   readOnly,
   required,
+  inputRef,
   ...props
 }: TextAreaProps) => (
   <BaseInput
@@ -43,6 +44,7 @@ export const TextArea = ({
         resize: "none",
         minHeight: "96px",
       },
+      ref: inputRef,
     }}
   />
 )

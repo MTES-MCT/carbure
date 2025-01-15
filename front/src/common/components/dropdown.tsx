@@ -106,7 +106,13 @@ export const Dropdown = ({
 
       const isInsideTrigger = isInside(triggerRef.current, e.target)
       const isInsideDropdown = isInside(dropdownRef.current, e.target)
-
+      console.log("click outside legacy", {
+        t: e.target,
+        triggerRef: triggerRef.current,
+        dropdownRef: dropdownRef.current,
+        isInsideTrigger,
+        isInsideDropdown,
+      })
       if (!isInsideTrigger && !isInsideDropdown) {
         setOpen(false)
       }
@@ -236,6 +242,11 @@ export function isInside(
   container: EventTarget | Element | null,
   element: EventTarget | Element | null
 ) {
+  console.log("isInside2", {
+    container,
+    element,
+    isInside: (container as Element)?.contains(element as Element),
+  })
   return (container as Element)?.contains(element as Element)
 }
 

@@ -1,6 +1,5 @@
 import { Button, ButtonProps } from "common/components/button2"
 import { Dropdown, Trigger } from "common/components/dropdown2"
-import { Control } from "common/components/input"
 import { useAsyncList } from "common/hooks/async-list"
 import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
 import { useRef, useState } from "react"
@@ -8,7 +7,7 @@ import cl from "clsx"
 import styles from "./multiselect.module.css"
 import { List } from "common/components/list2"
 import { Text } from "common/components/text"
-export interface MultiSelectProps<T, V = T> extends Control, Trigger {
+export interface MultiSelectProps<T, V = T> extends Trigger {
   clear?: boolean
   search?: boolean
   value?: V[] | undefined
@@ -18,12 +17,14 @@ export interface MultiSelectProps<T, V = T> extends Control, Trigger {
   onChange?: (value: V[] | undefined) => void
   normalize?: Normalizer<T, V>
   sort?: Sorter<T, V>
-
+  loading?: boolean
   size?: ButtonProps["size"]
 
   // If true, the select will take the full width of its container
   full?: boolean
   className?: string
+  readOnly?: boolean
+  disabled?: boolean
 }
 
 export const MultiSelect = <T, V>({
@@ -53,11 +54,6 @@ export const MultiSelect = <T, V>({
     getItems: getOptions,
     normalize,
   })
-
-  // function onClear() {
-  //   onChange?.(undefined)
-  //   setOpen(false)
-  // }
 
   return (
     <>
