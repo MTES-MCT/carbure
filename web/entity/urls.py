@@ -22,7 +22,7 @@ router.register(r"", EntityViewSet, basename="entity")
 
 urlpatterns = [
     path(
-        "search-company",
+        "search-company/",
         search_company_view,
         name="api-entity-registration-search-company",
     ),

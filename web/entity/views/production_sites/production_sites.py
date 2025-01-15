@@ -7,7 +7,7 @@ from core.models import Entity, ExternalAdminRights, UserRights
 from core.serializers import GenericCertificateSerializer
 from entity.serializers import EntityProductionSiteSerializer
 from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights
+from saf.permissions.user_rights import HasAdminRights, OrPermission
 from transactions.models import ProductionSite
 
 from .mixins import ActionMixin
@@ -17,9 +17,7 @@ class ProductionSiteViewSet(ViewSet, ActionMixin):
     queryset = ProductionSite.objects.all()
     serializer_class = None
     lookup_field = "id"
-    permission_classes = [
-        HasUserRights(None, [Entity.PRODUCER]) or HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING]),
-    ]
+    permission_classes = []
 
     def get_permissions(self):
         # TODO fix permissions if needed
@@ -37,7 +35,12 @@ class ProductionSiteViewSet(ViewSet, ActionMixin):
         if self.action in ["set_certificates"]:
             return [HasUserRights(None, [Entity.PRODUCER])]
 
-        return super().get_permissions()
+        return [
+            OrPermission(
+                lambda: HasUserRights(None, [Entity.PRODUCER]),
+                lambda: HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING]),
+            )
+        ]
 
     def get_queryset(self):
         return ProductionSite.objects.all()

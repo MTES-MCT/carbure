@@ -74,7 +74,7 @@ class AddProductionSiteMixin:
         serializer = ProductionSiteModelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         country_code = request.data.get("country_code")
-        entity_id = request.data.get("entity_id")
+        entity_id = self.request.query_params.get("entity_id")
         if country_code is None:
             return Response(
                 {

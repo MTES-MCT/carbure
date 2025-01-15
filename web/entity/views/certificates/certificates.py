@@ -7,7 +7,7 @@ from certificates.models import ProductionSiteCertificate
 from core.models import Entity, EntityCertificate, ExternalAdminRights, UserRights
 from core.serializers import EntityCertificateSerializer
 from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights
+from saf.permissions.user_rights import HasAdminRights, OrPermission
 
 from .mixins import ActionMixin
 
@@ -15,13 +15,7 @@ from .mixins import ActionMixin
 class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.GenericViewSet, ActionMixin):
     serializer_class = EntityCertificateSerializer
     pagination_class = None
-    permission_classes = [
-        HasUserRights(
-            None,
-            [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER],
-        )
-        or HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING]),
-    ]
+    permission_classes = []
 
     def get_queryset(self):
         return EntityCertificate.objects.order_by("-added_dt", "checked_by_admin").select_related("entity", "certificate")
@@ -44,13 +38,15 @@ class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.Gene
                 ),
             )
 
-        if self.action in [
-            "check_entity",
-            "reject_entity",
-        ]:
+        if self.action in ["check_entity", "reject_entity"]:
             return [HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])]
 
-        return super().get_permissions()
+        return [
+            OrPermission(
+                lambda: HasUserRights(None, [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]),
+                lambda: HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING]),
+            )
+        ]
 
     @extend_schema(
         parameters=[

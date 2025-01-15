@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from core.models import Entity, UserRights
 from entity.serializers import EntitySiteSerializer
 from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights
+from saf.permissions.user_rights import HasAdminRights, OrPermission
 from transactions.models import Depot, EntitySite
 
 from .mixins import DepotActionMixin
@@ -15,9 +15,7 @@ from .mixins import DepotActionMixin
 class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
     serializer_class = EntitySiteSerializer
     pagination_class = None
-    permission_classes = [
-        HasUserRights() or HasAdminRights(allow_external=[]),
-    ]
+    permission_classes = []
 
     def get_permissions(self):
         # TODO fix permissions if needed
@@ -26,17 +24,12 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
             "create_depot",
             "delete_depot",
         ]:
-            return [
-                HasUserRights(
-                    [UserRights.ADMIN, UserRights.RW],
-                    None,
-                )
-            ]
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], None)]
 
-        return super().get_permissions()
+        return [OrPermission(lambda: HasUserRights(), lambda: HasAdminRights(allow_external=[]))]
 
     def get_queryset(self):
-        return EntitySite.objects.none()
+        return EntitySite.objects.all()
 
     @extend_schema(
         parameters=[
@@ -63,6 +56,7 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
         if entity.entity_type == Entity.ADMIN:
             entity_id = self.request.query_params.get("company_id")
 
+        entity = Entity.objects.get(id=entity_id)
         try:
             ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.filter(is_enabled=True))
             serializer = EntitySiteSerializer(instance=ds, many=True)

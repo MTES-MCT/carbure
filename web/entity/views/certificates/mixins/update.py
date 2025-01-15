@@ -8,9 +8,9 @@ from core.models import Entity, EntityCertificate, GenericCertificate
 
 
 class UpdateCertificateSerializer(serializers.Serializer):
-    old_certificate_id = serializers.IntegerField(required=True)
+    old_certificate_id = serializers.CharField(required=True)
     old_certificate_type = serializers.CharField(required=True)
-    new_certificate_id = serializers.IntegerField(required=True)
+    new_certificate_id = serializers.CharField(required=True)
     new_certificate_type = serializers.CharField(required=True)
 
     def validate_old_certificate_id(self, value):

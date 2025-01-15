@@ -8,12 +8,12 @@ from core.models import CarbureLot, EntityCertificate
 
 
 class CheckCertificateSerializer(serializers.Serializer):
-    certificate_id = serializers.IntegerField(required=True)
+    entity_certificate_id = serializers.CharField(required=True)
 
-    def validate_certificate_id(self, value):
-        """Ensure the certificate_id is valid."""
+    def validate_entity_certificate_id(self, value):
+        """Ensure the entity_certificate_id is valid."""
         if not EntityCertificate.objects.filter(id=value).exists():
-            raise serializers.ValidationError("Invalid certificate_id")
+            raise serializers.ValidationError("Invalid entity_certificate_id")
         return value
 
 
@@ -49,7 +49,7 @@ class CheckCertificateActionMixin:
     def check_entity(self, request):
         serializer = CheckCertificateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        certificate_id = serializer.validated_data.get("certificate_id")
+        certificate_id = serializer.validated_data.get("entity_certificate_id")
 
         try:
             ec = EntityCertificate.objects.get(id=certificate_id)

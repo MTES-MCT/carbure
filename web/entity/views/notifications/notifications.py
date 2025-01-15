@@ -101,10 +101,11 @@ class NotificationViewSet(ListModelMixin, viewsets.GenericViewSet):
         entity_id = self.request.query_params.get("entity_id")
         serializer = NotificationSerializer(data=request.data, entity_id=entity_id)
         if serializer.is_valid():
-            notifications = serializer.validated_data["notifications"]
+            notifications = serializer.validated_data["notification_ids"]
+            print(notifications, "Notification")
+            notification_ids = [notification.id for notification in notifications]
+            CarbureNotification.objects.filter(id__in=notification_ids).update(acked=True)
 
-            notifications.update(acked=True)
-
-            return Response({"status": "success", "updated_count": notifications.count()})
+            return Response({"status": "success", "updated_count": len(notification_ids)})
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

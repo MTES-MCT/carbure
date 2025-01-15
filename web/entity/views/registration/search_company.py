@@ -39,7 +39,7 @@ class SeachCompanyFormError:
 @api_view(["POST"])
 @otp_or_403
 def search_company_view(request):
-    serializer = SeachCompanySerializer(request.data)  # Utiliser request.data avec DRF
+    serializer = SeachCompanySerializer(data=request.data)  # Utiliser request.data avec DRF
     serializer.is_valid(raise_exception=True)
 
     registration_id = serializer.validated_data["registration_id"]

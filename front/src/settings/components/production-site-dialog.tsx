@@ -374,7 +374,7 @@ async function addProductionSite(
     form.manager_email!
   )
 
-  const psite = res.data.data!
+  const psite = res.data!
 
   const mps = form.matieres_premieres?.map((mp) => mp.code)
   await api.setProductionSiteFeedstock(entity.id, psite!.id, mps ?? [])

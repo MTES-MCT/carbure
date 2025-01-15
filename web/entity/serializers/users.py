@@ -48,6 +48,7 @@ class EntityUserEntitySerializer(serializers.ModelSerializer):
             "website",
             "vat_number",
             "ext_admin_pages",
+            "is_enabled",
         ]
 
     @extend_schema_field(serializers.ListField)

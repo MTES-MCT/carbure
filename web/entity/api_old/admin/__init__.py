@@ -6,8 +6,8 @@ from .depots import get_entity_depots
 from .production_sites import get_entity_production_sites
 
 urlpatterns = [
-    path("certificates/", include("entity.api.admin.certificates")),
-    path("users/", include("entity.api.admin.users")),
+    path("certificates/", include("entity.api_old.admin.certificates")),
+    path("users/", include("entity.api_old.admin.users")),
     path("", get_entities, name="transactions-admin-entities"),
     path("create", create_entity, name="transactions-admin-entities-create"),
     path("details", get_entity_details, name="transactions-admin-entities-details"),

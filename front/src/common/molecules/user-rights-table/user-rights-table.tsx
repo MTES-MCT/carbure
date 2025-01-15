@@ -135,8 +135,8 @@ export const UserRightsTable = ({
             {
               key: "user",
               header: t("Utilisateur"),
-              orderBy: (r) => r.user[0] ?? "",
-              cell: (r) => <Cell text={r.user[0] ?? ""} />,
+              orderBy: (r) => r.user?.email ?? "",
+              cell: (r) => <Cell text={r.user?.email ?? ""} />,
             },
             {
               small: true,

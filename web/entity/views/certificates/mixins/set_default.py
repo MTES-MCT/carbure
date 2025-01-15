@@ -9,7 +9,7 @@ from core.models import Entity, EntityCertificate, GenericCertificate
 
 
 class SetDefaultCertificateSerializer(serializers.Serializer):
-    certificate_id = serializers.IntegerField(required=True)
+    certificate_id = serializers.CharField(required=True)
 
     def validate_certificate_id(self, value):
         """Ensure the certificate_id is valid."""

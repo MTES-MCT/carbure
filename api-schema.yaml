@@ -24,7 +24,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -69,7 +68,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -102,7 +100,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -135,7 +132,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -168,7 +164,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -221,7 +216,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -254,7 +248,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -2240,7 +2233,7 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
-  /api/entities/search-company:
+  /api/entities/search-company/:
     post:
       operationId: entities_search_company_create
       parameters:
@@ -2562,66 +2555,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/EntityUser"
           description: ""
-    post:
-      operationId: entities_users_create
-      tags:
-        - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EntityUserRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/EntityUserRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/EntityUserRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EntityUser"
-          description: ""
-  /api/entities/users/{id}/:
-    put:
-      operationId: entities_users_update
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this utilisateur.
-          required: true
-      tags:
-        - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EntityUserRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/EntityUserRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/EntityUserRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EntityUser"
-          description: ""
   /api/entities/users/accept-user/:
     post:
       operationId: entities_users_accept_user_create
@@ -2913,6 +2846,49 @@ paths:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
+  /api/entities/users/update-user-role/:
+    post:
+      operationId: entities_users_update_user_role_create
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRoleRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRoleRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRoleRequest"
         required: true
       security:
         - cookieAuth: []
@@ -4649,7 +4625,8 @@ components:
       type: object
       properties:
         certificate_id:
-          type: integer
+          type: string
+          minLength: 1
         certificate_type:
           type: string
           minLength: 1
@@ -5053,10 +5030,11 @@ components:
     CheckCertificateRequest:
       type: object
       properties:
-        certificate_id:
-          type: integer
+        entity_certificate_id:
+          type: string
+          minLength: 1
       required:
-        - certificate_id
+        - entity_certificate_id
     CheckFileResponse:
       type: object
       properties:
@@ -5254,7 +5232,8 @@ components:
       type: object
       properties:
         certificate_id:
-          type: integer
+          type: string
+          minLength: 1
         certificate_type:
           type: string
           minLength: 1
@@ -6424,22 +6403,13 @@ components:
           type: array
           items: {}
           readOnly: true
+        is_enabled:
+          type: boolean
       required:
         - ext_admin_pages
         - id
         - name
         - registered_country
-    EntityUserRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          minLength: 1
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
     ErrorResponse:
       type: object
       properties:
@@ -7015,10 +6985,11 @@ components:
     RejectCertificateRequest:
       type: object
       properties:
-        certificate_id:
-          type: integer
+        entity_certificate_id:
+          type: string
+          minLength: 1
       required:
-        - certificate_id
+        - entity_certificate_id
     RejectDoubleCountingRequest:
       type: object
       properties:
@@ -7672,7 +7643,8 @@ components:
       type: object
       properties:
         certificate_id:
-          type: integer
+          type: string
+          minLength: 1
       required:
         - certificate_id
     SetFeedstocksRequest:
@@ -7800,12 +7772,14 @@ components:
       type: object
       properties:
         old_certificate_id:
-          type: integer
+          type: string
+          minLength: 1
         old_certificate_type:
           type: string
           minLength: 1
         new_certificate_id:
-          type: integer
+          type: string
+          minLength: 1
         new_certificate_type:
           type: string
           minLength: 1
@@ -7908,6 +7882,17 @@ components:
       required:
         - id
         - status
+    UpdateUserRoleRequest:
+      type: object
+      properties:
+        request_id:
+          type: integer
+        role:
+          type: string
+          minLength: 1
+      required:
+        - request_id
+        - role
     UpdatedQuotasRequest:
       type: object
       properties:

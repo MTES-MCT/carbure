@@ -106,33 +106,27 @@ export const okDisableMac = http.post(
   }
 )
 
-export const okEnableTrading = http.post(
-  "/api/entities/trading/",
-  () => {
-    const entity = Data.get("entity")
-    setEntity({
-      ...entity,
-      has_trading: true,
-    })
-    return HttpResponse.json({
-      status: "success",
-    })
-  }
-)
+export const okEnableTrading = http.post("/api/entities/trading/", () => {
+  const entity = Data.get("entity")
+  setEntity({
+    ...entity,
+    has_trading: true,
+  })
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
-export const okDisableTrading = http.post(
-  "/api/entities/trading/",
-  () => {
-    const entity = Data.get("entity")
-    setEntity({
-      ...entity,
-      has_trading: false,
-    })
-    return HttpResponse.json({
-      status: "success",
-    })
-  }
-)
+export const okDisableTrading = http.post("/api/entities/trading/", () => {
+  const entity = Data.get("entity")
+  setEntity({
+    ...entity,
+    has_trading: false,
+  })
+  return HttpResponse.json({
+    status: "success",
+  })
+})
 
 export const okDeliverySites = http.get("/api/entities/depots/delete/", () => {
   return HttpResponse.json({

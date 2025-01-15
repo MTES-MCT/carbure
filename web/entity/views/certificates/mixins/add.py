@@ -9,7 +9,7 @@ from core.models import CarbureLot, Entity, EntityCertificate, GenericCertificat
 
 
 class AddCertificateSerializer(serializers.Serializer):
-    certificate_id = serializers.IntegerField(required=True)
+    certificate_id = serializers.CharField(required=True)
     certificate_type = serializers.CharField(required=True)
 
     def validate_certificate_id(self, value):

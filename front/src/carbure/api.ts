@@ -8,7 +8,7 @@ export function getUserSettings() {
 }
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {
-  return res.data.data ?? []
+  return res.data ?? []
 }
 
 export async function findFeedstocks(
@@ -113,10 +113,10 @@ export function findMyCertificates(
     production_site_id?: number | null | undefined
   }
 ) {
-  console.log("VERYUNSURE 90", query, options)
+  console.log("OKOKOK 90", query, "opt", options)
   return apiFetch
     .GET("/entities/certificates/", {
-      params: { query, ...options },
+      params: { query: { query, ...options } },
     })
     .then(extract)
     .then((certificates) =>
@@ -136,7 +136,7 @@ export function ackNotifications(
   entity_id: number,
   notification_ids: number[]
 ) {
-  console.log("VERYUNSURE 92")
+  console.log("OKOKOKOK 92")
   return apiFetch.POST("/entities/notifications/ack/", {
     params: { query: { entity_id } },
     body: { notification_ids },

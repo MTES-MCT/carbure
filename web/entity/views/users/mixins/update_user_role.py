@@ -12,7 +12,7 @@ class UpdateUserRoleSerializer(serializers.Serializer):
     role = serializers.CharField(required=True)
 
 
-class UpdateRightsRequestsActionMixin:
+class UpdatUserRoleActionMixin:
     @extend_schema(
         request=UpdateUserRoleSerializer,
         responses={

@@ -2,7 +2,7 @@ import { api as apiFetch } from "common/services/api-fetch"
 import { EntityType } from "carbure/types"
 
 export function searchCompanyDataBySiren(registration_id: string) {
-  console.log("VERYUNSURE 50")
+  console.log("OKOKOK 50")
   return apiFetch.POST("/entities/search-company/", {
     body: { registration_id },
   })
@@ -26,7 +26,7 @@ export function registerCompany(
   certificate_id?: string,
   certificate_type?: string
 ) {
-  console.log("VERYUNSURE 51")
+  console.log("VERYUNSURE 51: not located")
   return apiFetch.POST("/entities/add-company/", {
     body: {
       activity_description,

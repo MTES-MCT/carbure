@@ -41,20 +41,14 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                     [Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER],
                 ),
             ]
-        if self.action in [
-            "update_entity_info",
-        ]:
+        if self.action in ["update_entity_info"]:
             return [
-                IsAuthenticated(),
-                HasUserRights(
-                    [UserRights.ADMIN, UserRights.RW],
-                    [Entity.PRODUCER, Entity.OPERATOR],
-                ),
+                HasUserRights([UserRights.ADMIN, UserRights.RW], None),
             ]
         if self.action == "get_entity_stats":
             return [
                 IsAuthenticated(),
-                HasUserRights([UserRights.ADMIN, UserRights.RW], []),
+                HasUserRights([UserRights.ADMIN, UserRights.RW], None),
             ]
         if self.action in ["list", "retrieve", "create"]:
             return [

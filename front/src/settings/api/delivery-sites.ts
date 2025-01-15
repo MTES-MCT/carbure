@@ -1,17 +1,10 @@
-import { Api } from "common/services/api"
 import { api as apiFetch } from "common/services/api-fetch"
-import {
-  Country,
-  SiteType,
-  EntityDepot,
-  OwnershipType,
-  EntityPreview,
-} from "carbure/types"
+import { Country, SiteType, OwnershipType, EntityPreview } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
-  console.log("VERYUNSURE 21")
+  console.log("OKOKOK 21")
   return apiFetch.GET("/entities/depots/", {
-    params: { entity_id },
+    params: { query: { entity_id } },
   })
 }
 
@@ -25,8 +18,8 @@ export function addDeliverySite(
   blending_outsourced: boolean,
   blending_entity: EntityPreview | undefined
 ) {
-  console.log("VERYUNSURE 22")
-  return apiFetch.POST("/entities/depots/add", {
+  console.log("OKOKOK 22")
+  return apiFetch.POST("/entities/depots/add/", {
     params: { query: { entity_id } },
     body: {
       delivery_site_id,
@@ -50,10 +43,11 @@ export function createNewDeliverySite(
   thermal_efficiency?: number,
   useful_temperature?: number
 ) {
-  console.log("VERYUNSURE 23")
-  return apiFetch.POST("/entities/depots/create", {
+  console.log("OKOKOK 23, to validate")
+  return apiFetch.POST("/entities/depots/create-depot/", {
     params: { query: { entity_id } },
     body: {
+      entity_id,
       name,
       city,
       country_code: country.code_pays,
@@ -72,8 +66,8 @@ export function deleteDeliverySite(
   entity_id: number,
   delivery_site_id: string
 ) {
-  console.log("VERYUNSURE 24")
-  return apiFetch.POST("/entities/depots/delete", {
+  console.log("OKOKOK 24")
+  return apiFetch.POST("/entities/depots/delete-depot/", {
     params: { query: { entity_id } },
     body: {
       delivery_site_id,

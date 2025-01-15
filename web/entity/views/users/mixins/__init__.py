@@ -5,7 +5,7 @@ from .invite_user import InviteUserActionMixin
 from .revoke_access import RevokeUserActionMixin
 from .rights_requests import RightsRequestsActionMixin
 from .update_right_request import UpdateRightsRequestsActionMixin
-from .update_user_role import UpdateUserRoleSerializer
+from .update_user_role import UpdatUserRoleActionMixin
 
 
 class UserActionMixin(
@@ -16,6 +16,6 @@ class UserActionMixin(
     RevokeUserActionMixin,
     RightsRequestsActionMixin,
     UpdateRightsRequestsActionMixin,
-    UpdateUserRoleSerializer,
+    UpdatUserRoleActionMixin,
 ):
     pass

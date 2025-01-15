@@ -836,7 +836,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/entities/search-company": {
+  "/api/entities/search-company/": {
     parameters: {
       query?: never
       header?: never
@@ -941,22 +941,6 @@ export interface paths {
     }
     get: operations["entities_users_list"]
     put?: never
-    post: operations["entities_users_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/entities/users/{id}/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put: operations["entities_users_update"]
     post?: never
     delete?: never
     options?: never
@@ -1070,6 +1054,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["entities_users_update_right_request_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/entities/users/update-user-role/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["entities_users_update_user_role_create"]
     delete?: never
     options?: never
     head?: never
@@ -1538,7 +1538,7 @@ export interface components {
       token?: string
     }
     AddCertificateRequest: {
-      certificate_id: number
+      certificate_id: string
       certificate_type: string
     }
     AddDepotRequest: {
@@ -1690,7 +1690,7 @@ export interface components {
       files: string[]
     }
     CheckCertificateRequest: {
-      certificate_id: number
+      entity_certificate_id: string
     }
     CheckFileResponse: {
       file: components["schemas"]["File"]
@@ -1772,7 +1772,7 @@ export interface components {
       has_elec?: boolean
     }
     DeleteCertificateRequest: {
-      certificate_id: number
+      certificate_id: string
       certificate_type: string
     }
     DeleteDepotRequest: {
@@ -2196,13 +2196,7 @@ export interface components {
       website?: string
       vat_number?: string
       readonly ext_admin_pages: unknown[]
-    }
-    EntityUserRequest: {
-      /**
-       * Adresse électronique
-       * Format: email
-       */
-      email: string
+      is_enabled?: boolean
     }
     ErrorResponse: {
       message: string
@@ -2443,7 +2437,7 @@ export interface components {
       is_in_europe: boolean
     }
     RejectCertificateRequest: {
-      certificate_id: number
+      entity_certificate_id: string
     }
     RejectDoubleCountingRequest: {
       dca_id: number
@@ -2685,7 +2679,7 @@ export interface components {
       certificate_ids: string[]
     }
     SetDefaultCertificateRequest: {
-      certificate_id: number
+      certificate_id: string
     }
     SetFeedstocksRequest: {
       matiere_premiere_codes: string[]
@@ -2757,9 +2751,9 @@ export interface components {
       unit: components["schemas"]["PreferredUnitEnum"]
     }
     UpdateCertificateRequest: {
-      old_certificate_id: number
+      old_certificate_id: string
       old_certificate_type: string
-      new_certificate_id: number
+      new_certificate_id: string
       new_certificate_type: string
     }
     UpdateEntityInfoRequest: {
@@ -2798,6 +2792,10 @@ export interface components {
     UpdateRightsRequestsRequest: {
       id: number
       status: components["schemas"]["UserRightsRequestsStatusEnum"]
+    }
+    UpdateUserRoleRequest: {
+      request_id: number
+      role: string
     }
     UpdatedQuotasRequest: {
       approved_quotas: number[][]
@@ -4890,59 +4888,6 @@ export interface operations {
       }
     }
   }
-  entities_users_create: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["EntityUserRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["EntityUserRequest"]
-        "multipart/form-data": components["schemas"]["EntityUserRequest"]
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EntityUser"]
-        }
-      }
-    }
-  }
-  entities_users_update: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this utilisateur. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["EntityUserRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["EntityUserRequest"]
-        "multipart/form-data": components["schemas"]["EntityUserRequest"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EntityUser"]
-        }
-      }
-    }
-  }
   entities_users_accept_user_create: {
     parameters: {
       query: {
@@ -5161,6 +5106,41 @@ export interface operations {
         "application/json": components["schemas"]["UpdateRightsRequestsRequest"]
         "application/x-www-form-urlencoded": components["schemas"]["UpdateRightsRequestsRequest"]
         "multipart/form-data": components["schemas"]["UpdateRightsRequestsRequest"]
+      }
+    }
+    responses: {
+      /** @description Request successful. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  entities_users_update_user_role_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserRoleRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdateUserRoleRequest"]
+        "multipart/form-data": components["schemas"]["UpdateUserRoleRequest"]
       }
     }
     responses: {

@@ -48,7 +48,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   )
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
-  const entityData = entities.result?.data.data ?? []
+  const entityData = entities.result?.data ?? []
   // const entityData = companiesSummary // TEST data
 
   const matchedEntities = entityData.filter(
@@ -143,7 +143,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                 ),
               },
               {
-                key: "entities",
+                key: "entities-company",
                 header: t("Société"),
                 orderBy: (e) => e.entity.name,
                 cell: (e) => (
