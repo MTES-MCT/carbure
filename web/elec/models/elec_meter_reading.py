@@ -22,6 +22,10 @@ class ElecMeterReading(models.Model):
         ElecMeter, on_delete=models.CASCADE, null=True, blank=False, related_name="elec_meter_readings"
     )
 
+    facteur_de_charge = models.FloatField(default=0.0)
+    energy_used_since_last_reading = models.FloatField(default=0.0)
+    days_since_last_reading = models.IntegerField(default=0)
+
     @property
     def charge_point(self):
         return self.meter.charge_point if self.meter else None
