@@ -192,10 +192,10 @@ class TeneurService:
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
-            data.pop("target_volume"),
-            data.pop("target_emission"),
+            data["target_volume"],
+            data["target_emission"],
             enforced_volumes,
-            data.pop("max_n_batches") if "max_n_batches" in data else None,
+            data.get("max_n_batches", None),
         )
 
         return selected_lots, lot_ids, emissions, fun
@@ -206,7 +206,7 @@ class TeneurService:
         Compute minimum and maximum feasible mix emissions.
         Return emission rates per MJ
         """
-        volumes, emissions, lot_ids, enforced_volumes = TeneurService.prepare_data(entity_id, data)
+        volumes, emissions, _, _ = TeneurService.prepare_data(entity_id, data)
 
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
@@ -219,7 +219,7 @@ class TeneurService:
     @staticmethod
     def prepare_data(entity_id, data):
         """
-        Prepare data for optimization
+        Prepare data for optimization and operation creation
         """
         operations = (
             Operation.objects.filter(

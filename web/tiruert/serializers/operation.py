@@ -1,10 +1,9 @@
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
-from tiruert.services.teneur import TeneurService
+from tiruert.services.operation import OperationService
 
 
 class DepotSerializer(serializers.Serializer):
@@ -72,6 +71,12 @@ class OperationOutputSerializer(serializers.ModelSerializer):
         return representation
 
 
+class LotSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    volume = serializers.FloatField()
+    emission_rate_per_mj = serializers.FloatField()
+
+
 class OperationInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
@@ -84,33 +89,24 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "to_depot",
             "validity_date",
-            "target_volume",
-            "target_emission",
+            "lots",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
             "customs_category": {"required": True},
             "debited_entity": {"required": True},
-            "target_volume": {"required": True},
-            "target_emission": {"required": True},
+            "lots": {"required": True},
         }
 
-    target_volume = serializers.FloatField()
-    target_emission = serializers.FloatField()
+    lots = LotSerializer(many=True)
 
     def create(self, validated_data):
         with transaction.atomic():
             request = self.context.get("request")
             entity_id = request.query_params.get("entity_id")
+            selected_lots = validated_data.pop("lots")
 
-            try:
-                selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
-                    entity_id,
-                    validated_data,
-                )
-
-            except ValueError as error:
-                raise ValidationError(str(error))
+            OperationService.check_volumes_before_create(entity_id, selected_lots, validated_data)
 
             if validated_data["type"] in [
                 Operation.INCORPORATION,
@@ -128,13 +124,13 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             # Create the details
             detail_operations_data = []
-            for idx, lot_volume in selected_lots.items():
+            for lot in selected_lots:
                 detail_operations_data.append(
                     {
                         "operation": operation,
-                        "lot_id": lot_ids[idx],
-                        "volume": lot_volume,
-                        "emission_rate_per_mj": emissions[idx] + fun,
+                        "lot_id": lot["id"],
+                        "volume": lot["volume"],
+                        "emission_rate_per_mj": lot["emission_rate_per_mj"],  # gCO2/MJ
                     }
                 )
 

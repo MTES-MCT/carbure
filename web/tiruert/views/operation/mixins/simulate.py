@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from tiruert.serializers.teneur import (
@@ -69,8 +68,8 @@ class SimulateActionMixin:
                     data["debited_entity"].id,
                     data,
                 )
-            except ValueError as error:
-                raise ValidationError(str(error))
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
             output_serializer = output_serializer_class(
                 {
