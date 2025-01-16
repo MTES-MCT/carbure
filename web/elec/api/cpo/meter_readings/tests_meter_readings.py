@@ -354,9 +354,10 @@ class ElecMeterReadingsTest(TestCase):
         assert sheet["D4"].value is None
 
         assert sheet["A5"].value == self.charge_point_5.charge_point_id
-        assert sheet["B5"].value is None
+        assert sheet["A6"].value == self.charge_point_6.charge_point_id
+        assert sheet["A7"].value == self.charge_point_7.charge_point_id
 
-        assert sheet["A6"].value is None
+        assert sheet["A8"].value is None
 
     def test_check_application_error(self):
         excel_file = create_meter_readings_excel(
@@ -600,7 +601,7 @@ class ElecMeterReadingsTest(TestCase):
                     "quarter": 3,
                     "urgency_status": "HIGH",
                     "year": 2024,
-                    "charge_point_count": 4,
+                    "charge_point_count": 6,
                 },
             },
             "status": "success",
