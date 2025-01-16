@@ -73,6 +73,11 @@ class Operation(models.Model):
             return False
         return self.credited_entity.id == int(entity)
 
+    def is_acquisition(self, entity_id):
+        if self.credited_entity is None:
+            return False
+        return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
+
 
 @transaction.atomic
 def create_tiruert_operations_from_lots(lots):

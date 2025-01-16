@@ -7,6 +7,16 @@ from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.teneur import TeneurService
 
 
+class DepotSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
+class EntitySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
 class OperationOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
@@ -28,18 +38,20 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "details",
         ]
 
+    from_depot = DepotSerializer()
+    to_depot = DepotSerializer()
+    credited_entity = EntitySerializer()
+    debited_entity = EntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
-    credited_entity = serializers.CharField(source="credited_entity.name", read_only=True)
-    debited_entity = serializers.CharField(source="debited_entity.name", read_only=True)
     volume = serializers.SerializerMethodField()
     # emission_rate_per_mj = serializers.SerializerMethodField()
 
     def get_type(self, instance):
         entity_id = self.context.get("entity_id")
-        if instance.credited_entity and instance.credited_entity.id == int(entity_id) and instance.type == Operation.CESSION:
+        if instance.is_acquisition(entity_id):
             return Operation.ACQUISITION
         else:
             return instance.type

@@ -14,6 +14,7 @@ class BalanceService:
         Keep only PENDING and ACCEPTED operations
         Group by sector, customs_category and biofuel (and lot if needed)
         Sum volume: credit when entity is credited, debit when entity is debited
+        Don't sum pending ACQUISITION operations
         """
 
         balance = defaultdict(
@@ -31,6 +32,9 @@ class BalanceService:
         operations = operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED])
 
         for operation in operations:
+            if operation.is_acquisition(entity_id) and operation.status == Operation.PENDING:
+                continue
+
             for detail in operation.details.all():
                 key = (operation.sector, operation.customs_category, operation.biofuel.code)
 
