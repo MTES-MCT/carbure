@@ -206,7 +206,7 @@ class TeneurService:
         Compute minimum and maximum feasible mix emissions.
         Return emission rates per MJ
         """
-        volumes, emissions, lot_ids = TeneurService.prepare_data(entity_id, data)
+        volumes, emissions, lot_ids, enforced_volumes = TeneurService.prepare_data(entity_id, data)
 
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
