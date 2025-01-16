@@ -13,6 +13,7 @@ class SimulationInputSerializer(serializers.ModelSerializer):
             "target_volume",
             "target_emission",
             "max_n_batches",
+            "enforced_volumes",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -23,6 +24,7 @@ class SimulationInputSerializer(serializers.ModelSerializer):
     target_volume = serializers.FloatField(required=True)
     target_emission = serializers.FloatField(required=True)
     max_n_batches = serializers.IntegerField(required=False)
+    enforced_volumes = serializers.ListField(child=serializers.IntegerField(), required=False)
 
 
 class SimulationLotOutputSerializer(serializers.Serializer):

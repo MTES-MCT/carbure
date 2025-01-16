@@ -26,12 +26,13 @@ class SimulateActionMixin:
         if serializer.is_valid():
             data = serializer.validated_data
 
-            selected_lots, lot_ids, emissions, fun, error = TeneurService.prepare_data_and_optimize(
-                data["debited_entity"].id,
-                data,
-            )
-            if error:
-                raise ValidationError(error)
+            try:
+                selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
+                    data["debited_entity"].id,
+                    data,
+                )
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
             detail_operations_data = []
             for idx, lot_volume in selected_lots.items():
@@ -63,13 +64,13 @@ class SimulateActionMixin:
         if serializer.is_valid():
             data = serializer.validated_data
 
-            min, max, error = TeneurService.get_min_and_max_emissions(
-                data["debited_entity"].id,
-                data,
-            )
-
-            if error:
-                raise ValidationError(error)
+            try:
+                min, max = TeneurService.get_min_and_max_emissions(
+                    data["debited_entity"].id,
+                    data,
+                )
+            except ValueError as error:
+                raise ValidationError(str(error))
 
             output_serializer = output_serializer_class(
                 {

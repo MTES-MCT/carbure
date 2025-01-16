@@ -91,13 +91,14 @@ class OperationInputSerializer(serializers.ModelSerializer):
             request = self.context.get("request")
             entity_id = request.query_params.get("entity_id")
 
-            selected_lots, lot_ids, emissions, fun, error = TeneurService.prepare_data_and_optimize(
-                entity_id,
-                validated_data,
-            )
+            try:
+                selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
+                    entity_id,
+                    validated_data,
+                )
 
-            if error:
-                raise ValidationError(error)
+            except ValueError as error:
+                raise ValidationError(str(error))
 
             if validated_data["type"] in [
                 Operation.INCORPORATION,
