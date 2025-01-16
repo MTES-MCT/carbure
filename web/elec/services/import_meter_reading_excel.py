@@ -44,7 +44,7 @@ class ExcelMeterReadings:
 
     @staticmethod
     def parse_meter_reading_excel(excel_file: UploadedFile):
-        meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 4)))
+        meter_readings_data = pd.read_excel(excel_file, dtype=str, usecols=list(range(0, 4)))
         meter_readings_data["line"] = meter_readings_data.index + 2  # add a line number to locate data in the excel file
         meter_readings_data.rename(
             columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelMeterReadings.EXCEL_COLUMNS)},
@@ -91,66 +91,71 @@ class ExcelMeterReadings:
 
 
 class ExcelMeterReadingValidator(Validator):
-    meter = forms.ModelChoiceField(queryset=ElecMeter.objects.all())
+    meter = forms.ModelChoiceField(queryset=ElecMeter.objects.all(), required=False)
     extracted_energy = forms.FloatField(min_value=0)
     reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     energy_used_since_last_reading = forms.FloatField()
     renewable_energy = forms.FloatField()
     charge_point_id = forms.CharField()
 
-    def extend(self, new_reading):
+    def extend(self, meter_reading):
+        meter_reading["meter"] = None
+        meter_reading["energy_used_since_last_reading"] = 0
+        meter_reading["days_since_last_reading"] = 0
+        meter_reading["facteur_de_charge"] = 0
+        meter_reading["renewable_energy"] = 0
+        return meter_reading
+
+    def validate(self, meter_reading):
+        charge_point_id = meter_reading.get("charge_point_id")
+
         renewable_share = self.context.get("renewable_share")
-        charge_point_by_id = self.context.get("charge_point_by_id")
+        charge_point = self.context.get("charge_point_by_id").get(charge_point_id)
+        previous_readings = self.context.get("previous_readings_by_charge_point").get(charge_point_id)
+        lines = self.context.get("lines_by_charge_point").get(charge_point_id)
 
-        charge_point_id = new_reading.get("charge_point_id")
-        charge_point = charge_point_by_id.get(charge_point_id)
+        meter = charge_point.current_meter if charge_point else None
+        charge_point_power = charge_point.nominal_power if charge_point else 0
 
-        meter = charge_point.current_meter
-
-        # prepare an object that looks like previous_readings_by_charge_point, based on the inital meter data,
         # in case there was no registered reading for this charge point yet
-        initial_meter_reading = {
+        # prepare an object that looks like previous_readings_by_charge_point based on the inital meter data,
+        previous_reading = previous_readings or {
             "extracted_energy": meter.initial_index if meter else 0,
-            "reading_date": meter.initial_index_date if meter else date.today(),  # not sure about date.today() here
+            "reading_date": meter.initial_index_date if meter else date.min,  # not sure about date.today() here
         }
 
-        previous_readings_by_charge_point = self.context.get("previous_readings_by_charge_point")
-        previous_reading = previous_readings_by_charge_point.get(charge_point_id, initial_meter_reading)
-
         previous_extracted_energy = previous_reading["extracted_energy"]
-        new_extracted_energy = new_reading["extracted_energy"]
+        new_extracted_energy = meter_reading["extracted_energy"]
         energy_used_since_last_reading = new_extracted_energy - previous_extracted_energy
 
         previous_reading_date = previous_reading["reading_date"]
-        new_reading_date = new_reading["reading_date"]
+        new_reading_date = meter_reading["reading_date"]
         days_since_last_reading = (new_reading_date - previous_reading_date).days
 
-        charge_point_power = charge_point.nominal_power if charge_point else 0
-        facteur_de_charge = energy_used_since_last_reading / (charge_point_power * days_since_last_reading * 24)
+        facteur_de_charge = 0
+        if charge_point_power and days_since_last_reading:
+            facteur_de_charge = energy_used_since_last_reading / (charge_point_power * days_since_last_reading * 24)
 
-        new_reading["meter"] = meter
-        new_reading["energy_used_since_last_reading"] = energy_used_since_last_reading
-        new_reading["days_since_last_reading"] = days_since_last_reading
-        new_reading["facteur_de_charge"] = facteur_de_charge
-        new_reading["renewable_energy"] = energy_used_since_last_reading * renewable_share
+        meter_reading["meter"] = meter
+        meter_reading["energy_used_since_last_reading"] = energy_used_since_last_reading
+        meter_reading["days_since_last_reading"] = days_since_last_reading
+        meter_reading["facteur_de_charge"] = facteur_de_charge
+        meter_reading["renewable_energy"] = energy_used_since_last_reading * renewable_share
 
-        self.context["charge_point"] = charge_point
-        self.context["previous_extracted_energy"] = previous_extracted_energy
-        self.context["previous_reading_date"] = previous_reading_date
-
-        return new_reading
-
-    def validate(self, meter_reading):
-        charge_point = self.context.get("charge_point")
-        previous_extracted_energy = self.context.get("previous_extracted_energy")
-        previous_reading_date = self.context.get("previous_reading_date")
+        # charge_point = self.context.get("charge_point")
         reading_date = meter_reading.get("reading_date")
-        lines = self.context.get("lines_by_charge_point").get(meter_reading.get("charge_point_id"))
 
         if charge_point is None:
             self.add_error(
                 "charge_point_id",
                 _("Le point de recharge n'a pas encore été inscrit sur la plateforme."),
+            )
+        elif meter is None:
+            self.add_error(
+                "charge_point_id",
+                _(
+                    "Ce point de recharge n'a pas de compteur associé, veuillez en ajouter un depuis la page dédiée."  # noqa
+                ),
             )
         elif meter_reading.get("extracted_energy", 0) < previous_extracted_energy:
             self.add_error(
@@ -169,6 +174,14 @@ class ExcelMeterReadingValidator(Validator):
                 "reading_date",
                 _(
                     f"Un relevé plus récent est déjà enregistré pour ce point de recharge: {previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"  # noqa
+                ),
+            )
+
+        if facteur_de_charge > 1:
+            self.add_error(
+                "extracted_energy",
+                _(
+                    f"Le facteur de charge estimé depuis le dernier relevé enregistré est supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la puissance de votre point de recharge, renseignée sur TDG."  # noqa
                 ),
             )
 

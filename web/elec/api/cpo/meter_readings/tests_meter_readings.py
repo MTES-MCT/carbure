@@ -39,40 +39,67 @@ OK_METER_READINGS = [
 
 ERROR_METER_READINGS = [
     {
+        # no problemo
         "charge_point_id": "FR00ABCD",
         "previous_reading": 1000,
         "current_reading": 1100,
         "reading_date": datetime.date(2025, 9, 25),
     },
     {
+        # new energy is smaller than previous one
         "charge_point_id": "FR00EFGH",
         "previous_reading": 700,
         "current_reading": 600,
         "reading_date": datetime.date(2025, 9, 28),
     },
     {
+        # PDC is listed twice
         "charge_point_id": "FR00IJKL",
         "previous_reading": 500,
         "current_reading": 600,
         "reading_date": datetime.date(2025, 9, 29),
     },
     {
+        # PDC is listed twice
         "charge_point_id": "FR00IJKL",
         "previous_reading": 500,
         "current_reading": 800,
         "reading_date": datetime.date(2025, 9, 29),
     },
     {
+        # PDC is not yet registered
         "charge_point_id": "FR00IJKAA",
         "previous_reading": 300,
         "current_reading": 900,
         "reading_date": datetime.date(2025, 9, 29),
     },
     {
+        # reading date is outside of current quarter
         "charge_point_id": "FR00MNOP",
         "previous_reading": 1000,
         "current_reading": 2000,
         "reading_date": datetime.date(2025, 6, 29),
+    },
+    {
+        # PDC has no registered meter
+        "charge_point_id": "FR00QRST",
+        "previous_reading": 1000,
+        "current_reading": 2000,
+        "reading_date": datetime.date(2025, 9, 28),
+    },
+    {
+        # reading date is before previous one (+ outside quarter)
+        "charge_point_id": "FR00UVWX",
+        "previous_reading": 500,
+        "current_reading": 2000,
+        "reading_date": datetime.date(2024, 1, 28),  # previous: date(2024, 3, 28)
+    },
+    {
+        # facteur_de_charge is greater than 100%
+        "charge_point_id": "FR00YZAB",
+        "previous_reading": 500,
+        "current_reading": 2000000,
+        "reading_date": datetime.date(2025, 9, 28),
     },
 ]
 
@@ -110,21 +137,28 @@ class ElecMeterReadingsTest(TestCase):
         self.meter1 = ElecMeter.objects.create(
             mid_certificate="MID_ABCD",
             initial_index=1000,
-            initial_index_date=datetime.date(2022, 10, 1),
+            initial_index_date=datetime.date(2024, 3, 30),
             charge_point=None,
         )
 
         self.meter2 = ElecMeter.objects.create(
             mid_certificate="MID_EFGH",
             initial_index=700,
-            initial_index_date=datetime.date(2022, 10, 1),
+            initial_index_date=datetime.date(2024, 3, 29),
             charge_point=None,
         )
 
         self.meter3 = ElecMeter.objects.create(
             mid_certificate="MID_IJKL",
             initial_index=500,
-            initial_index_date=datetime.date(2022, 10, 1),
+            initial_index_date=datetime.date(2024, 3, 28),
+            charge_point=None,
+        )
+
+        self.meter4 = ElecMeter.objects.create(
+            mid_certificate="MID_MNOP",
+            initial_index=500,
+            initial_index_date=datetime.date(2024, 3, 28),
             charge_point=None,
         )
 
@@ -138,7 +172,7 @@ class ElecMeterReadingsTest(TestCase):
             measure_reference_point_id="PRM_ABCD",
             station_name="Station",
             station_id="FR00",
-            nominal_power=1000,
+            nominal_power=10,
             cpo_name="CPO",
             cpo_siren="SIREN_ABCD",
             latitude=Decimal(12.0),
@@ -158,7 +192,7 @@ class ElecMeterReadingsTest(TestCase):
             measure_reference_point_id="PRM_EFGH",
             station_name="Station",
             station_id="FR00",
-            nominal_power=500,
+            nominal_power=50,
             cpo_name="CPO",
             cpo_siren="SIREN_EFGH",
             latitude=Decimal(12.0),
@@ -178,7 +212,7 @@ class ElecMeterReadingsTest(TestCase):
             measure_reference_point_id="PRM_IJKL",
             station_name="Station",
             station_id="FR00",
-            nominal_power=500,
+            nominal_power=50,
             cpo_name="CPO",
             cpo_siren="SIREN_IJKL",
             latitude=Decimal(12.0),
@@ -186,25 +220,79 @@ class ElecMeterReadingsTest(TestCase):
             is_article_2=True,
         )
 
+        self.meter3.charge_point = self.charge_point_3
+        self.meter3.save()
+
         self.charge_point_4 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
             cpo=self.cpo,
             charge_point_id="FR00MNOP",
             current_type="AC",
             installation_date=datetime.date(2021, 6, 2),
-            current_meter=self.meter3,
+            current_meter=self.meter4,
             measure_reference_point_id="PRM_MNOP",
             station_name="Station",
             station_id="FR00",
-            nominal_power=500,
+            nominal_power=50,
             cpo_name="CPO",
             cpo_siren="SIREN_MNOP",
             latitude=Decimal(12.0),
             longitude=Decimal(5.0),
         )
 
-        self.meter3.charge_point = self.charge_point_3
-        self.meter3.save()
+        self.meter4.charge_point = self.charge_point_4
+        self.meter4.save()
+
+        self.charge_point_5 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR00QRST",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=None,
+            measure_reference_point_id="PRM_QRST",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=50,
+            cpo_name="CPO",
+            cpo_siren="SIREN_MNOP",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
+
+        self.charge_point_6 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR00UVWX",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=self.meter4,
+            measure_reference_point_id="PRM_UVWX",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=50,
+            cpo_name="CPO",
+            cpo_siren="SIREN_UVWX",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
+
+        self.charge_point_7 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR00YZAB",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=self.meter4,
+            measure_reference_point_id="PRM_YZAB",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=50,
+            cpo_name="CPO",
+            cpo_siren="SIREN_YZAB",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
 
         self.meter_reading_application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
@@ -223,7 +311,7 @@ class ElecMeterReadingsTest(TestCase):
         self.meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=800,
             renewable_energy=24.92,
-            reading_date=datetime.date(2024, 5, 21),
+            reading_date=datetime.date(2024, 6, 21),
             meter=self.meter2,
             cpo=self.cpo,
             application=self.meter_reading_application,
@@ -232,7 +320,7 @@ class ElecMeterReadingsTest(TestCase):
         self.meter_reading_3 = ElecMeterReading.objects.create(
             extracted_energy=4,
             renewable_energy=2,
-            reading_date=datetime.date(2024, 9, 29),
+            reading_date=datetime.date(2024, 6, 29),
             meter=self.meter3,
             cpo=self.cpo,
             application=self.meter_reading_application,
@@ -261,11 +349,14 @@ class ElecMeterReadingsTest(TestCase):
         assert sheet["D3"].value is None
 
         assert sheet["A4"].value == self.charge_point_4.charge_point_id
-        assert sheet["B4"].value == self.meter3.initial_index
+        assert sheet["B4"].value == self.meter4.initial_index
         assert sheet["C4"].value is None
         assert sheet["D4"].value is None
 
-        assert sheet["A5"].value is None
+        assert sheet["A5"].value == self.charge_point_5.charge_point_id
+        assert sheet["B5"].value is None
+
+        assert sheet["A6"].value is None
 
     def test_check_application_error(self):
         excel_file = create_meter_readings_excel(
@@ -296,7 +387,7 @@ class ElecMeterReadingsTest(TestCase):
                 "meter_reading_count": 1,
                 "quarter": 3,
                 "year": 2025,
-                "error_count": 5,
+                "error_count": 8,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -322,6 +413,34 @@ class ElecMeterReadingsTest(TestCase):
                         "error": "INVALID_DATA",
                         "line": 7,
                         "meta": {"reading_date": ["La date du relevé ne correspond pas au trimestre traité actuellement."]},
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 8,
+                        "meta": {
+                            "charge_point_id": [
+                                "Ce point de recharge n'a pas de compteur associé, veuillez en ajouter un depuis la page dédiée."  # noqa
+                            ]
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 9,
+                        "meta": {
+                            "reading_date": [
+                                "Un relevé plus récent est déjà enregistré pour ce point de recharge: 500.0kWh, 28/03/2024",
+                                "La date du relevé ne correspond pas au trimestre traité actuellement.",
+                            ],
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 10,
+                        "meta": {
+                            "extracted_energy": [
+                                "Le facteur de charge estimé depuis le dernier relevé enregistré est supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la puissance de votre point de recharge, renseignée sur TDG."  # noqa
+                            ],
+                        },
                     },
                 ],
             },
@@ -481,7 +600,7 @@ class ElecMeterReadingsTest(TestCase):
                     "quarter": 3,
                     "urgency_status": "HIGH",
                     "year": 2024,
-                    "charge_point_count": 3,
+                    "charge_point_count": 4,
                 },
             },
             "status": "success",
@@ -553,7 +672,7 @@ class ElecMeterReadingsTest(TestCase):
                     "charge_point_id": "FR00EFGH",
                     "previous_reading": 700.0,
                     "current_reading": 800.0,
-                    "reading_date": "2024-05-21",
+                    "reading_date": "2024-06-21",
                 }
             ],
         }
@@ -603,3 +722,58 @@ class ElecMeterReadingsTest(TestCase):
         assert data["error"] == "APPLICATION_NOT_PENDING"
         assert ElecMeterReadingApplication.objects.filter(id=application_id).exists()
         assert ElecMeterReading.objects.filter(application_id=application_id).exists()
+
+    def test_facteur_de_charge(self):
+        excel_file = create_meter_readings_excel(
+            name="readings",
+            quarter=4,
+            year=2024,
+            meter_readings_data=[
+                # first reading for this PDC since registration (previous data from meter)
+                {
+                    "charge_point_id": "FR00ABCD",
+                    "previous_reading": 1000,
+                    "current_reading": 1100,  # delta = 100
+                    "reading_date": datetime.date(2024, 12, 25),  # previous = 2024-03-30, delta = 270
+                },
+                # second reading for this PDC since registration (previous data from last meter reading)
+                {
+                    "charge_point_id": "FR00EFGH",
+                    "previous_reading": 800,
+                    "current_reading": 1000,  # delta = 200
+                    "reading_date": datetime.date(2024, 12, 28),  # previous = 2024-06-21, delta = 190
+                },
+            ],
+        )
+
+        response = self.client.post(
+            reverse("elec-cpo-meter-readings-add-application"),
+            {
+                "entity_id": self.cpo.id,
+                "quarter": 4,
+                "year": 2024,
+                "file": SimpleUploadedFile("readings.xlsx", excel_file.read()),
+            },
+        )
+
+        data = response.json()
+
+        assert response.status_code == 200
+        assert data == {"status": "success"}
+
+        last_application = ElecMeterReadingApplication.objects.last()
+
+        assert last_application.quarter == 4
+        assert last_application.year == 2024
+        assert last_application.elec_meter_readings.count() == 2
+
+        readings = last_application.elec_meter_readings.all()
+        reading_1 = readings[0]
+        reading_2 = readings[1]
+
+        assert reading_1.energy_used_since_last_reading == 100
+        assert reading_1.days_since_last_reading == 270
+        assert round(reading_1.facteur_de_charge, 6) == 0.001543
+        assert reading_2.energy_used_since_last_reading == 200
+        assert reading_2.days_since_last_reading == 190
+        assert round(reading_2.facteur_de_charge, 6) == 0.000877
