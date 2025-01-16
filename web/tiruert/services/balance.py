@@ -26,6 +26,7 @@ class BalanceService:
                 "emission_rate_per_mj": 0,
                 "teneur": 0,
                 "pending": 0,
+                "pci": 0,
             }
         )
 
@@ -34,6 +35,8 @@ class BalanceService:
         for operation in operations:
             if operation.is_acquisition(entity_id) and operation.status == Operation.PENDING:
                 continue
+
+            pci = operation.biofuel.pci_litre
 
             for detail in operation.details.all():
                 key = (operation.sector, operation.customs_category, operation.biofuel.code)
@@ -50,6 +53,7 @@ class BalanceService:
                     balance[key]["biofuel"] = operation.biofuel.code
 
                 balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
+                balance[key]["pci"] = pci
 
                 if operation.type == Operation.TENEUR and group_by != "lot":
                     balance[key]["teneur"] += detail.volume
