@@ -12,8 +12,8 @@ import {
 export const useDoubleCount = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { isAdmin, hasAdminRight, ext_admin_pages } = useEntity()
-  console.log("is admin", { isAdmin, ext_admin_pages })
+  const { isAdmin, hasAdminRight } = useEntity()
+
   const doubleCount: MenuSection = {
     title: t("Double-comptage"),
     condition: isAdmin || hasAdminRight("DCA"),

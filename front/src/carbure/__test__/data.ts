@@ -265,7 +265,7 @@ export const generateUser = (
       ),
     ],
   }
-  console.log("res", res)
+
   return res
 }
 

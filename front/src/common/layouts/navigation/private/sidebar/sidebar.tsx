@@ -11,6 +11,7 @@ import {
 } from "common/components/icon"
 import { EntitySelector } from "./entity-selector"
 import { useUser } from "carbure/hooks/user"
+import useEntity from "carbure/hooks/entity"
 
 export const PrivateSidebar = () => {
   const menuItems = usePrivateSidebar()
@@ -18,6 +19,7 @@ export const PrivateSidebar = () => {
   const routes = useRoutes()
   const user = useUser()
   const firstEntity = user.getFirstEntity()
+  const entity = useEntity()
 
   return (
     <div className={styles["sidebar"]}>
@@ -55,7 +57,7 @@ export const PrivateSidebar = () => {
           }}
         />
         {/* Display settings only if an entity is selected */}
-        {firstEntity && (
+        {entity.id !== -1 && (
           <ChildItem
             child={{
               path: routes.SETTINGS,

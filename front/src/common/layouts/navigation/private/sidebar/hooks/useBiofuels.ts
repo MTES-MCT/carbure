@@ -18,7 +18,7 @@ export const useBiofuels = () => {
     useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
-  console.log("has_stocks", has_stocks)
+
   const biofuels: MenuSection = {
     title: t("Lots de biocarburants"),
     condition: isIndustry || isPowerOrHeatProducer,
