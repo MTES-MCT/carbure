@@ -1,0 +1,28 @@
+/* We use a button to trigger the dropdown, but we want to have a full width button with a dropdown icon fixed on the right */
+.select-button {
+  justify-content: space-between;
+  position: relative;
+}
+
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--text-action-high-blue-france);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  /* Override the default line-height of the dsfr text style */
+  line-height: 1.1 !important;
+}
+
+.select-button-full {
+  width: 100%;
+}

@@ -18,3 +18,31 @@ export const Tertiary: Story = {
     priority: "tertiary",
   },
 }
+
+export const Danger: Story = {
+  args: {
+    customPriority: "danger",
+  },
+}
+
+export const Success: Story = {
+  args: {
+    customPriority: "success",
+  },
+}
+
+export const LinkStyle: Story = {
+  args: {
+    customPriority: "link",
+  },
+}
+
+export const Loading: Story = {
+  args: {
+    disabled: true,
+    iconId: "ri-loader-line",
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+}

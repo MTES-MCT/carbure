@@ -1,0 +1,26 @@
+.notice__title,
+.notice__desc {
+  margin-right: var(--spacing-1w);
+}
+.notice__title::before {
+  display: none;
+}
+
+.notice__icon {
+  margin-right: var(--spacing-1w);
+}
+
+.notice--info .notice__link {
+  color: var(--text-default-info);
+  --shadow-link-color: var(--text-default-info);
+}
+
+.notice--warning .notice__link {
+  color: var(--text-default-warning);
+  --shadow-link-color: var(--text-default-warning);
+}
+
+.notice--alert .notice__link {
+  color: var(--text-default-error);
+  --shadow-link-color: var(--text-default-error);
+}

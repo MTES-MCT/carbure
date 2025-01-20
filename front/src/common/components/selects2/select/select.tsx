@@ -2,16 +2,13 @@ import { useRef, useState } from "react"
 import { useAsyncList } from "common/hooks/async-list"
 import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
 import { Dropdown, Trigger } from "../../dropdown2"
-
-import { Control } from "../../input"
 import { List, ListProps } from "../../list2"
 import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
 import cl from "clsx"
 
-export interface SelectProps<T, V = T> extends Control, Trigger {
-  clear?: boolean // A garder ?
+export interface SelectProps<T, V = T> extends Trigger {
   search?: boolean
   value?: V | undefined
   options?: T[]
@@ -30,6 +27,9 @@ export interface SelectProps<T, V = T> extends Control, Trigger {
   full?: boolean
   className?: string
   children?: ListProps<T, V>["children"]
+  loading?: boolean
+  readOnly?: boolean
+  disabled?: boolean
 }
 
 export function Select<T, V>({
@@ -82,7 +82,11 @@ export function Select<T, V>({
         )}
         size={size}
       >
-        <Text fontWeight="semibold" is="span">
+        <Text
+          fontWeight="semibold"
+          is="span"
+          className={cl(!valueRenderer && styles.label)}
+        >
           {currentItem && valueRenderer
             ? valueRenderer(currentItem)
             : asyncOptions.label || placeholder}
@@ -99,6 +103,7 @@ export function Select<T, V>({
             onOpen?.()
             asyncOptions.execute()
           }}
+          className={cl(search && styles["select-dropdown"])}
         >
           <List
             controlRef={triggerRef}
