@@ -27,13 +27,13 @@ OK_METER_READINGS = [
         "charge_point_id": "FR00ABCD",
         "previous_reading": 1000,
         "current_reading": 1100,
-        "reading_date": datetime.date(2024, 9, 25),
+        "reading_date": datetime.date(2025, 9, 25),
     },
     {
         "charge_point_id": "FR00EFGH",
         "previous_reading": 700,
         "current_reading": 800,
-        "reading_date": datetime.date(2024, 9, 28),
+        "reading_date": datetime.date(2025, 9, 28),
     },
 ]
 
@@ -42,31 +42,37 @@ ERROR_METER_READINGS = [
         "charge_point_id": "FR00ABCD",
         "previous_reading": 1000,
         "current_reading": 1100,
-        "reading_date": datetime.date(2024, 9, 25),
+        "reading_date": datetime.date(2025, 9, 25),
     },
     {
         "charge_point_id": "FR00EFGH",
         "previous_reading": 700,
         "current_reading": 600,
-        "reading_date": datetime.date(2024, 9, 28),
+        "reading_date": datetime.date(2025, 9, 28),
     },
     {
         "charge_point_id": "FR00IJKL",
         "previous_reading": 500,
         "current_reading": 600,
-        "reading_date": datetime.date(2024, 9, 29),
+        "reading_date": datetime.date(2025, 9, 29),
     },
     {
         "charge_point_id": "FR00IJKL",
         "previous_reading": 500,
         "current_reading": 800,
-        "reading_date": datetime.date(2024, 9, 29),
+        "reading_date": datetime.date(2025, 9, 29),
     },
     {
         "charge_point_id": "FR00IJKAA",
         "previous_reading": 300,
         "current_reading": 900,
-        "reading_date": datetime.date(2024, 9, 29),
+        "reading_date": datetime.date(2025, 9, 29),
+    },
+    {
+        "charge_point_id": "FR00MNOP",
+        "previous_reading": 1000,
+        "current_reading": 2000,
+        "reading_date": datetime.date(2025, 6, 29),
     },
 ]
 
@@ -94,6 +100,7 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         YearConfig.objects.create(year=2024, renewable_share=24.92)
+        YearConfig.objects.create(year=2025, renewable_share=25)
 
         self.charge_point_application = ElecChargePointApplication.objects.create(
             status=ElecChargePointApplication.ACCEPTED,
@@ -179,6 +186,23 @@ class ElecMeterReadingsTest(TestCase):
             is_article_2=True,
         )
 
+        self.charge_point_4 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR00MNOP",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=self.meter3,
+            measure_reference_point_id="PRM_MNOP",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=500,
+            cpo_name="CPO",
+            cpo_siren="SIREN_MNOP",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
+
         self.meter3.charge_point = self.charge_point_3
         self.meter3.save()
 
@@ -236,7 +260,12 @@ class ElecMeterReadingsTest(TestCase):
         assert sheet["C3"].value is None
         assert sheet["D3"].value is None
 
-        assert sheet["A4"].value is None
+        assert sheet["A4"].value == self.charge_point_4.charge_point_id
+        assert sheet["B4"].value == self.meter3.initial_index
+        assert sheet["C4"].value is None
+        assert sheet["D4"].value is None
+
+        assert sheet["A5"].value is None
 
     def test_check_application_error(self):
         excel_file = create_meter_readings_excel(
@@ -251,7 +280,7 @@ class ElecMeterReadingsTest(TestCase):
             {
                 "entity_id": self.cpo.id,
                 "quarter": 3,
-                "year": 2024,
+                "year": 2025,
                 "file": SimpleUploadedFile("readings.xlsx", excel_file.read()),
             },
         )
@@ -264,10 +293,10 @@ class ElecMeterReadingsTest(TestCase):
             "error": "VALIDATION_FAILED",
             "data": {
                 "file_name": "readings.xlsx",
-                "quarter": 3,
-                "year": 2024,
                 "meter_reading_count": 1,
-                "error_count": 3,
+                "quarter": 3,
+                "year": 2025,
+                "error_count": 5,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -277,12 +306,22 @@ class ElecMeterReadingsTest(TestCase):
                     {
                         "error": "INVALID_DATA",
                         "line": 4,
-                        "meta": {"reading_date": ["Le relevé du 2024-09-29 existe déjà"]},
+                        "meta": {"charge_point_id": ["Ce point de recharge a été défini 2 fois (lignes 4, 5)"]},
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 5,
+                        "meta": {"charge_point_id": ["Ce point de recharge a été défini 2 fois (lignes 4, 5)"]},
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 6,
                         "meta": {"charge_point_id": ["Le point de recharge n'a pas encore été inscrit sur la plateforme."]},
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 7,
+                        "meta": {"reading_date": ["La date du relevé ne correspond pas au trimestre traité actuellement."]},
                     },
                 ],
             },
@@ -301,7 +340,7 @@ class ElecMeterReadingsTest(TestCase):
             {
                 "entity_id": self.cpo.id,
                 "quarter": 3,
-                "year": 2024,
+                "year": 2025,
                 "file": SimpleUploadedFile("readings.xlsx", excel_file.read()),
             },
         )
@@ -314,7 +353,7 @@ class ElecMeterReadingsTest(TestCase):
                 "file_name": "readings.xlsx",
                 "meter_reading_count": 2,
                 "quarter": 3,
-                "year": 2024,
+                "year": 2025,
                 "errors": [],
                 "error_count": 0,
             },
@@ -324,7 +363,7 @@ class ElecMeterReadingsTest(TestCase):
         excel_file = create_meter_readings_excel(
             name="readings",
             quarter=3,
-            year=2024,
+            year=2025,
             meter_readings_data=ERROR_METER_READINGS,
         )
 
@@ -333,7 +372,7 @@ class ElecMeterReadingsTest(TestCase):
             {
                 "entity_id": self.cpo.id,
                 "quarter": 3,
-                "year": 2024,
+                "year": 2025,
                 "file": SimpleUploadedFile("readings.xlsx", excel_file.read()),
             },
         )
@@ -346,7 +385,7 @@ class ElecMeterReadingsTest(TestCase):
         excel_file = create_meter_readings_excel(
             name="readings",
             quarter=3,
-            year=2024,
+            year=2025,
             meter_readings_data=OK_METER_READINGS,
         )
 
@@ -355,7 +394,7 @@ class ElecMeterReadingsTest(TestCase):
             {
                 "entity_id": self.cpo.id,
                 "quarter": 3,
-                "year": 2024,
+                "year": 2025,
                 "file": SimpleUploadedFile("readings.xlsx", excel_file.read()),
             },
         )
@@ -368,7 +407,7 @@ class ElecMeterReadingsTest(TestCase):
         last_application = ElecMeterReadingApplication.objects.last()
 
         assert last_application.quarter == 3
-        assert last_application.year == 2024
+        assert last_application.year == 2025
         assert last_application.elec_meter_readings.count() == 2
 
         readings = last_application.elec_meter_readings.all()
@@ -376,9 +415,9 @@ class ElecMeterReadingsTest(TestCase):
         reading_2 = readings[1]
 
         assert reading_1.extracted_energy == 1100
-        assert reading_1.reading_date == datetime.date(2024, 9, 25)
+        assert reading_1.reading_date == datetime.date(2025, 9, 25)
         assert reading_2.extracted_energy == 800
-        assert reading_2.reading_date == datetime.date(2024, 9, 28)
+        assert reading_2.reading_date == datetime.date(2025, 9, 28)
 
     def test_get_applications(self):
         mocked_get_application_quarter = patch(
@@ -400,15 +439,15 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         application = ElecMeterReadingApplication.objects.last()
-        application_date = application.created_at.isoformat()
 
         data = response.json()
         assert response.status_code == 200
+
         expected = {
             "data": {
                 "applications": [
                     {
-                        "application_date": application_date,
+                        "application_date": mock.ANY,
                         "charge_point_count": 2,
                         "cpo": {
                             "entity_type": "Charge Point Operator",
@@ -422,7 +461,7 @@ class ElecMeterReadingsTest(TestCase):
                         "year": 2024,
                     },
                     {
-                        "application_date": application_date,
+                        "application_date": mock.ANY,
                         "charge_point_count": 0,
                         "cpo": {
                             "entity_type": "Charge Point Operator",
@@ -442,7 +481,7 @@ class ElecMeterReadingsTest(TestCase):
                     "quarter": 3,
                     "urgency_status": "HIGH",
                     "year": 2024,
-                    "charge_point_count": 2,
+                    "charge_point_count": 3,
                 },
             },
             "status": "success",

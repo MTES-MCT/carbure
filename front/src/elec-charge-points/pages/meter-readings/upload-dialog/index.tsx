@@ -31,12 +31,14 @@ type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
   companyId: number
   currentApplicationPeriod: ElecMeterReadingsCurrentApplicationsPeriod
+  hasPendingApplications: boolean
 }
 
 const ElecMeterReadingsFileUpload = ({
   onClose,
   currentApplicationPeriod,
   companyId,
+  hasPendingApplications,
 }: ElecMeterReadingsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -132,6 +134,17 @@ const ElecMeterReadingsFileUpload = ({
       </header>
 
       <main>
+        {hasPendingApplications && (
+          <section>
+            <Alert icon={AlertCircle} variant="danger">
+              <Trans>
+                Des relevés sont déjà en attente de validation. Veuillez les
+                supprimer si vous souhaitez enregistrer un nouveau dossier.
+              </Trans>
+            </Alert>
+          </section>
+        )}
+
         <section>
           <Form id="dc-checker">
             {currentApplicationPeriod.urgency_status ===
@@ -204,6 +217,7 @@ const ElecMeterReadingsFileUpload = ({
                   : t("Choisir un fichier")
               }
               {...bind("meterReadingsFile")}
+              disabled={hasPendingApplications}
             />
           </Form>
         </section>

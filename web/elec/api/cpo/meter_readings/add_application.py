@@ -14,7 +14,7 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
-from elec.services.meter_readings_application_quarter import get_application_quarter
+from elec.services.meter_readings_application_quarter import first_day_of_quarter, get_application_quarter
 
 
 class AddMeterReadingApplicationForm(forms.Form):
@@ -27,6 +27,7 @@ class AddMeterReadingApplicationError:
     MISSING_FILE = "MISSING_FILE"
     NO_READING_FOUND = "NO_READING_FOUND"
     VALIDATION_FAILED = "VALIDATION_FAILED"
+    METER_READINGS_FOR_QUARTER_ALREADY_EXISTS = "METER_READINGS_FOR_QUARTER_ALREADY_EXISTS"
 
 
 @require_POST
@@ -51,17 +52,24 @@ def add_application(request: HttpRequest, entity: Entity):
     if not quarter or not year:
         return ErrorResponse(400, AddMeterReadingApplicationError.TOO_LATE)
 
+    if MeterReadingRepository.get_cpo_application_for_quarter(cpo=entity, year=year, quarter=quarter) is not None:
+        return ErrorResponse(400, AddMeterReadingApplicationError.METER_READINGS_FOR_QUARTER_ALREADY_EXISTS)
+
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
     previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
 
-    meter_reading_data, errors, original = import_meter_reading_excel(
+    # get the first day of this quarter so we can verify that the readings are for the current quarter
+    beginning_of_quarter = first_day_of_quarter(year, quarter)
+
+    meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
         previous_readings,
         previous_application,
         renewable_share,
+        beginning_of_quarter,
     )
 
     if len(errors) > 0:
@@ -74,20 +82,6 @@ def add_application(request: HttpRequest, entity: Entity):
     meter_readings = ElecMeterReading.objects.filter(
         cpo=entity, meter__charge_point__charge_point_id__in=charge_points_by_id
     )
-
-    previous_date = {}
-    for item in meter_readings:
-        previous_date[item.charge_point.charge_point_id] = item.reading_date
-
-    duplicate = False
-    for row in original:
-        reading_date = row["reading_date"]
-        if previous_date.get(row["charge_point_id"]) == reading_date:
-            duplicate = True
-            break
-
-    if duplicate:
-        return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
 
     [data.pop("charge_point_id", None) for data in meter_reading_data]
 

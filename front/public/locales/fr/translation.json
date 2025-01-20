@@ -1646,5 +1646,6 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> doit être déclaré avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
-  "Brouillon_plural": "Brouillons"
+  "Brouillon_plural": "Brouillons",
+  "Des relevés sont déjà en attente de validation. Veuillez les supprimer si vous souhaitez enregistrer un nouveau dossier.": "Des relevés sont déjà en attente de validation. Veuillez les supprimer si vous souhaitez enregistrer un nouveau dossier."
 }

@@ -1559,5 +1559,6 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} batches</b> show <b>anomalies</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} batch</b> must be declared before <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
-  "Brouillon_plural": "Drafts"
+  "Brouillon_plural": "Drafts",
+  "Des relevés sont déjà en attente de validation. Veuillez les supprimer si vous souhaitez enregistrer un nouveau dossier.": "A meter reading application is still pending validation. Please delete it if you wish to upload a new application."
 }
