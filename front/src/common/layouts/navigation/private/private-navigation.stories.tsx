@@ -6,9 +6,10 @@ import {
   usePrivateNavigation,
 } from "./private-navigation.context"
 import { EntityType } from "carbure/types"
-import { mockUser } from "carbure/__test__/helpers"
+import { mockGetWithResponseData, mockUser } from "carbure/__test__/helpers"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 import { ExtAdminPagesEnum } from "api-schema"
+import { apiTypes } from "common/services/api-fetch.types"
 
 const meta: Meta<typeof PrivateNavigation> = {
   component: PrivateNavigation,
@@ -26,6 +27,21 @@ const meta: Meta<typeof PrivateNavigation> = {
   ],
   parameters: {
     layout: "fullscreen",
+    msw: {
+      handlers: [
+        mockGetWithResponseData<apiTypes["NavStats"]>("/nav-stats", {
+          pending_draft_lots: 984,
+          audits: 5,
+          doublecount_agreement_pending: 10,
+          tickets: 100,
+          total_pending_action_for_admin: 10,
+          charge_point_registration_pending: 10,
+          metering_reading_pending: 10,
+          pending_transfer_certificates: 10,
+          in_pending_lots: 5,
+        }),
+      ],
+    },
   },
 }
 type Story = StoryObj<typeof PrivateNavigation>
@@ -59,6 +75,7 @@ export const ExternalAdminElec: Story = {
   parameters: {
     msw: {
       handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
         mockUser(EntityType.ExternalAdmin, {
           right: {
             entity: {
@@ -76,6 +93,7 @@ export const ExternalAdminDCA: Story = {
   parameters: {
     msw: {
       handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
         mockUser(EntityType.ExternalAdmin, {
           right: {
             entity: {
@@ -93,6 +111,7 @@ export const OperatorLayout: Story = {
   parameters: {
     msw: {
       handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
         mockUser(EntityType.Operator, {
           right: {
             entity: {
@@ -111,7 +130,10 @@ export const AuditorLayout: Story = {
   ...AdminLayout,
   parameters: {
     msw: {
-      handlers: [mockUser(EntityType.Auditor)],
+      handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
+        mockUser(EntityType.Auditor),
+      ],
     },
   },
 }
@@ -121,6 +143,7 @@ export const ProducerLayout: Story = {
   parameters: {
     msw: {
       handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
         mockUser(EntityType.Producer, {
           right: {
             entity: {
@@ -137,7 +160,10 @@ export const PowerOrHeatProducerLayout: Story = {
   ...AdminLayout,
   parameters: {
     msw: {
-      handlers: [mockUser(EntityType.PowerOrHeatProducer)],
+      handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
+        mockUser(EntityType.PowerOrHeatProducer),
+      ],
     },
     reactRouter: reactRouterParameters({
       location: {
@@ -155,7 +181,10 @@ export const TraderLayout: Story = {
   ...AdminLayout,
   parameters: {
     msw: {
-      handlers: [mockUser(EntityType.Trader)],
+      handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
+        mockUser(EntityType.Trader),
+      ],
     },
   },
 }
@@ -164,7 +193,10 @@ export const AirlineLayout: Story = {
   ...AdminLayout,
   parameters: {
     msw: {
-      handlers: [mockUser(EntityType.Airline)],
+      handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
+        mockUser(EntityType.Airline),
+      ],
     },
   },
 }
@@ -173,7 +205,10 @@ export const ChargePointOperatorLayout: Story = {
   ...AdminLayout,
   parameters: {
     msw: {
-      handlers: [mockUser(EntityType.CPO)],
+      handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
+        mockUser(EntityType.CPO),
+      ],
     },
   },
 }

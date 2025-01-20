@@ -14,8 +14,14 @@ import {
   TodoFill,
   TodoLine,
 } from "common/components/icon/icon"
+import { apiTypes } from "common/services/api-fetch.types"
 
-export const useChargePoints = () => {
+type ChargePointsParams = Pick<
+  apiTypes["NavStats"],
+  "charge_point_registration_pending" | "metering_reading_pending" | "audits"
+>
+
+export const useChargePoints = (params?: ChargePointsParams) => {
   const { isCPO, isAuditor, isAdmin, hasAdminRight } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
@@ -27,12 +33,14 @@ export const useChargePoints = () => {
       {
         path: routes.ELEC().CHARGE_POINTS.PENDING,
         title: t("Inscription"),
+
         icon: FileTextLine,
         iconActive: FileTextFill,
       },
       {
         path: routes.ELEC().CHARGE_POINTS.METER_READINGS,
         title: t("Relevés trimestriels"),
+
         icon: CalendarCheckLine,
         iconActive: CalendarCheckFill,
       },
@@ -52,6 +60,7 @@ export const useChargePoints = () => {
       {
         path: routes.ELEC_AUDITOR(),
         title: t("Points de recharge"),
+        additionalInfo: params?.audits,
         icon: BuildingLine,
         iconActive: BuildingFill,
       },
@@ -65,11 +74,13 @@ export const useChargePoints = () => {
       {
         path: routes.ELEC_ADMIN().CHARGE_POINTS.PENDING,
         title: t("Inscription"),
+        additionalInfo: params?.charge_point_registration_pending,
         icon: ClipboardLine,
         iconActive: ClipboardFill,
       },
       {
         path: routes.ELEC_ADMIN().CHARGE_POINTS.METER_READINGS,
+        additionalInfo: params?.metering_reading_pending,
         title: t("Relevés"),
         icon: TodoLine,
         iconActive: TodoFill,

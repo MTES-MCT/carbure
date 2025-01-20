@@ -8,8 +8,11 @@ import {
   ContrastDropFill,
   ContrastDropLine,
 } from "common/components/icon/icon"
+import { apiTypes } from "common/services/api-fetch.types"
 
-export const useSaf = () => {
+type SafParams = Pick<apiTypes["NavStats"], "tickets">
+
+export const useSaf = (params?: SafParams) => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const { has_saf, isOperator, isAirline } = useEntity()
@@ -40,6 +43,7 @@ export const useSaf = () => {
       {
         path: routes.SAF().TICKETS_PENDING,
         title: t("Tickets en attente"),
+        additionalInfo: params?.tickets,
         icon: ArrowGoBackLine,
         condition: isAirline,
       },

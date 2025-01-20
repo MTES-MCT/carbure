@@ -8,8 +8,14 @@ import {
   FileTextFill,
   FileTextLine,
 } from "common/components/icon"
+import { apiTypes } from "common/services/api-fetch.types"
 
-export const useDoubleCount = () => {
+type DoubleCountParams = Pick<
+  apiTypes["NavStats"],
+  "doublecount_agreement_pending"
+>
+
+export const useDoubleCount = (params?: DoubleCountParams) => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const { isAdmin, hasAdminRight } = useEntity()
@@ -21,6 +27,7 @@ export const useDoubleCount = () => {
       {
         path: routes.ADMIN().DOUBLE_COUNT.APPLICATIONS,
         title: t("En attente"),
+        additionalInfo: params?.doublecount_agreement_pending,
         icon: FileTextLine,
         iconActive: FileTextFill,
       },

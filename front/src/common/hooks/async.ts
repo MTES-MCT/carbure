@@ -2,10 +2,11 @@ import {
   useAsync,
   useAsyncCallback,
   UseAsyncCallbackOptions,
+  UseAsyncOptions,
 } from "react-async-hook"
 import { invalidate, useInvalidate } from "./invalidate"
 
-export type QueryOptions<R, A extends any[]> = UseAsyncCallbackOptions<R> & {
+export type QueryOptions<R, A extends any[]> = UseAsyncOptions<R> & {
   key: string
   params: A
 }

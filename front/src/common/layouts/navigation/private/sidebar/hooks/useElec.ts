@@ -10,8 +10,10 @@ import {
   NewsPaperFill,
   NewsPaperLine,
 } from "common/components/icon"
+import { apiTypes } from "common/services/api-fetch.types"
 
-export const useElec = () => {
+type ElecParams = Pick<apiTypes["NavStats"], "pending_transfer_certificates">
+export const useElec = (params?: ElecParams) => {
   const { has_elec, isOperator, isCPO, isAdmin, hasAdminRight } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
@@ -23,6 +25,7 @@ export const useElec = () => {
       {
         path: routes.ELEC().CERTIFICATES,
         title: t("Certificats"),
+        additionalInfo: params?.pending_transfer_certificates,
         icon: FileTextLine,
         iconActive: FileTextFill,
         condition: has_elec && isOperator,

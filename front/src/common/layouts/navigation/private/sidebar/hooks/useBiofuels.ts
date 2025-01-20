@@ -12,8 +12,14 @@ import {
   SurveyFill,
   SurveyLine,
 } from "common/components/icon"
+import { apiTypes } from "common/services/api-fetch.types"
 
-export const useBiofuels = () => {
+type BiofuelsParams = Pick<
+  apiTypes["NavStats"],
+  "pending_draft_lots" | "in_pending_lots"
+>
+
+export const useBiofuels = (params?: BiofuelsParams) => {
   const { isAuditor, isIndustry, isPowerOrHeatProducer, has_stocks, isAdmin } =
     useEntity()
   const { t } = useTranslation()
@@ -26,20 +32,20 @@ export const useBiofuels = () => {
       {
         path: routes.BIOFUELS().DRAFT,
         title: t("Brouillons"),
+        additionalInfo: params?.pending_draft_lots,
         icon: SurveyLine,
         iconActive: SurveyFill,
       },
       {
         path: routes.BIOFUELS().RECEIVED,
         title: t("Reçus"),
-        additionalInfo: "12",
+        additionalInfo: params?.in_pending_lots,
         icon: InboxArchiveLine,
         iconActive: InboxArchiveFill,
       },
       {
         path: routes.BIOFUELS().STOCKS,
         title: t("En stock"),
-        additionalInfo: "12",
         icon: StackLine,
         iconActive: StackFill,
         condition: has_stocks,

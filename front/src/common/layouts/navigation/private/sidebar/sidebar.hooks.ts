@@ -4,15 +4,24 @@ import { useChargePoints } from "./hooks/useChargePoints"
 import { useElec } from "./hooks/useElec"
 import { useBiofuels } from "./hooks/useBiofuels"
 import { useDoubleCount } from "./hooks/useDoubleCount"
+import { useQuery } from "common/hooks/async"
+import useEntity from "carbure/hooks/entity"
+import { getNavStats } from "./api"
 
 export const usePrivateSidebar = () => {
-  const biofuels = useBiofuels()
+  const entity = useEntity()
+  const { result } = useQuery(() => getNavStats(entity.id), {
+    key: `nav-stats-${entity.id}`,
+    params: [],
+    executeOnMount: entity.id !== -1,
+  })
 
-  const elec = useElec()
-  const chargePoints = useChargePoints()
-  const saf = useSaf()
-  const admin = useAdmin()
-  const doubleCount = useDoubleCount()
+  const biofuels = useBiofuels(result?.data)
+  const elec = useElec(result?.data)
+  const chargePoints = useChargePoints(result?.data)
+  const saf = useSaf(result?.data)
+  const admin = useAdmin(result?.data)
+  const doubleCount = useDoubleCount(result?.data)
 
   return [admin, ...biofuels, doubleCount, ...elec, ...chargePoints, saf]
     .filter(

@@ -16,9 +16,9 @@ import { useRoutes } from "common/hooks/routes"
 
 export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const routes = useRoutes()
-  console.log("PrivateNavigation", i18n.language)
+
   return (
     <>
       <header className={styles.header}>
