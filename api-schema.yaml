@@ -985,7 +985,7 @@ paths:
           description: ""
   /api/nav-stats/:
     get:
-      operationId: nav_stats_retrieve
+      operationId: nav_stats_list
       parameters:
         - in: query
           name: entity_id
@@ -993,6 +993,30 @@ paths:
             type: integer
           description: Entity ID
           required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
       tags:
         - nav-stats
       security:
@@ -1004,8 +1028,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: {}
+                $ref: "#/components/schemas/PaginatedNavStatsList"
           description: ""
   /api/resources/biofuels:
     get:
@@ -4084,6 +4107,27 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    NavStats:
+      type: object
+      properties:
+        total_pending_action_for_admin:
+          type: integer
+        pending_draft_lots:
+          type: integer
+        in_pending_lots:
+          type: integer
+        doublecount_agreement_pending:
+          type: integer
+        charge_point_registration_pending:
+          type: integer
+        metering_reading_pending:
+          type: integer
+        pending_transfer_certificates:
+          type: integer
+        audits:
+          type: integer
+        tickets:
+          type: integer
     OtpResponse:
       type: object
       properties:
@@ -4114,6 +4158,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityPreview"
+    PaginatedNavStatsList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/NavStats"
     PaginatedSafTicketList:
       type: object
       required:
