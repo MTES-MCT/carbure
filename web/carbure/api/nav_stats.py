@@ -44,7 +44,7 @@ class NavStatsViewSet(ListModelMixin, GenericViewSet):
                 required=True,
             ),
         ],
-        responses={"200": dict},
+        responses={"200": NavStatsSerializer},
     )
     def list(self, request, *args, **kwargs):
         # @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

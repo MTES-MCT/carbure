@@ -427,7 +427,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["nav_stats_retrieve"]
+    get: operations["nav_stats_list"]
     put?: never
     post?: never
     delete?: never
@@ -1412,6 +1412,17 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    NavStats: {
+      total_pending_action_for_admin?: number
+      pending_draft_lots?: number
+      in_pending_lots?: number
+      doublecount_agreement_pending?: number
+      charge_point_registration_pending?: number
+      metering_reading_pending?: number
+      pending_transfer_certificates?: number
+      audits?: number
+      tickets?: number
+    }
     OtpResponse: {
       valid_until: string
     }
@@ -1429,6 +1440,21 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["EntityPreview"][]
+    }
+    PaginatedNavStatsList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["NavStats"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -2592,11 +2618,19 @@ export interface operations {
       }
     }
   }
-  nav_stats_retrieve: {
+  nav_stats_list: {
     parameters: {
       query: {
         /** @description Entity ID */
         entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description A search term. */
+        search?: string
       }
       header?: never
       path?: never
@@ -2609,9 +2643,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": {
-            [key: string]: unknown
-          }
+          "application/json": components["schemas"]["PaginatedNavStatsList"]
         }
       }
     }
