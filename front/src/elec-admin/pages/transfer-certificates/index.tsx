@@ -33,7 +33,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
-  usePrivateNavigation(t("Energie cédée"))
+  usePrivateNavigation(t("Énergie cédée"))
   const location = useLocation()
 
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)

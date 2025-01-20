@@ -54,7 +54,7 @@ export const useElec = () => {
       },
       {
         path: routes.ELEC_ADMIN().TRANSFER,
-        title: t("Energie cédée"),
+        title: t("Énergie cédée"),
         icon: ArrowGoForwardLine,
       },
     ],
