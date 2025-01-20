@@ -55,7 +55,6 @@ export const CheckboxGroup = <T, V extends string | number>({
     ...option,
     nativeInputProps: {
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
-        console.log("on change ?", option.value)
         selection.onSelect(option.value)
         onToggle?.(option.value, e.target.checked)
       },

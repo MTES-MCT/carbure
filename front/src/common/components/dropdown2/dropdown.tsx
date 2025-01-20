@@ -108,13 +108,6 @@ export const Dropdown = ({
       const isInsideDropdown = isInside(dropdownRef.current, e.target)
 
       if (!isInsideTrigger && !isInsideDropdown) {
-        console.log("onClickOustide", {
-          t: e.target,
-          triggerRef: triggerRef.current,
-          dropdownRef: dropdownRef.current,
-          isInsideDropdown,
-          isInsideTrigger,
-        })
         setOpen(false)
       }
     }
@@ -243,12 +236,6 @@ export function isInside(
   container: EventTarget | Element | null,
   element: EventTarget | Element | null
 ) {
-  console.log("isInside", {
-    container,
-    element,
-    isInside: (container as Element)?.contains(element as Element),
-    isEq: (container as Element)?.isEqualNode(element as Element),
-  })
   return (container as Element)?.contains(element as Element)
 }
 

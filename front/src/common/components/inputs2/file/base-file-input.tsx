@@ -37,7 +37,6 @@ export const BaseFileInput = forwardRef<HTMLDivElement, BaseFileInputProps>(
       if (files === null) return
 
       for (const file of files) {
-        console.log("taille du fichier", file.size)
         if (file.size > 5000000) {
           const message = t(
             'La taille du fichier "{{fileName}}" est trop importante pour être analysée (5mo maximum).',

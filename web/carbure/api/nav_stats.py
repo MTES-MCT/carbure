@@ -76,7 +76,7 @@ def get_nav_stats(request):
         # EN ATTENTE ou AUDIT A VALIDER) (uniquement pour les types d'entité Administration
         # OU qui ont les droits externes elec)
         charge_point_registration_pending = ElecChargePointApplication.objects.filter(
-            status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.AUDIT_IN_PROGRESS]
+            status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.AUDIT_DONE]
         )
         response_data["charge_point_registration_pending"] = charge_point_registration_pending.count()
 
@@ -84,7 +84,7 @@ def get_nav_stats(request):
         # le status EN ATTENTE ou AUDIT A VALIDER)
         # (uniquement pour les types d'entité Administration OU qui ont les droits externes elec)
         metering_reading_pending = ElecMeterReadingApplication.objects.filter(
-            status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.AUDIT_IN_PROGRESS]
+            status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.AUDIT_DONE]
         )
         response_data["metering_reading_pending"] = metering_reading_pending.count()
 
@@ -105,7 +105,7 @@ def get_nav_stats(request):
     if entity.entity_type != Entity.ADMIN:  # and request.user.saf_management TODO
         # SAF (uniquement comptes non admin qui gèrent du saf)
         # Nombre de tickets reçus en attente
-        tickets = SafTicket.objects.filter(status=SafTicket.PENDING)
+        tickets = SafTicket.objects.filter(status=SafTicket.PENDING, client_id=entity_id)
         response_data["tickets"] = tickets.count()
 
     serializer = NavStatsSerializer(response_data)
