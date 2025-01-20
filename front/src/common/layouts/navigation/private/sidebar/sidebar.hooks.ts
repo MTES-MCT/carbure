@@ -7,13 +7,13 @@ import { useDoubleCount } from "./hooks/useDoubleCount"
 import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import { getNavStats } from "./api"
-
+import { useEffect } from "react"
 export const usePrivateSidebar = () => {
   const entity = useEntity()
-  const { result } = useQuery(() => getNavStats(entity.id), {
+  const { result, execute } = useQuery(() => getNavStats(entity.id), {
     key: `nav-stats-${entity.id}`,
     params: [],
-    executeOnMount: entity.id !== -1,
+    executeOnMount: false,
   })
 
   const biofuels = useBiofuels(result?.data)
@@ -22,6 +22,12 @@ export const usePrivateSidebar = () => {
   const saf = useSaf(result?.data)
   const admin = useAdmin(result?.data)
   const doubleCount = useDoubleCount(result?.data)
+
+  useEffect(() => {
+    if (entity.id !== -1) {
+      execute()
+    }
+  }, [entity.id, execute])
 
   return [admin, ...biofuels, doubleCount, ...elec, ...chargePoints, saf]
     .filter(

@@ -4,7 +4,7 @@ import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
 import { Dropdown, Trigger } from "../../dropdown2"
 
 import { Control } from "../../input"
-import { List } from "../../list2"
+import { List, ListProps } from "../../list2"
 import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
@@ -29,6 +29,7 @@ export interface SelectProps<T, V = T> extends Control, Trigger {
   // If true, the select will take the full width of its container
   full?: boolean
   className?: string
+  children?: ListProps<T, V>["children"]
 }
 
 export function Select<T, V>({
@@ -49,6 +50,7 @@ export function Select<T, V>({
   size = "medium",
   full,
   className,
+  children,
   ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -110,7 +112,9 @@ export function Select<T, V>({
               onChange?.(value)
               setOpen(false)
             }}
-          />
+          >
+            {children}
+          </List>
         </Dropdown>
       )}
     </>

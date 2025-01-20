@@ -87,6 +87,13 @@ export const EntitySelector = ({ className }: { className?: string }) => {
         }
       }}
       placeholder={t("Liste des entités")}
-    />
+    >
+      {({ label, value }) => {
+        if (value === "add-entity") {
+          return <b>{label}</b>
+        }
+        return label
+      }}
+    </Select>
   )
 }

@@ -68,6 +68,14 @@ export const AdminLayout: Story = {
       </>
     ),
   },
+  parameters: {
+    msw: {
+      handlers: [
+        ...(meta.parameters?.msw?.handlers ?? []),
+        mockUser(EntityType.Administration),
+      ],
+    },
+  },
 }
 
 export const ExternalAdminElec: Story = {

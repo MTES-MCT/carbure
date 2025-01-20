@@ -55,14 +55,14 @@ export const ChildItem = ({ child }: ChildItemProps) => {
         )}
         <Text fontWeight="semibold">{child.title}</Text>
       </div>
-      {child.additionalInfo && (
+      {child.additionalInfo ? (
         <Text
           fontWeight="semibold"
           className={styles["nav-item-child-additional-info"]}
         >
           {child.additionalInfo}
         </Text>
-      )}
+      ) : null}
     </NavLink>
   )
 }
