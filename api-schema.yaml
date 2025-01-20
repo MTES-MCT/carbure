@@ -983,6 +983,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/EmptyResponse"
           description: ""
+  /api/nav-stats/:
+    get:
+      operationId: nav_stats_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - nav-stats
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ""
   /api/resources/biofuels:
     get:
       operationId: resources_biofuels_list
