@@ -420,14 +420,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/nav-stats/": {
+  "/api/nav-stats": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["nav_stats_list"]
+    get: operations["nav_stats_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -1440,21 +1440,6 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["EntityPreview"][]
-    }
-    PaginatedNavStatsList: {
-      /** @example 123 */
-      count: number
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null
-      results: components["schemas"]["NavStats"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -2618,19 +2603,11 @@ export interface operations {
       }
     }
   }
-  nav_stats_list: {
+  nav_stats_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        /** @description A page number within the paginated result set. */
-        page?: number
-        /** @description Number of results to return per page. */
-        page_size?: number
-        /** @description A search term. */
-        search?: string
       }
       header?: never
       path?: never
@@ -2643,7 +2620,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedNavStatsList"]
+          "application/json": components["schemas"]["NavStats"]
         }
       }
     }
