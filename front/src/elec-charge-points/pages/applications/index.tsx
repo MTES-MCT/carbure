@@ -12,11 +12,7 @@ import { useTranslation } from "react-i18next"
 import { deleteChargePointsApplication } from "./api"
 import { usePrivateNavigation } from "common/layouts/navigation"
 
-type ChargePointsPendingProps = {
-  year: number
-}
-
-const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
+const ChargePointsApplications = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   usePrivateNavigation(t("Inscription"))
@@ -24,7 +20,7 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
 
   const applicationsResponse = useQuery(apiCpo.getChargePointsApplications, {
     key: "charge-points-applications",
-    params: [entity.id, entity.id, year],
+    params: [entity.id, entity.id],
   })
 
   const deleteApplication = useMutation(
@@ -74,4 +70,4 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   )
 }
 
-export default ChargePointsPending
+export default ChargePointsApplications

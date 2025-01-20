@@ -24,6 +24,11 @@ def quarter(date: date):
     return date.year, (date.month - 1) // 3 + 1
 
 
+def first_day_of_quarter(year, quarter):
+    first_month = (quarter - 1) * 3 + 1
+    return date(year, first_month, 1)
+
+
 def last_day_of_quarter(year, quarter):
     last_month = quarter * 3
     last_day = calendar.monthrange(year, quarter * 3)[1]

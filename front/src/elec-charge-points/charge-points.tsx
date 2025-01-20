@@ -6,7 +6,7 @@ import * as api from "./api"
 import { ChargePointsSnapshot } from "./types"
 import ElecMeterReadingsSettings from "./pages/meter-readings"
 import ChargePointsList from "./pages/list"
-import ChargePointsPending from "./pages/pending"
+import ChargePointsApplications from "./pages/applications"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -41,12 +41,9 @@ const ChargePoints = () => {
           element={<ChargePointsList year={currentYear} snapshot={snapshot} />}
         />
 
-        <Route
-          path="pending"
-          element={<ChargePointsPending year={currentYear} />}
-        />
+        <Route path="applications" element={<ChargePointsApplications />} />
 
-        <Route path="*" element={<Navigate replace to="pending" />} />
+        <Route path="*" element={<Navigate replace to="applications" />} />
       </Routes>
     </Main>
   )

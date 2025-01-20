@@ -48,7 +48,7 @@ export const ROUTE_URLS = {
       PROVISIONNED_ENERGY: `${baseUrl}/provisioned`,
       TRANSFERRED_ENERGY: `${baseUrl}/transferred`,
       CHARGE_POINTS: {
-        PENDING: urlWithOrgId(entity_id, "/charge-points/pending"),
+        PENDING: urlWithOrgId(entity_id, "/charge-points/applications"),
         METER_READINGS: urlWithOrgId(
           entity_id,
           "/charge-points/meter-readings"
@@ -68,7 +68,7 @@ export const ROUTE_URLS = {
       PROVISION: `${baseUrl}/provision`,
       TRANSFER: `${baseUrl}/transfer`,
       CHARGE_POINTS: {
-        PENDING: `${baseChargePointsUrl}/charge-points/pending`,
+        PENDING: `${baseChargePointsUrl}/charge-points`,
         METER_READINGS: `${baseChargePointsUrl}/meter-readings`,
       },
     }
