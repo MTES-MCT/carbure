@@ -68,7 +68,7 @@ export function getUsersRightRequests(
 export function updateUsersRights(
   request_id: number,
   entity_id: number,
-  status?: UserRightStatus
+  status: UserRightStatus
 ) {
   console.log("OKOKOK 66")
   return apiFetch.POST("/entities/users/update-right-request/", {

@@ -84,7 +84,7 @@ export function updateProductionSite(
 }
 
 export function deleteProductionSite(
-  entity_id: number | undefined,
+  entity_id: number,
   production_site_id: number
 ) {
   console.log("OKOKOK 4")

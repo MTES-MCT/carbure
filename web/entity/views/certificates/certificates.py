@@ -62,23 +62,34 @@ class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.Gene
                 OpenApiTypes.INT,
                 OpenApiParameter.QUERY,
                 description="Compay ID, Admin only",
-                required=True,
+                required=False,
             ),
             OpenApiParameter(
                 "production_site_id",
                 OpenApiTypes.INT,
                 OpenApiParameter.QUERY,
                 description="Production site ID",
-                required=True,
+                required=False,
+            ),
+            OpenApiParameter(
+                "query",
+                OpenApiTypes.STR,
+                OpenApiParameter.QUERY,
+                description="Search within the field `certificate_id`",
+                required=False,
             ),
         ],
         responses=EntityCertificateSerializer(many=True),
     )
     def list(self, request):
         entity_id = self.request.query_params.get("entity_id")
+        query = self.request.query_params.get("query", None)
         production_site_id = self.request.query_params.get("production_site_id")
         entity = Entity.objects.get(id=entity_id)
         queryset = self.get_queryset()
+        if query:
+            queryset = queryset.filter(certificate__certificate_id__icontains=query)
+
         if entity.entity_type == Entity.ADMIN:
             company_id = self.request.query_params.get("company_id")
             if company_id:

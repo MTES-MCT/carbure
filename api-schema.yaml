@@ -951,13 +951,11 @@ paths:
           schema:
             type: boolean
           description: Has requests
-          required: true
         - in: query
           name: q
           schema:
             type: string
           description: Search query
-          required: true
       tags:
         - entities
       security:
@@ -1149,7 +1147,6 @@ paths:
           schema:
             type: integer
           description: Compay ID, Admin only
-          required: true
         - in: query
           name: entity_id
           schema:
@@ -1167,7 +1164,11 @@ paths:
           schema:
             type: integer
           description: Production site ID
-          required: true
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `certificate_id`
         - name: search
           required: false
           in: query
@@ -1263,6 +1264,13 @@ paths:
   /api/entities/certificates/check-entity/:
     post:
       operationId: entities_certificates_check_entity_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -1306,6 +1314,13 @@ paths:
   /api/entities/certificates/delete/:
     post:
       operationId: entities_certificates_delete_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -1349,6 +1364,13 @@ paths:
   /api/entities/certificates/reject-entity/:
     post:
       operationId: entities_certificates_reject_entity_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -1392,6 +1414,13 @@ paths:
   /api/entities/certificates/set-default/:
     post:
       operationId: entities_certificates_set_default_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -1435,6 +1464,13 @@ paths:
   /api/entities/certificates/update-certificate/:
     post:
       operationId: entities_certificates_update_certificate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -1484,7 +1520,6 @@ paths:
           schema:
             type: integer
           description: Compay ID, Admin only
-          required: true
         - in: query
           name: entity_id
           schema:
@@ -1862,7 +1897,6 @@ paths:
           schema:
             type: integer
           description: Compay ID, Admin only
-          required: true
         - in: query
           name: entity_id
           schema:
@@ -2833,6 +2867,13 @@ paths:
   /api/entities/users/update-right-request/:
     post:
       operationId: entities_users_update_right_request_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -2876,6 +2917,13 @@ paths:
   /api/entities/users/update-user-role/:
     post:
       operationId: entities_users_update_user_role_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
@@ -4645,8 +4693,7 @@ components:
           type: boolean
           default: false
         blending_entity_id:
-          type: string
-          minLength: 1
+          type: integer
       required:
         - delivery_site_id
         - ownership_type
@@ -5031,8 +5078,7 @@ components:
       type: object
       properties:
         entity_certificate_id:
-          type: string
-          minLength: 1
+          type: integer
       required:
         - entity_certificate_id
     CheckFileResponse:
@@ -5989,6 +6035,8 @@ components:
         vat_number:
           type: string
           maxLength: 32
+        is_enabled:
+          type: boolean
       required:
         - id
         - name
@@ -6986,8 +7034,7 @@ components:
       type: object
       properties:
         entity_certificate_id:
-          type: string
-          minLength: 1
+          type: integer
       required:
         - entity_certificate_id
     RejectDoubleCountingRequest:
@@ -7906,16 +7953,6 @@ components:
             minItems: 2
       required:
         - approved_quotas
-    User:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
     UserCreation:
       type: object
       description: |-
@@ -8171,7 +8208,10 @@ components:
           type: integer
           readOnly: true
         user:
-          $ref: "#/components/schemas/User"
+          type: array
+          items:
+            type: string
+          readOnly: true
         entity:
           $ref: "#/components/schemas/EntityUserEntity"
         date_requested:

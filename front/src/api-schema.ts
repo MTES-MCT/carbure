@@ -1546,7 +1546,7 @@ export interface components {
       ownership_type: components["schemas"]["OwnershipTypeEnum"]
       /** @default false */
       blending_is_outsourced: boolean
-      blending_entity_id?: string
+      blending_entity_id?: number
     }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
@@ -1690,7 +1690,7 @@ export interface components {
       files: string[]
     }
     CheckCertificateRequest: {
-      entity_certificate_id: string
+      entity_certificate_id: number
     }
     CheckFileResponse: {
       file: components["schemas"]["File"]
@@ -2048,6 +2048,7 @@ export interface components {
       /** Format: uri */
       website?: string
       vat_number?: string
+      is_enabled?: boolean
     }
     EntityBiofuel: {
       name: string
@@ -2437,7 +2438,7 @@ export interface components {
       is_in_europe: boolean
     }
     RejectCertificateRequest: {
-      entity_certificate_id: string
+      entity_certificate_id: number
     }
     RejectDoubleCountingRequest: {
       dca_id: number
@@ -2800,13 +2801,6 @@ export interface components {
     UpdatedQuotasRequest: {
       approved_quotas: number[][]
     }
-    User: {
-      /**
-       * Adresse électronique
-       * Format: email
-       */
-      email: string
-    }
     /** @description Serializer for creating new users. Includes required fields
      *     and repeated password validation. */
     UserCreation: {
@@ -2896,7 +2890,7 @@ export interface components {
     }
     UserRightsRequestsSeriaizer: {
       readonly id: number
-      user: components["schemas"]["User"]
+      readonly user: string[]
       entity: components["schemas"]["EntityUserEntity"]
       /** Format: date-time */
       readonly date_requested: string
@@ -3656,9 +3650,9 @@ export interface operations {
         /** @description Entity ID */
         entity_id: number
         /** @description Has requests */
-        has_requests: boolean
+        has_requests?: boolean
         /** @description Search query */
-        q: string
+        q?: string
       }
       header?: never
       path?: never
@@ -3812,13 +3806,15 @@ export interface operations {
     parameters: {
       query: {
         /** @description Compay ID, Admin only */
-        company_id: number
+        company_id?: number
         /** @description Entity ID */
         entity_id: number
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Production site ID */
-        production_site_id: number
+        production_site_id?: number
+        /** @description Search within the field `certificate_id` */
+        query?: string
         /** @description A search term. */
         search?: string
       }
@@ -3900,7 +3896,10 @@ export interface operations {
   }
   entities_certificates_check_entity_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -3935,7 +3934,10 @@ export interface operations {
   }
   entities_certificates_delete_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -3970,7 +3972,10 @@ export interface operations {
   }
   entities_certificates_reject_entity_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -4005,7 +4010,10 @@ export interface operations {
   }
   entities_certificates_set_default_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -4040,7 +4048,10 @@ export interface operations {
   }
   entities_certificates_update_certificate_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -4077,7 +4088,7 @@ export interface operations {
     parameters: {
       query: {
         /** @description Compay ID, Admin only */
-        company_id: number
+        company_id?: number
         /** @description Entity ID */
         entity_id: number
         /** @description Which field to use when ordering the results. */
@@ -4359,7 +4370,7 @@ export interface operations {
     parameters: {
       query: {
         /** @description Compay ID, Admin only */
-        company_id: number
+        company_id?: number
         /** @description Entity ID */
         entity_id: number
       }
@@ -5096,7 +5107,10 @@ export interface operations {
   }
   entities_users_update_right_request_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -5131,7 +5145,10 @@ export interface operations {
   }
   entities_users_update_user_role_create: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never

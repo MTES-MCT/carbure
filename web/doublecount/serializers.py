@@ -40,6 +40,7 @@ class EntitySerializer(serializers.ModelSerializer):
             "activity_description",
             "website",
             "vat_number",
+            "is_enabled",
         ]
 
 

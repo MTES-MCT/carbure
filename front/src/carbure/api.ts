@@ -106,22 +106,31 @@ export async function findCertificates(query: string) {
   return res.data?.map((c) => c.certificate_id) ?? []
 }
 
-export function findMyCertificates(
+export async function findMyCertificates(
   query: string,
   options: {
-    entity_id?: number | null
-    production_site_id?: number | null | undefined
+    entity_id: number
+    production_site_id?: number
   }
 ) {
   console.log("OKOKOK 90", query, "opt", options)
-  return apiFetch
-    .GET("/entities/certificates/", {
-      params: { query: { query, ...options } },
-    })
-    .then(extract)
-    .then((certificates) =>
-      certificates.map((c) => c.certificate.certificate_id)
-    )
+  // return apiFetch
+  //   .GET("/entities/certificates/", {
+  //     params: { query: { query, ...options } },
+  //   })
+  //   .then(extract)
+  //   .then((certificates) =>
+  //     certificates.map((c) => c.certificate.certificate_id)
+  // )
+  const res = await apiFetch.GET("/entities/certificates/", {
+    params: { query: { query, ...options } },
+  })
+  return (
+    res.data?.map(
+      (c: { certificate: { certificate_id: string } }) =>
+        c.certificate.certificate_id
+    ) ?? []
+  )
 }
 
 export async function getNotifications(entity_id: number) {

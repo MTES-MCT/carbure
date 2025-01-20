@@ -1,5 +1,11 @@
 from django.conf import settings
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -16,6 +22,15 @@ class UpdateRightsRequestsSerializer(serializers.Serializer):
 
 class UpdateRightsRequestsActionMixin:
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
         request=UpdateRightsRequestsSerializer,
         responses={
             200: OpenApiResponse(

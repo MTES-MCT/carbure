@@ -59,7 +59,7 @@ class ProductionSiteViewSet(ViewSet, ActionMixin):
                 OpenApiTypes.INT,
                 OpenApiParameter.QUERY,
                 description="Compay ID, Admin only",
-                required=True,
+                required=False,
             ),
         ],
         responses=EntityProductionSiteSerializer,

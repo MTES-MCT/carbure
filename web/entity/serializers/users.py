@@ -8,7 +8,9 @@ from core.models import Entity, Pays, UserRights, UserRightsRequests
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ["email"]
+        fields = [
+            "email",
+        ]
 
 
 class PaysSerializer(serializers.ModelSerializer):
@@ -74,9 +76,13 @@ class EntityMetricsSerializer(serializers.Serializer):
     meter_readings_pending = serializers.IntegerField()
 
 
+class SimplifiedUserSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
 class UserRightsRequestsSeriaizer(serializers.ModelSerializer):
     entity = EntityUserEntitySerializer()
-    user = UserSerializer()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = UserRightsRequests
@@ -90,6 +96,17 @@ class UserRightsRequestsSeriaizer(serializers.ModelSerializer):
             "role",
             "expiration_date",
         ]
+
+    @extend_schema_field(
+        {
+            "type": "array",
+            "items": {
+                "type": "string",
+            },
+        }
+    )
+    def get_user(self, obj):
+        return [obj.user.email]
 
 
 class UserRightsSeriaizer(serializers.ModelSerializer):

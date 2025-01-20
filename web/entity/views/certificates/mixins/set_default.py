@@ -1,6 +1,6 @@
 import traceback
 
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,6 +20,15 @@ class SetDefaultCertificateSerializer(serializers.Serializer):
 
 class SetDefaultCertificateActionMixin:
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
         request=SetDefaultCertificateSerializer,
         responses={
             200: OpenApiResponse(

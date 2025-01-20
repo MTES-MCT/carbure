@@ -45,7 +45,7 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
                 OpenApiTypes.INT,
                 OpenApiParameter.QUERY,
                 description="Compay ID, Admin only",
-                required=True,
+                required=False,
             ),
         ],
         responses=EntitySiteSerializer(many=True),

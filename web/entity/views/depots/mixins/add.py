@@ -21,7 +21,7 @@ class AddDepotSerializer(serializers.Serializer):
     delivery_site_id = serializers.CharField(required=True)
     ownership_type = serializers.ChoiceField(choices=EntitySite.TYPE_OWNERSHIP, required=True)
     blending_is_outsourced = serializers.BooleanField(default=False, required=False)
-    blending_entity_id = serializers.CharField(required=False)
+    blending_entity_id = serializers.IntegerField(required=False)
 
 
 class AddDepotActionMixin:

@@ -28,7 +28,7 @@ export const ChangeUserRoleDialog = ({
   const [role, setRole] = useState<UserRole | undefined>(request.role)
   // Portal is not reactif, we can't pass loading state from parent mutation
   const [loading, setLoading] = useState(false)
-  const userEmail = request.user?.email
+  const userEmail = request.user[0]
 
   const handleSubmit = async () => {
     if (role) {

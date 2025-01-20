@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -9,10 +8,6 @@ from core.models import UserRightsRequests
 from entity.serializers import UserRightsRequestsSeriaizer
 
 User = get_user_model()
-
-
-class RightsRequestsSerializer(serializers.Serializer):
-    request_id = serializers.PrimaryKeyRelatedField(queryset=UserRightsRequests.objects.all())
 
 
 class RightsRequestsActionMixin:

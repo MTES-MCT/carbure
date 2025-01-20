@@ -1,5 +1,5 @@
 from django.db import transaction
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -14,6 +14,15 @@ class UpdateUserRoleSerializer(serializers.Serializer):
 
 class UpdatUserRoleActionMixin:
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
         request=UpdateUserRoleSerializer,
         responses={
             200: OpenApiResponse(

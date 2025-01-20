@@ -47,7 +47,7 @@ const Certificates = ({
         c.certificate.certificate_holder,
         c.certificate.certificate_type,
         c.entity.name,
-        c.entity.entity_type,
+        c.entity.entity_type ?? "Unknown",
       ]) && hasCertificatFilter(c, certificatsFilter)
   )
 

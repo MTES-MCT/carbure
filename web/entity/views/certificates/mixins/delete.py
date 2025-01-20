@@ -1,5 +1,5 @@
 from django.db.models.query_utils import Q
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -27,6 +27,15 @@ class DeleteCertificateSerializer(serializers.Serializer):
 
 class DeleteCertificateActionMixin:
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            )
+        ],
         request=DeleteCertificateSerializer,
         responses={
             200: OpenApiResponse(
