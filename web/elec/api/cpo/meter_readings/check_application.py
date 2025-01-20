@@ -8,7 +8,6 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.models.elec_meter_reading import ElecMeterReading
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
@@ -51,9 +50,8 @@ def check_application(request: HttpRequest, entity):
         return ErrorResponse(400, CheckMeterReadingApplicationError.METER_READINGS_FOR_QUARTER_ALREADY_EXISTS)
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
-    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
+    past_readings = MeterReadingRepository.get_cpo_meter_readings(entity)
 
     # get the first day of this quarter so we can verify that the readings are for the current quarter
     beginning_of_quarter = first_day_of_quarter(year, quarter)
@@ -61,8 +59,7 @@ def check_application(request: HttpRequest, entity):
     meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
-        previous_readings,
-        previous_application,
+        past_readings,
         renewable_share,
         beginning_of_quarter,
     )
