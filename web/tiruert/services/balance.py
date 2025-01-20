@@ -9,7 +9,7 @@ from tiruert.models import Operation
 
 class BalanceService:
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by):
+    def calculate_balance(operations, entity_id, group_by, unit="l"):
         """
         Keep only PENDING and ACCEPTED operations
         Group by sector, customs_category and biofuel (and lot if needed)
@@ -26,7 +26,7 @@ class BalanceService:
                 "emission_rate_per_mj": 0,
                 "teneur": 0,
                 "pending": 0,
-                "pci": 0,
+                "unit": "l",
             }
         )
 
@@ -36,7 +36,7 @@ class BalanceService:
             if operation.is_acquisition(entity_id) and operation.status == Operation.PENDING:
                 continue
 
-            pci = operation.biofuel.pci_litre
+            pci = operation.biofuel.pci_litre if unit == "mj" else 1  # pci = 1 if unit is in litres
 
             for detail in operation.details.all():
                 key = (operation.sector, operation.customs_category, operation.biofuel.code)
@@ -53,23 +53,24 @@ class BalanceService:
                     balance[key]["biofuel"] = operation.biofuel.code
 
                 balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
-                balance[key]["pci"] = pci
 
                 if operation.type == Operation.TENEUR and group_by != "lot":
-                    balance[key]["teneur"] += detail.volume
+                    balance[key]["teneur"] += detail.volume * pci
                 else:
                     if operation.is_credit(entity_id):
-                        balance[key]["volume"]["credit"] += detail.volume
+                        balance[key]["volume"]["credit"] += detail.volume * pci
                     else:
-                        balance[key]["volume"]["debit"] += detail.volume
+                        balance[key]["volume"]["debit"] += detail.volume * pci
 
             if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
 
+            balance[key]["unit"] = unit
+
         return balance
 
     @staticmethod
-    def calculate_initial_balance(balance, entity_id, until_date, group_by):
+    def calculate_initial_balance(balance, entity_id, until_date, group_by, unit="l"):
         """
         Calculate initial balances for the given entity until the given date
         and add them to the balance dict
@@ -82,10 +83,11 @@ class BalanceService:
         initial_balances = defaultdict(int)
 
         for operation in operations:
-            key, balance = BalanceService.set_keys_and_initial_balance(operation, balance, group_by)
+            key, balance = BalanceService.set_keys_and_initial_balance(operation, balance, group_by, unit)
+            pci = operation.biofuel.pci_litre if unit == "mj" else 1
 
             for detail in operation.details.all():
-                initial_balances[key] += detail.volume if operation.is_credit(entity_id) else -detail.volume
+                initial_balances[key] += (detail.volume if operation.is_credit(entity_id) else -detail.volume) * pci
 
         for key in balance:
             balance[key]["initial_balance"] = initial_balances[key]
@@ -93,7 +95,7 @@ class BalanceService:
         return balance
 
     @staticmethod
-    def calculate_yearly_teneur(balance, entity_id, until_date, group_by):
+    def calculate_yearly_teneur(balance, entity_id, until_date, group_by, unit="l"):
         """
         Calculate yearly teneur for the given entity, from the beginning of the year
         to the until_date given, and add them to the balance dict
@@ -115,10 +117,11 @@ class BalanceService:
         yearly_teneurs = defaultdict(int)
 
         for operation in operations:
-            key, balance = BalanceService.set_keys_and_initial_balance(operation, balance, group_by)
+            key, balance = BalanceService.set_keys_and_initial_balance(operation, balance, group_by, unit)
+            pci = operation.biofuel.pci_litre if unit == "mj" else 1
 
             for detail in operation.details.all():
-                yearly_teneurs[key] += detail.volume
+                yearly_teneurs[key] += detail.volume * pci
 
         for key in balance:
             balance[key]["yearly_teneur"] = yearly_teneurs[key]
@@ -126,7 +129,7 @@ class BalanceService:
         return balance
 
     @staticmethod
-    def set_keys_and_initial_balance(operation, balance, group_by):
+    def set_keys_and_initial_balance(operation, balance, group_by, unit):
         key = (
             operation.sector
             if group_by == "sector"
@@ -145,6 +148,7 @@ class BalanceService:
                 "teneur": 0,
                 "yearly_teneur": 0,
                 "initial_balance": 0,
+                "unit": unit,
             }
             if group_by != "sector":
                 balance[key]["customs_category"] = operation.customs_category

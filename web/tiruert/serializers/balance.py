@@ -13,7 +13,7 @@ class BalanceSerializer(serializers.Serializer):
     teneur = serializers.FloatField(required=False)
     yearly_teneur = serializers.FloatField(required=False)
     pending = serializers.IntegerField()
-    pci = serializers.IntegerField()
+    unit = serializers.CharField(required=False)
 
     def to_representation(self, instance):
         # Overrides the default representation to remove fields with null values.
@@ -39,8 +39,6 @@ class LotSerializer(serializers.Serializer):
 class BalanceByLotSerializer(serializers.Serializer):
     customs_category = serializers.CharField(required=False, allow_null=True)
     biofuel = serializers.CharField(required=False, allow_null=True)
-    pci = serializers.IntegerField()
-
     lots = LotSerializer(many=True, required=False)
 
     @staticmethod
@@ -56,7 +54,6 @@ class BalanceByLotSerializer(serializers.Serializer):
                 grouped_balance[group_key] = {
                     "customs_category": customs_cat,
                     "biofuel": biofuel,
-                    "pci": value["pci"],
                     "lots": [],
                 }
 

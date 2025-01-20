@@ -32,9 +32,8 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "to_depot",
             "created_at",
             "validity_date",
-            "volume_l",
-            "volume_mj",
-            # "emission_rate_per_mj",
+            "volume",
+            "unit",
             "details",
         ]
 
@@ -46,8 +45,8 @@ class OperationOutputSerializer(serializers.ModelSerializer):
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
-    volume_l = serializers.SerializerMethodField()
-    volume_mj = serializers.SerializerMethodField()
+    volume = serializers.SerializerMethodField()
+    unit = serializers.SerializerMethodField()
 
     def get_type(self, instance):
         entity_id = self.context.get("entity_id")
@@ -62,8 +61,12 @@ class OperationOutputSerializer(serializers.ModelSerializer):
     def get_volume_l(self, instance):
         return sum(detail.volume for detail in instance.details.all())
 
-    def get_volume_mj(self, instance):
-        return self.get_volume_l(instance) * instance.biofuel.pci_litre
+    def get_volume(self, instance):
+        pci = instance.biofuel.pci_litre if self.context.get("unit") == "mj" else 1
+        return self.get_volume_l(instance) * pci
+
+    def get_unit(self, instance):
+        return self.context.get("unit")
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
