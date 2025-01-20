@@ -14,18 +14,6 @@ export type ButtonProps = ButtonDSFRProps &
     loading?: boolean
   }
 
-export const BaseButton = forwardRef<HTMLButtonElement, ButtonProps>(
-  (props, ref) =>
-    !props.linkProps ? (
-      <ButtonDSFR
-        {...props}
-        ref={ref}
-        {...layout(props)}
-        disabled={Boolean(props.disabled || props.loading)}
-      />
-    ) : null
-)
-
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   ButtonProps

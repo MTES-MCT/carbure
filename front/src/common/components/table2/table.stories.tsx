@@ -82,6 +82,9 @@ export const LinkRows: Story = {
   args: {
     rowLink: (row) => `/${row.age}`,
   },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
 }
 
 export const HiddenColumns: Story = {

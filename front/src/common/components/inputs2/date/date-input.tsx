@@ -1,4 +1,3 @@
-import { forwardRef } from "react"
 import { Input, InputProps } from "../input"
 
 export type DateInputProps = InputProps & {
@@ -6,17 +5,14 @@ export type DateInputProps = InputProps & {
   onChange?: (value: string | undefined) => void
 }
 
-export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
-  ({ value, onChange, ...props }, ref) => {
-    return (
-      <Input
-        {...props}
-        ref={ref}
-        nativeInputProps={{
-          value,
-          onChange: onChange ? (e) => onChange(e.target.value) : undefined,
-        }}
-      />
-    )
-  }
-)
+export const DateInput = ({ value, onChange, ...props }: DateInputProps) => {
+  return (
+    <Input
+      {...props}
+      nativeInputProps={{
+        value,
+        onChange: onChange ? (e) => onChange(e.target.value) : undefined,
+      }}
+    />
+  )
+}

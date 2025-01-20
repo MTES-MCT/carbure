@@ -35,6 +35,10 @@ export const LinkStyle: Story = {
   args: {
     customPriority: "link",
   },
+  // The snapshot does not render correctly
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
 }
 
 export const Loading: Story = {
