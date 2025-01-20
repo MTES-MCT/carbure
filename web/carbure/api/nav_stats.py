@@ -34,6 +34,9 @@ class NavStatsSerializer(serializers.Serializer):
 
 
 class NavStatsViewSet(ListModelMixin, GenericViewSet):
+    def get_queryset(self):
+        return Entity.objects.none()
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -47,6 +50,9 @@ class NavStatsViewSet(ListModelMixin, GenericViewSet):
         responses={"200": NavStatsSerializer},
     )
     def list(self, request, *args, **kwargs):
+        if not self.request or not self.request.user:
+            return Response({})
+
         # @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
         entity_id = request.GET["entity_id"]
         entity = Entity.objects.get(id=entity_id)
