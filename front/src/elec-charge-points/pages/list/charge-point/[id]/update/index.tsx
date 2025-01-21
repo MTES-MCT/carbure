@@ -69,6 +69,12 @@ const UpdateChargePointDialog = () => {
             "Cet identifiant est déjà utilisé pour un autre point de charge."
           ),
         },
+        INITIAL_INDEX_CANNOT_BE_UPDATED: {
+          field: "measure_energy",
+          error: t(
+            "Ce compteur a déjà des relevés associés, veuillez contacter l'administration si vous souhaitez modifier l'index initial de ce compteur."
+          ),
+        },
       }
       const error = (e as AxiosError<{ error: string }>).response?.data.error
 
