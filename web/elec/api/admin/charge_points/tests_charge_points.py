@@ -198,6 +198,8 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "latitude": None,
                     "longitude": None,
+                    "initial_index": 1000.123,
+                    "initial_index_date": "2023-06-29",
                 },
                 {
                     "id": charge_point2.id,
@@ -220,6 +222,8 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "latitude": None,
                     "longitude": None,
+                    "initial_index": 1000.123,
+                    "initial_index_date": "2023-06-29",
                 },
             ],
         }
@@ -280,6 +284,8 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "latitude": None,
                     "longitude": None,
+                    "initial_index": 1000.123,
+                    "initial_index_date": "2023-06-29",
                 }
             ],
         }
