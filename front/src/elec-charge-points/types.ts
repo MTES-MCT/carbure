@@ -37,6 +37,8 @@ export type ChargePoint = {
   longitude: number
   nominal_power: number
   measure_reference_point_id: string // See more https://particulier.edf.fr/fr/accueil/aide-contact/faq/compteur/numero-prm.html
+  initial_index: number
+  initial_index_date: string
 }
 
 export type ElecMeter = {
