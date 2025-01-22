@@ -614,6 +614,8 @@ class ElecCharginPointsTest(TestCase):
                         "status": "PENDING",
                         "latitude": None,
                         "longitude": None,
+                        "initial_index": 1000.1234,
+                        "initial_index_date": "2023-06-29",
                     },
                     {
                         "id": charge_point2.id,
@@ -636,6 +638,8 @@ class ElecCharginPointsTest(TestCase):
                         "status": "PENDING",
                         "latitude": None,
                         "longitude": None,
+                        "initial_index": 1000.1234,
+                        "initial_index_date": "2023-06-29",
                     },
                 ],
                 "ids": [charge_point.id, charge_point2.id],
@@ -862,6 +866,8 @@ class ElecCharginPointsTest(TestCase):
                 "status": "PENDING",
                 "latitude": None,
                 "longitude": None,
+                "initial_index": 1000.1234,
+                "initial_index_date": "2023-06-29",
             },
         }
         data = response.json()
@@ -935,6 +941,8 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "latitude": None,
                     "longitude": None,
+                    "initial_index": 1000.1234,
+                    "initial_index_date": "2023-06-29",
                 }
             ],
         }
