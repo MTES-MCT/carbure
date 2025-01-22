@@ -33,6 +33,6 @@
 
 
 
-/label ~"type::bug"
+/label ~"type::Bug"
 <!-- If you don't have /label privileges, follow up with an issue comment of `@gitlab-bot label ~"type::bug"` -->
 
