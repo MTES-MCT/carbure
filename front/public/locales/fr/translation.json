@@ -882,7 +882,7 @@
   "Inscrire des points de recharge": "Inscrire des points de recharge",
   "Aucun point de recharge trouvé": "Aucun point de recharge trouvé",
   "Inscription des points de recharge": "Inscription des points de recharge",
-  "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier._one": "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier.",
+  "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier._one": "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérence</b>.  Veuillez la corriger puis recharger à nouveau votre fichier.",
   "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier._many": "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier.",
   "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier._other": "Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier.",
   "Envoyer la demande d'inscription": "Envoyer la demande d'inscription",
@@ -915,7 +915,7 @@
   "La demande d'inscription des {{count}} points de recharge a été ajoutée !_other": "La demande d'inscription des {{count}} points de recharge a été ajoutée !",
   "Impossible d'envoyer la demande d'inscription de points de recharges": "Impossible d'envoyer la demande d'inscription de points de recharges",
   "Votre fichier <b>{{fileName}}</b> ne comporte aucune erreur.": "Votre fichier <b>{{fileName}}</b> ne comporte aucune erreur.",
-  "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe._one": "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe.",
+  "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe._one": "Le point de recharge peut être inscrit à votre espace CarbuRe.",
   "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe._many": "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe.",
   "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe._other": "Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe.",
   "Un échantillon de points de recharge vous sera transmis directement par e-mail de notre part dans le but de réaliser un audit.": "Un échantillon de points de recharge vous sera transmis directement par e-mail de notre part dans le but de réaliser un audit.",
@@ -943,7 +943,6 @@
   "Cet identifiant est déjà utilisé pour un autre point de charge.": "Cet identifiant est déjà utilisé pour un autre point de charge.",
   "Ce compteur a déjà des relevés associés, veuillez contacter l'administration si vous souhaitez modifier l'index initial de ce compteur.": "Ce compteur a déjà des relevés associés, veuillez contacter l'administration si vous souhaitez modifier l'index initial de ce compteur.",
   "Une erreur est survenue lors de la mise à jour du point de recharge.": "Une erreur est survenue lors de la mise à jour du point de recharge.",
-  "PDC": "PDC",
   "Point de recharge non trouvé.": "Point de recharge non trouvé.",
   "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur": "Pour modifier ce champ, veuillez contacter directement l'équipe de CarbuRe sur",
   "Longitude": "Longitude",
@@ -976,7 +975,7 @@
   "Téléchargez le relevé à remplir :": "Téléchargez le relevé à remplir :",
   "Remplissez les colonnes en bleu (C et D) correspondant aux relevés du trimestre actuel": "Remplissez les colonnes en bleu (C et D) correspondant aux relevés du trimestre actuel",
   "Déposez le fichier ci-dessous : ": "Déposez le fichier ci-dessous : ",
-  "Les {{count}} relevés trimestriels ont bien été envoyés !_one": "Les {{count}} relevés trimestriels ont bien été envoyés !",
+  "Les {{count}} relevés trimestriels ont bien été envoyés !_one": "Le relevé trimestriel a bien été envoyé !",
   "Les {{count}} relevés trimestriels ont bien été envoyés !_many": "Les {{count}} relevés trimestriels ont bien été envoyés !",
   "Les {{count}} relevés trimestriels ont bien été envoyés !_other": "Les {{count}} relevés trimestriels ont bien été envoyés !",
   "Impossible d'envoyer les relevés trimestriels.": "Impossible d'envoyer les relevés trimestriels.",
@@ -1640,5 +1639,6 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} lots</b> présentent des <b>incohérences</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
-  "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>"
+  "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
+  "Brouillon_plural": "Brouillons"
 }
