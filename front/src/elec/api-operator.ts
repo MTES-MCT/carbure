@@ -74,10 +74,14 @@ export function rejectTransfer(
 
 export function acceptTransfer(
   entity_id: number,
-  transfer_certificate_id: number
+  transfer_certificate_id: number,
+  used_in_tiruert: boolean,
+  consumption_date?: string
 ) {
   return api.post("/elec/operator/accept-transfer-certificate", {
     entity_id,
     transfer_certificate_id,
+    used_in_tiruert,
+    consumption_date,
   })
 }

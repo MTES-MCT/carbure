@@ -25,6 +25,8 @@ export interface ElecTransferCertificatePreview {
   energy_amount: number
   status: ElecTransferCertificateStatus
   certificate_id: number
+  used_in_tiruert: boolean
+  consumption_date: string
 }
 
 export interface ElecTransferCertificate
