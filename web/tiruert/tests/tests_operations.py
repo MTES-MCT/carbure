@@ -33,11 +33,13 @@ class TiruertOperationsTest(TestCase):
             "customs_category",
             "biofuel",
             "credited_entity",
+            "debited_entity",
             "from_depot",
             "to_depot",
             "created_at",
             "validity_date",
             "volume",
+            "unit",
         ]
 
         query = {

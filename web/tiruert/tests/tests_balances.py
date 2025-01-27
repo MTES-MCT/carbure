@@ -17,31 +17,33 @@ class TiruertBalancesTest(TestCase):
                 "sector": "ESSENCE",
                 "customs_category": "CONV",
                 "biofuel": "ETH",
-                "initial_balance": "0.00",
-                "available_balance": "10000.00",
-                "final_balance": "10000.00",
-                "volume": {"credit": "10000.00", "debit": "0.00"},
-                "teneur": "0.00",
+                "initial_balance": 0.0,
+                "available_balance": 10000.0,
+                "final_balance": 10000.0,
+                "volume": {"credit": 10000.0, "debit": 0.0},
+                "teneur": 0.0,
                 "pending": 0,
+                "unit": "l",
             },
             {
                 "sector": "DIESEL",
                 "customs_category": "ANN-IX-A",
                 "biofuel": "EMAG",
-                "initial_balance": "0.00",
-                "available_balance": "5000.00",
-                "final_balance": "5000.00",
-                "volume": {"credit": "5000.00", "debit": "0.00"},
-                "teneur": "0.00",
+                "initial_balance": 0.0,
+                "available_balance": 5000.0,
+                "final_balance": 5000.0,
+                "volume": {"credit": 5000.0, "debit": 0.0},
+                "teneur": 0.0,
                 "pending": 0,
+                "unit": "l",
             },
         ]
 
         response = self.client.get(reverse("operations-balance"), query)
         data = response.json()
         assert response.status_code == 200
-        assert len(data) == 2
-        assert data == expected_response
+        assert response.json()["count"] == 2
+        assert data["results"] == expected_response
 
     def test_view_balances_by_sector(self):
         query = {
@@ -52,28 +54,30 @@ class TiruertBalancesTest(TestCase):
         expected_response = [
             {
                 "sector": "ESSENCE",
-                "initial_balance": "0.00",
-                "available_balance": "10000.00",
-                "final_balance": "10000.00",
-                "volume": {"credit": "10000.00", "debit": "0.00"},
-                "teneur": "0.00",
+                "initial_balance": 0.0,
+                "available_balance": 10000.0,
+                "final_balance": 10000.0,
+                "volume": {"credit": 10000.0, "debit": 0.0},
+                "teneur": 0.0,
                 "pending": 0,
+                "unit": "l",
             },
             {
                 "sector": "DIESEL",
-                "initial_balance": "0.00",
-                "available_balance": "5000.00",
-                "final_balance": "5000.00",
-                "volume": {"credit": "5000.00", "debit": "0.00"},
-                "teneur": "0.00",
+                "initial_balance": 0.0,
+                "available_balance": 5000.0,
+                "final_balance": 5000.0,
+                "volume": {"credit": 5000.0, "debit": 0.0},
+                "teneur": 0.0,
                 "pending": 0,
+                "unit": "l",
             },
         ]
 
         response = self.client.get(reverse("operations-balance"), query)
-        data = response.json()
         assert response.status_code == 200
-        assert len(data) == 2
+        assert response.json()["count"] == 2
+        data = response.json()["results"]
         assert data == expected_response
 
     def test_view_balances_by_lot(self):
@@ -83,9 +87,9 @@ class TiruertBalancesTest(TestCase):
         }
 
         response = self.client.get(reverse("operations-balance"), query)
-        data = response.json()
         assert response.status_code == 200
-        assert len(data) == 2
+        assert response.json()["count"] == 2
+        data = response.json()["results"]
         assert list(data[0].keys()) == ["customs_category", "biofuel", "lots"]
         assert list(data[0]["lots"][0].keys()) == ["lot", "volume", "emission_rate_per_mj"]
         assert len(data[0]["lots"]) == 4
@@ -126,7 +130,7 @@ class TiruertBalancesTest(TestCase):
         response = self.client.post(reverse("operations-simulate-min-max"), query)
         assert response.status_code == 400
         data = response.json()
-        assert data == ["INSUFFICIENT_INPUT_VOLUME"]
+        assert data == {"error": "INSUFFICIENT_INPUT_VOLUME"}
 
     def test_view_balances_simulate_success(self):
         query = {
@@ -142,7 +146,9 @@ class TiruertBalancesTest(TestCase):
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
-        assert list(data[0].keys()) == ["lot_id", "volume", "emission_rate_per_mj", "fun"]
+        assert list(data.keys()) == ["selected_lots", "fun"]
+        assert len(data["selected_lots"]) == 2
+        assert list(data["selected_lots"][0].keys()) == ["lot_id", "volume", "emission_rate_per_mj"]
 
     def test_view_balances_simulate_no_results(self):
         query = {
@@ -157,4 +163,4 @@ class TiruertBalancesTest(TestCase):
         response = self.client.post(reverse("operations-simulate"), query)
         assert response.status_code == 400
         data = response.json()
-        assert data == ["NO_SUITABLE_LOTS_FOUND"]
+        assert data == {"error": "NO_SUITABLE_LOTS_FOUND"}
