@@ -36,6 +36,7 @@ class ValidateDeclarationTest(TestCase):
             year=2022,
             declared_by_supplier=False,
             declared_by_client=True,
+            delivery_type=CarbureLot.DIRECT,
         )
 
         # create received lots
@@ -49,6 +50,7 @@ class ValidateDeclarationTest(TestCase):
             year=2022,
             declared_by_supplier=True,
             declared_by_client=False,
+            delivery_type=CarbureLot.DIRECT,
         )
 
     def get_entity_lots(self, **kwargs):

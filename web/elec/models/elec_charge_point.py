@@ -1,4 +1,5 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from core.models import Entity
 from elec.models.elec_charge_point_application import ElecChargePointApplication
@@ -40,6 +41,14 @@ class ElecChargePoint(models.Model):
     longitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
 
     is_deleted = models.BooleanField(default=False)
+    history = HistoricalRecords(
+        custom_model_name="ElecChargePointHistory",
+        table_name="elec_charge_point_history",
+        history_change_reason_field=models.CharField(max_length=100, null=True),
+        verbose_name="Historique point de recharge",
+        verbose_name_plural="Historiques des points de recharge",
+        cascade_delete_history=True,
+    )
 
     @property
     def mid_id(self):

@@ -15,4 +15,5 @@ urlpatterns = [
     path("elec/", include("elec.api")),
     path("home-stats", get_home_stats, name="carbure-home-stats"),
     path("nav-stats", get_nav_stats, name="carbure-nav-stats"),
+    path("tiruert/", include("tiruert.urls")),
 ]

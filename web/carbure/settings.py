@@ -99,6 +99,8 @@ INSTALLED_APPS = [
     "saf",
     "transactions",
     "elec",
+    "simple_history",
+    "tiruert",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -117,6 +119,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "carbure.middlewares.logging.LoggingMiddleware",
     "carbure.middlewares.exception.ExceptionMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 ROOT_URLCONF = "carbure.urls"
