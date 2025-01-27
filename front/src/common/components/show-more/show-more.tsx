@@ -41,7 +41,7 @@ export const ShowMore = ({
 
     const containerWidth = containerRef?.current?.offsetWidth ?? 0
     const showMoreButtonWidth = showMoreButtonRef?.current?.offsetWidth ?? 0
-
+    console.log("btn width", showMoreButtonWidth)
     const findOverflow = (defaultWidth = 0) => {
       if (!hiddenElementsRef?.current?.children) return -1
 
@@ -86,7 +86,12 @@ export const ShowMore = ({
   }, [getFirstOverflowIndex, _setVisibleItems, children])
 
   useEffect(() => {
-    if (!containerRef.current || !hiddenElementsRef.current) return
+    if (
+      !containerRef.current ||
+      !hiddenElementsRef.current ||
+      !showMoreButtonRef.current
+    )
+      return
 
     const resizeObserver = new ResizeObserver(() => {
       setVisibleItems()
@@ -94,6 +99,7 @@ export const ShowMore = ({
 
     // Define a observer on the hidden element div to trigger the setVisibleItems function when the size of the hidden element div changes
     resizeObserver.observe(hiddenElementsRef.current)
+    resizeObserver.observe(showMoreButtonRef.current)
 
     return () => {
       resizeObserver.disconnect()
@@ -117,6 +123,7 @@ export const ShowMore = ({
           priority="tertiary no outline"
           customPriority="link"
           nativeButtonProps={{ role: "none" }}
+          className={styles["show-more-button"]}
         >
           {showMoreText}
         </Button>
