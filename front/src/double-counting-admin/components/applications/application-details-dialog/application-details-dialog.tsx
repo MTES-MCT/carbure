@@ -17,7 +17,7 @@ import { ApplicationInfo } from "../application-info"
 import ApplicationStatus from "../../../../double-counting/components/application-status"
 import ApplicationTabs from "../application-tabs"
 import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
-import ApplicationDetailsDialogGenerateDecision from "./application-details-dialog-generate-decision"
+import GenerateDecisionDialog from "double-counting-admin/components/generate-decision-dialog/generate-decision-dialog"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -151,10 +151,7 @@ export const ApplicationDetailsDialog = () => {
     }
 
     portal((close) => (
-      <ApplicationDetailsDialogGenerateDecision
-        application={application}
-        onClose={close}
-      />
+      <GenerateDecisionDialog application={application} onClose={close} />
     ))
   }
 

@@ -3,9 +3,9 @@ import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
 import { Return } from "common/components/icons"
-import Portal from "common/components/portal"
+import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
@@ -23,21 +23,20 @@ import Tabs from "common/components/tabs"
 import { ROUTE_URLS } from "common/utils/routes"
 import { ProductionSiteForm } from "settings/components/production-site-dialog"
 import { ProductionSiteDetails } from "carbure/types"
+import GenerateDecisionDialog from "../generate-decision-dialog/generate-decision-dialog"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
+  const portal = usePortal()
   const match = useHashMatch("agreement/:id")
 
   const applicationResponse = useQuery(api.getDoubleCountingAgreement, {
     key: "dc-agreement",
     params: [entity.id, parseInt(match?.params.id || "")],
   })
-
-  // TODO: download decision
-  const downloadDecision = useMutation(() => Promise.resolve())
 
   const agreement: AgreementDetails | undefined =
     applicationResponse.result?.data
@@ -46,6 +45,16 @@ export const AgreementDetailsDialog = () => {
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
+  }
+
+  const openGenerateDecisionDialog = () => {
+    if (!application) {
+      return
+    }
+
+    portal((close) => (
+      <GenerateDecisionDialog application={application} onClose={close} />
+    ))
   }
 
   return (
@@ -126,8 +135,11 @@ export const AgreementDetailsDialog = () => {
 
         <footer>
           {application && (
-            <Button variant="primary" action={downloadDecision.execute}>
-              <Trans>Télécharger la décision</Trans>
+            <Button
+              variant="primary"
+              action={() => openGenerateDecisionDialog()}
+            >
+              <Trans>Générer la décision</Trans>
             </Button>
           )}
 

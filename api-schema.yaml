@@ -621,39 +621,6 @@ paths:
                   value: csv file.*
                   summary: Example of export response.
           description: ""
-  /api/double-counting/applications/{id}/get-link/:
-    get:
-      operationId: double_counting_applications_get_link_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Dossier Double Compte.
-          required: true
-      tags:
-        - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LinkResponse"
-              examples:
-                ExampleOfResponse.:
-                  value:
-                    link: https://foobar.s3.amazonaws.com/exports/FR_126_2024.docx?....
-                  summary: Example of response.
-          description: ""
   /api/double-counting/applications/{id}/update-approved-quotas/:
     post:
       operationId: double_counting_applications_update_approved_quotas_create
@@ -674,6 +641,12 @@ paths:
         - double-counting
       requestBody:
         content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatedQuotasRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdatedQuotasRequest"
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/UpdatedQuotasRequest"
@@ -707,6 +680,12 @@ paths:
         - double-counting
       requestBody:
         content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingAdminAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingAdminAddRequest"
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/DoubleCountingAdminAddRequest"
@@ -740,6 +719,12 @@ paths:
         - double-counting
       requestBody:
         content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
@@ -785,6 +770,12 @@ paths:
         - double-counting
       requestBody:
         content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckAdminFileRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CheckAdminFileRequest"
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/CheckAdminFileRequest"
@@ -861,14 +852,13 @@ paths:
       responses:
         "200":
           content:
-            application/json:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
               schema:
-                $ref: "#/components/schemas/LinkResponse"
+                type: string
               examples:
-                ExampleOfResponse.:
-                  value:
-                    link: https://foobar.s3.amazonaws.com/exports/FR_126_2024.docx?....
-                  summary: Example of response.
+                ExampleOfExportResponse.:
+                  value: file.docx
+                  summary: Example of export response.
           description: ""
   /api/double-counting/applications/list-admin/:
     get:
@@ -906,6 +896,12 @@ paths:
         - double-counting
       requestBody:
         content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectDoubleCountingRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RejectDoubleCountingRequest"
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/RejectDoubleCountingRequest"
@@ -4048,14 +4044,6 @@ components:
           type: integer
       required:
         - assigned_tickets_count
-    LinkResponse:
-      type: object
-      properties:
-        link:
-          type: string
-          format: uri
-      required:
-        - link
     LotStatusEnum:
       enum:
         - DRAFT

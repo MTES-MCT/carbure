@@ -255,22 +255,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/double-counting/applications/{id}/get-link/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["double_counting_applications_get_link_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/double-counting/applications/{id}/update-approved-quotas/": {
     parameters: {
       query?: never
@@ -1397,10 +1381,6 @@ export interface components {
     GroupAssignmentResponse: {
       assigned_tickets_count: number
     }
-    LinkResponse: {
-      /** Format: uri */
-      link: string
-    }
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -2314,31 +2294,6 @@ export interface operations {
       }
     }
   }
-  double_counting_applications_get_link_retrieve: {
-    parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Dossier Double Compte. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["LinkResponse"]
-        }
-      }
-    }
-  }
   double_counting_applications_update_approved_quotas_create: {
     parameters: {
       query: {
@@ -2354,6 +2309,8 @@ export interface operations {
     }
     requestBody: {
       content: {
+        "application/json": components["schemas"]["UpdatedQuotasRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["UpdatedQuotasRequest"]
         "multipart/form-data": components["schemas"]["UpdatedQuotasRequest"]
       }
     }
@@ -2380,6 +2337,8 @@ export interface operations {
     }
     requestBody: {
       content: {
+        "application/json": components["schemas"]["DoubleCountingAdminAddRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["DoubleCountingAdminAddRequest"]
         "multipart/form-data": components["schemas"]["DoubleCountingAdminAddRequest"]
       }
     }
@@ -2406,6 +2365,8 @@ export interface operations {
     }
     requestBody: {
       content: {
+        "application/json": components["schemas"]["ApprouveDoubleCountingRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApprouveDoubleCountingRequest"]
         "multipart/form-data": components["schemas"]["ApprouveDoubleCountingRequest"]
       }
     }
@@ -2436,6 +2397,8 @@ export interface operations {
     }
     requestBody: {
       content: {
+        "application/json": components["schemas"]["CheckAdminFileRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["CheckAdminFileRequest"]
         "multipart/form-data": components["schemas"]["CheckAdminFileRequest"]
       }
     }
@@ -2500,7 +2463,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["LinkResponse"]
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string
         }
       }
     }
@@ -2539,6 +2502,8 @@ export interface operations {
     }
     requestBody: {
       content: {
+        "application/json": components["schemas"]["RejectDoubleCountingRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RejectDoubleCountingRequest"]
         "multipart/form-data": components["schemas"]["RejectDoubleCountingRequest"]
       }
     }
