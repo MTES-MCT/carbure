@@ -2090,6 +2090,30 @@ export interface components {
       code_pays: string
       is_in_europe?: boolean
     }
+    EntityDepot: {
+      customs_id?: string
+      name: string
+      city?: string
+      country: components["schemas"]["Pays"]
+      site_type?: components["schemas"]["SiteTypeEnum"]
+      address?: string
+      postal_code?: string
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      electrical_efficiency?: number | null
+      /**
+       * Format: double
+       * @description Entre 0 et 1
+       */
+      thermal_efficiency?: number | null
+      /**
+       * Format: double
+       * @description En degrés Celsius
+       */
+      useful_temperature?: number | null
+    }
     EntityFeedStock: {
       name: string
       name_en: string
@@ -2142,6 +2166,8 @@ export interface components {
       ownership_type: string
       blending_is_outsourced: boolean
       blender: components["schemas"]["EntityUserEntity"]
+      readonly depot: components["schemas"]["EntityDepot"] | null
+      readonly site: components["schemas"]["DepotProductionSite"] | null
     }
     EntitySummary: {
       readonly id: number
@@ -2174,7 +2200,7 @@ export interface components {
     EntityUserEntity: {
       readonly id: number
       name: string
-      entity_type?: components["schemas"]["EntityTypeEnum"]
+      entity_type: components["schemas"]["EntityTypeEnum"]
       has_mac?: boolean
       has_trading?: boolean
       has_direct_deliveries?: boolean
@@ -2197,7 +2223,7 @@ export interface components {
       website?: string
       vat_number?: string
       readonly ext_admin_pages: unknown[]
-      is_enabled?: boolean
+      is_enabled: boolean
     }
     ErrorResponse: {
       message: string

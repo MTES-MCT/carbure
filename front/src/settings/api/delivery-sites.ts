@@ -23,7 +23,7 @@ export function addDeliverySite(
     body: {
       delivery_site_id,
       ownership_type,
-      blending_outsourced,
+      blending_is_outsourced: blending_outsourced,
       blending_entity_id: blending_entity?.id,
     },
   })

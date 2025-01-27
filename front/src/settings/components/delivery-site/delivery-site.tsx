@@ -185,7 +185,7 @@ export const DeliverySiteFinderDialog = ({
 
   const { value, bind } = useForm({
     depot: undefined as Depot | undefined,
-    ownership_type: OwnershipType.ThirdParty as OwnershipType | undefined,
+    ownership_type: OwnershipType.THIRD_PARTY as OwnershipType | undefined,
     blending_is_outsourced: false,
     blender: undefined as EntityPreview | undefined,
   })

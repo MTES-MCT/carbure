@@ -2328,11 +2328,11 @@ paths:
           content:
             application/json:
               schema:
-                metabase_iframe_url: https://metabase.carbure.beta.gouv.fr/embed/dashboard/...#bordered=false&titled=false
+                metabase_iframe_url: url
               examples:
                 SuccessExample:
                   value:
-                    metabase_iframe_url: https://metabase.carbure.beta.gouv.fr/embed/dashboard/...#bordered=false&titled=false
+                    metabase_iframe_url: url
                   summary: Success example
           description: Request successful.
         "400":
@@ -6151,6 +6151,50 @@ components:
         - code_pays
         - name
         - name_en
+    EntityDepot:
+      type: object
+      properties:
+        customs_id:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 128
+        city:
+          type: string
+          maxLength: 128
+        country:
+          $ref: "#/components/schemas/Pays"
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
+          type: string
+          maxLength: 256
+        postal_code:
+          type: string
+          maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
+      required:
+        - country
+        - name
     EntityFeedStock:
       type: object
       properties:
@@ -6309,10 +6353,22 @@ components:
           type: boolean
         blender:
           $ref: "#/components/schemas/EntityUserEntity"
+        depot:
+          allOf:
+            - $ref: "#/components/schemas/EntityDepot"
+          readOnly: true
+          nullable: true
+        site:
+          allOf:
+            - $ref: "#/components/schemas/DepotProductionSite"
+          readOnly: true
+          nullable: true
       required:
         - blender
         - blending_is_outsourced
+        - depot
         - ownership_type
+        - site
     EntitySummary:
       type: object
       properties:
@@ -6454,8 +6510,10 @@ components:
         is_enabled:
           type: boolean
       required:
+        - entity_type
         - ext_admin_pages
         - id
+        - is_enabled
         - name
         - registered_country
     ErrorResponse:

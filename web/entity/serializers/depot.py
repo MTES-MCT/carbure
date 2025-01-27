@@ -100,12 +100,17 @@ class EntitySiteSerializer(serializers.Serializer):
     ownership_type = serializers.CharField()
     blending_is_outsourced = serializers.BooleanField()
     blender = EntityUserEntitySerializer()
+    depot = serializers.SerializerMethodField(allow_null=True)
+    site = serializers.SerializerMethodField(allow_null=True)
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
+    @extend_schema_field(EntityDepotSerializer)
+    def get_depot(self, instance):
         if instance.site.is_depot():
-            representation["depot"] = EntityDepotSerializer(instance.site).data
-        else:
-            representation["site"] = DepotProductionSiteSerializer(instance.site).data
-        return representation
+            return EntityDepotSerializer(instance.site).data
+        return None
+
+    @extend_schema_field(DepotProductionSiteSerializer)
+    def get_site(self, instance):
+        if not instance.site.is_depot():
+            return DepotProductionSiteSerializer(instance.site).data
+        return None

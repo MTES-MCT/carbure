@@ -155,7 +155,7 @@ const Certificates = () => {
             {
               key: "validition",
               header: t("Validation"),
-              orderBy: (c) => c.rejected_by_admin.toString(),
+              orderBy: (c) => c?.rejected_by_admin?.toString() ?? "",
               cell: (c) => <Validation link={c} />,
             },
             actionColumn<EntityCertificate>((c) =>

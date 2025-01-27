@@ -27,7 +27,7 @@ setEntity(producer)
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
     depot: clone(ds),
-    ownership_type: OwnershipType.ThirdParty,
+    ownership_type: OwnershipType.THIRD_PARTY,
   }))
 }
 

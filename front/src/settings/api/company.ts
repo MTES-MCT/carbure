@@ -95,7 +95,7 @@ export function updateEntity(
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
   console.log("VERYUNSURE 37: not located")
-  return apiFetch.POST("/entities/unit", {
+  return apiFetch.POST("/entities/unit/", {
     params: { query: { entity_id } },
     body: {
       unit,
