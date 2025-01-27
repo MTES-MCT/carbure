@@ -5,7 +5,7 @@ import { useHashMatch } from "common/components/hash-route"
 import { Return } from "common/components/icons"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
@@ -35,6 +35,9 @@ export const AgreementDetailsDialog = () => {
     key: "dc-agreement",
     params: [entity.id, parseInt(match?.params.id || "")],
   })
+
+  // TODO: download decision
+  const downloadDecision = useMutation(() => Promise.resolve())
 
   const agreement: AgreementDetails | undefined =
     applicationResponse.result?.data
@@ -122,9 +125,11 @@ export const AgreementDetailsDialog = () => {
         </main>
 
         <footer>
-          {/* {application &&
-            <ApplicationDownloadButton application={application} />
-          } */}
+          {application && (
+            <Button variant="primary" action={downloadDecision.execute}>
+              <Trans>Télécharger la décision</Trans>
+            </Button>
+          )}
 
           <Button icon={Return} action={closeDialog}>
             <Trans>Retour</Trans>
