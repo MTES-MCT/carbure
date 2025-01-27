@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "saf",
     "transactions",
     "elec",
+    "simple_history",
     "tiruert",
 ]
 
@@ -118,6 +119,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "carbure.middlewares.logging.LoggingMiddleware",
     "carbure.middlewares.exception.ExceptionMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 ROOT_URLCONF = "carbure.urls"
@@ -341,6 +343,9 @@ SPECTACULAR_SETTINGS = {
     "DEBUG": True,
     "ENUM_NAME_OVERRIDES": {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
+        "DoubleCountingStatus": "doublecount.models.DoubleCountingApplication.DCA_STATUS_CHOICES",
+        "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
     },
+    "COMPONENT_SPLIT_REQUEST": True,
     # OTHER SETTINGS
 }

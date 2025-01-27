@@ -27,6 +27,8 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "status",
             "latitude",
             "longitude",
+            "initial_index",
+            "initial_index_date",
         ]
 
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
@@ -66,6 +68,7 @@ class ElecChargePointSampleSerializer(serializers.ModelSerializer):
 
 class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=ElecChargePoint.objects.filter(is_deleted=False), required=True)
+    initial_index = serializers.FloatField(required=False)
 
     class Meta:
         model = ElecChargePoint
@@ -73,6 +76,7 @@ class ElecChargePointUpdateSerializer(serializers.ModelSerializer):
             "id",
             "charge_point_id",
             "measure_reference_point_id",
+            "initial_index",
         ]
 
 

@@ -21,6 +21,7 @@ import {
 import FileApplicationInfo from "../../../double-counting-admin/components/files-checker/file-application-info"
 import { SourcingFullTable } from "../sourcing-table"
 import { ProductionTable } from "../production-table"
+import { ProductionHistoryTable } from "../production-history-table"
 import { t } from "i18next"
 import { useMatch } from "react-router-dom"
 
@@ -75,8 +76,16 @@ export const ErrorsDetailsDialog = ({
                 label: `${t("Production")} (${fileData.errors?.production?.length || 0})`,
               },
               {
+                key: "sourcing_history",
+                label: `${t("Historique d'approvisionnement")} (${fileData.errors?.sourcing_history?.length || 0})`,
+              },
+              {
+                key: "production_history",
+                label: `${t("Historique de production")} (${fileData.errors?.production_history?.length || 0})`,
+              },
+              {
                 key: "global",
-                label: `${t("Global")} (${fileData.errors?.global?.length || 0})`,
+                label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
               },
             ]}
             focus={focus}
@@ -103,6 +112,20 @@ export const ErrorsDetailsDialog = ({
             <ProductionTable
               production={fileData.production ?? []}
               sourcing={fileData.sourcing}
+            />
+          </section>
+        )}
+
+        {focusedErrors.length === 0 && focus === "sourcing_history" && (
+          <section>
+            <SourcingFullTable sourcing={fileData.sourcing_history ?? []} />
+          </section>
+        )}
+
+        {focusedErrors.length === 0 && focus === "production_history" && (
+          <section>
+            <ProductionHistoryTable
+              production={fileData.production_history ?? []}
             />
           </section>
         )}

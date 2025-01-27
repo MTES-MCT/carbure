@@ -26,7 +26,7 @@ const DoubleCounting = () => {
     key: "dc-snapshot",
     params: [entity.id],
   })
-  const snapshot = snapshotResponse.result?.data.data
+  const snapshot = snapshotResponse.result?.data
 
   return (
     <Main>

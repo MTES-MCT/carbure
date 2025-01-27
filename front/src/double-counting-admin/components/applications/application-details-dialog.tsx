@@ -41,7 +41,7 @@ export const ApplicationDetailsDialog = () => {
     params: [entity.id, parseInt(match?.params.id || "")],
 
     onSuccess: (application) => {
-      const applicationData = application.data.data
+      const applicationData = application.data
       if (applicationData === undefined) {
         setQuotas({})
         return
@@ -73,8 +73,8 @@ export const ApplicationDetailsDialog = () => {
     },
   })
 
-  const application = applicationResponse.result?.data.data
-  const dcaStatus = application?.status ?? DCStatus.Pending
+  const application = applicationResponse.result?.data
+  const dcaStatus = application?.status ?? DCStatus.PENDING
 
   const isAdmin = entity?.entity_type === EntityType.Administration
   const hasQuotas = !application?.production.some(

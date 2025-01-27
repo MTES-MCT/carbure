@@ -133,13 +133,12 @@ export function cancelTransferCertificate(
 
 export function getChargePointsApplications(
   entity_id: number,
-  companyId: number,
-  year?: number
+  companyId: number
 ) {
   return api.get<Api<ElecChargePointsApplication[]>>(
     "/elec/cpo/charge-points/applications",
     {
-      params: { entity_id, company_id: companyId, year },
+      params: { entity_id, company_id: companyId },
     }
   )
 }
