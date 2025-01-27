@@ -204,3 +204,11 @@ export const TodoLine = ({ ...props }: IconProps) => {
 export const TodoFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-todo-fill" />
 }
+
+export const DraftFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-draft-fill" />
+}
+
+export const ArrowRightLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-arrow-right-line" />
+}

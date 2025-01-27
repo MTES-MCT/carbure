@@ -12,8 +12,8 @@ export const useMaterialAccounting = () => {
     condition: isIndustry || isPowerOrHeatProducer,
     children: [
       {
-        path: routes.MATERIAL_ACCOUNTING.BALANCE,
-        title: t("Comptabilité matière"),
+        path: routes.MATERIAL_ACCOUNTING.OPERATIONS,
+        title: t("Comptabilité"),
       },
     ],
   }

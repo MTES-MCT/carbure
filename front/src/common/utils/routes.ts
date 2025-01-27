@@ -23,7 +23,7 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, "/material-accounting")
 
     return {
-      TRANSACTIONS: `${baseUrl}/transactions`,
+      OPERATIONS: `${baseUrl}/operations`,
       BALANCE: `${baseUrl}/balance`,
     }
   },

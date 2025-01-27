@@ -18,6 +18,14 @@
   gap: var(--spacing-3w);
 }
 
+.content {
+  margin-top: calc(var(--spacing-3w) * -1);
+  margin-left: calc(var(--spacing-3w) * -1);
+  margin-right: calc(var(--spacing-3w) * -1);
+  padding: var(--spacing-3w);
+  background-color: white;
+}
+
 .main > header {
   display: flex;
   flex-direction: column;
