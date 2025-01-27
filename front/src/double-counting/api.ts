@@ -25,7 +25,7 @@ export function getDoubleCountingApplicationDetails(
 export function checkDoubleCountingApplication(entity_id: number, file: File) {
   return apiFetch.POST("/double-counting/applications/check-file/", {
     params: { query: { entity_id } },
-    body: { file: file as unknown as string }, // hack for file upload :/
+    body: { file },
   })
 }
 
@@ -55,7 +55,7 @@ export function producerAddDoubleCountingApplication(
       producer_id,
       production_site_id,
       should_replace,
-      file: file as unknown as string, // file upload hack again :/
+      file,
     },
   })
 }
