@@ -836,6 +836,150 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/operations/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_operations_list"]
+    put?: never
+    post: operations["tiruert_operations_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_operations_retrieve"]
+    put: operations["tiruert_operations_update"]
+    post?: never
+    delete: operations["tiruert_operations_destroy"]
+    options?: never
+    head?: never
+    patch: operations["tiruert_operations_partial_update"]
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/accept/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["tiruert_operations_accept_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/reject/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["tiruert_operations_reject_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/balance/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_operations_balance_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_operations_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/simulate/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["tiruert_operations_simulate_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/simulate/min_max/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["tiruert_operations_simulate_min_max_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/teneur/validate/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["tiruert_operations_teneur_validate_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/user/": {
     parameters: {
       query?: never
@@ -915,6 +1059,24 @@ export interface components {
     }
     ApprouveDoubleCountingRequest: {
       dca_id: number
+    }
+    Balance: {
+      sector: string
+      customs_category?: string | null
+      biofuel?: string | null
+      /** Format: double */
+      initial_balance?: number
+      readonly available_balance: string
+      readonly final_balance: string
+      volume: {
+        [key: string]: number
+      }
+      /** Format: double */
+      teneur?: number
+      /** Format: double */
+      yearly_teneur?: number
+      pending: number
+      unit?: string
     }
     Biofuel: {
       name: string
@@ -1008,9 +1170,11 @@ export interface components {
      *     * `ANN-IX-B` - ANNEXE IX-B
      *     * `TALLOL` - Tallol
      *     * `OTHER` - Autre
+     *     * `EP2AM` - EP2AM
+     *     * `AM` - AM
      * @enum {string}
      */
-    CategoryEnum: CategoryEnum
+    CategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     /**
      * @description * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
      *     * `ISCC` - ISCC
@@ -1043,6 +1207,17 @@ export interface components {
       code_pays: string
       is_in_europe?: boolean
     }
+    /**
+     * @description * `CONV` - Conventionnel
+     *     * `ANN-IX-A` - ANNEXE IX-A
+     *     * `ANN-IX-B` - ANNEXE IX-B
+     *     * `TALLOL` - Tallol
+     *     * `OTHER` - Autre
+     *     * `EP2AM` - EP2AM
+     *     * `AM` - AM
+     * @enum {string}
+     */
+    CustomsCategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     /**
      * @description * `UNKNOWN` - UNKNOWN
      *     * `RFC` - RFC
@@ -1083,6 +1258,10 @@ export interface components {
        * @description En degrés Celsius
        */
       useful_temperature?: number | null
+    }
+    DepotRequest: {
+      id: number
+      name: string
     }
     DoubleCountingAdminAddRequest: {
       certificate_id?: string
@@ -1296,6 +1475,10 @@ export interface components {
       readonly name: string
       readonly entity_type: components["schemas"]["EntityTypeEnum"]
     }
+    EntityRequest: {
+      id: number
+      name: string
+    }
     EntitySummary: {
       readonly id: number
       readonly name: string
@@ -1423,6 +1606,58 @@ export interface components {
       audits?: number
       tickets?: number
     }
+    OperationDetail: {
+      lot: number
+      /** Format: double */
+      volume?: number
+      /** Format: double */
+      emission_rate_per_mj?: number
+    }
+    OperationDetailRequest: {
+      lot: number
+      /** Format: double */
+      volume?: number
+      /** Format: double */
+      emission_rate_per_mj?: number
+    }
+    OperationOutput: {
+      readonly id: number
+      readonly type: string
+      status?: components["schemas"]["OperationOutputStatusEnum"]
+      readonly sector: string
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      readonly biofuel: string
+      credited_entity: components["schemas"]["Entity"]
+      debited_entity: components["schemas"]["Entity"]
+      from_depot: components["schemas"]["Depot"]
+      to_depot: components["schemas"]["Depot"]
+      /** Format: date-time */
+      readonly created_at: string
+      /** Format: date */
+      validity_date: string
+      readonly volume: string
+      readonly unit: string
+      details?: components["schemas"]["OperationDetail"][]
+    }
+    OperationOutputRequest: {
+      status?: components["schemas"]["OperationOutputStatusEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      credited_entity: components["schemas"]["EntityRequest"]
+      debited_entity: components["schemas"]["EntityRequest"]
+      from_depot: components["schemas"]["DepotRequest"]
+      to_depot: components["schemas"]["DepotRequest"]
+      /** Format: date */
+      validity_date: string
+      details?: components["schemas"]["OperationDetailRequest"][]
+    }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     * @enum {string}
+     */
+    OperationOutputStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
     OtpResponse: {
       valid_until: string
     }
@@ -1440,6 +1675,21 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["EntityPreview"][]
+    }
+    PaginatedOperationOutputList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["OperationOutput"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -1470,6 +1720,17 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
+    }
+    PatchedOperationOutputRequest: {
+      status?: components["schemas"]["OperationOutputStatusEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      credited_entity?: components["schemas"]["EntityRequest"]
+      debited_entity?: components["schemas"]["EntityRequest"]
+      from_depot?: components["schemas"]["DepotRequest"]
+      to_depot?: components["schemas"]["DepotRequest"]
+      /** Format: date */
+      validity_date?: string
+      details?: components["schemas"]["OperationDetailRequest"][]
     }
     /**
      * @description * `l` - litres
@@ -3527,6 +3788,360 @@ export interface operations {
       }
     }
   }
+  tiruert_operations_list: {
+    parameters: {
+      query?: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        entity_id?: string
+        from_to?: string
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description A search term. */
+        search?: string
+        sector?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedOperationOutputList"]
+        }
+      }
+    }
+  }
+  tiruert_operations_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_destroy: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  tiruert_operations_partial_update: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedOperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedOperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["PatchedOperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_accept_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_reject_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_balance_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Balance"]
+        }
+      }
+    }
+  }
+  tiruert_operations_filters_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        entity_id?: string
+        /** @description Filter string to apply */
+        filter?: string
+        from_to?: string
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        sector?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+    }
+  }
+  tiruert_operations_simulate_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_simulate_min_max_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
+  tiruert_operations_teneur_validate_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationOutputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
+        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationOutput"]
+        }
+      }
+    }
+  }
   user_retrieve: {
     parameters: {
       query?: never
@@ -3638,12 +4253,29 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
   PENDING = "PENDING",
   REJECTED = "REJECTED",
 }
-export enum CategoryEnum {
-  CONV = "CONV",
+export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
+  AM = "AM",
   ANN_IX_A = "ANN-IX-A",
   ANN_IX_B = "ANN-IX-B",
-  TALLOL = "TALLOL",
+  CONV = "CONV",
+  EP2AM = "EP2AM",
   OTHER = "OTHER",
+  TALLOL = "TALLOL",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryStatus {
+  ACCEPTED = "ACCEPTED",
+  CANCELED = "CANCELED",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryType {
+  CESSION = "CESSION",
+  DEVALUATION = "DEVALUATION",
+  EXPORTATION = "EXPORTATION",
+  INCORPORATION = "INCORPORATION",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  TENEUR = "TENEUR",
 }
 export enum CertificateTypeEnum {
   SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
