@@ -45,11 +45,6 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
       <main>
         <section>
           <Form id={FORM_ID} onSubmit={openAcceptChangeMeter}>
-            <DateInput
-              label={t("Date d'installation")}
-              required
-              {...bind("initial_index_date")}
-            />
             <TextInput
               label={t("Nouveau numéro de certificat MID")}
               required
@@ -62,6 +57,12 @@ export const ChangeMeter = ({ onClose, charge_point_id }: ChangeMeterProps) => {
                 required
                 {...bind("initial_index")}
                 min={0}
+              />
+
+              <DateInput
+                label={t("Date du relevé")}
+                required
+                {...bind("initial_index_date")}
               />
             </Fieldset>
           </Form>

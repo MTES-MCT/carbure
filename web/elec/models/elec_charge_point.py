@@ -65,5 +65,13 @@ class ElecChargePoint(models.Model):
         else:
             return None
 
+    @property
+    def initial_index(self):
+        return self.current_meter.initial_index if self.current_meter else None
+
+    @property
+    def initial_index_date(self):
+        return self.current_meter.initial_index_date if self.current_meter else None
+
     def is_updatable(self):
         return self.application.status != ElecChargePointApplication.AUDIT_IN_PROGRESS
