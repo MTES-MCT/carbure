@@ -149,7 +149,11 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                 cell: (e) => (
                   <Cell
                     text={e.entity.name}
-                    sub={getEntityTypeLabel(e.entity.entity_type)}
+                    sub={
+                      e.entity.entity_type
+                        ? getEntityTypeLabel(e.entity.entity_type)
+                        : ""
+                    }
                   />
                 ),
               },
@@ -331,7 +335,10 @@ const EntityInfoCell = ({ data }: { data: EntityInfo[] }) => (
 
 function hasTypes(details: EntityDetails, types: EntityType[] | undefined) {
   if (types === undefined || types.length === 0) return true
-  else return types.includes(details.entity.entity_type)
+  else
+    return details.entity.entity_type
+      ? types.includes(details.entity.entity_type)
+      : false
 }
 
 function hasOperation(

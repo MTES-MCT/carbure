@@ -2,7 +2,6 @@ import { api as apiFetch } from "common/services/api-fetch"
 import { UserRightStatus, EntityType, UserRole } from "carbure/types"
 
 export function getCompanies(entity_id: number) {
-  console.log("OKOKOK 60, removed admin")
   return apiFetch.GET("/entities/", {
     params: { query: { entity_id } },
   })

@@ -2,7 +2,6 @@ import { api as apiFetch } from "common/services/api-fetch"
 import { EntityType } from "carbure/types"
 
 export function searchCompanyDataBySiren(registration_id: string) {
-  console.log("OKOKOK 50")
   return apiFetch.POST("/entities/search-company/", {
     body: { registration_id },
   })

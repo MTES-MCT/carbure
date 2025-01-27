@@ -2,7 +2,6 @@ import { api as apiFetch } from "common/services/api-fetch"
 import { Country, SiteType, OwnershipType, EntityPreview } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
-  console.log("OKOKOK 21")
   return apiFetch.GET("/entities/depots/", {
     params: { query: { entity_id } },
   })

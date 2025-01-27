@@ -42,14 +42,7 @@ export type EntityDepot = apiTypes["EntitySite"]
 
 export type Certificate = apiTypes["GenericCertificate"]
 
-export interface EntityCertificate {
-  id: number
-  certificate: Certificate
-  entity: Entity
-  has_been_updated: boolean
-  checked_by_admin: boolean
-  rejected_by_admin: boolean
-}
+export type EntityCertificate = apiTypes["EntityCertificate"]
 
 export interface UploadCheckError {
   line: number

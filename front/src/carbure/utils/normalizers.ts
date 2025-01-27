@@ -115,7 +115,7 @@ export const normalizeDepotOrUnknown: Normalizer<Depot | string> = (depot) => ({
 
 // prettier-ignore
 export const normalizeEntityDepot: Normalizer<EntityDepot> = (depot) => ({
-  label: `${depot.blender!.name} - ${depot.depot!.name}`,
+  label: `${depot.blender.name} - ${depot.depot!.name}`,
   value: depot
 })
 

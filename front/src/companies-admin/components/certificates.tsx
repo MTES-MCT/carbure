@@ -106,7 +106,10 @@ const Certificates = ({
               header: t("Société"),
               orderBy: (e) => e.entity.name,
               cell: (e) => (
-                <Cell text={e.entity.name} sub={t(e.entity.entity_type)} />
+                <Cell
+                  text={e.entity.name}
+                  sub={t(e.entity.entity_type ?? "")}
+                />
               ),
             },
             {
