@@ -69,6 +69,12 @@ const UpdateChargePointDialog = () => {
             "Cet identifiant est déjà utilisé pour un autre point de charge."
           ),
         },
+        INITIAL_INDEX_CANNOT_BE_UPDATED: {
+          field: "initial_index",
+          error: t(
+            "Ce compteur a déjà des relevés associés, veuillez contacter l'administration si vous souhaitez modifier l'index initial de ce compteur."
+          ),
+        },
       }
       const error = (e as AxiosError<{ error: string }>).response?.data.error
 
@@ -86,8 +92,13 @@ const UpdateChargePointDialog = () => {
       }
     },
   })
+
   const chargePointDetail = chargePointDetailQuery?.result?.data.data
   const isReadOnly = value.status === ChargePointStatus.AuditInProgress
+
+  const hasChangedInitialIndex =
+    chargePointDetailQuery.result?.data.data?.initial_index !=
+    value.initial_index
 
   const openChangeMeterDialog = () => {
     if (!chargePointDetail) return
@@ -143,11 +154,6 @@ const UpdateChargePointDialog = () => {
                       hideError={false}
                     />
                     <NumberInput
-                      label={`${t("Dernier index en kWh")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
-                      readOnly
-                      {...bind("measure_energy")}
-                    />
-                    <NumberInput
                       label={t("Longitude")}
                       readOnly
                       {...bind("longitude")}
@@ -169,6 +175,17 @@ const UpdateChargePointDialog = () => {
                       label={t("Numéro du certificat (MID)")}
                       readOnly
                       {...bind("mid_id")}
+                    />
+                    <NumberInput
+                      label={`${t("Index initial relevé (kWh)")}${value.initial_index_date ? ` - ${formatDate(value.initial_index_date)}` : ""}`}
+                      readOnly={isReadOnly}
+                      hideError={false}
+                      {...bind("initial_index")}
+                    />
+                    <NumberInput
+                      label={`${t("Dernier index relevé (kWh)")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
+                      readOnly
+                      {...bind("measure_energy")}
                     />
 
                     <Button
@@ -229,6 +246,9 @@ const UpdateChargePointDialog = () => {
                   action={() =>
                     chargePointUpdate.execute(entity.id, chargePointDetail.id, {
                       charge_point_id: value.charge_point_id || "",
+                      initial_index: hasChangedInitialIndex
+                        ? value.initial_index
+                        : undefined,
                     })
                   }
                   loading={chargePointUpdate.loading}

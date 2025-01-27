@@ -15,4 +15,5 @@ export type ChangeMeasureReferencePointQuery = {
 
 export type UpdateChargePointQuery = {
   charge_point_id: ChargePoint["charge_point_id"]
+  initial_index?: ChargePoint["initial_index"]
 }

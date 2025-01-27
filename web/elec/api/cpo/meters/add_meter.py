@@ -10,6 +10,7 @@ from elec.serializers.elec_meter import ElecMeterSerializer
 class MetersError:
     CP_NOT_FOUND_ON_CPO = "CP_NOT_FOUND_ON_CPO"
     AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
+    NEW_INITIAL_INDEX_DATE_KO = "NEW_INITIAL_INDEX_DATE_KO"
 
 
 @require_POST
@@ -25,6 +26,18 @@ def add_elec_meter(request, entity, entity_id):
 
     if not serializer.validated_data["charge_point"].is_updatable():
         return ErrorResponse(400, MetersError.AUDIT_IN_PROGRESS)
+
+    if (
+        serializer.validated_data["charge_point"].current_meter
+        and serializer.validated_data["charge_point"].current_meter.elec_meter_readings.exists()
+    ):
+        last_meter_reading_date = (
+            serializer.validated_data["charge_point"].current_meter.elec_meter_readings.last().reading_date
+        )
+        new_initial_index_date = serializer.validated_data["initial_index_date"]
+
+        if new_initial_index_date <= last_meter_reading_date:
+            return ErrorResponse(400, MetersError.NEW_INITIAL_INDEX_DATE_KO)
 
     meter = serializer.save()
 

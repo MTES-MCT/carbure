@@ -8,6 +8,7 @@ import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api"
 import { AddMeterQuery } from "../types"
+import { AxiosError } from "axios"
 
 type AcceptChangeMeterProps = {
   onClose: PortalInstance["close"]
@@ -33,10 +34,21 @@ export const AcceptChangeMeter = ({
       onClose()
       onMeterChanged()
     },
-    onError: () => {
-      notify("Une erreur est survenue lors du changement de compteur MID.", {
-        variant: "danger",
-      })
+    onError: (e) => {
+      const error = (e as AxiosError<{ error: string }>).response?.data.error
+
+      if (error === "NEW_INITIAL_INDEX_DATE_KO") {
+        notify(
+          t(
+            "Le changement de compteur a échoué car la nouvelle date de relevé est antérieure à la date de votre dernier relevé pour ce point de recharge."
+          ),
+          { variant: "danger" }
+        )
+      } else {
+        notify("Une erreur est survenue lors du changement de compteur MID.", {
+          variant: "danger",
+        })
+      }
     },
   })
 
