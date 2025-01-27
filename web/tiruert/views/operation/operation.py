@@ -1,13 +1,14 @@
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Entity, UserRights
+from core.models import Entity, MatierePremiere, UserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.permissions import HasUserRights
-from tiruert.serializers import OperationInputSerializer, OperationOutputSerializer
+from tiruert.serializers import LotSerializer, OperationInputSerializer, OperationOutputSerializer
 
 from .mixins import ActionMixin
 
@@ -36,6 +37,121 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         kwargs["context"]["unit"] = unit
         return super().get_serializer(*args, **kwargs)
 
+    @extend_schema(
+        operation_id="list_operations",
+        description="Retrieve a list of operations with optional filtering and pagination.",
+        filters=True,
+        parameters=[
+            OpenApiParameter(
+                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+            ),
+            OpenApiParameter(
+                name="details",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                description="Include detailed information if set to `1`.",
+                default="0",
+            ),
+            OpenApiParameter(
+                name="unit",
+                type=str,
+                enum=["l", "mj"],
+                location=OpenApiParameter.QUERY,
+                description="Specify the volume unit (default is `l`).",
+                default="l",
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="create_operation",
+        description="Create a new operation.",
+        request=OperationInputSerializer,
+        parameters=[
+            OpenApiParameter(
+                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+            ),
+            OpenApiParameter(
+                name="type",
+                type=str,
+                enum=Operation.OPERATION_TYPES,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="customs_category",
+                type=str,
+                enum=MatierePremiere.MP_CATEGORIES,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="biofuel",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="credited_entity",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="debited_entity",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="depot",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="validity_date",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Format 2025-01-25",
+            ),
+            OpenApiParameter(
+                name="lots",
+                type=LotSerializer,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+        ],
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response=OperationOutputSerializer, description="The newly created operation."
+            ),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid input data."),
+        },
+        examples=[
+            OpenApiExample(
+                name="Create Operation Example",
+                value={
+                    "type": "TENEUR",
+                    "customs_category": "CONV",
+                    "biofuel": 33,
+                    "credited_entity": "",
+                    "debited_entity": 2,
+                    "depot": "",
+                    "validity_date": "2025-01-03",
+                    "lots": [
+                        {"id": 10, "volume": 39462, "emission_rate_per_mj": 5.25},
+                        {"id": 11, "volume": 723.2, "emission_rate_per_mj": 30.2},
+                    ],
+                },
+            )
+        ],
+    )
     def create(self, request):
         serializer = OperationInputSerializer(
             data=request.data,
@@ -48,6 +164,21 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        operation_id="delete_operation",
+        description="Delete an operation. Only allowed for certain types and statuses.",
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(description="Operation deleted successfully."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Forbidden. The operation type or status does not allow deletion."
+            ),
+        },
+        parameters=[
+            OpenApiParameter(
+                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+            ),
+        ],
+    )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.type == Operation.CESSION and instance.status in [Operation.PENDING, Operation.REJECTED]:

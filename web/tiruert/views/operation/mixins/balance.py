@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.utils.timezone import make_aware
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 
@@ -10,6 +12,33 @@ from tiruert.services.balance import BalanceService
 
 
 class BalanceActionMixin:
+    @extend_schema(
+        operation_id="list_balances",
+        description="Retrieve balances, by sector or by lot",
+        filters=True,
+        parameters=[
+            OpenApiParameter(
+                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+            ),
+            OpenApiParameter(
+                name="group_by",
+                type=str,
+                enum=["sector", "lot"],
+                location=OpenApiParameter.QUERY,
+                description="Group by sector or by lot.",
+                default="",
+            ),
+            OpenApiParameter(
+                name="unit",
+                type=str,
+                enum=["l", "mj"],
+                location=OpenApiParameter.QUERY,
+                description="Specify the volume unit (default is `l`).",
+                default="l",
+            ),
+        ],
+        responses={status.HTTP_200_OK: OpenApiResponse(response=BalanceSerializer, description="A list of operations.")},
+    )
     @action(
         detail=False,
         methods=["get"],
