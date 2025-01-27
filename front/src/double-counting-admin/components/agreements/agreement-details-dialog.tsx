@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Return } from "common/components/icons"
+import { Download, Return } from "common/components/icons"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -138,6 +138,7 @@ export const AgreementDetailsDialog = () => {
             <Button
               variant="primary"
               action={() => openGenerateDecisionDialog()}
+              icon={Download}
             >
               <Trans>Générer la décision</Trans>
             </Button>
