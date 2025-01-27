@@ -6,6 +6,7 @@ import {
   UserRightsRequestsStatusEnum as UserRightStatus,
   RoleEnum as UserRole,
   ExtAdminPagesEnum as ExternalAdminPages,
+  TypeEnum as NotificationType,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
@@ -19,16 +20,7 @@ export type UserRight = apiTypes["UserRights"]
 
 export type UserRightRequest = apiTypes["UserRightsRequests"]
 
-export interface Notification {
-  id: number
-  dest: Entity
-  datetime: string
-  type: NotificationType
-  acked: boolean
-  send_by_email: boolean
-  email_sent: boolean
-  meta: null | any
-}
+export type Notification = apiTypes["CarbureNotification"]
 
 export type Feedstock = apiTypes["FeedStock"]
 
@@ -46,12 +38,7 @@ export type ProductionSiteDetails = ProductionSite & {
 
 export type Depot = apiTypes["Depot"]
 
-export interface EntityDepot {
-  depot: Depot | null
-  ownership_type: OwnershipType
-  blending_is_outsourced: boolean
-  blender: Entity | null
-}
+export type EntityDepot = apiTypes["EntitySite"]
 
 export type Certificate = apiTypes["GenericCertificate"]
 
@@ -78,30 +65,6 @@ export interface UploadCheckReportInfo {
 
 // export type ExternalAdminPages = `${apiTypes["ExtAdminPagesEnum"]}`
 
-export enum NotificationType {
-  CorrectionRequest = "CORRECTION_REQUEST",
-  CorrectionDone = "CORRECTION_DONE",
-  LotsRejected = "LOTS_REJECTED",
-  LotsReceived = "LOTS_RECEIVED",
-  LotsRecalled = "LOTS_RECALLED",
-  CertificateExpired = "CERTIFICATE_EXPIRED",
-  CertificateRejected = "CERTIFICATE_REJECTED",
-
-  DeclarationValidated = "DECLARATION_VALIDATED",
-  DeclarationCancelled = "DECLARATION_CANCELLED",
-  DeclarationReminder = "DECLARATION_REMINDER",
-
-  MeterReadingsApplicationStarted = "METER_READINGS_APP_STARTED",
-  MeterReadingsApplicationEndingSoon = "METER_READINGS_APP_ENDING_SOON",
-
-  SafTicketReceived = "SAF_TICKET_RECEIVED",
-  SafTicketAccepted = "SAF_TICKET_ACCEPTED",
-  SafTicketRejected = "SAF_TICKET_REJECTED",
-
-  LotsUpdatedByAdmin = "LOTS_UPDATED_BY_ADMIN",
-  LotsDeletedByAdmin = "LOTS_DELETED_BY_ADMIN",
-}
-
 export enum OwnershipType {
   Own = "OWN",
   ThirdParty = "THIRD_PARTY",
@@ -122,3 +85,5 @@ export { UserRightStatus }
 export { UserRole }
 
 export { ExternalAdminPages }
+
+export { NotificationType }
