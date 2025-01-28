@@ -18,7 +18,11 @@ class BalanceActionMixin:
         filters=True,
         parameters=[
             OpenApiParameter(
-                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
             ),
             OpenApiParameter(
                 name="group_by",
