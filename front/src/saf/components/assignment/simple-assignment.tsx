@@ -1,5 +1,5 @@
 import useEntity from "carbure/hooks/entity"
-import { EntityPreview, EntityType } from "carbure/types"
+import { Depot, EntityPreview, EntityType } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
@@ -15,6 +15,9 @@ import { SafTicketSourceDetails } from "saf/pages/operator/types"
 import * as api from "../../pages/operator/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
+import { findDepots } from "carbure/api"
+import Select from "common/components/select"
+import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails
@@ -56,8 +59,12 @@ export const TicketAssignment = ({
       value.assignment_period,
       value.client!,
       value.agreement_reference,
-      value.free_field
+      value.free_field,
+      value.reception_airport!.id,
+      value.shipping_method!,
+      value.consumption_type!
     )
+
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
   }
@@ -68,6 +75,11 @@ export const TicketAssignment = ({
 
   const findSafClient = (query: string) => {
     return api.findClients(entity.id, query)
+  }
+
+  const findAirports = (query: string) => {
+    // @TODO find actual airports
+    return findDepots(query)
   }
 
   return (
@@ -115,6 +127,56 @@ export const TicketAssignment = ({
                 />
               )}
 
+              {value.client?.entity_type === EntityType.Airline && (
+                <>
+                  <Autocomplete
+                    required
+                    label={t("Aéroport de réception")}
+                    getOptions={findAirports}
+                    // @ts-ignore type issue
+                    normalize={norm.normalizeDepot}
+                    {...bind("reception_airport")}
+                  />
+
+                  <Select
+                    required
+                    label={t("Mode d'expédition")}
+                    placeholder={t("Choisissez un mode")}
+                    {...bind("shipping_method")}
+                    options={[
+                      {
+                        value: ShippingMethodEnum.Ol_oduc,
+                        label: t("Oléoduc"),
+                      },
+                      { value: ShippingMethodEnum.Camion, label: t("Camion") },
+                      { value: ShippingMethodEnum.Train, label: t("Train") },
+                      { value: ShippingMethodEnum.Barge, label: t("Barge") },
+                    ]}
+                  />
+
+                  <Select
+                    required
+                    label={t("Type de consommation")}
+                    placeholder={t("Choisissez un type")}
+                    {...bind("consumption_type")}
+                    options={[
+                      {
+                        value:
+                          ConsumptionTypeEnum.Mise_consommation_mandat_FR_EU,
+                        label: t("Mise à consommation mandat FR/EU"),
+                      },
+                      {
+                        value:
+                          ConsumptionTypeEnum.Mise_consommation_hors_mandat_d_classement_,
+                        label: t(
+                          "Mise à consommation hors mandat (déclassement)"
+                        ),
+                      },
+                    ]}
+                  />
+                </>
+              )}
+
               <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
@@ -144,6 +206,9 @@ const defaultAssignment = {
   assignment_period: formatPeriodFromDate(new Date()),
   agreement_reference: "" as string | undefined, //TODO for transfer only
   free_field: "" as string | undefined,
+  reception_airport: undefined as Depot | undefined,
+  shipping_method: undefined as ShippingMethodEnum | undefined,
+  consumption_type: undefined as ConsumptionTypeEnum | undefined,
 }
 
 export type AssignmentForm = typeof defaultAssignment
