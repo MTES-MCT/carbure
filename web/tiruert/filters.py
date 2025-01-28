@@ -14,6 +14,7 @@ class OperationFilter(FilterSet):
     biofuel = BaseInFilter(field_name="biofuel__code", lookup_expr="in")
     sector = CharFilter(method="filter_sector")
     from_to = CharFilter(method="filter_from_to")
+    depot = CharFilter(method="filter_depot")
 
     def filter_entity(self, queryset, name, value):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
@@ -28,3 +29,6 @@ class OperationFilter(FilterSet):
 
     def filter_from_to(self, queryset, name, value):
         return queryset.filter(Q(credited_entity__name=value) | Q(debited_entity__name=value)).distinct()
+
+    def filter_depot(self, queryset, name, value):
+        return queryset.filter(Q(from_depot=value) | Q(to_depot=value)).distinct()
