@@ -15,11 +15,19 @@ class FilterActionMixin:
         filters=True,
         parameters=[
             OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+            OpenApiParameter(
                 name="filter",
                 type=str,
                 enum=["statuses", "sectors", "categories", "biofuels", "operations", "entities", "depots"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
+                required=True,
             ),
         ],
         examples=[
