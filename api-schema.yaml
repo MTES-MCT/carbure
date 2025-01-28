@@ -2609,7 +2609,8 @@ paths:
           description: ""
   /api/tiruert/operations/:
     get:
-      operationId: tiruert_operations_list
+      operationId: list_operations
+      description: Retrieve a list of operations with optional filtering and pagination.
       parameters:
         - in: query
           name: biofuel
@@ -2648,17 +2649,18 @@ paths:
             type: string
             format: date
         - in: query
+          name: details
+          schema:
+            type: boolean
+            default: "0"
+          description: Include detailed information if set to `1`.
+        - in: query
           name: entity_id
           schema:
             type: string
+          description: Authorised entity ID.
         - in: query
           name: from_to
-          schema:
-            type: string
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
           schema:
             type: string
         - name: page
@@ -2673,12 +2675,6 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
         - in: query
           name: sector
           schema:
@@ -2714,6 +2710,15 @@ paths:
           description: Les valeurs multiples doivent être séparées par des virgules.
           explode: false
           style: form
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - l
+              - mj
+            default: l
+          description: Specify the volume unit (default is `l`).
       tags:
         - tiruert
       security:
@@ -2725,22 +2730,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedOperationOutputList"
-          description: ""
+          description: A list of operations.
     post:
-      operationId: tiruert_operations_create
+      operationId: create_operation
+      description: Create a new operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+          description: Authorised entity ID.
       tags:
         - tiruert
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/OperationInputRequest"
+            examples:
+              CreateOperationExample:
+                value:
+                  type: TENEUR
+                  customs_category: CONV
+                  biofuel: 33
+                  credited_entity: ""
+                  debited_entity: 2
+                  depot: ""
+                  validity_date: 2025-01-03
+                  lots:
+                    - id: 10
+                      volume: 39462
+                      emission_rate_per_mj: 5.25
+                    - id: 11
+                      volume: 723.2
+                      emission_rate_per_mj: 30.2
+                summary: Create Operation Example
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/OperationInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/OperationInputRequest"
         required: true
       security:
         - cookieAuth: []
@@ -2751,7 +2781,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OperationOutput"
-          description: ""
+              examples:
+                CreateOperationExample:
+                  value:
+                    type: TENEUR
+                    customs_category: CONV
+                    biofuel: 33
+                    credited_entity: ""
+                    debited_entity: 2
+                    depot: ""
+                    validity_date: 2025-01-03
+                    lots:
+                      - id: 10
+                        volume: 39462
+                        emission_rate_per_mj: 5.25
+                      - id: 11
+                        volume: 723.2
+                        emission_rate_per_mj: 30.2
+                  summary: Create Operation Example
+          description: The newly created operation.
+        "400":
+          description: Invalid input data.
   /api/tiruert/operations/{id}/:
     get:
       operationId: tiruert_operations_retrieve
@@ -2840,8 +2890,14 @@ paths:
                 $ref: "#/components/schemas/OperationOutput"
           description: ""
     delete:
-      operationId: tiruert_operations_destroy
+      operationId: delete_operation
+      description: Delete an operation. Only allowed for certain types and statuses.
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+          description: Authorised entity ID.
         - in: path
           name: id
           schema:
@@ -2855,7 +2911,9 @@ paths:
         - basicAuth: []
       responses:
         "204":
-          description: No response body
+          description: Operation deleted successfully.
+        "403":
+          description: Forbidden. The operation type or status does not allow deletion.
   /api/tiruert/operations/{id}/accept/:
     post:
       operationId: tiruert_operations_accept_create
@@ -2926,7 +2984,107 @@ paths:
           description: ""
   /api/tiruert/operations/balance/:
     get:
-      operationId: tiruert_operations_balance_retrieve
+      operationId: list_balances
+      description: Retrieve balances grouped by mp category / biofuel or by sector
+      parameters:
+        - in: query
+          name: biofuel
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: customs_category
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - AM
+                - ANN-IX-A
+                - ANN-IX-B
+                - CONV
+                - EP2AM
+                - OTHER
+                - TALLOL
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+          description: Authorised entity ID.
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: group_by
+          schema:
+            type: string
+            enum:
+              - lot
+              - sector
+            default: ""
+          description: Group by sector or by lot.
+        - in: query
+          name: sector
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - PENDING
+                - REJECTED
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - CESSION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
+                - LIVRAISON_DIRECTE
+                - MAC_BIO
+                - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - l
+              - mj
+            default: l
+          description: Specify the volume unit (default is `l`).
       tags:
         - tiruert
       security:
@@ -2938,10 +3096,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Balance"
-          description: ""
+          description: Balances by sector or by lot.
   /api/tiruert/operations/filters/:
     get:
-      operationId: tiruert_operations_filters_retrieve
+      operationId: filter_operations
+      description: Retrieve content of a specific filter
       parameters:
         - in: query
           name: biofuel
@@ -2987,21 +3146,17 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - biofuels
+              - categories
+              - depots
+              - entities
+              - operations
+              - sectors
+              - statuses
           description: Filter string to apply
         - in: query
           name: from_to
-          schema:
-            type: string
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
           schema:
             type: string
         - in: query
@@ -3064,20 +3219,27 @@ paths:
           description: ""
   /api/tiruert/operations/simulate/:
     post:
-      operationId: tiruert_operations_simulate_create
+      operationId: simulate
+      description: Simulate a blending operation
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+          description: Authorised entity ID.
       tags:
         - tiruert
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/SimulationInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/SimulationInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/SimulationInputRequest"
         required: true
       security:
         - cookieAuth: []
@@ -3087,24 +3249,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
+                $ref: "#/components/schemas/SimulationOutput"
           description: ""
   /api/tiruert/operations/simulate/min_max/:
     post:
-      operationId: tiruert_operations_simulate_min_max_create
+      operationId: simulation_bounds
+      description: Get bounds for blending operation
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+          description: Authorised entity ID.
       tags:
         - tiruert
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/SimulationInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/SimulationInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/SimulationInputRequest"
         required: true
       security:
         - cookieAuth: []
@@ -3114,7 +3283,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
+                $ref: "#/components/schemas/SimulationOutput"
           description: ""
   /api/tiruert/operations/teneur/validate/:
     post:
@@ -4688,6 +4857,21 @@ components:
           type: integer
       required:
         - assigned_tickets_count
+    LotRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - emission_rate_per_mj
+        - id
+        - volume
     LotStatusEnum:
       enum:
         - DRAFT
@@ -4751,6 +4935,42 @@ components:
           format: double
       required:
         - lot
+    OperationInputRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/TypeEnum"
+        customs_category:
+          $ref: "#/components/schemas/CustomsCategoryEnum"
+        biofuel:
+          type: integer
+          nullable: true
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        from_depot:
+          type: integer
+          nullable: true
+        to_depot:
+          type: integer
+          nullable: true
+        validity_date:
+          type: string
+          format: date
+        lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/LotRequest"
+      required:
+        - biofuel
+        - customs_category
+        - debited_entity
+        - lots
+        - type
+        - validity_date
     OperationOutput:
       type: object
       properties:
@@ -5679,6 +5899,63 @@ components:
         - assigned_volume
         - id
         - total_volume
+    SimulationInputRequest:
+      type: object
+      properties:
+        customs_category:
+          $ref: "#/components/schemas/CustomsCategoryEnum"
+        biofuel:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        target_volume:
+          type: number
+          format: double
+        target_emission:
+          type: number
+          format: double
+        max_n_batches:
+          type: integer
+        enforced_volumes:
+          type: array
+          items:
+            type: integer
+      required:
+        - biofuel
+        - customs_category
+        - debited_entity
+        - target_emission
+        - target_volume
+    SimulationLotOutput:
+      type: object
+      properties:
+        lot_id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - emission_rate_per_mj
+        - lot_id
+        - volume
+    SimulationOutput:
+      type: object
+      properties:
+        selected_lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/SimulationLotOutput"
+        fun:
+          type: number
+          format: double
+      required:
+        - fun
+        - selected_lots
     SiteTypeEnum:
       enum:
         - OTHER
@@ -5719,6 +5996,24 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeEnum:
+      enum:
+        - INCORPORATION
+        - CESSION
+        - TENEUR
+        - LIVRAISON_DIRECTE
+        - MAC_BIO
+        - EXPORTATION
+        - DEVALUATION
+      type: string
+      description: |-
+        * `INCORPORATION` - INCORPORATION
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
+        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+        * `MAC_BIO` - MAC_BIO
+        * `EXPORTATION` - EXPORTATION
+        * `DEVALUATION` - DEVALUATION
     UpdatedQuotasRequest:
       type: object
       properties:

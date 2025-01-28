@@ -22,7 +22,7 @@ import {
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
-import { CategoryEnum } from "api-schema"
+import { PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum } from "api-schema"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,

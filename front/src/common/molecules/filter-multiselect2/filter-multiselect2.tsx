@@ -6,7 +6,7 @@ export interface FilterMultiSelectProps2 {
   filterLabels: Record<string, string>
   selected: CBFilterSelection
   onSelect: (filters: CBFilterSelection) => void
-  getFilterOptions: (filter: string) => Promise<any[]>
+  getFilterOptions: (filter: string) => Promise<(string | number)[]>
 }
 export const FilterMultiSelect2 = ({
   filterLabels,
@@ -15,7 +15,7 @@ export const FilterMultiSelect2 = ({
   getFilterOptions,
 }: FilterMultiSelectProps2) => {
   const filters = Object.keys(filterLabels)
-  console.log(filters)
+
   return (
     <ShowMore>
       {filters.map((filter) => (

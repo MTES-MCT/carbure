@@ -1,7 +1,17 @@
-export enum OperationsFilter {
-  STATUS = "status",
-  SECTOR = "sector",
-  TYPE = "type", // CESSION, DEVALUATION, EXPORTATION, INCORPORATION, LIVRAISON_DIRECTE, MAC_BIO, TENEUR
-  CATEGORY = "customs_category",
-  BIOFUEL = "biofuel",
+import {
+  PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
+  PathsApiTiruertOperationsGetParametersQueryStatus as OperationsStatus,
+} from "api-schema"
+import { CBQueryParams } from "common/hooks/query-builder-2"
+
+export { OperationsFilter, OperationsStatus }
+
+export interface OperationsQuery
+  extends CBQueryParams<[], OperationsStatus, undefined> {
+  [OperationsFilter.statuses]?: OperationsStatus[]
+  [OperationsFilter.sectors]?: string[]
+  [OperationsFilter.categories]?: string[]
+  [OperationsFilter.biofuels]?: string[]
+  [OperationsFilter.operations]?: string[]
+  [OperationsFilter.depots]?: string[]
 }

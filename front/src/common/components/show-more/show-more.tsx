@@ -41,7 +41,7 @@ export const ShowMore = ({
 
     const containerWidth = containerRef?.current?.offsetWidth ?? 0
     const showMoreButtonWidth = showMoreButtonRef?.current?.offsetWidth ?? 0
-    console.log("btn width", showMoreButtonWidth)
+
     const findOverflow = (defaultWidth = 0) => {
       if (!hiddenElementsRef?.current?.children) return -1
 

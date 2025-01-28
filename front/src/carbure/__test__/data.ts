@@ -1,4 +1,7 @@
-import { CategoryEnum, PreferredUnitEnum } from "api-schema"
+import {
+  PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum,
+  PreferredUnitEnum,
+} from "api-schema"
 import {
   Entity,
   EntityType,

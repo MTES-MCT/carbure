@@ -98,9 +98,9 @@ export function useCBQueryBuilder<
 }
 
 export function useCBQueryParamsStore<
-  S extends string,
+  S extends string | undefined,
   T extends string | undefined,
->(entity: Entity, year: number, status: S, type?: T) {
+>(entity: Entity, year: number, status?: S, type?: T) {
   const [limit, saveLimit] = useLimit()
   const [{ page, ...filtersParams }, setFiltersParams] = useFilterSearchParams()
 
@@ -213,7 +213,7 @@ export function useCBQueryParamsStore<
   }
 
   // // sync store state with status set in the route
-  if (state.status !== status) {
+  if (status && state.status !== status) {
     actions.setStatus(status)
   }
 
