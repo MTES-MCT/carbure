@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema, OpenApiParameter, OpenApiTypes
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response

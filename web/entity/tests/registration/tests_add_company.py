@@ -6,7 +6,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Entity, EntityCertificate, GenericCertificate, UserRights, UserRightsRequests
+from core.models import Entity, EntityCertificate, GenericCertificate, Pays, UserRights, UserRightsRequests
 from core.tests_utils import setup_current_user
 from entity.services.enable_entity import enable_entity
 
@@ -23,6 +23,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
         )
 
     def test_register_company(self):
+        Pays.objects.create(code_pays="FR", name="France", name_en="France")
         GenericCertificate.objects.create(
             certificate_id="EU-ISCC-Cert-PL123-12345678",
             certificate_type="ISCC",
@@ -51,6 +52,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
             params,
         )
         # # check new entity created
+
         assert response.status_code == 200
         entity = Entity.objects.get(legal_name="Mon entreprise test", registration_id="542051180")
         assert entity.registered_address == "1 rue de la paix"

@@ -3,8 +3,8 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import Entity, Pays
+from core.serializers import UserEntitySerializer as EntityUserEntitySerializer
 from transactions.models import Depot, ProductionSite
-from user.serializers.user import UserEntitySerializer as EntityUserEntitySerializer
 
 from .users import PaysSerializer
 

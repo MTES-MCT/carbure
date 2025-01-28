@@ -31,7 +31,7 @@ def search_company_view(request):
         company_found = search_company_gouv_fr(registration_id)
     except Exception:
         return Response(
-            {"message": SeachCompanyFormError.NO_COMPANY_FOUND},
+            {"error": SeachCompanyFormError.NO_COMPANY_FOUND},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -68,7 +68,7 @@ def search_company_view(request):
     except Entity.DoesNotExist:
         print("no registred company wit same siret")
 
-    return Response(response_data, status=status.HTTP_200_OK)
+    return Response({"data": response_data}, status=status.HTTP_200_OK)
 
 
 def search_company_gouv_fr(siren):

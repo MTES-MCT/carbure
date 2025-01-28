@@ -15,7 +15,7 @@ from transactions.models import ProductionSite
 
 
 class Endpoint:
-    change_user_role = reverse("entity-users-change-role")
+    change_user_role = reverse("api-entity-users-change-role")
 
 
 User = get_user_model()

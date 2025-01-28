@@ -6086,7 +6086,7 @@ components:
         registered_city:
           type: string
           maxLength: 64
-        registered_country_code:
+        registered_country:
           type: string
           minLength: 1
         registered_zipcode:

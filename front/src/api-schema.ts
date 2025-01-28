@@ -2074,7 +2074,7 @@ export interface components {
       legal_name?: string
       registered_address?: string
       registered_city?: string
-      registered_country_code?: string
+      registered_country?: string
       registered_zipcode?: string
       registration_id?: string
       sustainability_officer?: string

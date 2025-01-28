@@ -46,7 +46,7 @@ class EntityEnableSourceTest(TestCase):
         producer_user = setup_current_user(self, "user@entity.local", "Entity user", "gogogo", [])
 
         response = self.client.post(
-            reverse("entity-registration-add-company"),
+            reverse("api-entity-registration-add-company"),
             {**FAKE_COMPANY_DATA, "name": "Test Producer", "entity_type": Entity.PRODUCER},
         )
 

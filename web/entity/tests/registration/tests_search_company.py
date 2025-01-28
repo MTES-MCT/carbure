@@ -24,7 +24,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
 
     def test_search_company(self):
         response = self.client.post(
-            reverse("entity-registration-search-company"),
+            reverse("api-entity-registration-search-company"),
             {"registration_id": "542051180"},
         )
         assert response.status_code == 200
@@ -37,7 +37,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
         Entity.objects.create(name="name", registration_id=siren)
 
         response = self.client.post(
-            reverse("entity-registration-search-company"),
+            reverse("api-entity-registration-search-company"),
             {"registration_id": siren},
         )
         assert response.status_code == 200
@@ -47,7 +47,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
 
     def test_search_unexisting_company(self):
         response = self.client.post(
-            reverse("entity-registration-search-company"),
+            reverse("api-entity-registration-search-company"),
             {"registration_id": "753991464"},
         )
         assert response.status_code == 400

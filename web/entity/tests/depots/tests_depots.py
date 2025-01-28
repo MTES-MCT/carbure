@@ -27,7 +27,7 @@ class EntityDepotsTest(TestCase):
         url_get = "api-entity-depots-list"
         url_add = "api-entity-depots-add"
         # get 0
-        response = self.client.get(reverse(url_get) + f"?entity_id={self.admin.id}", {"entity_id": self.admin.id})
+        response = self.client.get(reverse(url_get), {"entity_id": self.admin.id, "company_id": self.admin.id})
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 0
@@ -42,7 +42,7 @@ class EntityDepotsTest(TestCase):
         response = self.client.post(reverse(url_add) + f"?entity_id={self.admin.id}", postdata)
         assert response.status_code == 200
         # get 1
-        response = self.client.get(reverse(url_get) + f"?entity_id={self.admin.id}", {"entity_id": self.admin.id})
+        response = self.client.get(reverse(url_get), {"entity_id": self.admin.id, "company_id": self.admin.id})
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1

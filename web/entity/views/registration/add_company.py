@@ -23,9 +23,7 @@ from core.utils import CarbureEnv
 
 
 class EntityCompanySerializer(serializers.ModelSerializer):
-    registered_country_code = serializers.SlugRelatedField(
-        queryset=Pays.objects.all(), slug_field="code_pays", required=False
-    )
+    registered_country = serializers.SlugRelatedField(queryset=Pays.objects.all(), slug_field="code_pays", required=False)
     certificate_type = serializers.ChoiceField(choices=GenericCertificate.CERTIFICATE_TYPES, required=False)
     certificate_id = serializers.CharField(required=False)
 
@@ -40,7 +38,7 @@ class EntityCompanySerializer(serializers.ModelSerializer):
             "legal_name",
             "registered_address",
             "registered_city",
-            "registered_country_code",
+            "registered_country",
             "registered_zipcode",
             "registration_id",
             "sustainability_officer",
