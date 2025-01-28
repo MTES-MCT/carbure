@@ -44,6 +44,7 @@ class Site(models.Model):
     name = models.CharField(max_length=128, blank=False)
     site_siret = models.CharField(max_length=64, blank=True)
     customs_id = models.CharField(max_length=32, blank=True)
+    icao_code = models.CharField(max_length=32, blank=True)
     site_type = models.CharField(max_length=32, choices=SITE_TYPE, default=OTHER)
     address = models.CharField(max_length=256, blank=True)
     postal_code = models.CharField(max_length=32, blank=True)
