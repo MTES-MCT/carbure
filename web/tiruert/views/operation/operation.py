@@ -1,14 +1,15 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Entity, MatierePremiere, UserRights
+from core.models import Entity, UserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.permissions import HasUserRights
-from tiruert.serializers import LotSerializer, OperationInputSerializer, OperationOutputSerializer
+from tiruert.serializers import OperationInputSerializer, OperationOutputSerializer
 
 from .mixins import ActionMixin
 
@@ -21,6 +22,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         HasUserRights(None, [Entity.OPERATOR]),
     )
     filterset_class = OperationFilter
+    filter_backends = [DjangoFilterBackend]
 
     def get_permissions(self):
         if self.action in ["reject", "accept", "balance"]:
@@ -75,57 +77,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         parameters=[
             OpenApiParameter(
                 name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
-            ),
-            OpenApiParameter(
-                name="type",
-                type=str,
-                enum=Operation.OPERATION_TYPES,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="customs_category",
-                type=str,
-                enum=MatierePremiere.MP_CATEGORIES,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="biofuel",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="credited_entity",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="debited_entity",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="depot",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="validity_date",
-                type=str,
-                location=OpenApiParameter.QUERY,
-                description="Format 2025-01-25",
-            ),
-            OpenApiParameter(
-                name="lots",
-                type=LotSerializer,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
+            )
         ],
         responses={
             status.HTTP_201_CREATED: OpenApiResponse(

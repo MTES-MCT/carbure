@@ -14,7 +14,7 @@ from tiruert.services.balance import BalanceService
 class BalanceActionMixin:
     @extend_schema(
         operation_id="list_balances",
-        description="Retrieve balances, by sector or by lot",
+        description="Retrieve balances grouped by mp category / biofuel or by sector",
         filters=True,
         parameters=[
             OpenApiParameter(
@@ -37,7 +37,9 @@ class BalanceActionMixin:
                 default="l",
             ),
         ],
-        responses={status.HTTP_200_OK: OpenApiResponse(response=BalanceSerializer, description="A list of operations.")},
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=BalanceSerializer, description="Balances by sector or by lot.")
+        },
     )
     @action(
         detail=False,
