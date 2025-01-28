@@ -24,7 +24,7 @@ class FilterActionMixin:
             OpenApiParameter(
                 name="filter",
                 type=str,
-                enum=["statuses", "sectors", "categories", "biofuels", "operations", "entities", "depots"],
+                enum=["status", "sector", "customs_category", "biofuel", "type", "from_to", "depot"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,
@@ -62,19 +62,19 @@ class FilterActionMixin:
         if not filter:
             raise ValidationError({"message": "No filter was specified"})
 
-        if filter == "statuses":
+        if filter == "status":
             column = "status"
-        elif filter == "sectors":
+        elif filter == "sector":
             column = "sector"
-        elif filter == "categories":
+        elif filter == "customs_category":
             column = "customs_category"
-        elif filter == "biofuels":
+        elif filter == "biofuel":
             column = "biofuel__code"
-        elif filter == "operations":
+        elif filter == "type":
             column = "type"
-        elif filter == "entities":
+        elif filter == "from_to":
             column = "entities"
-        elif filter == "depots":
+        elif filter == "depot":
             column = "depots"
         else:  # raise an error for unknown filters
             raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
