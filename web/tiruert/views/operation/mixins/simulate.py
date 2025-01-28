@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,6 +13,17 @@ from tiruert.services.teneur import TeneurService
 
 
 class SimulateActionMixin:
+    @extend_schema(
+        operation_id="simulate",
+        description="Simulate a blending operation",
+        request=SimulationInputSerializer,
+        responses={status.HTTP_200_OK: SimulationOutputSerializer},
+        parameters=[
+            OpenApiParameter(
+                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+            ),
+        ],
+    )
     @action(
         detail=False,
         methods=["post"],
@@ -49,6 +61,17 @@ class SimulateActionMixin:
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        operation_id="simulation_bounds",
+        description="Get bounds for blending operation",
+        request=SimulationInputSerializer,
+        responses={status.HTTP_200_OK: SimulationOutputSerializer},
+        parameters=[
+            OpenApiParameter(
+                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+            ),
+        ],
+    )
     @action(
         detail=False,
         methods=["post"],

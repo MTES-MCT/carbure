@@ -10,11 +10,14 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 
 class FilterActionMixin:
     @extend_schema(
+        operation_id="filter_operations",
+        description="Retrieve content of a specific filter",
         filters=True,
         parameters=[
             OpenApiParameter(
                 name="filter",
                 type=str,
+                enum=["statuses", "sectors", "categories", "biofuels", "operations", "entities", "depots"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
             ),
