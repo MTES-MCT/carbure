@@ -66,6 +66,21 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 description="Specify the volume unit (default is `l`).",
                 default="l",
             ),
+            OpenApiParameter(
+                name="sector",
+                type=str,
+                many=True,
+                enum=["ESSENCE", "DIESEL", "SAF"],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="depot",
+                type=str,
+                many=True,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
