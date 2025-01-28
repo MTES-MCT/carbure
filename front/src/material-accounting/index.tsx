@@ -7,18 +7,20 @@ import {
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRoutes } from "common/hooks/routes"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { Route, Routes } from "react-router-dom"
 import { Operations } from "./operations"
 import { Balance } from "./balance"
+import { useState } from "react"
 export const MaterialAccounting = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
+  const [operationCount, setOperationCount] = useState(0)
 
   return (
     <Main>
       <Button priority="primary" asideX>
-        Clôturer ma comptabilité mensuelle
+        <Trans>Clôturer ma comptabilité mensuelle</Trans>
       </Button>
       <Tabs
         tabs={[
@@ -30,7 +32,7 @@ export const MaterialAccounting = () => {
           },
           {
             key: "transactions",
-            label: t("Opérations"),
+            label: `${t("Opérations")} (${operationCount})`,
             path: routes.MATERIAL_ACCOUNTING.OPERATIONS,
             icon: SendPlaneLine,
           },
@@ -44,7 +46,10 @@ export const MaterialAccounting = () => {
       />
       <Content>
         <Routes>
-          <Route path="operations" element={<Operations />} />
+          <Route
+            path="operations"
+            element={<Operations setOperationCount={setOperationCount} />}
+          />
           <Route path="balance" element={<Balance />} />
         </Routes>
       </Content>

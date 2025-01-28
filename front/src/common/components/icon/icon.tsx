@@ -212,3 +212,11 @@ export const DraftFill = ({ ...props }: IconProps) => {
 export const ArrowRightLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-arrow-right-line" />
 }
+
+export const BarChartLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-bar-chart-2-line" />
+}
+
+export const BarChartFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-bar-chart-2-fill" />
+}

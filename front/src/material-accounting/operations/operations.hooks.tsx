@@ -5,12 +5,14 @@ import { apiTypes } from "common/services/api-fetch.types"
 import { OperationBadge } from "./components/operation-badge"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { formatOperationType, formatSector } from "./operations.utils"
-import useEntity from "carbure/hooks/entity"
+import {
+  formatOperationType,
+  formatSector,
+  isOperationDebit,
+} from "./operations.utils"
 
 export const useOperationsColumns = () => {
   const { t } = useTranslation()
-  const entity = useEntity()
 
   const columns: Column<apiTypes["OperationOutput"]>[] = [
     {
@@ -50,24 +52,33 @@ export const useOperationsColumns = () => {
     {
       key: "depot",
       header: t("Dépot"),
-      cell: (item) => <Cell text={item.from_depot?.name ?? "-"} />,
+      cell: (item) => <Cell text={item.to_depot?.name ?? "-"} />,
     },
     {
       key: "operation_type",
       header: t("Opération"),
       cell: (item) => <Cell text={t(formatOperationType(item.type))} />,
     },
-    // {
-    //   key: "from_to",
-    //   header: t("De/à"),
-    //   // @ts-ignore toto
-    //   cell: (item) => "-",
-    // },
+    {
+      key: "from_to",
+      header: t("De/à"),
+      cell: (item) => (
+        <Cell
+          text={
+            <>
+              {isOperationDebit(item.type)
+                ? (item.debited_entity?.name ?? "-")
+                : (item.credited_entity?.name ?? "-")}
+            </>
+          }
+        />
+      ),
+    },
     {
       key: "volume",
       header: t("Volume"),
       cell: (item) =>
-        item.debited_entity?.id === entity.id ? (
+        isOperationDebit(item.type) ? (
           <Text
             size="sm"
             fontWeight="semibold"

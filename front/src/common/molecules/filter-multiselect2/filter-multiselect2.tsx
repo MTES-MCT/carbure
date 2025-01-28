@@ -1,5 +1,5 @@
+import { Grid } from "common/components/scaffold"
 import { MultiSelect } from "common/components/selects2/multiselect"
-import { ShowMore } from "common/components/show-more/show-more"
 import { CBFilterSelection } from "common/hooks/query-builder-2"
 
 export interface FilterMultiSelectProps2 {
@@ -15,9 +15,8 @@ export const FilterMultiSelect2 = ({
   getFilterOptions,
 }: FilterMultiSelectProps2) => {
   const filters = Object.keys(filterLabels)
-
   return (
-    <ShowMore>
+    <Grid>
       {filters.map((filter) => (
         <MultiSelect
           key={filter}
@@ -27,8 +26,9 @@ export const FilterMultiSelect2 = ({
           sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
           onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
           getOptions={() => getFilterOptions(filter)}
+          full
         />
       ))}
-    </ShowMore>
+    </Grid>
   )
 }

@@ -116,11 +116,7 @@
 
 section.bar {
   display: flex;
-  /* background-color: var(--white); */
-  /* padding: var(--spacing-m) var(--main-spacing-x); */
   gap: var(--spacing-s);
-  /* box-shadow: var(--shadow); */
-  /* border-top: var(--border); */
 }
 
 section.actionbar {

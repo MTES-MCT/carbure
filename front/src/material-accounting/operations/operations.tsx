@@ -10,10 +10,15 @@ import * as api from "./api"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import { useOperationsColumns } from "./operations.hooks"
+import { Pagination } from "common/components/pagination2/pagination"
 
 const currentYear = new Date().getFullYear()
 
-export const Operations = () => {
+export const Operations = ({
+  setOperationCount,
+}: {
+  setOperationCount: (count: number) => void
+}) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -36,6 +41,9 @@ export const Operations = () => {
   const { result } = useQuery(api.getOperations, {
     key: "operations",
     params: [query],
+    onSuccess: (data) => {
+      setOperationCount(data?.data?.count ?? 0)
+    },
   })
 
   const columns = useOperationsColumns()
@@ -52,6 +60,11 @@ export const Operations = () => {
         }}
       />
       <Table columns={columns} rows={result?.data?.results ?? []} />
+      <Pagination
+        defaultPage={query.page}
+        total={result?.data?.count ?? 0}
+        limit={query.limit}
+      />
     </>
   )
 }

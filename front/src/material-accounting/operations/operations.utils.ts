@@ -31,7 +31,23 @@ export const formatOperationType = (type: string) => {
       return "Cession"
     case OperationType.MAC_BIO:
       return "Mise à consommation"
+    case OperationType.TENEUR:
+      return "Teneur"
+    case OperationType.EXPORTATION:
+      return "Exportation"
+    case OperationType.DEVALUATION:
+      return "Dévaluation"
+    case OperationType.LIVRAISON_DIRECTE:
+      return "Livraison directe"
     default:
       return "Inconnu"
   }
 }
+
+export const isOperationDebit = (operation: string) =>
+  [
+    OperationType.CESSION,
+    OperationType.TENEUR,
+    OperationType.EXPORTATION,
+    OperationType.DEVALUATION,
+  ].includes(operation as OperationType)
