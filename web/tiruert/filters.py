@@ -20,12 +20,15 @@ class OperationFilter(FilterSet):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
 
     def filter_sector(self, queryset, name, value):
-        if value == "ESSENCE":
-            return queryset.filter(biofuel__compatible_essence=True)
-        elif value == "DIESEL":
-            return queryset.filter(biofuel__compatible_diesel=True)
-        elif value == "SAF":
-            return queryset.filter(biofuel__code__in=SAF_BIOFUEL_TYPES)
+        sectors = value.split(",")
+        q_objects = Q()
+        if "ESSENCE" in sectors:
+            q_objects |= Q(biofuel__compatible_essence=True)
+        if "DIESEL" in sectors:
+            q_objects |= Q(biofuel__compatible_diesel=True)
+        if "SAF" in sectors:
+            q_objects |= Q(biofuel__code__in=SAF_BIOFUEL_TYPES)
+        return queryset.filter(q_objects).distinct()
 
     def filter_from_to(self, queryset, name, value):
         return queryset.filter(Q(credited_entity__name=value) | Q(debited_entity__name=value)).distinct()
