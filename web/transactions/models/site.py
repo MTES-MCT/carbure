@@ -19,6 +19,7 @@ class Site(models.Model):
     COGENERATION_PLANT = "COGENERATION PLANT"
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID"
     EFCA = "EFCA"
+    AIRPORT = "AIRPORT"
 
     SITE_TYPE = (
         (OTHER, "Autre"),
@@ -31,10 +32,12 @@ class Site(models.Model):
         (COGENERATION_PLANT, "COGENERATION PLANT"),
         (PRODUCTION_BIOLIQUID, "PRODUCTION BIOLIQUID"),
         (EFCA, "EFCA"),
+        (AIRPORT, "AIRPORT"),
     )
 
     DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT, EFCA]
     PRODUCTION_SITE_TYPES = [PRODUCTION_BIOLIQUID]
+    AIRPORT_TYPES = [AIRPORT]
 
     GES_OPTIONS = [("Default", "Valeurs par défaut"), ("Actual", "Valeurs réelles"), ("NUTS2", "Valeurs NUTS2")]
 

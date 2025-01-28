@@ -69,6 +69,30 @@ class SafTicketSource(models.Model):
     parent_lot = models.ForeignKey("core.CarbureLot", null=True, blank=True, on_delete=models.CASCADE)
     parent_ticket = models.ForeignKey("saf.SafTicket", null=True, blank=True, on_delete=models.CASCADE)
 
+    reception_airport = models.ForeignKey(
+        "transactions.Site", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_reception_airport"
+    )
+
+    MAC = "Mise à consommation mandat FR/EU"
+    MAC_DECLASSEMENT = "Mise à consommation hors mandat (déclassement)"
+    CONSUMPTION_TYPES = (
+        (MAC, MAC),
+        (MAC_DECLASSEMENT, MAC_DECLASSEMENT),
+    )
+    consumption_type = models.CharField(max_length=64, choices=CONSUMPTION_TYPES, null=True, blank=True)
+
+    PIPELINE = "Oléoduc"
+    TRUCK = "Camion"
+    TRAIN = "Train"
+    BARGE = "Barge"
+    SHIPPING_METHODS = (
+        (PIPELINE, PIPELINE),
+        (TRUCK, TRUCK),
+        (TRAIN, TRAIN),
+        (BARGE, BARGE),
+    )
+    shipping_method = models.CharField(max_length=64, choices=SHIPPING_METHODS, null=True, blank=True)
+
     def generate_carbure_id(self):
         production_country = self.production_country.code_pays if self.production_country else None
         self.carbure_id = "TS{period}-{production_country}-{id}".format(
