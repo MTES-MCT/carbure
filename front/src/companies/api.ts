@@ -1,5 +1,6 @@
 import { api as apiFetch } from "common/services/api-fetch"
 import { EntityType } from "carbure/types"
+import { CertificateTypeEnum } from "api-schema"
 
 export function searchCompanyDataBySiren(registration_id: string) {
   return apiFetch.POST("/entities/search-company/", {
@@ -23,10 +24,9 @@ export function registerCompany(
   website?: string,
   vat_number?: string,
   certificate_id?: string,
-  certificate_type?: string
+  certificate_type?: CertificateTypeEnum
 ) {
-  console.log("VERYUNSURE 51: not located")
-  return apiFetch.POST("/entities/add-company/", {
+  return apiFetch.POST("/entities/add-company", {
     body: {
       activity_description,
       entity_type,

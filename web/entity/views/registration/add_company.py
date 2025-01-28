@@ -3,9 +3,7 @@ from datetime import datetime
 from django.conf import settings
 from drf_spectacular.utils import (
     OpenApiExample,
-    OpenApiParameter,
     OpenApiResponse,
-    OpenApiTypes,
     extend_schema,
 )
 from rest_framework import serializers, status
@@ -63,15 +61,6 @@ class ApplyForNewCompanyError:
 
 
 @extend_schema(
-    parameters=[
-        OpenApiParameter(
-            "entity_id",
-            OpenApiTypes.INT,
-            OpenApiParameter.QUERY,
-            description="Entity ID",
-            required=True,
-        ),
-    ],
     request=EntityCompanySerializer,
     responses={
         200: OpenApiResponse(

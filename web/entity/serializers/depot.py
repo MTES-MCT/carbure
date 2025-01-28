@@ -4,8 +4,9 @@ from rest_framework import serializers
 
 from core.models import Entity, Pays
 from transactions.models import Depot, ProductionSite
+from user.serializers.user import UserEntitySerializer as EntityUserEntitySerializer
 
-from .users import EntityUserEntitySerializer, PaysSerializer
+from .users import PaysSerializer
 
 
 class CreateDepotSerializer(serializers.ModelSerializer):

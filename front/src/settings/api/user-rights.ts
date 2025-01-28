@@ -18,7 +18,7 @@ export function revokeUserRights(entity_id: number, email: string) {
 
 export function acceptUserRightsRequest(entity_id: number, request_id: number) {
   console.log("VERYUNSURE 13: not located")
-  return apiFetch.POST("/entities/users/grant-access/", {
+  return apiFetch.POST("/entities/users/accept-user/", {
     params: { query: { entity_id } },
     body: { request_id },
   })

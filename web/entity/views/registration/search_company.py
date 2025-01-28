@@ -1,7 +1,7 @@
 from math import e
 
 import requests
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -17,22 +17,6 @@ class SeachCompanyFormError:
 
 
 @extend_schema(
-    parameters=[
-        OpenApiParameter(
-            "entity_id",
-            OpenApiTypes.INT,
-            OpenApiParameter.QUERY,
-            description="Entity ID",
-            required=True,
-        ),
-        OpenApiParameter(
-            "registration_id",
-            OpenApiTypes.INT,
-            OpenApiParameter.QUERY,
-            description="SIREN",
-            required=True,
-        ),
-    ],
     request=SeachCompanySerializer,
     responses=ResponseDataSerializer,
 )

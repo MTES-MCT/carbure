@@ -1045,7 +1045,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntityUserEntity"
+                $ref: "#/components/schemas/UserEntity"
           description: ""
   /api/entities/{id}/enable/:
     post:
@@ -1090,13 +1090,6 @@ paths:
   /api/entities/add-company:
     post:
       operationId: entities_add_company_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
       tags:
         - entities
       requestBody:
@@ -2270,19 +2263,6 @@ paths:
   /api/entities/search-company/:
     post:
       operationId: entities_search_company_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: query
-          name: registration_id
-          schema:
-            type: integer
-          description: SIREN
-          required: true
       tags:
         - entities
       requestBody:
@@ -2328,13 +2308,13 @@ paths:
           content:
             application/json:
               schema:
-                metabase_iframe_url: url
+                $ref: "#/components/schemas/StatsResponse"
               examples:
                 SuccessExample:
                   value:
-                    metabase_iframe_url: url
+                    metabase_iframe_url: https://metabase.carbure.beta.gouv.fr/embed/dashboard/...#bordered=false&titled=false
                   summary: Success example
-          description: Request successful.
+          description: ""
         "400":
           content:
             application/json:
@@ -2862,7 +2842,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserRightsRequestsSeriaizer"
+                  $ref: "#/components/schemas/UserRightsRequests"
           description: ""
   /api/entities/users/update-right-request/:
     post:
@@ -6219,7 +6199,7 @@ components:
       type: object
       properties:
         entity:
-          $ref: "#/components/schemas/EntityUserEntity"
+          $ref: "#/components/schemas/UserEntity"
         users:
           type: integer
         requests:
@@ -6352,7 +6332,7 @@ components:
         blending_is_outsourced:
           type: boolean
         blender:
-          $ref: "#/components/schemas/EntityUserEntity"
+          $ref: "#/components/schemas/UserEntity"
         depot:
           allOf:
             - $ref: "#/components/schemas/EntityDepot"
@@ -6439,83 +6419,6 @@ components:
         - email
         - id
         - name
-    EntityUserEntity:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 64
-        entity_type:
-          $ref: "#/components/schemas/EntityTypeEnum"
-        has_mac:
-          type: boolean
-        has_trading:
-          type: boolean
-        has_direct_deliveries:
-          type: boolean
-        has_stocks:
-          type: boolean
-        legal_name:
-          type: string
-          maxLength: 128
-        registration_id:
-          type: string
-          maxLength: 64
-        sustainability_officer:
-          type: string
-          maxLength: 256
-        sustainability_officer_phone_number:
-          type: string
-          maxLength: 32
-        sustainability_officer_email:
-          type: string
-          maxLength: 254
-        registered_address:
-          type: string
-          maxLength: 256
-        registered_zipcode:
-          type: string
-          maxLength: 64
-        registered_city:
-          type: string
-          maxLength: 64
-        registered_country:
-          $ref: "#/components/schemas/Pays"
-        default_certificate:
-          type: string
-          nullable: true
-          maxLength: 64
-        preferred_unit:
-          $ref: "#/components/schemas/PreferredUnitEnum"
-        has_saf:
-          type: boolean
-        has_elec:
-          type: boolean
-        activity_description:
-          type: string
-        website:
-          type: string
-          format: uri
-          maxLength: 200
-        vat_number:
-          type: string
-          maxLength: 32
-        ext_admin_pages:
-          type: array
-          items: {}
-          readOnly: true
-        is_enabled:
-          type: boolean
-      required:
-        - entity_type
-        - ext_admin_pages
-        - id
-        - is_enabled
-        - name
-        - registered_country
     ErrorResponse:
       type: object
       properties:
@@ -7786,6 +7689,13 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
+    StatsResponse:
+      type: object
+      properties:
+        metabase_iframe_url:
+          type: string
+      required:
+        - metabase_iframe_url
     ToggleElecRequest:
       type: object
       properties:
@@ -8259,39 +8169,6 @@ components:
         - role
         - status
         - user
-    UserRightsRequestsSeriaizer:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        user:
-          type: array
-          items:
-            type: string
-          readOnly: true
-        entity:
-          $ref: "#/components/schemas/EntityUserEntity"
-        date_requested:
-          type: string
-          format: date-time
-          readOnly: true
-        status:
-          $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
-        comment:
-          type: string
-          nullable: true
-        role:
-          $ref: "#/components/schemas/RoleEnum"
-        expiration_date:
-          type: string
-          format: date-time
-          nullable: true
-      required:
-        - date_requested
-        - entity
-        - id
-        - user
     UserRightsRequestsStatusEnum:
       enum:
         - PENDING
@@ -8319,7 +8196,7 @@ components:
         requests:
           type: array
           items:
-            $ref: "#/components/schemas/UserRightsRequestsSeriaizer"
+            $ref: "#/components/schemas/UserRightsRequests"
       required:
         - requests
         - rights
@@ -8334,7 +8211,7 @@ components:
           format: email
           readOnly: true
         entity:
-          $ref: "#/components/schemas/EntityUserEntity"
+          $ref: "#/components/schemas/UserEntity"
         role:
           $ref: "#/components/schemas/RoleEnum"
         expiration_date:

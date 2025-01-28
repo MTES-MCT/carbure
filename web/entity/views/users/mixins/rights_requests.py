@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.models import UserRightsRequests
-from entity.serializers import UserRightsRequestsSeriaizer
+from user.serializers.user import UserRightsRequestsSerializer as UserRightsRequestsSeriaizer
 
 User = get_user_model()
 

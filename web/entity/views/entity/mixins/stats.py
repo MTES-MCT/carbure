@@ -10,11 +10,16 @@ from drf_spectacular.utils import (
     OpenApiTypes,
     extend_schema,
 )
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.models import Entity
+
+
+class StatsResponseSerializer(serializers.Serializer):
+    metabase_iframe_url = serializers.CharField()
+
 
 METABASE_SITE_URL = "https://metabase.carbure.beta.gouv.fr"
 
@@ -50,10 +55,7 @@ class EntityStatsActionMixin:
             ),
         ],
         responses={
-            200: OpenApiResponse(
-                response={"metabase_iframe_url": f"{METABASE_SITE_URL}/embed/dashboard/...#bordered=false&titled=false"},
-                description="Request successful.",
-            ),
+            200: StatsResponseSerializer,
             400: OpenApiResponse(
                 response={"message": ""},
                 description="Bad request.",
@@ -104,7 +106,9 @@ class EntityStatsActionMixin:
             }
             token = jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256")
             iframe_url = f"{METABASE_SITE_URL}/embed/dashboard/{token}#bordered=false&titled=false"
-            return Response({"metabase_iframe_url": iframe_url})
+            serializer = StatsResponseSerializer({"metabase_iframe_url": iframe_url})
+            serializer.is_valid(raise_exception=True)
+            return Response(serializer.validated_data)
         except Exception:
             traceback.print_exc()
             return Response(

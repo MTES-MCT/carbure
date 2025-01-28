@@ -2122,7 +2122,7 @@ export interface components {
       is_double_compte?: boolean
     }
     EntityMetrics: {
-      entity: components["schemas"]["EntityUserEntity"]
+      entity: components["schemas"]["UserEntity"]
       users: number
       requests: number
       depots: number
@@ -2165,7 +2165,7 @@ export interface components {
     EntitySite: {
       ownership_type: string
       blending_is_outsourced: boolean
-      blender: components["schemas"]["EntityUserEntity"]
+      blender: components["schemas"]["UserEntity"]
       readonly depot: components["schemas"]["EntityDepot"] | null
       readonly site: components["schemas"]["DepotProductionSite"] | null
     }
@@ -2196,34 +2196,6 @@ export interface components {
        * Format: email
        */
       email: string
-    }
-    EntityUserEntity: {
-      readonly id: number
-      name: string
-      entity_type: components["schemas"]["EntityTypeEnum"]
-      has_mac?: boolean
-      has_trading?: boolean
-      has_direct_deliveries?: boolean
-      has_stocks?: boolean
-      legal_name?: string
-      registration_id?: string
-      sustainability_officer?: string
-      sustainability_officer_phone_number?: string
-      sustainability_officer_email?: string
-      registered_address?: string
-      registered_zipcode?: string
-      registered_city?: string
-      registered_country: components["schemas"]["Pays"]
-      default_certificate?: string | null
-      preferred_unit?: components["schemas"]["PreferredUnitEnum"]
-      has_saf?: boolean
-      has_elec?: boolean
-      activity_description?: string
-      /** Format: uri */
-      website?: string
-      vat_number?: string
-      readonly ext_admin_pages: unknown[]
-      is_enabled: boolean
     }
     ErrorResponse: {
       message: string
@@ -2725,6 +2697,9 @@ export interface components {
      * @enum {string}
      */
     SiteTypeEnum: SiteTypeEnum
+    StatsResponse: {
+      metabase_iframe_url: string
+    }
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean
@@ -2914,18 +2889,6 @@ export interface components {
       /** Format: date-time */
       expiration_date?: string | null
     }
-    UserRightsRequestsSeriaizer: {
-      readonly id: number
-      readonly user: string[]
-      entity: components["schemas"]["EntityUserEntity"]
-      /** Format: date-time */
-      readonly date_requested: string
-      status?: components["schemas"]["UserRightsRequestsStatusEnum"]
-      comment?: string | null
-      role?: components["schemas"]["RoleEnum"]
-      /** Format: date-time */
-      expiration_date?: string | null
-    }
     /**
      * @description * `PENDING` - En attente de validation
      *     * `ACCEPTED` - Accepté
@@ -2936,13 +2899,13 @@ export interface components {
     UserRightsRequestsStatusEnum: UserRightsRequestsStatusEnum
     UserRightsResponseSeriaizer: {
       rights: components["schemas"]["UserRightsSeriaizer"][]
-      requests: components["schemas"]["UserRightsRequestsSeriaizer"][]
+      requests: components["schemas"]["UserRightsRequests"][]
     }
     UserRightsSeriaizer: {
       readonly name: string
       /** Format: email */
       readonly email: string
-      entity: components["schemas"]["EntityUserEntity"]
+      entity: components["schemas"]["UserEntity"]
       role?: components["schemas"]["RoleEnum"]
       /** Format: date-time */
       expiration_date?: string | null
@@ -3754,7 +3717,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["EntityUserEntity"]
+          "application/json": components["schemas"]["UserEntity"]
         }
       }
     }
@@ -3792,10 +3755,7 @@ export interface operations {
   }
   entities_add_company_create: {
     parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-      }
+      query?: never
       header?: never
       path?: never
       cookie?: never
@@ -4683,12 +4643,7 @@ export interface operations {
   }
   entities_search_company_create: {
     parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-        /** @description SIREN */
-        registration_id: number
-      }
+      query?: never
       header?: never
       path?: never
       cookie?: never
@@ -4723,13 +4678,12 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Request successful. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": unknown
+          "application/json": components["schemas"]["StatsResponse"]
         }
       }
       /** @description Bad request. */
@@ -5126,7 +5080,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserRightsRequestsSeriaizer"][]
+          "application/json": components["schemas"]["UserRightsRequests"][]
         }
       }
     }
