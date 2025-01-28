@@ -1,7 +1,9 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from core.models import MatierePremiere
 from tiruert.serializers.teneur import (
     SimulationInputSerializer,
     SimulationMinMaxInputSerializer,
@@ -12,6 +14,64 @@ from tiruert.services.teneur import TeneurService
 
 
 class SimulateActionMixin:
+    @extend_schema(
+        operation_id="simulate",
+        description="Simulate a blending operation",
+        request=SimulationInputSerializer,
+        responses={status.HTTP_200_OK: SimulationOutputSerializer},
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+            ),
+            OpenApiParameter(
+                name="customs_category",
+                type=str,
+                enum=MatierePremiere.MP_CATEGORIES,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="biofuel",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="debited_entity",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="target_volume",
+                type=float,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="target_emission",
+                type=float,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="max_n_batches",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="enforced_volumes",
+                type=int,
+                many=True,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+        ],
+    )
     @action(
         detail=False,
         methods=["post"],
