@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from transactions.models.site import Site
+
 
 class SafTicketSourceAssignmentSerializer(serializers.Serializer):
     client_id = serializers.IntegerField(required=True)
@@ -8,6 +10,11 @@ class SafTicketSourceAssignmentSerializer(serializers.Serializer):
     agreement_date = serializers.CharField(required=False)
     free_field = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     assignment_period = serializers.IntegerField(required=True)
+    reception_airport = serializers.PrimaryKeyRelatedField(
+        queryset=Site.objects.filter(site_type=Site.AIRPORT), required=False
+    )
+    consumption_type = serializers.CharField(required=False)
+    shipping_method = serializers.CharField(required=False)
 
 
 class SafTicketSourceGroupAssignmentSerializer(SafTicketSourceAssignmentSerializer):
