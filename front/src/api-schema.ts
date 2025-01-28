@@ -3850,7 +3850,7 @@ export interface operations {
   }
   list_operations: {
     parameters: {
-      query?: {
+      query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -3860,7 +3860,7 @@ export interface operations {
         /** @description Include detailed information if set to `1`. */
         details?: boolean
         /** @description Authorised entity ID. */
-        entity_id?: string
+        entity_id: number
         from_to?: string
         /** @description A page number within the paginated result set. */
         page?: number
@@ -4094,7 +4094,7 @@ export interface operations {
   }
   list_balances: {
     parameters: {
-      query?: {
+      query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -4102,7 +4102,7 @@ export interface operations {
         date_from?: string
         date_to?: string
         /** @description Authorised entity ID. */
-        entity_id?: string
+        entity_id: number
         from_to?: string
         /** @description Group by sector or by lot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
@@ -4133,16 +4133,17 @@ export interface operations {
   }
   filter_operations: {
     parameters: {
-      query?: {
+      query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
-        entity_id?: string
+        /** @description Authorised entity ID. */
+        entity_id: number
         /** @description Filter string to apply */
-        filter?: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
+        filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
         sector?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -4168,9 +4169,9 @@ export interface operations {
   }
   simulate: {
     parameters: {
-      query?: {
+      query: {
         /** @description Authorised entity ID. */
-        entity_id?: string
+        entity_id: number
       }
       header?: never
       path?: never
@@ -4196,9 +4197,9 @@ export interface operations {
   }
   simulation_bounds: {
     parameters: {
-      query?: {
+      query: {
         /** @description Authorised entity ID. */
-        entity_id?: string
+        entity_id: number
       }
       header?: never
       path?: never

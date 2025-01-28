@@ -2657,8 +2657,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
           description: Authorised entity ID.
+          required: true
         - in: query
           name: from_to
           schema:
@@ -3026,8 +3027,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
           description: Authorised entity ID.
+          required: true
         - in: query
           name: from_to
           schema:
@@ -3141,7 +3143,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: query
           name: filter
           schema:
@@ -3155,6 +3159,7 @@ paths:
               - sectors
               - statuses
           description: Filter string to apply
+          required: true
         - in: query
           name: from_to
           schema:
@@ -3225,8 +3230,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
           description: Authorised entity ID.
+          required: true
       tags:
         - tiruert
       requestBody:
@@ -3259,8 +3265,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
           description: Authorised entity ID.
+          required: true
       tags:
         - tiruert
       requestBody:

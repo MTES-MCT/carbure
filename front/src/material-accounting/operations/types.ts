@@ -15,3 +15,11 @@ export interface OperationsQuery
   [OperationsFilter.operations]?: string[]
   [OperationsFilter.depots]?: string[]
 }
+
+export enum OperationType {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  MAC_BIO = "MAC_BIO",
+  ACQUISITION = "ACQUISITION",
+  TENEUR = "TENEUR",
+}

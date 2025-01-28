@@ -1,5 +1,6 @@
 import { OperationsFilter, OperationsQuery } from "./types"
 import { api as apiFetch } from "common/services/api-fetch"
+
 export const getOperationsFilters = (
   filter: string,
   query: OperationsQuery
@@ -8,9 +9,19 @@ export const getOperationsFilters = (
     params: {
       query: {
         ...query,
-        entity_id: `${query.entity_id}`,
         status: query.statuses,
         filter: filter as OperationsFilter,
+      },
+    },
+  })
+}
+
+export const getOperations = (query: OperationsQuery) => {
+  return apiFetch.GET("/tiruert/operations/", {
+    params: {
+      query: {
+        ...query,
+        status: query.statuses,
       },
     },
   })

@@ -7,6 +7,9 @@ import {
 } from "common/hooks/query-builder-2"
 import useEntity from "carbure/hooks/entity"
 import * as api from "./api"
+import { Table } from "common/components/table2"
+import { useQuery } from "common/hooks/async"
+import { useOperationsColumns } from "./operations.hooks"
 
 const currentYear = new Date().getFullYear()
 
@@ -30,6 +33,13 @@ export const Operations = () => {
 
   const query = useCBQueryBuilder<[], OperationsStatus, undefined>(state)
 
+  const { result } = useQuery(api.getOperations, {
+    key: "operations",
+    params: [query],
+  })
+
+  const columns = useOperationsColumns()
+
   return (
     <>
       <FilterMultiSelect2
@@ -41,6 +51,7 @@ export const Operations = () => {
           return res.data ?? []
         }}
       />
+      <Table columns={columns} rows={result?.data?.results ?? []} />
     </>
   )
 }

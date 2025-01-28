@@ -12,7 +12,8 @@
   font-weight: 600;
 }
 
-.main {
+.main,
+.content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-3w);
