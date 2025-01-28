@@ -321,7 +321,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Tri
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -410,7 +410,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Tri
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -463,7 +463,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Tri
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -520,7 +520,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Tri
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -1379,7 +1379,7 @@ paths:
                 - period
                 - volume
           description: |-
-            Ordre
+            Tri
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -1604,7 +1604,7 @@ paths:
                 - period
                 - volume
           description: |-
-            Ordre
+            Tri
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -1754,7 +1754,7 @@ paths:
                 - period
                 - volume
           description: |-
-            Ordre
+            Tri
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -1943,7 +1943,7 @@ paths:
                 - suppliers
                 - volume
           description: |-
-            Ordre
+            Tri
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -2293,7 +2293,7 @@ paths:
                 - suppliers
                 - volume
           description: |-
-            Ordre
+            Tri
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -2447,7 +2447,7 @@ paths:
                 - suppliers
                 - volume
           description: |-
-            Ordre
+            Tri
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -3042,6 +3042,16 @@ components:
         comment:
           type: string
           minLength: 1
+    ConsumptionTypeEnum:
+      enum:
+        - Mise à consommation mandat FR/EU
+        - Mise à consommation hors mandat (déclassement)
+      type: string
+      description: >-
+        * `Mise à consommation mandat FR/EU` - Mise à consommation mandat FR/EU
+
+        * `Mise à consommation hors mandat (déclassement)` - Mise à consommation
+        hors mandat (déclassement)
     CorrectionStatusEnum:
       enum:
         - NO_PROBLEMO
@@ -4512,6 +4522,17 @@ components:
           allOf:
             - $ref: "#/components/schemas/SafTicketSourcePreview"
           readOnly: true
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ShippingMethodEnum"
+          nullable: true
+        reception_airport:
+          type: integer
+          nullable: true
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
       required:
         - assignment_period
         - biofuel
@@ -4640,6 +4661,12 @@ components:
           nullable: true
         assignment_period:
           type: integer
+        reception_airport:
+          type: integer
+        consumption_type:
+          type: string
+        shipping_method:
+          type: string
       required:
         - assignment_period
         - client_id
@@ -4663,6 +4690,14 @@ components:
           nullable: true
         assignment_period:
           type: integer
+        reception_airport:
+          type: integer
+        consumption_type:
+          type: string
+          minLength: 1
+        shipping_method:
+          type: string
+          minLength: 1
       required:
         - assignment_period
         - client_id
@@ -4806,6 +4841,14 @@ components:
           nullable: true
         assignment_period:
           type: integer
+        reception_airport:
+          type: integer
+        consumption_type:
+          type: string
+          minLength: 1
+        shipping_method:
+          type: string
+          minLength: 1
         ticket_sources_ids:
           type: array
           items:
@@ -4846,6 +4889,18 @@ components:
         - assigned_volume
         - id
         - total_volume
+    ShippingMethodEnum:
+      enum:
+        - Oléoduc
+        - Camion
+        - Train
+        - Barge
+      type: string
+      description: |-
+        * `Oléoduc` - Oléoduc
+        * `Camion` - Camion
+        * `Train` - Train
+        * `Barge` - Barge
     SiteTypeEnum:
       enum:
         - OTHER
@@ -4858,6 +4913,7 @@ components:
         - COGENERATION PLANT
         - PRODUCTION BIOLIQUID
         - EFCA
+        - AIRPORT
       type: string
       description: |-
         * `OTHER` - Autre
@@ -4870,6 +4926,7 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
+        * `AIRPORT` - AIRPORT
     TransportDocumentTypeEnum:
       enum:
         - DAU
