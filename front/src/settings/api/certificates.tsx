@@ -11,7 +11,6 @@ export function getMyCertificates(
   entity_id: number,
   production_site_id?: number
 ) {
-  console.log("OKOKOK 40 empty array")
   return apiFetch.GET("/entities/certificates/", {
     params: { query: { entity_id, production_site_id } },
   })
@@ -22,7 +21,6 @@ export function addCertificate(
   certificate_id: string,
   certificate_type: CertificateType
 ) {
-  console.log("OKOKOK 41")
   return apiFetch.POST("/entities/certificates/add/", {
     params: { query: { entity_id } },
     body: {
@@ -37,7 +35,6 @@ export function deleteCertificate(
   certificate_id: string,
   certificate_type: CertificateType
 ) {
-  console.log("OKOKOK 42")
   return apiFetch.POST("/entities/certificates/delete/", {
     params: { query: { entity_id } },
     body: {
@@ -54,7 +51,6 @@ export function updateCertificate(
   new_certificate_id: string,
   new_certificate_type: CertificateType
 ) {
-  console.log("OKOKOK 43")
   return apiFetch.POST("/entities/certificates/update-certificate/", {
     params: { query: { entity_id } },
     body: {
@@ -70,7 +66,6 @@ export function setDefaultCertificate(
   entity_id: number,
   certificate_id: string
 ) {
-  console.log("OKOKOK 44")
   return apiFetch.POST("/entities/certificates/set-default/", {
     params: { query: { entity_id } },
     body: {

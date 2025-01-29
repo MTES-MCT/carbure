@@ -113,15 +113,6 @@ export async function findMyCertificates(
     production_site_id?: number
   }
 ) {
-  console.log("OKOKOK 90", query, "opt", options)
-  // return apiFetch
-  //   .GET("/entities/certificates/", {
-  //     params: { query: { query, ...options } },
-  //   })
-  //   .then(extract)
-  //   .then((certificates) =>
-  //     certificates.map((c) => c.certificate.certificate_id)
-  // )
   const res = await apiFetch.GET("/entities/certificates/", {
     params: { query: { query, ...options } },
   })
@@ -135,7 +126,6 @@ export async function findMyCertificates(
 
 export async function getNotifications(entity_id: number) {
   if (entity_id === -1) return
-  console.log("OKOKOKOKOK 91")
   return apiFetch.GET("/entities/notifications/", {
     params: { query: { entity_id } },
   })
@@ -145,7 +135,6 @@ export function ackNotifications(
   entity_id: number,
   notification_ids: number[]
 ) {
-  console.log("OKOKOKOK 92")
   return apiFetch.POST("/entities/notifications/ack/", {
     params: { query: { entity_id } },
     body: { notification_ids },

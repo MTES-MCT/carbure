@@ -3,7 +3,6 @@ import { api as apiFetch } from "common/services/api-fetch"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/entities/release-for-consumption/"
-  console.log("VERYUNSURE 31: not located")
   return apiFetch.POST(endpoint, {
     params: { query: { entity_id } },
     body: {
@@ -14,7 +13,6 @@ export function toggleMAC(entity_id: number, shouldEnable: boolean) {
 
 export function toggleTrading(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/entities/trading/"
-  console.log("VERYUNSURE 32: not located")
   return apiFetch.POST(endpoint, {
     params: { query: { entity_id } },
     body: {
@@ -24,7 +22,6 @@ export function toggleTrading(entity_id: number, shouldEnable: boolean) {
 }
 export function toggleElec(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/entities/elec/"
-  console.log("VERYUNSURE 33: not located")
   return apiFetch.POST(endpoint, {
     params: { query: { entity_id } },
     body: {
@@ -35,7 +32,6 @@ export function toggleElec(entity_id: number, shouldEnable: boolean) {
 
 export function toggleStocks(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/entities/stocks/"
-  console.log("VERYUNSURE 34: not located")
   return apiFetch.POST(endpoint, {
     params: { query: { entity_id } },
     body: {
@@ -49,7 +45,6 @@ export function toggleDirectDeliveries(
   shouldEnable: boolean
 ) {
   const endpoint = "/entities/direct-deliveries/"
-  console.log("VERYUNSURE 35: not located")
   return apiFetch.POST(endpoint, {
     params: { query: { entity_id } },
     body: {
@@ -73,7 +68,6 @@ export function updateEntity(
   website: string,
   vat_number: string
 ) {
-  console.log("OKOKOK 36")
   return apiFetch.POST("/entities/update-entity-info/", {
     params: { query: { entity_id } },
     body: {
@@ -94,7 +88,6 @@ export function updateEntity(
 }
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
-  console.log("VERYUNSURE 37: not located")
   return apiFetch.POST("/entities/unit/", {
     params: { query: { entity_id } },
     body: {

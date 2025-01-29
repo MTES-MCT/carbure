@@ -17,7 +17,6 @@ export function addDeliverySite(
   blending_outsourced: boolean,
   blending_entity: EntityPreview | undefined
 ) {
-  console.log("OKOKOK 22")
   return apiFetch.POST("/entities/depots/add/", {
     params: { query: { entity_id } },
     body: {
@@ -42,7 +41,6 @@ export function createNewDeliverySite(
   thermal_efficiency?: number,
   useful_temperature?: number
 ) {
-  console.log("OKOKOK 23, to validate")
   return apiFetch.POST("/entities/depots/create-depot/", {
     params: { query: { entity_id } },
     body: {
@@ -65,7 +63,6 @@ export function deleteDeliverySite(
   entity_id: number,
   delivery_site_id: string
 ) {
-  console.log("OKOKOK 24")
   return apiFetch.POST("/entities/depots/delete-depot/", {
     params: { query: { entity_id } },
     body: {
