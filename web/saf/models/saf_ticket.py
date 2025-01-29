@@ -101,6 +101,16 @@ class SafTicket(models.Model):
     )
     shipping_method = models.CharField(max_length=64, choices=SHIPPING_METHODS, null=True, blank=True)
 
+    ETS_VALUATION = "ETS_VALUATION"
+    OUTSIDE_ETS = "OUTSIDE_ETS"
+    NOT_CONCERNED = "NOT_CONCERNED"
+    ETS_STATUS = (
+        (ETS_VALUATION, "Valorisation ETS"),
+        (OUTSIDE_ETS, "Hors ETS (schéma volontaire)"),
+        (NOT_CONCERNED, "Non concerné"),
+    )
+    ets_status = models.CharField(max_length=16, choices=ETS_STATUS, null=True, blank=True)
+
     def generate_carbure_id(self):
         production_country = self.production_country.code_pays if self.production_country else None
         self.carbure_id = "T{period}-{production_country}-{id}".format(
