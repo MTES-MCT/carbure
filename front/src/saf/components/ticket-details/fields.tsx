@@ -85,6 +85,27 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
           />
         )}
+        {ticket.shipping_method && (
+          <TextInput
+            label={t("Méthode de livraison")}
+            value={ticket.shipping_method}
+            readOnly
+          />
+        )}
+        {ticket.consumption_type && (
+          <TextInput
+            label={t("Type de consommation")}
+            value={ticket.consumption_type}
+            readOnly
+          />
+        )}
+        {ticket.reception_airport && (
+          <TextInput
+            label={t("Méthode de livraison")}
+            value={ticket.reception_airport.name}
+            readOnly
+          />
+        )}
       </Fieldset>
       <DurabilityFields durability={ticket} />
     </div>

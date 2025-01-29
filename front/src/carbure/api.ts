@@ -98,6 +98,14 @@ export async function findDepots(query?: string, public_only?: boolean) {
   return res.data ?? []
 }
 
+export async function findAirports(query?: string, public_only?: boolean) {
+  const res = await apiFetch.GET("/resources/airports", {
+    params: { query: { query, public_only } },
+  })
+
+  return res.data ?? []
+}
+
 export async function findCertificates(query: string) {
   const res = await apiFetch.GET("/resources/certificates", {
     params: { query: { query } },

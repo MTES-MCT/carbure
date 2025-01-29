@@ -13,9 +13,9 @@ import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/pages/operator/types"
 import * as api from "../../pages/operator/api"
+import * as apiResources from "carbure/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import { findDepots } from "carbure/api"
 import Select from "common/components/select"
 import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
 
@@ -78,8 +78,7 @@ export const TicketAssignment = ({
   }
 
   const findAirports = (query: string) => {
-    // @TODO find actual airports
-    return findDepots(query)
+    return apiResources.findAirports(query)
   }
 
   return (
@@ -133,8 +132,7 @@ export const TicketAssignment = ({
                     required
                     label={t("Aéroport de réception")}
                     getOptions={findAirports}
-                    // @ts-ignore type issue
-                    normalize={norm.normalizeDepot}
+                    normalize={norm.normalizeAirport}
                     {...bind("reception_airport")}
                   />
 
@@ -145,12 +143,12 @@ export const TicketAssignment = ({
                     {...bind("shipping_method")}
                     options={[
                       {
-                        value: ShippingMethodEnum.Ol_oduc,
+                        value: ShippingMethodEnum.PIPELINE,
                         label: t("Oléoduc"),
                       },
-                      { value: ShippingMethodEnum.Camion, label: t("Camion") },
-                      { value: ShippingMethodEnum.Train, label: t("Train") },
-                      { value: ShippingMethodEnum.Barge, label: t("Barge") },
+                      { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
+                      { value: ShippingMethodEnum.TRAIN, label: t("Train") },
+                      { value: ShippingMethodEnum.BARGE, label: t("Barge") },
                     ]}
                   />
 
@@ -161,13 +159,11 @@ export const TicketAssignment = ({
                     {...bind("consumption_type")}
                     options={[
                       {
-                        value:
-                          ConsumptionTypeEnum.Mise_consommation_mandat_FR_EU,
+                        value: ConsumptionTypeEnum.MAC,
                         label: t("Mise à consommation mandat FR/EU"),
                       },
                       {
-                        value:
-                          ConsumptionTypeEnum.Mise_consommation_hors_mandat_d_classement_,
+                        value: ConsumptionTypeEnum.MAC_DECLASSEMENT,
                         label: t(
                           "Mise à consommation hors mandat (déclassement)"
                         ),

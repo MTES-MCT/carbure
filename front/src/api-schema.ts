@@ -415,6 +415,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/resources/airports": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_airports_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/resources/biofuels": {
     parameters: {
       query?: never
@@ -881,6 +897,17 @@ export interface components {
       incoming: components["schemas"]["DoubleCountingRegistration"][]
       expired: components["schemas"]["DoubleCountingRegistration"][]
     }
+    Airport: {
+      readonly id: number
+      name: string
+      city?: string
+      icao_code?: string
+      readonly country: components["schemas"]["Country"]
+      site_type?: components["schemas"]["SiteTypeEnum"]
+      address?: string
+      postal_code?: string
+      gps_coordinates?: string | null
+    }
     ApplicationListe: {
       rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
       pending: components["schemas"]["DoubleCountingApplicationPartial"][]
@@ -1010,8 +1037,8 @@ export interface components {
       comment?: string
     }
     /**
-     * @description * `Mise à consommation mandat FR/EU` - Mise à consommation mandat FR/EU
-     *     * `Mise à consommation hors mandat (déclassement)` - Mise à consommation hors mandat (déclassement)
+     * @description * `MAC` - MAC
+     *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
      * @enum {string}
      */
     ConsumptionTypeEnum: ConsumptionTypeEnum
@@ -1590,7 +1617,7 @@ export interface components {
       client_comment?: string | null
       readonly parent_ticket_source: components["schemas"]["SafTicketSourcePreview"]
       shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
-      reception_airport?: number | null
+      readonly reception_airport: components["schemas"]["Airport"]
       consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
     }
     SafTicketPreview: {
@@ -1720,10 +1747,10 @@ export interface components {
       assigned_volume: number
     }
     /**
-     * @description * `Oléoduc` - Oléoduc
-     *     * `Camion` - Camion
-     *     * `Train` - Train
-     *     * `Barge` - Barge
+     * @description * `PIPELINE` - PIPELINE
+     *     * `TRUCK` - TRUCK
+     *     * `TRAIN` - TRAIN
+     *     * `BARGE` - BARGE
      * @enum {string}
      */
     ShippingMethodEnum: ShippingMethodEnum
@@ -2115,7 +2142,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2175,7 +2202,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2208,7 +2235,7 @@ export interface operations {
   double_counting_agreements_agreement_public_list: {
     parameters: {
       query?: {
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2241,7 +2268,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2598,6 +2625,30 @@ export interface operations {
       }
     }
   }
+  resources_airports_list: {
+    parameters: {
+      query?: {
+        /** @description Public Only */
+        public_only?: boolean
+        /** @description Search within the fields `name`, `icao_code` and `city` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Airport"][]
+        }
+      }
+    }
+  }
   resources_biofuels_list: {
     parameters: {
       query?: {
@@ -2872,7 +2923,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -2986,7 +3037,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3042,7 +3093,7 @@ export interface operations {
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3130,7 +3181,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3360,7 +3411,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3421,7 +3472,7 @@ export interface operations {
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3625,8 +3676,8 @@ export enum CertificateTypeEnum {
   Value2BS = "2BS",
 }
 export enum ConsumptionTypeEnum {
-  Mise_consommation_mandat_FR_EU = "Mise \u00E0 consommation mandat FR/EU",
-  Mise_consommation_hors_mandat_d_classement_ = "Mise \u00E0 consommation hors mandat (d\u00E9classement)",
+  MAC = "MAC",
+  MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
 }
 export enum CorrectionStatusEnum {
   NO_PROBLEMO = "NO_PROBLEMO",
@@ -3705,10 +3756,10 @@ export enum RoleEnum {
   Auditor = "AUDITOR",
 }
 export enum ShippingMethodEnum {
-  Ol_oduc = "Ol\u00E9oduc",
-  Camion = "Camion",
-  Train = "Train",
-  Barge = "Barge",
+  PIPELINE = "PIPELINE",
+  TRUCK = "TRUCK",
+  TRAIN = "TRAIN",
+  BARGE = "BARGE",
 }
 export enum SiteTypeEnum {
   OTHER = "OTHER",

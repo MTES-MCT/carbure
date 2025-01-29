@@ -81,18 +81,18 @@ class SafTicket(models.Model):
         "transactions.Site", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_reception_airport"
     )
 
-    MAC = "Mise à consommation mandat FR/EU"
-    MAC_DECLASSEMENT = "Mise à consommation hors mandat (déclassement)"
+    MAC = "MAC"
+    MAC_DECLASSEMENT = "MAC_DECLASSEMENT"
     CONSUMPTION_TYPES = (
         (MAC, MAC),
         (MAC_DECLASSEMENT, MAC_DECLASSEMENT),
     )
     consumption_type = models.CharField(max_length=64, choices=CONSUMPTION_TYPES, null=True, blank=True)
 
-    PIPELINE = "Oléoduc"
-    TRUCK = "Camion"
-    TRAIN = "Train"
-    BARGE = "Barge"
+    PIPELINE = "PIPELINE"
+    TRUCK = "TRUCK"
+    TRAIN = "TRAIN"
+    BARGE = "BARGE"
     SHIPPING_METHODS = (
         (PIPELINE, PIPELINE),
         (TRUCK, TRUCK),
