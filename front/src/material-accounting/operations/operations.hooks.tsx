@@ -10,6 +10,7 @@ import {
   formatOperationStatus,
   formatOperationType,
   formatSector,
+  getOperationEntity,
   isOperationDebit,
 } from "./operations.utils"
 import * as api from "./api"
@@ -79,17 +80,10 @@ export const useOperationsColumns = ({
     {
       key: "from_to",
       header: t("De/à"),
-      cell: (item) => (
-        <Cell
-          text={
-            <>
-              {isOperationDebit(item.type)
-                ? (item.debited_entity?.name ?? "-")
-                : (item.credited_entity?.name ?? "-")}
-            </>
-          }
-        />
-      ),
+      cell: (item) => {
+        const entity = getOperationEntity(item)
+        return <Cell text={entity ? entity.name : "-"} />
+      },
     },
     {
       key: "volume",

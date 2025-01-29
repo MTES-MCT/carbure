@@ -1,3 +1,4 @@
+import { apiTypes } from "common/services/api-fetch.types"
 import {
   OperationDebitOrCredit,
   OperationsStatus,
@@ -43,6 +44,8 @@ export const formatOperationType = (type: string) => {
       return "Dévaluation"
     case OperationType.LIVRAISON_DIRECTE:
       return "Livraison directe"
+    case OperationType.ACQUISITION:
+      return "Acquisition"
     default:
       return "Inconnu"
   }
@@ -81,3 +84,13 @@ export const isOperationDebit = (operation: string) =>
     OperationType.EXPORTATION,
     OperationType.DEVALUATION,
   ].includes(operation as OperationType)
+
+export const getOperationEntity = (operation: apiTypes["OperationOutput"]) =>
+  [
+    OperationType.TENEUR,
+    OperationType.EXPORTATION,
+    OperationType.DEVALUATION,
+    OperationType.ACQUISITION,
+  ].includes(operation.type as OperationType)
+    ? operation.debited_entity
+    : operation.credited_entity

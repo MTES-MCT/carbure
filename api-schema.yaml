@@ -2677,6 +2677,7 @@ paths:
             items:
               type: string
               enum:
+                - ACQUISITION
                 - CESSION
                 - DEVALUATION
                 - EXPORTATION
@@ -2684,9 +2685,6 @@ paths:
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
                 - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
         - name: page
           required: false
           in: query
@@ -2826,8 +2824,15 @@ paths:
           description: Invalid input data.
   /api/tiruert/operations/{id}/:
     get:
-      operationId: tiruert_operations_retrieve
+      operationId: get_operation
+      description: Retrieve one specific operation.
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -2845,7 +2850,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OperationOutput"
-          description: ""
+          description: A list of operations.
     put:
       operationId: tiruert_operations_update
       parameters:
@@ -3207,6 +3212,7 @@ paths:
             items:
               type: string
               enum:
+                - ACQUISITION
                 - CESSION
                 - DEVALUATION
                 - EXPORTATION
@@ -3214,9 +3220,6 @@ paths:
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
                 - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
         - in: query
           name: sector
           schema:

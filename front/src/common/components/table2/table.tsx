@@ -330,9 +330,7 @@ export const Cell = ({
       style={style}
     >
       <Tooltip title={`${text || sub}`}>
-        <strong>
-          {text || sub} {icon}
-        </strong>
+        {text || sub} {icon}
       </Tooltip>
       {text && sub !== undefined && <small title={`${sub}`}>{sub}</small>}
     </Col>

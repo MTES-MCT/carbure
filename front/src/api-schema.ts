@@ -861,7 +861,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["tiruert_operations_retrieve"]
+    /** @description Retrieve one specific operation. */
+    get: operations["get_operation"]
     put: operations["tiruert_operations_update"]
     post?: never
     /** @description Delete an operation. Only allowed for certain types and statuses. */
@@ -2077,7 +2078,7 @@ export interface components {
      *     * `DEVALUATION` - DEVALUATION
      * @enum {string}
      */
-    TypeEnum: PathsApiTiruertOperationsGetParametersQueryOperation
+    TypeEnum: PathsApiTiruertOperationsBalanceGetParametersQueryOperation
     UpdatedQuotasRequest: {
       approved_quotas: number[][]
     }
@@ -3863,7 +3864,6 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -3929,9 +3929,12 @@ export interface operations {
       }
     }
   }
-  tiruert_operations_retrieve: {
+  get_operation: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Opération. */
@@ -3941,6 +3944,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description A list of operations. */
       200: {
         headers: {
           [name: string]: unknown
@@ -4110,7 +4114,7 @@ export interface operations {
         /** @description Group by sector or by lot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        operation?: PathsApiTiruertOperationsBalanceGetParametersQueryOperation[]
         sector?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -4150,7 +4154,6 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -4375,6 +4378,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   TALLOL = "TALLOL",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
+  ACQUISITION = "ACQUISITION",
   CESSION = "CESSION",
   DEVALUATION = "DEVALUATION",
   EXPORTATION = "EXPORTATION",
@@ -4405,6 +4409,15 @@ export enum PathsApiTiruertOperationsGetParametersQueryUnit {
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
   lot = "lot",
   sector = "sector",
+}
+export enum PathsApiTiruertOperationsBalanceGetParametersQueryOperation {
+  CESSION = "CESSION",
+  DEVALUATION = "DEVALUATION",
+  EXPORTATION = "EXPORTATION",
+  INCORPORATION = "INCORPORATION",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  TENEUR = "TENEUR",
 }
 export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
   biofuel = "biofuel",
