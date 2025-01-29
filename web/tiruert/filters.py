@@ -20,7 +20,10 @@ class OperationFilter(FilterSet):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
 
     def filter_sector(self, queryset, name, value):
-        sectors = value.split(",")
+        sectors = self.request.GET.getlist(name)
+        if not sectors:
+            return queryset
+
         q_objects = Q()
         if "ESSENCE" in sectors:
             q_objects |= Q(biofuel__compatible_essence=True)
