@@ -29,6 +29,29 @@ class FilterActionMixin:
                 description="Filter string to apply",
                 required=True,
             ),
+            OpenApiParameter(
+                name="sector",
+                type=str,
+                many=True,
+                enum=["ESSENCE", "DIESEL", "SAF"],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="depot",
+                type=str,
+                many=True,
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+            OpenApiParameter(
+                name="type",
+                type=str,
+                many=True,
+                enum=["CREDIT", "DEBIT"],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
         ],
         examples=[
             OpenApiExample(
@@ -70,12 +93,14 @@ class FilterActionMixin:
             column = "customs_category"
         elif filter == "biofuel":
             column = "biofuel__code"
-        elif filter == "type":
+        elif filter == "operation":
             column = "type"
         elif filter == "from_to":
             column = "entities"
         elif filter == "depot":
             column = "depots"
+        elif filter == "type":
+            column = "types"
         else:  # raise an error for unknown filters
             raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
 
@@ -92,6 +117,12 @@ class FilterActionMixin:
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                 When(biofuel__compatible_diesel=True, then=Value("DIESEL")),
                 When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+            types=Case(
+                When(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"], then=Value("CREDIT")),
+                When(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"], then=Value("DEBIT")),
                 default=Value(None),
                 output_field=CharField(),
             ),

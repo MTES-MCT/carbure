@@ -81,6 +81,14 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 location=OpenApiParameter.QUERY,
                 description="",
             ),
+            OpenApiParameter(
+                name="type",
+                type=str,
+                many=True,
+                enum=["CREDIT", "DEBIT"],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
