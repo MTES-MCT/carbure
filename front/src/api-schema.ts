@@ -883,6 +883,11 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    AcceptRequest: {
+      ets_status: components["schemas"]["EtsStatusEnum"]
+      /** Format: date */
+      ets_declaration_date?: string
+    }
     ActivateAccountRequest: {
       uidb64: string
       token: string
@@ -1331,6 +1336,13 @@ export interface components {
       message: string
     }
     /**
+     * @description * `ETS_VALUATION` - Valorisation ETS
+     *     * `OUTSIDE_ETS` - Hors ETS (schéma volontaire)
+     *     * `NOT_CONCERNED` - Non concerné
+     * @enum {string}
+     */
+    EtsStatusEnum: EtsStatusEnum
+    /**
      * @description * `DCA` - DCA
      *     * `AGRIMER` - AGRIMER
      *     * `TIRIB` - TIRIB
@@ -1659,9 +1671,9 @@ export interface components {
       agreement_date?: string
       free_field?: string | null
       assignment_period: number
-      reception_airport?: number
-      consumption_type?: string
-      shipping_method?: string
+      reception_airport?: number | null
+      consumption_type?: string | null
+      shipping_method?: string | null
     }
     SafTicketSourceAssignmentRequest: {
       client_id: number
@@ -1671,9 +1683,9 @@ export interface components {
       agreement_date?: string
       free_field?: string | null
       assignment_period: number
-      reception_airport?: number
-      consumption_type?: string
-      shipping_method?: string
+      reception_airport?: number | null
+      consumption_type?: string | null
+      shipping_method?: string | null
     }
     SafTicketSourceDetails: {
       readonly id: number
@@ -1729,9 +1741,9 @@ export interface components {
       agreement_date?: string
       free_field?: string | null
       assignment_period: number
-      reception_airport?: number
-      consumption_type?: string
-      shipping_method?: string
+      reception_airport?: number | null
+      consumption_type?: string | null
+      shipping_method?: string | null
       ticket_sources_ids: number[]
     }
     SafTicketSourceParentLot: {
@@ -2142,7 +2154,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2202,7 +2214,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2235,7 +2247,7 @@ export interface operations {
   double_counting_agreements_agreement_public_list: {
     parameters: {
       query?: {
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2268,7 +2280,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2923,7 +2935,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3037,7 +3049,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3093,7 +3105,7 @@ export interface operations {
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3181,7 +3193,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3272,11 +3284,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: {
+    requestBody: {
       content: {
-        "application/json": components["schemas"]["CommentRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["CommentRequest"]
-        "multipart/form-data": components["schemas"]["CommentRequest"]
+        "application/json": components["schemas"]["AcceptRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["AcceptRequest"]
+        "multipart/form-data": components["schemas"]["AcceptRequest"]
       }
     }
     responses: {
@@ -3411,7 +3423,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3472,7 +3484,7 @@ export interface operations {
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
-        /** @description Ordre
+        /** @description Tri
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3719,6 +3731,11 @@ export enum EntityTypeEnum {
   Airline = "Compagnie a\u00E9rienne",
   Unknown = "Unknown",
   PowerOrHeatProducer = "Power or Heat Producer",
+}
+export enum EtsStatusEnum {
+  ETS_VALUATION = "ETS_VALUATION",
+  OUTSIDE_ETS = "OUTSIDE_ETS",
+  NOT_CONCERNED = "NOT_CONCERNED",
 }
 export enum ExtAdminPagesEnum {
   DCA = "DCA",
