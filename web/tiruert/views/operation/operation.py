@@ -89,6 +89,23 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 location=OpenApiParameter.QUERY,
                 description="",
             ),
+            OpenApiParameter(
+                name="operation",
+                type=str,
+                many=True,
+                enum=[
+                    "CESSION",
+                    "ACQUISITION",
+                    "DEVALUATION",
+                    "EXPORTATION",
+                    "INCORPORATION",
+                    "LIVRAISON_DIRECTE",
+                    "MAC_BIO",
+                    "TENEUR",
+                ],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
@@ -96,6 +113,25 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="get_operation",
+        description="Retrieve one specific operation.",
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="create_operation",
