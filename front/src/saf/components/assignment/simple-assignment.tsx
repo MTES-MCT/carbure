@@ -1,5 +1,5 @@
 import useEntity from "carbure/hooks/entity"
-import { Depot, EntityPreview, EntityType } from "carbure/types"
+import { EntityPreview, EntityType, Airport } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
@@ -202,7 +202,7 @@ const defaultAssignment = {
   assignment_period: formatPeriodFromDate(new Date()),
   agreement_reference: "" as string | undefined, //TODO for transfer only
   free_field: "" as string | undefined,
-  reception_airport: undefined as Depot | undefined,
+  reception_airport: undefined as Airport | undefined,
   shipping_method: undefined as ShippingMethodEnum | undefined,
   consumption_type: undefined as ConsumptionTypeEnum | undefined,
 }
