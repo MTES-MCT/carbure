@@ -1,18 +1,28 @@
 import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
   PathsApiTiruertOperationsGetParametersQueryStatus as OperationsStatus,
-  PathsApiTiruertOperationsGetParametersQueryType as OperationType,
+  PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
+  PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
+  PathsApiTiruertOperationsGetParametersQuerySector as OperationSector,
+  PathsApiTiruertOperationsGetParametersQueryOperation as OperationType,
 } from "api-schema"
 import { CBQueryParams } from "common/hooks/query-builder-2"
 
-export { OperationsFilter, OperationsStatus, OperationType }
+export {
+  OperationsFilter,
+  OperationsStatus,
+  OperationDebitOrCredit,
+  OperationSector,
+  OperationType,
+}
 
 export interface OperationsQuery
-  extends CBQueryParams<[], OperationsStatus, undefined> {
-  [OperationsFilter.statuses]?: OperationsStatus[]
-  [OperationsFilter.sectors]?: string[]
-  [OperationsFilter.categories]?: string[]
-  [OperationsFilter.biofuels]?: string[]
-  [OperationsFilter.operations]?: string[]
-  [OperationsFilter.depots]?: string[]
+  extends CBQueryParams<[], OperationsStatus[], string[]> {
+  [OperationsFilter.status]?: OperationsStatus[]
+  [OperationsFilter.sector]?: OperationSector[]
+  [OperationsFilter.customs_category]?: OperationBiofuelCategory[]
+  [OperationsFilter.biofuel]?: string[]
+  [OperationsFilter.type]?: OperationDebitOrCredit[]
+  [OperationsFilter.operation]?: OperationType[]
+  [OperationsFilter.depot]?: string[]
 }

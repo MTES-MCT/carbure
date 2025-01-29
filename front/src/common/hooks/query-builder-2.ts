@@ -33,10 +33,7 @@ const formatOrder = <Columns extends string[]>(
   return [mapping[order.direction]] as Columns
 }
 
-export type CBQueryStates<
-  S extends string | undefined,
-  T extends string | undefined,
-> = {
+export type CBQueryStates<S, T> = {
   entity: Entity
   year: number
   filters: CBFilterSelection
@@ -48,11 +45,7 @@ export type CBQueryStates<
   limit?: number
   order?: Order
 }
-export interface CBQueryParams<
-  Columns extends string[],
-  Status extends string | undefined,
-  Type extends string | undefined,
-> {
+export interface CBQueryParams<Columns extends string[], Status, Type> {
   entity_id: number
   year: number
   status?: Status
@@ -64,11 +57,9 @@ export interface CBQueryParams<
 }
 
 /* Hooks */
-export function useCBQueryBuilder<
-  Columns extends string[],
-  Status extends string | undefined,
-  Type extends string | undefined,
->(params: CBQueryStates<Status, Type>): CBQueryParams<Columns, Status, Type> {
+export function useCBQueryBuilder<Columns extends string[], Status, Type>(
+  params: CBQueryStates<Status, Type>
+): CBQueryParams<Columns, Status, Type> {
   const {
     entity,
     year,
@@ -97,10 +88,12 @@ export function useCBQueryBuilder<
   )
 }
 
-export function useCBQueryParamsStore<
-  S extends string | undefined,
-  T extends string | undefined,
->(entity: Entity, year: number, status?: S, type?: T) {
+export function useCBQueryParamsStore<S, T>(
+  entity: Entity,
+  year: number,
+  status?: S,
+  type?: T
+) {
   const [limit, saveLimit] = useLimit()
   const [{ page, ...filtersParams }, setFiltersParams] = useFilterSearchParams()
 

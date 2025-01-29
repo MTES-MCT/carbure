@@ -2077,7 +2077,7 @@ export interface components {
      *     * `DEVALUATION` - DEVALUATION
      * @enum {string}
      */
-    TypeEnum: PathsApiTiruertOperationsGetParametersQueryType
+    TypeEnum: PathsApiTiruertOperationsGetParametersQueryOperation
     UpdatedQuotasRequest: {
       approved_quotas: number[][]
     }
@@ -3857,19 +3857,21 @@ export interface operations {
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
+        depot?: string[]
         /** @description Include detailed information if set to `1`. */
         details?: boolean
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
         page_size?: number
-        sector?: string
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
         /** @description Specify the volume unit (default is `l`). */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
@@ -4101,16 +4103,18 @@ export interface operations {
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
+        depot?: string
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
         /** @description Group by sector or by lot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         sector?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        type?: string
         /** @description Specify the volume unit (default is `l`). */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
@@ -4140,15 +4144,17 @@ export interface operations {
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
+        depot?: string[]
         /** @description Authorised entity ID. */
         entity_id: number
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
-        sector?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
       }
       header?: never
@@ -4368,13 +4374,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   OTHER = "OTHER",
   TALLOL = "TALLOL",
 }
-export enum PathsApiTiruertOperationsGetParametersQueryStatus {
-  ACCEPTED = "ACCEPTED",
-  CANCELED = "CANCELED",
-  PENDING = "PENDING",
-  REJECTED = "REJECTED",
-}
-export enum PathsApiTiruertOperationsGetParametersQueryType {
+export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   CESSION = "CESSION",
   DEVALUATION = "DEVALUATION",
   EXPORTATION = "EXPORTATION",
@@ -4382,6 +4382,21 @@ export enum PathsApiTiruertOperationsGetParametersQueryType {
   LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
   MAC_BIO = "MAC_BIO",
   TENEUR = "TENEUR",
+}
+export enum PathsApiTiruertOperationsGetParametersQuerySector {
+  DIESEL = "DIESEL",
+  ESSENCE = "ESSENCE",
+  SAF = "SAF",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryStatus {
+  ACCEPTED = "ACCEPTED",
+  CANCELED = "CANCELED",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryType {
+  CREDIT = "CREDIT",
+  DEBIT = "DEBIT",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
   l = "l",
@@ -4392,13 +4407,14 @@ export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
   sector = "sector",
 }
 export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
-  biofuels = "biofuels",
-  categories = "categories",
-  depots = "depots",
-  entities = "entities",
-  operations = "operations",
-  sectors = "sectors",
-  statuses = "statuses",
+  biofuel = "biofuel",
+  customs_category = "customs_category",
+  depot = "depot",
+  from_to = "from_to",
+  operation = "operation",
+  sector = "sector",
+  status = "status",
+  type = "type",
 }
 export enum CertificateTypeEnum {
   SYSTEME_NATIONAL = "SYSTEME_NATIONAL",

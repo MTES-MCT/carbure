@@ -9,7 +9,6 @@ export const getOperationsFilters = (
     params: {
       query: {
         ...query,
-        status: query.statuses,
         filter: filter as OperationsFilter,
       },
     },
@@ -19,10 +18,7 @@ export const getOperationsFilters = (
 export const getOperations = (query: OperationsQuery) => {
   return apiFetch.GET("/tiruert/operations/", {
     params: {
-      query: {
-        ...query,
-        status: query.statuses,
-      },
+      query,
     },
   })
 }

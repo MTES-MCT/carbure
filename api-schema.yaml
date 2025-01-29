@@ -2649,6 +2649,12 @@ paths:
             type: string
             format: date
         - in: query
+          name: depot
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: details
           schema:
             type: boolean
@@ -2664,6 +2670,23 @@ paths:
           name: from_to
           schema:
             type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - CESSION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
+                - LIVRAISON_DIRECTE
+                - MAC_BIO
+                - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
@@ -2679,7 +2702,13 @@ paths:
         - in: query
           name: sector
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              enum:
+                - DIESEL
+                - ESSENCE
+                - SAF
         - in: query
           name: status
           schema:
@@ -2701,16 +2730,8 @@ paths:
             items:
               type: string
               enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
-                - INCORPORATION
-                - LIVRAISON_DIRECTE
-                - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - CREDIT
+                - DEBIT
         - in: query
           name: unit
           schema:
@@ -3025,6 +3046,10 @@ paths:
             type: string
             format: date
         - in: query
+          name: depot
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -3043,6 +3068,23 @@ paths:
               - sector
             default: ""
           description: Group by sector or by lot.
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - CESSION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
+                - LIVRAISON_DIRECTE
+                - MAC_BIO
+                - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
         - in: query
           name: sector
           schema:
@@ -3064,20 +3106,7 @@ paths:
         - in: query
           name: type
           schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
-                - INCORPORATION
-                - LIVRAISON_DIRECTE
-                - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+            type: string
         - in: query
           name: unit
           schema:
@@ -3141,6 +3170,12 @@ paths:
             type: string
             format: date
         - in: query
+          name: depot
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -3151,13 +3186,14 @@ paths:
           schema:
             type: string
             enum:
-              - biofuels
-              - categories
-              - depots
-              - entities
-              - operations
-              - sectors
-              - statuses
+              - biofuel
+              - customs_category
+              - depot
+              - from_to
+              - operation
+              - sector
+              - status
+              - type
           description: Filter string to apply
           required: true
         - in: query
@@ -3165,9 +3201,32 @@ paths:
           schema:
             type: string
         - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - CESSION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
+                - LIVRAISON_DIRECTE
+                - MAC_BIO
+                - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
           name: sector
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              enum:
+                - DIESEL
+                - ESSENCE
+                - SAF
         - in: query
           name: status
           schema:
@@ -3189,16 +3248,8 @@ paths:
             items:
               type: string
               enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
-                - INCORPORATION
-                - LIVRAISON_DIRECTE
-                - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - CREDIT
+                - DEBIT
       tags:
         - tiruert
       security:

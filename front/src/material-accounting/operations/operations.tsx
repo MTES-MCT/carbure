@@ -9,9 +9,8 @@ import useEntity from "carbure/hooks/entity"
 import * as api from "./api"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
-import { useOperationsColumns } from "./operations.hooks"
+import { useGetFilterOptions, useOperationsColumns } from "./operations.hooks"
 import { Pagination } from "common/components/pagination2/pagination"
-
 const currentYear = new Date().getFullYear()
 
 export const Operations = ({
@@ -23,20 +22,22 @@ export const Operations = ({
   const entity = useEntity()
 
   const filterLabels = {
-    [OperationsFilter.statuses]: t("Statut"),
-    [OperationsFilter.sectors]: t("Filière"),
-    [OperationsFilter.categories]: t("Catégorie"),
-    [OperationsFilter.biofuels]: t("Biocarburants"),
-    [OperationsFilter.operations]: t("Opération"),
-    [OperationsFilter.depots]: t("Dépôts"),
+    [OperationsFilter.status]: t("Statut"),
+    [OperationsFilter.sector]: t("Filière"),
+    [OperationsFilter.customs_category]: t("Catégorie"),
+    [OperationsFilter.biofuel]: t("Biocarburants"),
+    [OperationsFilter.type]: t("Débit / Crédit"),
+    [OperationsFilter.operation]: t("Opération"),
+    [OperationsFilter.from_to]: t("Redevable"),
+    [OperationsFilter.depot]: t("Dépôts"),
   }
 
-  const [state, actions] = useCBQueryParamsStore<OperationsStatus, undefined>(
+  const [state, actions] = useCBQueryParamsStore<OperationsStatus[], undefined>(
     entity,
     currentYear
   )
 
-  const query = useCBQueryBuilder<[], OperationsStatus, undefined>(state)
+  const query = useCBQueryBuilder<[], OperationsStatus[], undefined>(state)
 
   const { result } = useQuery(api.getOperations, {
     key: "operations",
@@ -46,7 +47,16 @@ export const Operations = ({
     },
   })
 
-  const columns = useOperationsColumns()
+  const columns = useOperationsColumns({
+    onClickSector: (sector) => {
+      actions.setFilters({
+        ...state.filters,
+        sector: [sector],
+      })
+    },
+  })
+
+  const getFilterOptions = useGetFilterOptions(query)
 
   return (
     <>
@@ -54,10 +64,7 @@ export const Operations = ({
         filterLabels={filterLabels}
         selected={state.filters}
         onSelect={actions.setFilters}
-        getFilterOptions={async (filter) => {
-          const res = await api.getOperationsFilters(filter, query)
-          return res.data ?? []
-        }}
+        getFilterOptions={getFilterOptions}
       />
       <Table columns={columns} rows={result?.data?.results ?? []} />
       <Pagination

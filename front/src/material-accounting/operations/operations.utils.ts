@@ -1,4 +1,8 @@
-import { OperationType } from "./types"
+import {
+  OperationDebitOrCredit,
+  OperationsStatus,
+  OperationType,
+} from "./types"
 
 /**
  * Return the i18n key for the sector
@@ -39,6 +43,32 @@ export const formatOperationType = (type: string) => {
       return "Dévaluation"
     case OperationType.LIVRAISON_DIRECTE:
       return "Livraison directe"
+    default:
+      return "Inconnu"
+  }
+}
+
+export const formatOperationStatus = (status: OperationsStatus) => {
+  switch (status) {
+    case OperationsStatus.ACCEPTED:
+      return "Validé"
+    case OperationsStatus.CANCELED:
+      return "Annulé"
+    case OperationsStatus.PENDING:
+      return "En attente"
+    case OperationsStatus.REJECTED:
+      return "Rejeté"
+    default:
+      return "Inconnu"
+  }
+}
+
+export const formatOperationCreditOrDebit = (type: string) => {
+  switch (type) {
+    case OperationDebitOrCredit.CREDIT:
+      return "Crédit"
+    case OperationDebitOrCredit.DEBIT:
+      return "Débit"
     default:
       return "Inconnu"
   }
