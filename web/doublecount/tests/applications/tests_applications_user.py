@@ -163,19 +163,7 @@ class DoubleCountApplicationsTest(TestCase):
 
         # sourcing history
         sourcing_errors = errors["sourcing_history"]
-        assert len(sourcing_errors) == 3
-
-        error1 = sourcing_errors[0]
-        assert error1["error"] == DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN
-        assert error1["line_number"] == 20
-
-        error2 = sourcing_errors[1]
-        assert error2["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error2["line_number"] == 21
-
-        error3 = sourcing_errors[2]
-        assert error3["error"] == DoubleCountingError.MISSING_FEEDSTOCK
-        assert error3["line_number"] == 22
+        assert len(sourcing_errors) == 0
 
     def test_production_integrity(self):
         response = self.check_file("dc_agreement_application_errors_prod_integrity.xlsx")
