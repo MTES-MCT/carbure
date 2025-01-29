@@ -14,7 +14,8 @@ class BalanceService:
         Keep only PENDING and ACCEPTED operations
         Group by sector, customs_category and biofuel (and lot if needed)
         Sum volume: credit when entity is credited, debit when entity is debited
-        Don't sum pending ACQUISITION operations
+        For credit operation, if PENDING, don't sum volume
+        For debit operation, if PENDING, sum volume
         """
 
         balance = defaultdict(
@@ -33,7 +34,7 @@ class BalanceService:
         operations = operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED])
 
         for operation in operations:
-            if operation.is_acquisition(entity_id) and operation.status == Operation.PENDING:
+            if operation.is_credit(entity_id) and operation.status == Operation.PENDING:
                 continue
 
             pci = operation.biofuel.pci_litre if unit == "mj" else 1  # pci = 1 if unit is in litres
