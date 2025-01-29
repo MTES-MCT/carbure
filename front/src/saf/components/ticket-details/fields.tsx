@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 import DurabilityFields from "saf/pages/operator/ticket-source-details/parent-lot/durability-fields"
 import { SafTicketDetails } from "../../types"
+import { EtsStatusEnum } from "api-schema"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
@@ -15,6 +16,12 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
   const { t } = useTranslation()
 
   if (!ticket) return null
+
+  const etsStatusMap = {
+    [EtsStatusEnum.ETS_VALUATION]: t("Valorisation ETS"),
+    [EtsStatusEnum.OUTSIDE_ETS]: t("Hors ETS (schéma volontaire)"),
+    [EtsStatusEnum.NOT_CONCERNED]: t("Non concerné"),
+  }
 
   return (
     <div className={cl(css.form, css.columns)}>
@@ -103,6 +110,21 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           <TextInput
             label={t("Méthode de livraison")}
             value={ticket.reception_airport.name}
+            readOnly
+          />
+        )}
+        {ticket.ets_status &&
+          ticket.ets_status !== EtsStatusEnum.NOT_CONCERNED && (
+            <TextInput
+              label={t("Déclaration ETS")}
+              value={etsStatusMap[ticket.ets_status]}
+              readOnly
+            />
+          )}
+        {ticket.ets_declaration_date && (
+          <DateInput
+            label={t("Date de déclaration ETS")}
+            value={ticket.ets_declaration_date}
             readOnly
           />
         )}
