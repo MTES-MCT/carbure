@@ -93,11 +93,11 @@ class ExportApplicationActionMixin:
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if application.status != DoubleCountingApplication.ACCEPTED:
-            return Response(
-                {"message": DoubleCountingApplicationExportError.APPLICATION_NOT_ACCEPTED},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # if application.status != DoubleCountingApplication.ACCEPTED:
+        #     return Response(
+        #         {"message": DoubleCountingApplicationExportError.APPLICATION_NOT_ACCEPTED},
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
 
         has_dechets_industriels = check_has_dechets_industriels(application)
         dechets_industriels = dechets_industriels.strip()

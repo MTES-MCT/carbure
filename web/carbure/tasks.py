@@ -98,7 +98,7 @@ if env.get("IMAGE_TAG") == "prod":
         create_meter_readings_application_deadline_reminder()
 
     # Read replica
-    @periodic_task(crontab(hour=0, minute=45))
+    @periodic_task(crontab(hour=1, minute=45))
     def populate_read_replica() -> None:
         subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", "$READ_REPLICA_DATABASE_URL"])
 

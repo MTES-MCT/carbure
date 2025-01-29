@@ -73,10 +73,7 @@ def get_applications(request):
 
 
 def filter_meter_readings_applications(applications, **filters):
-    print("filters: ", filters)
-
     applications = applications.select_related("cpo")
-
     applications = applications.filter(year=filters["year"])
 
     if filters.get("cpo"):

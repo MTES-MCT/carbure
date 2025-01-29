@@ -191,14 +191,14 @@ export function downloadMeterReadingsSample(
 
 export function downloadMeterReadingsApplication(
   entityId: number,
-  applicationId: number,
-  sample = false
+  companyId: number,
+  applicationId: number
 ) {
-  return download("/elec/admin/audit/meter-readings/application-details", {
+  return download("/elec/admin/meter-readings/application-details", {
     entity_id: entityId,
+    company_id: companyId,
     application_id: applicationId,
     export: true,
-    sample: sample,
   })
 }
 
