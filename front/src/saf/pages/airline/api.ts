@@ -81,7 +81,7 @@ export function acceptSafTicket(
   entity_id: number,
   ticket_id: number,
   ets_status: EtsStatusEnum,
-  ets_status_date: string | undefined
+  ets_declaration_date: string | undefined
 ) {
   return apiFetch.POST("/saf/tickets/{id}/accept/", {
     params: {
@@ -94,7 +94,7 @@ export function acceptSafTicket(
     },
     body: {
       ets_status,
-      ets_status_date,
+      ets_declaration_date,
     },
   })
 }
