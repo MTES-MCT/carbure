@@ -29,7 +29,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
         )
         assert response.status_code == 200
         data = response.json()
-        company_preview = data["data"]["company_preview"]
+        company_preview = data["company_preview"]
         assert company_preview["legal_name"] == "TOTALENERGIES SE"
 
     def test_search_company_already_exists(self):
@@ -42,7 +42,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
         )
         assert response.status_code == 200
         data = response.json()
-        warning = data["data"]["warning"]
+        warning = data["warning"]
         assert warning["code"] == "REGISTRATION_ID_ALREADY_USED"
 
     def test_search_unexisting_company(self):
