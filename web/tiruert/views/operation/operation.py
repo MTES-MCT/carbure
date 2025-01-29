@@ -98,6 +98,25 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         return super().list(request, *args, **kwargs)
 
     @extend_schema(
+        operation_id="get_operation",
+        description="Retrieve one specific operation.",
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
         operation_id="create_operation",
         description="Create a new operation.",
         request=OperationInputSerializer,
