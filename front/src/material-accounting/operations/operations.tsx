@@ -11,6 +11,8 @@ import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import { useGetFilterOptions, useOperationsColumns } from "./operations.hooks"
 import { Pagination } from "common/components/pagination2/pagination"
+import HashRoute from "common/components/hash-route"
+import { OperationDetail } from "./pages/operation-detail"
 const currentYear = new Date().getFullYear()
 
 export const Operations = ({
@@ -66,12 +68,21 @@ export const Operations = ({
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
-      <Table columns={columns} rows={result?.data?.results ?? []} />
+      <Table
+        columns={columns}
+        rows={result?.data?.results ?? []}
+        rowLink={(row) => ({
+          pathname: location.pathname,
+          search: location.search,
+          hash: `operation/${row.id}`,
+        })}
+      />
       <Pagination
         defaultPage={query.page}
         total={result?.data?.count ?? 0}
         limit={query.limit}
       />
+      <HashRoute path="operation/:id" element={<OperationDetail />} />
     </>
   )
 }

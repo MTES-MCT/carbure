@@ -171,7 +171,13 @@ export function Table<T>({
               data-interactive={onAction ? true : undefined}
               onClick={onAction ? () => onAction(row, i) : undefined}
             >
-              {link ? <Link to={link}>{cells}</Link> : cells}
+              {link ? (
+                <Link to={link} className={css.rowLink}>
+                  {cells}
+                </Link>
+              ) : (
+                cells
+              )}
             </li>
           )
         })}

@@ -54,6 +54,10 @@
   border-bottom: 1px solid var(--border-default-grey);
 }
 
+.rowLink:hover {
+  background-color: var(--background-default-grey-hover);
+}
+
 .rows > li > a {
   flex: 1;
   min-width: 0;
