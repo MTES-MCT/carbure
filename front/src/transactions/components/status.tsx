@@ -159,14 +159,14 @@ const StatusRecap = ({
 }
 
 export function useStatus() {
-  const match = useMatch("/org/:entity/transactions/:year/:status/*") // prettier-ignore
+  const match = useMatch("/org/:entity/transactions/:year/:status/*")
   const status = match?.params.status as Status | undefined
   return status ?? "drafts"
 }
 
 export function useAutoStatus() {
   const navigate = useNavigate()
-  const match = useMatch("/org/:entity/transactions/:year/:status/*") // prettier-ignore
+  const match = useMatch("/org/:entity/transactions/:year/:status/*")
   const status = match?.params.status as Status | undefined
 
   useEffect(() => {

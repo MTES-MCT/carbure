@@ -7,7 +7,6 @@ import { useQuery } from "common/hooks/async"
 import * as api from "./api"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import StatusTabs from "./components/status"
 import { DeclarationButton, DeclarationDialog } from "./actions/declaration"
 import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
@@ -36,8 +35,6 @@ export const Transactions = () => {
       <Main>
         <header>
           <section>
-            <h1>{t("Transactions")}</h1>
-
             <Select
               loading={years.loading}
               variant="inline"
@@ -51,10 +48,6 @@ export const Transactions = () => {
             {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
               <DeclarationButton />
             )}
-          </section>
-
-          <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
           </section>
         </header>
 

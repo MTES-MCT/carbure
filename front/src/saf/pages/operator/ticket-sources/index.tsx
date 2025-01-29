@@ -29,6 +29,8 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { SafTicketSource, SafTicketSourceStatus } from "../types"
+import { useTranslation } from "react-i18next"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 export interface TicketSourcesProps {
   year: number
@@ -36,6 +38,9 @@ export interface TicketSourcesProps {
 }
 
 export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
+  const { t } = useTranslation()
+  usePrivateNavigation(t("Volumes SAF"))
+
   const location = useLocation()
 
   const entity = useEntity()

@@ -1,0 +1,8 @@
+.menu span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.dropdown {
+  max-height: 50vh;
+}

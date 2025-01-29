@@ -1,4 +1,4 @@
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import IframeResizer from "iframe-resizer-react"
 import { LoaderOverlay, Main } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -7,11 +7,13 @@ import useEntity from "carbure/hooks/entity"
 import { getEntityStats } from "./api"
 import { Loader } from "common/components/icons"
 import { useState } from "react"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const Stats = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   useTitle(t("Statistiques") + " " + entity.name)
+  usePrivateNavigation(t("Statistiques"))
   const [isLoaded, setIsLoaded] = useState(false)
 
   const statsResponse = useQuery(getEntityStats, {
@@ -25,11 +27,6 @@ const Stats = () => {
     <LoaderOverlay />
   ) : (
     <Main>
-      <header>
-        <h1>
-          <Trans>Statistiques</Trans>
-        </h1>
-      </header>
       <section>
         <IframeResizer
           onResized={() => setIsLoaded(true)}

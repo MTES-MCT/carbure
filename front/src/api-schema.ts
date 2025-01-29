@@ -415,6 +415,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/nav-stats": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["nav_stats_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/resources/biofuels": {
     parameters: {
       query?: never
@@ -1391,6 +1407,17 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    NavStats: {
+      total_pending_action_for_admin?: number
+      pending_draft_lots?: number
+      in_pending_lots?: number
+      doublecount_agreement_pending?: number
+      charge_point_registration_pending?: number
+      metering_reading_pending?: number
+      pending_transfer_certificates?: number
+      audits?: number
+      tickets?: number
+    }
     OtpResponse: {
       valid_until: string
     }
@@ -2567,6 +2594,28 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["EmptyResponse"]
+        }
+      }
+    }
+  }
+  nav_stats_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["NavStats"]
         }
       }
     }

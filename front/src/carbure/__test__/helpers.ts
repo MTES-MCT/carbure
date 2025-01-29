@@ -1,6 +1,8 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+
 import { http, HttpResponse, JsonBodyType } from "msw"
+import { generateUser } from "./data"
 
 export async function waitWhileLoading() {
   const loaders = screen.queryAllByTestId("loader")
@@ -96,3 +98,6 @@ export const mockPostWithResponseData = (
     )
   })
 }
+
+export const mockUser = (...params: Parameters<typeof generateUser>) =>
+  mockGetWithResponseData("/user", generateUser(...params))

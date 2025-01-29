@@ -40,7 +40,7 @@ export function useAsyncList<T, V>({
   const asyncSelectedItems: UseAsyncReturn<T[]> = useAsync(
     async () => {
       const dirtyValues: V[] =
-        selectedValue !== undefined // prettier-ignore
+        selectedValue !== undefined
           ? [selectedValue]
           : (selectedValues ?? EMPTY)
 

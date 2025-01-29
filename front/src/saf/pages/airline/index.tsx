@@ -1,34 +1,21 @@
-import useEntity from "carbure/hooks/entity"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import AirlineTabs from "./tabs"
 import AirlineTickets from "./tickets"
-import { SafAirlineSnapshot, SafTicketStatus } from "../../types"
+import { SafTicketStatus } from "../../types"
 
 export const SafAirline = () => {
   const { t } = useTranslation()
 
-  const entity = useEntity()
-
   const years = useYears("saf", api.getAirlineYears)
-
-  const snapshot = useQuery(api.getAirlineSnapshot, {
-    key: "airline-snapshot",
-    params: [entity.id, years.selected],
-  })
-  const snapshotData = snapshot.result?.data as SafAirlineSnapshot
 
   return (
     <Main>
       <header>
         <section>
-          <h1>{t("Carburant Durable d'Aviation")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"
@@ -38,10 +25,6 @@ export const SafAirline = () => {
             options={years.options}
             sort={(year) => -year.value}
           />
-        </section>
-
-        <section>
-          <AirlineTabs loading={snapshot.loading} count={snapshotData} />
         </section>
       </header>
 
