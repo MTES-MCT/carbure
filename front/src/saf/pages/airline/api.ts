@@ -4,6 +4,7 @@ import {
   download as downloadFetch,
 } from "common/services/api-fetch"
 import { SafFilter, SafQuery } from "../../types"
+import { EtsStatusEnum } from "api-schema"
 
 //AIRLINE
 
@@ -76,7 +77,12 @@ export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
   })
 }
 
-export function acceptSafTicket(entity_id: number, ticket_id: number) {
+export function acceptSafTicket(
+  entity_id: number,
+  ticket_id: number,
+  ets_status: EtsStatusEnum,
+  ets_status_date: string | undefined
+) {
   return apiFetch.POST("/saf/tickets/{id}/accept/", {
     params: {
       path: {
@@ -85,6 +91,10 @@ export function acceptSafTicket(entity_id: number, ticket_id: number) {
       query: {
         entity_id,
       },
+    },
+    body: {
+      ets_status,
+      ets_status_date,
     },
   })
 }
