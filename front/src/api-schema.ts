@@ -1578,6 +1578,7 @@ export interface components {
       readonly country_of_origin: components["schemas"]["Country"]
       /** Format: double */
       ghg_reduction?: number
+      ets_status?: components["schemas"]["EtsStatusEnum"] | null
     }
     SafTicketDetails: {
       readonly id: number
@@ -1631,6 +1632,9 @@ export interface components {
       shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
       readonly reception_airport: components["schemas"]["Airport"]
       consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
+      ets_status?: components["schemas"]["EtsStatusEnum"] | null
+      /** Format: date */
+      ets_declaration_date?: string | null
     }
     SafTicketPreview: {
       readonly id: number

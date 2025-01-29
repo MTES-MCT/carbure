@@ -4477,6 +4477,10 @@ components:
         ghg_reduction:
           type: number
           format: double
+        ets_status:
+          allOf:
+            - $ref: "#/components/schemas/EtsStatusEnum"
+          nullable: true
       required:
         - assignment_period
         - biofuel
@@ -4615,6 +4619,14 @@ components:
         consumption_type:
           allOf:
             - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
+        ets_status:
+          allOf:
+            - $ref: "#/components/schemas/EtsStatusEnum"
+          nullable: true
+        ets_declaration_date:
+          type: string
+          format: date
           nullable: true
       required:
         - assignment_period
