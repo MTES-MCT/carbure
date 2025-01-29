@@ -11,10 +11,10 @@ class SafTicketSourceAssignmentSerializer(serializers.Serializer):
     free_field = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     assignment_period = serializers.IntegerField(required=True)
     reception_airport = serializers.PrimaryKeyRelatedField(
-        queryset=Site.objects.filter(site_type=Site.AIRPORT), required=False
+        queryset=Site.objects.filter(site_type=Site.AIRPORT), required=False, allow_null=True
     )
-    consumption_type = serializers.CharField(required=False)
-    shipping_method = serializers.CharField(required=False)
+    consumption_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    shipping_method = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
 
 class SafTicketSourceGroupAssignmentSerializer(SafTicketSourceAssignmentSerializer):
