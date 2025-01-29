@@ -89,6 +89,23 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 location=OpenApiParameter.QUERY,
                 description="",
             ),
+            OpenApiParameter(
+                name="operation",
+                type=str,
+                many=True,
+                enum=[
+                    "CESSION",
+                    "ACQUISITION",
+                    "DEVALUATION",
+                    "EXPORTATION",
+                    "INCORPORATION",
+                    "LIVRAISON_DIRECTE",
+                    "MAC_BIO",
+                    "TENEUR",
+                ],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")

@@ -52,6 +52,23 @@ class FilterActionMixin:
                 location=OpenApiParameter.QUERY,
                 description="",
             ),
+            OpenApiParameter(
+                name="operation",
+                type=str,
+                many=True,
+                enum=[
+                    "CESSION",
+                    "ACQUISITION",
+                    "DEVALUATION",
+                    "EXPORTATION",
+                    "INCORPORATION",
+                    "LIVRAISON_DIRECTE",
+                    "MAC_BIO",
+                    "TENEUR",
+                ],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
         ],
         examples=[
             OpenApiExample(
@@ -94,7 +111,7 @@ class FilterActionMixin:
         elif filter == "biofuel":
             column = "biofuel__code"
         elif filter == "operation":
-            column = "type"
+            column = "operations"
         elif filter == "from_to":
             column = "entities"
         elif filter == "depot":
@@ -103,6 +120,8 @@ class FilterActionMixin:
             column = "types"
         else:  # raise an error for unknown filters
             raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
+
+        entity_id = self.request.query_params.get("entity_id")
 
         queryset = queryset.annotate(
             entities=Coalesce(
@@ -123,6 +142,18 @@ class FilterActionMixin:
             types=Case(
                 When(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"], then=Value("CREDIT")),
                 When(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"], then=Value("DEBIT")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+            operations=Case(
+                When(type="CESSION", credited_entity_id=entity_id, then=Value("ACQUISITION")),
+                When(type="CESSION", then=Value("CESSION")),
+                When(type="INCORPORATION", then=Value("INCORPORATION")),
+                When(type="TENEUR", then=Value("TENEUR")),
+                When(type="LIVRAISON_DIRECTE", then=Value("LIVRAISON_DIRECTE")),
+                When(type="MAC_BIO", then=Value("MAC_BIO")),
+                When(type="EXPORTATION", then=Value("EXPORTATION")),
+                When(type="DEVALUATION", then=Value("DEVALUATION")),
                 default=Value(None),
                 output_field=CharField(),
             ),
