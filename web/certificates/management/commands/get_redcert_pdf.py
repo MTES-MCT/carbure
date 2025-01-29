@@ -5,7 +5,7 @@ import time
 import undetected_chromedriver as uc
 from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand, CommandError
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -84,7 +84,7 @@ class Command(BaseCommand):
             certificate_type=GenericCertificate.REDCERT,
             download_link__isnull=True,
             valid_until__gte=time.strftime("%Y-%m-%d"),
-        ).order_by("-valid_until")[:10]
+        ).order_by("-valid_until")
 
     def certificates_with_ids(self, certificate_ids):
         return GenericCertificate.objects.filter(certificate_id__in=certificate_ids.split(","))
@@ -114,7 +114,7 @@ class Command(BaseCommand):
             rows = driver.find_elements(By.CSS_SELECTOR, "tr")
             rows = rows[1:]  # Remove the first row header
 
-            if not rows[0]:
+            if not rows:
                 self.stdout.write("No results found for certificate %s" % certificate.certificate_id)
                 continue
 
@@ -142,7 +142,7 @@ class Command(BaseCommand):
         driver.find_element(By.XPATH, '//*[@id="ctl00_mainContentPlaceHolder_SearchButton"]').click()
 
         # Wait until results are loaded
-        time.sleep(18)
+        time.sleep(7)
 
         # Change the number of results per page to 100
         pagination_100 = driver.find_element(
@@ -151,7 +151,7 @@ class Command(BaseCommand):
         pagination_100.click()
 
         # Wait until results are loaded, again...
-        time.sleep(18)
+        time.sleep(7)
 
         # Get all certificates with 'valid_until' date > today
         certificates = GenericCertificate.objects.filter(
@@ -232,12 +232,15 @@ class Command(BaseCommand):
         return kwargs["nb_pdf_downloaded"], kwargs["nb_skipped"], certificates_to_update
 
     def download_certificate(self, driver, row, certificate):
-        dl_button = row.find_element(By.CLASS_NAME, "lastColumns").find_element(By.TAG_NAME, "input")
-        actions = ActionChains(driver)
-        actions.move_to_element(dl_button).click().perform()
+        try:
+            dl_button = row.find_element(By.CLASS_NAME, "lastColumns").find_element(By.TAG_NAME, "input")
+            actions = ActionChains(driver)
+            actions.move_to_element(dl_button).click().perform()
 
-        new_name = f"certificate_{certificate.certificate_id}.pdf"
-        self.wait_for_download_and_move(new_name)
+            new_name = f"certificate_{certificate.certificate_id}.pdf"
+            self.wait_for_download_and_move(new_name)
+        except WebDriverException:
+            raise NoSuchElementException
 
     def update_certificates(self, certificates_to_update):
         self.stdout.write("Updating certificates download links...")
@@ -254,9 +257,10 @@ class Command(BaseCommand):
         self.stdout.write("--> Going to next ten")
         try:
             next_page = driver.find_element(By.XPATH, "//input[@type='button' and @value='next-page']")
-            next_page.click()
+            actions = ActionChains(driver)
+            actions.move_to_element(next_page).click().perform()
 
-            time.sleep(18)
+            time.sleep(6)
 
         except NoSuchElementException:
             self.stdout.write("No next ten")
@@ -270,9 +274,10 @@ class Command(BaseCommand):
                 By.XPATH,
                 f"//input[@type='button' and @value='{page_number}']",
             )
-            next_page.click()
+            actions = ActionChains(driver)
+            actions.move_to_element(next_page).click().perform()
 
-            time.sleep(18)
+            time.sleep(6)
 
         except NoSuchElementException:
             self.stdout.write("No next page")
