@@ -88,10 +88,10 @@ def create_tiruert_operations_from_lots(lots):
     if not validated_lots:
         return []
 
-    # Group validated_lots by delivery_type, feedstock and biofuel
+    # Group validated_lots by delivery_type, feedstock, biofuel and depot
     lots_by_delivery_type = {}
     for lot in validated_lots:
-        key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code)
+        key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site)
         if key not in lots_by_delivery_type:
             lots_by_delivery_type[key] = []
         lots_by_delivery_type[key].append(lot)
@@ -105,7 +105,7 @@ def create_tiruert_operations_from_lots(lots):
     for key, lots in lots_by_delivery_type.items():
         operation = Operation.objects.create(
             type=matching_types[key[0]],
-            status=Operation.ACCEPTED,
+            status=Operation.PENDING,
             customs_category=key[1],
             biofuel=lots[0].biofuel,
             credited_entity=lots[0].carbure_client,

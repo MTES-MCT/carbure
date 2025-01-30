@@ -139,8 +139,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         request=OperationInputSerializer,
         parameters=[
             OpenApiParameter(
-                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
-            )
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
         ],
         responses={
             status.HTTP_201_CREATED: OpenApiResponse(
@@ -190,7 +194,11 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         },
         parameters=[
             OpenApiParameter(
-                name="entity_id", type=str, location=OpenApiParameter.QUERY, description="Authorised entity ID."
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
             ),
         ],
     )

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,6 +11,26 @@ class AcceptActionMixinErrors:
 
 
 class AcceptActionMixin:
+    @extend_schema(
+        operation_id="accept_operation",
+        description="Set status operation to ACCEPTED",
+        request=None,
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response={"status": "accepted"}, description="Success message"),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                response={"error": "Operation not found"}, description="Error message"
+            ),
+        },
+    )
     @action(detail=True, methods=["post"])
     def accept(self, request, pk=None):
         operation = self.get_object()
@@ -17,6 +38,26 @@ class AcceptActionMixin:
         operation.save()
         return Response({"status": "accepted"}, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        operation_id="validate_teneur",
+        description="Set teneur operations to ACCEPTED",
+        request=None,
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response={"status": "validated"}, description="Success message"),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                response={"error": AcceptActionMixinErrors.NOTHING_TO_VALIDATE}, description="Error message"
+            ),
+        },
+    )
     @action(
         detail=False,
         methods=["post"],
@@ -38,4 +79,4 @@ class AcceptActionMixin:
 
         queryset.update(status=Operation.ACCEPTED)
 
-        return Response({"status": "validated"}, status=status.HTTP_200_OK)
+        return Response({"status": "validated", "month": month}, status=status.HTTP_200_OK)
