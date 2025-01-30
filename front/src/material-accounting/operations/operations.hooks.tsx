@@ -69,7 +69,7 @@ export const useOperationsColumns = ({
     },
     {
       key: "depot",
-      header: t("Dépot"),
+      header: t("Dépôt"),
       cell: (item) => <Cell text={item.to_depot?.name ?? "-"} />,
     },
     {
