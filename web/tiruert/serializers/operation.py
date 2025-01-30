@@ -30,6 +30,7 @@ class OperationOutputSerializer(serializers.ModelSerializer):
             "debited_entity",
             "from_depot",
             "to_depot",
+            "export_country",
             "created_at",
             "validity_date",
             "volume",
@@ -92,6 +93,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "debited_entity",
             "from_depot",
             "to_depot",
+            "export_country",
             "validity_date",
             "lots",
         ]
