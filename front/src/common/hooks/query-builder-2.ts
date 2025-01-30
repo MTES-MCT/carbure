@@ -90,7 +90,7 @@ export function useCBQueryBuilder<Columns extends string[], Status, Type>(
 
 export function useCBQueryParamsStore<S, T>(
   entity: Entity,
-  year: number,
+  year?: number,
   status?: S,
   type?: T
 ) {
@@ -201,7 +201,7 @@ export function useCBQueryParamsStore<S, T>(
   }
 
   // sync store state with year set from above
-  if (state.year !== year) {
+  if (year && state.year !== year) {
     actions.setYear(year)
   }
 
