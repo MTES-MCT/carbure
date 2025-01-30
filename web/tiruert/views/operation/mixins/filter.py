@@ -162,3 +162,88 @@ class FilterActionMixin:
         results = [v for v in values if v]
         data = set(results)
         return Response(list(data))
+
+    @extend_schema(
+        operation_id="filter_balances",
+        description="Retrieve content of a specific filter",
+        filters=True,
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="filter",
+                type=str,
+                enum=["sector", "customs_category", "biofuel"],
+                location=OpenApiParameter.QUERY,
+                description="Filter string to apply",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="sector",
+                type=str,
+                many=True,
+                enum=["ESSENCE", "DIESEL", "SAF"],
+                location=OpenApiParameter.QUERY,
+                description="",
+            ),
+        ],
+        examples=[
+            OpenApiExample(
+                "Example of filters response.",
+                value=[
+                    "SHELL France",
+                    "CIM SNC",
+                    "ESSO SAF",
+                    "TMF",
+                    "TERF SAF",
+                ],
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+        responses={
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                },
+            },
+        },
+    )
+    @action(methods=["get"], detail=False, url_path="balance/filters")
+    def filters_balance(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status="ACCEPTED")
+
+        filter = self.request.query_params.get("filter")
+
+        if not filter:
+            raise ValidationError({"message": "No filter was specified"})
+
+        if filter == "sector":
+            column = "sector"
+        elif filter == "customs_category":
+            column = "customs_category"
+        elif filter == "biofuel":
+            column = "biofuel__code"
+        else:  # raise an error for unknown filters
+            raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
+
+        queryset = queryset.annotate(
+            sector=Case(
+                When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
+                When(biofuel__compatible_diesel=True, then=Value("DIESEL")),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+        )
+        values = queryset.values_list(column, flat=True).distinct()
+        results = [v for v in values if v]
+        data = set(results)
+        return Response(list(data))
