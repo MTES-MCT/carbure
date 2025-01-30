@@ -323,15 +323,6 @@ def load_dc_production_history_data(
     for index, production_base_rows in enumerate([production_max_history_rows, production_effective_history_rows]):
         tab_name = ["Capacité maximale de production", "Production effective"][index]
 
-        if len(production_base_rows) < 2:
-            production_errors.append(
-                error(
-                    DoubleCountingError.MISSING_DATA,
-                    meta={"tab_name": tab_name},
-                )
-            )
-            continue
-
         for production_row in production_base_rows:
             feedstock = get_material(production_row["feedstock"], feedstocks)
             biofuel = get_material(production_row["biofuel"], biofuels)
@@ -722,9 +713,6 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
     countries = Pays.objects.all()
 
     for row in sourcing_history_rows:
-        line = row["line"]
-        meta = {"year": row["year"]}
-
         errors = check_sourcing_row(row)
         if len(errors) > 0:
             sourcing_errors += errors
@@ -748,16 +736,11 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
 
         # Origin country
         origin_country = get_country(row["origin_country"], countries)
-        if origin_country:
-            sourcing.origin_country = origin_country
-        else:
-            errors.append(
-                error(
-                    DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN,
-                    line=line,
-                    meta=meta,
-                )
-            )
+
+        if not origin_country:
+            origin_country = countries.get(code_pays="N/A")
+
+        sourcing.origin_country = origin_country
         sourcing.supply_country = get_country(row["supply_country"], countries)
         sourcing.transit_country = get_country(row["transit_country"], countries)
         sourcing.raw_material_supplier = row.get("raw_material_supplier") or ""
