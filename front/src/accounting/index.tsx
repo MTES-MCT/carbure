@@ -25,9 +25,9 @@ export const MaterialAccounting = () => {
       <Tabs
         tabs={[
           {
-            key: "balance",
+            key: "balances",
             label: t("Soldes"),
-            path: routes.MATERIAL_ACCOUNTING.BALANCE,
+            path: routes.MATERIAL_ACCOUNTING.BALANCES,
             icon: DraftFill,
           },
           {
