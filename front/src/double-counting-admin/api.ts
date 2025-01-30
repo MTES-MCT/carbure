@@ -2,6 +2,7 @@ import { download } from "common/services/api"
 import {
   api as apiFetch,
   download as downloadFetch,
+  toFileArray,
 } from "common/services/api-fetch"
 import { PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by } from "api-schema"
 
@@ -49,7 +50,7 @@ export function adminAddDoubleCountingApplication(
       production_site_id,
       certificate_id,
       should_replace,
-      file: file as unknown as string, // hacky cast for file upload
+      file,
     },
   })
 }
@@ -145,6 +146,6 @@ export function getDoubleCountingAgreement(
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   return apiFetch.POST("/double-counting/applications/check-admin-files/", {
     params: { query: { entity_id } },
-    body: { files: files as unknown as string[] }, // type hack for file upload
+    body: { files: toFileArray(files) },
   })
 }

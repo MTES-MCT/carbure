@@ -5,9 +5,6 @@ import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-import { Loader } from "common/components/icons"
-import Tabs from "common/components/tabs"
-import { formatNumber } from "common/utils/formatters"
 import * as api from "./api-cpo"
 import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types-cpo"
 import ProvisionCertificateList from "./components/provision-certificates/list"
@@ -26,7 +23,6 @@ const defaultElecSnapshot: ElecCPOSnapshot = {
 
 export const ElecCPO = () => {
   const { t } = useTranslation()
-
   const entity = useEntity()
 
   const years = useYears("elec", api.getYears)
@@ -36,14 +32,11 @@ export const ElecCPO = () => {
   })
 
   const snapshot = snapshotResponse.result?.data.data ?? defaultElecSnapshot
-  // const snapshot = elecSnapshot //TODO TEST with testing data
 
   return (
     <Main>
       <header>
         <section>
-          <h1>{t("Électricité renouvelable")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"
@@ -53,10 +46,6 @@ export const ElecCPO = () => {
             options={years.options}
             sort={(year) => -year.value}
           />
-        </section>
-
-        <section>
-          <ElecTabs loading={snapshotResponse.loading} snapshot={snapshot} />
         </section>
       </header>
 
@@ -95,62 +84,3 @@ export const ElecCPO = () => {
 }
 
 export default ElecCPO
-
-interface ElecTabsProps {
-  loading: boolean
-  snapshot: ElecCPOSnapshot
-}
-
-function ElecTabs({ loading, snapshot }: ElecTabsProps) {
-  const { t } = useTranslation()
-
-  return (
-    <Tabs
-      variant="main"
-      tabs={[
-        {
-          key: "provisioned",
-          path: "provisioned",
-          label: (
-            <>
-              <p
-                style={{
-                  fontWeight: "normal",
-                }}
-              >
-                {loading ? (
-                  <Loader size={20} />
-                ) : (
-                  formatNumber(snapshot?.remaining_energy, 3)
-                )}{" "}
-                MWh
-              </p>
-              <strong>{t("Énergie disponible")}</strong>
-            </>
-          ),
-        },
-        {
-          key: "transferred",
-          path: "transferred",
-          label: (
-            <>
-              <p
-                style={{
-                  fontWeight: "normal",
-                }}
-              >
-                {loading ? (
-                  <Loader size={20} />
-                ) : (
-                  formatNumber(snapshot?.transferred_energy, 3)
-                )}{" "}
-                MWh
-              </p>
-              <strong>{t("Énergie cédée")}</strong>
-            </>
-          ),
-        },
-      ]}
-    />
-  )
-}

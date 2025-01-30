@@ -80,6 +80,21 @@ dc_biofuel_to_carbure_biofuel = {
     "mtbe": "MTBE",
     "taee": "TAEE",
     "tame": "TAME",
+    "ester ethylique d'huiles animales": "eeha",
+    "ester ethylique d'huiles usagées": "eehu",
+    "ester ethylique d'huiles végétales": "eehv",
+    "ester méthylique d'acide gras": "emag",
+    "ester méthylique d'acide gras d'effluents d'huilerie de palme": "emag",
+    "ester méthylique d'huiles animales": "emha",
+    "ester méthylique d'huiles usagées": "emhu",
+    "ester méthylique d'huiles végétales": "emhv",
+    "ethyl tert-butyl ether": "etbe",
+    "huiles hydrotraitées carburéacteur": "hvoc",
+    "huiles hydrotraitées essences": "hvoe",
+    "huiles hydrotraitées gazoles": "hvog",
+    "methyl tert-butyl ether": "mtbe",
+    "tert-amyl ethyl ether": "taee",
+    "tert-amyl methyl ether": "tame",
 }
 
 

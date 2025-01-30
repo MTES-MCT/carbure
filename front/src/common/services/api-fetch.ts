@@ -73,6 +73,10 @@ export function toSearchParams(params: any) {
   return urlParams
 }
 
+export function toFileArray(files: FileList) {
+  return Array.from(files).map((file) => file)
+}
+
 function isEmpty(value: any) {
   const isNull = value === null
   const isUndefined = value === undefined

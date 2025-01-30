@@ -5,7 +5,6 @@ import { LoaderOverlay } from "common/components/scaffold"
 import Entities from "companies-admin"
 import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
 import Controls from "controls"
-import Dashboard from "dashboard"
 import DoubleCounting from "double-counting-admin"
 import AgreementPublicList from "double-counting/components/agreement-public-list"
 import ElecAdmin from "elec-admin"
@@ -21,62 +20,79 @@ import Settings from "settings"
 import Stats from "stats"
 import Transactions from "transactions"
 import AccessibilityDeclaration from "./components/accessibility-declaration"
-import Footer from "./components/footer"
 import Home from "./components/home"
 import Pending from "./components/pending"
 import PublicStats from "./components/public-stats"
-import Topbar from "./components/top-bar"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
 import ElecAudit from "elec-auditor"
+import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
+import { ContactPage } from "contact"
+import { YearsProvider } from "common/providers/years-provider"
 
 const Carbure = () => {
   const user = useUserManager()
   const entity = useEntityManager(user)
-
+  const firstEntity = user.getFirstEntity()
   const isAuth = user.isAuthenticated()
 
   return (
-    <UserContext.Provider value={user}>
-      <EntityContext.Provider value={entity}>
-        <PortalProvider>
-          <div id="app">
-            <Topbar />
+    <YearsProvider>
+      <UserContext.Provider value={user}>
+        <EntityContext.Provider value={entity}>
+          <PortalProvider>
+            <div id="app">
+              <NavigationLayout>
+                <Routes>
+                  {!isAuth && <Route path="*" element={<Home />} />}
 
-            <Routes>
-              <Route path="*" element={<Home />} />
-              <Route path="/stats" element={<PublicStats />} />
-              <Route
-                path="/double-counting-list"
-                element={<AgreementPublicList />}
-              />
-              <Route
-                path="/accessibilite"
-                element={<AccessibilityDeclaration />}
-              />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/stats" element={<PublicStats />} />
+                  <Route
+                    path="/double-counting-list"
+                    element={<AgreementPublicList />}
+                  />
+                  <Route
+                    path="/accessibilite"
+                    element={<AccessibilityDeclaration />}
+                  />
 
-              <Route path="/auth/*" element={<Auth />} />
+                  <Route path="/auth/*" element={<Auth />} />
 
-              {isAuth && (
-                <>
-                  <Route path="/pending" element={<Pending />} />
-                  <Route path="/account/*" element={<Account />} />
-                  <Route path="/org/:entity/*" element={<Org />} />
-                </>
-              )}
+                  {isAuth && (
+                    <>
+                      <Route path="/pending" element={<Pending />} />
+                      <Route path="/account/*" element={<Account />} />
+                      <Route path="/org/:entity/*" element={<Org />} />
+                      {entity.isBlank && firstEntity && (
+                        <Route
+                          path="/"
+                          element={
+                            <Navigate replace to={`/org/${firstEntity.id}`} />
+                          }
+                        />
+                      )}
+                      {entity.isBlank && !firstEntity && (
+                        <Route
+                          path="/"
+                          element={<Navigate replace to={`/pending`} />}
+                        />
+                      )}
+                    </>
+                  )}
 
-              {!user.loading && (
-                <Route path="*" element={<Navigate replace to="/" />} />
-              )}
-            </Routes>
+                  {!user.loading && (
+                    <Route path="*" element={<Navigate replace to="/" />} />
+                  )}
+                </Routes>
+              </NavigationLayout>
 
-            <Footer />
-
-            {user.loading && <LoaderOverlay />}
-          </div>
-        </PortalProvider>
-      </EntityContext.Provider>
-    </UserContext.Provider>
+              {user.loading && <LoaderOverlay />}
+            </div>
+          </PortalProvider>
+        </EntityContext.Provider>
+      </UserContext.Provider>
+    </YearsProvider>
   )
 }
 
@@ -106,11 +122,11 @@ const Org = () => {
   return (
     <Routes>
       <Route path="settings" element={<Settings />} />
-
+      <Route path="registry" element={<Registry />} />
       {(isIndustry || isPowerOrHeatProducer) && (
         <>
           <Route path="transactions/:year/*" element={<Transactions />} />
-          <Route path="registry" element={<Registry />} />
+
           <Route
             path="transactions"
             element={<Navigate replace to={`${currentYear}`} />}
@@ -146,20 +162,6 @@ const Org = () => {
             path="*"
             element={<Navigate replace to={`saf/${currentYear}/tickets`} />}
           />
-        </>
-      )}
-
-      {isAdmin && (
-        <>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate replace to="dashboard" />} />
-        </>
-      )}
-
-      {isAdmin && (
-        <>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate replace to="dashboard" />} />
         </>
       )}
 
@@ -228,7 +230,10 @@ const Org = () => {
       )}
 
       {(isAdmin || hasAirline || isElecAdmin || isAdminDC) && (
-        <Route path="entities/*" element={<Entities />} />
+        <>
+          <Route path="entities/*" element={<Entities />} />
+          <Route path="*" element={<Navigate replace to="entities" />} />
+        </>
       )}
 
       {(isAdmin || isElecAdmin) && (

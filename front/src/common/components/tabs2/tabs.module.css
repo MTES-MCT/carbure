@@ -1,0 +1,27 @@
+.tabs {
+  display: flex;
+  gap: var(--spacing-1w);
+}
+
+.tab {
+  background: var(--background-action-low-blue-france);
+  padding: var(--spacing-1w) var(--spacing-3v);
+  color: var(--text-action-high-grey);
+  transition: all 0.1s ease-in-out;
+}
+
+.icon {
+  display: flex;
+  gap: var(--spacing-1w);
+}
+
+.active,
+.tab:hover,
+.tab[href]:hover {
+  background-color: var(--background-default-grey);
+  color: var(--text-active-blue-france);
+  box-shadow:
+    inset 0 2px 0 0 var(--border-active-blue-france),
+    inset 1px 0 0 0 var(--border-default-grey),
+    inset -1px 0 0 0 var(--border-default-grey);
+}

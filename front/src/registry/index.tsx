@@ -1,25 +1,21 @@
 import { Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs"
 import useTitle from "common/hooks/title"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import Biofuels from "./components/biofuels"
 import Companies from "./components/companies"
 import Depots from "./components/depots"
 import Feedstocks from "./components/feedstocks"
 import DoubleCounting from "./components/double-counting"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const Registry = () => {
   const { t } = useTranslation()
   useTitle(t("Annuaire"))
+  usePrivateNavigation(t("Annuaire"))
 
   return (
     <Main>
-      <header>
-        <h1>
-          <Trans>Annuaire CarbuRe</Trans>
-        </h1>
-      </header>
-
       <Tabs
         variant="sticky"
         tabs={[
