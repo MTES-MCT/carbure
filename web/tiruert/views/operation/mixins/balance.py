@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 
 from tiruert.filters import OperationFilter
-from tiruert.serializers import BalanceByLotSerializer, BalanceSerializer
+from tiruert.serializers import BalanceByLotSerializer, BalanceSerializer, PaginatedBalanceSerializer
 from tiruert.services.balance import BalanceService
 
 
@@ -42,7 +42,10 @@ class BalanceActionMixin:
             ),
         ],
         responses={
-            status.HTTP_200_OK: OpenApiResponse(response=BalanceSerializer, description="Balances by sector or by lot.")
+            status.HTTP_200_OK: OpenApiResponse(
+                response=PaginatedBalanceSerializer,
+                description="Paginated response with balances grouped by mp category / biofuel or by sector",
+            )
         },
     )
     @action(
@@ -50,6 +53,7 @@ class BalanceActionMixin:
         methods=["get"],
         serializer_class=BalanceSerializer,
         filterset_class=OperationFilter,
+        pagination_class=PageNumberPagination,
     )
     def balance(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")

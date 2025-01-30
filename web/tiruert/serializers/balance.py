@@ -69,3 +69,10 @@ class BalanceByLotSerializer(serializers.Serializer):
             )
 
         return list(grouped_balance.values())
+
+
+class PaginatedBalanceSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.CharField(allow_null=True)
+    previous = serializers.CharField(allow_null=True)
+    results = BalanceSerializer(many=True)
