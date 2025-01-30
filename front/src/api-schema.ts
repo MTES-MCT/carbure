@@ -1641,6 +1641,7 @@ export interface components {
       debited_entity: number | null
       from_depot?: number | null
       to_depot?: number | null
+      export_country?: number | null
       /** Format: date */
       validity_date: string
       lots: components["schemas"]["LotRequest"][]
@@ -1656,6 +1657,7 @@ export interface components {
       debited_entity: components["schemas"]["Entity"]
       from_depot: components["schemas"]["Depot"]
       to_depot: components["schemas"]["Depot"]
+      export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
       /** Format: date */
@@ -1671,6 +1673,7 @@ export interface components {
       debited_entity: components["schemas"]["EntityRequest"]
       from_depot: components["schemas"]["DepotRequest"]
       to_depot: components["schemas"]["DepotRequest"]
+      export_country?: number | null
       /** Format: date */
       validity_date: string
       details?: components["schemas"]["OperationDetailRequest"][]
@@ -1685,6 +1688,12 @@ export interface components {
     OperationOutputStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
     OtpResponse: {
       valid_until: string
+    }
+    PaginatedBalance: {
+      count: number
+      next: string | null
+      previous: string | null
+      results: components["schemas"]["Balance"][]
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -1753,6 +1762,7 @@ export interface components {
       debited_entity?: components["schemas"]["EntityRequest"]
       from_depot?: components["schemas"]["DepotRequest"]
       to_depot?: components["schemas"]["DepotRequest"]
+      export_country?: number | null
       /** Format: date */
       validity_date?: string
       details?: components["schemas"]["OperationDetailRequest"][]
@@ -4140,13 +4150,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Balances by sector or by lot. */
+      /** @description Paginated response with balances grouped by mp category / biofuel or by sector */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["Balance"]
+          "application/json": components["schemas"]["PaginatedBalance"]
         }
       }
     }

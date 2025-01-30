@@ -31,12 +31,10 @@ export const useOperationsColumns = ({
 
   const columns: Column<apiTypes["OperationOutput"]>[] = [
     {
-      key: "status",
       header: t("Statut"),
       cell: (item) => <OperationBadge status={item.status} />,
     },
     {
-      key: "sector",
       header: t("Filière"),
       cell: (item) => (
         <Text
@@ -53,22 +51,18 @@ export const useOperationsColumns = ({
       ),
     },
     {
-      key: "biofuel",
       header: t("Biocarburant"),
       cell: (item) => item.biofuel,
     },
     {
-      key: "category",
       header: t("Catégorie"),
       cell: (item) => item.customs_category,
     },
     {
-      key: "created_at",
       header: t("Date"),
       cell: (item) => formatDate(item.created_at),
     },
     {
-      key: "depot",
       header: t("Dépôt"),
       cell: (item) => {
         const depot =
@@ -77,12 +71,10 @@ export const useOperationsColumns = ({
       },
     },
     {
-      key: "operation_type",
       header: t("Opération"),
       cell: (item) => <Cell text={t(formatOperationType(item.type))} />,
     },
     {
-      key: "from_to",
       header: t("De/à"),
       cell: (item) => {
         const entity = getOperationEntity(item)
