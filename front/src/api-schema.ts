@@ -881,7 +881,8 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["tiruert_operations_accept_create"]
+    /** @description Set status operation to ACCEPTED */
+    post: operations["accept_operation"]
     delete?: never
     options?: never
     head?: never
@@ -897,7 +898,8 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["tiruert_operations_reject_create"]
+    /** @description Set status operation to REJECTED */
+    post: operations["reject_operation"]
     delete?: never
     options?: never
     head?: never
@@ -981,7 +983,8 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["tiruert_operations_teneur_validate_create"]
+    /** @description Set teneur operations to ACCEPTED */
+    post: operations["validate_teneur"]
     delete?: never
     options?: never
     head?: never
@@ -3895,9 +3898,9 @@ export interface operations {
   }
   create_operation: {
     parameters: {
-      query?: {
+      query: {
         /** @description Authorised entity ID. */
-        entity_id?: string
+        entity_id: number
       }
       header?: never
       path?: never
@@ -3985,9 +3988,9 @@ export interface operations {
   }
   delete_operation: {
     parameters: {
-      query?: {
+      query: {
         /** @description Authorised entity ID. */
-        entity_id?: string
+        entity_id: number
       }
       header?: never
       path: {
@@ -4042,9 +4045,12 @@ export interface operations {
       }
     }
   }
-  tiruert_operations_accept_create: {
+  accept_operation: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Opération. */
@@ -4052,27 +4058,34 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["OperationOutputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
-        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
-      }
-    }
+    requestBody?: never
     responses: {
+      /** @description Success message */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
         }
       }
     }
   }
-  tiruert_operations_reject_create: {
+  reject_operation: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Opération. */
@@ -4080,20 +4093,24 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["OperationOutputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
-        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
-      }
-    }
+    requestBody?: never
     responses: {
+      /** @description Success message */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
         }
       }
     }
@@ -4232,27 +4249,34 @@ export interface operations {
       }
     }
   }
-  tiruert_operations_teneur_validate_create: {
+  validate_teneur: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["OperationOutputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
-        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
-      }
-    }
+    requestBody?: never
     responses: {
+      /** @description Success message */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
         }
       }
     }

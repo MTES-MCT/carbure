@@ -2758,8 +2758,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
           description: Authorised entity ID.
+          required: true
       tags:
         - tiruert
       requestBody:
@@ -2923,8 +2924,9 @@ paths:
         - in: query
           name: entity_id
           schema:
-            type: string
+            type: integer
           description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -2943,8 +2945,15 @@ paths:
           description: Forbidden. The operation type or status does not allow deletion.
   /api/tiruert/operations/{id}/accept/:
     post:
-      operationId: tiruert_operations_accept_create
+      operationId: accept_operation
+      description: Set status operation to ACCEPTED
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -2953,18 +2962,6 @@ paths:
           required: true
       tags:
         - tiruert
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -2973,12 +2970,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
-          description: ""
+                status: accepted
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: Operation not found
+          description: Error message
   /api/tiruert/operations/{id}/reject/:
     post:
-      operationId: tiruert_operations_reject_create
+      operationId: reject_operation
+      description: Set status operation to REJECTED
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -2987,18 +2997,6 @@ paths:
           required: true
       tags:
         - tiruert
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -3007,8 +3005,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
-          description: ""
+                status: rejected
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: Operation not found
+          description: Error message
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
@@ -3348,21 +3352,17 @@ paths:
           description: ""
   /api/tiruert/operations/teneur/validate/:
     post:
-      operationId: tiruert_operations_teneur_validate_create
+      operationId: validate_teneur
+      description: Set teneur operations to ACCEPTED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
       tags:
         - tiruert
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
-        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -3371,8 +3371,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
-          description: ""
+                status: validated
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: NOTHING_TO_VALIDATE
+          description: Error message
   /api/user/:
     get:
       operationId: user_retrieve

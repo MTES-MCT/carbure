@@ -70,7 +70,11 @@ export const useOperationsColumns = ({
     {
       key: "depot",
       header: t("Dépôt"),
-      cell: (item) => <Cell text={item.to_depot?.name ?? "-"} />,
+      cell: (item) => {
+        const depot =
+          item.type === OperationType.CESSION ? item.from_depot : item.to_depot
+        return <Cell text={depot?.name ?? "-"} />
+      },
     },
     {
       key: "operation_type",
@@ -82,7 +86,16 @@ export const useOperationsColumns = ({
       header: t("De/à"),
       cell: (item) => {
         const entity = getOperationEntity(item)
-        return <Cell text={entity ? entity.name : "-"} />
+        return (
+          <Cell
+            text={
+              item.type === OperationType.CESSION ||
+              item.type === OperationType.ACQUISITION
+                ? entity.name
+                : "-"
+            }
+          />
+        )
       },
     },
     {
