@@ -70,8 +70,12 @@ export const OperationDetail = () => {
           label: t("Date d'opération"),
           value: formatDate(operation?.created_at),
         },
-        {
+        operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
+          value: getOperationEntity(operation)?.name ?? "-",
+        },
+        operation.type === OperationType.CESSION && {
+          label: t("Destinataire"),
           value: getOperationEntity(operation)?.name ?? "-",
         },
         {
@@ -85,11 +89,15 @@ export const OperationDetail = () => {
           label: t("Volume"),
           value: getOperationVolume(operation),
         },
-        { label: t("Tonnes CO2 eq evitées"), value: "???" },
         {
           label: t("Dépôt expéditeur"),
           value: operation.from_depot?.name ?? "-",
         },
+        operation.type !== OperationType.DEVALUATION && {
+          label: t("Dépôt destinataire"),
+          value: operation.to_depot?.name ?? "-",
+        },
+        { label: t("Tonnes CO2 eq evitées"), value: "???" },
       ])
     : []
 
