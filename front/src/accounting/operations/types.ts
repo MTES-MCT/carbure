@@ -17,6 +17,7 @@ export {
   OperationDebitOrCredit,
   OperationSector,
   OperationType,
+  OperationBiofuelCategory,
 }
 
 export interface OperationsQuery

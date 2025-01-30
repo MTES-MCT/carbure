@@ -1,0 +1,7 @@
+.debit-operation-dialog__radios-container {
+  border: 1px solid var(--border-default-grey);
+}
+
+.debit-operation-dialog__radios {
+  padding: var(--spacing-4w);
+}
