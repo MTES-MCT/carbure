@@ -10,7 +10,7 @@ import { useRoutes } from "common/hooks/routes"
 import { Trans, useTranslation } from "react-i18next"
 import { Route, Routes } from "react-router-dom"
 import { Operations } from "./operations"
-import { Balance } from "./balance"
+import { Balances } from "./balances"
 import { useState } from "react"
 export const MaterialAccounting = () => {
   const { t } = useTranslation()
@@ -25,9 +25,9 @@ export const MaterialAccounting = () => {
       <Tabs
         tabs={[
           {
-            key: "balance",
+            key: "balances",
             label: t("Soldes"),
-            path: routes.MATERIAL_ACCOUNTING.BALANCE,
+            path: routes.MATERIAL_ACCOUNTING.BALANCES,
             icon: DraftFill,
           },
           {
@@ -50,7 +50,7 @@ export const MaterialAccounting = () => {
             path="operations"
             element={<Operations setOperationCount={setOperationCount} />}
           />
-          <Route path="balance" element={<Balance />} />
+          <Route path="balances" element={<Balances />} />
         </Routes>
       </Content>
     </Main>
