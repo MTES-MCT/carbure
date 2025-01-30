@@ -1384,7 +1384,7 @@
   "Voulez-vous renvoyer les lots dans la boîte de réception ?": "Do you want to put back the batches in the pending state?",
   "En confirmant cette opération, les lots sélectionnés retourneront dans l'état 'En attente' afin que vous puissiez à nouveau les accepter avec la bonne option.": "After running this operation, The selected batches will return to the 'Pending' state so you can accept them again with the right option.",
   "Créer un lot": "Create a batch",
-  "Gérer mes déclarations": "Manage my meter readings ",
+  "Gérer mes déclarations": "Manage my declarations",
   "La déclaration a bien été validée !": "The declaration was validated!",
   "La déclaration n'a pas pu être validée !": "The declaration coiuld not be validated!",
   "La déclaration a bien été annulée !": "The declaration was canceled!",
