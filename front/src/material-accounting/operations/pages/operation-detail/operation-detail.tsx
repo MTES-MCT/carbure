@@ -1,5 +1,5 @@
 import Dialog from "common/components/dialog2/dialog"
-import Portal, { usePortal } from "common/components/portal"
+import Portal from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
 import * as api from "./api"
@@ -15,7 +15,7 @@ import { OperationBadge } from "material-accounting/operations/components/operat
 import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
 import { useTranslation } from "react-i18next"
-import { Grid } from "common/components/scaffold"
+import { Grid, Main } from "common/components/scaffold"
 import { formatDate } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
@@ -23,14 +23,17 @@ import {
   OperationsStatus,
   OperationType,
 } from "material-accounting/operations/types"
-import { DeleteOperationDialog } from "./components/delete-operation-dialog"
+import {
+  useAcceptOperation,
+  useDeleteOperation,
+  useRejectOperation,
+} from "./operation-detail.hooks"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { t } = useTranslation()
   const match = useHashMatch("operation/:id")
-  const portal = usePortal()
 
   const { result } = useQuery(api.getOperationDetail, {
     key: "operation-detail",
@@ -43,17 +46,23 @@ export const OperationDetail = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
-  const openDialogDeleteOperation = () => {
-    if (!operation) return
+  const { execute: deleteOperation, loading: deleteOperationLoading } =
+    useDeleteOperation({
+      operation,
+      onDeleteOperation: closeDialog,
+    })
 
-    portal((close) => (
-      <DeleteOperationDialog
-        onClose={close}
-        operation={operation}
-        onDeleteOperation={closeDialog}
-      />
-    ))
-  }
+  const { execute: acceptOperation, loading: acceptOperationLoading } =
+    useAcceptOperation({
+      operation,
+      onAcceptOperation: closeDialog,
+    })
+
+  const { execute: rejectOperation, loading: rejectOperationLoading } =
+    useRejectOperation({
+      operation,
+      onRejectOperation: closeDialog,
+    })
 
   const fields = operation
     ? compact([
@@ -103,10 +112,20 @@ export const OperationDetail = () => {
             {operation?.type === OperationType.ACQUISITION &&
               operation?.status === OperationsStatus.PENDING && (
                 <>
-                  <Button customPriority="danger" iconId="fr-icon-close-line">
+                  <Button
+                    customPriority="danger"
+                    iconId="fr-icon-close-line"
+                    onClick={() => rejectOperation(entity.id, operation.id)}
+                    loading={rejectOperationLoading}
+                  >
                     {t("Refuser")}
                   </Button>
-                  <Button customPriority="success" iconId="fr-icon-check-line">
+                  <Button
+                    customPriority="success"
+                    iconId="fr-icon-check-line"
+                    onClick={() => acceptOperation(entity.id, operation.id)}
+                    loading={acceptOperationLoading}
+                  >
                     {t("Accepter")}
                   </Button>
                 </>
@@ -116,7 +135,8 @@ export const OperationDetail = () => {
                 <Button
                   customPriority="danger"
                   iconId="fr-icon-close-line"
-                  onClick={openDialogDeleteOperation}
+                  onClick={() => deleteOperation(entity.id, operation.id)}
+                  loading={deleteOperationLoading}
                 >
                   {t("Annuler le certificat de cession")}
                 </Button>
@@ -130,14 +150,47 @@ export const OperationDetail = () => {
           </>
         }
       >
-        <Grid className={css["operation-detail-fields"]}>
-          {fields.map(({ label, value }) => (
-            <div key={label}>
-              <Text className={css["field-label"]}>{label}</Text>
-              <Text className={css["field-value"]}>{value}</Text>
-            </div>
-          ))}
-        </Grid>
+        <Main>
+          <Grid className={css["operation-detail-fields"]}>
+            {fields.map(({ label, value }) => (
+              <div key={label}>
+                <Text className={css["field-label"]}>{label}</Text>
+                <Text className={css["field-value"]}>{value}</Text>
+              </div>
+            ))}
+          </Grid>
+          {operation?.type === OperationType.ACQUISITION &&
+            operation?.status === OperationsStatus.PENDING && (
+              <>
+                <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
+                <div>
+                  <Text>
+                    {t(
+                      "<b>Si pour l’accepter</b>, celui-ci sera comptabilisé en acquisition et viendra alimenter votre solde."
+                    )}
+                  </Text>
+                  <Text>
+                    {t(
+                      "Si vous le <b>refusez</b>, celui-ci n’apparaîtra plus dans vos opérations en attente."
+                    )}
+                  </Text>
+                </div>
+              </>
+            )}
+          {operation?.type === OperationType.CESSION &&
+            operation?.status === OperationsStatus.PENDING && (
+              <>
+                <Text>
+                  {t("Voulez-vous annuler ce certificat de cession ?")}
+                </Text>
+                <Text>
+                  {t(
+                    "Vous pouvez annuler un certificat de cession, tant que celui-ci est encore en attente côté redevable."
+                  )}
+                </Text>
+              </>
+            )}
+        </Main>
       </Dialog>
     </Portal>
   )

@@ -25,3 +25,25 @@ export const deleteOperation = (entity_id: number, operation_id: number) => {
     },
   })
 }
+
+export const acceptOperation = (entity_id: number, operation_id: number) => {
+  return apiFetch.POST(`/tiruert/operations/{id}/accept/`, {
+    params: {
+      query: {
+        entity_id: entity_id.toString(),
+      },
+      path: { id: operation_id },
+    },
+  })
+}
+
+export const rejectOperation = (entity_id: number, operation_id: number) => {
+  return apiFetch.POST(`/tiruert/operations/{id}/reject/`, {
+    params: {
+      query: {
+        entity_id: entity_id.toString(),
+      },
+      path: { id: operation_id },
+    },
+  })
+}
