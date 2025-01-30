@@ -1,6 +1,6 @@
 from django.db import models, transaction
 
-from core.models import CarbureLot, MatierePremiere
+from core.models import CarbureLot, MatierePremiere, Pays
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation_detail import OperationDetail
 
@@ -50,6 +50,9 @@ class Operation(models.Model):
     )
     to_depot = models.ForeignKey(
         "transactions.Depot", null=True, on_delete=models.SET_NULL, related_name="operations_to_depot"
+    )
+    export_country = models.ForeignKey(
+        Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="operations_country"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     validity_date = models.DateField(null=False, blank=False)
