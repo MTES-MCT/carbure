@@ -1,9 +1,10 @@
-import { apiTypes } from "common/services/api-fetch.types"
 import {
   OperationDebitOrCredit,
   OperationsStatus,
   OperationType,
 } from "./types"
+import { apiTypes } from "common/services/api-fetch.types"
+import { formatNumber } from "common/utils/formatters"
 
 /**
  * Return the i18n key for the sector
@@ -94,3 +95,8 @@ export const getOperationEntity = (operation: apiTypes["OperationOutput"]) =>
   ].includes(operation.type as OperationType)
     ? operation.debited_entity
     : operation.credited_entity
+
+export const getOperationVolume = (operation: apiTypes["OperationOutput"]) =>
+  isOperationDebit(operation.type)
+    ? `-${formatNumber(Number(operation.volume))}`
+    : `+${formatNumber(Number(operation.volume))}`

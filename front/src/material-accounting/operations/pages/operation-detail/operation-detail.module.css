@@ -1,0 +1,19 @@
+.operation-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.operation-detail-fields {
+  grid-template-columns: repeat(3, minmax(var(--grid-cell-width), 1fr));
+  row-gap: var(--spacing-3v);
+  column-gap: var(--spacing-3w);
+}
+
+.field-label {
+  color: var(--text-mention-grey);
+}
+
+.field-value {
+  color: var(--text-label-grey);
+}
