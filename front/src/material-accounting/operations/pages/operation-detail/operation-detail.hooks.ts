@@ -19,15 +19,20 @@ export const useDeleteOperation = ({
   return useMutation(api.deleteOperation, {
     invalidates: ["operations"],
     onSuccess: () => {
-      notify(t(`L'opération n°${operation?.id} a été annulée.`), {
+      notify(t(`L'opération n°{{id}} a été annulée.`, { id: operation?.id }), {
         variant: "success",
       })
       onDeleteOperation()
     },
     onError: () => {
-      notify(t(`L'opération n°${operation?.id} n'a pas pu être annulée.`), {
-        variant: "danger",
-      })
+      notify(
+        t(`L'opération n°{{id}} n'a pas pu être annulée.`, {
+          id: operation?.id,
+        }),
+        {
+          variant: "danger",
+        }
+      )
     },
   })
 }
@@ -46,15 +51,20 @@ export const useAcceptOperation = ({
   return useMutation(api.acceptOperation, {
     invalidates: ["operations"],
     onSuccess: () => {
-      notify(t(`L'opération n°${operation?.id} a été acceptée.`), {
+      notify(t(`L'opération n°{{id}} a été acceptée.`, { id: operation?.id }), {
         variant: "success",
       })
       onAcceptOperation()
     },
     onError: () => {
-      notify(t(`L'opération n°${operation?.id} n'a pas pu être acceptée.`), {
-        variant: "danger",
-      })
+      notify(
+        t(`L'opération n°{{id}} n'a pas pu être acceptée.`, {
+          id: operation?.id,
+        }),
+        {
+          variant: "danger",
+        }
+      )
     },
   })
 }
@@ -74,15 +84,20 @@ export const useRejectOperation = ({
   return useMutation(api.rejectOperation, {
     invalidates: ["operations"],
     onSuccess: () => {
-      notify(t(`L'opération n°${operation?.id} a été rejetée.`), {
+      notify(t(`L'opération n°{{id}} a été rejetée.`, { id: operation?.id }), {
         variant: "success",
       })
       onRejectOperation()
     },
     onError: () => {
-      notify(t(`L'opération n°${operation?.id} n'a pas pu être rejetée.`), {
-        variant: "danger",
-      })
+      notify(
+        t(`L'opération n°{{id}} n'a pas pu être rejetée.`, {
+          id: operation?.id,
+        }),
+        {
+          variant: "danger",
+        }
+      )
     },
   })
 }

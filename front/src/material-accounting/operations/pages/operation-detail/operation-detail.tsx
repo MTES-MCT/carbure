@@ -14,7 +14,7 @@ import {
 import { OperationBadge } from "material-accounting/operations/components/operation-badge"
 import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { Grid, Main } from "common/components/scaffold"
 import { formatDate } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
@@ -165,14 +165,10 @@ export const OperationDetail = () => {
                 <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
                 <div>
                   <Text>
-                    {t(
-                      "<b>Si pour l’accepter</b>, celui-ci sera comptabilisé en acquisition et viendra alimenter votre solde."
-                    )}
+                    <Trans defaults="<b>Si vous l’acceptez</b>, celui-ci sera comptabilisé en acquisition et viendra alimenter votre solde." />
                   </Text>
                   <Text>
-                    {t(
-                      "Si vous le <b>refusez</b>, celui-ci n’apparaîtra plus dans vos opérations en attente."
-                    )}
+                    <Trans defaults="Si vous le <b>refusez</b>, celui-ci n’apparaîtra plus dans vos opérations en attente." />
                   </Text>
                 </div>
               </>
