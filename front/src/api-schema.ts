@@ -2263,6 +2263,7 @@ export interface components {
      *     * `TIRIB` - TIRIB
      *     * `AIRLINE` - AIRLINE
      *     * `ELEC` - ELEC
+     *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
      * @enum {string}
      */
     ExtAdminPagesEnum: ExtAdminPagesEnum
@@ -6382,6 +6383,7 @@ export enum ExtAdminPagesEnum {
   TIRIB = "TIRIB",
   AIRLINE = "AIRLINE",
   ELEC = "ELEC",
+  TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
 }
 export enum FileTypeEnum {
   SOURCING = "SOURCING",

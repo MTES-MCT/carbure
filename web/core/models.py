@@ -547,6 +547,7 @@ class ExternalAdminRights(models.Model):
     TIRIB_STATS = "TIRIB"
     AIRLINE = "AIRLINE"
     ELEC = "ELEC"
+    TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -554,6 +555,7 @@ class ExternalAdminRights(models.Model):
         (TIRIB_STATS, TIRIB_STATS),
         (AIRLINE, AIRLINE),
         (ELEC, ELEC),
+        (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)

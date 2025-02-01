@@ -13,16 +13,27 @@ import {
   NewsPaperLine,
 } from "common/components/icon"
 import { apiTypes } from "common/services/api-fetch.types"
+import { ExtAdminPagesEnum } from "api-schema"
 
 type ElecParams = Pick<apiTypes["NavStats"], "pending_transfer_certificates">
 export const useElec = (params?: ElecParams) => {
-  const { has_elec, isOperator, isCPO, isAdmin, hasAdminRight } = useEntity()
+  const {
+    has_elec,
+    ext_admin_pages,
+    isOperator,
+    isCPO,
+    isAdmin,
+    hasAdminRight,
+  } = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
 
   const elec: MenuSection = {
     title: t("Certificats d'électricité"),
-    condition: (has_elec && isOperator) || isCPO,
+    condition:
+      (has_elec && isOperator) ||
+      isCPO ||
+      ext_admin_pages.includes(ExtAdminPagesEnum.TRANSFERRED_ELEC),
     children: [
       {
         path: routes.ELEC().CERTIFICATES.PENDING,
@@ -56,18 +67,25 @@ export const useElec = (params?: ElecParams) => {
 
   const elecAdmin: MenuSection = {
     title: t("Électricité"),
-    condition: isAdmin || hasAdminRight("ELEC"),
+    condition:
+      isAdmin ||
+      hasAdminRight("ELEC") ||
+      ext_admin_pages.includes(ExtAdminPagesEnum.TRANSFERRED_ELEC),
     children: [
       {
         path: routes.ELEC_ADMIN().PROVISION,
         title: t("Certificats"),
         icon: NewsPaperLine,
         iconActive: NewsPaperFill,
+        condition: isCPO,
       },
       {
         path: routes.ELEC_ADMIN().TRANSFER,
         title: t("Énergie cédée"),
+        additionalInfo: params?.pending_transfer_certificates,
         icon: ArrowGoForwardLine,
+        condition:
+          ext_admin_pages.includes(ExtAdminPagesEnum.TRANSFERRED_ELEC) || isCPO,
       },
     ],
   }
