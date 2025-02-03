@@ -11,10 +11,12 @@ import * as api from "../../../api"
 type ApplicationDetailsDialogValidateQuotasProps = {
   application: DoubleCountingApplicationDetails
   onClose: PortalInstance["close"]
+  onValidate: () => void
 }
 const ApplicationDetailsDialogValidateQuotas = ({
   application,
   onClose,
+  onValidate,
 }: ApplicationDetailsDialogValidateQuotasProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -24,6 +26,7 @@ const ApplicationDetailsDialogValidateQuotas = ({
     onSuccess: () => {
       notify(t("Les quotas ont bien été validés."), { variant: "success" })
       onClose()
+      onValidate()
     },
   })
 
