@@ -182,7 +182,6 @@ const TicketsGroupedAssignment = ({
                   />
 
                   <Select
-                    required
                     label={t("Mode d'expédition")}
                     placeholder={t("Choisissez un mode")}
                     {...bind("shipping_method")}
@@ -198,7 +197,6 @@ const TicketsGroupedAssignment = ({
                   />
 
                   <Select
-                    required
                     label={t("Type de consommation")}
                     placeholder={t("Choisissez un type")}
                     {...bind("consumption_type")}

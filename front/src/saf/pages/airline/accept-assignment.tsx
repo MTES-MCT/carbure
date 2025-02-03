@@ -83,7 +83,7 @@ export const AcceptAssignment = ({
                   },
                   {
                     value: EtsStatusEnum.OUTSIDE_ETS,
-                    label: t("Hors ETS (schéma volontaire)"),
+                    label: t("Hors ETS (volontaire)"),
                   },
                   {
                     value: EtsStatusEnum.NOT_CONCERNED,

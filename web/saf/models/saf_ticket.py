@@ -106,7 +106,7 @@ class SafTicket(models.Model):
     NOT_CONCERNED = "NOT_CONCERNED"
     ETS_STATUS = (
         (ETS_VALUATION, "Valorisation ETS"),
-        (OUTSIDE_ETS, "Hors ETS (schéma volontaire)"),
+        (OUTSIDE_ETS, "Hors ETS (volontaire)"),
         (NOT_CONCERNED, "Non concerné"),
     )
     ets_status = models.CharField(max_length=16, choices=ETS_STATUS, null=True, blank=True)

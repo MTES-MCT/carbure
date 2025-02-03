@@ -19,7 +19,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   const etsStatusMap = {
     [EtsStatusEnum.ETS_VALUATION]: t("Valorisation ETS"),
-    [EtsStatusEnum.OUTSIDE_ETS]: t("Hors ETS (schéma volontaire)"),
+    [EtsStatusEnum.OUTSIDE_ETS]: t("Hors ETS (volontaire)"),
     [EtsStatusEnum.NOT_CONCERNED]: t("Non concerné"),
   }
 
@@ -108,7 +108,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         )}
         {ticket.reception_airport && (
           <TextInput
-            label={t("Méthode de livraison")}
+            label={t("Aéroport de réception")}
             value={ticket.reception_airport.name}
             readOnly
           />
