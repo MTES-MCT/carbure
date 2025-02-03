@@ -55,7 +55,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
         return representation
 
 
-class OperationOutputSerializer(BaseOperationSerializer):
+class OperationListSerializer(BaseOperationSerializer):
     class Meta:
         model = Operation
         fields = [
@@ -78,7 +78,7 @@ class OperationOutputSerializer(BaseOperationSerializer):
         ]
 
 
-class OperationDetailSerializer(BaseOperationSerializer):
+class OperationSerializer(BaseOperationSerializer):
     class Meta:
         model = Operation
         fields = [
