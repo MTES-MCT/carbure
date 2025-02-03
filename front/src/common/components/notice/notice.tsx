@@ -25,6 +25,9 @@ export interface NoticeProps {
   isClosable?: boolean
   onClose?: () => void
 
+  // If true, the notice will not have a color
+  noColor?: boolean
+
   // The text displayed in the link
   linkText?: string
 
@@ -46,6 +49,7 @@ export const Notice = ({
   onClose,
   linkText,
   linkHref,
+  noColor,
   onAction,
 }: NoticeProps) => {
   const [open, setOpen] = useState(true)
@@ -69,6 +73,7 @@ export const Notice = ({
         fr.cx("fr-notice"),
         variant &&
           cl(fr.cx(`fr-notice--${variant}`), css[`notice--${variant}`]),
+        noColor && css["notice--no-color"],
         className
       )}
       style={style}

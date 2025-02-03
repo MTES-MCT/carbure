@@ -55,3 +55,10 @@ export const Closable: Story = {
     isClosable: true,
   },
 }
+
+export const NoColor: Story = {
+  args: {
+    variant: "info",
+    noColor: true,
+  },
+}
