@@ -1353,7 +1353,7 @@ export interface components {
     }
     /**
      * @description * `ETS_VALUATION` - Valorisation ETS
-     *     * `OUTSIDE_ETS` - Hors ETS (schéma volontaire)
+     *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
      *     * `NOT_CONCERNED` - Non concerné
      * @enum {string}
      */
