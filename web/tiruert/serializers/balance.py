@@ -27,7 +27,7 @@ class BalanceSerializer(serializers.Serializer):
         return self.calcul_available_balance(instance) - instance["teneur"]
 
     def calcul_available_balance(self, instance):
-        return round(instance["initial_balance"] + instance["volume"]["credit"] - instance["volume"]["debit"], 2)
+        return instance["initial_balance"] + instance["volume"]["credit"] - instance["volume"]["debit"]
 
 
 class LotSerializer(serializers.Serializer):

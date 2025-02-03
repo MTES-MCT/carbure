@@ -67,9 +67,6 @@ class BalanceService:
                 balance[key]["pending"] += 1
 
             balance[key]["unit"] = unit
-            balance[key]["volume"]["credit"] = round(balance[key]["volume"]["credit"], 2)
-            balance[key]["volume"]["debit"] = round(balance[key]["volume"]["debit"], 2)
-            balance[key]["teneur"] = round(balance[key]["teneur"], 2)
 
         return balance
 
@@ -94,7 +91,7 @@ class BalanceService:
                 initial_balances[key] += (detail.volume if operation.is_credit(entity_id) else -detail.volume) * pci
 
         for key in balance:
-            balance[key]["initial_balance"] = round(initial_balances[key], 2)
+            balance[key]["initial_balance"] = initial_balances[key]
 
         return balance
 
@@ -128,7 +125,7 @@ class BalanceService:
                 yearly_teneurs[key] += detail.volume * pci
 
         for key in balance:
-            balance[key]["yearly_teneur"] = round(yearly_teneurs[key], 2)
+            balance[key]["yearly_teneur"] = yearly_teneurs[key]
 
         return balance
 
