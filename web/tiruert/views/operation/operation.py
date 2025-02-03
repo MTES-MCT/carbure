@@ -9,7 +9,7 @@ from core.models import Entity, UserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.permissions import HasUserRights
-from tiruert.serializers import OperationInputSerializer, OperationOutputSerializer
+from tiruert.serializers import OperationDetailSerializer, OperationInputSerializer, OperationOutputSerializer
 
 from .mixins import ActionMixin
 
@@ -127,10 +127,13 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             ),
         ],
         responses={
-            status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
+            status.HTTP_200_OK: OpenApiResponse(
+                response=OperationDetailSerializer, description="Details of specific operation."
+            )
         },
     )
     def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = OperationDetailSerializer
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(

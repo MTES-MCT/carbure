@@ -16,28 +16,7 @@ class EntitySerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class OperationOutputSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Operation
-        fields = [
-            "id",
-            "type",
-            "status",
-            "sector",
-            "customs_category",
-            "biofuel",
-            "credited_entity",
-            "debited_entity",
-            "from_depot",
-            "to_depot",
-            "export_country",
-            "created_at",
-            "validity_date",
-            "volume",
-            "unit",
-            "details",
-        ]
-
+class BaseOperationSerializer(serializers.ModelSerializer):
     from_depot = DepotSerializer()
     to_depot = DepotSerializer()
     credited_entity = EntitySerializer()
@@ -64,7 +43,7 @@ class OperationOutputSerializer(serializers.ModelSerializer):
 
     def get_volume(self, instance):
         pci = instance.biofuel.pci_litre if self.context.get("unit") == "mj" else 1
-        return self.get_volume_l(instance) * pci
+        return round(self.get_volume_l(instance) * pci, 2)
 
     def get_unit(self, instance):
         return self.context.get("unit")
@@ -74,6 +53,58 @@ class OperationOutputSerializer(serializers.ModelSerializer):
         if not self.context.get("details"):
             representation.pop("details", None)
         return representation
+
+
+class OperationOutputSerializer(BaseOperationSerializer):
+    class Meta:
+        model = Operation
+        fields = [
+            "id",
+            "type",
+            "status",
+            "sector",
+            "customs_category",
+            "biofuel",
+            "credited_entity",
+            "debited_entity",
+            "from_depot",
+            "to_depot",
+            "export_country",
+            "created_at",
+            "validity_date",
+            "volume",
+            "unit",
+            "details",
+        ]
+
+
+class OperationDetailSerializer(BaseOperationSerializer):
+    class Meta:
+        model = Operation
+        fields = [
+            "id",
+            "type",
+            "status",
+            "sector",
+            "customs_category",
+            "biofuel",
+            "credited_entity",
+            "debited_entity",
+            "from_depot",
+            "to_depot",
+            "export_country",
+            "created_at",
+            "validity_date",
+            "volume",
+            "unit",
+            "avoided_emissions",
+            "details",
+        ]
+
+    avoided_emissions = serializers.SerializerMethodField()
+
+    def get_avoided_emissions(self, instance):
+        return round(sum(detail.avoided_emissions for detail in instance.details.all()), 2)
 
 
 class LotSerializer(serializers.Serializer):
