@@ -1,0 +1,7 @@
+.operation-text-title {
+  color: var(--text-mention-grey);
+}
+
+.operation-text-description {
+  color: var(--text-label-grey);
+}

@@ -1,13 +1,16 @@
 import Dialog from "common/components/dialog2/dialog"
-import Portal from "common/components/portal"
+import Portal, { usePortal } from "common/components/portal"
 import { Trans } from "react-i18next"
-import { Balance } from "../types"
 import { RadioGroup } from "common/components/inputs2"
 import { OperationType } from "material-accounting/operations/types"
 import { useState } from "react"
 import { formatOperationType } from "material-accounting/operations/operations.utils"
 import styles from "./debit-operation-dialog.module.css"
 import { Button } from "common/components/button2"
+import { CessionDialog } from "./cession-dialog"
+import { DevaluationDialog } from "./devaluation-dialog"
+import { ExportationDialog } from "./exportation-dialog"
+import { Balance } from "material-accounting/balances/types"
 interface DebitOperationDialogProps {
   onClose: () => void
   balance: Balance
@@ -15,12 +18,29 @@ interface DebitOperationDialogProps {
 
 export const DebitOperationDialog = ({
   onClose,
+  balance,
 }: DebitOperationDialogProps) => {
+  const portal = usePortal()
   const [currentOperation, setCurrentOperation] = useState<
     | OperationType.CESSION
     | OperationType.DEVALUATION
     | OperationType.EXPORTATION
   >(OperationType.CESSION)
+
+  const handleNext = () => {
+    switch (currentOperation) {
+      case OperationType.CESSION:
+        portal((close) => <CessionDialog onClose={close} balance={balance} />)
+        break
+      case OperationType.DEVALUATION:
+        portal((close) => <DevaluationDialog onClose={close} />)
+        break
+      case OperationType.EXPORTATION:
+        portal((close) => <ExportationDialog onClose={close} />)
+        break
+    }
+  }
+
   return (
     <Portal>
       <Dialog
@@ -36,7 +56,7 @@ export const DebitOperationDialog = ({
             <Button priority="secondary" onClick={onClose}>
               <Trans>Annuler</Trans>
             </Button>
-            <Button>
+            <Button onClick={handleNext}>
               <Trans>Suivant</Trans>
             </Button>
           </>
