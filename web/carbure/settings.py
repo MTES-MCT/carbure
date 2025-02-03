@@ -346,5 +346,6 @@ SPECTACULAR_SETTINGS = {
         "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
     },
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
     # OTHER SETTINGS
 }

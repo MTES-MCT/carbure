@@ -46,6 +46,8 @@ export type ProductionSiteDetails = ProductionSite & {
 
 export type Depot = apiTypes["Depot"]
 
+export type Airport = apiTypes["Airport"]
+
 export interface EntityDepot {
   depot: Depot | null
   ownership_type: OwnershipType

@@ -431,6 +431,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/resources/airports": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_airports_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/resources/biofuels": {
     parameters: {
       query?: never
@@ -883,6 +899,11 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    AcceptRequest: {
+      ets_status: components["schemas"]["EtsStatusEnum"]
+      /** Format: date */
+      ets_declaration_date?: string
+    }
     ActivateAccountRequest: {
       uidb64: string
       token: string
@@ -896,6 +917,17 @@ export interface components {
       active: components["schemas"]["DoubleCountingRegistration"][]
       incoming: components["schemas"]["DoubleCountingRegistration"][]
       expired: components["schemas"]["DoubleCountingRegistration"][]
+    }
+    Airport: {
+      readonly id: number
+      name: string
+      city?: string
+      icao_code?: string
+      readonly country: components["schemas"]["Country"]
+      site_type?: components["schemas"]["SiteTypeEnum"]
+      address?: string
+      postal_code?: string
+      gps_coordinates?: string | null
     }
     ApplicationListe: {
       rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
@@ -1025,6 +1057,12 @@ export interface components {
     CommentRequest: {
       comment?: string
     }
+    /**
+     * @description * `MAC` - MAC
+     *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+     * @enum {string}
+     */
+    ConsumptionTypeEnum: ConsumptionTypeEnum
     /**
      * @description * `NO_PROBLEMO` - NO_PROBLEMO
      *     * `IN_CORRECTION` - IN_CORRECTION
@@ -1314,6 +1352,13 @@ export interface components {
       message: string
     }
     /**
+     * @description * `ETS_VALUATION` - Valorisation ETS
+     *     * `OUTSIDE_ETS` - Hors ETS (schéma volontaire)
+     *     * `NOT_CONCERNED` - Non concerné
+     * @enum {string}
+     */
+    EtsStatusEnum: EtsStatusEnum
+    /**
      * @description * `DCA` - DCA
      *     * `AGRIMER` - AGRIMER
      *     * `TIRIB` - TIRIB
@@ -1560,6 +1605,7 @@ export interface components {
       readonly country_of_origin: components["schemas"]["Country"]
       /** Format: double */
       ghg_reduction?: number
+      ets_status?: components["schemas"]["EtsStatusEnum"] | null
     }
     SafTicketDetails: {
       readonly id: number
@@ -1610,6 +1656,12 @@ export interface components {
       ghg_total?: number
       client_comment?: string | null
       readonly parent_ticket_source: components["schemas"]["SafTicketSourcePreview"]
+      shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
+      readonly reception_airport: components["schemas"]["Airport"]
+      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
+      ets_status?: components["schemas"]["EtsStatusEnum"] | null
+      /** Format: date */
+      ets_declaration_date?: string | null
     }
     SafTicketPreview: {
       readonly id: number
@@ -1650,6 +1702,9 @@ export interface components {
       agreement_date?: string
       free_field?: string | null
       assignment_period: number
+      reception_airport?: number | null
+      consumption_type?: string | null
+      shipping_method?: string | null
     }
     SafTicketSourceAssignmentRequest: {
       client_id: number
@@ -1659,6 +1714,9 @@ export interface components {
       agreement_date?: string
       free_field?: string | null
       assignment_period: number
+      reception_airport?: number | null
+      consumption_type?: string | null
+      shipping_method?: string | null
     }
     SafTicketSourceDetails: {
       readonly id: number
@@ -1714,6 +1772,9 @@ export interface components {
       agreement_date?: string
       free_field?: string | null
       assignment_period: number
+      reception_airport?: number | null
+      consumption_type?: string | null
+      shipping_method?: string | null
       ticket_sources_ids: number[]
     }
     SafTicketSourceParentLot: {
@@ -1729,6 +1790,14 @@ export interface components {
       assigned_volume: number
     }
     /**
+     * @description * `PIPELINE` - PIPELINE
+     *     * `TRUCK` - TRUCK
+     *     * `TRAIN` - TRAIN
+     *     * `BARGE` - BARGE
+     * @enum {string}
+     */
+    ShippingMethodEnum: ShippingMethodEnum
+    /**
      * @description * `OTHER` - Autre
      *     * `EFS` - EFS
      *     * `EFPE` - EFPE
@@ -1739,6 +1808,7 @@ export interface components {
      *     * `COGENERATION PLANT` - COGENERATION PLANT
      *     * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
      *     * `EFCA` - EFCA
+     *     * `AIRPORT` - AIRPORT
      * @enum {string}
      */
     SiteTypeEnum: SiteTypeEnum
@@ -2620,6 +2690,30 @@ export interface operations {
       }
     }
   }
+  resources_airports_list: {
+    parameters: {
+      query?: {
+        /** @description Public Only */
+        public_only?: boolean
+        /** @description Search within the fields `name`, `icao_code` and `city` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Airport"][]
+        }
+      }
+    }
+  }
   resources_biofuels_list: {
     parameters: {
       query?: {
@@ -3243,11 +3337,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: {
+    requestBody: {
       content: {
-        "application/json": components["schemas"]["CommentRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["CommentRequest"]
-        "multipart/form-data": components["schemas"]["CommentRequest"]
+        "application/json": components["schemas"]["AcceptRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["AcceptRequest"]
+        "multipart/form-data": components["schemas"]["AcceptRequest"]
       }
     }
     responses: {
@@ -3646,6 +3740,10 @@ export enum CertificateTypeEnum {
   REDCERT = "REDCERT",
   Value2BS = "2BS",
 }
+export enum ConsumptionTypeEnum {
+  MAC = "MAC",
+  MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
+}
 export enum CorrectionStatusEnum {
   NO_PROBLEMO = "NO_PROBLEMO",
   IN_CORRECTION = "IN_CORRECTION",
@@ -3687,6 +3785,11 @@ export enum EntityTypeEnum {
   Unknown = "Unknown",
   PowerOrHeatProducer = "Power or Heat Producer",
 }
+export enum EtsStatusEnum {
+  ETS_VALUATION = "ETS_VALUATION",
+  OUTSIDE_ETS = "OUTSIDE_ETS",
+  NOT_CONCERNED = "NOT_CONCERNED",
+}
 export enum ExtAdminPagesEnum {
   DCA = "DCA",
   AGRIMER = "AGRIMER",
@@ -3722,6 +3825,12 @@ export enum RoleEnum {
   Admin = "ADMIN",
   Auditor = "AUDITOR",
 }
+export enum ShippingMethodEnum {
+  PIPELINE = "PIPELINE",
+  TRUCK = "TRUCK",
+  TRAIN = "TRAIN",
+  BARGE = "BARGE",
+}
 export enum SiteTypeEnum {
   OTHER = "OTHER",
   EFS = "EFS",
@@ -3733,6 +3842,7 @@ export enum SiteTypeEnum {
   COGENERATION_PLANT = "COGENERATION PLANT",
   PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
   EFCA = "EFCA",
+  AIRPORT = "AIRPORT",
 }
 export enum TransportDocumentTypeEnum {
   DAU = "DAU",
