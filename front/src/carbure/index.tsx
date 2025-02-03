@@ -29,7 +29,7 @@ import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { ContactPage } from "contact"
 import { YearsProvider } from "common/providers/years-provider"
-import { MaterialAccounting } from "material-accounting"
+import { MaterialAccounting } from "accounting"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -126,10 +126,7 @@ const Org = () => {
       <Route path="registry" element={<Registry />} />
       {(isIndustry || isPowerOrHeatProducer) && (
         <>
-          <Route
-            path="material-accounting/*"
-            element={<MaterialAccounting />}
-          />
+          <Route path="accounting/*" element={<MaterialAccounting />} />
           <Route path="transactions/:year/*" element={<Transactions />} />
 
           <Route

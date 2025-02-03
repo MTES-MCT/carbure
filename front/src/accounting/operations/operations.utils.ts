@@ -1,9 +1,9 @@
 import {
+  Operation,
   OperationDebitOrCredit,
   OperationsStatus,
   OperationType,
 } from "./types"
-import { apiTypes } from "common/services/api-fetch.types"
 import { formatNumber } from "common/utils/formatters"
 
 /**
@@ -86,7 +86,7 @@ export const isOperationDebit = (operation: string) =>
     OperationType.DEVALUATION,
   ].includes(operation as OperationType)
 
-export const getOperationEntity = (operation: apiTypes["OperationOutput"]) =>
+export const getOperationEntity = (operation: Operation) =>
   [
     OperationType.TENEUR,
     OperationType.EXPORTATION,
@@ -96,7 +96,7 @@ export const getOperationEntity = (operation: apiTypes["OperationOutput"]) =>
     ? operation.debited_entity
     : operation.credited_entity
 
-export const getOperationVolume = (operation: apiTypes["OperationOutput"]) =>
+export const getOperationVolume = (operation: Operation) =>
   isOperationDebit(operation.type)
     ? `-${formatNumber(Number(operation.volume))}`
     : `+${formatNumber(Number(operation.volume))}`

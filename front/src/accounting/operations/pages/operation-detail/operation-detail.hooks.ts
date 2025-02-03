@@ -2,10 +2,10 @@ import { useMutation } from "common/hooks/async"
 import * as api from "./api"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
-import { apiTypes } from "common/services/api-fetch.types"
+import { Operation } from "accounting/operations/types"
 
 type UseDeleteOperationProps = {
-  operation?: apiTypes["OperationOutput"]
+  operation?: Operation
   onDeleteOperation: () => void
 }
 
@@ -38,7 +38,7 @@ export const useDeleteOperation = ({
 }
 
 type UseAcceptOperationProps = {
-  operation?: apiTypes["OperationOutput"]
+  operation?: Operation
   onAcceptOperation: () => void
 }
 export const useAcceptOperation = ({
@@ -70,7 +70,7 @@ export const useAcceptOperation = ({
 }
 
 type UseRejectOperationProps = {
-  operation?: apiTypes["OperationOutput"]
+  operation?: Operation
   onRejectOperation: () => void
 }
 

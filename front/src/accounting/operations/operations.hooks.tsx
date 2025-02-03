@@ -1,7 +1,5 @@
 import { Column, Cell } from "common/components/table2"
 import { useTranslation } from "react-i18next"
-
-import { apiTypes } from "common/services/api-fetch.types"
 import { OperationBadge } from "./components/operation-badge"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { Text } from "common/components/text"
@@ -15,6 +13,7 @@ import {
 } from "./operations.utils"
 import * as api from "./api"
 import {
+  Operation,
   OperationDebitOrCredit,
   OperationsFilter,
   OperationsQuery,
@@ -29,7 +28,7 @@ export const useOperationsColumns = ({
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
 
-  const columns: Column<apiTypes["OperationOutput"]>[] = [
+  const columns: Column<Operation>[] = [
     {
       header: t("Statut"),
       cell: (item) => <OperationBadge status={item.status} />,

@@ -2749,7 +2749,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedOperationOutputList"
+                $ref: "#/components/schemas/PaginatedOperationListList"
           description: A list of operations.
     post:
       operationId: create_operation
@@ -2801,7 +2801,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
+                $ref: "#/components/schemas/OperationList"
               examples:
                 CreateOperationExample:
                   value:
@@ -2850,8 +2850,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
-          description: A list of operations.
+                $ref: "#/components/schemas/Operation"
+          description: Details of specific operation.
     put:
       operationId: tiruert_operations_update
       parameters:
@@ -2867,13 +2867,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/OperationListRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/OperationListRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/OperationOutputRequest"
+              $ref: "#/components/schemas/OperationListRequest"
         required: true
       security:
         - cookieAuth: []
@@ -2883,7 +2883,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
+                $ref: "#/components/schemas/OperationList"
           description: ""
     patch:
       operationId: tiruert_operations_partial_update
@@ -2900,13 +2900,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PatchedOperationOutputRequest"
+              $ref: "#/components/schemas/PatchedOperationListRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/PatchedOperationOutputRequest"
+              $ref: "#/components/schemas/PatchedOperationListRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/PatchedOperationOutputRequest"
+              $ref: "#/components/schemas/PatchedOperationListRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -2915,7 +2915,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationOutput"
+                $ref: "#/components/schemas/OperationList"
           description: ""
     delete:
       operationId: delete_operation
@@ -3138,6 +3138,139 @@ paths:
                 $ref: "#/components/schemas/PaginatedBalance"
           description: Paginated response with balances grouped by mp category / biofuel
             or by sector
+  /api/tiruert/operations/balance/filters/:
+    get:
+      operationId: filter_balances
+      description: Retrieve content of a specific filter
+      parameters:
+        - in: query
+          name: biofuel
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: customs_category
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - AM
+                - ANN-IX-A
+                - ANN-IX-B
+                - CONV
+                - EP2AM
+                - OTHER
+                - TALLOL
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: depot
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - biofuel
+              - customs_category
+              - sector
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - CESSION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
+                - LIVRAISON_DIRECTE
+                - MAC_BIO
+                - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: sector
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - DIESEL
+                - ESSENCE
+                - SAF
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - PENDING
+                - REJECTED
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: type
+          schema:
+            type: string
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
   /api/tiruert/operations/filters/:
     get:
       operationId: filter_operations
@@ -4977,6 +5110,70 @@ components:
           type: integer
         tickets:
           type: integer
+    Operation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/StatusD22Enum"
+        sector:
+          type: string
+          readOnly: true
+        customs_category:
+          $ref: "#/components/schemas/CustomsCategoryEnum"
+        biofuel:
+          type: string
+          readOnly: true
+        credited_entity:
+          $ref: "#/components/schemas/Entity"
+        debited_entity:
+          $ref: "#/components/schemas/Entity"
+        from_depot:
+          $ref: "#/components/schemas/Depot"
+        to_depot:
+          $ref: "#/components/schemas/Depot"
+        export_country:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        validity_date:
+          type: string
+          format: date
+        volume:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        avoided_emissions:
+          type: string
+          readOnly: true
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationDetail"
+      required:
+        - avoided_emissions
+        - biofuel
+        - created_at
+        - credited_entity
+        - debited_entity
+        - from_depot
+        - id
+        - sector
+        - to_depot
+        - type
+        - unit
+        - validity_date
+        - volume
     OperationDetail:
       type: object
       properties:
@@ -5042,7 +5239,7 @@ components:
         - lots
         - type
         - validity_date
-    OperationOutput:
+    OperationList:
       type: object
       properties:
         id:
@@ -5052,7 +5249,7 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/OperationOutputStatusEnum"
+          $ref: "#/components/schemas/StatusD22Enum"
         sector:
           type: string
           readOnly: true
@@ -5102,11 +5299,11 @@ components:
         - unit
         - validity_date
         - volume
-    OperationOutputRequest:
+    OperationListRequest:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/OperationOutputStatusEnum"
+          $ref: "#/components/schemas/StatusD22Enum"
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         credited_entity:
@@ -5133,18 +5330,6 @@ components:
         - from_depot
         - to_depot
         - validity_date
-    OperationOutputStatusEnum:
-      enum:
-        - PENDING
-        - ACCEPTED
-        - REJECTED
-        - CANCELED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `ACCEPTED` - ACCEPTED
-        * `REJECTED` - REJECTED
-        * `CANCELED` - CANCELED
     OtpResponse:
       type: object
       properties:
@@ -5195,7 +5380,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityPreview"
-    PaginatedOperationOutputList:
+    PaginatedOperationListList:
       type: object
       required:
         - count
@@ -5217,7 +5402,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/OperationOutput"
+            $ref: "#/components/schemas/OperationList"
     PaginatedSafTicketList:
       type: object
       required:
@@ -5264,11 +5449,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
-    PatchedOperationOutputRequest:
+    PatchedOperationListRequest:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/OperationOutputStatusEnum"
+          $ref: "#/components/schemas/StatusD22Enum"
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         credited_entity:
@@ -6080,6 +6265,18 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
+    StatusD22Enum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - CANCELED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `CANCELED` - CANCELED
     TransportDocumentTypeEnum:
       enum:
         - DAU

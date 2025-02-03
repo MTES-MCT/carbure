@@ -918,6 +918,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/operations/balance/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve content of a specific filter */
+    get: operations["filter_balances"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/operations/filters/": {
     parameters: {
       query?: never
@@ -1619,6 +1636,27 @@ export interface components {
       audits?: number
       tickets?: number
     }
+    Operation: {
+      readonly id: number
+      readonly type: string
+      status?: components["schemas"]["StatusD22Enum"]
+      readonly sector: string
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      readonly biofuel: string
+      credited_entity: components["schemas"]["Entity"]
+      debited_entity: components["schemas"]["Entity"]
+      from_depot: components["schemas"]["Depot"]
+      to_depot: components["schemas"]["Depot"]
+      export_country?: number | null
+      /** Format: date-time */
+      readonly created_at: string
+      /** Format: date */
+      validity_date: string
+      readonly volume: string
+      readonly unit: string
+      readonly avoided_emissions: string
+      details?: components["schemas"]["OperationDetail"][]
+    }
     OperationDetail: {
       lot: number
       /** Format: double */
@@ -1646,10 +1684,10 @@ export interface components {
       validity_date: string
       lots: components["schemas"]["LotRequest"][]
     }
-    OperationOutput: {
+    OperationList: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["OperationOutputStatusEnum"]
+      status?: components["schemas"]["StatusD22Enum"]
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
@@ -1666,8 +1704,8 @@ export interface components {
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
-    OperationOutputRequest: {
-      status?: components["schemas"]["OperationOutputStatusEnum"]
+    OperationListRequest: {
+      status?: components["schemas"]["StatusD22Enum"]
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       credited_entity: components["schemas"]["EntityRequest"]
       debited_entity: components["schemas"]["EntityRequest"]
@@ -1678,14 +1716,6 @@ export interface components {
       validity_date: string
       details?: components["schemas"]["OperationDetailRequest"][]
     }
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `ACCEPTED` - ACCEPTED
-     *     * `REJECTED` - REJECTED
-     *     * `CANCELED` - CANCELED
-     * @enum {string}
-     */
-    OperationOutputStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
     OtpResponse: {
       valid_until: string
     }
@@ -1710,7 +1740,7 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["EntityPreview"][]
     }
-    PaginatedOperationOutputList: {
+    PaginatedOperationListList: {
       /** @example 123 */
       count: number
       /**
@@ -1723,7 +1753,7 @@ export interface components {
        * @example http://api.example.org/accounts/?page=2
        */
       previous?: string | null
-      results: components["schemas"]["OperationOutput"][]
+      results: components["schemas"]["OperationList"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -1755,8 +1785,8 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
     }
-    PatchedOperationOutputRequest: {
-      status?: components["schemas"]["OperationOutputStatusEnum"]
+    PatchedOperationListRequest: {
+      status?: components["schemas"]["StatusD22Enum"]
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       credited_entity?: components["schemas"]["EntityRequest"]
       debited_entity?: components["schemas"]["EntityRequest"]
@@ -2066,6 +2096,14 @@ export interface components {
      * @enum {string}
      */
     SiteTypeEnum: SiteTypeEnum
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     * @enum {string}
+     */
+    StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
     /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
@@ -3896,7 +3934,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedOperationOutputList"]
+          "application/json": components["schemas"]["PaginatedOperationListList"]
         }
       }
     }
@@ -3925,7 +3963,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": components["schemas"]["OperationList"]
         }
       }
       /** @description Invalid input data. */
@@ -3952,13 +3990,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description A list of operations. */
+      /** @description Details of specific operation. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": components["schemas"]["Operation"]
         }
       }
     }
@@ -3975,9 +4013,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["OperationOutputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["OperationOutputRequest"]
-        "multipart/form-data": components["schemas"]["OperationOutputRequest"]
+        "application/json": components["schemas"]["OperationListRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationListRequest"]
+        "multipart/form-data": components["schemas"]["OperationListRequest"]
       }
     }
     responses: {
@@ -3986,7 +4024,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": components["schemas"]["OperationList"]
         }
       }
     }
@@ -4034,9 +4072,9 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["PatchedOperationOutputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedOperationOutputRequest"]
-        "multipart/form-data": components["schemas"]["PatchedOperationOutputRequest"]
+        "application/json": components["schemas"]["PatchedOperationListRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedOperationListRequest"]
+        "multipart/form-data": components["schemas"]["PatchedOperationListRequest"]
       }
     }
     responses: {
@@ -4045,7 +4083,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationOutput"]
+          "application/json": components["schemas"]["OperationList"]
         }
       }
     }
@@ -4157,6 +4195,44 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["PaginatedBalance"]
+        }
+      }
+    }
+  }
+  filter_balances: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        depot?: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
+        from_to?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operation?: PathsApiTiruertOperationsBalanceGetParametersQueryOperation[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        type?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
         }
       }
     }
@@ -4447,6 +4523,11 @@ export enum PathsApiTiruertOperationsBalanceGetParametersQueryOperation {
   LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
   MAC_BIO = "MAC_BIO",
   TENEUR = "TENEUR",
+}
+export enum PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter {
+  biofuel = "biofuel",
+  customs_category = "customs_category",
+  sector = "sector",
 }
 export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
   biofuel = "biofuel",

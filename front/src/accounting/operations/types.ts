@@ -7,6 +7,9 @@ import {
   PathsApiTiruertOperationsGetParametersQueryOperation as OperationType,
 } from "api-schema"
 import { CBQueryParams } from "common/hooks/query-builder-2"
+import { apiTypes } from "common/services/api-fetch.types"
+
+export type Operation = apiTypes["OperationList"]
 
 export {
   OperationsFilter,

@@ -10,19 +10,16 @@ import {
   formatSector,
   getOperationEntity,
   getOperationVolume,
-} from "material-accounting/operations/operations.utils"
-import { OperationBadge } from "material-accounting/operations/components/operation-badge"
+} from "accounting/operations/operations.utils"
+import { OperationBadge } from "accounting/operations/components/operation-badge"
 import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
-import { Grid, Main } from "common/components/scaffold"
-import { formatDate } from "common/utils/formatters"
+import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
+import { formatDate, formatNumber } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
-import {
-  OperationsStatus,
-  OperationType,
-} from "material-accounting/operations/types"
+import { OperationsStatus, OperationType } from "accounting/operations/types"
 import {
   useAcceptOperation,
   useDeleteOperation,
@@ -35,7 +32,7 @@ export const OperationDetail = () => {
   const { t } = useTranslation()
   const match = useHashMatch("operation/:id")
 
-  const { result } = useQuery(api.getOperationDetail, {
+  const { result, loading } = useQuery(api.getOperationDetail, {
     key: "operation-detail",
     params: [entity.id, parseInt(match?.params.id ?? "")],
   })
@@ -97,7 +94,10 @@ export const OperationDetail = () => {
           label: t("Dépôt destinataire"),
           value: operation.to_depot?.name ?? "-",
         },
-        { label: t("Tonnes CO2 eq evitées"), value: "???" },
+        {
+          label: t("Tonnes CO2 eq evitées"),
+          value: formatNumber(Number(operation.avoided_emissions)),
+        },
       ])
     : []
 
@@ -159,41 +159,47 @@ export const OperationDetail = () => {
         }
       >
         <Main>
-          <Grid className={css["operation-detail-fields"]}>
-            {fields.map(({ label, value }) => (
-              <div key={label}>
-                <Text className={css["field-label"]}>{label}</Text>
-                <Text className={css["field-value"]}>{value}</Text>
-              </div>
-            ))}
-          </Grid>
-          {operation?.type === OperationType.ACQUISITION &&
-            operation?.status === OperationsStatus.PENDING && (
-              <>
-                <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
-                <div>
-                  <Text>
-                    <Trans defaults="<b>Si vous l’acceptez</b>, celui-ci sera comptabilisé en acquisition et viendra alimenter votre solde." />
-                  </Text>
-                  <Text>
-                    <Trans defaults="Si vous le <b>refusez</b>, celui-ci n’apparaîtra plus dans vos opérations en attente." />
-                  </Text>
-                </div>
-              </>
-            )}
-          {operation?.type === OperationType.CESSION &&
-            operation?.status === OperationsStatus.PENDING && (
-              <>
-                <Text>
-                  {t("Voulez-vous annuler ce certificat de cession ?")}
-                </Text>
-                <Text>
-                  {t(
-                    "Vous pouvez annuler un certificat de cession, tant que celui-ci est encore en attente côté redevable."
-                  )}
-                </Text>
-              </>
-            )}
+          {loading ? (
+            <LoaderOverlay />
+          ) : (
+            <>
+              <Grid className={css["operation-detail-fields"]}>
+                {fields.map(({ label, value }) => (
+                  <div key={label}>
+                    <Text className={css["field-label"]}>{label}</Text>
+                    <Text className={css["field-value"]}>{value}</Text>
+                  </div>
+                ))}
+              </Grid>
+              {operation?.type === OperationType.ACQUISITION &&
+                operation?.status === OperationsStatus.PENDING && (
+                  <>
+                    <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
+                    <div>
+                      <Text>
+                        <Trans defaults="<b>Si vous l’acceptez</b>, celui-ci sera comptabilisé en acquisition et viendra alimenter votre solde." />
+                      </Text>
+                      <Text>
+                        <Trans defaults="Si vous le <b>refusez</b>, celui-ci n’apparaîtra plus dans vos opérations en attente." />
+                      </Text>
+                    </div>
+                  </>
+                )}
+              {operation?.type === OperationType.CESSION &&
+                operation?.status === OperationsStatus.PENDING && (
+                  <>
+                    <Text>
+                      {t("Voulez-vous annuler ce certificat de cession ?")}
+                    </Text>
+                    <Text>
+                      {t(
+                        "Vous pouvez annuler un certificat de cession, tant que celui-ci est encore en attente côté redevable."
+                      )}
+                    </Text>
+                  </>
+                )}
+            </>
+          )}
         </Main>
       </Dialog>
     </Portal>

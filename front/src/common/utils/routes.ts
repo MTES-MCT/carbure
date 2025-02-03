@@ -20,7 +20,7 @@ export const ROUTE_URLS = {
     }
   },
   MATERIAL_ACCOUNTING: (entity_id: number) => {
-    const baseUrl = urlWithOrgId(entity_id, "/material-accounting")
+    const baseUrl = urlWithOrgId(entity_id, "/accounting")
 
     return {
       OPERATIONS: `${baseUrl}/operations`,

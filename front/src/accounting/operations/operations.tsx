@@ -13,6 +13,7 @@ import { useGetFilterOptions, useOperationsColumns } from "./operations.hooks"
 import { Pagination } from "common/components/pagination2/pagination"
 import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
+import { usePrivateNavigation } from "common/layouts/navigation"
 const currentYear = new Date().getFullYear()
 
 export const Operations = ({
@@ -22,7 +23,7 @@ export const Operations = ({
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
-
+  usePrivateNavigation(t("Comptabilité"))
   const filterLabels = {
     [OperationsFilter.status]: t("Statut"),
     [OperationsFilter.sector]: t("Filière"),
@@ -41,7 +42,7 @@ export const Operations = ({
 
   const query = useCBQueryBuilder<[], OperationsStatus[], undefined>(state)
 
-  const { result } = useQuery(api.getOperations, {
+  const { result, loading } = useQuery(api.getOperations, {
     key: "operations",
     params: [query],
     onSuccess: (data) => {
@@ -76,6 +77,7 @@ export const Operations = ({
           search: location.search,
           hash: `operation/${row.id}`,
         })}
+        loading={loading}
       />
       <Pagination
         defaultPage={query.page}
