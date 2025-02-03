@@ -9,14 +9,14 @@ from core.models import Entity, UserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.permissions import HasUserRights
-from tiruert.serializers import OperationDetailSerializer, OperationInputSerializer, OperationOutputSerializer
+from tiruert.serializers import OperationInputSerializer, OperationListSerializer, OperationSerializer
 
 from .mixins import ActionMixin
 
 
 class OperationViewSet(ModelViewSet, ActionMixin):
     queryset = Operation.objects.all()
-    serializer_class = OperationOutputSerializer
+    serializer_class = OperationListSerializer
     permission_classes = (
         IsAuthenticated,
         HasUserRights(None, [Entity.OPERATOR]),
@@ -108,7 +108,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             ),
         ],
         responses={
-            status.HTTP_200_OK: OpenApiResponse(response=OperationOutputSerializer, description="A list of operations.")
+            status.HTTP_200_OK: OpenApiResponse(response=OperationListSerializer, description="A list of operations.")
         },
     )
     def list(self, request, *args, **kwargs):
@@ -127,13 +127,11 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             ),
         ],
         responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=OperationDetailSerializer, description="Details of specific operation."
-            )
+            status.HTTP_200_OK: OpenApiResponse(response=OperationSerializer, description="Details of specific operation.")
         },
     )
     def retrieve(self, request, *args, **kwargs):
-        self.serializer_class = OperationDetailSerializer
+        self.serializer_class = OperationSerializer
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
@@ -151,7 +149,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         ],
         responses={
             status.HTTP_201_CREATED: OpenApiResponse(
-                response=OperationOutputSerializer, description="The newly created operation."
+                response=OperationListSerializer, description="The newly created operation."
             ),
             status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid input data."),
         },
@@ -181,9 +179,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         )
         if serializer.is_valid():
             operation = serializer.save()
-            return Response(
-                OperationOutputSerializer(operation, context={"details": 1}).data, status=status.HTTP_201_CREATED
-            )
+            return Response(OperationListSerializer(operation, context={"details": 1}).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
