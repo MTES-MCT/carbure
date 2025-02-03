@@ -231,7 +231,7 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="double-counting" />} />
       )}
 
-      {(isAdmin || hasAirline || isElecAdmin || isAdminDC) && (
+      {(isAdmin || isExternal) && (
         <>
           <Route path="entities/*" element={<Entities />} />
           <Route path="*" element={<Navigate replace to="entities" />} />
