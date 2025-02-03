@@ -1,5 +1,5 @@
 import useEntity from "carbure/hooks/entity"
-import { EntityPreview, EntityType } from "carbure/types"
+import { EntityPreview, EntityType, Airport } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
@@ -18,8 +18,11 @@ import {
 import { useTranslation } from "react-i18next"
 import { SafTicketSource } from "saf/pages/operator/types"
 import * as api from "../../pages/operator/api"
+import * as apiResources from "carbure/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
+import Select from "common/components/select"
+import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSource[]
@@ -57,7 +60,10 @@ const TicketsGroupedAssignment = ({
       value.assignment_period,
       value.client!,
       value.agreement_reference || "",
-      value.free_field
+      value.free_field,
+      value.reception_airport!.id,
+      value.shipping_method!,
+      value.consumption_type!
     )
 
     if (response.data) {
@@ -76,6 +82,10 @@ const TicketsGroupedAssignment = ({
 
   const findSafClient = (query: string) => {
     return api.findClients(entity.id, query)
+  }
+
+  const findAirports = (query: string) => {
+    return apiResources.findAirports(query)
   }
 
   const lastDeliveryPeriod = ticketSources.sort(
@@ -161,6 +171,53 @@ const TicketsGroupedAssignment = ({
                 />
               )}
 
+              {value.client?.entity_type === EntityType.Airline && (
+                <>
+                  <Autocomplete
+                    required
+                    label={t("Aéroport de réception")}
+                    getOptions={findAirports}
+                    normalize={norm.normalizeAirport}
+                    {...bind("reception_airport")}
+                  />
+
+                  <Select
+                    required
+                    label={t("Mode d'expédition")}
+                    placeholder={t("Choisissez un mode")}
+                    {...bind("shipping_method")}
+                    options={[
+                      {
+                        value: ShippingMethodEnum.PIPELINE,
+                        label: t("Oléoduc"),
+                      },
+                      { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
+                      { value: ShippingMethodEnum.TRAIN, label: t("Train") },
+                      { value: ShippingMethodEnum.BARGE, label: t("Barge") },
+                    ]}
+                  />
+
+                  <Select
+                    required
+                    label={t("Type de consommation")}
+                    placeholder={t("Choisissez un type")}
+                    {...bind("consumption_type")}
+                    options={[
+                      {
+                        value: ConsumptionTypeEnum.MAC,
+                        label: t("Mise à consommation mandat FR/EU"),
+                      },
+                      {
+                        value: ConsumptionTypeEnum.MAC_DECLASSEMENT,
+                        label: t(
+                          "Mise à consommation hors mandat (déclassement)"
+                        ),
+                      },
+                    ]}
+                  />
+                </>
+              )}
+
               <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
@@ -189,6 +246,9 @@ const defaultAssignment = {
   assignment_period: formatPeriodFromDate(new Date()),
   free_field: "" as string | undefined,
   agreement_reference: "" as string | undefined, //TODO for transfer only
+  reception_airport: undefined as Airport | undefined,
+  shipping_method: undefined as ShippingMethodEnum | undefined,
+  consumption_type: undefined as ConsumptionTypeEnum | undefined,
 }
 
 export type GroupedAssignmentForm = typeof defaultAssignment

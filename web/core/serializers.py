@@ -22,7 +22,25 @@ from doublecount.serializers import (
     EntitySummarySerializer,
     FeedStockSerializer,
 )
-from transactions.models import Depot, ProductionSite
+from transactions.models import Airport, Depot, ProductionSite
+
+
+class AirportSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+
+    class Meta:
+        model = Airport
+        fields = [
+            "id",
+            "name",
+            "city",
+            "icao_code",
+            "country",
+            "site_type",
+            "address",
+            "postal_code",
+            "gps_coordinates",
+        ]
 
 
 class DepotSerializer(serializers.ModelSerializer):
