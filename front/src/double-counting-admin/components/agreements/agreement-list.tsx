@@ -19,6 +19,7 @@ import {
 import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import AgreementStatusTag from "./agreement-status"
 import { compact } from "common/utils/collection"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const AgreementList = ({
   snapshot = defaultCount,
@@ -26,6 +27,7 @@ const AgreementList = ({
   snapshot: DoubleCountingAgreementsSnapshot | undefined
 }) => {
   const { t } = useTranslation()
+  usePrivateNavigation(t("Agréments actifs"))
   const [tab, setTab] = useState("active")
   const entity = useEntity()
   const navigate = useNavigate()

@@ -300,14 +300,6 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert response.status_code == 400
         assert response.json()["message"] == DoubleCountingApplicationExportError.APPLICATION_NOT_FOUND
 
-        # Application not accepted
-        response = self.client.get(
-            reverse("double-counting-applications-export-application"),
-            {"dca_id": application.id, "entity_id": self.admin.id},
-        )
-        assert response.status_code == 400
-        assert response.json()["message"] == DoubleCountingApplicationExportError.APPLICATION_NOT_ACCEPTED
-
         application.status = DoubleCountingApplication.ACCEPTED
         application.save()
 

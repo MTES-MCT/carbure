@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "saf",
     "transactions",
     "elec",
+    "simple_history",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -117,6 +118,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "carbure.middlewares.logging.LoggingMiddleware",
     "carbure.middlewares.exception.ExceptionMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 ROOT_URLCONF = "carbure.urls"
@@ -346,5 +348,6 @@ SPECTACULAR_SETTINGS = {
         "PreferredUnitEnum": "core.models.Entity.UNIT_CHOICE",
     },
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
     # OTHER SETTINGS
 }

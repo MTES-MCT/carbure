@@ -1,7 +1,4 @@
 import { http, HttpResponse } from "msw"
-import translations from "../../../public/locales/fr/translation.json"
-import errors from "../../../public/locales/fr/errors.json"
-import fields from "../../../public/locales/fr/fields.json"
 import { EntityType } from "carbure/types"
 
 import {
@@ -14,6 +11,7 @@ import {
   biocarburant,
   productionSite,
   generateUser,
+  notifications,
 } from "./data"
 import { mockGetWithResponseData } from "./helpers"
 
@@ -31,12 +29,42 @@ export const okStats = http.get("/api/home-stats", () => {
   })
 })
 
-export const okNotifications = http.get("/api/entities/notifications", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [],
-  })
-})
+// First time notifications are fetched, they are not acked
+export const okNotifications = http.get(
+  "/api/entities/notifications",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: notifications,
+    })
+  },
+  {
+    once: true,
+  }
+)
+
+// Second time notifications are fetched, they are acked
+export const okNotificationsAcked = http.get(
+  "/api/entities/notifications",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: notifications.map((n) => ({ ...n, acked: true })),
+    })
+  },
+  {
+    once: true,
+  }
+)
+
+export const okAckNotifications = http.post(
+  "/api/entities/notifications/ack",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+    })
+  }
+)
 
 export const okEntitySearch = http.get("/api/resources/entities", () => {
   return HttpResponse.json({
@@ -86,26 +114,9 @@ export const okDeliverySitesSearch = http.get("/api/resources/depots", () => {
   })
 })
 
-export const okTranslations = http.get(
-  "/app/locales/fr/translations.json",
-  () => {
-    return HttpResponse.json({ translations })
-  }
-)
-
-export const okErrorsTranslations = http.get(
-  "/app/locales/fr/errors.json",
-  () => {
-    return HttpResponse.json({ errors })
-  }
-)
-
-export const okFieldsTranslations = http.get(
-  "/app/locales/fr/fields.json",
-  () => {
-    return HttpResponse.json({ fields })
-  }
-)
+export const okUnauthorizedUser = http.get("/api/user", () => {
+  return new HttpResponse(null, { status: 401 })
+})
 
 export const okDefaultUser = mockGetWithResponseData(
   "/user",

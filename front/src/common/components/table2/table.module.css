@@ -1,0 +1,217 @@
+.table {
+  --min-cell-width: var(--spacing-xxl);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.table.compact {
+  padding-bottom: var(--spacing-xs);
+}
+
+.columns {
+  display: flex;
+  align-items: center;
+  background-color: var(--blue-ecume-975-75);
+}
+
+.header {
+  flex: 1 1 0%;
+  padding: var(--spacing-3v) var(--spacing-2w);
+}
+
+.header[data-sortable] {
+  cursor: pointer;
+}
+
+.sortable {
+  color: var(--gray-medium);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  border: 1px solid var(--border-default-grey);
+  background: white;
+}
+
+.compact .rows {
+  gap: var(--spacing-xs);
+}
+
+.rows > li {
+  position: relative;
+}
+
+.rows > li:not(.rowLink) {
+  padding-bottom: 0;
+}
+
+.rows > li:not(.rowLink):not(:last-child) {
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.rows > li > a {
+  flex: 1;
+  min-width: 0;
+}
+
+.rows > li > a:not(:last-child) {
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.rows > li,
+.rows > li > a {
+  display: flex;
+  align-items: center;
+}
+
+.compact .rows > li {
+  padding: 0 var(--spacing-xs);
+}
+
+.rows > li[data-interactive] {
+  cursor: pointer;
+}
+
+.cell {
+  flex: 1 1 0%;
+  padding: var(--spacing-3v) var(--spacing-2w);
+}
+
+.compact .cell {
+  padding: 0;
+}
+
+.cell strong {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.cell strong [data-icon] {
+  width: 20px;
+}
+
+.cell .warning strong {
+  color: var(--orange-dark);
+}
+
+.cell small {
+  color: var(--gray-dark);
+}
+
+.small {
+  flex: 0.5 1;
+}
+
+.cell,
+.header {
+  min-width: 0;
+}
+
+.header,
+.cell .multiline > *,
+.cell .multiline div > * {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.cell .multiline strong > svg {
+  margin-bottom: -5px;
+}
+
+.selection {
+  align-self: stretch;
+  flex: 0 0 min-content;
+  min-width: 0;
+  padding: 0;
+}
+
+.selection [data-checkbox] {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.rows .selection {
+  /* margin-left: calc(-1 * (var(--spacing-2w) + 1px)); */
+  margin-left: -1px;
+}
+
+.header.selection [data-checkbox],
+.rows .selection {
+  border-right: 1px solid var(--border-default-grey);
+  padding: var(--spacing-2w) var(--spacing-3w);
+}
+
+.marker {
+  display: block;
+  position: absolute;
+  min-width: 4px;
+  height: 100%;
+  padding: 0;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.marker > * {
+  width: var(--spacing-xs);
+  height: 100%;
+}
+
+.marker .warning {
+  background-color: var(--orange-medium);
+}
+
+.marker .danger {
+  background-color: var(--red-dark);
+}
+
+.marker .success {
+  background-color: var(--green-medium);
+}
+
+.marker .info {
+  background-color: var(--blue-medium);
+}
+
+.actions {
+  display: flex;
+  flex: 0.33;
+  min-width: 0;
+  justify-content: center;
+  gap: var(--spacing-s);
+}
+
+.actions button {
+  color: var(--gray-dark);
+}
+
+/*
+ * When there are selected rows, a list of actions is displayed at the top of the table
+ */
+.columns.topActions {
+  background-color: white;
+  border: 1px solid var(--border-default-grey);
+  border-bottom: none;
+  width: fit-content;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.top-actions__count {
+  padding: var(--spacing-1w) var(--spacing-2w);
+}
+
+.top-actions__item:not(:last-child) {
+  border-right: 1px solid var(--border-default-grey);
+}

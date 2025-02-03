@@ -43,6 +43,7 @@ drf-nested-routers = "*"
 undetected-chromedriver = "*"
 setuptools = "*"
 psutil = "*"
+django-simple-history = "*"
 
 [dev-packages]
 django-stubs = "*"
@@ -56,7 +57,7 @@ types-pyjwt = "*"
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
 types-six = "*"
 pre-commit = "*"
-ruff = "*"
+ruff = "0.8.6"
 
 [requires]
 python_version = "3.12"

@@ -2944,6 +2944,57 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
+  /api/nav-stats:
+    get:
+      operationId: nav_stats_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - nav-stats
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NavStats"
+          description: ""
+  /api/resources/airports:
+    get:
+      operationId: resources_airports_list
+      parameters:
+        - in: query
+          name: public_only
+          schema:
+            type: boolean
+          description: Public Only
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `icao_code` and `city`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Airport"
+          description: ""
   /api/resources/biofuels:
     get:
       operationId: resources_biofuels_list
@@ -4053,13 +4104,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CommentRequest"
+              $ref: "#/components/schemas/AcceptRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/CommentRequest"
+              $ref: "#/components/schemas/AcceptRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/CommentRequest"
+              $ref: "#/components/schemas/AcceptRequest"
+        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -4626,6 +4678,16 @@ paths:
           description: ""
 components:
   schemas:
+    AcceptRequest:
+      type: object
+      properties:
+        ets_status:
+          $ref: "#/components/schemas/EtsStatusEnum"
+        ets_declaration_date:
+          type: string
+          format: date
+      required:
+        - ets_status
     ActivateAccountRequest:
       type: object
       properties:
@@ -4696,6 +4758,41 @@ components:
         - active
         - expired
         - incoming
+    Airport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        city:
+          type: string
+          maxLength: 128
+        icao_code:
+          type: string
+          maxLength: 32
+        country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
+          type: string
+          maxLength: 256
+        postal_code:
+          type: string
+          maxLength: 32
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+      required:
+        - country
+        - id
+        - name
     ApplicationListe:
       type: object
       properties:
@@ -5109,6 +5206,14 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
+    ConsumptionTypeEnum:
+      enum:
+        - MAC
+        - MAC_DECLASSEMENT
+      type: string
+      description: |-
+        * `MAC` - MAC
+        * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
     CorrectionStatusEnum:
       enum:
         - NO_PROBLEMO
@@ -5161,6 +5266,9 @@ components:
           type: string
           maxLength: 64
         customs_id:
+          type: string
+          maxLength: 32
+        icao_code:
           type: string
           maxLength: 32
         site_type:
@@ -6426,6 +6534,16 @@ components:
           type: string
       required:
         - message
+    EtsStatusEnum:
+      enum:
+        - ETS_VALUATION
+        - OUTSIDE_ETS
+        - NOT_CONCERNED
+      type: string
+      description: |-
+        * `ETS_VALUATION` - Valorisation ETS
+        * `OUTSIDE_ETS` - Hors ETS (volontaire)
+        * `NOT_CONCERNED` - Non concerné
     ExtAdminPagesEnum:
       enum:
         - DCA
@@ -6677,6 +6795,27 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    NavStats:
+      type: object
+      properties:
+        total_pending_action_for_admin:
+          type: integer
+        pending_draft_lots:
+          type: integer
+        in_pending_lots:
+          type: integer
+        doublecount_agreement_pending:
+          type: integer
+        charge_point_registration_pending:
+          type: integer
+        metering_reading_pending:
+          type: integer
+        pending_transfer_certificates:
+          type: integer
+        audits:
+          type: integer
+        tickets:
+          type: integer
     NotificationRequest:
       type: object
       properties:
@@ -7156,6 +7295,10 @@ components:
         ghg_reduction:
           type: number
           format: double
+        ets_status:
+          allOf:
+            - $ref: "#/components/schemas/EtsStatusEnum"
+          nullable: true
       required:
         - assignment_period
         - biofuel
@@ -7283,6 +7426,26 @@ components:
           allOf:
             - $ref: "#/components/schemas/SafTicketSourcePreview"
           readOnly: true
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ShippingMethodEnum"
+          nullable: true
+        reception_airport:
+          allOf:
+            - $ref: "#/components/schemas/Airport"
+          readOnly: true
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
+        ets_status:
+          allOf:
+            - $ref: "#/components/schemas/EtsStatusEnum"
+          nullable: true
+        ets_declaration_date:
+          type: string
+          format: date
+          nullable: true
       required:
         - assignment_period
         - biofuel
@@ -7294,6 +7457,7 @@ components:
         - feedstock
         - id
         - parent_ticket_source
+        - reception_airport
         - supplier
         - volume
         - year
@@ -7411,6 +7575,15 @@ components:
           nullable: true
         assignment_period:
           type: integer
+        reception_airport:
+          type: integer
+          nullable: true
+        consumption_type:
+          type: string
+          nullable: true
+        shipping_method:
+          type: string
+          nullable: true
       required:
         - assignment_period
         - client_id
@@ -7434,6 +7607,15 @@ components:
           nullable: true
         assignment_period:
           type: integer
+        reception_airport:
+          type: integer
+          nullable: true
+        consumption_type:
+          type: string
+          nullable: true
+        shipping_method:
+          type: string
+          nullable: true
       required:
         - assignment_period
         - client_id
@@ -7577,6 +7759,15 @@ components:
           nullable: true
         assignment_period:
           type: integer
+        reception_airport:
+          type: integer
+          nullable: true
+        consumption_type:
+          type: string
+          nullable: true
+        shipping_method:
+          type: string
+          nullable: true
         ticket_sources_ids:
           type: array
           items:
@@ -7665,6 +7856,18 @@ components:
             minLength: 1
       required:
         - matiere_premiere_codes
+    ShippingMethodEnum:
+      enum:
+        - PIPELINE
+        - TRUCK
+        - TRAIN
+        - BARGE
+      type: string
+      description: |-
+        * `PIPELINE` - PIPELINE
+        * `TRUCK` - TRUCK
+        * `TRAIN` - TRAIN
+        * `BARGE` - BARGE
     SiteTypeEnum:
       enum:
         - OTHER
@@ -7677,6 +7880,7 @@ components:
         - COGENERATION PLANT
         - PRODUCTION BIOLIQUID
         - EFCA
+        - AIRPORT
       type: string
       description: |-
         * `OTHER` - Autre
@@ -7689,6 +7893,7 @@ components:
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
+        * `AIRPORT` - AIRPORT
     StatsResponse:
       type: object
       properties:

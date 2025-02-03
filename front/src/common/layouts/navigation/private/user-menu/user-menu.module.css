@@ -1,0 +1,13 @@
+.user-menu-infos {
+  padding: var(--spacing-2w) var(--spacing-2w) var(--spacing-1w)
+    var(--spacing-2w);
+  color: var(--text-mention-grey);
+  width: 100%;
+  max-width: 300px;
+}
+
+.user-menu-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-1w);
+}

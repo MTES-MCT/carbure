@@ -3,7 +3,7 @@ import datetime
 from rest_framework import serializers
 
 from core.excel import export_to_excel
-from core.serializers import EntityPreviewSerializer, ProductionSiteSerializer
+from core.serializers import AirportSerializer, EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket
 
@@ -25,6 +25,7 @@ class SafTicketSerializer(serializers.ModelSerializer):
             "biofuel",
             "country_of_origin",
             "ghg_reduction",
+            "ets_status",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -73,6 +74,11 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
             "ghg_total",
             "client_comment",
             "parent_ticket_source",
+            "shipping_method",
+            "reception_airport",
+            "consumption_type",
+            "ets_status",
+            "ets_declaration_date",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -83,8 +89,7 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
     parent_ticket_source = SafTicketSourcePreviewSerializer(read_only=True)
     supplier = serializers.SlugRelatedField(read_only=True, slug_field="name")
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    # supplier = EntityPreviewSerializer(read_only=True)
-    # client = EntityPreviewSerializer(read_only=True)
+    reception_airport = AirportSerializer(read_only=True)
 
 
 def export_tickets_to_excel(tickets):

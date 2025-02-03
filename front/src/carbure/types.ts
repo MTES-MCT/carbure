@@ -37,6 +37,8 @@ export type Depot = apiTypes["Depot"]
 
 export type EntityDepot = apiTypes["EntitySite"]
 
+export type Airport = apiTypes["Airport"]
+
 export type Certificate = apiTypes["GenericCertificate"]
 
 export type EntityCertificate = apiTypes["EntityCertificate"]

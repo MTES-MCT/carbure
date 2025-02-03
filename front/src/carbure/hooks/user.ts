@@ -13,6 +13,7 @@ export interface UserManager {
   hasEntity: (entityID: number) => boolean
   hasEntities: () => boolean
   getFirstEntity: () => Entity | null
+  getName: () => string
   user: User | undefined
 }
 
@@ -34,6 +35,11 @@ export function useUserManager(): UserManager {
 
   function getRights(entityID: number) {
     return rights?.find((r) => r.entity.id === entityID) ?? null
+  }
+
+  function getName() {
+    const firstRight = rights[0]
+    return firstRight?.name ?? ""
   }
 
   function hasEntity(entityID: number) {
@@ -59,6 +65,7 @@ export function useUserManager(): UserManager {
     requests,
     isAuthenticated,
     getRights,
+    getName,
     hasEntity,
     hasEntities,
     getFirstEntity,

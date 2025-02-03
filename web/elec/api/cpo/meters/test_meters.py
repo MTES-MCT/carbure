@@ -8,7 +8,7 @@ from rest_framework import status
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
-from elec.models import ElecChargePoint, ElecChargePointApplication, ElecMeter
+from elec.models import ElecChargePoint, ElecChargePointApplication, ElecMeter, ElecMeterReading, ElecMeterReadingApplication
 
 
 class ElecMeterTest(TestCase):
@@ -37,6 +37,12 @@ class ElecMeterTest(TestCase):
         application.created_at = datetime.date(2023, 12, 28)
         application.save()
 
+        self.reading_application = ElecMeterReadingApplication.objects.create(
+            cpo=self.cpo,
+            quarter=3,
+            year=2023,
+        )
+
         self.charge_point = ElecChargePoint.objects.create(
             application=application,
             cpo=self.cpo,
@@ -63,12 +69,24 @@ class ElecMeterTest(TestCase):
             mid_certificate="MID_EFGH",
         )
 
+        self.charge_point.current_meter = self.meter2
+        self.charge_point.save()
+
+        self.meter_reading = ElecMeterReading.objects.create(
+            extracted_energy=1000,
+            renewable_energy=1000,
+            reading_date=datetime.date(2023, 11, 15),
+            cpo=self.cpo,
+            application=self.reading_application,
+            meter=self.meter2,
+        )
+
     def test_add_elec_meter_success(self):
         url = reverse("elec-cpo-meters-add-meter")
         data = {
             "charge_point": self.charge_point.id,
             "initial_index": 1000,
-            "initial_index_date": datetime.date(2023, 2, 15),
+            "initial_index_date": datetime.date(2023, 12, 15),
             "mid_certificate": "MID_ABCD",
             "entity_id": self.cpo.id,
         }
@@ -109,6 +127,20 @@ class ElecMeterTest(TestCase):
         data = response.json()
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert data["error"] == "CP_NOT_FOUND_ON_CPO"
+
+    def test_add_elec_meter_initial_date_nok(self):
+        url = reverse("elec-cpo-meters-add-meter")
+        data = {
+            "charge_point": self.charge_point.id,
+            "initial_index": 1000,
+            "initial_index_date": datetime.date(2023, 10, 15),
+            "mid_certificate": "MID_ABCD",
+            "entity_id": self.cpo.id,
+        }
+        response = self.client.post(url, data)
+        data = response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert data["error"] == "NEW_INITIAL_INDEX_DATE_KO"
 
     def test_get_elec_meters_success(self):
         url = reverse("elec-cpo-meters-get-meters")
