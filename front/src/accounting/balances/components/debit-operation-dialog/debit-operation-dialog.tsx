@@ -2,15 +2,15 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal, { usePortal } from "common/components/portal"
 import { Trans } from "react-i18next"
 import { RadioGroup } from "common/components/inputs2"
-import { OperationType } from "material-accounting/operations/types"
+import { OperationType } from "accounting/operations/types"
 import { useState } from "react"
-import { formatOperationType } from "material-accounting/operations/operations.utils"
+import { formatOperationType } from "accounting/operations/operations.utils"
 import styles from "./debit-operation-dialog.module.css"
 import { Button } from "common/components/button2"
 import { CessionDialog } from "./cession-dialog"
 import { DevaluationDialog } from "./devaluation-dialog"
 import { ExportationDialog } from "./exportation-dialog"
-import { Balance } from "material-accounting/balances/types"
+import { Balance } from "accounting/balances/types"
 interface DebitOperationDialogProps {
   onClose: () => void
   balance: Balance
