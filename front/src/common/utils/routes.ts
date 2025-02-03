@@ -44,7 +44,10 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, `/elec/${year}`)
 
     return {
-      CERTIFICATES: `${baseUrl}/pending`,
+      CERTIFICATES: {
+        PENDING: `${baseUrl}/pending`,
+        ACCEPTED: `${baseUrl}/accepted`,
+      },
       PROVISIONNED_ENERGY: `${baseUrl}/provisioned`,
       TRANSFERRED_ENERGY: `${baseUrl}/transferred`,
       CHARGE_POINTS: {
