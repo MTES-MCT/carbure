@@ -43,7 +43,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
     def get_volume(self, instance):
         pci = instance.biofuel.pci_litre if self.context.get("unit") == "mj" else 1
-        return self.get_volume_l(instance) * pci, 2
+        return self.get_volume_l(instance) * pci
 
     def get_unit(self, instance):
         return self.context.get("unit")
