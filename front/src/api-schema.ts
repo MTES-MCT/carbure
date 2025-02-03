@@ -415,6 +415,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/nav-stats": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["nav_stats_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/resources/airports": {
     parameters: {
       query?: never
@@ -1436,6 +1452,17 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    NavStats: {
+      total_pending_action_for_admin?: number
+      pending_draft_lots?: number
+      in_pending_lots?: number
+      doublecount_agreement_pending?: number
+      charge_point_registration_pending?: number
+      metering_reading_pending?: number
+      pending_transfer_certificates?: number
+      audits?: number
+      tickets?: number
+    }
     OtpResponse: {
       valid_until: string
     }
@@ -2158,7 +2185,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2218,7 +2245,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2251,7 +2278,7 @@ export interface operations {
   double_counting_agreements_agreement_public_list: {
     parameters: {
       query?: {
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2284,7 +2311,7 @@ export interface operations {
       query: {
         /** @description Entity ID */
         entity_id: number
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
@@ -2641,6 +2668,28 @@ export interface operations {
       }
     }
   }
+  nav_stats_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["NavStats"]
+        }
+      }
+    }
+  }
   resources_airports_list: {
     parameters: {
       query?: {
@@ -2939,7 +2988,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3053,7 +3102,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3109,7 +3158,7 @@ export interface operations {
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `volume` - Volume
          *     * `-volume` - Volume (décroissant)
@@ -3197,7 +3246,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3427,7 +3476,7 @@ export interface operations {
         entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         feedstocks?: string[]
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)
@@ -3488,7 +3537,7 @@ export interface operations {
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
-        /** @description Tri
+        /** @description Ordre
          *
          *     * `client` - Client
          *     * `-client` - Client (décroissant)

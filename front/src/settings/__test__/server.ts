@@ -1,10 +1,7 @@
 import {
   okCountrySearch,
   okDeliverySitesSearch,
-  okErrorsTranslations,
-  okFieldsTranslations,
   okProductionSitesSearch,
-  okTranslations,
 } from "carbure/__test__/api"
 import {
   okChargePointsAddSuccess,
@@ -23,10 +20,7 @@ const allRequests = [
   ...Object.values(defaultSettingsRequests),
   okCountrySearch,
   okDeliverySitesSearch,
-  okErrorsTranslations,
-  okFieldsTranslations,
   okProductionSitesSearch,
-  okTranslations,
   okChargePointsAddSuccess,
   okChargePointsApplications,
   okChargePointsCheckValid,

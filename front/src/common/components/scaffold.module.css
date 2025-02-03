@@ -15,16 +15,13 @@
 .main {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-3w);
 }
 
 .main > header {
   display: flex;
   flex-direction: column;
-  background-color: var(--gray-light);
-  padding: var(--main-spacing-y) var(--main-spacing-x);
   gap: var(--spacing-xl);
-  box-shadow: var(--shadow);
-  border-top: var(--border);
 }
 
 .main > header > section {
@@ -36,7 +33,6 @@
 .main > section {
   display: flex;
   flex-direction: column;
-  padding: var(--main-spacing-y) var(--main-spacing-x);
   gap: var(--spacing-l);
 }
 
@@ -111,11 +107,11 @@
 
 section.bar {
   display: flex;
-  background-color: var(--white);
-  padding: var(--spacing-m) var(--main-spacing-x);
+  /* background-color: var(--white); */
+  /* padding: var(--spacing-m) var(--main-spacing-x); */
   gap: var(--spacing-s);
-  box-shadow: var(--shadow);
-  border-top: var(--border);
+  /* box-shadow: var(--shadow); */
+  /* border-top: var(--border); */
 }
 
 section.actionbar {

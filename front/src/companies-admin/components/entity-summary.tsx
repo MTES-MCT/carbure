@@ -7,7 +7,7 @@ import css from "./entity-summary.module.css"
 import Table, { Cell } from "common/components/table"
 import { Alert } from "common/components/alert"
 import { AlertTriangle } from "common/components/icons"
-import { Panel, LoaderOverlay, Grid } from "common/components/scaffold"
+import { LoaderOverlay, Grid } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { compact, matchesSearch } from "common/utils/collection"
 import MultiSelect from "common/components/multi-select"
@@ -119,17 +119,14 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
       )}
 
       {hasResults && (
-        <Panel>
-          <header>
-            <h1>{t("Récapitulatif des sociétés")}</h1>
-          </header>
+        <>
           <Table<EntityDetails>
             loading={entities.loading}
             rows={matchedEntities}
             rowLink={(e) => `${e.entity.id}`}
             columns={compact([
               {
-                key: "entities",
+                key: "acces",
                 header: t("Accès"),
                 small: true,
                 orderBy: (e) => e.entity.name,
@@ -303,7 +300,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             ])}
           />
           {entities.loading && <LoaderOverlay />}
-        </Panel>
+        </>
       )}
     </>
   )

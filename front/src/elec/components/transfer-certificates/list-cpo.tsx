@@ -20,6 +20,7 @@ import * as api from "../../api-cpo"
 import { StatusSwitcher } from "./cpo-status-switcher"
 import ElecTransferDetailsDialog from "./details"
 import ElecTransferCertificateTable from "./table"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type CPOTransferCertificateListProps = {
   snapshot: ElecCPOSnapshot
@@ -34,6 +35,7 @@ const CPOTransferCertificateList = ({
   const status = useAutoStatus()
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   const { t } = useTranslation()
+  usePrivateNavigation(t("Énergie cédée"))
 
   const query = useCBQueryBuilder(state)
   const location = useLocation()

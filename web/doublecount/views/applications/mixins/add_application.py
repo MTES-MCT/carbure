@@ -1,5 +1,6 @@
 import traceback
 
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import (
@@ -178,6 +179,10 @@ class AddActionMixin:
             agreement.application = dca
             agreement.save()
 
+        s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
+        dca.download_link = default_storage.url(s3_path)
+        dca.save()
+
         # 2 - save all production_data DoubleCountingProduction in db
         sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
         production_data, _ = load_dc_production_data(
@@ -202,6 +207,13 @@ class AddActionMixin:
         for production_history in production_history_data:
             production_history.save()
 
+        # 3 - Upload file to S3
+        try:
+            default_storage.save(s3_path, file)
+        except Exception:
+            traceback.print_exc()
+
+        # 4 - send emails
         try:
             send_dca_confirmation_email(dca, request)
         except Exception:

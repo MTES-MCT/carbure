@@ -37,11 +37,15 @@ export const Portal = ({ children, root, onClose }: PortalProps) => {
     return () => window.removeEventListener("keydown", onKeyDown, true)
   }, [onClose])
 
+  // if the portal is opened in storybook, we need to render it in the storybook root
+  // Couldn't find a better way to detect if we are in storybook
+  const sbRoot = document.getElementById("storybook-root")
+
   return ReactDOM.createPortal(
     <div ref={portalRef} data-portal="">
       {children}
     </div>,
-    root ?? document.body
+    root ?? sbRoot ?? document.body
   )
 }
 

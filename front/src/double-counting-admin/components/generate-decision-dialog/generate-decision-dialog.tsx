@@ -41,25 +41,27 @@ const GenerateDecisionDialog = ({
       <header>
         <h1>{t("Générer la décision double comptage")}</h1>
       </header>
+
       <main>
         <section>
-          {hasIndustrialWastes(application) && (
-            <div style={{ marginBottom: "8px" }}>
-              <Alert
-                variant="info"
-                icon={AlertTriangle}
-                style={{ marginBottom: "8px" }}
-              >
-                <p>
-                  {t(
-                    "La demande d’agrément du producteur comporte des déchets industriels. Afin de les incorporer dans la décision, veuillez les noter ci-dessous."
-                  )}
-                </p>
-              </Alert>
-              <Form
-                id="generate-decision"
-                onSubmit={downloadDoubleCountingApplication}
-              >
+          <Form
+            id="generate-decision"
+            onSubmit={downloadDoubleCountingApplication}
+          >
+            {hasIndustrialWastes(application) && (
+              <div style={{ marginBottom: "8px" }}>
+                <Alert
+                  variant="info"
+                  icon={AlertTriangle}
+                  style={{ marginBottom: "8px" }}
+                >
+                  <p>
+                    {t(
+                      "La demande d’agrément du producteur comporte des déchets industriels. Afin de les incorporer dans la décision, veuillez les noter ci-dessous."
+                    )}
+                  </p>
+                </Alert>
+
                 <Input
                   value={industrialWastes}
                   onChange={(e) => setIndustrialWastes(e.target.value)}
@@ -71,16 +73,17 @@ const GenerateDecisionDialog = ({
                   )}
                   required
                 />
-              </Form>
-            </div>
-          )}
-          <p>
-            {t(
-              "Voulez-vous vraiment télécharger la décision double comptage ?"
+              </div>
             )}
-          </p>
+            <p>
+              {t(
+                "Voulez-vous vraiment télécharger la décision double comptage ?"
+              )}
+            </p>
+          </Form>
         </section>
       </main>
+
       <footer>
         <Button
           variant="primary"
