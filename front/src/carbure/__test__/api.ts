@@ -33,10 +33,7 @@ export const okStats = http.get("/api/home-stats", () => {
 export const okNotifications = http.get(
   "/api/entities/notifications",
   () => {
-    return HttpResponse.json({
-      status: "success",
-      data: notifications,
-    })
+    return HttpResponse.json(notifications)
   },
   {
     once: true,
@@ -47,22 +44,10 @@ export const okNotifications = http.get(
 export const okNotificationsAcked = http.get(
   "/api/entities/notifications",
   () => {
-    return HttpResponse.json({
-      status: "success",
-      data: notifications.map((n) => ({ ...n, acked: true })),
-    })
+    return HttpResponse.json(notifications.map((n) => ({ ...n, acked: true })))
   },
   {
     once: true,
-  }
-)
-
-export const okAckNotifications = http.post(
-  "/api/entities/notifications/ack",
-  () => {
-    return HttpResponse.json({
-      status: "success",
-    })
   }
 )
 
