@@ -1,0 +1,5 @@
+.cession-dialog__grid {
+  grid-template-columns: repeat(3, minmax(var(--grid-cell-width), 1fr));
+  row-gap: var(--spacing-3v);
+  column-gap: var(--spacing-3v);
+}
