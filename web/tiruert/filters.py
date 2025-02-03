@@ -35,10 +35,12 @@ class OperationFilter(FilterSet):
         return queryset.filter(q_objects).distinct()
 
     def filter_from_to(self, queryset, name, value):
-        return queryset.filter(Q(credited_entity__name=value) | Q(debited_entity__name=value)).distinct()
+        entities = self.request.GET.getlist(name)
+        return queryset.filter(Q(credited_entity__name__in=entities) | Q(debited_entity__name__in=entities)).distinct()
 
     def filter_depot(self, queryset, name, value):
-        return queryset.filter(Q(from_depot=value) | Q(to_depot=value)).distinct()
+        depots = self.request.GET.getlist(name)
+        return queryset.filter(Q(from_depot__name__in=depots) | Q(to_depot__name__in=depots)).distinct()
 
     def filter_type(self, queryset, name, value):
         if value == "credit":

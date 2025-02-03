@@ -1,7 +1,5 @@
 from django.db import models
 
-from tiruert.services.teneur import GHG_REFERENCE_RED_II
-
 
 class OperationDetail(models.Model):
     operation = models.ForeignKey("tiruert.Operation", on_delete=models.deletion.CASCADE, related_name="details")
@@ -11,6 +9,8 @@ class OperationDetail(models.Model):
 
     @property
     def avoided_emissions(self):
+        from tiruert.services.teneur import GHG_REFERENCE_RED_II
+
         lot_energy = self.lot.biofuel.pci_litre * self.volume  # (MJ) energie du lot utilisée pour la création du lot
         return (
             (GHG_REFERENCE_RED_II - self.emission_rate_per_mj) * lot_energy / 1000000
