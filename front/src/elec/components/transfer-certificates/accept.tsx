@@ -39,6 +39,7 @@ export const AcceptTransfer = ({
   const acceptTransfer = useMutation(api.acceptTransfer, {
     invalidates: ["elec-transfer-certificates", "elec-operator-snapshot"],
     onSuccess: () => {
+      setShowConfirmationModal(false)
       notify(t("Le certificat de cession a été accepté"), {
         variant: "success",
       })
@@ -161,9 +162,9 @@ export const AcceptTransfer = ({
               label={t("Confirmer")}
               variant="primary"
               action={() => {
-                setShowConfirmationModal(false)
                 handleConfirmTransfer()
               }}
+              loading={acceptTransfer.loading}
             />
           </footer>
         </Dialog>
