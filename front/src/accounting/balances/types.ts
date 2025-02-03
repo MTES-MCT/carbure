@@ -4,7 +4,7 @@ import {
   OperationSector,
   OperationsFilter,
   OperationsStatus,
-} from "material-accounting/operations/types"
+} from "accounting/operations/types"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export type Balance = apiTypes["Balance"]

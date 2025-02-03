@@ -9,7 +9,7 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-import { OperationsStatus } from "material-accounting/operations/types"
+import { OperationsStatus } from "accounting/operations/types"
 import { Pagination } from "common/components/pagination2/pagination"
 
 export const Balances = () => {

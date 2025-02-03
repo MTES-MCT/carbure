@@ -3,9 +3,9 @@ import { Notice } from "common/components/notice"
 import Portal from "common/components/portal"
 import { Grid, Main } from "common/components/scaffold"
 import { formatNumber } from "common/utils/formatters"
-import { Balance } from "material-accounting/balances/types"
-import { OperationText } from "material-accounting/components/operation-text"
-import { formatSector } from "material-accounting/operations/operations.utils"
+import { Balance } from "accounting/balances/types"
+import { OperationText } from "accounting/components/operation-text"
+import { formatSector } from "accounting/operations/operations.utils"
 import { Trans, useTranslation } from "react-i18next"
 
 interface CessionDialogProps {
