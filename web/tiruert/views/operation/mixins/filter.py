@@ -17,7 +17,7 @@ class FilterActionMixin:
             OpenApiParameter(
                 name="filter",
                 type=str,
-                enum=["status", "sector", "customs_category", "biofuel", "type", "from_to", "depot", "operation"],
+                enum=["status", "sector", "customs_category", "biofuel", "type", "from_to", "depot", "operation", "period"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,

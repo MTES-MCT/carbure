@@ -4,13 +4,14 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
+from tiruert.models.operation import Operation
 
 
 class OperationFilter(FilterSet):
     entity_id = CharFilter(method="filter_entity")
     date_from = DateFilter(field_name="created_at", lookup_expr="gte")
     date_to = DateFilter(field_name="created_at", lookup_expr="lte")
-    operation = BaseInFilter(field_name="type", lookup_expr="in")
+    operation = CharFilter(method="filter_operation")
     status = BaseInFilter(field_name="status", lookup_expr="in")
     customs_category = BaseInFilter(field_name="customs_category", lookup_expr="in")
     biofuel = BaseInFilter(field_name="biofuel__code", lookup_expr="in")
@@ -66,4 +67,27 @@ class OperationFilter(FilterSet):
         q_objects = Q()
         for period in periods:
             q_objects |= Q(created_at__year=period[:4], created_at__month=period[4:])
+        return queryset.filter(q_objects).distinct()
+
+    @extend_schema_field(
+        ListField(
+            child=ChoiceField(
+                choices=Operation.OPERATION_TYPES + ("ACQUISITION", "ACQUISITION"),
+            )
+        )
+    )
+    def filter_operation(self, queryset, name, value):
+        entity_id = self.request.query_params.get("entity_id")
+        operations = [operation.upper() for operation in self.request.GET.getlist(name)]
+        if not operations:
+            return queryset
+
+        q_objects = Q()
+        if "ACQUISITION" in operations:
+            q_objects |= Q(type="CESSION", credited_entity_id=entity_id)
+            operations.remove("ACQUISITION")
+        if "CESSION" in operations:
+            q_objects |= Q(type="CESSION", debited_entity_id=entity_id)
+            operations.remove("CESSION")
+        q_objects |= Q(type__in=operations)
         return queryset.filter(q_objects).distinct()
