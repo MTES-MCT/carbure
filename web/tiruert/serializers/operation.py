@@ -71,7 +71,6 @@ class OperationListSerializer(BaseOperationSerializer):
             "to_depot",
             "export_country",
             "created_at",
-            "validity_date",
             "volume",
             "unit",
             "details",
@@ -94,7 +93,7 @@ class OperationSerializer(BaseOperationSerializer):
             "to_depot",
             "export_country",
             "created_at",
-            "validity_date",
+            "validation_date",
             "volume",
             "unit",
             "avoided_emissions",
@@ -125,7 +124,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "to_depot",
             "export_country",
-            "validity_date",
             "lots",
         ]
         extra_kwargs = {

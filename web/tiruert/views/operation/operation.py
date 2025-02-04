@@ -109,7 +109,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     "credited_entity": "",
                     "debited_entity": 2,
                     "depot": "",
-                    "validity_date": "2025-01-03",
                     "lots": [
                         {"id": 10, "volume": 39462, "emission_rate_per_mj": 5.25},
                         {"id": 11, "volume": 723.2, "emission_rate_per_mj": 30.2},
