@@ -1,7 +1,7 @@
 import { Column, Cell } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import { OperationBadge } from "./components/operation-badge"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
 import {
   formatOperationCreditOrDebit,
@@ -150,6 +150,13 @@ export const useGetFilterOptions = (query: OperationsQuery) => {
     if (filter === OperationsFilter.type) {
       return data?.map((item) => ({
         label: t(formatOperationCreditOrDebit(item as OperationDebitOrCredit)),
+        value: item,
+      }))
+    }
+
+    if (filter === OperationsFilter.period) {
+      return data?.map((item) => ({
+        label: formatPeriod(item),
         value: item,
       }))
     }

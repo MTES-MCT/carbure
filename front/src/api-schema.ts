@@ -2665,7 +2665,7 @@ export interface components {
      *     * `DEVALUATION` - DEVALUATION
      * @enum {string}
      */
-    OperationInputTypeEnum: PathsApiTiruertOperationsGetParametersQueryOperation
+    OperationInputTypeEnum: OperationInputTypeEnum
     OperationList: {
       readonly id: number
       readonly type: string
@@ -6595,7 +6595,6 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -6866,7 +6865,6 @@ export interface operations {
         from_to?: string
         /** @description Group by sector or by lot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -6908,7 +6906,6 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
         from_to?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -6947,7 +6944,6 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -7180,13 +7176,14 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   TALLOL = "TALLOL",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
-  CESSION = "CESSION",
-  DEVALUATION = "DEVALUATION",
-  EXPORTATION = "EXPORTATION",
   INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
   LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
   MAC_BIO = "MAC_BIO",
-  TENEUR = "TENEUR",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
+  ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
@@ -7222,6 +7219,7 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
   depot = "depot",
   from_to = "from_to",
   operation = "operation",
+  period = "period",
   sector = "sector",
   status = "status",
   type = "type",
@@ -7325,6 +7323,15 @@ export enum LotStatusEnum {
   REJECTED = "REJECTED",
   FROZEN = "FROZEN",
   DELETED = "DELETED",
+}
+export enum OperationInputTypeEnum {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
 }
 export enum OwnershipTypeEnum {
   OWN = "OWN",

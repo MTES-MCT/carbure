@@ -29,6 +29,7 @@ export const Operations = ({
     [OperationsFilter.sector]: t("Filière"),
     [OperationsFilter.customs_category]: t("Catégorie"),
     [OperationsFilter.biofuel]: t("Biocarburants"),
+    [OperationsFilter.period]: t("Date"),
     [OperationsFilter.type]: t("Débit / Crédit"),
     [OperationsFilter.operation]: t("Opération"),
     [OperationsFilter.from_to]: t("Redevable"),

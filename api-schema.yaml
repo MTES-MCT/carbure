@@ -4666,18 +4666,25 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
                 - INCORPORATION
+                - CESSION
+                - TENEUR
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - EXPORTATION
+                - DEVALUATION
+                - ACQUISITION
+              type: string
+              description: |-
+                * `INCORPORATION` - INCORPORATION
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+                * `MAC_BIO` - MAC_BIO
+                * `EXPORTATION` - EXPORTATION
+                * `DEVALUATION` - DEVALUATION
+                * `ACQUISITION` - ACQUISITION
         - name: page
           required: false
           in: query
@@ -5102,18 +5109,25 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
                 - INCORPORATION
+                - CESSION
+                - TENEUR
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - EXPORTATION
+                - DEVALUATION
+                - ACQUISITION
+              type: string
+              description: |-
+                * `INCORPORATION` - INCORPORATION
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+                * `MAC_BIO` - MAC_BIO
+                * `EXPORTATION` - EXPORTATION
+                * `DEVALUATION` - DEVALUATION
+                * `ACQUISITION` - ACQUISITION
         - in: query
           name: period
           schema:
@@ -5256,18 +5270,25 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
                 - INCORPORATION
+                - CESSION
+                - TENEUR
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - EXPORTATION
+                - DEVALUATION
+                - ACQUISITION
+              type: string
+              description: |-
+                * `INCORPORATION` - INCORPORATION
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+                * `MAC_BIO` - MAC_BIO
+                * `EXPORTATION` - EXPORTATION
+                * `DEVALUATION` - DEVALUATION
+                * `ACQUISITION` - ACQUISITION
         - in: query
           name: period
           schema:
@@ -5402,6 +5423,7 @@ paths:
               - depot
               - from_to
               - operation
+              - period
               - sector
               - status
               - type
@@ -5416,18 +5438,25 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - CESSION
-                - DEVALUATION
-                - EXPORTATION
                 - INCORPORATION
+                - CESSION
+                - TENEUR
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - TENEUR
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - EXPORTATION
+                - DEVALUATION
+                - ACQUISITION
+              type: string
+              description: |-
+                * `INCORPORATION` - INCORPORATION
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+                * `MAC_BIO` - MAC_BIO
+                * `EXPORTATION` - EXPORTATION
+                * `DEVALUATION` - DEVALUATION
+                * `ACQUISITION` - ACQUISITION
         - in: query
           name: period
           schema:
