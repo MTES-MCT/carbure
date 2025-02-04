@@ -53,7 +53,7 @@ const mapDeliverySiteToForm: (
   site_type: deliverySite?.depot?.site_type ?? SiteType.OTHER,
   address: deliverySite?.depot?.address ?? "",
   postal_code: deliverySite?.depot?.postal_code ?? "",
-  ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
+  ownership_type: deliverySite?.ownership_type ?? OwnershipType.OWN,
   blending_outsourced: deliverySite?.blending_is_outsourced ?? false,
   blending_entity: deliverySite?.blender ?? undefined,
   electrical_efficiency: deliverySite?.depot?.electrical_efficiency,

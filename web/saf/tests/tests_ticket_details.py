@@ -151,6 +151,11 @@ class SafTicketDetailsTest(TestCase):
                 "total_volume": 30000.0,
                 "assigned_volume": 0.0,
             },
+            "shipping_method": None,
+            "reception_airport": None,
+            "consumption_type": None,
+            "ets_status": None,
+            "ets_declaration_date": None,
         }
 
         assert response.json() == expected_ticket

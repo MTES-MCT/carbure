@@ -53,6 +53,9 @@ class AssignActionMixin:
         agreement_date = serializer.validated_data.get("agreement_date")
         free_field = serializer.validated_data.get("free_field")
         assignment_period = serializer.validated_data["assignment_period"]
+        reception_airport = serializer.validated_data.get("reception_airport")
+        consumption_type = serializer.validated_data.get("consumption_type")
+        shipping_method = serializer.validated_data.get("shipping_method")
 
         if volume > (ticket_source.total_volume - ticket_source.assigned_volume):
             raise ValidationError({"message": SafTicketAssignError.VOLUME_TOO_BIG})
@@ -70,6 +73,9 @@ class AssignActionMixin:
                     agreement_reference=agreement_reference,
                     assignment_period=assignment_period,
                     free_field=free_field,
+                    reception_airport=reception_airport,
+                    consumption_type=consumption_type,
+                    shipping_method=shipping_method,
                 )
 
                 CarbureNotification.objects.create(

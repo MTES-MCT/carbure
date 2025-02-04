@@ -6,21 +6,21 @@ from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
 
 
-class DepotSerializer(serializers.Serializer):
+class TiruertDepotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 
-class EntitySerializer(serializers.Serializer):
+class TiruertEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 
 class BaseOperationSerializer(serializers.ModelSerializer):
-    from_depot = DepotSerializer()
-    to_depot = DepotSerializer()
-    credited_entity = EntitySerializer()
-    debited_entity = EntitySerializer()
+    from_depot = TiruertDepotSerializer()
+    to_depot = TiruertDepotSerializer()
+    credited_entity = TiruertEntitySerializer()
+    debited_entity = TiruertEntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
@@ -28,24 +28,24 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     volume = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
 
-    def get_type(self, instance):
+    def get_type(self, instance) -> str:
         entity_id = self.context.get("entity_id")
         if instance.is_acquisition(entity_id):
             return Operation.ACQUISITION
         else:
             return instance.type
 
-    def get_sector(self, instance):
+    def get_sector(self, instance) -> str:
         return instance.sector
 
-    def get_volume_l(self, instance):
+    def get_volume_l(self, instance) -> float:
         return sum(detail.volume for detail in instance.details.all())
 
-    def get_volume(self, instance):
+    def get_volume(self, instance) -> float:
         pci = instance.biofuel.pci_litre if self.context.get("unit") == "mj" else 1
         return self.get_volume_l(instance) * pci
 
-    def get_unit(self, instance):
+    def get_unit(self, instance) -> str:
         return self.context.get("unit")
 
     def to_representation(self, instance):
@@ -71,7 +71,6 @@ class OperationListSerializer(BaseOperationSerializer):
             "to_depot",
             "export_country",
             "created_at",
-            "validity_date",
             "volume",
             "unit",
             "details",
@@ -94,7 +93,7 @@ class OperationSerializer(BaseOperationSerializer):
             "to_depot",
             "export_country",
             "created_at",
-            "validity_date",
+            "validation_date",
             "volume",
             "unit",
             "avoided_emissions",
@@ -103,7 +102,7 @@ class OperationSerializer(BaseOperationSerializer):
 
     avoided_emissions = serializers.SerializerMethodField()
 
-    def get_avoided_emissions(self, instance):
+    def get_avoided_emissions(self, instance) -> float:
         return sum(detail.avoided_emissions for detail in instance.details.all())
 
 
@@ -125,7 +124,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "to_depot",
             "export_country",
-            "validity_date",
             "lots",
         ]
         extra_kwargs = {

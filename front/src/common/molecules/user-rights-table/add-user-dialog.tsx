@@ -7,18 +7,13 @@ import { RadioGroup } from "common/components/radio"
 import { useTranslation } from "react-i18next"
 import { TextInput } from "common/components/input"
 import { Mail, Plus, Return } from "common/components/icons"
-import { User, UserRole } from "carbure/types"
+import { UserRole } from "carbure/types"
 import { useAsyncCallback } from "react-async-hook"
-import { AxiosResponse } from "axios"
-import { Api } from "common/services/api"
 import { useNotify } from "common/components/notifications"
 
 export type AddUserDialogProps = {
   onClose: PortalInstance["close"]
-  onAddNewUser: (
-    email: string,
-    role: UserRole
-  ) => Promise<AxiosResponse<Api<User>>>
+  onAddNewUser: (email: string, role: UserRole) => Promise<unknown>
 }
 
 export const AddUserDialog = ({
@@ -36,18 +31,17 @@ export const AddUserDialog = ({
   const notify = useNotify()
 
   const addNewUserMutation = useAsyncCallback(onAddNewUser, {
-    onSuccess: (response) => {
+    onSuccess: () => {
       onClose()
-      const email = response.data.data?.email
-
       notify(
         t("L'utilisateur {{email}} a bien été ajouté !", {
-          email,
+          email: value.email,
         }),
         {
           variant: "success",
         }
       )
+      setFieldError("email", "")
     },
     onError: () => {
       setFieldError("email", t("Le format d'email n'est pas valide"))
@@ -55,7 +49,6 @@ export const AddUserDialog = ({
   })
 
   const handleSubmit = async () => {
-    setFieldError("email", "")
     // Wait for backend request before closing dialog
     addNewUserMutation.execute(value.email!, value.role!)
   }

@@ -158,9 +158,9 @@ export const useOwnerShipTypeOptions = () => {
 
   return useMemo(
     () => [
-      { value: OwnershipType.Own, label: t("Propre") },
-      { value: OwnershipType.ThirdParty, label: t("Tiers") },
-      { value: OwnershipType.Processing, label: t("Processing") },
+      { value: OwnershipType.OWN, label: t("Propre") },
+      { value: OwnershipType.THIRD_PARTY, label: t("Tiers") },
+      { value: OwnershipType.PROCESSING, label: t("Processing") },
     ],
     [t]
   )

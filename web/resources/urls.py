@@ -1,6 +1,7 @@
 from django.urls import path
 
 from resources.views import (
+    get_airports,
     get_biofuels,
     get_certificates,
     get_countries,
@@ -20,4 +21,5 @@ urlpatterns = [
     path("entities", get_entities, name="resources-entities"),
     path("feedstocks", get_feedstocks, name="resources-feedstocks"),
     path("production-sites", get_production_sites, name="resources-production-sites"),
+    path("airports", get_airports, name="resources-airports"),
 ]

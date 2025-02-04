@@ -1,15 +1,9 @@
-import api, { Api } from "common/services/api"
-import {
-  Country,
-  SiteType,
-  EntityDepot,
-  OwnershipType,
-  EntityPreview,
-} from "carbure/types"
+import { api as apiFetch } from "common/services/api-fetch"
+import { Country, SiteType, OwnershipType, EntityPreview } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
-  return api.get<Api<EntityDepot[]>>("/entity/depots", {
-    params: { entity_id },
+  return apiFetch.GET("/entities/depots/", {
+    params: { query: { entity_id } },
   })
 }
 
@@ -23,12 +17,14 @@ export function addDeliverySite(
   blending_outsourced: boolean,
   blending_entity: EntityPreview | undefined
 ) {
-  return api.post("/entity/depots/add", {
-    entity_id,
-    delivery_site_id,
-    ownership_type,
-    blending_outsourced,
-    blending_entity_id: blending_entity?.id,
+  return apiFetch.POST("/entities/depots/add/", {
+    params: { query: { entity_id } },
+    body: {
+      delivery_site_id,
+      ownership_type,
+      blending_is_outsourced: blending_outsourced,
+      blending_entity_id: blending_entity?.id,
+    },
   })
 }
 
@@ -45,18 +41,21 @@ export function createNewDeliverySite(
   thermal_efficiency?: number,
   useful_temperature?: number
 ) {
-  return api.post("/entity/depots/create", {
-    entity_id,
-    name,
-    city,
-    country_code: country.code_pays,
-    depot_id,
-    depot_type,
-    address,
-    postal_code,
-    electrical_efficiency,
-    thermal_efficiency,
-    useful_temperature,
+  return apiFetch.POST("/entities/depots/create-depot/", {
+    params: { query: { entity_id } },
+    body: {
+      entity_id,
+      name,
+      city,
+      country_code: country.code_pays,
+      depot_id,
+      depot_type,
+      address,
+      postal_code,
+      electrical_efficiency,
+      thermal_efficiency,
+      useful_temperature,
+    },
   })
 }
 
@@ -64,8 +63,10 @@ export function deleteDeliverySite(
   entity_id: number,
   delivery_site_id: string
 ) {
-  return api.post("/entity/depots/delete", {
-    entity_id,
-    delivery_site_id,
+  return apiFetch.POST("/entities/depots/delete-depot/", {
+    params: { query: { entity_id } },
+    body: {
+      delivery_site_id,
+    },
   })
 }

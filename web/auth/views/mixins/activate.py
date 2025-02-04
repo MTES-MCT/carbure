@@ -24,10 +24,6 @@ class ActivateAccountAction:
                     "token": CharField(required=False),
                 },
             ),
-            # OpenApiResponse(
-            #     response={"status": "success"},
-            #     description="Request successful.",
-            # )
             400: OpenApiResponse(
                 response={"message": CarbureError.ACTIVATION_COULD_NOT_ACTIVATE_USER},
                 description="Bad request - missing fields.",

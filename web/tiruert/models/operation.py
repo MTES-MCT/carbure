@@ -55,7 +55,7 @@ class Operation(models.Model):
         Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="operations_country"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    validity_date = models.DateField(null=False, blank=False)
+    validation_date = models.DateField(null=True, blank=True)
 
     @property
     def sector(self):
@@ -115,7 +115,6 @@ def create_tiruert_operations_from_lots(lots):
             debited_entity=None,
             from_depot=None,
             to_depot=lots[0].carbure_delivery_site,
-            validity_date=lots[0].delivery_date,
         )
 
         lots_bulk = []

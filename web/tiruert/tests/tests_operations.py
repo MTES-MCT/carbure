@@ -37,7 +37,6 @@ class TiruertOperationsTest(TestCase):
             "from_depot",
             "to_depot",
             "created_at",
-            "validity_date",
             "volume",
             "unit",
         ]

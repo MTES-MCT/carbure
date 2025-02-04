@@ -31,12 +31,9 @@ export const okStats = http.get("/api/home-stats", () => {
 
 // First time notifications are fetched, they are not acked
 export const okNotifications = http.get(
-  "/api/entity/notifications",
+  "/api/entities/notifications",
   () => {
-    return HttpResponse.json({
-      status: "success",
-      data: notifications,
-    })
+    return HttpResponse.json(notifications)
   },
   {
     once: true,
@@ -45,24 +42,12 @@ export const okNotifications = http.get(
 
 // Second time notifications are fetched, they are acked
 export const okNotificationsAcked = http.get(
-  "/api/entity/notifications",
+  "/api/entities/notifications",
   () => {
-    return HttpResponse.json({
-      status: "success",
-      data: notifications.map((n) => ({ ...n, acked: true })),
-    })
+    return HttpResponse.json(notifications.map((n) => ({ ...n, acked: true })))
   },
   {
     once: true,
-  }
-)
-
-export const okAckNotifications = http.post(
-  "/api/entity/notifications/ack",
-  () => {
-    return HttpResponse.json({
-      status: "success",
-    })
   }
 )
 

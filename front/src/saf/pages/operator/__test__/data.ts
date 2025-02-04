@@ -6,7 +6,7 @@ import {
   productionSite,
   trader,
 } from "carbure/__test__/data"
-import { Biofuel, Country, Feedstock } from "carbure/types"
+import { Airport, Biofuel, Country, Feedstock } from "carbure/types"
 import {
   LotPreview,
   SafOperatorSnapshot,
@@ -22,7 +22,10 @@ import {
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
-import { PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum } from "api-schema"
+import {
+  PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum,
+  SiteTypeEnum,
+} from "api-schema"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,
@@ -55,6 +58,17 @@ const country1: Country = {
   name: "France",
   name_en: "France",
   is_in_europe: true,
+}
+
+const safAirport: Airport = {
+  id: 12,
+  name: "Airport",
+  city: "Paris",
+  icao_code: "ABCD",
+  country: country1,
+  site_type: SiteTypeEnum.AIRPORT,
+  address: "Rue de l'aéroport",
+  postal_code: "75000",
 }
 
 export const safTicketSource: SafTicketSource = {
@@ -236,6 +250,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   eee: 0,
   ghg_total: 23.5,
   parent_ticket_source: safTicketSource,
+  reception_airport: safAirport,
 }
 
 // const safTicketSourceSummaryItem: SafTicketSourceSummaryItem = {

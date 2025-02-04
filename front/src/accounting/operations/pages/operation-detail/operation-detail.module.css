@@ -5,7 +5,8 @@
 }
 
 .operation-detail-fields {
-  grid-template-columns: repeat(3, minmax(var(--grid-cell-width), 1fr));
+  --grid-cell-width: 350px;
+  grid-template-columns: repeat(2, minmax(var(--grid-cell-width), 1fr));
   row-gap: var(--spacing-3v);
   column-gap: var(--spacing-3w);
 }

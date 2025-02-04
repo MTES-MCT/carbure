@@ -63,9 +63,20 @@ export const OperationDetail = () => {
 
   const fields = operation
     ? compact([
+        { label: t("Filière"), value: formatSector(operation.sector) },
         {
           label: t("Date d'opération"),
           value: formatDate(operation?.created_at),
+        },
+        { label: t("Catégorie"), value: operation.customs_category },
+        { label: t("Biocarburant"), value: operation.biofuel },
+        {
+          label: t("Volume"),
+          value: getOperationVolume(operation),
+        },
+        {
+          label: t("Tonnes CO2 eq evitées"),
+          value: formatNumber(operation.avoided_emissions),
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
@@ -76,27 +87,12 @@ export const OperationDetail = () => {
           value: getOperationEntity(operation)?.name ?? "-",
         },
         {
-          label: t("Transaction"),
-          value: formatOperationType(operation.type),
-        },
-        { label: t("Filière"), value: formatSector(operation.sector) },
-        { label: t("Catégorie"), value: operation.customs_category },
-        { label: t("Biocarburant"), value: operation.biofuel },
-        {
-          label: t("Volume"),
-          value: getOperationVolume(operation),
-        },
-        {
           label: t("Dépôt expéditeur"),
           value: operation.from_depot?.name ?? "-",
         },
         operation.type !== OperationType.DEVALUATION && {
           label: t("Dépôt destinataire"),
           value: operation.to_depot?.name ?? "-",
-        },
-        {
-          label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(Number(operation.avoided_emissions)),
         },
       ])
     : []
@@ -149,12 +145,6 @@ export const OperationDetail = () => {
                   {t("Annuler le certificat de cession")}
                 </Button>
               )}
-            {(operation?.status === OperationsStatus.ACCEPTED ||
-              operation?.status === OperationsStatus.REJECTED) && (
-              <Button priority="secondary" onClick={closeDialog}>
-                {t("Annuler")}
-              </Button>
-            )}
           </>
         }
       >

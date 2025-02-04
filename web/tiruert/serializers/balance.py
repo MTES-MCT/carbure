@@ -20,13 +20,13 @@ class BalanceSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         return {key: value for key, value in representation.items() if value is not None}
 
-    def get_available_balance(self, instance):
+    def get_available_balance(self, instance) -> float:
         return self.calcul_available_balance(instance)
 
-    def get_final_balance(self, instance):
+    def get_final_balance(self, instance) -> float:
         return self.calcul_available_balance(instance) - instance["teneur"]
 
-    def calcul_available_balance(self, instance):
+    def calcul_available_balance(self, instance) -> float:
         return instance["initial_balance"] + instance["volume"]["credit"] - instance["volume"]["debit"]
 
 

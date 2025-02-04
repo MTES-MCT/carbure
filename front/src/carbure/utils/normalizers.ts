@@ -21,6 +21,7 @@ import {
   EntityDepot,
   EntityPreview,
 } from "carbure/types"
+import { apiTypes } from "common/services/api-fetch.types"
 import { formatPeriod } from "common/utils/formatters"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
@@ -108,6 +109,11 @@ export const normalizeDepot: Normalizer<Depot> = (depot) => ({
   label: depot.name,
 })
 
+export const normalizeAirport: Normalizer<apiTypes["Airport"]> = (airport) => ({
+  value: airport,
+  label: airport.name,
+})
+
 export const normalizeDepotOrUnknown: Normalizer<Depot | string> = (depot) => ({
   value: depot,
   label: isString(depot) ? depot : depot.name,
@@ -115,7 +121,7 @@ export const normalizeDepotOrUnknown: Normalizer<Depot | string> = (depot) => ({
 
 // prettier-ignore
 export const normalizeEntityDepot: Normalizer<EntityDepot> = (depot) => ({
-  label: `${depot.blender!.name} - ${depot.depot!.name}`,
+  label: `${depot.blender.name} - ${depot.depot!.name}`,
   value: depot
 })
 

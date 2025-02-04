@@ -141,7 +141,6 @@ def check_admin_rights(allow_external=None, allow_role=None):
 
             # find out if the decorated function is accessible only by admins
             is_admin_only = len(allow_external) == 0
-
             # if the user tries to access an admin page
             if is_admin_only:
                 # confirm that the current entity is the administration
@@ -157,7 +156,6 @@ def check_admin_rights(allow_external=None, allow_role=None):
                     ExternalAdminRights.objects.get(entity=entity, right__in=allow_external)
                 except Exception:
                     return ErrorResponse(403, AdminRightsError.ENTITY_HAS_NO_RIGHT)
-
             context = {"entity_id": entity_id, "entity": entity}
             return call_with_context(view_function, context, request, args, kwargs)
 

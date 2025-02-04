@@ -55,7 +55,7 @@ const ProductionSitesSettings = ({
   })
 
   const canModify = !readOnly && rights.is(UserRole.Admin, UserRole.ReadWrite)
-  const prodSitesData = productionSites.result?.data.data ?? []
+  const prodSitesData = productionSites.result?.data ?? []
 
   function showProductionSite(prodSite: ProductionSiteDetails) {
     portal((close) => (

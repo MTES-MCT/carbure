@@ -51,6 +51,9 @@ class GroupAssignActionMixin:
         agreement_date = serializer.validated_data.get("agreement_date")
         free_field = serializer.validated_data.get("free_field")
         assignment_period = serializer.validated_data["assignment_period"]
+        reception_airport = serializer.validated_data.get("reception_airport")
+        consumption_type = serializer.validated_data.get("consumption_type")
+        shipping_method = serializer.validated_data.get("shipping_method")
 
         ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
             "created_at"
@@ -102,6 +105,9 @@ class GroupAssignActionMixin:
                         agreement_reference=agreement_reference,
                         assignment_period=assignment_period,
                         free_field=free_field,
+                        reception_airport=reception_airport,
+                        consumption_type=consumption_type,
+                        shipping_method=shipping_method,
                     )
 
                     CarbureNotification.objects.create(

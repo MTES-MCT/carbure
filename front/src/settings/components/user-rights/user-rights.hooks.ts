@@ -13,7 +13,7 @@ export const useGetEntityRights = () => {
   })
 
   return {
-    rights: response.result?.data.data?.requests ?? [],
+    rights: response.result?.data?.requests ?? [],
     response,
   }
 }

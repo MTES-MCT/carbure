@@ -8,7 +8,7 @@ import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRoutes } from "common/hooks/routes"
 import { Trans, useTranslation } from "react-i18next"
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import { Operations } from "./operations"
 import { Balances } from "./balances"
 import { useState } from "react"
@@ -51,6 +51,7 @@ export const MaterialAccounting = () => {
             element={<Operations setOperationCount={setOperationCount} />}
           />
           <Route path="balances" element={<Balances />} />
+          <Route path="*" element={<Navigate replace to="operations" />} />
         </Routes>
       </Content>
     </Main>

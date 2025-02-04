@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,15 +18,6 @@ class SimulateActionMixin:
         description="Simulate a blending operation",
         request=SimulationInputSerializer,
         responses={status.HTTP_200_OK: SimulationOutputSerializer},
-        parameters=[
-            OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-        ],
     )
     @action(
         detail=False,
@@ -70,15 +61,6 @@ class SimulateActionMixin:
         description="Get bounds for blending operation",
         request=SimulationInputSerializer,
         responses={status.HTTP_200_OK: SimulationOutputSerializer},
-        parameters=[
-            OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-        ],
     )
     @action(
         detail=False,
@@ -104,8 +86,8 @@ class SimulateActionMixin:
 
             output_serializer = output_serializer_class(
                 {
-                    "blending_min_emission_rate_per_mj": min,
-                    "blending_max_emission_rate_per_mj": max,
+                    "min_avoided_emissions": min,  # tCO2
+                    "max_avoided_emissions": max,  # tCO2
                 }
             )
             return Response(output_serializer.data, status=status.HTTP_200_OK)

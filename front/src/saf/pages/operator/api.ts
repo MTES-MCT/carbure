@@ -5,6 +5,7 @@ import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
+import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
 
 export function getOperatorYears(entity_id: number) {
   return apiFetch.GET("/saf/years/", {
@@ -122,7 +123,10 @@ export function assignSafTicket(
   assignment_period: number,
   client: EntityPreview,
   i?: string,
-  free_field?: string
+  free_field?: string,
+  reception_airport?: number,
+  shipping_method?: ShippingMethodEnum,
+  consumption_type?: ConsumptionTypeEnum
 ) {
   return apiFetch.POST("/saf/ticket-sources/{id}/assign/", {
     params: {
@@ -140,6 +144,9 @@ export function assignSafTicket(
       free_field,
       i,
       agreement_date: "",
+      reception_airport,
+      shipping_method,
+      consumption_type,
     },
   })
 }
@@ -151,7 +158,10 @@ export function groupedAssignSafTicket(
   assignment_period: number,
   client: EntityPreview,
   i: string,
-  free_field?: string
+  free_field?: string,
+  reception_airport?: number,
+  shipping_method?: ShippingMethodEnum,
+  consumption_type?: ConsumptionTypeEnum
 ) {
   return apiFetch.POST("/saf/ticket-sources/group-assign/", {
     params: {
@@ -166,6 +176,9 @@ export function groupedAssignSafTicket(
       ticket_sources_ids,
       volume,
       free_field,
+      reception_airport,
+      shipping_method,
+      consumption_type,
     },
   })
 }

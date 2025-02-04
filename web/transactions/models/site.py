@@ -19,6 +19,7 @@ class Site(models.Model):
     COGENERATION_PLANT = "COGENERATION PLANT"
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID"
     EFCA = "EFCA"
+    AIRPORT = "AIRPORT"
 
     SITE_TYPE = (
         (OTHER, "Autre"),
@@ -31,16 +32,19 @@ class Site(models.Model):
         (COGENERATION_PLANT, "COGENERATION PLANT"),
         (PRODUCTION_BIOLIQUID, "PRODUCTION BIOLIQUID"),
         (EFCA, "EFCA"),
+        (AIRPORT, "AIRPORT"),
     )
 
     DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT, EFCA]
     PRODUCTION_SITE_TYPES = [PRODUCTION_BIOLIQUID]
+    AIRPORT_TYPES = [AIRPORT]
 
     GES_OPTIONS = [("Default", "Valeurs par défaut"), ("Actual", "Valeurs réelles"), ("NUTS2", "Valeurs NUTS2")]
 
     name = models.CharField(max_length=128, blank=False)
     site_siret = models.CharField(max_length=64, blank=True)
     customs_id = models.CharField(max_length=32, blank=True)
+    icao_code = models.CharField(max_length=32, blank=True)
     site_type = models.CharField(max_length=32, choices=SITE_TYPE, default=OTHER)
     address = models.CharField(max_length=256, blank=True)
     postal_code = models.CharField(max_length=32, blank=True)

@@ -3,10 +3,9 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
 import { Check, Cross } from "common/components/icons"
-import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
@@ -19,6 +18,7 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
+import AcceptAssignment from "./accept-assignment"
 
 export type TicketDetailsProps = Omit<NavigationButtonsProps, "closeAction">
 
@@ -32,7 +32,6 @@ export const ClientTicketDetails = ({
 
   const navigate = useNavigate()
   const location = useLocation()
-  const notify = useNotify()
   const entity = useEntity()
   const match = useHashMatch("ticket/:id")
   const portal = usePortal()
@@ -42,15 +41,11 @@ export const ClientTicketDetails = ({
     params: [entity.id, parseInt(match?.params.id ?? "")],
   })
 
-  const acceptSafTicket = useMutation(api.acceptSafTicket, {
-    invalidates: ["ticket-details", "tickets", "airline-snapshot"],
-    onSuccess: () => {
-      closeDialog()
-      notify(t("Le ticket a été accepté."), { variant: "success" })
-    },
-  })
-
   const ticket = ticketResponse.result?.data
+
+  const showAcceptModal = () => {
+    portal((close) => <AcceptAssignment ticket={ticket!} onClose={close} />)
+  }
 
   const showRejectModal = () => {
     portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
@@ -58,10 +53,6 @@ export const ClientTicketDetails = ({
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
-  }
-
-  const acceptTicket = async () => {
-    await acceptSafTicket.execute(entity.id, ticket!.id)
   }
 
   return (
@@ -90,7 +81,7 @@ export const ClientTicketDetails = ({
                 label={t("Accepter")}
                 variant="success"
                 disabled={!ticket}
-                action={acceptTicket}
+                action={showAcceptModal}
               />
               <Button
                 icon={Cross}

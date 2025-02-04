@@ -40,14 +40,14 @@ const Certificates = ({
     params: [entity.id, entity_id],
   })
 
-  const certData = (certificates.result?.data?.data ?? []).filter(
+  const certData = (certificates.result?.data ?? []).filter(
     (c) =>
       matchesSearch(search, [
         c.certificate.certificate_id,
         c.certificate.certificate_holder,
         c.certificate.certificate_type,
         c.entity.name,
-        c.entity.entity_type,
+        c.entity.entity_type ?? "Unknown",
       ]) && hasCertificatFilter(c, certificatsFilter)
   )
 
@@ -106,7 +106,10 @@ const Certificates = ({
               header: t("Société"),
               orderBy: (e) => e.entity.name,
               cell: (e) => (
-                <Cell text={e.entity.name} sub={t(e.entity.entity_type)} />
+                <Cell
+                  text={e.entity.name}
+                  sub={t(e.entity.entity_type ?? "")}
+                />
               ),
             },
             {

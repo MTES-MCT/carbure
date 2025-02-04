@@ -16,6 +16,9 @@ class TeneurServiceErrors:
     INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES = "INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES"
 
 
+GHG_REFERENCE_RED_II = 94  # gCO2/MJ
+
+
 class TeneurService:
     @staticmethod
     def optimize_biofuel_blending(
@@ -189,11 +192,16 @@ class TeneurService:
     def prepare_data_and_optimize(entity_id, data):
         volumes, emissions, lot_ids, enforced_volumes = TeneurService.prepare_data(entity_id, data)
 
+        # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
+        pci = data["biofuel"].pci_litre
+        volume_energy = data["target_volume"] * pci  # MJ
+        target_emission = GHG_REFERENCE_RED_II - (data["target_emission"] * 1000000 / volume_energy)  # gCO2/MJ emis
+
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
             data["target_volume"],
-            data["target_emission"],
+            target_emission,
             enforced_volumes,
             data.get("max_n_batches", None),
         )
@@ -204,7 +212,7 @@ class TeneurService:
     def get_min_and_max_emissions(entity_id, data):
         """
         Compute minimum and maximum feasible mix emissions.
-        Return emission rates per MJ
+        Return avoided emissions (tCO2)
         """
         volumes, emissions, _, _ = TeneurService.prepare_data(entity_id, data)
 
@@ -214,7 +222,13 @@ class TeneurService:
             data["target_volume"],
         )
 
-        return min_emissions_rate, max_emissions_rate
+        # Transform producted emissions (gCO2/MJ) into avoided emissions (tCO2)
+        pci = data["biofuel"].pci_litre
+        volume_energy = data["target_volume"] * pci  # MJ
+        max_avoided_emissions = (GHG_REFERENCE_RED_II - min_emissions_rate) * volume_energy / 1000000  # tCO2
+        min_avoided_emissions = (GHG_REFERENCE_RED_II - max_emissions_rate) * volume_energy / 1000000  # tCO2
+
+        return min_avoided_emissions, max_avoided_emissions
 
     @staticmethod
     def prepare_data(entity_id, data):

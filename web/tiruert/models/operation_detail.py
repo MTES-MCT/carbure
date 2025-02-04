@@ -9,14 +9,12 @@ class OperationDetail(models.Model):
 
     @property
     def avoided_emissions(self):
-        lot_energy = self.lot.biofuel.pci_litre * self.volume  # MJ - energie du lot utilisée pour la création du lot
+        from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-        ghg_reference = self.lot.ghg_reference_red_ii  # gCO2/MJ - valeur de référence pour la création du lot 100% fossile
-        emissions_reference = ghg_reference * lot_energy  # gCO2 - émissions pour la création du lot dans le cas 100% fossile
-
-        emissions_real = self.emission_rate_per_mj * lot_energy  # gCO2 - émissions réelles pour la création du lot
-
-        return (emissions_reference - emissions_real) / 1000000  # tCO2 - émissions évitées pour la création du lot
+        lot_energy = self.lot.biofuel.pci_litre * self.volume  # (MJ) energie du lot utilisée pour la création du lot
+        return (
+            (GHG_REFERENCE_RED_II - self.emission_rate_per_mj) * lot_energy / 1000000
+        )  # (tCO2) émissions évitées pour la création du lot
 
     class Meta:
         db_table = "tiruert_operation_details"

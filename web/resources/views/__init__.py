@@ -5,3 +5,4 @@ from .depots import get_depots
 from .entity import get_entities
 from .feedstocks import get_feedstocks
 from .production_sites import get_production_sites
+from .airports import get_airports

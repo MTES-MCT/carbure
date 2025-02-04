@@ -5,6 +5,8 @@ import { MenuSection } from "../sidebar.types"
 import {
   ArrowGoBackLine,
   ArrowGoForwardLine,
+  FileListFill,
+  FileListLine,
   FileTextFill,
   FileTextLine,
   NewsPaperFill,
@@ -23,11 +25,18 @@ export const useElec = (params?: ElecParams) => {
     condition: (has_elec && isOperator) || isCPO,
     children: [
       {
-        path: routes.ELEC().CERTIFICATES,
-        title: t("Certificats"),
+        path: routes.ELEC().CERTIFICATES.PENDING,
+        title: t("En attente"),
         additionalInfo: params?.pending_transfer_certificates,
         icon: FileTextLine,
         iconActive: FileTextFill,
+        condition: has_elec && isOperator,
+      },
+      {
+        path: routes.ELEC().CERTIFICATES.ACCEPTED,
+        title: t("Acceptés"),
+        icon: FileListLine,
+        iconActive: FileListFill,
         condition: has_elec && isOperator,
       },
       {

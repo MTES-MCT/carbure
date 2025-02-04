@@ -220,3 +220,11 @@ export const BarChartLine = ({ ...props }: IconProps) => {
 export const BarChartFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-bar-chart-2-fill" />
 }
+
+export const FileListLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-file-list-line" />
+}
+
+export const FileListFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-file-list-fill" />
+}

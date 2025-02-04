@@ -6,7 +6,6 @@ from .nav_stats import get_nav_stats
 urlpatterns = [
     path("auth/", include("auth.urls")),
     path("double-counting/", include("doublecount.urls")),
-    path("entity/", include("entity.api")),
     path("entities/", include("entity.urls")),
     path("saf/", include("saf.urls")),
     path("resources/", include("resources.urls")),

@@ -27,7 +27,7 @@ const UserRights = ({ readOnly }: UserRightsProps) => {
     invalidates: ["user-right-requests"],
   })
 
-  const rights = response.result?.data.data ?? []
+  const rights = response.result?.data ?? []
 
   return (
     <UserRightsTable
