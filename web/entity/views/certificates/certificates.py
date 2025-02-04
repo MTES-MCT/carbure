@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from certificates.models import ProductionSiteCertificate
 from core.models import Entity, EntityCertificate, ExternalAdminRights, UserRights
 from core.serializers import EntityCertificateSerializer
-from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights, OrPermission
+from saf.permissions import HasAdminRights, HasUserRights
+from saf.permissions.user_rights import OrPermission
 
 from .mixins import ActionMixin
 

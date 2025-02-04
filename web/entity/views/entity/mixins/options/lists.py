@@ -43,17 +43,25 @@ class EntityListActionMixin:
         has_requests = request.query_params.get("has_requests", None)
         entities = Entity.objects.all().order_by("name")
 
+        filter_condition = Q()
+
         # limit entities for DGAC
-        if entity.has_external_admin_right("AIRLINE"):
-            entities = entities.filter(entity_type=Entity.AIRLINE)
+        if entity.has_external_admin_right(ExternalAdminRights.AIRLINE):
+            filter_condition |= Q(entity_type=Entity.AIRLINE)
 
         # limit entities for Elec stuff
-        if entity.has_external_admin_right("ELEC"):
-            entities = entities.filter(Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True))
+        if entity.has_external_admin_right(ExternalAdminRights.ELEC):
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True)
+
+        if entity.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
 
         # limit entities related to double counting
         if entity.has_external_admin_right(ExternalAdminRights.DOUBLE_COUNTING):
-            entities = entities.filter(entity_type=Entity.PRODUCER)
+            filter_condition |= Q(entity_type=Entity.PRODUCER)
+
+        if filter_condition:
+            entities = entities.filter(filter_condition)
 
         # initialize counters for all expected values
         entities = entities.annotate(

@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from core.models import Entity, ExternalAdminRights, UserRights
+from core.models import Entity, UserRights
 
 
 class BaseEntityPermission(BasePermission):
