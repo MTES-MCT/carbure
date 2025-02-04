@@ -63,9 +63,20 @@ export const OperationDetail = () => {
 
   const fields = operation
     ? compact([
+        { label: t("Filière"), value: formatSector(operation.sector) },
         {
           label: t("Date d'opération"),
           value: formatDate(operation?.created_at),
+        },
+        { label: t("Catégorie"), value: operation.customs_category },
+        { label: t("Biocarburant"), value: operation.biofuel },
+        {
+          label: t("Volume"),
+          value: getOperationVolume(operation),
+        },
+        {
+          label: t("Tonnes CO2 eq evitées"),
+          value: formatNumber(Number(operation.avoided_emissions)),
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
@@ -76,17 +87,6 @@ export const OperationDetail = () => {
           value: getOperationEntity(operation)?.name ?? "-",
         },
         {
-          label: t("Transaction"),
-          value: formatOperationType(operation.type),
-        },
-        { label: t("Filière"), value: formatSector(operation.sector) },
-        { label: t("Catégorie"), value: operation.customs_category },
-        { label: t("Biocarburant"), value: operation.biofuel },
-        {
-          label: t("Volume"),
-          value: getOperationVolume(operation),
-        },
-        {
           label: t("Dépôt expéditeur"),
           value: operation.from_depot?.name ?? "-",
         },
@@ -94,16 +94,13 @@ export const OperationDetail = () => {
           label: t("Dépôt destinataire"),
           value: operation.to_depot?.name ?? "-",
         },
-        {
-          label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(Number(operation.avoided_emissions)),
-        },
       ])
     : []
 
   return (
     <Portal onClose={closeDialog}>
       <Dialog
+        fullscreen
         onClose={closeDialog}
         header={
           operation && (
