@@ -174,3 +174,18 @@ class OperationInputSerializer(serializers.ModelSerializer):
             )
 
             return operation
+
+
+class OperationUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Operation
+        fields = [
+            "type",
+            "customs_category",
+            "biofuel",
+            "credited_entity",
+            "debited_entity",
+            "from_depot",
+            "to_depot",
+            "export_country",
+        ]
