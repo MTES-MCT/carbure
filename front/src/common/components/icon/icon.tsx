@@ -204,3 +204,11 @@ export const TodoLine = ({ ...props }: IconProps) => {
 export const TodoFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-todo-fill" />
 }
+
+export const FileListLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-file-list-line" />
+}
+
+export const FileListFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-file-list-fill" />
+}

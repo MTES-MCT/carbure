@@ -1,31 +1,56 @@
 import { Unit } from "carbure/types"
-import { api } from "common/services/api"
+import { api as apiFetch } from "common/services/api-fetch"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/entity/options/release-for-consumption"
-  return api.post(endpoint, { entity_id, has_mac: shouldEnable })
+  const endpoint = "/entities/release-for-consumption/"
+  return apiFetch.POST(endpoint, {
+    params: { query: { entity_id } },
+    body: {
+      has_mac: shouldEnable,
+    },
+  })
 }
 
 export function toggleTrading(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/entity/options/trading"
-  return api.post(endpoint, { entity_id, has_trading: shouldEnable })
+  const endpoint = "/entities/trading/"
+  return apiFetch.POST(endpoint, {
+    params: { query: { entity_id } },
+    body: {
+      has_trading: shouldEnable,
+    },
+  })
 }
 export function toggleElec(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/entity/options/elec"
-  return api.post(endpoint, { entity_id, has_elec: shouldEnable })
+  const endpoint = "/entities/elec/"
+  return apiFetch.POST(endpoint, {
+    params: { query: { entity_id } },
+    body: {
+      has_elec: shouldEnable,
+    },
+  })
 }
 
 export function toggleStocks(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/entity/options/stocks"
-  return api.post(endpoint, { entity_id, has_stocks: shouldEnable })
+  const endpoint = "/entities/stocks/"
+  return apiFetch.POST(endpoint, {
+    params: { query: { entity_id } },
+    body: {
+      has_stocks: shouldEnable,
+    },
+  })
 }
 
 export function toggleDirectDeliveries(
   entity_id: number,
   shouldEnable: boolean
 ) {
-  const endpoint = "/entity/options/direct-deliveries"
-  return api.post(endpoint, { entity_id, has_direct_deliveries: shouldEnable })
+  const endpoint = "/entities/direct-deliveries/"
+  return apiFetch.POST(endpoint, {
+    params: { query: { entity_id } },
+    body: {
+      has_direct_deliveries: shouldEnable,
+    },
+  })
 }
 
 export function updateEntity(
@@ -43,23 +68,30 @@ export function updateEntity(
   website: string,
   vat_number: string
 ) {
-  return api.post("/entity/update-info", {
-    entity_id,
-    activity_description,
-    legal_name,
-    registered_address,
-    registered_city,
-    registered_country_code,
-    registered_zipcode,
-    registration_id,
-    sustainability_officer_email,
-    sustainability_officer_phone_number,
-    sustainability_officer,
-    website,
-    vat_number,
+  return apiFetch.POST("/entities/update-entity-info/", {
+    params: { query: { entity_id } },
+    body: {
+      activity_description,
+      legal_name,
+      registered_address,
+      registered_city,
+      registered_country_code,
+      registered_zipcode,
+      registration_id,
+      sustainability_officer_email,
+      sustainability_officer_phone_number,
+      sustainability_officer,
+      website,
+      vat_number,
+    },
   })
 }
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
-  return api.post("/entity/options/unit", { entity_id, unit })
+  return apiFetch.POST("/entities/unit/", {
+    params: { query: { entity_id } },
+    body: {
+      unit,
+    },
+  })
 }

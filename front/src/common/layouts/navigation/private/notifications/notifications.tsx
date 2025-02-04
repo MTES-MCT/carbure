@@ -35,8 +35,8 @@ export const Notifications = () => {
 
   if (entity.id === -1) return null
 
-  const items = notifications.result?.data.data ?? []
-
+  const items = notifications.result?.data ?? []
+  console.log("items", items)
   const pending = items.filter((n) => !n.acked).map((n) => n.id)
 
   const handleOpenMenu = () => {

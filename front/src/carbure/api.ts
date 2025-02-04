@@ -1,14 +1,14 @@
-import api, { Api } from "common/services/api"
+import { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
 import { api as apiFetch } from "common/services/api-fetch"
-import { Notification, EntityType, EntityCertificate } from "./types"
+import { EntityType } from "./types"
 
 export function getUserSettings() {
   return apiFetch.GET("/user/")
 }
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {
-  return res.data.data ?? []
+  return res.data ?? []
 }
 
 export async function findFeedstocks(
@@ -114,27 +114,28 @@ export async function findCertificates(query: string) {
   return res.data?.map((c) => c.certificate_id) ?? []
 }
 
-export function findMyCertificates(
+export async function findMyCertificates(
   query: string,
   options: {
-    entity_id?: number | null
-    production_site_id?: number | null | undefined
+    entity_id: number
+    production_site_id?: number
   }
 ) {
-  return api
-    .get<Api<EntityCertificate[]>>("/entity/certificates", {
-      params: { query, ...options },
-    })
-    .then(extract)
-    .then((certificates) =>
-      certificates.map((c) => c.certificate.certificate_id)
-    )
+  const res = await apiFetch.GET("/entities/certificates/", {
+    params: { query: { query, ...options } },
+  })
+  return (
+    res.data?.map(
+      (c: { certificate: { certificate_id: string } }) =>
+        c.certificate.certificate_id
+    ) ?? []
+  )
 }
 
 export async function getNotifications(entity_id: number) {
   if (entity_id === -1) return
-  return api.get<Api<Notification[]>>("/entity/notifications", {
-    params: { entity_id },
+  return apiFetch.GET("/entities/notifications/", {
+    params: { query: { entity_id } },
   })
 }
 
@@ -142,8 +143,8 @@ export function ackNotifications(
   entity_id: number,
   notification_ids: number[]
 ) {
-  return api.post("/entity/notifications/ack", {
-    entity_id,
-    notification_ids,
+  return apiFetch.POST("/entities/notifications/ack/", {
+    params: { query: { entity_id } },
+    body: { notification_ids },
   })
 }
