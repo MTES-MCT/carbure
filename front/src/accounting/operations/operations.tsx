@@ -1,5 +1,5 @@
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { OperationsFilter, OperationsStatus } from "./types"
+import { OperationsFilter } from "./types"
 import { useTranslation } from "react-i18next"
 import {
   useCBQueryBuilder,
@@ -14,6 +14,7 @@ import { Pagination } from "common/components/pagination2/pagination"
 import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { OperationsStatus } from "accounting/types"
 const currentYear = new Date().getFullYear()
 
 export const Operations = ({

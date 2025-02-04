@@ -5,9 +5,6 @@ import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
 import {
   formatOperationCreditOrDebit,
-  formatOperationStatus,
-  formatOperationType,
-  formatSector,
   getOperationEntity,
   isOperationDebit,
 } from "./operations.utils"
@@ -17,10 +14,16 @@ import {
   OperationDebitOrCredit,
   OperationsFilter,
   OperationsQuery,
-  OperationsStatus,
-  OperationType,
 } from "./types"
 import useEntity from "carbure/hooks/entity"
+import { useNormalizeSector } from "accounting/hooks/normalizers"
+import {
+  formatOperationStatus,
+  formatOperationType,
+  formatSector,
+} from "accounting/utils/formatters"
+import { OperationsStatus, OperationType } from "accounting/types"
+
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
 }
@@ -122,6 +125,7 @@ export const useOperationsColumns = ({
 
 export const useGetFilterOptions = (query: OperationsQuery) => {
   const { t } = useTranslation()
+  const normalizeSector = useNormalizeSector()
 
   const getFilterOptions = async (filter: string) => {
     const { data } = await api.getOperationsFilters(filter, query)
@@ -138,10 +142,7 @@ export const useGetFilterOptions = (query: OperationsQuery) => {
     }
 
     if (filter === OperationsFilter.sector) {
-      return data?.map((item) => ({
-        label: t(formatSector(item)),
-        value: item,
-      }))
+      return data?.map(normalizeSector)
     }
 
     if (filter === OperationsFilter.operation) {
