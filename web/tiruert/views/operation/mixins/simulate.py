@@ -104,8 +104,8 @@ class SimulateActionMixin:
 
             output_serializer = output_serializer_class(
                 {
-                    "blending_min_emission_rate_per_mj": min,
-                    "blending_max_emission_rate_per_mj": max,
+                    "min_avoided_emissions": min,  # tCO2
+                    "max_avoided_emissions": max,  # tCO2
                 }
             )
             return Response(output_serializer.data, status=status.HTTP_200_OK)
