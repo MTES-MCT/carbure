@@ -5,11 +5,14 @@ import { useRoutes } from "common/hooks/routes"
 import { apiTypes } from "common/services/api-fetch.types"
 import { formatNumber } from "common/utils/formatters"
 import { addQueryParams } from "common/utils/routes"
-import { formatSector } from "accounting/operations/operations.utils"
-import { OperationsStatus } from "accounting/operations/types"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { DebitOperationDialog } from "./components/debit-operation-dialog"
+import { BalancesFilter, BalancesQuery } from "./types"
+import * as api from "./api"
+import { formatSector } from "accounting/utils/formatters"
+import { OperationsStatus } from "accounting/types"
+import { useNormalizeSector } from "accounting/hooks/normalizers"
 
 export const useBalancesColumns = () => {
   const { t } = useTranslation()
@@ -78,4 +81,27 @@ export const useBalancesColumns = () => {
   ]
 
   return columns
+}
+
+export const useGetFilterOptions = (query: BalancesQuery) => {
+  const normalizeSector = useNormalizeSector()
+
+  const getFilterOptions = async (filter: string) => {
+    const { data } = await api.getBalanceFilters(
+      query,
+      filter as BalancesFilter
+    )
+
+    if (!data) {
+      return []
+    }
+
+    if (filter === BalancesFilter.sector) {
+      return data?.map(normalizeSector)
+    }
+
+    return data
+  }
+
+  return getFilterOptions
 }

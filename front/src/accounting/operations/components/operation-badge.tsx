@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
-import { OperationsStatus } from "../types"
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
-import { formatOperationStatus } from "../operations.utils"
+import { formatOperationStatus } from "accounting/utils/formatters"
+import { OperationsStatus } from "accounting/types"
 
 export const OperationBadge = ({ status }: { status?: OperationsStatus }) => {
   const { t } = useTranslation()

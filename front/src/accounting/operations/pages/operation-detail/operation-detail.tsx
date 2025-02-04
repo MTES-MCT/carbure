@@ -6,8 +6,6 @@ import * as api from "./api"
 import useEntity from "carbure/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import {
-  formatOperationType,
-  formatSector,
   getOperationEntity,
   getOperationVolume,
 } from "accounting/operations/operations.utils"
@@ -19,12 +17,13 @@ import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
-import { OperationsStatus, OperationType } from "accounting/operations/types"
 import {
   useAcceptOperation,
   useDeleteOperation,
   useRejectOperation,
 } from "./operation-detail.hooks"
+import { formatOperationType, formatSector } from "accounting/utils/formatters"
+import { OperationsStatus, OperationType } from "accounting/types"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()

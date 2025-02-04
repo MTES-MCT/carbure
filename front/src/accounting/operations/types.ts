@@ -1,24 +1,19 @@
 import {
+  OperationSector,
+  OperationsStatus,
+  OperationType,
+} from "accounting/types"
+import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
-  PathsApiTiruertOperationsGetParametersQueryStatus as OperationsStatus,
   PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
-  PathsApiTiruertOperationsGetParametersQuerySector as OperationSector,
-  PathsApiTiruertOperationsGetParametersQueryOperation as OperationType,
 } from "api-schema"
 import { CBQueryParams } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export type Operation = apiTypes["OperationList"]
 
-export {
-  OperationsFilter,
-  OperationsStatus,
-  OperationDebitOrCredit,
-  OperationSector,
-  OperationType,
-  OperationBiofuelCategory,
-}
+export { OperationsFilter, OperationDebitOrCredit, OperationBiofuelCategory }
 
 export interface OperationsQuery
   extends CBQueryParams<[], OperationsStatus[], string[]> {
