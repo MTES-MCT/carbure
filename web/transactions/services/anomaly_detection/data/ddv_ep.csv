@@ -1,0 +1,36 @@
+biofuel,feedstock,process,typical_value_ep,default_value_ep
+ethanol,sugar beet,"no biogas from slop, natural gas as process fuel in conventional boiler",18.8,26.3
+ethanol,sugar beet,"with biogas from slop, natural gas as process fuel in conventional",9.7,13.6
+ethanol,sugar beet,"no biogas from slop, natural gas as process fuel in CHP plant",13.2,18.5
+ethanol,sugar beet,"with biogas from slop, natural gas as process fuel in CHP plant",7.6,10.6
+ethanol,sugar beet,"no biogas from slop, lignite as process fuel in CHP plant",27.4,38.3
+ethanol,sugar beet,"with biogas from slop, lignite as process fuel in CHP plant",15.7,22.0
+ethanol,corn (maize),natural gas as process fuel in conventional boiler,20.8,29.1
+ethanol,corn (maize),natural gas as process fuel in CHP plant,14.8,20.8
+ethanol,corn (maize),lignite as process fuel in CHP plant,28.6,40.1
+ethanol,corn (maize),forest residues as process fuel in CHP plant,1.8,2.6
+ethanol,other cereals excluding corn (maize),natural gas as process fuel in conventional boiler,21.0,29.3
+ethanol,other cereals excluding corn (maize),natural gas as process fuel in CHP plant,15.1,21.1
+ethanol,other cereals excluding corn (maize),lignite as process fuel in CHP plant,30.3,42.5
+ethanol,other cereals excluding corn (maize),forest residues as process fuel in CHP plant,1.5,2.2
+ethanol,sugar cane,,1.3,1.8
+biodiesel,rape seed,,11.7,16.3
+biodiesel,sunflower,,11.8,16.5
+biodiesel,soybean,,12.1,16.9
+biodiesel,palm oil,open effluent pond,30.4,42.6
+biodiesel,palm oil,process with methane capture at oil mill,13.2,18.5
+biodiesel,waste cooking oil,,9.3,13.0
+biodiesel,animal fats from rendering,,13.6,19.1
+hydrotreated vegetable oil,rape seed,,10.7,15.0
+hydrotreated vegetable oil,sunflower,,10.5,14.7
+hydrotreated vegetable oil,soybean,,10.9,15.2
+hydrotreated vegetable oil,palm oil,open effluent pond,27.8,38.9
+hydrotreated vegetable oil,palm oil,process with methane capture at oil mill,9.7,13.6
+hydrotreated oil,waste cooking oil,,10.2,14.3
+hydrotreated oil,animal fats from rendering,,14.5,20.3
+pure vegetable oil,rape seed,,3.7,5.2
+pure vegetable oil,sunflower,,3.8,5.4
+pure vegetable oil,soybean,,4.2,5.9
+pure vegetable oil,palm oil,open effluent pond,22.6,31.7
+pure vegetable oil,palm oil,process with methane capture at oil mill,4.7,6.5
+pure oil,waste cooking oil,,0.6,0.8
