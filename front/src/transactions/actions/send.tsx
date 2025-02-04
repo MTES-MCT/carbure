@@ -97,14 +97,20 @@ const SendDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
-
+  const entity = useEntity()
   const [durability, setDurability] = useState(false)
   const [validity, setValidity] = useState(false)
 
   const v = variations(selection.length)
 
   const sendLots = useMutation(api.sendLots, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({

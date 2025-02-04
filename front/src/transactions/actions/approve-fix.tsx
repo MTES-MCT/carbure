@@ -89,7 +89,13 @@ const ApproveFixDialog = ({
   const v = variations(selection.length)
 
   const approveFix = useMutation(api.approveFix, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
