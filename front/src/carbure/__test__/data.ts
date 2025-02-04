@@ -8,13 +8,13 @@ import {
   UserRole,
   SiteType,
   GESOption,
-  ProductionSiteDetails,
   Depot,
   User,
   UserRightRequest,
   UserRightStatus,
   UserRight,
   Feedstock,
+  ProductionSite,
   NotificationType,
 } from "carbure/types"
 import { DeepPartial } from "common/types"
@@ -152,10 +152,14 @@ export const deliverySite: Depot = {
 
 // PRODUCTION SITES
 
-export const productionSite: ProductionSiteDetails = {
+export const productionSite: ProductionSite = {
   name: "Test Production Site",
   country: country,
   id: 2,
+  producer: {
+    ...producer,
+    registered_country: 111,
+  },
   date_mise_en_service: "2000-01-31",
   site_siret: "123456",
   address: "",
@@ -167,10 +171,6 @@ export const productionSite: ProductionSiteDetails = {
   eligible_dc: true,
   dc_reference: "bobobobobob",
   city: "Baigorri",
-  inputs: [],
-  outputs: [],
-  certificates: [],
-  producer: producer as any,
 }
 
 // MATIERE PREMIERE
@@ -277,7 +277,7 @@ export const notifications = [
     id: 1,
     dest: operator,
     datetime: "2024-01-01",
-    type: NotificationType.CertificateExpired,
+    type: NotificationType.CERTIFICATE_EXPIRED,
     acked: false,
     send_by_email: false,
     email_sent: false,
@@ -292,7 +292,7 @@ export const notifications = [
     acked: true,
     send_by_email: false,
     email_sent: false,
-    type: NotificationType.LotsUpdatedByAdmin,
+    type: NotificationType.LOTS_UPDATED_BY_ADMIN,
     meta: {
       updated: 10,
       comment: "Commentaire de l'admin",

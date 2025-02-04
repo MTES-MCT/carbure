@@ -58,8 +58,10 @@ export const EnergyTransferDialog = ({
     setField("energy_mwh", remainingEnergy)
   }
 
-  const findCPOClient = (query: string) => {
-    return api.findClients(query)
+  const findCPOClient = async (query: string) => {
+    const res = await api.findClients(query)
+
+    return res.data ?? []
   }
 
   return (
