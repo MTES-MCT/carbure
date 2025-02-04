@@ -1,0 +1,41 @@
+id,name,feedstock
+32,Betterave,sugar beet
+34,Canne à sucre,sugar cane
+35,Colza,rape seed
+39,Huiles ou graisses animales  (catégorie I et ou II),animal fats from rendering
+40,Huiles ou graisses animales  (catégorie III),animal fats from rendering
+41,Huile de palme,palm oil
+42,Huile alimentaire usagée,waste cooking oil
+43,Maïs,corn (maize)
+45,Soja,soybean
+46,Tournesol,sunflower
+33,Blé,other cereals excluding corn (maize)
+74,Sorgho,other cereals excluding corn (maize)
+64,Seigle,other cereals excluding corn (maize)
+65,Orge,other cereals excluding corn (maize)
+66,Triticale,other cereals excluding corn (maize)
+36,Déchets organiques ménagers,
+44,Résidus viniques,
+47,Glycérine brute,
+48,Déchets de bois,
+49,Déchets industriels,
+50,Algues,
+51,Paille,
+52,Boues d'épuration,
+53,Effluents d'huileries de palme et rafles,
+54,Brai de tallol,
+55,Bagasse,
+58,Râpes,
+62,Égouts pauvres de 2ème extraction,
+63,Amidon résiduel,
+67,Résidus de bière,
+68,Tallol,
+69,Marc de raisin,
+70,Lies de vin,
+72,Déchet de processus sucrier contaminé,
+73,Graisses de flottation,
+75,Mélasse,
+76,Carinata,
+77,Ethanol pur de marc de raisin,
+78,Distillat d'acide gras de palme,
+84,Ethanol pur de lies de vin,

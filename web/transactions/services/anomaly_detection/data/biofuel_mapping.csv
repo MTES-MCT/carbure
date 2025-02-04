@@ -1,0 +1,32 @@
+id,name,biofuel
+12,Biogaz,
+13,Biogazole de synthèse (Hors HVO),biodiesel
+14,EMHA,biodiesel
+15,EMHU,biodiesel
+16,EMHV,biodiesel
+17,ETBE,ethanol
+20,MTBE,ethanol
+21,TAEE,ethanol
+23,Huile végétale pure,pure vegetable oil
+24,Huile provenant d'huiles de cuisson usagées,pure oil
+25,Autres Huiles Hydrotraitées - Gazole,hydrotreated oil
+26,Autres Huiles Hydrotraitées - Essence,hydrotreated oil
+27,Huiles Végétales Hydrotraitées - Gazole,hydrotreated vegetable oil
+28,Huiles Végétales Hydrotraitées - Essence,hydrotreated vegetable oil
+29,Méthanol,ethanol
+30,Butanol,ethanol
+31,EMAG,biodiesel
+32,Éthanol pour ED95,ethanol
+33,Éthanol,ethanol
+34,B100,biodiesel
+35,Autres Huiles Hydrotraitées - Kérosène,hydrotreated oil
+36,Huiles Végétales Hydrotraitées - Kérosène,hydrotreated vegetable oil
+37,Huiles co-traitées - Essence,
+43,Huiles co-traitées - Gazole,
+44,Huiles co-traitées - Kérosène,
+45,EEHA,biodiesel
+46,EEHU,biodiesel
+47,EEHV,biodiesel
+48,TAME,ethanol
+49,Bio-essence de synthèse,ethanol
+50,EEAG,biodiesel

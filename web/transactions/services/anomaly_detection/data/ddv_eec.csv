@@ -1,0 +1,22 @@
+biofuel,feedstock,typical_value_eec,default_value_eec
+ethanol,sugar beet,9.6,9.6
+ethanol,corn (maize),25.5,25.5
+ethanol,other cereals excluding corn (maize),27.0,27.0
+ethanol,sugar cane,17.1,17.1
+biodiesel,rape seed,32.0,32.0
+biodiesel,sunflower,26.1,26.1
+biodiesel,soybean,21.2,21.2
+biodiesel,palm oil,26.2,26.2
+biodiesel,waste cooking oil,0.,0.
+biodiesel,animal fats from rendering,0.,0.
+hydrotreated vegetable oil,rape seed,33.4,33.4
+hydrotreated vegetable oil,sunflower,26.9,26.9
+hydrotreated vegetable oil,soybean,22.1,22.1
+hydrotreated vegetable oil,palm oil,27.4,27.4
+hydrotreated oil,waste cooking oil,0.,0.
+hydrotreated oil,animal fats from rendering,0.,0.
+pure vegetable oil,rape seed,33.4,33.4
+pure vegetable oil,sunflower,27.2,27.2
+pure vegetable oil,soybean,22.2,22.2
+pure vegetable oil,palm oil,27.1,27.1
+pure oil,waste cooking oil,0.,0.
