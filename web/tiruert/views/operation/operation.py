@@ -14,6 +14,17 @@ from tiruert.serializers import OperationInputSerializer, OperationListSerialize
 from .mixins import ActionMixin
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
 class OperationViewSet(ModelViewSet, ActionMixin):
     queryset = Operation.objects.all()
     serializer_class = OperationListSerializer
@@ -45,13 +56,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         filters=True,
         parameters=[
             OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-            OpenApiParameter(
                 name="details",
                 type=bool,
                 location=OpenApiParameter.QUERY,
@@ -66,46 +70,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 description="Specify the volume unit (default is `l`).",
                 default="l",
             ),
-            OpenApiParameter(
-                name="sector",
-                type=str,
-                many=True,
-                enum=["ESSENCE", "DIESEL", "SAF"],
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="depot",
-                type=str,
-                many=True,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="type",
-                type=str,
-                many=True,
-                enum=["CREDIT", "DEBIT"],
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="operation",
-                type=str,
-                many=True,
-                enum=[
-                    "CESSION",
-                    "ACQUISITION",
-                    "DEVALUATION",
-                    "EXPORTATION",
-                    "INCORPORATION",
-                    "LIVRAISON_DIRECTE",
-                    "MAC_BIO",
-                    "TENEUR",
-                ],
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationListSerializer, description="A list of operations.")
@@ -117,15 +81,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     @extend_schema(
         operation_id="get_operation",
         description="Retrieve one specific operation.",
-        parameters=[
-            OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-        ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationSerializer, description="Details of specific operation.")
         },
@@ -138,15 +93,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         operation_id="create_operation",
         description="Create a new operation.",
         request=OperationInputSerializer,
-        parameters=[
-            OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-        ],
         responses={
             status.HTTP_201_CREATED: OpenApiResponse(
                 response=OperationListSerializer, description="The newly created operation."
@@ -163,7 +109,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     "credited_entity": "",
                     "debited_entity": 2,
                     "depot": "",
-                    "validity_date": "2025-01-03",
                     "lots": [
                         {"id": 10, "volume": 39462, "emission_rate_per_mj": 5.25},
                         {"id": 11, "volume": 723.2, "emission_rate_per_mj": 30.2},
@@ -191,15 +136,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 description="Forbidden. The operation type or status does not allow deletion."
             ),
         },
-        parameters=[
-            OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-        ],
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

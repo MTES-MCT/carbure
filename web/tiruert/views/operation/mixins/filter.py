@@ -1,5 +1,5 @@
 from django.db.models import Case, CharField, Value, When
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Cast, Coalesce, Concat
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -15,59 +15,12 @@ class FilterActionMixin:
         filters=True,
         parameters=[
             OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-            OpenApiParameter(
                 name="filter",
                 type=str,
                 enum=["status", "sector", "customs_category", "biofuel", "type", "from_to", "depot", "operation"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,
-            ),
-            OpenApiParameter(
-                name="sector",
-                type=str,
-                many=True,
-                enum=["ESSENCE", "DIESEL", "SAF"],
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="depot",
-                type=str,
-                many=True,
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="type",
-                type=str,
-                many=True,
-                enum=["CREDIT", "DEBIT"],
-                location=OpenApiParameter.QUERY,
-                description="",
-            ),
-            OpenApiParameter(
-                name="operation",
-                type=str,
-                many=True,
-                enum=[
-                    "CESSION",
-                    "ACQUISITION",
-                    "DEVALUATION",
-                    "EXPORTATION",
-                    "INCORPORATION",
-                    "LIVRAISON_DIRECTE",
-                    "MAC_BIO",
-                    "TENEUR",
-                ],
-                location=OpenApiParameter.QUERY,
-                description="",
             ),
         ],
         examples=[
@@ -118,6 +71,8 @@ class FilterActionMixin:
             column = "depots"
         elif filter == "type":
             column = "types"
+        elif filter == "period":
+            column = "periods"
         else:  # raise an error for unknown filters
             raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
 
@@ -157,6 +112,17 @@ class FilterActionMixin:
                 default=Value(None),
                 output_field=CharField(),
             ),
+            periods=Concat(
+                Cast("created_at__year", output_field=CharField()),
+                Case(
+                    When(
+                        created_at__month__lt=10,
+                        then=Concat(Value("0"), Cast("created_at__month", output_field=CharField())),
+                    ),
+                    default=Cast("created_at__month", output_field=CharField()),
+                    output_field=CharField(),
+                ),
+            ),
         )
         values = queryset.values_list(column, flat=True).distinct()
         results = [v for v in values if v]
@@ -169,27 +135,12 @@ class FilterActionMixin:
         filters=True,
         parameters=[
             OpenApiParameter(
-                name="entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Authorised entity ID.",
-                required=True,
-            ),
-            OpenApiParameter(
                 name="filter",
                 type=str,
                 enum=["sector", "customs_category", "biofuel"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,
-            ),
-            OpenApiParameter(
-                name="sector",
-                type=str,
-                many=True,
-                enum=["ESSENCE", "DIESEL", "SAF"],
-                location=OpenApiParameter.QUERY,
-                description="",
             ),
         ],
         examples=[
