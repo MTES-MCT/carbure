@@ -94,7 +94,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
         self.mock_api.side_effect = Exception("API failure")
 
         response = self.client.post(
-            reverse("entity-registration-search-company"),
+            reverse("api-entity-registration-search-company"),
             {"registration_id": "542051180"},
         )
 
