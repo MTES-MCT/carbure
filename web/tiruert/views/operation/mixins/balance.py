@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.utils.timezone import make_aware
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -65,10 +66,21 @@ class BalanceActionMixin:
         # Calculate the balance
         balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
 
+        # Get operations again but this time until the date_from
+        if date_from:
+            mutable_querydict = request.GET.copy()
+            mutable_querydict.pop("date_from", None)
+            request._request.GET = mutable_querydict
+            operations = DjangoFilterBackend().filter_queryset(request, self.get_queryset(), self)
+            operations = operations.filter(created_at__lt=date_from)
+        else:
+            operations = self.filter_queryset(self.get_queryset())
+            operations = operations.filter(created_at__lt=date_from)
+
         # Add initial balance and yearly teneur to the balance (can't be done for lot)
         if group_by != "lot":
-            balance = BalanceService.calculate_initial_balance(balance, entity_id, date_from, group_by, unit)
-            balance = BalanceService.calculate_yearly_teneur(balance, entity_id, date_from, group_by, unit)
+            balance = BalanceService.calculate_initial_balance(balance, entity_id, operations, group_by, unit)
+            balance = BalanceService.calculate_yearly_teneur(balance, entity_id, operations, date_from, group_by, unit)
 
         # Convert balance to a list of dictionaries for serialization
         if group_by == "lot":
