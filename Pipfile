@@ -44,6 +44,8 @@ undetected-chromedriver = "*"
 setuptools = "*"
 psutil = "*"
 django-simple-history = "*"
+connectorx = "*"
+scikit-learn = "*"
 
 [dev-packages]
 django-stubs = "*"
