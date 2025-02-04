@@ -1,6 +1,7 @@
 import {
   Operation,
   OperationDebitOrCredit,
+  OperationSector,
   OperationsStatus,
   OperationType,
 } from "./types"
@@ -13,11 +14,11 @@ import { formatNumber } from "common/utils/formatters"
  */
 export const formatSector = (sector: string) => {
   switch (sector) {
-    case "ESSENCE":
+    case OperationSector.ESSENCE:
       return "Essence"
-    case "DIESEL":
+    case OperationSector.DIESEL:
       return "Gazole"
-    case "AVIATION":
+    case OperationSector.SAF:
       return "Carburéacteur"
     default:
       return "Inconnu"
@@ -98,5 +99,5 @@ export const getOperationEntity = (operation: Operation) =>
 
 export const getOperationVolume = (operation: Operation) =>
   isOperationDebit(operation.type)
-    ? `-${formatNumber(Number(operation.volume))}`
-    : `+${formatNumber(Number(operation.volume))}`
+    ? `-${formatNumber(operation.volume)}`
+    : `+${formatNumber(operation.volume)}`

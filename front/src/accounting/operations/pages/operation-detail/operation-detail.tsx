@@ -76,7 +76,7 @@ export const OperationDetail = () => {
         },
         {
           label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(Number(operation.avoided_emissions)),
+          value: formatNumber(operation.avoided_emissions),
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
@@ -100,7 +100,6 @@ export const OperationDetail = () => {
   return (
     <Portal onClose={closeDialog}>
       <Dialog
-        fullscreen
         onClose={closeDialog}
         header={
           operation && (
@@ -146,12 +145,6 @@ export const OperationDetail = () => {
                   {t("Annuler le certificat de cession")}
                 </Button>
               )}
-            {(operation?.status === OperationsStatus.ACCEPTED ||
-              operation?.status === OperationsStatus.REJECTED) && (
-              <Button priority="secondary" onClick={closeDialog}>
-                {t("Annuler")}
-              </Button>
-            )}
           </>
         }
       >

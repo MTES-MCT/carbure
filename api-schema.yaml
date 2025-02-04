@@ -4644,6 +4644,7 @@ paths:
             type: array
             items:
               type: string
+              minLength: 1
         - in: query
           name: details
           schema:
@@ -4667,7 +4668,6 @@ paths:
             items:
               type: string
               enum:
-                - ACQUISITION
                 - CESSION
                 - DEVALUATION
                 - EXPORTATION
@@ -4675,6 +4675,9 @@ paths:
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
                 - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
@@ -4688,15 +4691,26 @@ paths:
           schema:
             type: integer
         - in: query
-          name: sector
+          name: period
           schema:
             type: array
             items:
               type: string
+              minLength: 1
+        - in: query
+          name: sector
+          schema:
+            type: array
+            items:
               enum:
-                - DIESEL
                 - ESSENCE
+                - DIESEL
                 - SAF
+              type: string
+              description: |-
+                * `ESSENCE` - ESSENCE
+                * `DIESEL` - DIESEL
+                * `SAF` - SAF
         - in: query
           name: status
           schema:
@@ -4716,10 +4730,13 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
                 - CREDIT
                 - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
         - in: query
           name: unit
           schema:
@@ -4767,7 +4784,6 @@ paths:
                   credited_entity: ""
                   debited_entity: 2
                   depot: ""
-                  validity_date: 2025-01-03
                   lots:
                     - id: 10
                       volume: 39462
@@ -4801,7 +4817,6 @@ paths:
                     credited_entity: ""
                     debited_entity: 2
                     depot: ""
-                    validity_date: 2025-01-03
                     lots:
                       - id: 10
                         volume: 39462
@@ -4845,6 +4860,12 @@ paths:
     put:
       operationId: tiruert_operations_update
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -4878,6 +4899,12 @@ paths:
     patch:
       operationId: tiruert_operations_partial_update
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -5047,7 +5074,10 @@ paths:
         - in: query
           name: depot
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              minLength: 1
         - in: query
           name: entity_id
           schema:
@@ -5085,9 +5115,26 @@ paths:
           explode: false
           style: form
         - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
           name: sector
           schema:
-            type: string
+            type: array
+            items:
+              enum:
+                - ESSENCE
+                - DIESEL
+                - SAF
+              type: string
+              description: |-
+                * `ESSENCE` - ESSENCE
+                * `DIESEL` - DIESEL
+                * `SAF` - SAF
         - in: query
           name: status
           schema:
@@ -5105,7 +5152,15 @@ paths:
         - in: query
           name: type
           schema:
-            type: string
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
         - in: query
           name: unit
           schema:
@@ -5172,7 +5227,10 @@ paths:
         - in: query
           name: depot
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              minLength: 1
         - in: query
           name: entity_id
           schema:
@@ -5211,15 +5269,26 @@ paths:
           explode: false
           style: form
         - in: query
-          name: sector
+          name: period
           schema:
             type: array
             items:
               type: string
+              minLength: 1
+        - in: query
+          name: sector
+          schema:
+            type: array
+            items:
               enum:
-                - DIESEL
                 - ESSENCE
+                - DIESEL
                 - SAF
+              type: string
+              description: |-
+                * `ESSENCE` - ESSENCE
+                * `DIESEL` - DIESEL
+                * `SAF` - SAF
         - in: query
           name: status
           schema:
@@ -5237,7 +5306,15 @@ paths:
         - in: query
           name: type
           schema:
-            type: string
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
       tags:
         - tiruert
       security:
@@ -5308,6 +5385,7 @@ paths:
             type: array
             items:
               type: string
+              minLength: 1
         - in: query
           name: entity_id
           schema:
@@ -5340,7 +5418,6 @@ paths:
             items:
               type: string
               enum:
-                - ACQUISITION
                 - CESSION
                 - DEVALUATION
                 - EXPORTATION
@@ -5348,16 +5425,30 @@ paths:
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
                 - TENEUR
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
         - in: query
           name: sector
           schema:
             type: array
             items:
-              type: string
               enum:
-                - DIESEL
                 - ESSENCE
+                - DIESEL
                 - SAF
+              type: string
+              description: |-
+                * `ESSENCE` - ESSENCE
+                * `DIESEL` - DIESEL
+                * `SAF` - SAF
         - in: query
           name: status
           schema:
@@ -5377,10 +5468,13 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
                 - CREDIT
                 - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
       tags:
         - tiruert
       security:
@@ -5754,10 +5848,12 @@ components:
           type: number
           format: double
         available_balance:
-          type: string
+          type: number
+          format: double
           readOnly: true
         final_balance:
-          type: string
+          type: number
+          format: double
           readOnly: true
         volume:
           type: object
@@ -6525,17 +6621,6 @@ components:
       required:
         - certificates
         - country
-        - id
-        - name
-    DepotRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-          minLength: 1
-      required:
         - id
         - name
     DirectDeliveriesRequest:
@@ -7452,17 +7537,6 @@ components:
         - inputs
         - name
         - outputs
-    EntityRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-          minLength: 1
-      required:
-        - id
-        - name
     EntitySite:
       type: object
       properties:
@@ -7891,13 +7965,13 @@ components:
           type: string
           readOnly: true
         credited_entity:
-          $ref: "#/components/schemas/Entity"
+          $ref: "#/components/schemas/TiruertEntity"
         debited_entity:
-          $ref: "#/components/schemas/Entity"
+          $ref: "#/components/schemas/TiruertEntity"
         from_depot:
-          $ref: "#/components/schemas/Depot"
+          $ref: "#/components/schemas/TiruertDepot"
         to_depot:
-          $ref: "#/components/schemas/Depot"
+          $ref: "#/components/schemas/TiruertDepot"
         export_country:
           type: integer
           nullable: true
@@ -7905,17 +7979,20 @@ components:
           type: string
           format: date-time
           readOnly: true
-        validity_date:
+        validation_date:
           type: string
           format: date
+          nullable: true
         volume:
-          type: string
+          type: number
+          format: double
           readOnly: true
         unit:
           type: string
           readOnly: true
         avoided_emissions:
-          type: string
+          type: number
+          format: double
           readOnly: true
         details:
           type: array
@@ -7933,7 +8010,6 @@ components:
         - to_depot
         - type
         - unit
-        - validity_date
         - volume
     OperationDetail:
       type: object
@@ -7986,9 +8062,6 @@ components:
         export_country:
           type: integer
           nullable: true
-        validity_date:
-          type: string
-          format: date
         lots:
           type: array
           items:
@@ -7999,7 +8072,6 @@ components:
         - debited_entity
         - lots
         - type
-        - validity_date
     OperationInputTypeEnum:
       enum:
         - INCORPORATION
@@ -8038,13 +8110,13 @@ components:
           type: string
           readOnly: true
         credited_entity:
-          $ref: "#/components/schemas/Entity"
+          $ref: "#/components/schemas/TiruertEntity"
         debited_entity:
-          $ref: "#/components/schemas/Entity"
+          $ref: "#/components/schemas/TiruertEntity"
         from_depot:
-          $ref: "#/components/schemas/Depot"
+          $ref: "#/components/schemas/TiruertDepot"
         to_depot:
-          $ref: "#/components/schemas/Depot"
+          $ref: "#/components/schemas/TiruertDepot"
         export_country:
           type: integer
           nullable: true
@@ -8052,11 +8124,9 @@ components:
           type: string
           format: date-time
           readOnly: true
-        validity_date:
-          type: string
-          format: date
         volume:
-          type: string
+          type: number
+          format: double
           readOnly: true
         unit:
           type: string
@@ -8076,7 +8146,6 @@ components:
         - to_depot
         - type
         - unit
-        - validity_date
         - volume
     OperationListRequest:
       type: object
@@ -8086,19 +8155,16 @@ components:
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         credited_entity:
-          $ref: "#/components/schemas/EntityRequest"
+          $ref: "#/components/schemas/TiruertEntityRequest"
         debited_entity:
-          $ref: "#/components/schemas/EntityRequest"
+          $ref: "#/components/schemas/TiruertEntityRequest"
         from_depot:
-          $ref: "#/components/schemas/DepotRequest"
+          $ref: "#/components/schemas/TiruertDepotRequest"
         to_depot:
-          $ref: "#/components/schemas/DepotRequest"
+          $ref: "#/components/schemas/TiruertDepotRequest"
         export_country:
           type: integer
           nullable: true
-        validity_date:
-          type: string
-          format: date
         details:
           type: array
           items:
@@ -8108,7 +8174,6 @@ components:
         - debited_entity
         - from_depot
         - to_depot
-        - validity_date
     OtpResponse:
       type: object
       properties:
@@ -8246,19 +8311,16 @@ components:
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         credited_entity:
-          $ref: "#/components/schemas/EntityRequest"
+          $ref: "#/components/schemas/TiruertEntityRequest"
         debited_entity:
-          $ref: "#/components/schemas/EntityRequest"
+          $ref: "#/components/schemas/TiruertEntityRequest"
         from_depot:
-          $ref: "#/components/schemas/DepotRequest"
+          $ref: "#/components/schemas/TiruertDepotRequest"
         to_depot:
-          $ref: "#/components/schemas/DepotRequest"
+          $ref: "#/components/schemas/TiruertDepotRequest"
         export_country:
           type: integer
           nullable: true
-        validity_date:
-          type: string
-          format: date
         details:
           type: array
           items:
@@ -9322,6 +9384,48 @@ components:
         * `ACCEPTED` - ACCEPTED
         * `REJECTED` - REJECTED
         * `CANCELED` - CANCELED
+    TiruertDepot:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    TiruertDepotRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+      required:
+        - id
+        - name
+    TiruertEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    TiruertEntityRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+      required:
+        - id
+        - name
     ToggleElecRequest:
       type: object
       properties:

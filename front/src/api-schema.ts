@@ -1788,8 +1788,10 @@ export interface components {
       biofuel?: string | null
       /** Format: double */
       initial_balance?: number
-      readonly available_balance: string
-      readonly final_balance: string
+      /** Format: double */
+      readonly available_balance: number
+      /** Format: double */
+      readonly final_balance: number
       volume: {
         [key: string]: number
       }
@@ -2112,10 +2114,6 @@ export interface components {
       dc_number?: string
       city?: string
       certificates: components["schemas"]["ProductionSiteCertificateSertificate"][]
-    }
-    DepotRequest: {
-      id: number
-      name: string
     }
     DirectDeliveriesRequest: {
       /** @default false */
@@ -2441,10 +2439,6 @@ export interface components {
       readonly inputs: components["schemas"]["EntityFeedStock"][]
       readonly outputs: components["schemas"]["EntityBiofuel"][]
     }
-    EntityRequest: {
-      id: number
-      name: string
-    }
     EntitySite: {
       ownership_type: string
       blending_is_outsourced: boolean
@@ -2620,18 +2614,20 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
-      credited_entity: components["schemas"]["Entity"]
-      debited_entity: components["schemas"]["Entity"]
-      from_depot: components["schemas"]["Depot"]
-      to_depot: components["schemas"]["Depot"]
+      credited_entity: components["schemas"]["TiruertEntity"]
+      debited_entity: components["schemas"]["TiruertEntity"]
+      from_depot: components["schemas"]["TiruertDepot"]
+      to_depot: components["schemas"]["TiruertDepot"]
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
       /** Format: date */
-      validity_date: string
-      readonly volume: string
+      validation_date?: string | null
+      /** Format: double */
+      readonly volume: number
       readonly unit: string
-      readonly avoided_emissions: string
+      /** Format: double */
+      readonly avoided_emissions: number
       details?: components["schemas"]["OperationDetail"][]
     }
     OperationDetail: {
@@ -2657,8 +2653,6 @@ export interface components {
       from_depot?: number | null
       to_depot?: number | null
       export_country?: number | null
-      /** Format: date */
-      validity_date: string
       lots: components["schemas"]["LotRequest"][]
     }
     /**
@@ -2671,7 +2665,7 @@ export interface components {
      *     * `DEVALUATION` - DEVALUATION
      * @enum {string}
      */
-    OperationInputTypeEnum: PathsApiTiruertOperationsBalanceGetParametersQueryOperation
+    OperationInputTypeEnum: PathsApiTiruertOperationsGetParametersQueryOperation
     OperationList: {
       readonly id: number
       readonly type: string
@@ -2679,29 +2673,26 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
-      credited_entity: components["schemas"]["Entity"]
-      debited_entity: components["schemas"]["Entity"]
-      from_depot: components["schemas"]["Depot"]
-      to_depot: components["schemas"]["Depot"]
+      credited_entity: components["schemas"]["TiruertEntity"]
+      debited_entity: components["schemas"]["TiruertEntity"]
+      from_depot: components["schemas"]["TiruertDepot"]
+      to_depot: components["schemas"]["TiruertDepot"]
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
-      /** Format: date */
-      validity_date: string
-      readonly volume: string
+      /** Format: double */
+      readonly volume: number
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
     OperationListRequest: {
       status?: components["schemas"]["StatusD22Enum"]
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
-      credited_entity: components["schemas"]["EntityRequest"]
-      debited_entity: components["schemas"]["EntityRequest"]
-      from_depot: components["schemas"]["DepotRequest"]
-      to_depot: components["schemas"]["DepotRequest"]
+      credited_entity: components["schemas"]["TiruertEntityRequest"]
+      debited_entity: components["schemas"]["TiruertEntityRequest"]
+      from_depot: components["schemas"]["TiruertDepotRequest"]
+      to_depot: components["schemas"]["TiruertDepotRequest"]
       export_country?: number | null
-      /** Format: date */
-      validity_date: string
       details?: components["schemas"]["OperationDetailRequest"][]
     }
     OtpResponse: {
@@ -2783,13 +2774,11 @@ export interface components {
     PatchedOperationListRequest: {
       status?: components["schemas"]["StatusD22Enum"]
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
-      credited_entity?: components["schemas"]["EntityRequest"]
-      debited_entity?: components["schemas"]["EntityRequest"]
-      from_depot?: components["schemas"]["DepotRequest"]
-      to_depot?: components["schemas"]["DepotRequest"]
+      credited_entity?: components["schemas"]["TiruertEntityRequest"]
+      debited_entity?: components["schemas"]["TiruertEntityRequest"]
+      from_depot?: components["schemas"]["TiruertDepotRequest"]
+      to_depot?: components["schemas"]["TiruertDepotRequest"]
       export_country?: number | null
-      /** Format: date */
-      validity_date?: string
       details?: components["schemas"]["OperationDetailRequest"][]
     }
     Pays: {
@@ -3188,6 +3177,22 @@ export interface components {
      * @enum {string}
      */
     StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
+    TiruertDepot: {
+      id: number
+      name: string
+    }
+    TiruertDepotRequest: {
+      id: number
+      name: string
+    }
+    TiruertEntity: {
+      id: number
+      name: string
+    }
+    TiruertEntityRequest: {
+      id: number
+      name: string
+    }
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean
@@ -6590,11 +6595,13 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
         page_size?: number
+        period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -6683,7 +6690,10 @@ export interface operations {
   }
   tiruert_operations_update: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Opération. */
@@ -6742,7 +6752,10 @@ export interface operations {
   }
   tiruert_operations_partial_update: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Opération. */
@@ -6847,18 +6860,19 @@ export interface operations {
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
-        depot?: string
+        depot?: string[]
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
         /** @description Group by sector or by lot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        operation?: PathsApiTiruertOperationsBalanceGetParametersQueryOperation[]
-        sector?: string
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        period?: string[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        type?: string
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
         /** @description Specify the volume unit (default is `l`). */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
@@ -6888,18 +6902,19 @@ export interface operations {
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
-        depot?: string
+        depot?: string[]
         /** @description Authorised entity ID. */
         entity_id: number
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
         from_to?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        operation?: PathsApiTiruertOperationsBalanceGetParametersQueryOperation[]
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        type?: string
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
       }
       header?: never
       path?: never
@@ -6932,7 +6947,9 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7163,7 +7180,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   TALLOL = "TALLOL",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
-  ACQUISITION = "ACQUISITION",
   CESSION = "CESSION",
   DEVALUATION = "DEVALUATION",
   EXPORTATION = "EXPORTATION",
@@ -7173,8 +7189,8 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   TENEUR = "TENEUR",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
-  DIESEL = "DIESEL",
   ESSENCE = "ESSENCE",
+  DIESEL = "DIESEL",
   SAF = "SAF",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
@@ -7194,15 +7210,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryUnit {
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
   lot = "lot",
   sector = "sector",
-}
-export enum PathsApiTiruertOperationsBalanceGetParametersQueryOperation {
-  CESSION = "CESSION",
-  DEVALUATION = "DEVALUATION",
-  EXPORTATION = "EXPORTATION",
-  INCORPORATION = "INCORPORATION",
-  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
-  MAC_BIO = "MAC_BIO",
-  TENEUR = "TENEUR",
 }
 export enum PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter {
   biofuel = "biofuel",

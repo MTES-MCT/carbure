@@ -99,7 +99,7 @@ export const useOperationsColumns = ({
             fontWeight="semibold"
             style={{ color: "var(--text-default-error)" }}
           >
-            -{formatNumber(Number(item.volume))}
+            -{formatNumber(item.volume)}
           </Text>
         ) : (
           <Text
@@ -107,7 +107,7 @@ export const useOperationsColumns = ({
             fontWeight="semibold"
             style={{ color: "var(--text-default-success)" }}
           >
-            +{formatNumber(Number(item.volume))}
+            +{formatNumber(item.volume)}
           </Text>
         ),
     },
