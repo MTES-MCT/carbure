@@ -26,9 +26,11 @@ export const ApplicationInfo = ({
           components={{
             Link: application ? (
               <Link
-                to={ROUTE_URLS.ADMIN(entity.id).COMPANY_DETAIL(
-                  application?.producer.id
-                )}
+                to={
+                  ROUTE_URLS.ADMIN(entity.id).COMPANY_DETAIL(
+                    application?.producer.id
+                  ) + "#double-counting"
+                }
                 target="_blank"
               />
             ) : (

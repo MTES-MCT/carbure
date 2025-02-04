@@ -1,5 +1,5 @@
-import useEntity, { useRights } from "carbure/hooks/entity"
-import { UserRole } from "carbure/types"
+import { useRights } from "carbure/hooks/entity"
+import { Entity, UserRole } from "carbure/types"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
@@ -15,25 +15,39 @@ import {
 } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
+import { useRef } from "react"
 import * as api from "double-counting/api"
 import DoubleCountingUploadDialog from "double-counting/components/upload-dialog"
 
-const DoubleCountingSettings = () => {
+type DoubleCountingSettingsProps = {
+  readOnly?: boolean
+  entity: Entity
+  getDoubleCountingAgreements?: typeof api.getDoubleCountingAgreements
+}
+
+const DoubleCountingSettings = ({
+  readOnly,
+  entity,
+  getDoubleCountingAgreements = api.getDoubleCountingAgreements,
+}: DoubleCountingSettingsProps) => {
+  const doubleCountingRef = useRef<HTMLDivElement | null>(null)
   const { t } = useTranslation()
   const rights = useRights()
-  const entity = useEntity()
   const portal = usePortal()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const applicationsData = useQuery(api.getDoubleCountingAgreements, {
+  const applicationsData = useQuery(getDoubleCountingAgreements, {
     key: "dc-agreements",
     params: [entity.id],
+    onSuccess: () => {
+      doubleCountingRef.current?.scrollIntoView({ behavior: "smooth" })
+    },
   })
 
   const applications = applicationsData.result?.data ?? []
   const isEmpty = applications.length === 0
-  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const canModify = !readOnly && rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   function showApplicationDialog(
     application: DoubleCountingApplicationOverview
@@ -62,9 +76,9 @@ const DoubleCountingSettings = () => {
   }
 
   return (
-    <Panel id="double-counting">
+    <Panel>
       <header>
-        <h1>
+        <h1 ref={doubleCountingRef}>
           <Trans>Agréments double comptage</Trans>
         </h1>
         {canModify && (

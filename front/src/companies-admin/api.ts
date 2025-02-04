@@ -48,6 +48,15 @@ export function getCompanyProductionSites(
   })
 }
 
+export function getCompanyDoubleCountingAgreements(
+  entity_id: number,
+  company_id: number
+) {
+  return apiFetch.GET("/double-counting/agreements/", {
+    params: { query: { entity_id, company_id } },
+  })
+}
+
 export function getUsersRightRequests(
   entity_id: number,
   query: string,
