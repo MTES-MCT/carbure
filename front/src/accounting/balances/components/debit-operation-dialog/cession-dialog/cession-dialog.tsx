@@ -5,8 +5,8 @@ import { Grid, Main } from "common/components/scaffold"
 import { formatNumber } from "common/utils/formatters"
 import { Balance } from "accounting/balances/types"
 import { OperationText } from "accounting/components/operation-text"
-import { formatSector } from "accounting/operations/operations.utils"
 import { Trans, useTranslation } from "react-i18next"
+import { formatSector } from "accounting/utils/formatters"
 
 interface CessionDialogProps {
   onClose: () => void
