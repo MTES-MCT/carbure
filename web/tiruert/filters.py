@@ -21,7 +21,7 @@ class OperationFilter(FilterSet):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
 
     def filter_sector(self, queryset, name, value):
-        sectors = self.request.GET.getlist(name)
+        sectors = [sector.upper() for sector in self.request.GET.getlist(name)]
         if not sectors:
             return queryset
 
@@ -43,9 +43,10 @@ class OperationFilter(FilterSet):
         return queryset.filter(Q(from_depot__name__in=depots) | Q(to_depot__name__in=depots)).distinct()
 
     def filter_type(self, queryset, name, value):
-        if value == "credit":
+        value = value.upper()
+        if value == "CREDIT":
             return queryset.filter(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"]).distinct()
-        elif value == "debit":
+        elif value == "DEBIT":
             return queryset.filter(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"]).distinct()
         else:
             return queryset
