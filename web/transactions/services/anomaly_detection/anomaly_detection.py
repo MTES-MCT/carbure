@@ -66,4 +66,6 @@ def anomaly_detection():
         df_etd=df_etd,
     )
 
-    create_errors(outliers_by_emission_category)
+    lot_ids = create_errors(outliers_by_emission_category)
+
+    return lot_ids

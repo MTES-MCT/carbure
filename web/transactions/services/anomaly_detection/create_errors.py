@@ -46,6 +46,8 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
         if_outlier_lot_ids = processed_lots.filter(if_outlier_filters).distinct().values_list("id", flat=True)
         errors += [create_error("IF_OUTLIER", emission_category, lot_id) for lot_id in if_outlier_lot_ids]
 
-    lot_ids = [e.lot_id for e in errors]
+    lot_ids: list[int] = [e.lot_id for e in errors]
     GenericError.objects.filter(error__in=["LOF_OUTLIER", "IF_OUTLIER"], lot_id__in=lot_ids).delete()
     GenericError.objects.bulk_create(errors)
+
+    return lot_ids
