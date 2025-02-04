@@ -948,5 +948,5 @@ async function getProcessingDepots(entity_id: number, type: EntityType) {
   if (type !== EntityType.Operator) return []
 
   const depots = await getDeliverySites(entity_id)
-  return depots.data.data?.filter((depot) => depot.blending_is_outsourced) ?? []
+  return depots.data?.filter((depot) => depot.blending_is_outsourced) ?? []
 }
