@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.utils.timezone import make_aware
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -52,33 +51,36 @@ class BalanceActionMixin:
     def balance(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
+        unit = request.query_params.get("unit", "l")
+
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
-        unit = request.query_params.get("unit", "l")
+
         operations = self.filter_queryset(self.get_queryset())
 
-        # Beginning of the current year by default
-        if not date_from and group_by != "lot":
-            current_year = datetime.now().year
-            date_from = make_aware(datetime(current_year, 1, 1))
-            operations = operations.filter(created_at__gte=date_from)
+        if group_by == "lot":
+            # Calculate the balance
+            balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
 
-        # Calculate the balance
-        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
-
-        # Get operations again but this time until the date_from
-        if date_from:
-            mutable_querydict = request.GET.copy()
-            mutable_querydict.pop("date_from", None)
-            request._request.GET = mutable_querydict
-            operations = DjangoFilterBackend().filter_queryset(request, self.get_queryset(), self)
-            operations = operations.filter(created_at__lt=date_from)
         else:
-            operations = self.filter_queryset(self.get_queryset())
-            operations = operations.filter(created_at__lt=date_from)
+            if not date_from:
+                # All operations from beginning of the current year by default
+                current_year = datetime.now().year
+                date_from = make_aware(datetime(current_year, 1, 1))
+                operations = operations.filter(created_at__gte=date_from)
 
-        # Add initial balance and yearly teneur to the balance (can't be done for lot)
-        if group_by != "lot":
+            # Calculate the balance
+            balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
+
+            # Get operations again but this time until the date_from
+            query_params = request.GET.copy()
+            query_params.pop("date_from", None)
+            filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+            operations_without_date_filter = filterset.qs
+
+            operations = operations_without_date_filter.filter(created_at__lt=date_from)
+
+            # Add initial balance and yearly teneur to the balance
             balance = BalanceService.calculate_initial_balance(balance, entity_id, operations, group_by, unit)
             balance = BalanceService.calculate_yearly_teneur(balance, entity_id, operations, date_from, group_by, unit)
 

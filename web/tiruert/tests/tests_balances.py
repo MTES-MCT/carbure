@@ -1,11 +1,15 @@
 from django.urls import reverse
 
+from tiruert.models.operation import Operation
 from tiruert.tests import TestCase
 
 
 class TiruertBalancesTest(TestCase):
     def setUp(self):
         super().setUp()
+
+        operations = Operation.objects.all()
+        operations.update(status=Operation.ACCEPTED)
 
     def test_view_balances(self):
         query = {
@@ -42,7 +46,7 @@ class TiruertBalancesTest(TestCase):
         response = self.client.get(reverse("operations-balance"), query)
         data = response.json()
         assert response.status_code == 200
-        assert response.json()["count"] == 2
+        assert data["count"] == 2
         assert data["results"] == expected_response
 
     def test_view_balances_by_sector(self):
@@ -115,8 +119,8 @@ class TiruertBalancesTest(TestCase):
         response = self.client.post(reverse("operations-simulate-min-max"), query)
         assert response.status_code == 200
         data = response.json()
-        assert data["blending_min_emission_rate_per_mj"] == 1.3
-        assert data["blending_max_emission_rate_per_mj"] == 4.8
+        assert data["min_avoided_emissions"] == 1.8732
+        assert data["max_avoided_emissions"] == 1.9467
 
     def test_view_balances_simulate_min_max_insufficient_volume(self):
         query = {
@@ -139,12 +143,13 @@ class TiruertBalancesTest(TestCase):
             "customs_category": "CONV",
             "debited_entity": self.entity.id,
             "target_volume": 1000,
-            "target_emission": 2,
+            "target_emission": 1.9,
         }
 
         response = self.client.post(reverse("operations-simulate"), query)
         assert response.status_code == 200
         data = response.json()
+        print(data)
         assert len(data) == 2
         assert list(data.keys()) == ["selected_lots", "fun"]
         assert len(data["selected_lots"]) == 2
@@ -157,7 +162,7 @@ class TiruertBalancesTest(TestCase):
             "customs_category": "CONV",
             "debited_entity": self.entity.id,
             "target_volume": 1000,
-            "target_emission": 0.5,
+            "target_emission": 2,
         }
 
         response = self.client.post(reverse("operations-simulate"), query)

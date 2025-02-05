@@ -13,6 +13,9 @@ class TiruertOperationsTest(TestCase):
         operations = Operation.objects.all()
         assert operations.count() == 4
 
+        for operation in operations:
+            assert operation.status == Operation.PENDING
+
         operation_details = Operation.objects.first().details.all()
         assert operation_details.count() == 2
 
@@ -36,6 +39,7 @@ class TiruertOperationsTest(TestCase):
             "debited_entity",
             "from_depot",
             "to_depot",
+            "export_country",
             "created_at",
             "volume",
             "unit",
