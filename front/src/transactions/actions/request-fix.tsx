@@ -102,7 +102,13 @@ const RequestFixDialog = ({
   const [comment = "", setComment] = useState<string | undefined>("")
 
   const requestFix = useMutation(requestFixAndCommentLots, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({

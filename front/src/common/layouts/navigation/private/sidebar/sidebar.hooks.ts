@@ -8,6 +8,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import { getNavStats } from "./api"
 import { useEffect } from "react"
+
 export const usePrivateSidebar = () => {
   const entity = useEntity()
   const { result, execute } = useQuery(() => getNavStats(entity.id), {

@@ -34,6 +34,7 @@ export const ChargePointsApplicationAcceptDialog = ({
       invalidates: [
         "audit-charge-points-applications",
         "elec-admin-audit-snapshot",
+        `nav-stats-${entity.id}`,
       ],
       onSuccess() {
         onClose()

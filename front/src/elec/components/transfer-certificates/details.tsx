@@ -79,7 +79,13 @@ export const ElecTransferDetailsDialog = ({
         </header>
 
         <main>
-          <section>
+          <section
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+            }}
+          >
             <TextInput
               readOnly
               label={t("Date d'émission")}
@@ -91,9 +97,16 @@ export const ElecTransferDetailsDialog = ({
 
             <TextInput
               readOnly
+              label={t("MWh")}
+              value={transferCertificate?.energy_amount + " MWh"}
+            />
+
+            <TextInput
+              readOnly
               label={t("Aménageur")}
               value={transferCertificate?.supplier.name}
             />
+
             <TextInput
               readOnly
               label={t("Redevable")}
@@ -102,13 +115,24 @@ export const ElecTransferDetailsDialog = ({
 
             <TextInput
               readOnly
-              label={t("MWh")}
-              value={transferCertificate?.energy_amount + " MWh"}
+              label={t("Déclaration TIRUERT")}
+              value={transferCertificate?.used_in_tiruert ? "Oui" : "Non"}
             />
+
+            <TextInput
+              readOnly
+              label={t("Date de déclaration TIRUERT")}
+              value={formatDate(transferCertificate?.consumption_date || null)}
+            />
+
             {transferCertificate?.status ===
               ElecTransferCertificateStatus.Accepted &&
               entity.id === transferCertificate?.client.id && (
-                <Alert variant="info" icon={Message}>
+                <Alert
+                  variant="info"
+                  icon={Message}
+                  style={{ gridColumn: "span 2" }}
+                >
                   {t(
                     "L'identifiant est à reporter sur le certificat d'acquisition à intégrer dans votre comptabilité matière pour le compte des douanes."
                   )}
@@ -116,7 +140,11 @@ export const ElecTransferDetailsDialog = ({
               )}
             {transferCertificate?.status ===
               ElecTransferCertificateStatus.Rejected && (
-              <Alert variant="info" icon={Message}>
+              <Alert
+                variant="info"
+                icon={Message}
+                style={{ gridColumn: "span 2" }}
+              >
                 {transferCertificate.comment}
               </Alert>
             )}

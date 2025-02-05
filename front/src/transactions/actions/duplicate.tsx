@@ -58,11 +58,18 @@ const DuplicateDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const duplicateLots = useMutation(api.duplicateLots, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({

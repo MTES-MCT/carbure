@@ -19,20 +19,29 @@ class ElecRejectError:
 class ElecTransferForm(forms.Form):
     entity_id = forms.IntegerField()
     transfer_certificate_id = forms.ModelChoiceField(queryset=ElecTransferCertificate.objects.all(), required=False)
+    used_in_tiruert = forms.CharField()
+    consumption_date = forms.DateField(required=False)
 
 
 @require_POST
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def accept_transfer_certificate(request, *args, **kwargs):
-    transfer_form = ElecTransferForm(request.POST)
+    post_data = request.POST.copy()
+    post_data["used_in_tiruert"] = "true" if post_data.get("used_in_tiruert", "").lower() == "true" else "false"
+    transfer_form = ElecTransferForm(post_data)
 
     if not transfer_form.is_valid():
         return ErrorResponse(400, ElecRejectError.MALFORMED_PARAMS, transfer_form.errors)
 
     transfer_certificate = transfer_form.cleaned_data["transfer_certificate_id"]
+    used_in_tiruert = transfer_form.cleaned_data["used_in_tiruert"]
+    consumption_date = transfer_form.cleaned_data["consumption_date"]
 
     try:
         transfer_certificate.status = ElecTransferCertificate.ACCEPTED
+        transfer_certificate.used_in_tiruert = used_in_tiruert == "true"
+        if consumption_date:
+            transfer_certificate.consumption_date = consumption_date
         transfer_certificate.save()
         return SuccessResponse()
     except Exception:

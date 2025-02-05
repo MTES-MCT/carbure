@@ -5,10 +5,11 @@ import { BaseInput, ExtendedInputProps } from "./base-input"
 // Props to be exposed to all inputs (text/number/date etc...)
 export type InputProps = Omit<
   InputPropsDSFR,
-  "nativeInputProps" | "textArea" | "nativeTextAreaProps"
+  "nativeInputProps" | "textArea" | "nativeTextAreaProps" | "label"
 > &
   ExtendedInputProps & {
     inputRef?: React.RefObject<HTMLInputElement>
+    label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
   }
 
 /**
@@ -24,9 +25,14 @@ export const Input = ({
   nativeInputProps,
   readOnly,
   inputRef,
+  required,
+  label,
   ...props
-}: InputPropsDSFR.RegularInput &
-  ExtendedInputProps & { inputRef?: React.RefObject<HTMLInputElement> }) => {
+}: Omit<InputPropsDSFR.RegularInput, "label"> &
+  ExtendedInputProps & {
+    inputRef?: React.RefObject<HTMLInputElement>
+    label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
+  }) => {
   return (
     <BaseInput
       {...props}
@@ -38,9 +44,11 @@ export const Input = ({
         placeholder,
         type,
         readOnly,
+        required,
         ref: inputRef as RefObject<HTMLInputElement>,
       }}
       textArea={false}
+      label={label ?? ""}
     />
   )
 }

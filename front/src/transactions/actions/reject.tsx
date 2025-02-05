@@ -95,13 +95,20 @@ const RejectDialog = ({
 }: RejectDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const [comment = "", setComment] = useState<string | undefined>("")
 
   const rejectLots = useMutation(rejectAndCommentLots, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
