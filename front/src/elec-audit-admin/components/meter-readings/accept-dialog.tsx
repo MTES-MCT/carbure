@@ -36,6 +36,7 @@ export const MeterReadingsApplicationAcceptDialog = ({
       invalidates: [
         "audit-meter-readings-applications",
         "elec-admin-audit-snapshot",
+        `nav-stats-${entity.id}`,
       ],
       onSuccess() {
         onClose()

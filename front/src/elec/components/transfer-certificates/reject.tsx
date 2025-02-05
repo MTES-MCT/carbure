@@ -31,7 +31,11 @@ export const RejectTransfer = ({
   })
 
   const rejectTransfer = useMutation(api.rejectTransfer, {
-    invalidates: ["elec-transfer-certificates", "elec-operator-snapshot"],
+    invalidates: [
+      "elec-transfer-certificates",
+      "elec-operator-snapshot",
+      `nav-stats-${entity.id}`,
+    ],
     onSuccess: () => {
       notify(
         t(
