@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useState } from "react"
 import cl from "clsx"
 import css from "./form.module.css"
+import { TextInputProps } from "../inputs2"
 
 export type FormVariant = "inline" | "columns"
 
@@ -162,12 +163,13 @@ export function useBindCallback<T>(
   setField: (name: keyof T, value: T[keyof T]) => void
 ): Bind<T> {
   return useCallback(
-    (name, option) => ({
+    (name, { showError, value: option } = {}) => ({
       name,
       value: option ?? value[name],
       disabled: disabledFields[name],
       checked: option ? option === value[name] : undefined,
-      error: errors[name],
+      state: errors[name] ? "error" : undefined,
+      stateRelatedMessage: showError ? errors[name] : undefined,
       onChange: (value) => setField(name, value),
     }),
     [value, errors, setField, disabledFields]
@@ -186,13 +188,16 @@ export const FormContext = React.createContext<FormManager<any> | undefined>(
 
 export type Bind<T> = <N extends keyof T>(
   name: N,
-  option?: T[N]
+  options?: {
+    value?: T[N]
+    showError?: boolean // by default, the error is not shown
+  }
 ) => BindProps<T, N>
 
 export interface BindProps<T, N extends keyof T> {
   name: N
   value: T[N]
-  error: string | undefined
+  state?: TextInputProps["state"]
   checked: boolean | undefined
   disabled: boolean | undefined
   onChange: (value: T[N]) => void
