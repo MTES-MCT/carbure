@@ -1,7 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
 
-from django.db.models import Q
 from django.utils.timezone import make_aware
 
 from tiruert.models import Operation
@@ -30,6 +29,7 @@ class BalanceService:
                 "unit": "l",
             }
         )
+        key = None
 
         operations = operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED])
 
@@ -71,16 +71,11 @@ class BalanceService:
         return balance
 
     @staticmethod
-    def calculate_initial_balance(balance, entity_id, until_date, group_by, unit="l"):
+    def calculate_initial_balance(balance, entity_id, operations, group_by, unit="l"):
         """
         Calculate initial balances for the given entity until the given date
         and add them to the balance dict
         """
-        operations = Operation.objects.filter(
-            created_at__lt=until_date,
-            status__in=[Operation.PENDING, Operation.ACCEPTED],
-        ).filter((Q(credited_entity_id=entity_id) | Q(debited_entity_id=entity_id)))
-
         initial_balances = defaultdict(int)
 
         for operation in operations:
@@ -96,7 +91,7 @@ class BalanceService:
         return balance
 
     @staticmethod
-    def calculate_yearly_teneur(balance, entity_id, until_date, group_by, unit="l"):
+    def calculate_yearly_teneur(balance, entity_id, operations, until_date, group_by, unit="l"):
         """
         Calculate yearly teneur for the given entity, from the beginning of the year
         to the until_date given, and add them to the balance dict
@@ -107,10 +102,8 @@ class BalanceService:
         if until_date == beginning_of_year:  # No need to calculate yearly teneur
             return balance
 
-        operations = Operation.objects.filter(
+        operations = operations.filter(
             created_at__gte=beginning_of_year,
-            created_at__lt=until_date,
-            status__in=[Operation.PENDING, Operation.ACCEPTED],  # Faut il garder les teneurs PENDING ?
             type=Operation.TENEUR,
             debited_entity_id=entity_id,
         )

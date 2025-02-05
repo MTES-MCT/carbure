@@ -9,7 +9,12 @@ from core.models import Entity, UserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.permissions import HasUserRights
-from tiruert.serializers import OperationInputSerializer, OperationListSerializer, OperationSerializer
+from tiruert.serializers import (
+    OperationInputSerializer,
+    OperationListSerializer,
+    OperationSerializer,
+    OperationUpdateSerializer,
+)
 
 from .mixins import ActionMixin
 
@@ -34,6 +39,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     )
     filterset_class = OperationFilter
     filter_backends = [DjangoFilterBackend]
+    http_method_names = ["get", "post", "patch", "delete"]
 
     def get_permissions(self):
         if self.action in ["reject", "accept", "balance"]:
@@ -124,7 +130,41 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         )
         if serializer.is_valid():
             operation = serializer.save()
-            return Response(OperationListSerializer(operation, context={"details": 1}).data, status=status.HTTP_201_CREATED)
+            return Response(OperationSerializer(operation, context={"details": 1}).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        operation_id="update_operation",
+        description="Update a part of operation.",
+        request=OperationUpdateSerializer,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=OperationSerializer, description="The updated operation."),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid input data."),
+        },
+        examples=[
+            OpenApiExample(
+                name="Update Operation Example",
+                value={
+                    "to_depot": 10,
+                },
+            )
+        ],
+    )
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        entity_id = self.request.GET.get("entity_id")
+        serializer = OperationUpdateSerializer(
+            instance,
+            data=request.data,
+            context={"request": request},
+            partial=True,
+        )
+        if serializer.is_valid():
+            operation = serializer.save()
+            return Response(
+                OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
