@@ -32,6 +32,9 @@ export const useOperationsColumns = ({
     {
       header: t("Statut"),
       cell: (item) => <OperationBadge status={item.status} />,
+      style: {
+        flexGrow: 2,
+      },
     },
     {
       header: t("Filière"),
@@ -59,7 +62,7 @@ export const useOperationsColumns = ({
     },
     {
       header: t("Date"),
-      cell: (item) => formatDate(item.created_at),
+      cell: (item) => <Cell text={formatDate(item.created_at)} />,
     },
     {
       header: t("Dépôt"),
@@ -90,7 +93,6 @@ export const useOperationsColumns = ({
       },
     },
     {
-      key: "volume",
       header: t("Volume"),
       cell: (item) =>
         isOperationDebit(item.type) ? (

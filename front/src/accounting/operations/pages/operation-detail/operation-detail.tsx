@@ -1,8 +1,10 @@
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
 import * as api from "./api"
+import * as apiAccounting from "accounting/api"
+import { findDepots } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import {
@@ -25,16 +27,29 @@ import {
   useDeleteOperation,
   useRejectOperation,
 } from "./operation-detail.hooks"
+import { Form, useForm } from "common/components/form2"
+import { useNotify } from "common/components/notifications"
+import Autocomplete from "common/components/autocomplete/autocomplete"
+import { Depot } from "carbure/types"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { t } = useTranslation()
+  const notify = useNotify()
   const match = useHashMatch("operation/:id")
+  const { value, bind, setField } = useForm<{
+    to_depot?: Pick<Depot, "id" | "name">
+  }>({
+    to_depot: undefined,
+  })
 
   const { result, loading } = useQuery(api.getOperationDetail, {
     key: "operation-detail",
     params: [entity.id, parseInt(match?.params.id ?? "")],
+    onSuccess: (result) => {
+      setField("to_depot", result?.data?.to_depot)
+    },
   })
 
   const operation = result?.data
@@ -60,6 +75,37 @@ export const OperationDetail = () => {
       operation,
       onRejectOperation: closeDialog,
     })
+
+  const { execute: patchOperation, loading: patchOperationLoading } =
+    useMutation(apiAccounting.patchOperation, {
+      onError: () => {
+        notify(
+          t(
+            "Une erreur est survenue lors de la mise à jour du dépot de livraison."
+          ),
+          {
+            variant: "danger",
+          }
+        )
+      },
+    })
+
+  const onAcceptOperation = () => {
+    const patch = () => {
+      if (operation && value.to_depot?.id !== operation?.to_depot?.id) {
+        return patchOperation(entity.id, operation?.id, {
+          to_depot: value.to_depot?.id,
+        })
+      }
+      return Promise.resolve()
+    }
+
+    patch().then(() => {
+      if (operation) {
+        acceptOperation(entity.id, operation.id)
+      }
+    })
+  }
 
   const fields = operation
     ? compact([
@@ -90,10 +136,12 @@ export const OperationDetail = () => {
           label: t("Dépôt expéditeur"),
           value: operation.from_depot?.name ?? "-",
         },
-        operation.type !== OperationType.DEVALUATION && {
-          label: t("Dépôt destinataire"),
-          value: operation.to_depot?.name ?? "-",
-        },
+        operation.type !== OperationType.DEVALUATION &&
+          operation.type === OperationType.ACQUISITION &&
+          operation.status !== OperationsStatus.PENDING && {
+            label: t("Dépôt destinataire"),
+            value: operation.to_depot?.name ?? "-",
+          },
       ])
     : []
 
@@ -119,7 +167,9 @@ export const OperationDetail = () => {
                   <Button
                     customPriority="danger"
                     iconId="fr-icon-close-line"
-                    onClick={() => rejectOperation(entity.id, operation.id)}
+                    onClick={() => {
+                      rejectOperation(entity.id, operation.id)
+                    }}
                     loading={rejectOperationLoading}
                   >
                     {t("Refuser")}
@@ -127,8 +177,8 @@ export const OperationDetail = () => {
                   <Button
                     customPriority="success"
                     iconId="fr-icon-check-line"
-                    onClick={() => acceptOperation(entity.id, operation.id)}
-                    loading={acceptOperationLoading}
+                    nativeButtonProps={{ form: "patch-operation" }}
+                    loading={acceptOperationLoading || patchOperationLoading}
                   >
                     {t("Accepter")}
                   </Button>
@@ -160,6 +210,31 @@ export const OperationDetail = () => {
                     <Text className={css["field-value"]}>{value}</Text>
                   </div>
                 ))}
+                {operation?.type === OperationType.ACQUISITION &&
+                  operation?.status === OperationsStatus.PENDING && (
+                    <div className={css["operation-detail-fields-depot"]}>
+                      <Form id="patch-operation" onSubmit={onAcceptOperation}>
+                        <Autocomplete
+                          autoFocus
+                          label={t("Dépot de livraison")}
+                          hintText={t(
+                            "Si le dépôt de livraison renseigné est inexact, vous pouvez le corriger ici."
+                          )}
+                          required
+                          placeholder={t("Rechercher un site de livraison...")}
+                          defaultOptions={
+                            value.to_depot ? [value.to_depot] : []
+                          }
+                          getOptions={findDepots}
+                          normalize={(depot) => ({
+                            label: depot.name,
+                            value: depot,
+                          })}
+                          {...bind("to_depot")}
+                        />
+                      </Form>
+                    </div>
+                  )}
               </Grid>
               {operation?.type === OperationType.ACQUISITION &&
                 operation?.status === OperationsStatus.PENDING && (

@@ -11,6 +11,10 @@
   column-gap: var(--spacing-3w);
 }
 
+.operation-detail-fields-depot {
+  grid-column: 1 / -1;
+}
+
 .field-label {
   color: var(--text-mention-grey);
 }

@@ -25,6 +25,7 @@ export const Operations = ({
   const entity = useEntity()
   usePrivateNavigation(t("Comptabilité"))
   const filterLabels = {
+    [OperationsFilter.depot]: t("Dépôts"),
     [OperationsFilter.status]: t("Statut"),
     [OperationsFilter.sector]: t("Filière"),
     [OperationsFilter.customs_category]: t("Catégorie"),
@@ -33,7 +34,6 @@ export const Operations = ({
     [OperationsFilter.type]: t("Débit / Crédit"),
     [OperationsFilter.operation]: t("Opération"),
     [OperationsFilter.from_to]: t("Redevable"),
-    [OperationsFilter.depot]: t("Dépôts"),
   }
 
   const [state, actions] = useCBQueryParamsStore<OperationsStatus[], undefined>(
