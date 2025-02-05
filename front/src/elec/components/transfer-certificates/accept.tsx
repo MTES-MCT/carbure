@@ -94,24 +94,30 @@ export const AcceptTransfer = ({
 
         <main>
           <section>
-            <p>
-              {t(
-                "Est-ce que le certificat est concerné par une déclaration TIRUERT ?"
-              )}
-            </p>
-            <RadioGroup
-              options={
-                tiruertChoice
-                  ? [
-                      { value: "true", label: t("Déclaration TIRUERT") },
-                      { value: "false", label: t("Non concerné") },
-                    ]
-                  : [{ value: "true", label: t("Déclaration TIRUERT") }]
-              }
-              value={usedInTiruert}
-              onChange={handleRadioChange} // Use the new handler
-              name="declaration-status"
-            />
+            {!tiruertChoice && (
+              <p>
+                {" "}
+                {t("Ce certificat a été concerné par une déclaration TIRUERT")}
+              </p>
+            )}
+            {tiruertChoice && (
+              <p>
+                {t(
+                  "Est-ce que le certificat est concerné par une déclaration TIRUERT ?"
+                )}
+              </p>
+            )}
+            {tiruertChoice && (
+              <RadioGroup
+                options={[
+                  { value: "true", label: t("Déclaration TIRUERT") },
+                  { value: "false", label: t("Non concerné") },
+                ]}
+                value={usedInTiruert}
+                onChange={handleRadioChange} // Use the new handler
+                name="declaration-status"
+              />
+            )}
 
             {usedInTiruert === "true" && (
               <>

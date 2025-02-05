@@ -53,10 +53,12 @@ export const ElecTransferCertificateTable = memo(
 
 export function useColumns(tiruert: boolean) {
   const { t } = useTranslation()
+  const tiruertStatusLabel = t("Statut TIRUERT")
+  const statusLabel = t("Statut")
   return {
     status: {
       key: "status",
-      header: t(tiruert ? "Statut TIRUERT" : "Statut"),
+      header: t(tiruert ? tiruertStatusLabel : statusLabel),
       cell: (transferCertificate: ElecTransferCertificatePreview) => {
         if (tiruert) {
           return (
