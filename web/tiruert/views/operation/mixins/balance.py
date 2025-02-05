@@ -75,7 +75,7 @@ class BalanceActionMixin:
             # Get operations again but this time until the date_from
             query_params = request.GET.copy()
             query_params.pop("date_from", None)
-            filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+            filterset = self.filterset_class(data=request.GET, queryset=self.get_queryset(), request=request)
             operations_without_date_filter = filterset.qs
 
             operations = operations_without_date_filter.filter(created_at__lt=date_from)

@@ -58,7 +58,7 @@ class FilterActionMixin:
         if filter in query_params:
             query_params.pop(filter)
 
-        filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+        filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
         queryset = filterset.qs
 
         filters = {
@@ -176,13 +176,14 @@ class FilterActionMixin:
         if filter in query_params:
             query_params.pop(filter)
 
-        filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+        filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
         queryset = filterset.qs
 
         filters = {
             "sector": "sector",
             "customs_category": "customs_category",
             "biofuel": "biofuel__code",
+            "depot": "depots",
         }
 
         column = filters.get(filter)
@@ -196,6 +197,10 @@ class FilterActionMixin:
                 When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
                 default=Value(None),
                 output_field=CharField(),
+            ),
+            depots=Coalesce(
+                "from_depot__name",
+                "to_depot__name",
             ),
         )
         values = queryset.values_list(column, flat=True).distinct()
