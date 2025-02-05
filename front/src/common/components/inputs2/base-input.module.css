@@ -1,0 +1,3 @@
+.dsfr-input--error :global(.fr-messages-group) {
+  display: none;
+}

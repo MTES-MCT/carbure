@@ -5,7 +5,8 @@ import {
 import { Tooltip } from "@codegouvfr/react-dsfr/Tooltip"
 import { ReactNode } from "react"
 import { InformationLine } from "../icon"
-
+import cl from "clsx"
+import css from "./base-input.module.css"
 export type ExtendedInputProps = {
   loading?: boolean
   hasTooltip?: boolean
@@ -19,6 +20,7 @@ export type ExtendedInputProps = {
   required?: boolean
   type?: string
   domRef?: React.RefObject<HTMLDivElement>
+  label?: InputPropsDSFR["label"]
 }
 type BaseInputProps = InputPropsDSFR & ExtendedInputProps
 
@@ -48,6 +50,12 @@ export const BaseInput = ({
         />
       }
       ref={domRef}
+      className={cl(
+        props.className,
+        props.state === "error" &&
+          !props.stateRelatedMessage &&
+          css["dsfr-input--error"]
+      )}
     />
   )
 }

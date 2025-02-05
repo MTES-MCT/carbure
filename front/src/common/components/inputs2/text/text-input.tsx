@@ -9,6 +9,7 @@ export const TextInput = ({
   value,
   onChange,
   autoComplete,
+  label,
   ...props
 }: TextInputProps) => {
   return (
@@ -19,6 +20,7 @@ export const TextInput = ({
         onChange: onChange ? (e) => onChange(e.target.value) : undefined,
         autoComplete: autoComplete ? "on" : undefined,
       }}
+      label={label ?? ""}
     />
   )
 }

@@ -37,6 +37,7 @@ export const ElecTransferCertificateTable = memo(
         rows={transferCertificates}
         columns={compact([
           columns.status,
+          columns.consumption_date,
           displayCpo ? columns.cpo : columns.operator,
           columns.transfer_date,
           columns.energy_amount,
@@ -52,9 +53,21 @@ export function useColumns() {
   return {
     status: {
       key: "status",
-      header: t("Statut"),
+      header: t("Statut TIRUERT"),
       cell: (transferCertificate: ElecTransferCertificatePreview) => {
         return <TransferCertificateTag status={transferCertificate.status} />
+      },
+    },
+
+    consumption_date: {
+      key: "consumption_date",
+      header: t("Date de déclaration"),
+      cell: (transferCertificate: ElecTransferCertificatePreview) => {
+        const value = formatDate(
+          transferCertificate.consumption_date,
+          "MM/yyyy"
+        )
+        return <Cell text={value} />
       },
     },
 
