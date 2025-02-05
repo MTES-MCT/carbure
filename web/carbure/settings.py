@@ -302,6 +302,7 @@ CSP_DEFAULT_SRC = (
     "metabase.carbure.beta.gouv.fr",
     "www.data.gouv.fr",
     "https://*.tile.openstreetmap.org/",
+    "sentry.incubateur.net",
 )
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 
