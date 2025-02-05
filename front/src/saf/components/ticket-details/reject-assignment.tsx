@@ -39,6 +39,7 @@ export const RejectAssignment = ({
         "airline-snapshot",
         "operator-snapshot",
         "tickets",
+        `nav-stats-${entity.id}`,
       ],
       onSuccess: () => ticketRejected(),
     }
