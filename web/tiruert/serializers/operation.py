@@ -95,7 +95,6 @@ class OperationSerializer(BaseOperationSerializer):
             "created_at",
             "validation_date",
             "volume",
-            "unit",
             "avoided_emissions",
             "details",
         ]
