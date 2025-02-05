@@ -1530,13 +1530,14 @@ export interface paths {
     }
     /** @description Retrieve one specific operation. */
     get: operations["get_operation"]
-    put: operations["tiruert_operations_update"]
+    put?: never
     post?: never
     /** @description Delete an operation. Only allowed for certain types and statuses. */
     delete: operations["delete_operation"]
     options?: never
     head?: never
-    patch: operations["tiruert_operations_partial_update"]
+    /** @description Update a part of operation. */
+    patch: operations["update_operation"]
     trace?: never
   }
   "/api/tiruert/operations/{id}/accept/": {
@@ -2637,15 +2638,8 @@ export interface components {
       /** Format: double */
       emission_rate_per_mj?: number
     }
-    OperationDetailRequest: {
-      lot: number
-      /** Format: double */
-      volume?: number
-      /** Format: double */
-      emission_rate_per_mj?: number
-    }
     OperationInputRequest: {
-      type: components["schemas"]["OperationInputTypeEnum"]
+      type: components["schemas"]["TypeDefEnum"]
       customs_category: components["schemas"]["CustomsCategoryEnum"]
       biofuel: number | null
       credited_entity?: number | null
@@ -2655,17 +2649,6 @@ export interface components {
       export_country?: number | null
       lots: components["schemas"]["LotRequest"][]
     }
-    /**
-     * @description * `INCORPORATION` - INCORPORATION
-     *     * `CESSION` - CESSION
-     *     * `TENEUR` - TENEUR
-     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-     *     * `MAC_BIO` - MAC_BIO
-     *     * `EXPORTATION` - EXPORTATION
-     *     * `DEVALUATION` - DEVALUATION
-     * @enum {string}
-     */
-    OperationInputTypeEnum: OperationInputTypeEnum
     OperationList: {
       readonly id: number
       readonly type: string
@@ -2684,16 +2667,6 @@ export interface components {
       readonly volume: number
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
-    }
-    OperationListRequest: {
-      status?: components["schemas"]["StatusD22Enum"]
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
-      credited_entity: components["schemas"]["TiruertEntityRequest"]
-      debited_entity: components["schemas"]["TiruertEntityRequest"]
-      from_depot: components["schemas"]["TiruertDepotRequest"]
-      to_depot: components["schemas"]["TiruertDepotRequest"]
-      export_country?: number | null
-      details?: components["schemas"]["OperationDetailRequest"][]
     }
     OtpResponse: {
       valid_until: string
@@ -2771,15 +2744,15 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
     }
-    PatchedOperationListRequest: {
-      status?: components["schemas"]["StatusD22Enum"]
+    PatchedOperationUpdateRequest: {
+      type?: components["schemas"]["TypeDefEnum"]
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
-      credited_entity?: components["schemas"]["TiruertEntityRequest"]
-      debited_entity?: components["schemas"]["TiruertEntityRequest"]
-      from_depot?: components["schemas"]["TiruertDepotRequest"]
-      to_depot?: components["schemas"]["TiruertDepotRequest"]
+      biofuel?: number | null
+      credited_entity?: number | null
+      debited_entity?: number | null
+      from_depot?: number | null
+      to_depot?: number | null
       export_country?: number | null
-      details?: components["schemas"]["OperationDetailRequest"][]
     }
     Pays: {
       code_pays: string
@@ -3181,15 +3154,7 @@ export interface components {
       id: number
       name: string
     }
-    TiruertDepotRequest: {
-      id: number
-      name: string
-    }
     TiruertEntity: {
-      id: number
-      name: string
-    }
-    TiruertEntityRequest: {
       id: number
       name: string
     }
@@ -3219,6 +3184,17 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
+    /**
+     * @description * `INCORPORATION` - INCORPORATION
+     *     * `CESSION` - CESSION
+     *     * `TENEUR` - TENEUR
+     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+     *     * `MAC_BIO` - MAC_BIO
+     *     * `EXPORTATION` - EXPORTATION
+     *     * `DEVALUATION` - DEVALUATION
+     * @enum {string}
+     */
+    TypeDefEnum: TypeDefEnum
     UnitRequest: {
       /** @default l */
       unit: components["schemas"]["PreferredUnitEnum"]
@@ -6687,37 +6663,6 @@ export interface operations {
       }
     }
   }
-  tiruert_operations_update: {
-    parameters: {
-      query: {
-        /** @description Authorised entity ID. */
-        entity_id: number
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Opération. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["OperationListRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["OperationListRequest"]
-        "multipart/form-data": components["schemas"]["OperationListRequest"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["OperationList"]
-        }
-      }
-    }
-  }
   delete_operation: {
     parameters: {
       query: {
@@ -6749,7 +6694,7 @@ export interface operations {
       }
     }
   }
-  tiruert_operations_partial_update: {
+  update_operation: {
     parameters: {
       query: {
         /** @description Authorised entity ID. */
@@ -6764,19 +6709,27 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["PatchedOperationListRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedOperationListRequest"]
-        "multipart/form-data": components["schemas"]["PatchedOperationListRequest"]
+        "application/json": components["schemas"]["PatchedOperationUpdateRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedOperationUpdateRequest"]
+        "multipart/form-data": components["schemas"]["PatchedOperationUpdateRequest"]
       }
     }
     responses: {
+      /** @description The updated operation. */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["OperationList"]
+          "application/json": components["schemas"]["Operation"]
         }
+      }
+      /** @description Invalid input data. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -7324,15 +7277,6 @@ export enum LotStatusEnum {
   FROZEN = "FROZEN",
   DELETED = "DELETED",
 }
-export enum OperationInputTypeEnum {
-  INCORPORATION = "INCORPORATION",
-  CESSION = "CESSION",
-  TENEUR = "TENEUR",
-  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
-  MAC_BIO = "MAC_BIO",
-  EXPORTATION = "EXPORTATION",
-  DEVALUATION = "DEVALUATION",
-}
 export enum OwnershipTypeEnum {
   OWN = "OWN",
   THIRD_PARTY = "THIRD_PARTY",
@@ -7375,6 +7319,15 @@ export enum TransportDocumentTypeEnum {
   DSAC = "DSAC",
   DSP = "DSP",
   OTHER = "OTHER",
+}
+export enum TypeDefEnum {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
 }
 export enum UserRightsRequestsStatusEnum {
   Pending = "PENDING",

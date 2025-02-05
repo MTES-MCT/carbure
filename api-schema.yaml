@@ -4864,47 +4864,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Operation"
           description: Details of specific operation.
-    put:
-      operationId: tiruert_operations_update
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Opération.
-          required: true
-      tags:
-        - tiruert
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OperationListRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/OperationListRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/OperationListRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OperationList"
-          description: ""
     patch:
-      operationId: tiruert_operations_partial_update
+      operationId: update_operation
+      description: Update a part of operation.
       parameters:
         - in: query
           name: entity_id
@@ -4924,13 +4886,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PatchedOperationListRequest"
+              $ref: "#/components/schemas/PatchedOperationUpdateRequest"
+            examples:
+              UpdateOperationExample:
+                value:
+                  to_depot: 10
+                summary: Update Operation Example
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/PatchedOperationListRequest"
+              $ref: "#/components/schemas/PatchedOperationUpdateRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/PatchedOperationListRequest"
+              $ref: "#/components/schemas/PatchedOperationUpdateRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -4939,8 +4906,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationList"
-          description: ""
+                $ref: "#/components/schemas/Operation"
+              examples:
+                UpdateOperationExample:
+                  value:
+                    to_depot: 10
+                  summary: Update Operation Example
+          description: The updated operation.
+        "400":
+          description: Invalid input data.
     delete:
       operationId: delete_operation
       description: Delete an operation. Only allowed for certain types and statuses.
@@ -8053,24 +8027,11 @@ components:
           format: double
       required:
         - lot
-    OperationDetailRequest:
-      type: object
-      properties:
-        lot:
-          type: integer
-        volume:
-          type: number
-          format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
-      required:
-        - lot
     OperationInputRequest:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/OperationInputTypeEnum"
+          $ref: "#/components/schemas/TypeDefEnum"
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
@@ -8101,24 +8062,6 @@ components:
         - debited_entity
         - lots
         - type
-    OperationInputTypeEnum:
-      enum:
-        - INCORPORATION
-        - CESSION
-        - TENEUR
-        - LIVRAISON_DIRECTE
-        - MAC_BIO
-        - EXPORTATION
-        - DEVALUATION
-      type: string
-      description: |-
-        * `INCORPORATION` - INCORPORATION
-        * `CESSION` - CESSION
-        * `TENEUR` - TENEUR
-        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-        * `MAC_BIO` - MAC_BIO
-        * `EXPORTATION` - EXPORTATION
-        * `DEVALUATION` - DEVALUATION
     OperationList:
       type: object
       properties:
@@ -8176,33 +8119,6 @@ components:
         - type
         - unit
         - volume
-    OperationListRequest:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/StatusD22Enum"
-        customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
-        credited_entity:
-          $ref: "#/components/schemas/TiruertEntityRequest"
-        debited_entity:
-          $ref: "#/components/schemas/TiruertEntityRequest"
-        from_depot:
-          $ref: "#/components/schemas/TiruertDepotRequest"
-        to_depot:
-          $ref: "#/components/schemas/TiruertDepotRequest"
-        export_country:
-          type: integer
-          nullable: true
-        details:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationDetailRequest"
-      required:
-        - credited_entity
-        - debited_entity
-        - from_depot
-        - to_depot
     OtpResponse:
       type: object
       properties:
@@ -8332,28 +8248,31 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
-    PatchedOperationListRequest:
+    PatchedOperationUpdateRequest:
       type: object
       properties:
-        status:
-          $ref: "#/components/schemas/StatusD22Enum"
+        type:
+          $ref: "#/components/schemas/TypeDefEnum"
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
+        biofuel:
+          type: integer
+          nullable: true
         credited_entity:
-          $ref: "#/components/schemas/TiruertEntityRequest"
+          type: integer
+          nullable: true
         debited_entity:
-          $ref: "#/components/schemas/TiruertEntityRequest"
+          type: integer
+          nullable: true
         from_depot:
-          $ref: "#/components/schemas/TiruertDepotRequest"
+          type: integer
+          nullable: true
         to_depot:
-          $ref: "#/components/schemas/TiruertDepotRequest"
+          type: integer
+          nullable: true
         export_country:
           type: integer
           nullable: true
-        details:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationDetailRequest"
     Pays:
       type: object
       properties:
@@ -9423,17 +9342,6 @@ components:
       required:
         - id
         - name
-    TiruertDepotRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-          minLength: 1
-      required:
-        - id
-        - name
     TiruertEntity:
       type: object
       properties:
@@ -9441,17 +9349,6 @@ components:
           type: integer
         name:
           type: string
-      required:
-        - id
-        - name
-    TiruertEntityRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-          minLength: 1
       required:
         - id
         - name
@@ -9495,6 +9392,24 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeDefEnum:
+      enum:
+        - INCORPORATION
+        - CESSION
+        - TENEUR
+        - LIVRAISON_DIRECTE
+        - MAC_BIO
+        - EXPORTATION
+        - DEVALUATION
+      type: string
+      description: |-
+        * `INCORPORATION` - INCORPORATION
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
+        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+        * `MAC_BIO` - MAC_BIO
+        * `EXPORTATION` - EXPORTATION
+        * `DEVALUATION` - DEVALUATION
     UnitRequest:
       type: object
       properties:
