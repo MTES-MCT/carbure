@@ -37,7 +37,11 @@ export const AcceptTransfer = ({
     useState<boolean>(false)
 
   const acceptTransfer = useMutation(api.acceptTransfer, {
-    invalidates: ["elec-transfer-certificates", "elec-operator-snapshot"],
+    invalidates: [
+      "elec-transfer-certificates",
+      "elec-operator-snapshot",
+      `nav-stats-${entity.id}`,
+    ],
     onSuccess: () => {
       setShowConfirmationModal(false)
       notify(t("Le certificat de cession a été accepté"), {

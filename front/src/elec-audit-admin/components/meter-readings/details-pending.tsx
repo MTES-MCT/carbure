@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import ApplicationSampleGeneration from "../sample/application-generation"
 import ApplicationSummary from "./details-application-summary"
+import useEntity from "carbure/hooks/entity"
 
 export type GenerationState =
   | "generation"
@@ -33,6 +34,7 @@ export const MeterReadingsApplicationDetailsPending = ({
   const notifyError = useNotifyError()
   const navigate = useNavigate()
   const location = useLocation()
+  const entity = useEntity()
 
   const startMeterReadingsApplicationAuditMutation = useMutation(
     api.startMeterReadingsApplicationAudit,
@@ -41,6 +43,7 @@ export const MeterReadingsApplicationDetailsPending = ({
         "audit-meter-readings-application-details",
         "audit-meter-readings-applications",
         "elec-admin-audit-snapshot",
+        `nav-stats-${entity.id}`,
       ],
     }
   )

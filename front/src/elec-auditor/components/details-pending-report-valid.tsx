@@ -28,7 +28,11 @@ const ReportValidSection = ({
   const notify = useNotify()
   const entity = useEntity()
   const acceptAuditReport = useMutation(api.acceptAuditReport, {
-    invalidates: ["elec-audit-applications", "elec-audit-snapshot"],
+    invalidates: [
+      "elec-audit-applications",
+      "elec-audit-snapshot",
+      `nav-stats-${entity.id}`,
+    ],
     onSuccess: () => {
       onReportAccepted()
       notify(
