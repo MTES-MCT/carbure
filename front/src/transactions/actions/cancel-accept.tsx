@@ -90,7 +90,13 @@ const CancelAcceptDialog = ({
   const v = variations(selection.length)
 
   const cancelAcceptLots = useMutation(api.cancelAcceptLots, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({

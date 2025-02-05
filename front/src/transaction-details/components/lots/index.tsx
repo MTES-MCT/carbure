@@ -54,8 +54,14 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const updateLot = useMutation(api.updateLot, {
-    invalidates: ["lots", "lot-details", "snapshot", "years", "lot-summary"],
-
+    invalidates: [
+      "lots",
+      "lot-details",
+      "snapshot",
+      "years",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
     onSuccess: () => {
       notify(t("Le lot a bien été mis à jour"), { variant: "success" })
     },

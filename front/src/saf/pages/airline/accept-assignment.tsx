@@ -35,7 +35,12 @@ export const AcceptAssignment = ({
   const form = useForm(defaultAcceptFormValue)
 
   const acceptSafTicket = useMutation(api.acceptSafTicket, {
-    invalidates: ["ticket-details", "airline-snapshot", "tickets"],
+    invalidates: [
+      "ticket-details",
+      "airline-snapshot",
+      "tickets",
+      `nav-stats-${entity.id}`,
+    ],
     onSuccess: () => ticketAccepted(),
   })
 

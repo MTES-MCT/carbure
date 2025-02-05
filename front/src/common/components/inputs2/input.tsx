@@ -26,9 +26,13 @@ export const Input = ({
   readOnly,
   inputRef,
   required,
+  label,
   ...props
-}: InputPropsDSFR.RegularInput &
-  ExtendedInputProps & { inputRef?: React.RefObject<HTMLInputElement> }) => {
+}: Omit<InputPropsDSFR.RegularInput, "label"> &
+  ExtendedInputProps & {
+    inputRef?: React.RefObject<HTMLInputElement>
+    label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
+  }) => {
   return (
     <BaseInput
       {...props}
@@ -44,6 +48,7 @@ export const Input = ({
         ref: inputRef as RefObject<HTMLInputElement>,
       }}
       textArea={false}
+      label={label ?? ""}
     />
   )
 }
