@@ -2,7 +2,6 @@ from django.db.models import Case, CharField, Value, When
 from django.db.models.functions import Cast, Coalesce, Concat
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
@@ -48,35 +47,35 @@ class FilterActionMixin:
     )
     @action(methods=["get"], detail=False)
     def filters(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        query_params = request.GET.copy()
 
-        filter = self.request.query_params.get("filter")
+        filter = request.query_params.get("filter")
+        entity_id = self.request.query_params.get("entity_id")
 
         if not filter:
-            raise ValidationError({"message": "No filter was specified"})
+            raise Exception("No filter was specified")
 
-        if filter == "status":
-            column = "status"
-        elif filter == "sector":
-            column = "sector"
-        elif filter == "customs_category":
-            column = "customs_category"
-        elif filter == "biofuel":
-            column = "biofuel__code"
-        elif filter == "operation":
-            column = "operations"
-        elif filter == "from_to":
-            column = "entities"
-        elif filter == "depot":
-            column = "depots"
-        elif filter == "type":
-            column = "types"
-        elif filter == "period":
-            column = "periods"
-        else:  # raise an error for unknown filters
-            raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
+        if filter in query_params:
+            query_params.pop(filter)
 
-        entity_id = self.request.query_params.get("entity_id")
+        filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+        queryset = filterset.qs
+
+        filters = {
+            "status": "status",
+            "sector": "sector",
+            "customs_category": "customs_category",
+            "biofuel": "biofuel__code",
+            "operation": "operations",
+            "from_to": "entities",
+            "depot": "depots",
+            "type": "types",
+            "period": "periods",
+        }
+
+        column = filters.get(filter)
+        if not column:
+            raise Exception(f"Filter '{filter}' does not exist for operations")
 
         queryset = queryset.annotate(
             entities=Coalesce(
@@ -168,22 +167,27 @@ class FilterActionMixin:
     )
     @action(methods=["get"], detail=False, url_path="balance/filters")
     def filters_balance(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(status="ACCEPTED")
-
-        filter = self.request.query_params.get("filter")
+        query_params = request.GET.copy()
+        filter = request.query_params.get("filter")
 
         if not filter:
-            raise ValidationError({"message": "No filter was specified"})
+            raise Exception("No filter was specified")
 
-        if filter == "sector":
-            column = "sector"
-        elif filter == "customs_category":
-            column = "customs_category"
-        elif filter == "biofuel":
-            column = "biofuel__code"
-        else:  # raise an error for unknown filters
-            raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
+        if filter in query_params:
+            query_params.pop(filter)
+
+        filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+        queryset = filterset.qs
+
+        filters = {
+            "sector": "sector",
+            "customs_category": "customs_category",
+            "biofuel": "biofuel__code",
+        }
+
+        column = filters.get(filter)
+        if not column:
+            raise Exception(f"Filter '{filter}' does not exist for balances")
 
         queryset = queryset.annotate(
             sector=Case(
