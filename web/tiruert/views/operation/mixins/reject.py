@@ -35,5 +35,4 @@ class RejectActionMixin:
         # detail.pk = None
         # detail.operation = canceled_operation
         # detail.save()
-
         return Response({"status": "rejected"}, status=status.HTTP_200_OK)
