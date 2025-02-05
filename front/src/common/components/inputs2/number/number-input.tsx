@@ -1,6 +1,7 @@
 import { Input, InputProps } from "../input"
 
 export type NumberInputProps = InputProps & {
+  label?: string
   min?: number
   max?: number
   step?: number
@@ -9,6 +10,7 @@ export type NumberInputProps = InputProps & {
 }
 
 export const NumberInput = ({
+  label,
   value,
   onChange,
   min,
@@ -19,6 +21,7 @@ export const NumberInput = ({
   return (
     <Input
       {...props}
+      label={label}
       type={props.readOnly ? "text" : "number"}
       nativeInputProps={{
         min,
