@@ -13,8 +13,18 @@ export const Main = (props: JSX.IntrinsicElements["main"]) => (
 )
 
 // a div used inside Main component to remove the padding and set a background color
-export const Content = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.content, props.className)} />
+export const Content = ({
+  marginTop,
+  ...props
+}: JSX.IntrinsicElements["div"] & { marginTop?: boolean }) => (
+  <div
+    {...props}
+    className={cl(
+      css.content,
+      props.className,
+      marginTop && css["content--margin-top"]
+    )}
+  />
 )
 
 // bottom footer with links and info, divided into some vertical <section>
@@ -27,10 +37,17 @@ export const Bar = (props: JSX.IntrinsicElements["section"]) => (
   <section {...props} className={cl(css.bar, props.className)} />
 )
 
+// a div that grows to fill the available space (used in ActionBar)
+const ActionBarGrow = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={css["actionbar--grow"]} />
+)
+
 // a bar where you can put many buttons
-export const ActionBar = (props: JSX.IntrinsicElements["section"]) => (
+export const ActionBar = ({ ...props }: JSX.IntrinsicElements["section"]) => (
   <section {...props} className={cl(css.actionbar, props.className)} />
 )
+
+ActionBar.Grow = ActionBarGrow
 
 // a enclosed box with its own <header>, many <section> and <footer>
 export const Panel = ({
