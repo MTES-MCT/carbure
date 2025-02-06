@@ -3,8 +3,7 @@ import { useLocation } from "react-router-dom"
 import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
-import { SearchInput } from "common/components/input"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { ActionBar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   SafColumsOrder,
@@ -18,11 +17,12 @@ import { SafFilters } from "../../components/filters"
 import { useAutoStatus } from "./tabs"
 import { ClientTicketDetails } from "./ticket-details"
 import TicketsTable from "../../components/tickets/table"
-import { ExportButton } from "../operator/ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
+import { SearchInput } from "common/components/inputs2"
+import { ExportButton } from "saf/components/export"
 
 export interface AirlineTicketsProps {
   year: number
@@ -78,29 +78,25 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
 
   return (
     <>
-      <Bar>
-        <SafFilters
-          filters={CLIENT_FILTERS}
-          selected={state.filters}
-          onSelect={actions.setFilters}
-          getFilterOptions={getTicketFilter}
-        />
-      </Bar>
-      <section>
-        <ActionBar>
-          <ExportButton
-            query={query}
-            download={api.downloadSafAirlineTickets}
-          />
+      <ActionBar>
+        <ActionBar.Grow>
           <SearchInput
-            asideX
-            clear
             debounce={250}
             value={state.search}
             onChange={actions.setSearch}
           />
-        </ActionBar>
+        </ActionBar.Grow>
 
+        <ExportButton query={query} download={api.downloadSafAirlineTickets} />
+      </ActionBar>
+
+      <SafFilters
+        filters={CLIENT_FILTERS}
+        selected={state.filters}
+        onSelect={actions.setFilters}
+        getFilterOptions={getTicketFilter}
+      />
+      <section>
         <TicketsTable
           client
           loading={ticketsResponse.loading}
