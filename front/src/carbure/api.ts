@@ -90,9 +90,13 @@ export async function findProductionSites(
   return res.data ?? []
 }
 
-export async function findDepots(query?: string, public_only?: boolean) {
+export async function findDepots(
+  query?: string,
+  public_only?: boolean,
+  is_enabled?: boolean
+) {
   const res = await apiFetch.GET("/resources/depots", {
-    params: { query: { query, public_only } },
+    params: { query: { query, public_only, is_enabled } },
   })
 
   return res.data ?? []
