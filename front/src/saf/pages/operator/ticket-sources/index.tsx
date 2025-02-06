@@ -22,7 +22,6 @@ import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
-import { ExportButton } from "../ticket-source-details/export"
 import NoResult from "common/components/no-result"
 import {
   useCBQueryBuilder,
@@ -31,6 +30,7 @@ import {
 import { SafTicketSource, SafTicketSourceStatus } from "../types"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { ExportButton } from "saf/components/export"
 
 export interface TicketSourcesProps {
   year: number

@@ -22,13 +22,13 @@ import { OperatorTicketDetails } from "../ticket-details"
 import { SafStatusSwitcher } from "./status-switcher"
 import TicketsTable from "../../../components/tickets/table"
 import TicketSourceDetails from "../ticket-source-details"
-import { ExportButton } from "../ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { ExportButton } from "saf/components/export"
 
 export interface OperatorTicketsProps {
   type: SafQueryType
@@ -109,11 +109,7 @@ export const OperatorTickets = ({
             status={status}
           />
 
-          <ExportButton
-            asideX
-            query={query}
-            download={api.downloadOperatorTickets}
-          />
+          <ExportButton query={query} download={api.downloadOperatorTickets} />
           <SearchInput
             clear
             debounce={250}
