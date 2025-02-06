@@ -33,7 +33,7 @@ export const useOperationsColumns = ({
       header: t("Statut"),
       cell: (item) => <OperationBadge status={item.status} />,
       style: {
-        flexGrow: 2,
+        flex: "0 0 137px",
       },
     },
     {
