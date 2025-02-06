@@ -3,19 +3,19 @@ import { CBFilterSelection } from "common/hooks/query-builder-2"
 import styles from "./filter-multiselect2.module.css"
 import { ShowMore } from "common/components/show-more/show-more"
 
-export interface FilterMultiSelectProps2 {
-  filterLabels: Record<string, string>
+export interface FilterMultiSelectProps2<Key extends string> {
+  filterLabels: Record<Key, string>
   selected: CBFilterSelection
   onSelect: (filters: CBFilterSelection) => void
-  getFilterOptions: (filter: string) => Promise<any[]>
+  getFilterOptions: (filter: Key) => Promise<any[]>
 }
-export const FilterMultiSelect2 = ({
+export const FilterMultiSelect2 = <Key extends string>({
   filterLabels,
   selected = {},
   onSelect,
   getFilterOptions,
-}: FilterMultiSelectProps2) => {
-  const filters = Object.keys(filterLabels)
+}: FilterMultiSelectProps2<Key>) => {
+  const filters = Object.keys(filterLabels) as Key[]
 
   return (
     <ShowMore>

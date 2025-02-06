@@ -1,9 +1,9 @@
 import * as norm from "common/utils/normalizers"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
-import { Grid } from "common/components/scaffold"
 import { Normalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
 import { SafFilter, SafFilterSelection } from "../types"
+import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 
 export interface FiltersProps {
   filters: SafFilter[]
@@ -30,19 +30,21 @@ export function SafFilters({
     [SafFilter.DeliverySites]: t("Sites de livraison"),
   }
 
+  const computedFilters = filters.reduce(
+    (acc, filter) => {
+      acc[filter] = filterLabels[filter]
+      return acc
+    },
+    {} as Record<SafFilter, string>
+  )
+
   return (
-    <Grid>
-      {filters.map((filter) => (
-        <FilterSelect
-          key={filter}
-          field={filter}
-          placeholder={filterLabels[filter]}
-          value={selected[filter]}
-          onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
-          getOptions={() => getFilterOptions(filter)}
-        />
-      ))}
-    </Grid>
+    <FilterMultiSelect2
+      filterLabels={computedFilters}
+      getFilterOptions={getFilterOptions}
+      selected={selected}
+      onSelect={onSelect}
+    />
   )
 }
 

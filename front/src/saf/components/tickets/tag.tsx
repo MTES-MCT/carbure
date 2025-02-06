@@ -1,19 +1,18 @@
 import { EtsStatusEnum } from "api-schema"
 import { Certificate } from "common/components/icons"
-import { Tag, TagProps, TagVariant } from "common/components/tag"
 import { useTranslation } from "react-i18next"
 import { SafTicketStatus } from "saf/types"
-
-export interface TicketTagProps extends TagProps {
+import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
+export interface TicketTagProps {
   status?: SafTicketStatus
   ets?: EtsStatusEnum | null
 }
 
-export const TicketTag = ({ status, ets, small, big }: TicketTagProps) => {
+export const TicketTag = ({ status, ets }: TicketTagProps) => {
   const { t } = useTranslation()
 
   let label
-  let variant: TagVariant
+  let variant: BadgeProps["severity"]
   let declared = false
 
   switch (status) {
@@ -29,12 +28,12 @@ export const TicketTag = ({ status, ets, small, big }: TicketTagProps) => {
 
     case SafTicketStatus.REJECTED:
       label = t("Refusé")
-      variant = "danger"
+      variant = "error"
       break
 
     default:
       label = t("N/A")
-      variant = "none"
+      variant = "info"
       break
   }
 
@@ -51,10 +50,10 @@ export const TicketTag = ({ status, ets, small, big }: TicketTagProps) => {
   }
 
   return (
-    <Tag variant={variant} small={small} big={big}>
+    <Badge severity={variant} noIcon>
       {declared && <Certificate />}
       {label}
-    </Tag>
+    </Badge>
   )
 }
 
