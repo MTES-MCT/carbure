@@ -27,6 +27,10 @@
   background-color: white;
 }
 
+.content--margin-top {
+  margin-top: 0;
+}
+
 .main > header {
   display: flex;
   flex-direction: column;
@@ -122,6 +126,10 @@ section.bar {
 section.actionbar {
   display: flex;
   gap: var(--spacing-m);
+}
+
+.actionbar--grow {
+  flex-grow: 1;
 }
 
 .column {
