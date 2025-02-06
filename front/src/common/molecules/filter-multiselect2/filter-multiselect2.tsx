@@ -1,6 +1,6 @@
-import { Grid } from "common/components/scaffold"
 import { MultiSelect } from "common/components/selects2/multiselect"
 import { CBFilterSelection } from "common/hooks/query-builder-2"
+import styles from "./filter-multiselect2.module.css"
 
 export interface FilterMultiSelectProps2 {
   filterLabels: Record<string, string>
@@ -16,7 +16,7 @@ export const FilterMultiSelect2 = ({
 }: FilterMultiSelectProps2) => {
   const filters = Object.keys(filterLabels)
   return (
-    <Grid>
+    <div className={styles["filter-multiselect"]}>
       {filters.map((filter) => (
         <MultiSelect
           key={filter}
@@ -26,9 +26,9 @@ export const FilterMultiSelect2 = ({
           sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
           onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
           getOptions={() => getFilterOptions(filter)}
-          full
+          className={styles["filter-multiselect__filter"]}
         />
       ))}
-    </Grid>
+    </div>
   )
 }
