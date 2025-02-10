@@ -96,18 +96,17 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
         onSelect={actions.setFilters}
         getFilterOptions={getTicketFilter}
       />
-      <section>
-        <TicketsTable
-          client
-          loading={ticketsResponse.loading}
-          state={state}
-          actions={actions}
-          order={state.order}
-          status={status}
-          ticketsData={ticketsData}
-          rowLink={showTicketDetail}
-        />
-      </section>
+
+      <TicketsTable
+        client
+        loading={ticketsResponse.loading}
+        state={state}
+        actions={actions}
+        order={state.order}
+        status={status}
+        ticketsData={ticketsData}
+        rowLink={showTicketDetail}
+      />
 
       {ticketsData && (
         <HashRoute

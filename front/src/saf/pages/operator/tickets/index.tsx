@@ -4,7 +4,7 @@ import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { ActionBar, Content } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   SafColumsOrder,
@@ -43,7 +43,7 @@ export const OperatorTickets = ({
 }: OperatorTicketsProps) => {
   const { t } = useTranslation()
   usePrivateNavigation(
-    type === "received" ? t("Tickets reçus") : t("Tickets assignés")
+    type === "received" ? t("Tickets reçus") : t("Tickets affectés")
   )
 
   const location = useLocation()
@@ -92,31 +92,31 @@ export const OperatorTickets = ({
 
   return (
     <>
-      <Bar>
+      <SafStatusSwitcher
+        onSwitch={actions.setStatus}
+        type={type}
+        count={snapshot}
+        status={status}
+      />
+      <Content>
+        <ActionBar>
+          <ActionBar.Grow>
+            <SearchInput
+              clear
+              debounce={250}
+              value={state.search}
+              onChange={actions.setSearch}
+            />
+          </ActionBar.Grow>
+          <ExportButton query={query} download={api.downloadOperatorTickets} />
+        </ActionBar>
+
         <SafFilters
           filters={filters}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTicketFilter}
         />
-      </Bar>
-      <section>
-        <ActionBar>
-          <SafStatusSwitcher
-            onSwitch={actions.setStatus}
-            type={type}
-            count={snapshot}
-            status={status}
-          />
-
-          <ExportButton query={query} download={api.downloadOperatorTickets} />
-          <SearchInput
-            clear
-            debounce={250}
-            value={state.search}
-            onChange={actions.setSearch}
-          />
-        </ActionBar>
 
         <TicketsTable
           loading={ticketsResponse.loading}
@@ -128,20 +128,20 @@ export const OperatorTickets = ({
           client={type === "received"}
           rowLink={showTicketDetail}
         />
-      </section>
 
-      <HashRoute
-        path="ticket/:id"
-        element={
-          <OperatorTicketDetails
-            limit={state.limit}
-            total={ticketsData?.count ?? 0}
-            fetchIdsForPage={fetchIdsForPage}
-            baseIdsList={ids}
-          />
-        }
-      />
-      <HashRoute path="ticket-source/:id" element={<TicketSourceDetails />} />
+        <HashRoute
+          path="ticket/:id"
+          element={
+            <OperatorTicketDetails
+              limit={state.limit}
+              total={ticketsData?.count ?? 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={ids}
+            />
+          }
+        />
+        <HashRoute path="ticket-source/:id" element={<TicketSourceDetails />} />
+      </Content>
     </>
   )
 }
