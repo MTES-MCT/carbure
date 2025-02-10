@@ -88,18 +88,32 @@ ERROR_METER_READINGS = [
         "reading_date": datetime.date(2025, 9, 28),
     },
     {
-        # reading date is before previous one (+ outside quarter)
+        # reading date is before previous one (+ before beginning of quarter)
         "charge_point_id": "FR00UVWX",
         "previous_reading": 500,
         "current_reading": 2000,
-        "reading_date": datetime.date(2024, 1, 28),  # previous: date(2024, 3, 28)
+        "reading_date": datetime.date(2024, 3, 25),  # previous: date(2024, 3, 28)
     },
     {
         # facteur_de_charge is greater than 100%
-        "charge_point_id": "FR00YZAB",
+        "charge_point_id": "FR11ABCD",
         "previous_reading": 500,
         "current_reading": 2000000,
         "reading_date": datetime.date(2025, 9, 28),
+    },
+    {
+        # reading date is before beginning of quarter
+        "charge_point_id": "FR11EFGH",
+        "previous_reading": 500,
+        "current_reading": 600,
+        "reading_date": datetime.date(2025, 6, 28),
+    },
+    {
+        # reading date is after end of quarter
+        "charge_point_id": "FR11IJKL",
+        "previous_reading": 500,
+        "current_reading": 600,
+        "reading_date": datetime.date(2025, 10, 25),
     },
 ]
 
@@ -280,16 +294,50 @@ class ElecMeterReadingsTest(TestCase):
         self.charge_point_7 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
             cpo=self.cpo,
-            charge_point_id="FR00YZAB",
+            charge_point_id="FR11ABCD",
             current_type="AC",
             installation_date=datetime.date(2021, 6, 2),
             current_meter=self.meter4,
-            measure_reference_point_id="PRM_YZAB",
+            measure_reference_point_id="PRM_ABCD1",
             station_name="Station",
             station_id="FR00",
             nominal_power=50,
             cpo_name="CPO",
-            cpo_siren="SIREN_YZAB",
+            cpo_siren="SIREN_ABCD1",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
+
+        self.charge_point_8 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR11EFGH",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=self.meter4,
+            measure_reference_point_id="PRM_EFGH",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=50,
+            cpo_name="CPO",
+            cpo_siren="SIREN_EFGH",
+            latitude=Decimal(12.0),
+            longitude=Decimal(5.0),
+        )
+
+        self.charge_point_9 = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FR11IJKL",
+            current_type="AC",
+            installation_date=datetime.date(2021, 6, 2),
+            current_meter=self.meter4,
+            measure_reference_point_id="PRM_IJKL",
+            station_name="Station",
+            station_id="FR00",
+            nominal_power=50,
+            cpo_name="CPO",
+            cpo_siren="SIREN_IJKL",
             latitude=Decimal(12.0),
             longitude=Decimal(5.0),
         )
@@ -356,8 +404,10 @@ class ElecMeterReadingsTest(TestCase):
         assert sheet["A5"].value == self.charge_point_5.charge_point_id
         assert sheet["A6"].value == self.charge_point_6.charge_point_id
         assert sheet["A7"].value == self.charge_point_7.charge_point_id
+        assert sheet["A8"].value == self.charge_point_8.charge_point_id
+        assert sheet["A9"].value == self.charge_point_9.charge_point_id
 
-        assert sheet["A8"].value is None
+        assert sheet["A10"].value is None
 
     def test_check_application_error(self):
         excel_file = create_meter_readings_excel(
@@ -388,7 +438,7 @@ class ElecMeterReadingsTest(TestCase):
                 "meter_reading_count": 1,
                 "quarter": 3,
                 "year": 2025,
-                "error_count": 8,
+                "error_count": 10,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -440,6 +490,24 @@ class ElecMeterReadingsTest(TestCase):
                         "meta": {
                             "extracted_energy": [
                                 "Le facteur de charge estimé depuis le dernier relevé enregistré est supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la puissance de votre point de recharge, renseignée sur TDG."  # noqa
+                            ],
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 11,
+                        "meta": {
+                            "reading_date": [
+                                "La date du relevé ne correspond pas au trimestre traité actuellement.",
+                            ],
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 12,
+                        "meta": {
+                            "reading_date": [
+                                "La date du relevé ne correspond pas au trimestre traité actuellement.",
                             ],
                         },
                     },
@@ -601,7 +669,7 @@ class ElecMeterReadingsTest(TestCase):
                     "quarter": 3,
                     "urgency_status": "HIGH",
                     "year": 2024,
-                    "charge_point_count": 6,
+                    "charge_point_count": 8,
                 },
             },
             "status": "success",
