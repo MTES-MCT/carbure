@@ -2626,7 +2626,6 @@ export interface components {
       validation_date?: string | null
       /** Format: double */
       readonly volume: number
-      readonly unit: string
       /** Format: double */
       readonly avoided_emissions: number
       details?: components["schemas"]["OperationDetail"][]

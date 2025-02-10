@@ -7990,9 +7990,6 @@ components:
           type: number
           format: double
           readOnly: true
-        unit:
-          type: string
-          readOnly: true
         avoided_emissions:
           type: number
           format: double
@@ -8012,7 +8009,6 @@ components:
         - sector
         - to_depot
         - type
-        - unit
         - volume
     OperationDetail:
       type: object
