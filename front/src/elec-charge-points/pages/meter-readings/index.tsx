@@ -51,12 +51,22 @@ const ElecMeterReadingsSettings = ({
       (app) => app.status === ElecAuditApplicationStatus.Pending
     )
 
+    const hasAcceptedApplicationForCurrentQuarter = applications.some(
+      (app) =>
+        app.quarter === currentApplicationPeriod?.quarter &&
+        app.year === currentApplicationPeriod.year &&
+        app.status === ElecAuditApplicationStatus.Accepted
+    )
+
     portal((resolve) => (
       <ElecMeterReadingsFileUpload
         onClose={resolve}
         companyId={companyId}
         currentApplicationPeriod={currentApplicationPeriod!}
         hasPendingApplications={hasPendingApplications}
+        hasAcceptedApplicationForCurrentQuarter={
+          hasAcceptedApplicationForCurrentQuarter
+        }
       />
     ))
   }
@@ -70,13 +80,6 @@ const ElecMeterReadingsSettings = ({
       application.id
     )
   }
-
-  const hasAcceptedApplicationForCurrentQuarter = applications.some(
-    (app) =>
-      app.quarter === currentApplicationPeriod?.quarter &&
-      app.year === currentApplicationPeriod.year &&
-      app.status === ElecAuditApplicationStatus.Accepted
-  )
 
   return (
     <section>
@@ -101,12 +104,6 @@ const ElecMeterReadingsSettings = ({
                   : "primary"
           }
           icon={Plus}
-          disabled={
-            (currentApplication &&
-              currentApplication.status !==
-                ElecAuditApplicationStatus.Pending) ||
-            hasAcceptedApplicationForCurrentQuarter
-          }
           action={showUploadDialog}
           label={t("Transmettre mes relevés trimestriels {{quarter}}", {
             quarter: quarterString,
