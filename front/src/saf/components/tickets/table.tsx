@@ -1,4 +1,3 @@
-import Pagination from "common/components/pagination"
 import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
@@ -11,8 +10,9 @@ import {
   SafTicketStatus,
 } from "saf/types"
 import TicketTag from "./tag"
-import NoResult from "common/components/no-result"
 import { Order, Table, Cell } from "common/components/table2"
+import { Pagination } from "common/components/pagination2/pagination"
+import { NoResult } from "common/components/no-result2"
 
 export interface TicketsTableProps {
   loading: boolean
@@ -63,13 +63,9 @@ export const TicketsTable = memo(
 
             {(state.limit || 0) < total && (
               <Pagination
-                page={state.page}
-                startPage={1}
+                defaultPage={state.page}
                 limit={state.limit}
                 total={total}
-                onPage={actions.setPage}
-                onLimit={actions.setLimit}
-                keepSearch
               />
             )}
           </>

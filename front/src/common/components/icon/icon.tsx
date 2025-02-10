@@ -228,3 +228,7 @@ export const FileListLine = ({ ...props }: IconProps) => {
 export const FileListFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-file-list-fill" />
 }
+
+export const ChatDeleteLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-chat-delete-line" />
+}
