@@ -1,0 +1,13 @@
+.checkbox-without-label {
+  width: 24px;
+  height: 24px;
+}
+
+.checkbox-without-label--small {
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-without-label__no-margin::before {
+  margin-top: 0 !important;
+}
