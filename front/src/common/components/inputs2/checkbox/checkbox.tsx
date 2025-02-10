@@ -9,10 +9,13 @@ import {
 } from "common/utils/normalize"
 import { multipleSelection } from "common/utils/selection"
 import { ChangeEvent } from "react"
-
+import cl from "clsx"
+import { fr } from "@codegouvfr/react-dsfr"
+import css from "./checkbox.module.css"
 type CheckboxProps = Omit<CheckboxDSFRProps, "options"> & {
   label?: string
   value?: boolean
+  captive?: boolean
   onChange?: (value: boolean) => void
 }
 
@@ -20,6 +23,8 @@ export const Checkbox = ({
   label,
   value,
   onChange,
+  captive = false,
+  small,
   ...props
 }: CheckboxProps) => {
   const options: CheckboxDSFRProps["options"] = [
@@ -29,10 +34,39 @@ export const Checkbox = ({
         checked: value,
         onChange: (e: ChangeEvent<HTMLInputElement>) =>
           onChange?.(e.target.checked),
+        onClick: captive ? (e) => e.stopPropagation() : undefined,
       },
     },
   ]
-  return <CheckboxDSFR {...props} options={options} />
+
+  // The checkbox DSFR component does not support checkbox without label
+  if (!label) {
+    return (
+      <div
+        className={cl(
+          css["checkbox-without-label"],
+          fr.cx("fr-checkbox-group"),
+          small && fr.cx("fr-checkbox-group--sm"),
+          small && css["checkbox-without-label--small"]
+        )}
+      >
+        <input
+          type="checkbox"
+          {...props}
+          checked={value ?? false}
+          onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
+        />
+        <label
+          className={cl(
+            fr.cx("fr-label"),
+            css["checkbox-without-label__no-margin"]
+          )}
+          htmlFor={props.id}
+        />
+      </div>
+    )
+  }
+  return <CheckboxDSFR {...props} options={options} small={small} />
 }
 
 export type CheckboxGroupProps<T, V> = Omit<CheckboxDSFRProps, "options"> & {

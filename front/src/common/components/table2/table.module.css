@@ -46,11 +46,11 @@
   position: relative;
 }
 
-.rows > li:not(.rowLink) {
+.rows > li.rowLink {
   padding-bottom: 0;
 }
 
-.rows > li:not(.rowLink):not(:last-child) {
+.rows > li:not(:last-child) {
   border-bottom: 1px solid var(--border-default-grey);
 }
 
@@ -63,9 +63,9 @@
   min-width: 0;
 }
 
-.rows > li > a:not(:last-child) {
+/* .rows > li > a:not(:last-child) {
   border-bottom: 1px solid var(--border-default-grey);
-}
+} */
 
 .rows > li,
 .rows > li > a {
@@ -105,8 +105,8 @@
   color: var(--orange-dark);
 }
 
-.cell small {
-  color: var(--gray-dark);
+.cell__sub-text {
+  color: var(--text-disabled-grey);
 }
 
 .small {
@@ -119,16 +119,21 @@
 }
 
 .header,
-.cell .multiline > *,
-.cell .multiline div > * {
+.cell .overflow > *,
+.cell .overflow div > * {
   display: block;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.cell .multiline strong > svg {
+.cell .overflow strong > svg {
   margin-bottom: -5px;
+}
+
+.cell:has(.multiline) {
+  padding-top: var(--spacing-1w);
+  padding-bottom: var(--spacing-1w);
 }
 
 .selection {
@@ -136,6 +141,8 @@
   flex: 0 0 min-content;
   min-width: 0;
   padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .selection [data-checkbox] {
@@ -146,11 +153,10 @@
 }
 
 .rows .selection {
-  /* margin-left: calc(-1 * (var(--spacing-2w) + 1px)); */
   margin-left: -1px;
 }
 
-.header.selection [data-checkbox],
+.header.selection,
 .rows .selection {
   border-right: 1px solid var(--border-default-grey);
   padding: var(--spacing-2w) var(--spacing-3w);

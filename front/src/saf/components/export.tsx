@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 export interface ExportButtonProps<
   GenericType extends CBQueryParams<ParamsType, Status, Type>,
   ParamsType extends string[],
-  Status extends string,
-  Type extends string,
+  Status extends string | undefined,
+  Type extends string | undefined,
 > {
   query: GenericType
   download: (query: GenericType) => unknown

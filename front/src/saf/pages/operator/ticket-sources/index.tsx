@@ -4,8 +4,7 @@ import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
-import Pagination from "common/components/pagination"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { ActionBar, Content } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import {
@@ -31,6 +30,7 @@ import { SafTicketSource, SafTicketSourceStatus } from "../types"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExportButton } from "saf/components/export"
+import { Pagination } from "common/components/pagination2/pagination"
 
 export interface TicketSourcesProps {
   year: number
@@ -50,6 +50,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
     SafTicketSourceStatus,
     undefined
   >(entity, year, status)
+
   const query = useCBQueryBuilder<
     SafOperatorColumnsOrder[],
     SafTicketSourceStatus,
@@ -94,7 +95,26 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 
   return (
     <>
-      <Bar>
+      <StatusSwitcher
+        onSwitch={actions.setStatus}
+        count={snapshot}
+        status={status}
+      />
+      <Content>
+        <ActionBar>
+          <ActionBar.Grow>
+            <SearchInput
+              clear
+              debounce={250}
+              value={state.search}
+              onChange={actions.setSearch}
+            />
+          </ActionBar.Grow>
+          <ExportButton
+            query={query}
+            download={api.downloadOperatorTicketSources}
+          />
+        </ActionBar>
         <SafFilters
           filters={FILTERS}
           selected={state.filters}
@@ -103,28 +123,6 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
             api.getTicketSourceFilters(filter, query)
           }
         />
-      </Bar>
-
-      <section>
-        <ActionBar>
-          <StatusSwitcher
-            onSwitch={actions.setStatus}
-            count={snapshot}
-            status={status}
-          />
-
-          <ExportButton
-            asideX
-            query={query}
-            download={api.downloadOperatorTicketSources}
-          />
-          <SearchInput
-            clear
-            debounce={250}
-            value={state.search}
-            onChange={actions.setSearch}
-          />
-        </ActionBar>
 
         {selectedTicketSources &&
           status === SafTicketSourceStatus.AVAILABLE && (
@@ -146,14 +144,11 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
               status={status}
             />
 
-            {(state.limit || 0) < total && (
+            {(state.limit ?? 0) < total && (
               <Pagination
-                page={state.page}
+                defaultPage={state.page}
                 limit={state.limit}
                 total={total}
-                onPage={actions.setPage}
-                onLimit={actions.setLimit}
-                startPage={1}
               />
             )}
           </>
@@ -164,7 +159,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
             onFilter={actions.setFilters}
           />
         )}
-      </section>
+      </Content>
+
       <HashRoute
         path="ticket-source/:id"
         element={
