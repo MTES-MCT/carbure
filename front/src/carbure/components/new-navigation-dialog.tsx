@@ -55,23 +55,22 @@ export const NewNavigationDialog = () => {
         </Text>
         <br />
         <Text>
-          <Trans>
-            <strong>Comment changer d'entité ?</strong> Rendez-vous en haut à
-            gauche de la barre latérale de navigation, ouvrez le menu déroulant
-            puis cliquez sur ajouter une entité.
+          <Trans components={{ b: <b /> }}>
+            <b>Comment changer d'entité ?</b> Rendez-vous en haut à gauche de la
+            barre latérale de navigation, ouvrez le menu déroulant puis cliquez
+            sur ajouter une entité.
           </Trans>
         </Text>
         <Text>
-          <Trans>
-            <strong>Où sont mes paramètres ?</strong> Ils sont désormais situés
-            en bas à gauche de la page.
+          <Trans components={{ b: <b /> }}>
+            <b>Où sont mes paramètres ?</b> Ils sont désormais situés en bas à
+            gauche de la page.
           </Trans>
         </Text>
         <Text>
-          <Trans>
-            <strong>Vous avez besoin d'aide ?</strong> Rendez-vous dans la
-            rubrique Aide en haut à droite pour compléter notre formulaire de
-            contact.
+          <Trans components={{ b: <b /> }}>
+            <b>Vous avez besoin d'aide ?</b> Rendez-vous dans la rubrique Aide
+            en haut à droite pour compléter notre formulaire de contact.
           </Trans>
         </Text>
       </Dialog>

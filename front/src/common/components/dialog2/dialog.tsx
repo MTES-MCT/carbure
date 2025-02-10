@@ -13,6 +13,8 @@ export interface DialogProps {
   className?: string
   style?: React.CSSProperties
   fullscreen?: boolean
+  fullWidth?: boolean
+  fullHeight?: boolean
   children?: React.ReactNode
   header?: React.ReactNode
   footer?: React.ReactNode
@@ -26,12 +28,20 @@ export const Dialog = ({
   header,
   footer,
   fullscreen,
+  fullWidth,
+  fullHeight,
   onClose,
 }: DialogProps) => (
   <div className={css.screen}>
     <Overlay onClick={onClose} />
     <div
-      className={cl(css.dialog, fullscreen && css.fullscreen, className)}
+      className={cl(
+        css.dialog,
+        fullscreen && css.fullscreen,
+        fullWidth && css.fullWidth,
+        fullHeight && css.fullHeight,
+        className
+      )}
       style={style}
     >
       <Button
