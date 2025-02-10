@@ -2,13 +2,14 @@ import cl from "clsx"
 import { Link, To } from "react-router-dom"
 import useControlledState from "../../hooks/controlled-state"
 import { multipleSelection } from "../../utils/selection"
-import Checkbox from "../checkbox"
 import { ChevronRight } from "../icons"
 import { Col, LoaderOverlay } from "../scaffold"
 import css from "./table.module.css"
 import Tooltip from "../tooltip"
 import { Text } from "../text"
 import { useTranslation } from "react-i18next"
+import { Checkbox } from "../inputs2"
+import { ReactNode } from "react"
 
 export type TableVariant = "spaced" | "compact"
 
@@ -92,11 +93,11 @@ export function Table<T>({
                   captive
                   value={selected.length > 0}
                   onChange={() => onSelect?.([])}
-                >
-                  {t("{{count}} lignes sélectionnées", {
+                  label={t("{{count}} lignes sélectionnées", {
                     count: selected.length,
                   })}
-                </Checkbox>
+                  small
+                />
               </span>
               {topActions?.map((action, i) => (
                 <div
@@ -191,7 +192,7 @@ function isVisible(column: Column<any>) {
   return !column.hidden
 }
 
-function selectionColumn<T, V>(
+export function selectionColumn<T, V>(
   rows: T[],
   selected: V[],
   onSelect: (selected: V[]) => void,
@@ -207,6 +208,7 @@ function selectionColumn<T, V>(
         captive
         value={selection.isAllSelected(values)}
         onChange={() => selection.onSelectAll(values)}
+        small
       />
     ),
     cell: (item) => (
@@ -214,6 +216,7 @@ function selectionColumn<T, V>(
         captive
         value={selection.isSelected(identify(item))}
         onChange={() => selection.onSelect(identify(item))}
+        small
       />
     ),
   }
@@ -316,8 +319,8 @@ export interface CellProps {
   style?: React.CSSProperties
   variant?: CellVariant
   icon?: React.FunctionComponent | React.ReactNode
-  text?: any
-  sub?: any
+  text?: ReactNode
+  sub?: ReactNode
 }
 
 export const Cell = ({
@@ -332,13 +335,25 @@ export const Cell = ({
 
   return (
     <Col
-      className={cl(css.multiline, variant && css[variant], className)}
+      className={cl(
+        css.overflow,
+        text && sub && css.multiline,
+        variant && css[variant],
+        className
+      )}
       style={style}
     >
       <Tooltip title={`${text || sub}`}>
-        {text || sub} {icon}
+        <Text is="span" size={text && sub ? "sm" : undefined}>
+          {text || sub}
+          {icon}
+        </Text>
       </Tooltip>
-      {text && sub !== undefined && <small title={`${sub}`}>{sub}</small>}
+      {text && sub !== undefined && (
+        <Text is="span" size="sm" className={css["cell__sub-text"]}>
+          {sub}
+        </Text>
+      )}
     </Col>
   )
 }

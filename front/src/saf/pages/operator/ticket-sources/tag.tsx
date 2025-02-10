@@ -1,8 +1,8 @@
-import { Tag, TagProps, TagVariant } from "common/components/tag"
+import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 import { useTranslation } from "react-i18next"
 import { SafTicketSource } from "saf/pages/operator/types"
 
-export interface TicketSourceTagProps extends TagProps {
+export interface TicketSourceTagProps {
   ticketSource: SafTicketSource | undefined
 }
 
@@ -17,20 +17,20 @@ export const TicketSourceTag = ({
   const available_volume =
     ticketSource.total_volume - ticketSource.assigned_volume
   let label
-  let variant: TagVariant
+  let variant: BadgeProps["severity"]
 
   if (available_volume > 0) {
     label = t("Disponible")
     variant = "success"
   } else {
     label = t("Affecté")
-    variant = "none"
+    variant = "info"
   }
 
   return (
-    <Tag {...props} variant={variant}>
+    <Badge {...props} severity={variant} noIcon>
       {label}
-    </Tag>
+    </Badge>
   )
 }
 
