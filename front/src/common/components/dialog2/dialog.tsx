@@ -6,7 +6,7 @@ import { Button, ButtonProps } from "../button2"
 import { Title, TitleProps } from "../title"
 import { Text, TextProps } from "../text"
 import { useMutation } from "common/hooks/async"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { IconName } from "../icon"
 
 export interface DialogProps {
@@ -53,7 +53,7 @@ export const Dialog = ({
         onClick={onClose}
         className={css["dialog__close-button"]}
       >
-        Fermer
+        <Trans>Fermer</Trans>
       </Button>
       <div className={css["dialog__wrapper"]}>
         {header && <header className={css["dialog__header"]}>{header}</header>}
