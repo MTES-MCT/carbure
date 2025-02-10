@@ -47,6 +47,7 @@ export const DefaultList: Story = {
     // For unknown reason, the dropdown does not have the good size
     // when the story is rendered.
     await new Promise((resolve) => setTimeout(resolve, 100))
+
     await userEvent.click(select)
   },
 }

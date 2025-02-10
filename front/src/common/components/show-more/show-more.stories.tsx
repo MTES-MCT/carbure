@@ -6,7 +6,6 @@ import { userEvent, waitFor, within } from "@storybook/test"
 const meta: Meta<typeof ShowMore> = {
   component: ShowMore,
   title: "common/components/ShowMore",
-  tags: ["IN PROGRESS"],
   render: (args) => {
     return (
       <div style={{ width: "700px", border: "1px solid red" }}>

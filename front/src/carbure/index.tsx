@@ -29,6 +29,7 @@ import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { ContactPage } from "contact"
 import { YearsProvider } from "common/providers/years-provider"
+import { NewNavigationDialog } from "./components/new-navigation-dialog"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -85,6 +86,7 @@ const Carbure = () => {
                     <Route path="*" element={<Navigate replace to="/" />} />
                   )}
                 </Routes>
+                <NewNavigationDialog />
               </NavigationLayout>
 
               {user.loading && <LoaderOverlay />}
