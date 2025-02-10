@@ -1,4 +1,6 @@
-import Tabs from "common/components/tabs"
+// import Tabs from "common/components/tabs"
+import { ChatDeleteLine, CheckLine, DraftFill } from "common/components/icon"
+import { Tabs } from "common/components/tabs2"
 import { compact } from "common/utils/collection"
 import { useTranslation } from "react-i18next"
 import { SafOperatorSnapshot, SafQueryType, SafTicketStatus } from "saf/types"
@@ -43,19 +45,30 @@ export const SafStatusSwitcher = ({
     }
   }
 
+  const getStatusIcon = (status: SafTicketStatus) => {
+    switch (status) {
+      case SafTicketStatus.PENDING:
+        return DraftFill
+      case SafTicketStatus.REJECTED:
+        return ChatDeleteLine
+      case SafTicketStatus.ACCEPTED:
+        return CheckLine
+    }
+  }
+
   return (
     <Tabs
-      keepSearch
-      variant="switcher"
       focus={status}
       onFocus={(status) => onSwitch(status as SafTicketStatus)}
       tabs={displayedStatuses.map((status) => {
         return {
           key: status,
-          path: status.toLowerCase(),
           label: getStatusLabel(status),
+          icon: getStatusIcon(status),
+          path: status.toLowerCase(),
         }
       })}
+      keepSearch
     />
   )
 }
