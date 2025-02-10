@@ -37,6 +37,9 @@ export function createNewDeliverySite(
   depot_type: SiteType,
   address: string,
   postal_code: string,
+  blender: any,
+  ownership_type: any,
+  blending_is_outsourced: any,
   electrical_efficiency?: number,
   thermal_efficiency?: number,
   useful_temperature?: number
@@ -55,6 +58,9 @@ export function createNewDeliverySite(
       electrical_efficiency,
       thermal_efficiency,
       useful_temperature,
+      blending_is_outsourced,
+      blending_entity_id: blender?.id,
+      ownership_type,
     },
   })
 }

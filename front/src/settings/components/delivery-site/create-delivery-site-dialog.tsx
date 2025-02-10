@@ -24,6 +24,7 @@ export const CreateDeliverySiteDialog = ({
   const entity = useEntity()
   const closeAll = useCloseAllPortals()
   const createNewDeliverySite = useMutation(api.createNewDeliverySite, {
+    invalidates: ["production-sites"],
     onSuccess: () => {
       closeAll()
       notify(
@@ -52,6 +53,9 @@ export const CreateDeliverySiteDialog = ({
       values.site_type!,
       values.address!,
       values.postal_code!,
+      values.blender,
+      values.ownership_type,
+      values.blending_is_outsourced,
       values.electrical_efficiency!,
       values.thermal_efficiency!,
       values.useful_temperature!

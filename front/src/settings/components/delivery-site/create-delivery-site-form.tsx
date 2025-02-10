@@ -11,9 +11,11 @@ import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
 import { AutoCompleteCountries } from "carbure/components/autocomplete-countries"
+import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
 import {
   useDeliverySiteFlags,
   useGetDepotTypeOptions,
+  useOwnerShipTypeOptions,
 } from "./delivery-site.hooks"
 import useEntity from "carbure/hooks/entity"
 import Checkbox from "common/components/checkbox"
@@ -40,8 +42,11 @@ export type DeliverySiteFormType = Partial<
     | "electrical_efficiency"
     | "thermal_efficiency"
     | "useful_temperature"
-  >
->
+  > &
+    Pick<EntityDepot, "ownership_type" | "blending_is_outsourced">
+> & {
+  blender?: Pick<EntityDepot["blender"], "id" | "name" | "entity_type">
+}
 
 const mapDeliverySiteToForm: (
   deliverySite?: EntityDepot
@@ -76,6 +81,7 @@ export const DeliverySiteForm = ({
     useDeliverySiteFlags(value.site_type)
 
   const depotTypeOptions = useGetDepotTypeOptions({ country: value.country })
+  const ownerShipTypeOptions = useOwnerShipTypeOptions()
 
   const handleSubmit = (values: DeliverySiteFormType) => {
     onCreate?.({
@@ -93,6 +99,9 @@ export const DeliverySiteForm = ({
       useful_temperature: isCogenerationPlant
         ? values.useful_temperature
         : undefined!,
+      blender: values.blender,
+      blending_is_outsourced: values.blending_is_outsourced,
+      ownership_type: values.ownership_type,
     })
   }
 
@@ -187,6 +196,28 @@ export const DeliverySiteForm = ({
           readOnly={isReadOnly}
         />
       </Row>
+
+      <RadioGroup
+        label={t("Propriété")}
+        options={ownerShipTypeOptions}
+        {...bind("ownership_type")}
+      />
+
+      {entity && entity.entity_type === EntityType.Operator && (
+        <Checkbox
+          label={t("Incorporation potentiellement effectuée par un tiers")} // prettier-ignore
+          {...bind("blending_is_outsourced")}
+          value={value.blending_is_outsourced ?? false}
+        />
+      )}
+
+      {value.blending_is_outsourced && (
+        <AutoCompleteOperators
+          label={t("Incorporateur Tiers")}
+          placeholder={t("Rechercher un opérateur pétrolier...")}
+          {...bind("blender")}
+        />
+      )}
 
       {entity.entity_type === EntityType.Operator &&
         deliverySite &&
