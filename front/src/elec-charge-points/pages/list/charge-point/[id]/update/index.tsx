@@ -171,22 +171,30 @@ const UpdateChargePointDialog = () => {
                   </Fieldset>
 
                   <Fieldset label={t("Compteur MID")}>
-                    <TextInput
-                      label={t("Numéro du certificat (MID)")}
-                      readOnly
-                      {...bind("mid_id")}
-                    />
-                    <NumberInput
-                      label={`${t("Index initial relevé (kWh)")}${value.initial_index_date ? ` - ${formatDate(value.initial_index_date)}` : ""}`}
-                      readOnly={isReadOnly}
-                      hideError={false}
-                      {...bind("initial_index")}
-                    />
-                    <NumberInput
-                      label={`${t("Dernier index relevé (kWh)")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
-                      readOnly
-                      {...bind("measure_energy")}
-                    />
+                    {value.mid_id && (
+                      <>
+                        <TextInput
+                          label={t("Numéro du certificat (MID)")}
+                          readOnly
+                          {...bind("mid_id")}
+                        />
+                        <NumberInput
+                          label={`${t("Index initial relevé (kWh)")}${value.initial_index_date ? ` - ${formatDate(value.initial_index_date)}` : ""}`}
+                          readOnly={isReadOnly}
+                          hideError={false}
+                          {...bind("initial_index")}
+                          disabled={
+                            value.initial_index != value.measure_energy ||
+                            value.initial_index_date != value.measure_date
+                          }
+                        />
+                        <NumberInput
+                          label={`${t("Dernier index relevé (kWh)")}${value.measure_date ? ` - ${formatDate(value.measure_date)}` : ""}`}
+                          readOnly
+                          {...bind("measure_energy")}
+                        />
+                      </>
+                    )}
 
                     <Button
                       variant="link"
