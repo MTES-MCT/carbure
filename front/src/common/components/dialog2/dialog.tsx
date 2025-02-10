@@ -72,7 +72,11 @@ export interface ConfirmProps {
   description: ReactNode
   confirm: string
   variant?: ButtonProps["priority"]
+  customVariant?: ButtonProps["customPriority"]
   icon?: IconName
+
+  // Hide cancel button
+  hideCancel?: boolean
   onConfirm: () => Promise<any>
   onClose: () => void
 }
@@ -81,6 +85,8 @@ export const Confirm = ({
   description,
   confirm,
   variant = "primary",
+  customVariant,
+  hideCancel,
   icon,
   onConfirm,
   onClose,
@@ -90,6 +96,7 @@ export const Confirm = ({
   const commonButtonProps = {
     nativeButtonProps: { autoFocus: true },
     priority: variant,
+    customPriority: customVariant,
     loading: confirmAction.loading,
     onClick: () => confirmAction.execute().then(onClose),
   }
@@ -104,7 +111,11 @@ export const Confirm = ({
       }
       footer={
         <>
-          <Button priority="secondary">{t("Annuler")}</Button>
+          {!hideCancel && (
+            <Button priority="secondary" onClick={onClose}>
+              {t("Annuler")}
+            </Button>
+          )}
           {/* Couldn't find a better way to handle icon prop drilling */}
           {icon ? (
             <Button {...commonButtonProps} iconId={icon}>

@@ -12,10 +12,19 @@
   font-weight: 600;
 }
 
-.main {
+.main,
+.content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-3w);
+}
+
+.content {
+  margin-top: calc(var(--spacing-3w) * -1);
+  margin-left: calc(var(--spacing-3w) * -1);
+  margin-right: calc(var(--spacing-3w) * -1);
+  padding: var(--spacing-3w);
+  background-color: white;
 }
 
 .main > header {
@@ -107,11 +116,7 @@
 
 section.bar {
   display: flex;
-  /* background-color: var(--white); */
-  /* padding: var(--spacing-m) var(--main-spacing-x); */
   gap: var(--spacing-s);
-  /* box-shadow: var(--shadow); */
-  /* border-top: var(--border); */
 }
 
 section.actionbar {

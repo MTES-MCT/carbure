@@ -17,10 +17,8 @@ export default meta
 export const Default: Story = {
   args: {
     defaultPage: 1,
-    count: 100,
-    getPageLinkProps: (page) => ({
-      to: `page=${page}`,
-    }),
+    total: 100,
+    limit: 10,
   },
   parameters: {
     reactRouter: reactRouterParameters({
