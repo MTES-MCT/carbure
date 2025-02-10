@@ -5,8 +5,8 @@ from rest_framework.response import Response
 
 from core.models import Entity, UserRights
 from entity.serializers import EntitySiteSerializer
-from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights, OrPermission
+from saf.permissions import HasAdminRights, HasUserRights
+from saf.permissions.user_rights import OrPermission
 from transactions.models import Depot, EntitySite
 
 from .mixins import DepotActionMixin

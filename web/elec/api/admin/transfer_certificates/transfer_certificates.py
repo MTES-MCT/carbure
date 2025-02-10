@@ -37,7 +37,7 @@ class TransferCertificatesSortForm(forms.Form):
     limit = forms.IntegerField(required=False)
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
+@check_admin_rights(allow_external=[ExternalAdminRights.ELEC, ExternalAdminRights.TRANSFERRED_ELEC])
 def get_transfer_certificates(request):
     transf_certif_filter_form = TransferCertificatesFilterForm(request.GET)
     transf_certif_sort_form = TransferCertificatesSortForm(request.GET)
