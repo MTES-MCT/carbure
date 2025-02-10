@@ -3,6 +3,7 @@ from django.test import TestCase as DjangoTestCase
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 from transactions.factories import CarbureLotFactory
+from transactions.models import Depot
 from tiruert.models.operation import create_tiruert_operations_from_lots
 
 
@@ -32,6 +33,8 @@ class TestCase(DjangoTestCase):
         feedstock2 = MatierePremiere.objects.filter(category="ANN-IX-A").first()
         biofuel2 = Biocarburant.objects.get(code="EMAG")
         
+        depot1 = Depot.objects.first()
+        
         # LOTS OK
         CarbureLotFactory.create(
             carbure_client=self.entity,
@@ -40,7 +43,8 @@ class TestCase(DjangoTestCase):
             lot_status="FROZEN",
             delivery_type="BLENDING",
             volume=1000,
-            ghg_total = 1.3,        
+            ghg_total = 1.3,
+            carbure_delivery_site=depot1,
         )
         
         CarbureLotFactory.create(
@@ -50,7 +54,8 @@ class TestCase(DjangoTestCase):
             lot_status="ACCEPTED",
             delivery_type="BLENDING",
             volume=2000,
-            ghg_total = 2.5,   
+            ghg_total = 2.5,
+            carbure_delivery_site=depot1,
         )
         
         CarbureLotFactory.create(
@@ -60,7 +65,8 @@ class TestCase(DjangoTestCase):
             lot_status="ACCEPTED",
             delivery_type="DIRECT",
             volume=3000,      
-            ghg_total=3.4,  
+            ghg_total=3.4,
+            carbure_delivery_site=depot1,
         )
         
         CarbureLotFactory.create(
@@ -70,7 +76,8 @@ class TestCase(DjangoTestCase):
             lot_status="ACCEPTED",
             delivery_type="RFC",    
             volume=4000,
-            ghg_total = 4.8,   
+            ghg_total = 4.8,
+            carbure_delivery_site=depot1, 
         )
         
         CarbureLotFactory.create(
@@ -80,7 +87,8 @@ class TestCase(DjangoTestCase):
             lot_status="ACCEPTED",
             delivery_type="RFC",     
             volume=5000,
-            ghg_total = 5.6, 
+            ghg_total = 5.6,
+            carbure_delivery_site=depot1,
         )
         
         # LOTS NOK
@@ -90,7 +98,8 @@ class TestCase(DjangoTestCase):
             biofuel=biofuel1,
             lot_status="DRAFT",
             delivery_type="BLENDING", 
-            volume=1000,       
+            volume=1000,
+            carbure_delivery_site=depot1,
         )
         
         CarbureLotFactory.create(
@@ -99,7 +108,8 @@ class TestCase(DjangoTestCase):
             biofuel=biofuel2,
             lot_status="ACCEPTED",
             delivery_type="EXPORT",    
-            volume=1000,    
+            volume=1000,
+            carbure_delivery_site=depot1,
         )
         
         lots = CarbureLot.objects.filter(carbure_client=self.entity)

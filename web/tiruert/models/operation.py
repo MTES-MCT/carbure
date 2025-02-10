@@ -84,16 +84,15 @@ class Operation(models.Model):
 
 @transaction.atomic
 def create_tiruert_operations_from_lots(lots):
-    # Keep only lots compatible with TIRUERT
-    DELIVERY_TYPES_ACCEPTED = [CarbureLot.RFC, CarbureLot.BLENDING, CarbureLot.DIRECT]
-    validated_lots = lots.filter(lot_status__in=["ACCEPTED", "FROZEN"], delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+    valid_lots = keep_valid_lots(lots)
+    valid_lots = remove_existing_lots(valid_lots)
 
-    if not validated_lots:
+    if not valid_lots:
         return []
 
     # Group validated_lots by delivery_type, feedstock, biofuel and depot
     lots_by_delivery_type = {}
-    for lot in validated_lots:
+    for lot in valid_lots:
         key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site)
         if key not in lots_by_delivery_type:
             lots_by_delivery_type[key] = []
@@ -130,3 +129,14 @@ def create_tiruert_operations_from_lots(lots):
             )
 
         OperationDetail.objects.bulk_create([OperationDetail(**data) for data in lots_bulk])
+
+
+def keep_valid_lots(lots):
+    # Keep only lots compatible with TIRUERT
+    DELIVERY_TYPES_ACCEPTED = [CarbureLot.RFC, CarbureLot.BLENDING, CarbureLot.DIRECT]
+    return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"], delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+
+
+def remove_existing_lots(lots):
+    existing_lots = OperationDetail.objects.filter(lot__in=lots).values_list("lot_id").distinct()
+    return lots.exclude(id__in=existing_lots)

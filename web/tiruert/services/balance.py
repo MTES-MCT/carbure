@@ -66,7 +66,8 @@ class BalanceService:
             if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
 
-            balance[key]["unit"] = unit
+            if key:
+                balance[key]["unit"] = unit
 
         return balance
 

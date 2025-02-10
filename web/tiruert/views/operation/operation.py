@@ -124,13 +124,17 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         ],
     )
     def create(self, request):
+        entity_id = self.request.GET.get("entity_id")
         serializer = OperationInputSerializer(
             data=request.data,
             context={"request": request},
         )
         if serializer.is_valid():
             operation = serializer.save()
-            return Response(OperationSerializer(operation, context={"details": 1}).data, status=status.HTTP_201_CREATED)
+            return Response(
+                OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
