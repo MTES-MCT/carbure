@@ -78,10 +78,8 @@ export const Notice = ({
           <p>
             {Icon && <Icon size="md" className={css.notice__icon} />}
             {title && (
-              <span
-                className={cl(fr.cx("fr-notice__title"), css.notice__title)}
-              >
-                {title}
+              <span className={css.notice__title}>
+                <span className={fr.cx("fr-notice__title")}>{title}</span>
               </span>
             )}
             {child && (
