@@ -55,7 +55,7 @@ def update_charge_point(request, entity, entity_id):
     # Update initial index of current meter
     # Only if there are no meter readings yet
     if "initial_index" in validated_data:
-        if not cp.current_meter:  # DC power case
+        if cp.current_meter:  # AC power case
             if not cp.current_meter.elec_meter_readings.exists():
                 cp.current_meter.initial_index = validated_data["initial_index"]
                 cp.current_meter.save()
