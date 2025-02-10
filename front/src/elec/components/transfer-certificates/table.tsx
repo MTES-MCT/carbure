@@ -2,6 +2,7 @@ import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
 import TransferCertificateTag from "elec/components/transfer-certificates/tag"
+import TransferCertificateTiruertTag from "elec/components/transfer-certificates/tiruert-tag"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
@@ -16,6 +17,7 @@ export interface ElecTransferCertificateTableProps {
   onOrder: (order: Order | undefined) => void
   selected: number[]
   onSelect: (selected: number[]) => void
+  tiruert?: boolean
 }
 
 export const ElecTransferCertificateTable = memo(
@@ -26,8 +28,9 @@ export const ElecTransferCertificateTable = memo(
     rowLink,
     onOrder,
     displayCpo = false,
+    tiruert = false,
   }: ElecTransferCertificateTableProps) => {
-    const columns = useColumns()
+    const columns = useColumns(tiruert || false)
     return (
       <Table
         loading={loading}
@@ -48,14 +51,24 @@ export const ElecTransferCertificateTable = memo(
   }
 )
 
-export function useColumns() {
+export function useColumns(tiruert: boolean) {
   const { t } = useTranslation()
+  const tiruertStatusLabel = t("Statut TIRUERT")
+  const statusLabel = t("Statut")
   return {
     status: {
       key: "status",
-      header: t("Statut TIRUERT"),
+      header: t(tiruert ? tiruertStatusLabel : statusLabel),
       cell: (transferCertificate: ElecTransferCertificatePreview) => {
-        return <TransferCertificateTag status={transferCertificate.status} />
+        if (tiruert) {
+          return (
+            <TransferCertificateTiruertTag
+              used_in_tiruert={transferCertificate.used_in_tiruert}
+            />
+          )
+        } else {
+          return <TransferCertificateTag status={transferCertificate.status} />
+        }
       },
     },
 
