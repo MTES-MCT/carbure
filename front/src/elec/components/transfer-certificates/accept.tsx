@@ -68,7 +68,11 @@ export const AcceptTransfer = ({
   }
 
   const onAcceptTransfer = () => {
-    setShowConfirmationModal(true)
+    if (usedInTiruert === "true") {
+      setShowConfirmationModal(true)
+    } else {
+      handleConfirmTransfer()
+    }
   }
 
   const handleRadioChange = (value: string | undefined) => {
@@ -103,15 +107,21 @@ export const AcceptTransfer = ({
             {tiruertChoice && (
               <p>
                 {t(
-                  "Est-ce que le certificat est concerné par une déclaration TIRUERT ?"
+                  "Est-ce que ce certificat est concerné par une déclaration TIRUERT ?"
                 )}
               </p>
             )}
             {tiruertChoice && (
               <RadioGroup
                 options={[
-                  { value: "true", label: t("Déclaration TIRUERT") },
-                  { value: "false", label: t("Non concerné") },
+                  {
+                    value: "true",
+                    label: t("Concerne une déclaration TIRUERT"),
+                  },
+                  {
+                    value: "false",
+                    label: t("Ne concerne pas encore une déclaration"),
+                  },
                 ]}
                 value={usedInTiruert}
                 onChange={handleRadioChange} // Use the new handler
