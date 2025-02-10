@@ -1,4 +1,6 @@
 import pandas as pd
+from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
 
 
 def detect_emission_category_outliers(
@@ -6,8 +8,8 @@ def detect_emission_category_outliers(
     emission_category: str,
     chosen_quantile: float,
     computed_quantiles: list[float],
-    clf_lof,
-    clf_if,
+    clf_lof: IsolationForest,
+    clf_if: LocalOutlierFactor,
 ) -> pd.DataFrame:
     outliers = pd.DataFrame(columns=df.columns.tolist() + ["is_lof_outlier", "is_if_outlier"])
 
@@ -39,7 +41,7 @@ def detect_emission_category_outliers(
     elif emission_category == "etd":
         outliers = outliers[["etd", "feedstock_id"] + outlier_columns]
 
-    return outliers.drop_duplicates()
+    return outliers
 
 
 def detect_outliers(
@@ -49,9 +51,6 @@ def detect_outliers(
     df_ep: pd.DataFrame,
     df_etd: pd.DataFrame,
 ) -> pd.DataFrame:
-    from sklearn.ensemble import IsolationForest
-    from sklearn.neighbors import LocalOutlierFactor
-
     clf_if = IsolationForest(
         **{
             "bootstrap": False,
