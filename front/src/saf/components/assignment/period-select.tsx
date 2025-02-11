@@ -26,10 +26,15 @@ export const PeriodSelect = ({
     const month: number = deliveryPeriod % 100
     const year: number = Math.floor(deliveryPeriod / 100)
     const list: Option<number>[] = []
-    for (let currentYear = year; currentYear <= year + 1; currentYear++) {
-      let currentMonth = currentYear === year ? month : 1
-      for (; currentMonth <= 12; currentMonth++) {
-        const period = currentYear * 100 + currentMonth
+    const currentDate = new Date()
+    const currentYear = currentDate.getFullYear()
+    const currentMonth = currentDate.getMonth() + 1
+
+    for (let y = year; y <= currentYear; y++) {
+      let m = y === year ? month : 1
+      for (; m <= 12; m++) {
+        if (y === currentYear && m > currentMonth) break
+        const period = y * 100 + m
         const date = formatPeriod(period) + "-01"
         const periodString = formatDate(date, "MMMM yyyy")
 
