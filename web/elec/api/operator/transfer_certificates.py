@@ -19,14 +19,6 @@ from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 
-class ElecOperatorTransferCertificateSerializer(ElecTransferCertificateSerializer):
-    class Meta(ElecTransferCertificateSerializer.Meta):
-        fields = ElecTransferCertificateSerializer.Meta.fields + [
-            "used_in_tiruert",
-            "consumption_date",
-        ]
-
-
 @require_GET
 @check_user_rights()
 def get_transfer_certificates(request, *args, **kwargs):
@@ -62,7 +54,7 @@ def get_transfer_certificates(request, *args, **kwargs):
         page = paginator.page(current_page)
 
         ids = transfer_certificates.values_list("id", flat=True)
-        serialized = ElecOperatorTransferCertificateSerializer(page.object_list, many=True)
+        serialized = ElecTransferCertificateSerializer(page.object_list, many=True)
 
         return SuccessResponse(
             {
