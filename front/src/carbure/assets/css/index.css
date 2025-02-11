@@ -46,7 +46,7 @@ select {
 [href] {
   background-image: none;
 }
-
+/* 
 .fr-stepper__steps {
   background-image: repeating-linear-gradient(
       to right,
@@ -62,7 +62,7 @@ select {
       transparent var(--default-inner),
       transparent var(--default-outer)
     );
-}
+} */
 
 /* ri-loader-line will be used as the common loading icon*/
 @keyframes loading {

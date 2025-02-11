@@ -10,7 +10,7 @@ import { useRoutes } from "common/hooks/routes"
 import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { Operations } from "./operations"
-import { Balance } from "./balance"
+import { Balances } from "./balances"
 import { useState } from "react"
 export const MaterialAccounting = () => {
   const { t } = useTranslation()
@@ -50,7 +50,7 @@ export const MaterialAccounting = () => {
             path="operations"
             element={<Operations setOperationCount={setOperationCount} />}
           />
-          <Route path="balance" element={<Balance />} />
+          <Route path="balances" element={<Balances />} />
           <Route path="*" element={<Navigate replace to="operations" />} />
         </Routes>
       </Content>
