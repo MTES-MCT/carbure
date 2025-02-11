@@ -11,18 +11,14 @@ import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { deleteChargePointsApplication } from "./api"
 
-type ChargePointsPendingProps = {
-  year: number
-}
-
-const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
+const ChargePointsApplications = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
 
   const applicationsResponse = useQuery(apiCpo.getChargePointsApplications, {
     key: "charge-points-applications",
-    params: [entity.id, entity.id, year],
+    params: [entity.id, entity.id],
   })
 
   const deleteApplication = useMutation(
@@ -72,4 +68,4 @@ const ChargePointsPending = ({ year }: ChargePointsPendingProps) => {
   )
 }
 
-export default ChargePointsPending
+export default ChargePointsApplications

@@ -614,6 +614,8 @@ class ElecCharginPointsTest(TestCase):
                         "status": "PENDING",
                         "latitude": None,
                         "longitude": None,
+                        "initial_index": 1000.1234,
+                        "initial_index_date": "2023-06-29",
                     },
                     {
                         "id": charge_point2.id,
@@ -636,6 +638,8 @@ class ElecCharginPointsTest(TestCase):
                         "status": "PENDING",
                         "latitude": None,
                         "longitude": None,
+                        "initial_index": 1000.1234,
+                        "initial_index_date": "2023-06-29",
                     },
                 ],
                 "ids": [charge_point.id, charge_point2.id],
@@ -862,6 +866,8 @@ class ElecCharginPointsTest(TestCase):
                 "status": "PENDING",
                 "latitude": None,
                 "longitude": None,
+                "initial_index": 1000.1234,
+                "initial_index_date": "2023-06-29",
             },
         }
         data = response.json()
@@ -935,6 +941,8 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "latitude": None,
                     "longitude": None,
+                    "initial_index": 1000.1234,
+                    "initial_index_date": "2023-06-29",
                 }
             ],
         }
@@ -961,6 +969,18 @@ class ElecCharginPointsTest(TestCase):
             nominal_power=150,
         )
 
+        ElecChargePoint.objects.create(
+            application=application,
+            cpo=self.cpo,
+            charge_point_id="FRCCCC333303",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 15),
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+        )
+
         # Bad extra field (measure_reference_point_id)
         payload = {
             "entity_id": self.cpo.id,
@@ -968,6 +988,7 @@ class ElecCharginPointsTest(TestCase):
             "charge_point_id": "FRBBBB222204",
             "measure_reference_point_id": "654321",
         }
+
         url = reverse("elec-cpo-charge-points-update-charge-point")
         response = self.client.post(url, payload)
         assert response.status_code == 400
@@ -999,6 +1020,7 @@ class ElecCharginPointsTest(TestCase):
         # charge_point_id already exists
         application.status = ElecChargePointApplication.PENDING
         application.save()
+        payload["charge_point_id"] = "FRCCCC333303"
         response = self.client.post(url, payload)
         assert response.status_code == 400
         data = response.json()

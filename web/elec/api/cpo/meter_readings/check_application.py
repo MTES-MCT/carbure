@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django import forms
 from django.http import HttpRequest
@@ -8,11 +8,14 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.models.elec_meter_reading import ElecMeterReading
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
-from elec.services.meter_readings_application_quarter import get_application_quarter
+from elec.services.meter_readings_application_quarter import (
+    first_day_of_quarter,
+    get_application_quarter,
+    last_day_of_quarter,
+)
 
 
 class CheckMeterReadingApplicationForm(forms.Form):
@@ -25,6 +28,7 @@ class CheckMeterReadingApplicationError:
     MISSING_FILE = "MISSING_FILE"
     NO_READING_FOUND = "NO_READING_FOUND"
     VALIDATION_FAILED = "VALIDATION_FAILED"
+    METER_READINGS_FOR_QUARTER_ALREADY_EXISTS = "METER_READINGS_FOR_QUARTER_ALREADY_EXISTS"
 
 
 @require_POST
@@ -46,17 +50,24 @@ def check_application(request: HttpRequest, entity):
     quarter = form.cleaned_data["quarter"] or auto_quarter
     year = form.cleaned_data["year"] or auto_year
 
-    charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
-    renewable_share = MeterReadingRepository.get_renewable_share(year)
-    previous_readings = ElecMeterReading.objects.filter(cpo=entity).select_related("meter", "meter__charge_point")
+    if MeterReadingRepository.get_cpo_application_for_quarter(cpo=entity, year=year, quarter=quarter) is not None:
+        return ErrorResponse(400, CheckMeterReadingApplicationError.METER_READINGS_FOR_QUARTER_ALREADY_EXISTS)
 
-    meter_reading_data, errors, __ = import_meter_reading_excel(
+    charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    renewable_share = MeterReadingRepository.get_renewable_share(year)
+    past_readings = MeterReadingRepository.get_cpo_meter_readings(entity)
+
+    # get the first and last day of this quarter so we can verify that the readings are for the current quarter
+    beginning_of_quarter = first_day_of_quarter(year, quarter)
+    end_of_quarter = last_day_of_quarter(year, quarter) + timedelta(days=15)
+
+    meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
-        previous_readings,
-        previous_application,
+        past_readings,
         renewable_share,
+        beginning_of_quarter,
+        end_of_quarter,
     )
 
     data = {}

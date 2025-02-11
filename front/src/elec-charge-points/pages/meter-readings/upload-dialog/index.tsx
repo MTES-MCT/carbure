@@ -31,12 +31,16 @@ type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
   companyId: number
   currentApplicationPeriod: ElecMeterReadingsCurrentApplicationsPeriod
+  hasPendingApplications: boolean
+  hasAcceptedApplicationForCurrentQuarter: boolean
 }
 
 const ElecMeterReadingsFileUpload = ({
   onClose,
   currentApplicationPeriod,
   companyId,
+  hasPendingApplications,
+  hasAcceptedApplicationForCurrentQuarter,
 }: ElecMeterReadingsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -132,91 +136,117 @@ const ElecMeterReadingsFileUpload = ({
       </header>
 
       <main>
-        <section>
-          <Form id="dc-checker">
-            {currentApplicationPeriod.urgency_status ===
-              MeterReadingsApplicationUrgencyStatus.Low && (
-              <Alert icon={AlertCircle} variant="info">
-                <Trans>
-                  A transmettre avant le{" "}
-                  {formatDate(currentApplicationPeriod.deadline)}
-                </Trans>
-              </Alert>
-            )}
-            {currentApplicationPeriod.urgency_status ===
-              MeterReadingsApplicationUrgencyStatus.High && (
-              <Alert icon={AlertCircle} variant="warning">
-                <Trans>
-                  A transmettre avant le{" "}
-                  {formatDate(currentApplicationPeriod.deadline)}
-                </Trans>
-              </Alert>
-            )}
-            {currentApplicationPeriod.urgency_status ===
-              MeterReadingsApplicationUrgencyStatus.Critical && (
-              <Alert icon={AlertCircle} variant="danger">
-                <Trans>
-                  Le délai de déclaration a été dépassé, l'administration se
-                  réserve le droit de la refuser.
-                </Trans>
-              </Alert>
-            )}
-            <p>
-              {t(
-                "Veuillez nous communiquer les relevés de vos points de recharge (kWh) chaque trimestre, pour cela :"
-              )}
-            </p>
-            <ol>
-              <li>
-                <span>
-                  <Trans>Téléchargez le relevé à remplir :</Trans>
-                </span>
-                <br />
-                <Button
-                  variant="secondary"
-                  icon={Download}
-                  href={
-                    TEMPLATE_URL +
-                    `?entity_id=${entity.id}&company_id=${companyId}`
-                  }
-                >
-                  Télécharger le fichier Excel
-                </Button>
-              </li>
-              <li>
-                <Trans>
-                  Remplissez les colonnes en bleu (C et D) correspondant aux
-                  relevés du trimestre actuel
-                </Trans>
-              </li>
-              <li>
-                <Trans>Déposez le fichier ci-dessous : </Trans>
-              </li>
-            </ol>
+        {hasPendingApplications && (
+          <section>
+            <Alert icon={AlertCircle} variant="danger">
+              <Trans>
+                Des relevés sont déjà en attente de validation. Veuillez les
+                supprimer si vous souhaitez enregistrer un nouveau dossier.
+              </Trans>
+            </Alert>
+          </section>
+        )}
 
-            <FileInput
-              loading={checkMeterReadingsFile.loading}
-              icon={value.meterReadingsFile ? Check : Upload}
-              label={t("Importer le fichier excel à analyser")}
-              placeholder={
-                value.meterReadingsFile
-                  ? value.meterReadingsFile.name
-                  : t("Choisir un fichier")
-              }
-              {...bind("meterReadingsFile")}
-            />
-          </Form>
-        </section>
+        {hasAcceptedApplicationForCurrentQuarter && (
+          <section>
+            <Alert icon={AlertCircle} variant="warning">
+              <Trans>
+                Vous avez déjà déclaré vos relevés pour le trimestre en cours.
+              </Trans>
+            </Alert>
+          </section>
+        )}
+
+        {!hasPendingApplications &&
+          !hasAcceptedApplicationForCurrentQuarter && (
+            <section>
+              <Form id="upload-readings" onSubmit={submitFile}>
+                {currentApplicationPeriod.urgency_status ===
+                  MeterReadingsApplicationUrgencyStatus.Low && (
+                  <Alert icon={AlertCircle} variant="info">
+                    <Trans>
+                      A transmettre avant le{" "}
+                      {formatDate(currentApplicationPeriod.deadline)}
+                    </Trans>
+                  </Alert>
+                )}
+
+                {currentApplicationPeriod.urgency_status ===
+                  MeterReadingsApplicationUrgencyStatus.High && (
+                  <Alert icon={AlertCircle} variant="warning">
+                    <Trans>
+                      A transmettre avant le{" "}
+                      {formatDate(currentApplicationPeriod.deadline)}
+                    </Trans>
+                  </Alert>
+                )}
+
+                {currentApplicationPeriod.urgency_status ===
+                  MeterReadingsApplicationUrgencyStatus.Critical && (
+                  <Alert icon={AlertCircle} variant="danger">
+                    <Trans>
+                      Le délai de déclaration a été dépassé, l'administration se
+                      réserve le droit de la refuser.
+                    </Trans>
+                  </Alert>
+                )}
+
+                <p>
+                  {t(
+                    "Veuillez nous communiquer les relevés de vos points de recharge (kWh) chaque trimestre, pour cela :"
+                  )}
+                </p>
+                <ol>
+                  <li>
+                    <span>
+                      <Trans>Téléchargez le relevé à remplir :</Trans>
+                    </span>
+                    <br />
+                    <Button
+                      variant="secondary"
+                      icon={Download}
+                      href={
+                        TEMPLATE_URL +
+                        `?entity_id=${entity.id}&company_id=${companyId}`
+                      }
+                    >
+                      Télécharger le fichier Excel
+                    </Button>
+                  </li>
+                  <li>
+                    <Trans>
+                      Remplissez les colonnes en bleu (C et D) correspondant aux
+                      relevés du trimestre actuel
+                    </Trans>
+                  </li>
+                  <li>
+                    <Trans>Déposez le fichier ci-dessous : </Trans>
+                  </li>
+                </ol>
+
+                <FileInput
+                  loading={checkMeterReadingsFile.loading}
+                  icon={value.meterReadingsFile ? Check : Upload}
+                  label={t("Importer le fichier excel à analyser")}
+                  placeholder={
+                    value.meterReadingsFile
+                      ? value.meterReadingsFile.name
+                      : t("Choisir un fichier")
+                  }
+                  {...bind("meterReadingsFile")}
+                />
+              </Form>
+            </section>
+          )}
       </main>
 
       <footer>
         <Button
-          submit="dc-request"
+          submit="upload-readings"
           loading={checkMeterReadingsFile.loading}
           disabled={!value.meterReadingsFile}
           variant="primary"
           icon={Check}
-          action={submitFile}
           label={t("Vérifier le fichier")}
         />
         <Button icon={Return} action={onClose} label={t("Annuler")} />

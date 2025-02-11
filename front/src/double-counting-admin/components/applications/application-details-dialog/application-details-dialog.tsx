@@ -3,7 +3,7 @@ import { EntityType } from "carbure/types"
 import { Button } from "common/components/button"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross, Return, Save } from "common/components/icons"
+import { Check, Cross, Download, Return, Save } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -11,12 +11,13 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
-import { DoubleCountingStatus as DCStatus } from "../../../double-counting/types"
-import { ApplicationInfo } from "./application-info"
-import ApplicationStatus from "../../../double-counting/components/application-status"
-import ApplicationTabs from "./application-tabs"
-import ApplicationDetailsDialogAccept from "./application-details-dialog-accept"
+import * as api from "../../../api"
+import { DoubleCountingStatus as DCStatus } from "../../../../double-counting/types"
+import { ApplicationInfo } from "../application-info"
+import ApplicationStatus from "../../../../double-counting/components/application-status"
+import ApplicationTabs from "../application-tabs"
+import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
+import GenerateDecisionDialog from "double-counting-admin/components/generate-decision-dialog/generate-decision-dialog"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -29,11 +30,6 @@ export const ApplicationDetailsDialog = () => {
   const [quotasIsUpdated, setQuotasIsUpdated] = useState(false)
   const [quotas, setQuotas] = useState<Record<string, number>>({})
 
-  const [
-    displayAcceptApplicationDetailsDialog,
-    setDisplayAcceptApplicationDetailsDialog,
-  ] = useState(false)
-  const [industrialWastes, setIndustrialWastes] = useState("")
   const match = useHashMatch("application/:id")
 
   const applicationResponse = useQuery(api.getDoubleCountingApplication, {
@@ -136,86 +132,109 @@ export const ApplicationDetailsDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
+  const displayAcceptApplicationDetailsDialog = () => {
+    if (!application) {
+      return
+    }
+
+    portal((close) => (
+      <ApplicationDetailsDialogValidateQuotas
+        application={application}
+        onClose={close}
+        onValidate={() => {
+          navigate({ search: location.search, hash: "#" })
+        }}
+      />
+    ))
+  }
+
+  const displayGenerateDecisionDialog = () => {
+    if (!application) {
+      return
+    }
+
+    portal((close) => (
+      <GenerateDecisionDialog application={application} onClose={close} />
+    ))
+  }
+
   if (!application) {
     return null
   }
 
   return (
-    <>
-      <Portal onClose={closeDialog}>
-        <Dialog fullscreen onClose={closeDialog}>
-          <header>
-            <ApplicationStatus big status={dcaStatus} />
-            <h1>{t("Demande d'agrément double comptage")} </h1>
-          </header>
+    <Portal onClose={closeDialog}>
+      <Dialog fullscreen onClose={closeDialog}>
+        <header>
+          <ApplicationStatus big status={dcaStatus} />
+          <h1>{t("Demande d'agrément double comptage")} </h1>
+        </header>
 
-          <main>
-            <ApplicationInfo application={application} />
+        <main>
+          <ApplicationInfo application={application} />
 
-            {application && (
-              <ApplicationTabs
-                productionSite={application.production_site}
-                sourcing={application.sourcing}
-                production={application.production}
-                quotas={quotas}
-                setQuotas={onUpdateQuotas}
-              />
-            )}
-          </main>
+          {application && (
+            <ApplicationTabs
+              productionSite={application.production_site}
+              sourcing={application.sourcing}
+              production={application.production}
+              quotas={quotas}
+              setQuotas={onUpdateQuotas}
+            />
+          )}
+        </main>
 
-          <footer>
-            {!applicationResponse.loading && (
-              <>
-                {isAdmin && (
-                  <Button
-                    loading={approveQuotas.loading}
-                    disabled={!quotasIsUpdated}
-                    variant="primary"
-                    icon={Save}
-                    action={submitQuotas}
-                  >
-                    <Trans>Enregistrer</Trans>
-                  </Button>
-                )}
-
+        <footer>
+          {!applicationResponse.loading && (
+            <>
+              {isAdmin && (
                 <Button
                   loading={approveQuotas.loading}
-                  disabled={applicationResponse.loading || !hasQuotas}
-                  variant="success"
-                  icon={Check}
-                  action={() => setDisplayAcceptApplicationDetailsDialog(true)}
+                  disabled={!quotasIsUpdated}
+                  variant="primary"
+                  icon={Save}
+                  action={submitQuotas}
                 >
-                  <Trans>Valider les quotas</Trans>
+                  <Trans>Enregistrer</Trans>
                 </Button>
-                <Button
-                  loading={rejectApplication.loading}
-                  disabled={applicationResponse.loading}
-                  variant="danger"
-                  icon={Cross}
-                  action={submitReject}
-                >
-                  <Trans>Refuser</Trans>
-                </Button>
-              </>
-            )}
-            <Button icon={Return} action={closeDialog}>
-              <Trans>Retour</Trans>
-            </Button>
-          </footer>
+              )}
 
-          {applicationResponse.loading && <LoaderOverlay />}
-        </Dialog>
-      </Portal>
-      <Portal>
-        {displayAcceptApplicationDetailsDialog && (
-          <ApplicationDetailsDialogAccept
-            application={application}
-            industrialWastes={industrialWastes}
-            onChangeIndustrialWastes={setIndustrialWastes}
-            onClose={() => setDisplayAcceptApplicationDetailsDialog(false)}
-          />
-        )}
-      </Portal>
-    </>
+              <Button
+                icon={Download}
+                variant="warning"
+                action={displayGenerateDecisionDialog}
+                disabled={applicationResponse.loading || !hasQuotas}
+              >
+                <Trans>Générer la décision</Trans>
+              </Button>
+
+              <Button
+                disabled={applicationResponse.loading || !hasQuotas}
+                variant="success"
+                icon={Check}
+                action={displayAcceptApplicationDetailsDialog}
+              >
+                <Trans>Valider les quotas</Trans>
+              </Button>
+
+              <Button
+                loading={rejectApplication.loading}
+                disabled={applicationResponse.loading}
+                variant="danger"
+                icon={Cross}
+                action={submitReject}
+              >
+                <Trans>Refuser</Trans>
+              </Button>
+            </>
+          )}
+          <Button icon={Return} action={closeDialog}>
+            <Trans>Retour</Trans>
+          </Button>
+        </footer>
+
+        {applicationResponse.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }

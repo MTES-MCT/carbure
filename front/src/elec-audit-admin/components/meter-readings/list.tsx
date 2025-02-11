@@ -62,7 +62,11 @@ const MeterReadingsApplicationsList = ({
   const downloadMeterReadingsApplication = (
     meterReadingApplication: ElecMeterReadingsApplication
   ) => {
-    api.downloadMeterReadingsApplication(entity.id, meterReadingApplication.id)
+    api.downloadMeterReadingsApplication(
+      entity.id,
+      meterReadingApplication.cpo.id,
+      meterReadingApplication.id
+    )
   }
 
   const meterReadingsApplicationsData =

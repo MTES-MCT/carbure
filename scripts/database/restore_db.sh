@@ -21,7 +21,7 @@ elif [ "$SOURCE_ENV" = "carbure-dev" ]; then
 fi
 
 # setup scalingo on servers
-if [ "$IMAGE_TAG" = "dev" ] || [ "$IMAGE_TAG" = "staging" ]; then
+if [ "$IMAGE_TAG" = "dev" ] || [ "$IMAGE_TAG" = "staging" ] || [ "$IMAGE_TAG" = "prod" ]; then
   dbclient-fetcher mysql 8
   install-scalingo-cli && scalingo login --api-token $SCALINGO_TOKEN
 fi

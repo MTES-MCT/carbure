@@ -82,7 +82,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --test",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "generate-api": "node --loader ts-node/esm scripts/overrides-api-schema.ts && npx openapi-typescript ../api-schema.yaml -o ./src/api-schema.ts --enum --dedupe-enums && eslint 'src/api-schema.ts' --fix",
+    "generate-api": "node --loader ts-node/esm scripts/overrides-api-schema.ts && node --loader ts-node/esm scripts/transform-schema.ts && eslint 'src/api-schema.ts' --fix",
     "check-diff": "git diff --quiet --exit-code ../api-schema.yaml || (echo 'Attention, le schéma a évolué depuis la dernière génération. Veuillez vérifier les différences et mettre à jour le schéma si nécessaire.')",
     "check-types": "tsc --noEmit",
     "generate-and-check-types": "npm run generate-api && npm run check-diff && npm run check-types"
