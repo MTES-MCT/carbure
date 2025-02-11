@@ -44,6 +44,7 @@ export const AcceptTransfer = ({
     invalidates: [
       "elec-transfer-certificates",
       "elec-operator-snapshot",
+      "elec-cpo-snapshot",
       `nav-stats-${entity.id}`,
     ],
     onSuccess: () => {
