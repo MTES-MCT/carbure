@@ -43,7 +43,7 @@ export const ClientTicketDetails = ({
   })
 
   const acceptSafTicket = useMutation(api.acceptSafTicket, {
-    invalidates: ["ticket-details", "tickets", "airline-snapshot"],
+    invalidates: ["tickets", "airline-snapshot"],
     onSuccess: () => {
       closeDialog()
       notify(t("Le ticket a été accepté."), { variant: "success" })
