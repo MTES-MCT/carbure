@@ -7659,6 +7659,7 @@ components:
         - TIRIB
         - AIRLINE
         - ELEC
+        - TRANSFERRED_ELEC
       type: string
       description: |-
         * `DCA` - DCA
@@ -7666,6 +7667,7 @@ components:
         * `TIRIB` - TIRIB
         * `AIRLINE` - AIRLINE
         * `ELEC` - ELEC
+        * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
     FeedStock:
       type: object
       properties:

@@ -2491,6 +2491,7 @@ export interface components {
      *     * `TIRIB` - TIRIB
      *     * `AIRLINE` - AIRLINE
      *     * `ELEC` - ELEC
+     *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
      * @enum {string}
      */
     ExtAdminPagesEnum: ExtAdminPagesEnum
@@ -2664,7 +2665,6 @@ export interface components {
       readonly created_at: string
       /** Format: double */
       readonly volume: number
-      readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
     OtpResponse: {
@@ -7258,6 +7258,7 @@ export enum ExtAdminPagesEnum {
   TIRIB = "TIRIB",
   AIRLINE = "AIRLINE",
   ELEC = "ELEC",
+  TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
 }
 export enum FileTypeEnum {
   SOURCING = "SOURCING",

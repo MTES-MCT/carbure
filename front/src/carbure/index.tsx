@@ -121,6 +121,8 @@ const Org = () => {
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
+  const isTransferredElecAdmin =
+    isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
 
   return (
     <Routes>
@@ -233,14 +235,14 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="double-counting" />} />
       )}
 
-      {(isAdmin || hasAirline || isElecAdmin || isAdminDC) && (
+      {(isAdmin || isExternal) && (
         <>
           <Route path="entities/*" element={<Entities />} />
           <Route path="*" element={<Navigate replace to="entities" />} />
         </>
       )}
 
-      {(isAdmin || isElecAdmin) && (
+      {(isAdmin || isElecAdmin || isTransferredElecAdmin) && (
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
           <Route

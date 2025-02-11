@@ -56,18 +56,21 @@ export const useElec = (params?: ElecParams) => {
 
   const elecAdmin: MenuSection = {
     title: t("Électricité"),
-    condition: isAdmin || hasAdminRight("ELEC"),
+    condition:
+      isAdmin || hasAdminRight("ELEC") || hasAdminRight("TRANSFERRED_ELEC"),
     children: [
       {
         path: routes.ELEC_ADMIN().PROVISION,
         title: t("Certificats"),
         icon: NewsPaperLine,
         iconActive: NewsPaperFill,
+        condition: isAdmin || hasAdminRight("ELEC"),
       },
       {
         path: routes.ELEC_ADMIN().TRANSFER,
         title: t("Énergie cédée"),
         icon: ArrowGoForwardLine,
+        condition: isAdmin || hasAdminRight("TRANSFERRED_ELEC"),
       },
     ],
   }

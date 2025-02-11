@@ -6,8 +6,8 @@ from rest_framework.viewsets import ViewSet
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.serializers import GenericCertificateSerializer
 from entity.serializers import EntityProductionSiteSerializer
-from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights, OrPermission
+from saf.permissions import HasAdminRights, HasUserRights
+from saf.permissions.user_rights import OrPermission
 from transactions.models import ProductionSite
 
 from .mixins import ActionMixin

@@ -18,7 +18,7 @@ class ElecSnapshotForm(forms.Form):
     year = forms.IntegerField()
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
+@check_admin_rights(allow_external=[ExternalAdminRights.ELEC, ExternalAdminRights.TRANSFERRED_ELEC])
 def get_snapshot(request):
     snapshot_form = ElecSnapshotForm(request.GET)
 
