@@ -87,7 +87,6 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
             "reception_airport",
             "consumption_type",
             "ets_status",
-            "ets_declaration_date",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)

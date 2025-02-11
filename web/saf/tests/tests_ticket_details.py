@@ -158,7 +158,6 @@ class SafTicketDetailsTest(TestCase):
             "reception_airport": None,
             "consumption_type": None,
             "ets_status": None,
-            "ets_declaration_date": None,
         }
 
         assert response.json() == expected_ticket

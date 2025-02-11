@@ -110,7 +110,6 @@ class SafTicket(models.Model):
         (NOT_CONCERNED, "Non concerné"),
     )
     ets_status = models.CharField(max_length=16, choices=ETS_STATUS, null=True, blank=True)
-    ets_declaration_date = models.DateField(null=True, blank=True)
 
     def generate_carbure_id(self):
         production_country = self.production_country.code_pays if self.production_country else None
