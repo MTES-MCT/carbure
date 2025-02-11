@@ -13,12 +13,17 @@ export const NewNavigationDialog = () => {
   )
   const [open, setOpen] = useState(!hasSeen)
 
+  const setHasSeenDialog = () => {
+    setHasSeen(true)
+    setOpen(false)
+  }
+
   if (hasSeen || !open) return null
 
   return (
     <Portal>
       <Dialog
-        onClose={() => setOpen(false)}
+        onClose={setHasSeenDialog}
         fullWidth
         header={
           <Dialog.Title>
@@ -26,12 +31,7 @@ export const NewNavigationDialog = () => {
           </Dialog.Title>
         }
         footer={
-          <Button
-            onClick={() => {
-              setHasSeen(true)
-              setOpen(false)
-            }}
-          >
+          <Button onClick={setHasSeenDialog}>
             <Trans>Je découvre la nouvelle navigation</Trans>
           </Button>
         }
@@ -71,6 +71,12 @@ export const NewNavigationDialog = () => {
           <Trans components={{ b: <b /> }}>
             <b>Vous avez besoin d'aide ?</b> Rendez-vous dans la rubrique Aide
             en haut à droite pour compléter notre formulaire de contact.
+          </Trans>
+        </Text>
+        <Text>
+          <Trans components={{ b: <b /> }}>
+            <b>Où puis-je trouver mes statistiques et l'annuaire ?</b> Je clique
+            sur mon compte en haut à droite.
           </Trans>
         </Text>
       </Dialog>
