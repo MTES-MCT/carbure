@@ -1,5 +1,11 @@
 import { api as apiFetch } from "common/services/api-fetch"
-import { Country, SiteType, OwnershipType, EntityPreview } from "carbure/types"
+import {
+  Country,
+  SiteType,
+  OwnershipType,
+  EntityPreview,
+  EntityDepot,
+} from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
   return apiFetch.GET("/entities/depots/", {
@@ -37,9 +43,9 @@ export function createNewDeliverySite(
   depot_type: SiteType,
   address: string,
   postal_code: string,
-  blender: any,
-  ownership_type: any,
-  blending_is_outsourced: any,
+  blender: Partial<EntityDepot["blender"]>,
+  ownership_type: EntityDepot["ownership_type"],
+  blending_is_outsourced: EntityDepot["blending_is_outsourced"],
   electrical_efficiency?: number,
   thermal_efficiency?: number,
   useful_temperature?: number

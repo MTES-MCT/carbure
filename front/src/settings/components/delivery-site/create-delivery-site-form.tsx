@@ -5,6 +5,7 @@ import {
   EntityDepot,
   EntityType,
   OwnershipType,
+  EntityPreview,
 } from "carbure/types"
 import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
@@ -45,7 +46,7 @@ export type DeliverySiteFormType = Partial<
   > &
     Pick<EntityDepot, "ownership_type" | "blending_is_outsourced">
 > & {
-  blender?: Pick<EntityDepot["blender"], "id" | "name" | "entity_type">
+  blender?: EntityPreview
 }
 
 const mapDeliverySiteToForm: (
