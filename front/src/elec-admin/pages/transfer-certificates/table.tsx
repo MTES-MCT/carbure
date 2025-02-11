@@ -5,6 +5,7 @@ import { ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import TransferCertificateTag from "../../../elec/components/transfer-certificates/tag"
+import TransferCertificateTiruertTag from "../../../elec/components/transfer-certificates/tiruert-tag"
 import { To } from "react-router-dom"
 
 export interface ElecAdminTransferCertificateTableProps {
@@ -15,6 +16,7 @@ export interface ElecAdminTransferCertificateTableProps {
   onOrder: (order: Order | undefined) => void
   selected: number[]
   onSelect: (selected: number[]) => void
+  tiruert?: boolean
 }
 
 export const ElecAdminTransferCertificateTable = memo(
@@ -24,8 +26,18 @@ export const ElecAdminTransferCertificateTable = memo(
     order,
     onOrder,
     rowLink,
+    tiruert = false,
   }: ElecAdminTransferCertificateTableProps) => {
-    const columns = useColumns()
+    const columns = useColumns(tiruert || false)
+    const displayedColumns = [
+      columns.status,
+      ...(tiruert ? [columns.consumption_date] : []),
+      columns.cpo,
+      columns.transfer_date,
+      columns.operator,
+      columns.energy_amount,
+      columns.certificate_id,
+    ]
     return (
       <Table
         loading={loading}
@@ -33,27 +45,42 @@ export const ElecAdminTransferCertificateTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={transferCertificates}
-        columns={[
-          columns.status,
-          columns.cpo,
-          columns.transfer_date,
-          columns.operator,
-          columns.energy_amount,
-          columns.certificate_id,
-        ]}
+        columns={displayedColumns}
       />
     )
   }
 )
 
-export function useColumns() {
+export function useColumns(tiruert: boolean) {
   const { t } = useTranslation()
+  const tiruertStatusLabel = t("Statut TIRUERT")
+  const statusLabel = t("Statut")
   return {
     status: {
       key: "status",
-      header: t("Statut"),
+      header: t(tiruert ? tiruertStatusLabel : statusLabel),
       cell: (transferCertificate: ElecTransferCertificatePreview) => {
-        return <TransferCertificateTag status={transferCertificate.status} />
+        if (tiruert) {
+          return (
+            <TransferCertificateTiruertTag
+              used_in_tiruert={transferCertificate.used_in_tiruert}
+            />
+          )
+        } else {
+          return <TransferCertificateTag status={transferCertificate.status} />
+        }
+      },
+    },
+
+    consumption_date: {
+      key: "consumption_date",
+      header: t("Date de déclaration"),
+      cell: (transferCertificate: ElecTransferCertificatePreview) => {
+        const value = formatDate(
+          transferCertificate.consumption_date,
+          "MM/yyyy"
+        )
+        return <Cell text={value} />
       },
     },
     cpo: {
