@@ -67,7 +67,7 @@ const FallbackComponent = () => {
 
 export const SentryProvider = ({ children }: PropsWithChildren) => {
   return (
-    <Sentry.ErrorBoundary fallback={FallbackComponent} showDialog>
+    <Sentry.ErrorBoundary fallback={FallbackComponent}>
       {children}
     </Sentry.ErrorBoundary>
   )
