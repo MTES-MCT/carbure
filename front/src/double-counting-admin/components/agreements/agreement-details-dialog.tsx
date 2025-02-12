@@ -80,8 +80,7 @@ export const AgreementDetailsDialog = () => {
                 components={{
                   Link: application ? (
                     <Link
-                      to={ROUTE_URLS.ADMIN_COMPANY_DETAIL(
-                        entity.id,
+                      to={ROUTE_URLS.ADMIN(entity.id).COMPANY_DETAIL(
                         application?.producer.id
                       )}
                       target="_blank"

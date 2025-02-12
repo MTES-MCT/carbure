@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 import DurabilityFields from "saf/pages/operator/ticket-source-details/parent-lot/durability-fields"
 import { SafTicketDetails } from "../../types"
+import { EtsStatusEnum } from "api-schema"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
@@ -15,6 +16,12 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
   const { t } = useTranslation()
 
   if (!ticket) return null
+
+  const etsStatusMap = {
+    [EtsStatusEnum.ETS_VALUATION]: t("Valorisation ETS"),
+    [EtsStatusEnum.OUTSIDE_ETS]: t("Hors ETS (volontaire)"),
+    [EtsStatusEnum.NOT_CONCERNED]: t("Non concerné"),
+  }
 
   return (
     <div className={cl(css.form, css.columns)}>
@@ -82,6 +89,34 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           <TextInput
             label={t("Champ libre")}
             value={ticket.free_field}
+            readOnly
+          />
+        )}
+        {ticket.shipping_method && (
+          <TextInput
+            label={t("Méthode de livraison")}
+            value={ticket.shipping_method}
+            readOnly
+          />
+        )}
+        {ticket.consumption_type && (
+          <TextInput
+            label={t("Type de consommation")}
+            value={ticket.consumption_type}
+            readOnly
+          />
+        )}
+        {ticket.reception_airport && (
+          <TextInput
+            label={t("Aéroport de réception")}
+            value={ticket.reception_airport.name}
+            readOnly
+          />
+        )}
+        {"ets_status" in ticket && ticket.ets_status && (
+          <TextInput
+            label={t("Déclaration ETS")}
+            value={etsStatusMap[ticket.ets_status]}
             readOnly
           />
         )}

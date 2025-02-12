@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from core.models import Entity, ExternalAdminRights, UserRights
+from core.models import Entity, UserRights
 
 
 class BaseEntityPermission(BasePermission):
@@ -11,7 +11,7 @@ class BaseEntityPermission(BasePermission):
 
         try:
             entity = Entity.objects.get(pk=entity_id)
-        except Entity.DoesNotExist:
+        except Exception:
             return None
 
         return entity
@@ -19,7 +19,7 @@ class BaseEntityPermission(BasePermission):
     def get_user_rights(self, request, entity):
         try:
             rights = UserRights.objects.get(entity=entity, user=request.user)
-        except UserRights.DoesNotExist:
+        except Exception:
             return None
         return rights
 
@@ -59,7 +59,6 @@ class HasUserRights(BaseEntityPermission):
 
         if entity_id != request.session.get("entity_id"):
             request.session["entity_id"] = entity_id
-
         user_role = rights[entity_id]
         if isinstance(self.entity_type, list) and entity.entity_type not in self.entity_type:
             return False
@@ -69,43 +68,19 @@ class HasUserRights(BaseEntityPermission):
         return True
 
 
-class HasAdminRights(BaseEntityPermission):
-    allow_external = None
-    role = None
+class OrPermission(BasePermission):
+    """
+    Combines multiple permission classes using OR logic.
+    The request is allowed if any of the provided permissions are satisfied.
+    """
 
-    def __init__(self, allow_external=None, role=None):
-        super().__init__()
-        self.role = role
-        self.allow_external = allow_external
-
-    def __call__(self):
-        return self
+    def __init__(self, *permission_classes):
+        self.permission_classes = permission_classes
 
     def has_permission(self, request, view):
-        entity = self.get_entity(request)
-        if entity is None or entity.entity_type not in [
-            Entity.ADMIN,
-            Entity.EXTERNAL_ADMIN,
-        ]:
-            return False
+        # Instantiate each permission class and check if any are satisfied
+        return any(permission().has_permission(request, view) for permission in self.permission_classes)
 
-        rights = self.get_user_rights(request, entity)
-        if rights is None:
-            return False
-
-        allow_external = self.allow_external if isinstance(self.allow_external, list) else []
-        is_admin_only = len(self.allow_external) == 0
-
-        if is_admin_only:
-            if entity.entity_type != Entity.ADMIN or not request.user.is_staff:
-                return False
-        elif entity.entity_type == Entity.EXTERNAL_ADMIN:
-            try:
-                ExternalAdminRights.objects.get(entity=entity, right__in=allow_external)
-            except ExternalAdminRights.DoesNotExist:
-                return False
-
-        if isinstance(self.role, list) and rights.role not in self.role:
-            return False
-
-        return True
+    def has_object_permission(self, request, view, obj):
+        # Instantiate each permission class and check if any object-level permission is satisfied
+        return any(permission().has_object_permission(request, view, obj) for permission in self.permission_classes)

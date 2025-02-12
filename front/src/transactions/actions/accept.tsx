@@ -175,11 +175,18 @@ const ReleaseForConsumptionDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptReleaseForConsumption, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -262,11 +269,18 @@ const InStockDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptInStock, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -351,11 +365,18 @@ const BlendingDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptForBlending, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -439,11 +460,18 @@ const DirectDeliveryDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptForDirectDelivery, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -527,11 +555,18 @@ const ExportDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptForExport, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -623,7 +658,13 @@ const TradingDialog = ({
   const [certificate, setCertificate] = useState<string | undefined>()
 
   const acceptLots = useMutation(api.acceptForTrading, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -740,13 +781,20 @@ const ProcessingDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const [depot, setDepot] = useState<EntityDepot | undefined>()
 
   const acceptLots = useMutation(api.acceptForProcessing, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -865,11 +913,18 @@ const ConsumptionDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptForConsumption, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+    invalidates: [
+      "lots",
+      "snapshot",
+      "lot-details",
+      "lot-summary",
+      `nav-stats-${entity.id}`,
+    ],
 
     onSuccess: () => {
       const text = v({
@@ -948,5 +1003,5 @@ async function getProcessingDepots(entity_id: number, type: EntityType) {
   if (type !== EntityType.Operator) return []
 
   const depots = await getDeliverySites(entity_id)
-  return depots.data.data?.filter((depot) => depot.blending_is_outsourced) ?? []
+  return depots.data?.filter((depot) => depot.blending_is_outsourced) ?? []
 }

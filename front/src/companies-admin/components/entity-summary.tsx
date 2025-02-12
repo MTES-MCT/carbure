@@ -7,7 +7,7 @@ import css from "./entity-summary.module.css"
 import Table, { Cell } from "common/components/table"
 import { Alert } from "common/components/alert"
 import { AlertTriangle } from "common/components/icons"
-import { Panel, LoaderOverlay, Grid } from "common/components/scaffold"
+import { LoaderOverlay, Grid } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { compact, matchesSearch } from "common/utils/collection"
 import MultiSelect from "common/components/multi-select"
@@ -48,7 +48,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   )
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
-  const entityData = entities.result?.data.data ?? []
+  const entityData = entities.result?.data ?? []
   // const entityData = companiesSummary // TEST data
 
   const matchedEntities = entityData.filter(
@@ -119,17 +119,14 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
       )}
 
       {hasResults && (
-        <Panel>
-          <header>
-            <h1>{t("Récapitulatif des sociétés")}</h1>
-          </header>
+        <>
           <Table<EntityDetails>
             loading={entities.loading}
             rows={matchedEntities}
             rowLink={(e) => `${e.entity.id}`}
             columns={compact([
               {
-                key: "entities",
+                key: "acces",
                 header: t("Accès"),
                 small: true,
                 orderBy: (e) => e.entity.name,
@@ -143,13 +140,17 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                 ),
               },
               {
-                key: "entities",
+                key: "entities-company",
                 header: t("Société"),
                 orderBy: (e) => e.entity.name,
                 cell: (e) => (
                   <Cell
                     text={e.entity.name}
-                    sub={getEntityTypeLabel(e.entity.entity_type)}
+                    sub={
+                      e.entity.entity_type
+                        ? getEntityTypeLabel(e.entity.entity_type)
+                        : ""
+                    }
                   />
                 ),
               },
@@ -303,7 +304,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             ])}
           />
           {entities.loading && <LoaderOverlay />}
-        </Panel>
+        </>
       )}
     </>
   )
@@ -331,7 +332,10 @@ const EntityInfoCell = ({ data }: { data: EntityInfo[] }) => (
 
 function hasTypes(details: EntityDetails, types: EntityType[] | undefined) {
   if (types === undefined || types.length === 0) return true
-  else return types.includes(details.entity.entity_type)
+  else
+    return details.entity.entity_type
+      ? types.includes(details.entity.entity_type)
+      : false
 }
 
 function hasOperation(

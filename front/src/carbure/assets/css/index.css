@@ -1,15 +1,9 @@
 @import "./reset.css";
 @import "./fonts.css";
 @import "./theme.css";
-/* @import '@gouvfr/dsfr/dist/css/dsfr.min.css'; */
 
 * {
   box-sizing: border-box;
-}
-
-a {
-  text-decoration: none;
-  color: var(--black);
 }
 
 body {
@@ -21,7 +15,6 @@ body {
   background-color: var(--body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
   color: var(--black);
 }
 
@@ -54,11 +47,6 @@ select {
   background-image: none;
 }
 
-h1 {
-  line-height: inherit;
-  font-size: 24px;
-}
-
 .fr-stepper__steps {
   background-image: repeating-linear-gradient(
       to right,
@@ -74,4 +62,20 @@ h1 {
       transparent var(--default-inner),
       transparent var(--default-outer)
     );
+}
+
+/* ri-loader-line will be used as the common loading icon*/
+@keyframes loading {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ri-loader-line::before,
+.ri-loader-line::after {
+  will-change: transform;
+  animation: loading infinite linear 3s;
 }

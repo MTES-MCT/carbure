@@ -27,7 +27,7 @@ setEntity(producer)
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
     depot: clone(ds),
-    ownership_type: OwnershipType.ThirdParty,
+    ownership_type: OwnershipType.THIRD_PARTY,
   }))
 }
 
@@ -79,7 +79,7 @@ export const okDynamicSettings = http.get("/api/user", () => {
 })
 
 export const okEnableMac = http.post(
-  "/api/entity/options/release-for-consumption",
+  "/api/entities/release-for-consumption/",
   () => {
     const entity = Data.get("entity")
     setEntity({
@@ -93,7 +93,7 @@ export const okEnableMac = http.post(
 )
 
 export const okDisableMac = http.post(
-  "/api/entity/options/release-for-consumption",
+  "/api/entities/release-for-consumption/",
   () => {
     const entity = Data.get("entity")
     setEntity({
@@ -106,7 +106,7 @@ export const okDisableMac = http.post(
   }
 )
 
-export const okEnableTrading = http.post("/api/entity/options/trading", () => {
+export const okEnableTrading = http.post("/api/entities/trading/", () => {
   const entity = Data.get("entity")
   setEntity({
     ...entity,
@@ -117,7 +117,7 @@ export const okEnableTrading = http.post("/api/entity/options/trading", () => {
   })
 })
 
-export const okDisableTrading = http.post("/api/entity/options/trading", () => {
+export const okDisableTrading = http.post("/api/entities/trading/", () => {
   const entity = Data.get("entity")
   setEntity({
     ...entity,
@@ -128,14 +128,14 @@ export const okDisableTrading = http.post("/api/entity/options/trading", () => {
   })
 })
 
-export const okDeliverySites = http.get("/api/entity/depots", () => {
+export const okDeliverySites = http.get("/api/entities/depots/delete/", () => {
   return HttpResponse.json({
     status: "success",
     data: deliverySites,
   })
 })
 
-export const okAddDeliverySite = http.post("/api/entity/depots/add", () => {
+export const okAddDeliverySite = http.post("/api/entities/depots/add/", () => {
   setDeliverySites([deliverySite])
   return HttpResponse.json({
     status: "success",
@@ -143,7 +143,7 @@ export const okAddDeliverySite = http.post("/api/entity/depots/add", () => {
 })
 
 export const okCreateNewDeliverySite = http.post(
-  "/entity/depots/create",
+  "/entities/depots/create/",
   () => {
     return HttpResponse.json({
       status: "success",
@@ -152,7 +152,7 @@ export const okCreateNewDeliverySite = http.post(
 )
 
 export const okDeleteDeliverySite = http.post(
-  "/api/entity/depots/delete",
+  "/api/entities/depots/delete/",
   () => {
     setDeliverySites([])
     return HttpResponse.json({
@@ -162,7 +162,7 @@ export const okDeleteDeliverySite = http.post(
 )
 
 export const okProductionSites = http.get(
-  "/api/entity/production-sites",
+  "/api/entities/production-sites/",
   () => {
     return HttpResponse.json({
       status: "success",
@@ -172,7 +172,7 @@ export const okProductionSites = http.get(
 )
 
 export const okAddProductionSite = http.post(
-  "/api/entity/production-sites/add",
+  "/api/entities/production-sites/add/",
   async ({ request }) => {
     const body = (await request.json()) as FormData
 
@@ -193,7 +193,7 @@ export const okAddProductionSite = http.post(
 )
 
 export const okUpdateProductionSite = http.post(
-  "/api/entity/production-sites/update",
+  "/api/entities/production-sites/update/",
   async ({ request }) => {
     const body = (await request.json()) as FormData
 
@@ -211,7 +211,7 @@ export const okUpdateProductionSite = http.post(
 )
 
 export const okDeleteProductionSite = http.post(
-  "/api/entity/production-sites/delete",
+  "/api/entities/production-sites/delete/",
   () => {
     setProductionSites([])
     return HttpResponse.json({
@@ -221,7 +221,7 @@ export const okDeleteProductionSite = http.post(
 )
 
 export const okSetBiocarburant = http.post(
-  "/api/entity/production-sites/set-biofuels",
+  "/api/entities/production-sites/set-biofuels/",
   () =>
     HttpResponse.json({
       status: "success",
@@ -229,7 +229,7 @@ export const okSetBiocarburant = http.post(
 )
 
 export const okSetMatierePremiere = http.post(
-  "/api/entity/production-sites/set-feedstocks",
+  "/api/entities/production-sites/set-feedstocks/",
   () =>
     HttpResponse.json({
       status: "success",
@@ -237,7 +237,7 @@ export const okSetMatierePremiere = http.post(
 )
 
 export const okSetCertificates = http.post(
-  "/api/entity/production-sites/set-certificates",
+  "/api/entities/production-sites/set-certificates/",
   () =>
     HttpResponse.json({
       status: "success",
@@ -245,7 +245,7 @@ export const okSetCertificates = http.post(
 )
 
 export const okEntityRights = http.get(
-  "http://localhost/api/entity/users",
+  "http://localhost/api/entities/users/",
   () => {
     return HttpResponse.json({
       status: "success",
@@ -254,18 +254,24 @@ export const okEntityRights = http.get(
   }
 )
 
-export const okInviteUser = mockPostWithResponseData("/entity/users/invite", {
-  email: "test@test.com",
-  rights: [{ entity: producer, rights: "rw" }],
-  requests: [],
-})
+export const okInviteUser = mockPostWithResponseData(
+  "/entities/users/invite/",
+  {
+    email: "test@test.com",
+    rights: [{ entity: producer, rights: "rw" }],
+    requests: [],
+  }
+)
 
-export const okSelfCertificates = http.get("/api/entity/certificates", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [],
-  })
-})
+export const okSelfCertificates = http.get(
+  "/api/entities/certificates/",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: [],
+    })
+  }
+)
 
 export const okDoubleCountApplications = http.get(
   "/api/double-counting/agreements",

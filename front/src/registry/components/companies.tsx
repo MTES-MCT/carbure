@@ -1,14 +1,18 @@
 import { findEntities } from "carbure/api"
+import useEntity from "carbure/hooks/entity"
+import { EntityPreview } from "carbure/types"
 import { getEntityTypeLabel } from "carbure/utils/normalizers"
 import { SearchInput } from "common/components/input"
 import NoResult from "common/components/no-result"
 import Table from "common/components/table"
 import { useQuery } from "common/hooks/async"
+import { ROUTE_URLS } from "common/utils/routes"
 import { Fragment, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const Companies = () => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const [query, setQuery] = useState<string | undefined>("")
   const entities = useQuery(findEntities, {
     key: "entities",
@@ -53,6 +57,13 @@ const Companies = () => {
               orderBy: (e) => getEntityTypeLabel(e.entity_type),
             },
           ]}
+          {...(entity.isAdmin
+            ? {
+                rowLink: (e: EntityPreview) => ({
+                  pathname: ROUTE_URLS.ADMIN(entity.id).COMPANY_DETAIL(e.id),
+                }),
+              }
+            : {})}
         />
       )}
     </Fragment>

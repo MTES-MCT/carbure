@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import ElecApplicationList from "./components/list"
 import { ElecAuditorApplicationsSnapshot } from "./types"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const defaultElecAdminAuditSnapshot: ElecAuditorApplicationsSnapshot = {
   charge_points_applications_audit_done: 0,
@@ -15,7 +16,7 @@ const defaultElecAdminAuditSnapshot: ElecAuditorApplicationsSnapshot = {
 
 export const ElecAudit = () => {
   const { t } = useTranslation()
-
+  usePrivateNavigation(t("Points de recharge à auditer"))
   const entity = useEntity()
   const years = useYears("elec-audit", api.getYears)
   const elecAdminAuditSnapshotResponse = useQuery(api.getSnapshot, {
@@ -31,8 +32,6 @@ export const ElecAudit = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Points de recharge à auditer")}</h1>
-
           <Select
             loading={years.loading}
             variant="inline"

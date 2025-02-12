@@ -84,5 +84,6 @@
   "PRODUCTION_SITE_ADDRESS_UNDEFINED": "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.",
   "APPLICATION_ALREADY_RECEIVED": "Un dossier double compte pour la même année a déjà été validée.",
   "MISSING_VENDOR_CERTIFICATE": "Votre société n'est ni le fournisseur, ni le client de ce lot : vous devez renseigner votre certificat de négoce pour justifier votre place d'intermédiaire dans cette transaction.",
-  "DECLARATION_ALREADY_VALIDATED": "La période de ce lot a déjà été déclarée : annulez la déclaration correspondante pour pouvoir le modifier."
+  "DECLARATION_ALREADY_VALIDATED": "La période de ce lot a déjà été déclarée : annulez la déclaration correspondante pour pouvoir le modifier.",
+  "DELIVERY_DATE_VALIDITY": "La date de livraison du lot est antérieure à la date de réception su stock dont il est issu."
 }

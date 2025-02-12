@@ -8,6 +8,7 @@ const config: StorybookConfig = {
     "@chromatic-com/storybook",
     "@storybook/addon-interactions",
     "storybook-addon-remix-react-router",
+    "storybook-addon-mock-date",
   ],
   framework: {
     name: "@storybook/react-vite",

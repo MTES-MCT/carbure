@@ -16,15 +16,17 @@ class SafCreditTicketSourceTest(TestCase):
             parent_ticket_source_id=self.ticket_source.id,
         )
 
-    def test_cancel_saf_ticket(self):
+    def test_accept_saf_ticket(self):
         self.ticket.status = SafTicket.PENDING
         self.ticket.save()
         query = {
             "entity_id": self.entity.id,
             "ticket_id": self.ticket.id,
+            "ets_status": "ETS_VALUATION",
         }
         query_params = f"?entity_id={self.entity.id}"
         assert self.ticket.status == SafTicket.PENDING
+        assert self.ticket.ets_status is None
         response = self.client.post(
             reverse("saf-tickets-accept", kwargs={"id": self.ticket.id}) + query_params,
             query,
@@ -33,3 +35,4 @@ class SafCreditTicketSourceTest(TestCase):
         assert response.status_code == 200
         self.ticket.refresh_from_db()
         assert self.ticket.status == SafTicket.ACCEPTED
+        assert self.ticket.ets_status == "ETS_VALUATION"

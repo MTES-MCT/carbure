@@ -11,7 +11,7 @@ class CertificateFilterError:
     MISSING_FILTER = "MISSING_FILTER"
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
+@check_admin_rights(allow_external=[ExternalAdminRights.ELEC, ExternalAdminRights.TRANSFERRED_ELEC])
 def get_transfer_certificate_filters(request):
     filters = TransferCertificatesFilterForm(request.GET)
     current_filter = request.GET.get("filter")

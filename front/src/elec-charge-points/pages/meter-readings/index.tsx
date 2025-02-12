@@ -16,16 +16,16 @@ import { useElecMeterReadingsSettings } from "./index.hooks"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
 import { useMutation } from "common/hooks/async"
 import { deleteChargePointsApplication } from "./api"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type ElecMeterReadingsSettingsProps = {
   companyId: number
-  contentOnly?: boolean
 }
 const ElecMeterReadingsSettings = ({
   companyId,
-  contentOnly = false,
 }: ElecMeterReadingsSettingsProps) => {
   const { t } = useTranslation()
+  usePrivateNavigation(t("Relevés trimestriels"))
   const entity = useEntity()
 
   const portal = usePortal()
@@ -83,8 +83,6 @@ const ElecMeterReadingsSettings = ({
 
   return (
     <section>
-      {!contentOnly && <h1>{t("Relevés trimestriels")}</h1>}
-
       {chargePointCount === 0 && (
         <p>
           <Trans>Vous n'avez aucun relevé à déclarer</Trans>

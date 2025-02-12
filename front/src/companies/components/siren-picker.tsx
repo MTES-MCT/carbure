@@ -19,7 +19,7 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
   const [error, setError] = useState<string | undefined>(undefined)
   const companyResponse = useMutation(api.searchCompanyDataBySiren, {
     onSuccess: (res) => {
-      const companyResult = res.data.data
+      const companyResult = res.data
 
       if (!companyResult) return
       let warning

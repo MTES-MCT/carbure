@@ -12,6 +12,11 @@ export const Main = (props: JSX.IntrinsicElements["main"]) => (
   <main {...props} className={cl(css.main, props.className)} />
 )
 
+// a div used inside Main component to remove the padding and set a background color
+export const Content = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={cl(css.content, props.className)} />
+)
+
 // bottom footer with links and info, divided into some vertical <section>
 export const Footer = (props: JSX.IntrinsicElements["footer"]) => (
   <footer {...props} className={cl(css.footer, props.className)} />

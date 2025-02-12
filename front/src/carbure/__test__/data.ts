@@ -5,14 +5,16 @@ import {
   UserRole,
   SiteType,
   GESOption,
-  ProductionSiteDetails,
   Depot,
   User,
   UserRightRequest,
   UserRightStatus,
   UserRight,
   Feedstock,
+  ProductionSite,
+  NotificationType,
 } from "carbure/types"
+import { DeepPartial } from "common/types"
 import { mergeDeepRight } from "ramda"
 
 // COUNTRIES
@@ -54,143 +56,79 @@ export const company: Entity = {
 }
 
 export const producer: Entity = {
-  id: 0,
+  ...company,
+  id: 1,
   name: "Producteur Test",
   entity_type: EntityType.Producer,
-  has_mac: true,
-  has_trading: true,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
-  is_enabled: true,
-  sustainability_officer_email: "",
-  vat_number: "",
-  website: "",
-  activity_description: "",
-  has_saf: false,
-  ext_admin_pages: [],
 }
 
 export const trader: Entity = {
-  id: 1,
+  ...company,
+  id: 2,
   name: "Trader Test",
   entity_type: EntityType.Trader,
-  has_mac: true,
-  has_trading: true,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
-  is_enabled: true,
-  sustainability_officer_email: "",
-  vat_number: "",
-  website: "",
-  activity_description: "",
-  has_saf: false,
-  ext_admin_pages: [],
 }
 
 export const operator: Entity = {
-  id: 2,
+  ...company,
+  id: 3,
   name: "Opérateur Test",
   entity_type: EntityType.Operator,
-  has_mac: true,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
-  is_enabled: true,
-  sustainability_officer_email: "",
-  vat_number: "",
-  website: "",
-  activity_description: "",
-  has_saf: false,
-  ext_admin_pages: [],
 }
 
 export const admin: Entity = {
-  id: 3,
+  ...company,
+  id: 4,
   name: "Admin Test",
   entity_type: EntityType.Administration,
   has_mac: false,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
-  is_enabled: true,
-  sustainability_officer_email: "",
-  vat_number: "",
-  website: "",
-  activity_description: "",
-  has_saf: false,
-  ext_admin_pages: [],
 }
 
 export const cpo: Entity = {
-  id: 4,
+  ...company,
+  id: 5,
   name: "CPO Test",
   entity_type: EntityType.CPO,
   has_mac: false,
   has_trading: false,
-  has_stocks: false,
-  has_elec: false,
-  has_direct_deliveries: false,
-  default_certificate: "",
-  legal_name: "",
-  registered_address: "",
-  registered_country: country,
-  registered_zipcode: "",
-  registered_city: "",
-  registration_id: "",
-  sustainability_officer: "",
-  sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
-  is_enabled: true,
-  sustainability_officer_email: "",
-  vat_number: "",
-  website: "",
-  activity_description: "",
-  has_saf: false,
-  ext_admin_pages: [],
+}
+
+export const airline: Entity = {
+  ...company,
+  id: 6,
+  name: "Airline Test",
+  entity_type: EntityType.Airline,
+  has_mac: false,
+  has_trading: false,
+}
+
+const auditor: Entity = {
+  ...company,
+  id: 7,
+  name: "Auditeur test",
+  entity_type: EntityType.Auditor,
+  has_mac: false,
+  has_trading: false,
+}
+
+const powerOrHeatProducer: Entity = {
+  ...company,
+  id: 8,
+  name: "Producteur de chaleur test",
+  entity_type: EntityType.PowerOrHeatProducer,
+  has_mac: false,
+  has_trading: false,
+}
+
+export const externalAdmin: Entity = {
+  ...admin,
+  id: 9,
+  name: "External admin",
+  entity_type: EntityType.ExternalAdmin,
+  has_mac: false,
+  has_trading: false,
 }
 
 // DELIVERY SITES
@@ -211,10 +149,14 @@ export const deliverySite: Depot = {
 
 // PRODUCTION SITES
 
-export const productionSite: ProductionSiteDetails = {
+export const productionSite: ProductionSite = {
   name: "Test Production Site",
   country: country,
   id: 2,
+  producer: {
+    ...producer,
+    registered_country: 111,
+  },
   date_mise_en_service: "2000-01-31",
   site_siret: "123456",
   address: "",
@@ -226,10 +168,6 @@ export const productionSite: ProductionSiteDetails = {
   eligible_dc: true,
   dc_reference: "bobobobobob",
   city: "Baigorri",
-  inputs: [],
-  outputs: [],
-  certificates: [],
-  producer: producer as any,
 }
 
 // MATIERE PREMIERE
@@ -252,9 +190,9 @@ export const biocarburant = {
 export const entityRight: UserRight = {
   entity: producer,
   role: UserRole.Admin,
+  name: "Admin Test",
   expiration_date: "",
   email: "test@test.test",
-  name: "test",
 }
 
 export const entityRequest: UserRightRequest = {
@@ -279,20 +217,20 @@ export const entityRights = {
 export const entities = {
   [EntityType.CPO]: cpo,
   [EntityType.Administration]: admin,
+  [EntityType.ExternalAdmin]: externalAdmin,
   [EntityType.Operator]: operator,
   [EntityType.Trader]: trader,
   [EntityType.Producer]: producer,
+  [EntityType.PowerOrHeatProducer]: powerOrHeatProducer,
+  [EntityType.Airline]: airline,
+  [EntityType.Auditor]: auditor,
 }
 
-type PartialUserParam = Partial<{
+type PartialUserParam = DeepPartial<{
   email: User["email"]
-  request: Exclude<User["requests"][0], "entity">
-  right: Exclude<User["rights"][0], "entity">
+  request: User["requests"][0]
+  right: User["rights"][0]
 }>
-type GenerateUserParams = (
-  entityType: keyof typeof entities,
-  partialUser?: PartialUserParam
-) => User
 
 /**
  * This function simplifies the way we mock a user attaching to an entity
@@ -300,28 +238,61 @@ type GenerateUserParams = (
  * @param partialUser Additional informations to overrides default user
  * @returns
  */
-export const generateUser: GenerateUserParams = (entityType, partialUser) => {
+export const generateUser = (
+  entityType: keyof typeof entities,
+  partialUser?: PartialUserParam
+) => {
   const currentEntity = entities[entityType]
-  return mergeDeepRight<User, PartialUserParam>(
-    {
-      email: "user@company.com",
-      requests: [
+
+  const res = {
+    email: partialUser?.email ?? "user@company.com",
+    requests: [
+      mergeDeepRight(
         {
           ...entityRequest,
           entity: currentEntity,
         },
-      ],
-      rights: [
+        partialUser?.request ?? {}
+      ),
+    ],
+    rights: [
+      mergeDeepRight(
         {
           ...entityRight,
           entity: currentEntity,
         },
-      ],
-    },
-    {
-      ...(partialUser?.email ? { email: partialUser.email } : {}),
-      ...(partialUser?.request ? { requests: [partialUser.request] } : {}),
-      ...(partialUser?.right ? { rights: [partialUser.right] } : {}),
-    }
-  )
+        partialUser?.right ?? {}
+      ),
+    ],
+  }
+
+  return res
 }
+
+export const notifications = [
+  {
+    id: 1,
+    dest: operator,
+    datetime: "2024-01-01",
+    type: NotificationType.CERTIFICATE_EXPIRED,
+    acked: false,
+    send_by_email: false,
+    email_sent: false,
+    meta: {
+      certificate: "1234567890",
+    },
+  },
+  {
+    id: 2,
+    dest: operator,
+    datetime: "2024-01-01",
+    acked: true,
+    send_by_email: false,
+    email_sent: false,
+    type: NotificationType.LOTS_UPDATED_BY_ADMIN,
+    meta: {
+      updated: 10,
+      comment: "Commentaire de l'admin",
+    },
+  },
+]

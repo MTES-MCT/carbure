@@ -1,6 +1,5 @@
-import React, { PropsWithChildren, Suspense, useEffect } from "react"
+import React, { Suspense, useEffect } from "react"
 import type { Preview } from "@storybook/react"
-import "../src/carbure/assets/css/index.css"
 import i18n from "../src/i18n"
 import { LoaderOverlay } from "../src/common/components/scaffold"
 import { I18nextProvider } from "react-i18next"
@@ -10,6 +9,12 @@ import mswHandlers from "./mocks"
 import useUserManager, { UserContext } from "../src/carbure/hooks/user"
 import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
+import { MatomoProvider } from "../src/matomo"
+
+import "../src/setup-dsfr"
+import "@codegouvfr/react-dsfr/main.css"
+// import css from our app
+import "../src/carbure/assets/css/index.css"
 
 // Init MSW
 initialize()
@@ -38,13 +43,17 @@ const withData = (Story) => {
   }
   return (
     <Suspense fallback={<LoaderOverlay />}>
-      <UserContext.Provider value={user}>
-        <EntityContext.Provider value={entity}>
-          <PortalProvider>
-            <Story />
-          </PortalProvider>
-        </EntityContext.Provider>
-      </UserContext.Provider>
+      <MatomoProvider>
+        <UserContext.Provider value={user}>
+          <EntityContext.Provider value={entity}>
+            <PortalProvider>
+              <div className="new-dsfr">
+                <Story />
+              </div>
+            </PortalProvider>
+          </EntityContext.Provider>
+        </UserContext.Provider>
+      </MatomoProvider>
     </Suspense>
   )
 }
