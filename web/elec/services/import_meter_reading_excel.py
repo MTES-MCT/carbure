@@ -20,6 +20,7 @@ def import_meter_reading_excel(
     past_readings: QuerySet[ElecMeterReading],
     renewable_share: int = 1,
     beginning_of_quarter: date = None,
+    end_of_quarter: date = None,
 ):
     parsed_meter_readings_data = ExcelMeterReadings.parse_meter_reading_excel(excel_file)
 
@@ -29,6 +30,7 @@ def import_meter_reading_excel(
         past_readings,
         renewable_share,
         beginning_of_quarter,
+        end_of_quarter,
     )
 
     return meter_readings_data[0], meter_readings_data[1]
@@ -61,6 +63,7 @@ class ExcelMeterReadings:
         past_readings: QuerySet[ElecMeterReading],
         renewable_share: int = 1,
         beginning_of_quarter: date = None,
+        end_of_quarter: date = None,
     ):
         charge_point_by_id = {cp.charge_point_id: cp for cp in registered_charge_points}
 
@@ -85,6 +88,7 @@ class ExcelMeterReadings:
             "previous_readings_by_charge_point": previous_readings_by_charge_point,
             "lines_by_charge_point": lines_by_charge_point,
             "beginning_of_quarter": beginning_of_quarter,
+            "end_of_quarter": end_of_quarter,
         }
 
         return ExcelMeterReadingValidator.bulk_validate(meter_readings, context)
@@ -186,5 +190,6 @@ class ExcelMeterReadingValidator(Validator):
             )
 
         beginning_of_quarter = self.context.get("beginning_of_quarter")
-        if reading_date and beginning_of_quarter and reading_date < beginning_of_quarter:
+        end_of_quarter = self.context.get("end_of_quarter")
+        if reading_date and beginning_of_quarter and (reading_date < beginning_of_quarter or reading_date > end_of_quarter):
             self.add_error("reading_date", _("La date du relevé ne correspond pas au trimestre traité actuellement."))

@@ -3,7 +3,6 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import { Check, Return } from "common/components/icons"
-import { DateInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -13,6 +12,7 @@ import TicketTag from "../../components/tickets/tag"
 import * as api from "./api"
 import { RadioGroup } from "common/components/radio"
 import { EtsStatusEnum } from "api-schema"
+import Tooltip from "@codegouvfr/react-dsfr/Tooltip"
 
 interface AcceptAssignmentProps {
   ticket: SafTicket
@@ -21,7 +21,6 @@ interface AcceptAssignmentProps {
 
 const defaultAcceptFormValue = {
   ets_status: undefined as EtsStatusEnum | undefined,
-  ets_declaration_date: undefined as string | undefined,
 }
 
 export const AcceptAssignment = ({
@@ -50,12 +49,7 @@ export const AcceptAssignment = ({
   }
 
   const acceptTicket = async () => {
-    await acceptSafTicket.execute(
-      entity.id,
-      ticket.id,
-      form.value.ets_status!,
-      form.value.ets_declaration_date
-    )
+    await acceptSafTicket.execute(entity.id, ticket.id, form.value.ets_status!)
   }
 
   return (
@@ -84,31 +78,36 @@ export const AcceptAssignment = ({
                 options={[
                   {
                     value: EtsStatusEnum.ETS_VALUATION,
-                    label: t("Valorisation ETS"),
-                  },
-                  {
-                    value: EtsStatusEnum.OUTSIDE_ETS,
-                    label: t("Hors ETS (volontaire)"),
+                    label: (
+                      <>
+                        {t("Valorisation ETS")}
+                        <Tooltip kind="hover" title={t("RED SAF")} />
+                      </>
+                    ),
                   },
                   {
                     value: EtsStatusEnum.NOT_CONCERNED,
-                    label: t("Non concerné"),
+                    label: (
+                      <>
+                        {t("Non concerné")}
+                        <Tooltip kind="hover" title={t("ICAO CEF")} />
+                      </>
+                    ),
+                  },
+                  {
+                    value: EtsStatusEnum.OUTSIDE_ETS,
+                    label: (
+                      <>
+                        {t("Volontaire")}
+                        <Tooltip
+                          kind="hover"
+                          title={t("Hors obligation ETS")}
+                        />
+                      </>
+                    ),
                   },
                 ]}
               />
-
-              {form.value.ets_status &&
-                form.value.ets_status !== EtsStatusEnum.NOT_CONCERNED && (
-                  <>
-                    <p>{t("J'indique la date de la déclaration :")}</p>
-
-                    <DateInput
-                      required
-                      label={t("Date de déclaration")}
-                      {...form.bind("ets_declaration_date")}
-                    />
-                  </>
-                )}
             </Form>
           </section>
         </main>

@@ -29,6 +29,7 @@ import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { ContactPage } from "contact"
 import { YearsProvider } from "common/providers/years-provider"
+import { NewNavigationDialog } from "./components/new-navigation-dialog"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -85,6 +86,7 @@ const Carbure = () => {
                     <Route path="*" element={<Navigate replace to="/" />} />
                   )}
                 </Routes>
+                <NewNavigationDialog />
               </NavigationLayout>
 
               {user.loading && <LoaderOverlay />}
@@ -118,6 +120,8 @@ const Org = () => {
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
+  const isTransferredElecAdmin =
+    isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
 
   return (
     <Routes>
@@ -229,14 +233,14 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="double-counting" />} />
       )}
 
-      {(isAdmin || hasAirline || isElecAdmin || isAdminDC) && (
+      {(isAdmin || isExternal) && (
         <>
           <Route path="entities/*" element={<Entities />} />
           <Route path="*" element={<Navigate replace to="entities" />} />
         </>
       )}
 
-      {(isAdmin || isElecAdmin) && (
+      {(isAdmin || isElecAdmin || isTransferredElecAdmin) && (
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
           <Route

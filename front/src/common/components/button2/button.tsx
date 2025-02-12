@@ -17,11 +17,11 @@ export type ButtonProps = ButtonDSFRProps &
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   ButtonProps
->(({ customPriority, ...props }, ref) => {
+>(({ customPriority, asideX, asideY, spread, loading, ...props }, ref) => {
   return (
     <ButtonDSFR
       {...props}
-      iconId={props.loading ? "ri-loader-line" : props.iconId}
+      iconId={loading ? "ri-loader-line" : props.iconId}
       className={cl(props.className, {
         [css["button-danger"] as string]: customPriority === "danger",
         [css["button-success"] as string]: customPriority === "success",
@@ -32,9 +32,10 @@ export const Button = forwardRef<
           ? "tertiary"
           : props.priority
       }
-      {...layout(props)}
+      {...layout({ asideX, asideY, spread })}
       // @ts-ignore couldn't find a better way to manage different cases for button (anchor, button, icon only)
       ref={ref}
+      disabled={loading}
     />
   )
 })

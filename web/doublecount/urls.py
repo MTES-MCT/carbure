@@ -7,5 +7,5 @@ router = SimpleRouter()
 router.register("applications", ApplicationViewSet, basename="double-counting-applications")
 router.register("agreements", AgreementViewSet, basename="double-counting-agreements")
 urlpatterns = [
-    path("snapshot/", get_snapshot, name="saf-snapshot"),
+    path("snapshot/", get_snapshot, name="double-counting-snapshot"),
 ] + router.urls

@@ -48,6 +48,19 @@ class ElecChargePoint(models.Model):
         verbose_name="Historique point de recharge",
         verbose_name_plural="Historiques des points de recharge",
         cascade_delete_history=True,
+        excluded_fields=[
+            "application",
+            "cpo",
+            "current_type",
+            "is_article_2",
+            "longitude",
+            "latitude",
+            "cpo_name",
+            "cpo_siren",
+            "station_id",
+            "station_name",
+            "nominal_power",
+        ],
     )
 
     @property

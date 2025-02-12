@@ -22,4 +22,5 @@
 
 .show-more-button {
   color: var(--text-action-high-blue-france);
+  flex-shrink: 0;
 }

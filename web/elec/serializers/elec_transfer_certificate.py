@@ -15,6 +15,8 @@ class ElecTransferCertificateSerializer(serializers.ModelSerializer):
             "energy_amount",
             "status",
             "certificate_id",
+            "used_in_tiruert",
+            "consumption_date",
         ]
 
     supplier = EntityPreviewSerializer(read_only=True)

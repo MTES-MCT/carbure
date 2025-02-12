@@ -57,7 +57,9 @@ def calculate_energy_used_in_meter_readings(apps, schema_editor):
             readings_to_update.append(reading)
 
     ElecMeterReading.objects.bulk_update(
-        readings_to_update, ["energy_used_since_last_reading", "days_since_last_reading", "facteur_de_charge"]
+        readings_to_update,
+        ["energy_used_since_last_reading", "days_since_last_reading", "facteur_de_charge"],
+        batch_size=1000,
     )
 
 

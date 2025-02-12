@@ -1,0 +1,7 @@
+.pagination {
+  margin: auto;
+}
+
+.pagination :global(.fr-pagination__list) {
+  justify-content: center;
+}

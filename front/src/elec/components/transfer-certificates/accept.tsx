@@ -4,13 +4,13 @@ import Dialog from "common/components/dialog"
 import { Check, Return } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import TransferCertificateTag from "elec/components/transfer-certificates/tag"
 import { ElecTransferCertificatesDetails } from "elec/types"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api-operator"
 import { useState } from "react"
 import { RadioGroup } from "common/components/radio"
 import { DateInput } from "common/components/input"
+import css from "common/components/input.module.css"
 
 interface AcceptTransferProps {
   transferCertificate?: ElecTransferCertificatesDetails
@@ -19,17 +19,21 @@ interface AcceptTransferProps {
     usedInTiruert: boolean,
     consumptionDate: string | undefined
   ) => void
+  tiruertChoice: boolean
 }
 
 export const AcceptTransfer = ({
   transferCertificate,
   onClose,
   onAccepted,
+  tiruertChoice,
 }: AcceptTransferProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
-  const [usedInTiruert, setUsedInTiruert] = useState<string>("false")
+  const [usedInTiruert, setUsedInTiruert] = useState<string>(
+    tiruertChoice ? "false" : "true"
+  )
   const [consumptionDate, setConsumptionDate] = useState<string | undefined>(
     undefined
   )
@@ -40,6 +44,7 @@ export const AcceptTransfer = ({
     invalidates: [
       "elec-transfer-certificates",
       "elec-operator-snapshot",
+      "elec-cpo-snapshot",
       `nav-stats-${entity.id}`,
     ],
     onSuccess: () => {
@@ -64,7 +69,11 @@ export const AcceptTransfer = ({
   }
 
   const onAcceptTransfer = () => {
-    setShowConfirmationModal(true)
+    if (usedInTiruert === "true") {
+      setShowConfirmationModal(true)
+    } else {
+      handleConfirmTransfer()
+    }
   }
 
   const handleRadioChange = (value: string | undefined) => {
@@ -82,8 +91,6 @@ export const AcceptTransfer = ({
     <>
       <Dialog onClose={onClose}>
         <header>
-          <TransferCertificateTag status={transferCertificate?.status} />
-
           <h1>
             {t("Accepter le certificat n°")}
             {transferCertificate?.certificate_id ?? "..."}
@@ -92,28 +99,47 @@ export const AcceptTransfer = ({
 
         <main>
           <section>
-            <p>
-              {t(
-                "Est-ce que le certificat est concerné par une déclaration TIRUERT ?"
-              )}
-            </p>
-            <RadioGroup
-              options={[
-                { value: "true", label: t("Déclaration TIRUERT") },
-                { value: "false", label: t("Non concerné") },
-              ]}
-              value={usedInTiruert}
-              onChange={handleRadioChange} // Use the new handler
-              name="declaration-status"
-            />
+            {!tiruertChoice && (
+              <p>
+                {" "}
+                {t("Ce certificat a été concerné par une déclaration TIRUERT")}
+              </p>
+            )}
+            {tiruertChoice && (
+              <p>
+                {t(
+                  "Est-ce que ce certificat est concerné par une déclaration TIRUERT ?"
+                )}
+              </p>
+            )}
+            {tiruertChoice && (
+              <RadioGroup
+                options={[
+                  {
+                    value: "true",
+                    label: t("Concerne une déclaration TIRUERT"),
+                  },
+                  {
+                    value: "false",
+                    label: t("Ne concerne pas encore une déclaration"),
+                  },
+                ]}
+                value={usedInTiruert}
+                onChange={handleRadioChange} // Use the new handler
+                name="declaration-status"
+              />
+            )}
 
             {usedInTiruert === "true" && (
               <>
                 <p>{t("J'indique la date de déclaration de la période :")}</p>
-                <DateInput
-                  value={consumptionDate}
-                  onChange={setConsumptionDate}
-                />
+                <label className={css.label}>
+                  Date de déclaration
+                  <DateInput
+                    value={consumptionDate}
+                    onChange={setConsumptionDate}
+                  />
+                </label>
               </>
             )}
           </section>

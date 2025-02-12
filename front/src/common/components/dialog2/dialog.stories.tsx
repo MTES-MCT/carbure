@@ -38,3 +38,15 @@ export const ConfirmDialog: StoryObj<typeof Confirm> = {
   },
   render: (args) => <Confirm {...args} />,
 }
+
+export const FullWidth: Story = {
+  args: {
+    fullWidth: true,
+  },
+}
+
+export const FullHeight: Story = {
+  args: {
+    fullHeight: true,
+  },
+}

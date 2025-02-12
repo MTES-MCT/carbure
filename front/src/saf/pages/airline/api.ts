@@ -80,8 +80,7 @@ export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
 export function acceptSafTicket(
   entity_id: number,
   ticket_id: number,
-  ets_status: EtsStatusEnum,
-  ets_declaration_date: string | undefined
+  ets_status: EtsStatusEnum
 ) {
   return apiFetch.POST("/saf/tickets/{id}/accept/", {
     params: {
@@ -94,7 +93,6 @@ export function acceptSafTicket(
     },
     body: {
       ets_status,
-      ets_declaration_date,
     },
   })
 }

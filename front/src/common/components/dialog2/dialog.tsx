@@ -6,13 +6,15 @@ import { Button, ButtonProps } from "../button2"
 import { Title, TitleProps } from "../title"
 import { Text, TextProps } from "../text"
 import { useMutation } from "common/hooks/async"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { IconName } from "../icon"
 
 export interface DialogProps {
   className?: string
   style?: React.CSSProperties
   fullscreen?: boolean
+  fullWidth?: boolean
+  fullHeight?: boolean
   children?: React.ReactNode
   header?: React.ReactNode
   footer?: React.ReactNode
@@ -26,12 +28,20 @@ export const Dialog = ({
   header,
   footer,
   fullscreen,
+  fullWidth,
+  fullHeight,
   onClose,
 }: DialogProps) => (
   <div className={css.screen}>
     <Overlay onClick={onClose} />
     <div
-      className={cl(css.dialog, fullscreen && css.fullscreen, className)}
+      className={cl(
+        css.dialog,
+        fullscreen && css.fullscreen,
+        fullWidth && css.fullWidth,
+        fullHeight && css.fullHeight,
+        className
+      )}
       style={style}
     >
       <Button
@@ -43,7 +53,7 @@ export const Dialog = ({
         onClick={onClose}
         className={css["dialog__close-button"]}
       >
-        Fermer
+        <Trans>Fermer</Trans>
       </Button>
       <div className={css["dialog__wrapper"]}>
         {header && <header className={css["dialog__header"]}>{header}</header>}
@@ -72,7 +82,11 @@ export interface ConfirmProps {
   description: ReactNode
   confirm: string
   variant?: ButtonProps["priority"]
+  customVariant?: ButtonProps["customPriority"]
   icon?: IconName
+
+  // Hide cancel button
+  hideCancel?: boolean
   onConfirm: () => Promise<any>
   onClose: () => void
 }
@@ -81,6 +95,8 @@ export const Confirm = ({
   description,
   confirm,
   variant = "primary",
+  customVariant,
+  hideCancel,
   icon,
   onConfirm,
   onClose,
@@ -90,6 +106,7 @@ export const Confirm = ({
   const commonButtonProps = {
     nativeButtonProps: { autoFocus: true },
     priority: variant,
+    customPriority: customVariant,
     loading: confirmAction.loading,
     onClick: () => confirmAction.execute().then(onClose),
   }
@@ -104,7 +121,11 @@ export const Confirm = ({
       }
       footer={
         <>
-          <Button priority="secondary">{t("Annuler")}</Button>
+          {!hideCancel && (
+            <Button priority="secondary" onClick={onClose}>
+              {t("Annuler")}
+            </Button>
+          )}
           {/* Couldn't find a better way to handle icon prop drilling */}
           {icon ? (
             <Button {...commonButtonProps} iconId={icon}>

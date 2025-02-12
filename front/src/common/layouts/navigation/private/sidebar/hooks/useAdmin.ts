@@ -12,19 +12,16 @@ type AdminParams = Pick<apiTypes["NavStats"], "total_pending_action_for_admin">
 export const useAdmin = (params?: AdminParams) => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { isAdmin, hasAdminRight, isExternal } = useEntity()
-  const isAdminDC = isExternal && hasAdminRight("DCA")
-  const isAdminAirline = isExternal && hasAdminRight("AIRLINE")
-  const isElecAdmin = isExternal && hasAdminRight("ELEC")
+  const { isAdmin, isExternal } = useEntity()
 
   const admin: MenuSection = {
     title: t("Admin"),
-    condition: isAdmin,
+    condition: isAdmin || isExternal,
     children: [
       {
         path: routes.ADMIN().COMPANIES,
         title: t("Sociétés"),
-        condition: isAdmin || isAdminAirline || isElecAdmin || isAdminDC,
+
         icon: BookLine,
         iconActive: BookFill,
       },

@@ -43,6 +43,11 @@ export const DefaultList: Story = {
   play: async ({ canvasElement }) => {
     const { getByRole } = within(canvasElement)
     const select = await waitFor(() => getByRole("button"))
+
+    // For unknown reason, the dropdown does not have the good size
+    // when the story is rendered.
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
     await userEvent.click(select)
   },
 }

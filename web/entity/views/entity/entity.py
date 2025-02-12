@@ -9,8 +9,7 @@ from core.models import Entity, ExternalAdminRights, UserRights
 from doublecount.serializers import EntitySerializer
 from entity.services.enable_entity import enable_entity as enable_entity_service
 from entity.services.get_administrated_entities import get_administrated_entities
-from saf.permissions import HasUserRights
-from saf.permissions.user_rights import HasAdminRights
+from saf.permissions import HasAdminRights, HasUserRights
 
 from .mixins import EntityActionMixin
 

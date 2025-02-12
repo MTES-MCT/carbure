@@ -3,7 +3,7 @@ import { matches } from "common/utils/collection"
 import { useEffect, useRef, useState } from "react"
 
 import { Dropdown, Trigger } from "../dropdown2"
-import { TextInput, TextInputProps } from "../inputs2/text"
+import { TextInput } from "../inputs2/text"
 import { List, createQueryFilter, defaultRenderer, Renderer } from "../list2"
 import {
   defaultNormalizer,
@@ -14,9 +14,10 @@ import {
 } from "common/utils/normalize"
 import { Text } from "../text"
 import { Trans } from "react-i18next"
+import { InputProps } from "../inputs2/input"
 
 export type AutocompleteProps<T, V = T> = Trigger &
-  TextInputProps & {
+  InputProps & {
     value?: V
     options?: T[]
     defaultOptions?: T[]

@@ -54,6 +54,10 @@
   border-bottom: 1px solid var(--border-default-grey);
 }
 
+.rowLink:hover {
+  background-color: var(--background-default-grey-hover);
+}
+
 .rows > li > a {
   flex: 1;
   min-width: 0;
@@ -79,7 +83,7 @@
 
 .cell {
   flex: 1 1 0%;
-  padding: var(--spacing-3v) var(--spacing-2w);
+  padding: var(--spacing-5v) var(--spacing-2w);
 }
 
 .compact .cell {

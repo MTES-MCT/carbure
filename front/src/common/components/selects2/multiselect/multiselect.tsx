@@ -59,7 +59,11 @@ export const MultiSelect = <T, V>({
     <>
       <Button
         ref={triggerRef}
-        iconId={loading ? "ri-loader-line" : "fr-icon-arrow-down-s-line"}
+        iconId={
+          loading || asyncOptions.loading
+            ? "ri-loader-line"
+            : "fr-icon-arrow-down-s-line"
+        }
         iconPosition="right"
         priority="tertiary"
         className={cl(

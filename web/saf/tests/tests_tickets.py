@@ -98,7 +98,6 @@ class SafTicketsTest(TestCase):
                 "is_in_europe": True,
             },
             "ghg_reduction": 65.0,
-            "ets_status": None,
         }
         assert response.json()["results"][0] == expected_ticket
         assert response.json()["count"] == 2

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django import forms
 from django.db import transaction
@@ -14,7 +14,11 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
-from elec.services.meter_readings_application_quarter import first_day_of_quarter, get_application_quarter
+from elec.services.meter_readings_application_quarter import (
+    first_day_of_quarter,
+    get_application_quarter,
+    last_day_of_quarter,
+)
 
 
 class AddMeterReadingApplicationForm(forms.Form):
@@ -61,6 +65,7 @@ def add_application(request: HttpRequest, entity: Entity):
 
     # get the first day of this quarter so we can verify that the readings are for the current quarter
     beginning_of_quarter = first_day_of_quarter(year, quarter)
+    end_of_quarter = last_day_of_quarter(year, quarter) + timedelta(days=15)
 
     meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
@@ -68,6 +73,7 @@ def add_application(request: HttpRequest, entity: Entity):
         past_readings,
         renewable_share,
         beginning_of_quarter,
+        end_of_quarter,
     )
 
     if len(errors) > 0:
