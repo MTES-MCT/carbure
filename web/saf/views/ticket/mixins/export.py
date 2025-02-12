@@ -2,6 +2,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiTypes, extend_schema
 from rest_framework.decorators import action
 
 from core.excel import ExcelResponse
+from core.models import Entity
 from saf.serializers.saf_ticket import export_tickets_to_excel
 
 
@@ -23,6 +24,7 @@ class ExportActionMixin:
     )
     @action(methods=["get"], detail=False)
     def export(self, request, *args, **kwargs):
+        entity = Entity.objects.get(pk=request.query_params.get("entity_id"))
         tickets = self.filter_queryset(self.get_queryset())
-        file = export_tickets_to_excel(tickets)
+        file = export_tickets_to_excel(tickets, entity)
         return ExcelResponse(file)

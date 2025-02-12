@@ -113,18 +113,10 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
           />
         )}
-        {ticket.ets_status &&
-          ticket.ets_status !== EtsStatusEnum.NOT_CONCERNED && (
-            <TextInput
-              label={t("Déclaration ETS")}
-              value={etsStatusMap[ticket.ets_status]}
-              readOnly
-            />
-          )}
-        {ticket.ets_declaration_date && (
-          <DateInput
-            label={t("Date de déclaration ETS")}
-            value={ticket.ets_declaration_date}
+        {"ets_status" in ticket && ticket.ets_status && (
+          <TextInput
+            label={t("Déclaration ETS")}
+            value={etsStatusMap[ticket.ets_status]}
             readOnly
           />
         )}
