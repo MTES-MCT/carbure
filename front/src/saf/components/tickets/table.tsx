@@ -91,9 +91,10 @@ export function useColumns() {
   return {
     status: {
       header: t("Statut"),
-      cell: (ticket: SafTicket) => (
-        <TicketTag status={ticket.status} ets={ticket.ets_status} />
-      ),
+      cell: (ticket: SafTicket) =>
+        "ets_status" in ticket && (
+          <TicketTag status={ticket.status} ets={ticket.ets_status} />
+        ),
     },
 
     availableVolume: {
