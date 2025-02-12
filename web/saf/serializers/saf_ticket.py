@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from core.excel import export_to_excel
-from core.models import Biocarburant
+from core.models import Biocarburant, Entity
 from core.serializers import AirportSerializer, EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket
@@ -110,16 +110,18 @@ class SafTicketDetailsAirlineSerializer(SafTicketDetailsBaseSerializer):
         fields = SafTicketDetailsBaseSerializer.Meta.fields + ["ets_status"]
 
 
-def export_tickets_to_excel(tickets):
+def export_tickets_to_excel(tickets, entity):
     today = datetime.datetime.today()
     location = "/tmp/carbure_saf_tickets_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
+
+    is_airline = entity.entity_type == Entity.AIRLINE
 
     return export_to_excel(
         location,
         [
             {
                 "label": _("tickets"),
-                "rows": SafTicketDetailsBaseSerializer(tickets, many=True).data,
+                "rows": SafTicketDetailsAirlineSerializer(tickets, many=True).data,
                 "columns": [
                     {"label": "carbure_id", "value": "carbure_id"},
                     {"label": "year", "value": "year"},
@@ -152,6 +154,7 @@ def export_tickets_to_excel(tickets):
                     {"label": "biofuel_pci_kg", "value": "biofuel.pci_kg"},
                     {"label": "biofuel_pci_litre", "value": "biofuel.pci_litre"},
                     {"label": "biofuel_masse_volumique", "value": "biofuel.masse_volumique"},
+                    {"label": "ets_status" if is_airline else "", "value": "ets_status" if is_airline else ""},
                 ],
             },
             {
