@@ -3,3 +3,8 @@
   row-gap: var(--spacing-3v);
   column-gap: var(--spacing-3v);
 }
+
+.cession-dialog__form {
+  border: 1px solid var(--border-default-grey);
+  padding: var(--spacing-4w);
+}

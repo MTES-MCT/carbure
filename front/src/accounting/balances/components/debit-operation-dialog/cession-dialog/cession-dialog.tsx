@@ -8,17 +8,14 @@ import { OperationText } from "accounting/components/operation-text"
 import { Trans, useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
 import { Stepper, useStepper } from "common/components/stepper"
+import { FromDepot } from "./from-depot"
+import styles from "./cession-dialog.module.css"
+import { useForm, Form } from "common/components/form2"
+import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
 
 interface CessionDialogProps {
   onClose: () => void
   balance: Balance
-}
-
-enum CessionStepKey {
-  FromDepot = "from_depot",
-  Volume = "volume",
-  ToDepot = "to_depot",
-  Recap = "recap",
 }
 
 export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
@@ -41,6 +38,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
       title: t("Récapitulatif"),
     },
   ])
+  const form = useForm<SessionDialogForm>({})
 
   return (
     <Portal>
@@ -74,11 +72,14 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               description={balance.biofuel ?? ""}
             />
           </Grid>
-          {/* <Notice variant="info" noColor>
-            <Trans>Solde disponible</Trans> {balance.biofuel}
-            {" : "}
-            <b>{formatNumber(Number(balance.available_balance))}l</b>
-          </Notice> */}
+
+          <div className={styles["cession-dialog__form"]}>
+            <Form form={form}>
+              {currentStep?.key === CessionStepKey.FromDepot && (
+                <FromDepot balance={balance} />
+              )}
+            </Form>
+          </div>
         </Main>
       </Dialog>
     </Portal>
