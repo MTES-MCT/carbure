@@ -18,3 +18,13 @@ export const patchOperation = (
     body: data,
   })
 }
+
+// export const createOperation = (
+//   entityId: number,
+//   data: apiTypes["OperationCreateRequest"]
+// ) => {
+//   return api.POST("/tiruert/operations/", {
+//     params: { query: { entity_id: entityId } },
+//     body: data,
+//   })
+// }

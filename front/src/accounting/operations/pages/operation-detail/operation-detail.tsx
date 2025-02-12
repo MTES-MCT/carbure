@@ -26,10 +26,10 @@ import {
 } from "./operation-detail.hooks"
 import { Form, useForm } from "common/components/form2"
 import { useNotify } from "common/components/notifications"
-import Autocomplete from "common/components/autocomplete/autocomplete"
 import { Depot } from "carbure/types"
 import { formatOperationType, formatSector } from "accounting/utils/formatters"
 import { OperationsStatus, OperationType } from "accounting/types"
+import { Autocomplete } from "common/components/autocomplete2"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()

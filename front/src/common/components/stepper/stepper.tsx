@@ -53,6 +53,8 @@ export const useStepper = <Key extends string>(steps: Step<Key>[]) => {
   return {
     currentStep,
     currentStepIndex: currentStepIndex + 1, // Index displayed in the stepper, starts at 1
+    hasPreviousStep,
+    hasNextStep,
     nextStep,
     setStep,
     goToNextStep,
