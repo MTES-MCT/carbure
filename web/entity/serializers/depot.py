@@ -125,7 +125,7 @@ class DepotProductionSiteSerializer(serializers.ModelSerializer):
 
 
 class EntitySiteSerializer(serializers.Serializer):
-    ownership_type = serializers.CharField()
+    ownership_type = serializers.ChoiceField(choices=EntitySite.TYPE_OWNERSHIP, required=True)
     blending_is_outsourced = serializers.BooleanField()
     blender = EntityUserEntitySerializer()
     depot = serializers.SerializerMethodField(allow_null=True)
