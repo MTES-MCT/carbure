@@ -94,7 +94,6 @@ class SafTicketDetailsTest(TestCase):
     def test_saf_ticket_details_ok(self):
         query = {"entity_id": self.entity.id}
         response = self.client.get(reverse("saf-tickets-detail", kwargs={"id": 4321}), query)
-        print(response.json())
         assert response.status_code == 200
 
         expected_ticket = {
@@ -157,7 +156,6 @@ class SafTicketDetailsTest(TestCase):
             "shipping_method": None,
             "reception_airport": None,
             "consumption_type": None,
-            "ets_status": None,
         }
 
         assert response.json() == expected_ticket
