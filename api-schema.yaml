@@ -5840,13 +5840,11 @@ components:
       type: object
       properties:
         sector:
-          type: string
+          $ref: "#/components/schemas/SectorEnum"
         customs_category:
-          type: string
-          nullable: true
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: string
-          nullable: true
         initial_balance:
           type: number
           format: double
@@ -5875,6 +5873,7 @@ components:
           type: string
       required:
         - available_balance
+        - customs_category
         - final_balance
         - pending
         - sector
@@ -7996,6 +7995,9 @@ components:
           type: number
           format: double
           readOnly: true
+        unit:
+          type: string
+          readOnly: true
         details:
           type: array
           items:
@@ -8011,6 +8013,7 @@ components:
         - sector
         - to_depot
         - type
+        - unit
         - volume
     OperationDetail:
       type: object
@@ -9177,6 +9180,16 @@ components:
           maxLength: 9
       required:
         - registration_id
+    SectorEnum:
+      enum:
+        - ESSENCE
+        - DIESEL
+        - SAF
+      type: string
+      description: |-
+        * `ESSENCE` - ESSENCE
+        * `DIESEL` - DIESEL
+        * `SAF` - SAF
     SetBioFuelsRequest:
       type: object
       properties:

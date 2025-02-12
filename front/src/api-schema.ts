@@ -1784,9 +1784,9 @@ export interface components {
       dca_id: number
     }
     Balance: {
-      sector: string
-      customs_category?: string | null
-      biofuel?: string | null
+      sector: components["schemas"]["SectorEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel?: string
       /** Format: double */
       initial_balance?: number
       /** Format: double */
@@ -2629,6 +2629,7 @@ export interface components {
       readonly volume: number
       /** Format: double */
       readonly avoided_emissions: number
+      readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
     OperationDetail: {
@@ -2665,6 +2666,7 @@ export interface components {
       readonly created_at: string
       /** Format: double */
       readonly volume: number
+      readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
     OtpResponse: {
@@ -3079,6 +3081,13 @@ export interface components {
     SeachCompanyRequest: {
       registration_id: string
     }
+    /**
+     * @description * `ESSENCE` - ESSENCE
+     *     * `DIESEL` - DIESEL
+     *     * `SAF` - SAF
+     * @enum {string}
+     */
+    SectorEnum: PathsApiTiruertOperationsGetParametersQuerySector
     SetBioFuelsRequest: {
       /** @description List of biocarburant codes. */
       biocarburant_codes: string[]
