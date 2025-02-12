@@ -6443,7 +6443,7 @@ components:
       type: object
       properties:
         ownership_type:
-          type: string
+          $ref: "#/components/schemas/OwnershipTypeEnum"
         blending_is_outsourced:
           type: boolean
         blender:

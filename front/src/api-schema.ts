@@ -2216,7 +2216,7 @@ export interface components {
       readonly outputs: components["schemas"]["EntityBiofuel"][]
     }
     EntitySite: {
-      ownership_type: string
+      ownership_type: components["schemas"]["OwnershipTypeEnum"]
       blending_is_outsourced: boolean
       blender: components["schemas"]["UserEntity"]
       readonly depot: components["schemas"]["EntityDepot"] | null
