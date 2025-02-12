@@ -100,7 +100,7 @@ if env.get("IMAGE_TAG") == "prod":
     # Read replica
     @periodic_task(crontab(hour=1, minute=45))
     def populate_read_replica() -> None:
-        subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", "$READ_REPLICA_DATABASE_URL"])
+        subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", env.get("READ_REPLICA_DATABASE_URL")])
 
 
 if env.get("IMAGE_TAG") == "staging":
