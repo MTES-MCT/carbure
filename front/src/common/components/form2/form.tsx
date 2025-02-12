@@ -163,14 +163,17 @@ export function useBindCallback<T>(
   setField: (name: keyof T, value: T[keyof T]) => void
 ): Bind<T> {
   return useCallback(
-    (name, { showError, value: option } = {}) => ({
+    (name, { showError, value: option, onChange: onChangeOption } = {}) => ({
       name,
       value: option ?? value[name],
       disabled: disabledFields[name],
       checked: option ? option === value[name] : undefined,
       state: errors[name] ? "error" : undefined,
       stateRelatedMessage: showError ? errors[name] : undefined,
-      onChange: (value) => setField(name, value),
+      onChange: (value) => {
+        setField(name, value)
+        onChangeOption?.(value)
+      },
     }),
     [value, errors, setField, disabledFields]
   )
@@ -191,6 +194,7 @@ export type Bind<T> = <N extends keyof T>(
   options?: {
     value?: T[N]
     showError?: boolean // by default, the error is not shown
+    onChange?: (value: T[N]) => void
   }
 ) => BindProps<T, N>
 

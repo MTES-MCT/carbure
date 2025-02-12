@@ -3,8 +3,8 @@ import { api } from "common/services/api-fetch"
 
 export const getVolumeByDepot = (
   entity_id: number,
-  sector: OperationSector,
-  category: OperationBiofuelCategory,
+  sector: string,
+  category: string,
   biofuel: string,
   depotName: string
 ) => {
@@ -13,9 +13,9 @@ export const getVolumeByDepot = (
       params: {
         query: {
           entity_id,
-          sector: [sector],
+          sector: [sector as OperationSector],
           biofuel: [biofuel],
-          customs_category: [category],
+          customs_category: [category as OperationBiofuelCategory],
           depot: [depotName],
         },
       },
