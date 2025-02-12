@@ -23,5 +23,6 @@ export default defineConfig({
         entryFileNames: "static/[name].[hash].js", // Place les fichiers d'entrée dans "static"
       },
     },
+    assetsInlineLimit: 0,
   },
 })
