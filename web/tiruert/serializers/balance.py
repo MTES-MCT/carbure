@@ -1,10 +1,12 @@
 from rest_framework import serializers
 
+from core.models import MatierePremiere
+
 
 class BalanceSerializer(serializers.Serializer):
-    sector = serializers.CharField()
-    customs_category = serializers.CharField(required=False, allow_null=True)
-    biofuel = serializers.CharField(required=False, allow_null=True)
+    sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
+    customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
+    biofuel = serializers.CharField(required=False)
     initial_balance = serializers.FloatField(required=False)
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
