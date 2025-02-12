@@ -11,7 +11,7 @@ from saf.models import SafTicket
 from transactions.models import Airport
 
 
-class SafTicketSerializer(serializers.ModelSerializer):
+class SafTicketBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = SafTicket
         fields = [
@@ -28,7 +28,6 @@ class SafTicketSerializer(serializers.ModelSerializer):
             "biofuel",
             "country_of_origin",
             "ghg_reduction",
-            "ets_status",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -38,13 +37,19 @@ class SafTicketSerializer(serializers.ModelSerializer):
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
 
+class SafTicketAirlineSerializer(SafTicketBaseSerializer):
+    class Meta:
+        model = SafTicket
+        fields = SafTicketBaseSerializer.Meta.fields + ["ets_status"]
+
+
 class SafBiofuelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Biocarburant
         fields = ["name", "name_en", "code", "pci_kg", "pci_litre", "masse_volumique"]
 
 
-class SafTicketDetailsSerializer(serializers.ModelSerializer):
+class SafTicketDetailsBaseSerializer(serializers.ModelSerializer):
     from .saf_ticket_source import SafTicketSourcePreviewSerializer  # noqa: E402
 
     class Meta:
@@ -86,7 +91,6 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
             "shipping_method",
             "reception_airport",
             "consumption_type",
-            "ets_status",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -100,6 +104,12 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
     reception_airport = AirportSerializer(read_only=True)
 
 
+class SafTicketDetailsAirlineSerializer(SafTicketDetailsBaseSerializer):
+    class Meta:
+        model = SafTicket
+        fields = SafTicketDetailsBaseSerializer.Meta.fields + ["ets_status"]
+
+
 def export_tickets_to_excel(tickets):
     today = datetime.datetime.today()
     location = "/tmp/carbure_saf_tickets_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
@@ -109,7 +119,7 @@ def export_tickets_to_excel(tickets):
         [
             {
                 "label": _("tickets"),
-                "rows": SafTicketDetailsSerializer(tickets, many=True).data,
+                "rows": SafTicketDetailsBaseSerializer(tickets, many=True).data,
                 "columns": [
                     {"label": "carbure_id", "value": "carbure_id"},
                     {"label": "year", "value": "year"},
