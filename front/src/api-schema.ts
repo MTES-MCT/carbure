@@ -2549,6 +2549,17 @@ export interface components {
      * @enum {string}
      */
     RoleEnum: RoleEnum
+    SafBiofuel: {
+      name: string
+      name_en: string
+      code: string
+      /** Format: double */
+      pci_kg?: number
+      /** Format: double */
+      pci_litre?: number
+      /** Format: double */
+      masse_volumique?: number
+    }
     SafTicket:
       | components["schemas"]["SafTicketBase"]
       | components["schemas"]["SafTicketAirline"]
@@ -2609,7 +2620,7 @@ export interface components {
       /** Format: double */
       volume: number
       readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly biofuel: components["schemas"]["SafBiofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
@@ -2663,7 +2674,7 @@ export interface components {
       /** Format: double */
       volume: number
       readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly biofuel: components["schemas"]["SafBiofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null

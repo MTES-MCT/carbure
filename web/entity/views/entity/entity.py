@@ -49,13 +49,24 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                 IsAuthenticated(),
                 HasUserRights([UserRights.ADMIN, UserRights.RW], None),
             ]
-        if self.action in ["list", "retrieve", "create"]:
+        if self.action == "create":
             return [
                 HasAdminRights(
                     allow_external=[
                         ExternalAdminRights.AIRLINE,
                         ExternalAdminRights.ELEC,
                         ExternalAdminRights.DOUBLE_COUNTING,
+                    ]
+                )
+            ]
+        elif self.action in ["list", "retrieve"]:
+            return [
+                HasAdminRights(
+                    allow_external=[
+                        ExternalAdminRights.AIRLINE,
+                        ExternalAdminRights.ELEC,
+                        ExternalAdminRights.DOUBLE_COUNTING,
+                        ExternalAdminRights.TRANSFERRED_ELEC,
                     ]
                 )
             ]

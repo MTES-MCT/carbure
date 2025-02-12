@@ -38,6 +38,9 @@ const EntityDetails = () => {
   const isEnabled = Boolean(entityData?.is_enabled)
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
+  const canApprove =
+    entity.isExternal &&
+    (entity.hasAdminRight("AIRLINE") || entity.hasAdminRight("ELEC"))
 
   return (
     <Main>
@@ -72,7 +75,7 @@ const EntityDetails = () => {
       />
 
       <section>
-        {!isEnabled && entityData && (
+        {!isEnabled && entityData && canApprove && (
           <AuthorizeEntityBanner company={entityData} />
         )}
 
