@@ -198,47 +198,51 @@ export const DeliverySiteForm = ({
         />
       </Row>
 
-      <RadioGroup
-        label={t("Propriété")}
-        options={ownerShipTypeOptions}
-        {...bind("ownership_type")}
-      />
-
-      {entity && entity.entity_type === EntityType.Operator && (
-        <Checkbox
-          label={t("Incorporation potentiellement effectuée par un tiers")} // prettier-ignore
-          {...bind("blending_is_outsourced")}
-          value={value.blending_is_outsourced ?? false}
-        />
-      )}
-
-      {value.blending_is_outsourced && (
-        <AutoCompleteOperators
-          label={t("Incorporateur Tiers")}
-          placeholder={t("Rechercher un opérateur pétrolier...")}
-          {...bind("blender")}
-        />
-      )}
-
-      {entity.entity_type === EntityType.Operator &&
-        deliverySite &&
-        isReadOnly && (
-          <>
-            <Checkbox
-              label={t("L'incorporation est effectuée par un tiers")}
-              value={deliverySite.blending_is_outsourced}
-              disabled
-            />
-
-            {deliverySite.blending_is_outsourced && (
-              <TextInput
-                label={t("Incorporateur Tiers")}
-                value={deliverySite.blender?.name ?? ""}
-                readOnly
+      {entity.entity_type === EntityType.Operator && (
+        <>
+          {isReadOnly && deliverySite ? (
+            <>
+              <Checkbox
+                label={t("L'incorporation est effectuée par un tiers")}
+                value={deliverySite.blending_is_outsourced}
+                disabled
               />
-            )}
-          </>
-        )}
+
+              {deliverySite.blending_is_outsourced && (
+                <TextInput
+                  label={t("Incorporateur Tiers")}
+                  value={deliverySite.blender?.name ?? ""}
+                  readOnly
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <RadioGroup
+                label={t("Propriété")}
+                options={ownerShipTypeOptions}
+                {...bind("ownership_type")}
+              />
+
+              {entity && entity.entity_type === EntityType.Operator && (
+                <Checkbox
+                  label={t("Incorporation potentiellement effectuée par un tiers")} // prettier-ignore
+                  {...bind("blending_is_outsourced")}
+                  value={value.blending_is_outsourced ?? false}
+                />
+              )}
+
+              {value.blending_is_outsourced && (
+                <AutoCompleteOperators
+                  label={t("Incorporateur Tiers")}
+                  placeholder={t("Rechercher un opérateur pétrolier...")}
+                  {...bind("blender")}
+                />
+              )}
+            </>
+          )}
+        </>
+      )}
     </Form>
   )
 }
