@@ -8,7 +8,7 @@ import { OperationText } from "accounting/components/operation-text"
 import { Trans, useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
 import { Stepper, useStepper } from "common/components/stepper"
-import { FromDepot } from "./from-depot"
+import { FromDepotForm } from "./from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
@@ -76,7 +76,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
           <div className={styles["cession-dialog__form"]}>
             <Form form={form}>
               {currentStep?.key === CessionStepKey.FromDepot && (
-                <FromDepot balance={balance} />
+                <FromDepotForm balance={balance} />
               )}
             </Form>
           </div>
