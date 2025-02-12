@@ -94,7 +94,7 @@ class SafTicketDetailsTest(TestCase):
     def test_saf_ticket_details_ok(self):
         query = {"entity_id": self.entity.id}
         response = self.client.get(reverse("saf-tickets-detail", kwargs={"id": 4321}), query)
-
+        print(response.json())
         assert response.status_code == 200
 
         expected_ticket = {
@@ -125,6 +125,9 @@ class SafTicketDetailsTest(TestCase):
                 "name": "Huile cotraitée - Carburéacteur",
                 "name_en": "Co-processed oil - jet",
                 "code": "HCC",
+                "pci_kg": 43.0,
+                "pci_litre": 33.0,
+                "masse_volumique": 0.0,
             },
             "country_of_origin": {
                 "name": "Espagne",
