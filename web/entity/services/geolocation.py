@@ -8,7 +8,9 @@ def get_coordinates(address):
     response = requests.get(URL, params=params)
     results = response.json()
 
-    if len(results.get("features")) > 0:
+    features = results.get("features", None)
+
+    if features and len(features) > 0:
         first_result = results.get("features")[0]
         lon, lat = first_result.get("geometry").get("coordinates")
         return lon, lat

@@ -119,6 +119,13 @@ class Site(models.Model):
         if self.site_type in self.DEPOT_TYPES and not self.customs_id:
             raise ValidationError({"customs_id": ["Ce champ est obligatoire pour les dépots."]})
 
+        # Check if customs_id is unique for depot, except for the current depot
+        if (
+            self.site_type in self.DEPOT_TYPES
+            and Site.objects.filter(customs_id=self.customs_id).exclude(id=self.id).exists()
+        ):
+            raise ValidationError({"customs_id": ["Ce numéro de douane est déjà utilisé."]})
+
         super().clean()
 
     def natural_key(self):

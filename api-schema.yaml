@@ -5255,6 +5255,13 @@ components:
         depot_type:
           type: string
           minLength: 1
+        ownership_type:
+          $ref: "#/components/schemas/OwnershipTypeEnum"
+        blending_is_outsourced:
+          type: boolean
+          default: false
+        blending_entity_id:
+          type: integer
         name:
           type: string
           minLength: 1
@@ -5344,6 +5351,7 @@ components:
         - depot_type
         - entity_id
         - name
+        - ownership_type
     CreateEntityRequest:
       type: object
       properties:
@@ -6277,6 +6285,8 @@ components:
           format: double
           nullable: true
           description: En degrés Celsius
+        is_enabled:
+          type: boolean
       required:
         - country
         - name
@@ -6433,7 +6443,7 @@ components:
       type: object
       properties:
         ownership_type:
-          type: string
+          $ref: "#/components/schemas/OwnershipTypeEnum"
         blending_is_outsourced:
           type: boolean
         blender:
