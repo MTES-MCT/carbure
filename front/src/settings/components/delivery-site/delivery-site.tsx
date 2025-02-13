@@ -34,6 +34,7 @@ import {
   useOwnerShipTypeOptions,
 } from "./delivery-site.hooks"
 import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
+import Tag from "common/components/tag"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -104,6 +105,15 @@ const DeliverySitesSettings = ({
           rows={deliverySitesData}
           onAction={showDeliverySite}
           columns={[
+            {
+              key: "status",
+              header: t("Statut"),
+              cell: (ds) => (
+                <Tag variant={ds.depot?.is_enabled ? "success" : "info"}>
+                  {ds.depot?.is_enabled ? t("Validé") : t("En attente")}
+                </Tag>
+              ),
+            },
             {
               key: "id",
               header: t("ID"),
@@ -223,7 +233,7 @@ export const DeliverySiteFinderDialog = ({
               autoFocus
               label={t("Dépôt à ajouter")}
               placeholder={t("Rechercher un dépôt...")}
-              getOptions={(search) => common.findDepots(search)}
+              getOptions={(search) => common.findDepots(search, false)}
               normalize={normalizeDepot}
               required
               {...bind("depot")}

@@ -69,8 +69,8 @@ class AddDepotActionMixin:
         serializer.is_valid(raise_exception=True)
         delivery_site_id = serializer.validated_data.get("delivery_site_id")
         ownership_type = serializer.validated_data.get("ownership_type")
-        blending_is_outsourced = serializer.validated_data.get("oblending_is_outsourced", False)
-        blending_entity_id = serializer.validated_data.get("oblending_entity_id")
+        blending_is_outsourced = serializer.validated_data.get("blending_is_outsourced", False)
+        blending_entity_id = serializer.validated_data.get("blending_entity_id")
         try:
             ds = Depot.objects.get(customs_id=delivery_site_id)
         except Exception:
