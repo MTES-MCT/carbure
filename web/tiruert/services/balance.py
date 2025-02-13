@@ -143,7 +143,7 @@ class BalanceService:
         # In this case, the key won't be in the balance dict
         if key not in balance:
             balance[key] = {
-                "volume": {"credit": 0, "debit": 0},
+                "quantity": {"credit": 0, "debit": 0},
                 "emission_rate_per_mj": 0,
                 "pending": 0,
                 "sector": operation.sector,
