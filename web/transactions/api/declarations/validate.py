@@ -3,7 +3,12 @@ import traceback
 from django.db import transaction
 from django.db.models import Q
 
-from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring, background_create_ticket_sources_from_lots
+from carbure.tasks import (
+    background_bulk_sanity_checks,
+    background_bulk_scoring,
+    background_create_ticket_sources_from_lots,
+    background_create_tiruert_operations_from_lots,
+)
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
@@ -78,6 +83,9 @@ def validate_declaration(request, *args, **kwargs):
 
         # Create SAF ticket sources for declared received lots
         background_create_ticket_sources_from_lots(received_lots)
+
+        # Create TIRUERT operations for declared received lots
+        background_create_tiruert_operations_from_lots(received_lots)
 
         # Freeze lots that are marked as declared by both supplier and client
         declared_lots = declaration_lots.filter(declared_by_supplier=True, declared_by_client=True)
