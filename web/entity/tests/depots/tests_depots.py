@@ -65,6 +65,7 @@ class EntityDepotsTest(TestCase):
             "country_code": self.pays.code_pays,
             "depot_type": "BIOFUEL DEPOT",
             "depot_id": "123456789012345",  # keep "depot_id" to not change front api call (but named "customs_id" from now)
+            "ownership_type": "OWN",
         }
         url_create = reverse("api-entity-depots-create-depot") + f"?entity_id={self.admin.id}"
         res = self.client.post(url_create, params)
