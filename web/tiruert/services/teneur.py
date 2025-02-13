@@ -256,12 +256,14 @@ class TeneurService:
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
-            volumes = np.append(volumes, value["volume"]["credit"] - value["volume"]["debit"])
+            volumes = np.append(volumes, value["quantity"]["credit"] - value["quantity"]["debit"])
             emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)
 
             if enforced_volumes is not None:
-                volume = value["volume"]["credit"] - value["volume"]["debit"] if lot_id in data["enforced_volumes"] else 0
+                volume = (
+                    value["quantity"]["credit"] - value["quantity"]["debit"] if lot_id in data["enforced_volumes"] else 0
+                )
                 enforced_volumes = np.append(enforced_volumes, volume)
 
         return volumes, emissions, lot_ids, enforced_volumes
