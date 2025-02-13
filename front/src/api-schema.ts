@@ -1774,6 +1774,10 @@ export interface components {
       entity_id: number
       depot_id: string
       depot_type: string
+      ownership_type: components["schemas"]["OwnershipTypeEnum"]
+      /** @default false */
+      blending_is_outsourced: boolean
+      blending_entity_id?: number
       name: string
       site_siret?: string
       customs_id?: string
@@ -2161,6 +2165,7 @@ export interface components {
        * @description En degrés Celsius
        */
       useful_temperature?: number | null
+      is_enabled?: boolean
     }
     EntityFeedStock: {
       name: string
@@ -2211,7 +2216,7 @@ export interface components {
       readonly outputs: components["schemas"]["EntityBiofuel"][]
     }
     EntitySite: {
-      ownership_type: string
+      ownership_type: components["schemas"]["OwnershipTypeEnum"]
       blending_is_outsourced: boolean
       blender: components["schemas"]["UserEntity"]
       readonly depot: components["schemas"]["EntityDepot"] | null

@@ -30,8 +30,11 @@ from transactions.models.depot import Depot
 def get_depots(request, *args, **kwargs):
     query = request.query_params.get("query")
     public_only = request.query_params.get("public_only", False)
+    only_enabled = request.query_params.get("only_enabled", True)
 
-    dsites = Depot.objects.all().order_by("name").filter(is_enabled=True)
+    dsites = Depot.objects.all().order_by("name")
+    if only_enabled:
+        dsites = dsites.filter(is_enabled=True)
     if public_only:
         dsites = dsites.filter(private=False)
     if query:

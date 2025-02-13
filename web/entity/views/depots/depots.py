@@ -58,7 +58,7 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
 
         entity = Entity.objects.get(id=entity_id)
         try:
-            ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.filter(is_enabled=True))
+            ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.all())
             serializer = EntitySiteSerializer(instance=ds, many=True)
             return Response(serializer.data)
         except Exception:
