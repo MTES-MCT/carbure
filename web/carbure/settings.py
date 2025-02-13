@@ -306,6 +306,13 @@ CSP_DEFAULT_SRC = (
     "https://*.tile.openstreetmap.org/",
     "sentry.incubateur.net",
 )
+
+CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + ("https://tally.so",)
+
+CSP_FRAME_SRC = CSP_DEFAULT_SRC + ("https://tally.so",)
+
+CSP_IMG_SRC = CSP_DEFAULT_SRC + ("https://*.tile.openstreetmap.org/",)
+
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 
 # Metabase API key
@@ -345,7 +352,10 @@ SPECTACULAR_SETTINGS = {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
         "DoubleCountingStatus": "doublecount.models.DoubleCountingApplication.DCA_STATUS_CHOICES",
         "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
+        "UserRightsRequestsStatusEnum": "core.models.UserRightsRequests.STATUS_TYPES",
+        "PreferredUnitEnum": "core.models.Entity.UNIT_CHOICE",
     },
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
     # OTHER SETTINGS
 }

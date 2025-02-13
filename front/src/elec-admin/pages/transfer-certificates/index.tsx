@@ -22,6 +22,8 @@ import ElecAdminTransferDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
+import { usePrivateNavigation } from "common/layouts/navigation"
+import { ElecOperatorStatus } from "elec/types-operator"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -32,6 +34,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
+  usePrivateNavigation(t("Énergie cédée"))
   const location = useLocation()
 
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
@@ -107,6 +110,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
+              tiruert={state.status === ElecOperatorStatus.Accepted}
             />
 
             {(state.limit || 0) < total && (

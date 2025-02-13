@@ -1,0 +1,1 @@
+from .certificates import EntityCertificateViewSet

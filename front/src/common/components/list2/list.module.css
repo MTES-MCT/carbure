@@ -1,0 +1,29 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list ul:focus-visible li {
+  margin-left: 1px;
+  margin-right: 1px;
+}
+.list ul:focus-visible li:first-child {
+  margin-top: 1px;
+}
+.list ul:focus-visible li:last-child {
+  margin-bottom: 1px;
+}
+
+/* Check the usage when a list will be implemented with a dropdown*/
+[data-dropdown] li {
+  padding: var(--spacing-s) var(--spacing-m);
+}

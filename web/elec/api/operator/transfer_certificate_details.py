@@ -18,6 +18,14 @@ class TransferCertificateDetailsForm(forms.Form):
     transfer_certificate_id = forms.IntegerField()
 
 
+class ElecOperatorTransferCertificateDetailsSerializer(ElecTransferCertificateDetailsSerializer):
+    class Meta(ElecTransferCertificateDetailsSerializer.Meta):
+        fields = ElecTransferCertificateDetailsSerializer.Meta.fields + [
+            "used_in_tiruert",
+            "consumption_date",
+        ]
+
+
 @require_GET
 @check_user_rights()
 def get_transfer_certificate_details(request, *args, **kwargs):
@@ -30,7 +38,7 @@ def get_transfer_certificate_details(request, *args, **kwargs):
 
     try:
         transfer_certificates = ElecTransferCertificate.objects.get(id=transfer_certificate_id)
-        serialized = ElecTransferCertificateDetailsSerializer(transfer_certificates)
+        serialized = ElecOperatorTransferCertificateDetailsSerializer(transfer_certificates)
 
         return SuccessResponse(
             {

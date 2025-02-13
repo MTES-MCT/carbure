@@ -15,6 +15,8 @@ class ElecTransferCertificateSerializer(serializers.ModelSerializer):
             "energy_amount",
             "status",
             "certificate_id",
+            "used_in_tiruert",
+            "consumption_date",
         ]
 
     supplier = EntityPreviewSerializer(read_only=True)
@@ -24,7 +26,18 @@ class ElecTransferCertificateSerializer(serializers.ModelSerializer):
 class ElecTransferCertificateDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElecTransferCertificate
-        fields = ["id", "supplier", "client", "transfer_date", "energy_amount", "status", "certificate_id", "comment"]
+        fields = [
+            "id",
+            "supplier",
+            "client",
+            "transfer_date",
+            "energy_amount",
+            "status",
+            "certificate_id",
+            "comment",
+            "used_in_tiruert",
+            "consumption_date",
+        ]
 
     supplier = EntityPreviewSerializer(read_only=True)
     client = EntityPreviewSerializer(read_only=True)

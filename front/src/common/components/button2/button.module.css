@@ -1,0 +1,25 @@
+.button-as-link-style {
+  padding: 0;
+  position: relative;
+  color: var(--text-action-high-blue-france);
+  background-color: transparent !important;
+  min-height: auto;
+  box-shadow: 0 1px 0 0 var(--shadow-link-color);
+  font-weight: 400;
+}
+.button-as-link-style:hover {
+  background-color: transparent !important;
+  box-shadow: 0 2px 0 0 var(--shadow-link-color);
+}
+.button-as-link-style:disabled {
+  box-shadow: none;
+}
+.button-danger {
+  box-shadow: inset 0 0 0 1px var(--error-425-625);
+  color: var(--error-425-625);
+}
+
+.button-success {
+  box-shadow: inset 0 0 0 1px var(--background-flat-success);
+  color: var(--background-flat-success);
+}

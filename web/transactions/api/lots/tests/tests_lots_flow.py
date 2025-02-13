@@ -7,6 +7,7 @@ from django_otp.plugins.otp_email.models import EmailDevice
 from core.carburetypes import CarbureError
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.factories import CarbureLotFactory, CarbureStockFactory
 from transactions.models import YearConfig
 
 
@@ -96,6 +97,63 @@ class LotsFlowTest(TestCase):
         )
         errors = response.json()["data"]["errors"]
         assert errors[0]["error"] == CarbureError.YEAR_LOCKED
+
+    def test_invalide_parent_lot_delivery_date(self):
+        parent_lot = CarbureLotFactory.create(
+            carbure_client_id=self.producer.id,
+            volume=100000,
+            delivery_type=CarbureLot.STOCK,
+            lot_status="ACCEPTED",
+            delivery_date="2022-01-02",
+        )
+
+        # Flush
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000)
+        stock.save()  # HACK to avoid `generate_carbure_id` later
+
+        lot = self.create_draft()
+        lot.parent_stock = stock
+        lot.delivery_date = "2020-01-02"
+        lot.save()
+
+        response = self.client.post(
+            reverse("transactions-lots-send"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
+        )
+        assert response.status_code == 400
+        assert response.json()["data"]["submitted"] == 1
+        assert response.json()["data"]["sent"] == 0
+        assert response.json()["data"]["auto-accepted"] == 0
+        assert response.json()["data"]["ignored"] == 0
+        assert response.json()["data"]["rejected"] == 1
+
+    def test_valide_parent_lot_delivery_date(self):
+        parent_lot = CarbureLotFactory.create(
+            carbure_client_id=self.producer.id,
+            volume=100000,
+            delivery_type=CarbureLot.STOCK,
+            lot_status="ACCEPTED",
+            delivery_date="2022-01-02",
+        )
+
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000)
+        stock.save()  # HACK to avoid `generate_carbure_id` later
+
+        lot = self.create_draft()
+        lot.parent_stock = stock
+        lot.delivery_date = "2023-01-02"
+        lot.save()
+
+        response = self.client.post(
+            reverse("transactions-lots-send"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
+        )
+        assert response.status_code == 200
+        assert response.json()["data"]["submitted"] == 1
+        assert response.json()["data"]["sent"] == 1
+        assert response.json()["data"]["auto-accepted"] == 0
+        assert response.json()["data"]["ignored"] == 0
+        assert response.json()["data"]["rejected"] == 0
 
     def test_update_lot(self):
         YearConfig.objects.create(year=2018, locked=True)

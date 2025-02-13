@@ -23,6 +23,7 @@ import FilterMultiSelect from "../../../common/molecules/filter-select"
 import ChargePointsApplicationDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -37,6 +38,7 @@ const ChargePointsApplicationsList = ({
   const status = useAutoStatus()
   const location = useLocation()
   const { t } = useTranslation()
+  usePrivateNavigation(t("Inscription"))
   const [state, actions] = useCBQueryParamsStore(entity, year, status, snapshot)
   usePageTitle(state)
   const query = useCBQueryBuilder(state)

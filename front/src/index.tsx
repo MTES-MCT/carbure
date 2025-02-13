@@ -9,10 +9,9 @@ import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
 import { SentryProvider, initSentry } from "./sentry"
-import { startReactDsfr } from "@codegouvfr/react-dsfr/spa"
+import "./setup-dsfr"
 
 initSentry()
-startReactDsfr({ defaultColorScheme: "system" })
 
 async function enableMocking() {
   if (import.meta.env.MODE !== "development") return

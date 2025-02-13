@@ -1,0 +1,21 @@
+.dev-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: var(--spacing-xl);
+  background-color: #ffbb40dd;
+  padding: var(--spacing-s) var(--main-spacing-x);
+  z-index: 10;
+}
+
+.dev-banner.minimized {
+  width: var(--spacing-xl);
+  padding: 0;
+  position: fixed;
+
+  --dev-banner-height: 0;
+}

@@ -63,6 +63,7 @@ class Entity(models.Model):
         (UNKNOWN, "Unknown"),
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
     )
+    UNIT_CHOICE = (("l", "litres"), ("kg", "kg"), ("MJ", "MJ"))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -91,7 +92,7 @@ class Entity(models.Model):
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
     notifications_enabled = models.BooleanField(default=False)
-    preferred_unit = models.CharField(max_length=64, choices=(("l", "litres"), ("kg", "kg"), ("MJ", "MJ")), default="l")
+    preferred_unit = models.CharField(max_length=64, choices=UNIT_CHOICE, default="l")
     has_saf = models.BooleanField(default=False)
     activity_description = models.TextField(blank=True, default="")
     website = models.URLField(blank=True, default="")
@@ -546,6 +547,7 @@ class ExternalAdminRights(models.Model):
     TIRIB_STATS = "TIRIB"
     AIRLINE = "AIRLINE"
     ELEC = "ELEC"
+    TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -553,6 +555,7 @@ class ExternalAdminRights(models.Model):
         (TIRIB_STATS, TIRIB_STATS),
         (AIRLINE, AIRLINE),
         (ELEC, ELEC),
+        (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)

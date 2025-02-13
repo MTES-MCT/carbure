@@ -19,6 +19,18 @@ def check_volume_faible(lot: CarbureLot):
         )
 
 
+def check_delivery_date_validity(lot: CarbureLot):
+    if not lot.parent_stock:
+        return
+    if lot.delivery_date < lot.parent_stock.get_parent_lot().delivery_date:
+        return generic_error(
+            error=CarbureSanityCheckErrors.DELIVERY_DATE_VALIDITY,
+            lot=lot,
+            field="delivery_date",
+            is_blocking=True,  # TODO: comment if bloquing
+        )
+
+
 def check_year_locked(lot: CarbureLot, prefetched_data):
     # don't run this check on lots that aren't being edited
     if lot.lot_status != CarbureLot.DRAFT and lot.correction_status != CarbureLot.IN_CORRECTION:

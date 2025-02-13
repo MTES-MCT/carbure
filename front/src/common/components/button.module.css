@@ -52,7 +52,7 @@
 
 .primary:not(:disabled):hover {
   color: var(--white);
-  background-color: var(--blue-dark);
+  background-color: var(--blue-dark) !important;
 }
 
 /* variant secondary */
@@ -72,7 +72,7 @@
 .success,
 .success:disabled {
   color: var(--green-dark);
-  background-color: var(--green-light);
+  background-color: var(--green-light) !important;
   border-color: var(--green-medium);
 }
 
@@ -92,7 +92,7 @@
 
 .warning:not(:disabled):hover {
   color: var(--white);
-  background-color: var(--orange-dark);
+  background-color: var(--orange-dark) !important;
   border-color: var(--orange-dark);
 }
 
@@ -106,7 +106,7 @@
 
 .danger:not(:disabled):hover {
   color: var(--white);
-  background-color: var(--red-dark);
+  background-color: var(--red-dark) !important;
   border-color: var(--red-dark);
 }
 

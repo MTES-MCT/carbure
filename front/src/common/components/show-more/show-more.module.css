@@ -1,0 +1,26 @@
+.show-more-hidden-items {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  z-index: -1;
+}
+
+.show-more-container {
+  position: relative;
+}
+
+.visible-items {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.visible {
+  flex-wrap: wrap;
+}
+
+.show-more-button {
+  color: var(--text-action-high-blue-france);
+  flex-shrink: 0;
+}

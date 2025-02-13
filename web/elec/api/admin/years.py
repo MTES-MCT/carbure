@@ -11,7 +11,7 @@ class ElecSnapshotError:
     YEAR_FAILED = "YEAR_FAILED"
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
+@check_admin_rights(allow_external=[ExternalAdminRights.ELEC, ExternalAdminRights.TRANSFERRED_ELEC])
 def get_years(request):
     try:
         provision_years = ElecProvisionCertificate.objects.values_list("year", flat=True).distinct()

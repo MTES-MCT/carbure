@@ -1,0 +1,9 @@
+.filter-multiselect {
+  display: flex;
+  gap: var(--spacing-2w);
+  flex-wrap: wrap;
+}
+
+.filter-multiselect__filter {
+  max-width: 250px !important;
+}

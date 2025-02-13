@@ -1,14 +1,17 @@
 import datetime
 
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from core.excel import export_to_excel
-from core.serializers import EntityPreviewSerializer, ProductionSiteSerializer
+from core.models import Biocarburant, Entity
+from core.serializers import AirportSerializer, EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket
+from transactions.models import Airport
 
 
-class SafTicketSerializer(serializers.ModelSerializer):
+class SafTicketBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = SafTicket
         fields = [
@@ -34,7 +37,19 @@ class SafTicketSerializer(serializers.ModelSerializer):
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
 
-class SafTicketDetailsSerializer(serializers.ModelSerializer):
+class SafTicketAirlineSerializer(SafTicketBaseSerializer):
+    class Meta:
+        model = SafTicket
+        fields = SafTicketBaseSerializer.Meta.fields + ["ets_status"]
+
+
+class SafBiofuelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Biocarburant
+        fields = ["name", "name_en", "code", "pci_kg", "pci_litre", "masse_volumique"]
+
+
+class SafTicketDetailsBaseSerializer(serializers.ModelSerializer):
     from .saf_ticket_source import SafTicketSourcePreviewSerializer  # noqa: E402
 
     class Meta:
@@ -73,30 +88,40 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
             "ghg_total",
             "client_comment",
             "parent_ticket_source",
+            "shipping_method",
+            "reception_airport",
+            "consumption_type",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
-    biofuel = BiofuelSerializer(read_only=True)
+    biofuel = SafBiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_ticket_source = SafTicketSourcePreviewSerializer(read_only=True)
     supplier = serializers.SlugRelatedField(read_only=True, slug_field="name")
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    # supplier = EntityPreviewSerializer(read_only=True)
-    # client = EntityPreviewSerializer(read_only=True)
+    reception_airport = AirportSerializer(read_only=True)
 
 
-def export_tickets_to_excel(tickets):
+class SafTicketDetailsAirlineSerializer(SafTicketDetailsBaseSerializer):
+    class Meta:
+        model = SafTicket
+        fields = SafTicketDetailsBaseSerializer.Meta.fields + ["ets_status"]
+
+
+def export_tickets_to_excel(tickets, entity):
     today = datetime.datetime.today()
     location = "/tmp/carbure_saf_tickets_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
+
+    is_airline = entity.entity_type == Entity.AIRLINE
 
     return export_to_excel(
         location,
         [
             {
-                "label": "tickets",
-                "rows": SafTicketDetailsSerializer(tickets, many=True).data,
+                "label": _("tickets"),
+                "rows": SafTicketDetailsAirlineSerializer(tickets, many=True).data,
                 "columns": [
                     {"label": "carbure_id", "value": "carbure_id"},
                     {"label": "year", "value": "year"},
@@ -122,11 +147,26 @@ def export_tickets_to_excel(tickets):
                     {"label": "eccr", "value": "eccr"},
                     {"label": "eee", "value": "eee"},
                     {"label": "ghg_total", "value": "ghg_total"},
-                    {"label": "ghg_reference", "value": "ghg_reference"},
                     {"label": "ghg_reduction", "value": "ghg_reduction"},
                     {"label": "free_field", "value": "free_field"},
+                    {"label": "reception_airport", "value": "reception_airport.name"},
+                    {"label": "reception_airport_icao", "value": "reception_airport.icao_code"},
+                    {"label": "biofuel_pci_kg", "value": "biofuel.pci_kg"},
+                    {"label": "biofuel_pci_litre", "value": "biofuel.pci_litre"},
+                    {"label": "biofuel_masse_volumique", "value": "biofuel.masse_volumique"},
+                    {"label": "ets_status" if is_airline else "", "value": "ets_status" if is_airline else ""},
                 ],
-            }
+            },
+            {
+                "label": _("aeroports"),
+                "rows": AirportSerializer(Airport.objects.all(), many=True).data,
+                "columns": [
+                    {"label": "name", "value": "name"},
+                    {"label": "icao_code", "value": "icao_code"},
+                    {"label": "city", "value": "city"},
+                    {"label": "country", "value": "country.name"},
+                ],
+            },
         ],
     )
 

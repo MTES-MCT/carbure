@@ -67,6 +67,9 @@ const OperatorTransferCertificateList = ({
     [ElecTransferCertificateFilter.TransferDate]: t("Date d'émission"),
     [ElecTransferCertificateFilter.CertificateId]: t("Numéro"),
   }
+  if (status === ElecOperatorStatus.Pending) {
+    delete (filterLabels as any)[ElecTransferCertificateFilter.Operator]
+  }
   return (
     <>
       <Bar>
@@ -113,6 +116,7 @@ const OperatorTransferCertificateList = ({
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
+              tiruert={state.status === ElecOperatorStatus.Accepted}
             />
 
             {(state.limit || 0) < total && (
@@ -131,7 +135,12 @@ const OperatorTransferCertificateList = ({
       </section>
       <HashRoute
         path="transfer-certificate/:id"
-        element={<ElecTransferDetailsDialog displayCpo={true} />}
+        element={
+          <ElecTransferDetailsDialog
+            displayCpo={true}
+            tiruert={status === ElecOperatorStatus.Accepted}
+          />
+        }
       />
     </>
   )

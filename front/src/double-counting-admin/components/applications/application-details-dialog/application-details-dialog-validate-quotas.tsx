@@ -22,7 +22,12 @@ const ApplicationDetailsDialogValidateQuotas = ({
   const notify = useNotify()
   const entity = useEntity()
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
-    invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
+    invalidates: [
+      "dc-applications",
+      "dc-snapshot",
+      "dc-agreements",
+      `nav-stats-${entity.id}`,
+    ],
     onSuccess: () => {
       notify(t("Les quotas ont bien été validés."), { variant: "success" })
       onClose()

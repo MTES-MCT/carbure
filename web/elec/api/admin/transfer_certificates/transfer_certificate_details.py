@@ -18,7 +18,7 @@ class TransferCertificateDetailsForm(forms.Form):
     transfer_certificate_id = forms.IntegerField()
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
+@check_admin_rights(allow_external=[ExternalAdminRights.ELEC, ExternalAdminRights.TRANSFERRED_ELEC])
 def get_transfer_certificate_details(request):
     transf_certif_form = TransferCertificateDetailsForm(request.GET)
 
