@@ -306,6 +306,7 @@ CSP_DEFAULT_SRC = (
     "https://*.tile.openstreetmap.org/",
     "sentry.incubateur.net",
     "https://tally.so",
+    "contact.carbure.beta.gouv.fr",
 )
 
 CSP_SCRIPT_SRC = CSP_DEFAULT_SRC
