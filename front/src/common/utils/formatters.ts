@@ -45,14 +45,14 @@ export function formatCelsiusDegree(num: number) {
   return formatNumber(num) + " °C"
 }
 
-export function formatUnit(num: number, unit: Unit) {
+export function formatUnit(num: number, unit: Unit, fractionDigits = 2) {
   const unitLabel = {
     l: i18next.t("litres", { count: num }),
     kg: i18next.t("kg"),
     MJ: i18next.t("MJ"),
   }
 
-  return `${formatNumber(num)} ${unitLabel[unit]}`
+  return `${formatNumber(num, fractionDigits)} ${unitLabel[unit]}`
 }
 
 export function formatGHG(num: number) {
