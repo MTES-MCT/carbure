@@ -12,6 +12,8 @@ import { FromDepotForm } from "./from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "carbure/types"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -70,6 +72,14 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
             <OperationText
               title={t("Biocarburant")}
               description={balance.biofuel ?? ""}
+            />
+            <OperationText
+              title={t("Solde disponible")}
+              description={
+                balance.available_balance
+                  ? formatUnit(balance.available_balance, Unit.l, 0)
+                  : ""
+              }
             />
           </Grid>
 

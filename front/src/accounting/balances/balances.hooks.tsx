@@ -35,7 +35,7 @@ export const useBalancesColumns = () => {
     },
     {
       header: t("Solde disponible"),
-      cell: (item) => formatNumber(Number(item.available_balance)),
+      cell: (item) => formatNumber(Number(item.available_balance), 0),
     },
     {
       header: t("Opérations en attente"),

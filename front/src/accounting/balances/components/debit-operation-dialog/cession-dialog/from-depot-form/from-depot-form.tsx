@@ -33,9 +33,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
         depot.name
       )
 
-      if (volume) {
-        setVolume(volume)
-      }
+      setVolume(volume ?? 0)
     }
   }
   return (
@@ -51,21 +49,28 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
       />
       {value.from_depot && (
         <>
-          {volume && volume > 0 && (
+          {volume && volume > 0 ? (
             <Notice noColor variant="info">
-              <Trans>
-                Solde disponible dans le dépôt {value.from_depot.name} :{" "}
-                <strong>{formatNumber(volume, 0)} litres</strong>
-              </Trans>
+              <Trans
+                components={{ strong: <strong /> }}
+                t={t}
+                values={{
+                  depot: value.from_depot.name,
+                  volume: formatNumber(volume, 0),
+                }}
+                defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{volume}} litres</strong>"
+              />
             </Notice>
-          )}
-          {volume === 0 && (
+          ) : null}
+          {volume === 0 ? (
             <Notice noColor variant="warning">
-              <Trans>
-                Aucun solde disponible dans le dépôt {value.from_depot.name}
-              </Trans>
+              <Trans
+                t={t}
+                values={{ depot: value.from_depot.name }}
+                defaults="Aucun solde disponible dans le dépôt {{depot}}"
+              />
             </Notice>
-          )}
+          ) : null}
         </>
       )}
     </>
