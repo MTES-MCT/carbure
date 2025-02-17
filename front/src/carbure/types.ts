@@ -6,7 +6,7 @@ import {
   UserRightsRequestsStatusEnum as UserRightStatus,
   RoleEnum as UserRole,
   ExtAdminPagesEnum as ExternalAdminPages,
-  TypeEnum as NotificationType,
+  CarbureNotificationTypeEnum as NotificationType,
   OwnershipTypeEnum as OwnershipType,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
