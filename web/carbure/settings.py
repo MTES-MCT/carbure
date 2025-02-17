@@ -309,7 +309,11 @@ CSP_DEFAULT_SRC = (
     "contact.carbure.beta.gouv.fr",
 )
 
-CSP_SCRIPT_SRC = CSP_DEFAULT_SRC
+CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
+    "'sha256-xVQ4mcypV0CvOtZpQgVcKpcoNvdUkR9BrwZBrtBbU+w='",
+    "'sha256-l0hQskZAA39ZNB1SAbclU+zKPtFeMvhhkjKEgiL2HI0='",
+    "'sha256-/kXZODfqoc2myS1eI6wr0HH8lUt+vRhW8H/oL+YJcMg='",
+)
 
 CSP_FRAME_SRC = CSP_DEFAULT_SRC
 
