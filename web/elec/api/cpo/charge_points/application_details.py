@@ -6,7 +6,8 @@ from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import Entity
 from elec.api.cpo.charge_points.charge_points import annotate_with_latest_meter_reading_date
-from elec.models import ElecChargePoint, ElecChargePointApplication
+from elec.models import ElecChargePointApplication
+from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
 from elec.services.export_charge_point_excel import export_charge_points_to_excel
 
@@ -33,7 +34,7 @@ def get_application_details(request, entity):
     if application.cpo != entity:
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
-    charge_points = ElecChargePoint.objects.filter(cpo=entity, application=application)
+    charge_points = ChargePointRepository.get_application_charge_points(application.cpo, application)
     charge_points = annotate_with_latest_meter_reading_date(charge_points)
 
     if "export" in request.GET:
