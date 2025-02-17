@@ -22,7 +22,9 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     )
 
     def get_queryset(self):
-        return DoubleCountingRegistration.objects.all()
+        return DoubleCountingRegistration.objects.all().select_related(
+            "production_site", "production_site__created_by", "application"
+        )
 
     def get_permissions(self):
         # TODO fix permissions if needed

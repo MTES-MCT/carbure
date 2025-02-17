@@ -1,5 +1,5 @@
 from django.db.models import Q
-from django_filters import BaseInFilter, CharFilter, DateFilter, FilterSet
+from django_filters import CharFilter, DateFilter, FilterSet
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
@@ -12,14 +12,29 @@ class OperationFilter(FilterSet):
     date_from = DateFilter(field_name="created_at", lookup_expr="gte")
     date_to = DateFilter(field_name="created_at", lookup_expr="lte")
     operation = CharFilter(method="filter_operation")
-    status = BaseInFilter(field_name="status", lookup_expr="in")
-    customs_category = BaseInFilter(field_name="customs_category", lookup_expr="in")
-    biofuel = BaseInFilter(field_name="biofuel__code", lookup_expr="in")
+    status = CharFilter(method="filter_status")
+    customs_category = CharFilter(method="filter_customs_category")
+    biofuel = CharFilter(method="filter_biofuel")
     sector = CharFilter(method="filter_sector")
     from_to = CharFilter(method="filter_from_to")
     depot = CharFilter(method="filter_depot")
     type = CharFilter(method="filter_type")
     period = CharFilter(method="filter_period")
+
+    def filter_multiple_values(self, queryset, field_name, param_name):
+        values = self.data.getlist(param_name)
+        if values:
+            return queryset.filter(Q(**{f"{field_name}__in": values}))
+        return queryset
+
+    def filter_biofuel(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "biofuel__code", "biofuel")
+
+    def filter_customs_category(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "customs_category", "customs_category")
+
+    def filter_status(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "status", "status")
 
     def filter_entity(self, queryset, name, value):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
