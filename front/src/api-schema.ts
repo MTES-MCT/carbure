@@ -1730,8 +1730,6 @@ export interface components {
   schemas: {
     AcceptRequest: {
       ets_status: components["schemas"]["EtsStatusEnum"]
-      /** Format: date */
-      ets_declaration_date?: string
     }
     ActivateAccountRequest: {
       uidb64: string
@@ -1993,6 +1991,10 @@ export interface components {
       entity_id: number
       depot_id: string
       depot_type: string
+      ownership_type: components["schemas"]["OwnershipTypeEnum"]
+      /** @default false */
+      blending_is_outsourced: boolean
+      blending_entity_id?: number
       name: string
       site_siret?: string
       customs_id?: string
@@ -2391,6 +2393,7 @@ export interface components {
        * @description En degrés Celsius
        */
       useful_temperature?: number | null
+      is_enabled?: boolean
     }
     EntityFeedStock: {
       name: string
@@ -2441,7 +2444,7 @@ export interface components {
       readonly outputs: components["schemas"]["EntityBiofuel"][]
     }
     EntitySite: {
-      ownership_type: string
+      ownership_type: components["schemas"]["OwnershipTypeEnum"]
       blending_is_outsourced: boolean
       blender: components["schemas"]["UserEntity"]
       readonly depot: components["schemas"]["EntityDepot"] | null
@@ -2877,7 +2880,10 @@ export interface components {
      * @enum {string}
      */
     RoleEnum: RoleEnum
-    SafTicket: {
+    SafTicket:
+      | components["schemas"]["SafTicketBase"]
+      | components["schemas"]["SafTicketAirline"]
+    SafTicketAirline: {
       readonly id: number
       carbure_id?: string | null
       year: number
@@ -2896,7 +2902,28 @@ export interface components {
       ghg_reduction?: number
       ets_status?: components["schemas"]["EtsStatusEnum"] | null
     }
-    SafTicketDetails: {
+    SafTicketBase: {
+      readonly id: number
+      carbure_id?: string | null
+      year: number
+      assignment_period: number
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
+      /** Format: date */
+      agreement_date?: string | null
+      readonly supplier: string
+      readonly client: string
+      /** Format: double */
+      volume: number
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly country_of_origin: components["schemas"]["Country"]
+      /** Format: double */
+      ghg_reduction?: number
+    }
+    SafTicketDetails:
+      | components["schemas"]["SafTicketDetailsBase"]
+      | components["schemas"]["SafTicketDetailsAirline"]
+    SafTicketDetailsAirline: {
       readonly id: number
       carbure_id?: string | null
       year: number
@@ -2949,8 +2976,59 @@ export interface components {
       readonly reception_airport: components["schemas"]["Airport"]
       consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
       ets_status?: components["schemas"]["EtsStatusEnum"] | null
+    }
+    SafTicketDetailsBase: {
+      readonly id: number
+      carbure_id?: string | null
+      year: number
+      assignment_period: number
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
+      /** Format: date-time */
+      readonly created_at: string | null
+      readonly supplier: string
+      readonly client: string
+      free_field?: string | null
       /** Format: date */
-      ets_declaration_date?: string | null
+      agreement_date?: string | null
+      agreement_reference?: string | null
+      /** Format: double */
+      volume: number
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly country_of_origin: components["schemas"]["Country"]
+      readonly carbure_producer: components["schemas"]["EntityPreview"]
+      unknown_producer?: string | null
+      readonly carbure_production_site: components["schemas"]["ProductionSite"]
+      unknown_production_site?: string | null
+      /** Format: date */
+      production_site_commissioning_date?: string | null
+      /** Format: double */
+      eec?: number
+      /** Format: double */
+      el?: number
+      /** Format: double */
+      ep?: number
+      /** Format: double */
+      etd?: number
+      /** Format: double */
+      eu?: number
+      /** Format: double */
+      esca?: number
+      /** Format: double */
+      eccs?: number
+      /** Format: double */
+      eccr?: number
+      /** Format: double */
+      eee?: number
+      /** Format: double */
+      ghg_reduction?: number
+      /** Format: double */
+      ghg_total?: number
+      client_comment?: string | null
+      readonly parent_ticket_source: components["schemas"]["SafTicketSourcePreview"]
+      shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
+      readonly reception_airport: components["schemas"]["Airport"]
+      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
     }
     SafTicketPreview: {
       readonly id: number
@@ -6370,7 +6448,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicket"]
+          "application/json": components["schemas"]["SafTicketBase"]
         }
       }
     }

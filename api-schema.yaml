@@ -4197,7 +4197,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafTicket"
+                $ref: "#/components/schemas/SafTicketBase"
               examples:
                 ExampleOfCreditResponse.:
                   value:
@@ -5686,9 +5686,6 @@ components:
       properties:
         ets_status:
           $ref: "#/components/schemas/EtsStatusEnum"
-        ets_declaration_date:
-          type: string
-          format: date
       required:
         - ets_status
     ActivateAccountRequest:
@@ -6347,6 +6344,13 @@ components:
         depot_type:
           type: string
           minLength: 1
+        ownership_type:
+          $ref: "#/components/schemas/OwnershipTypeEnum"
+        blending_is_outsourced:
+          type: boolean
+          default: false
+        blending_entity_id:
+          type: integer
         name:
           type: string
           minLength: 1
@@ -6436,6 +6440,7 @@ components:
         - depot_type
         - entity_id
         - name
+        - ownership_type
     CreateEntityRequest:
       type: object
       properties:
@@ -7387,6 +7392,8 @@ components:
           format: double
           nullable: true
           description: En degrés Celsius
+        is_enabled:
+          type: boolean
       required:
         - country
         - name
@@ -7543,7 +7550,7 @@ components:
       type: object
       properties:
         ownership_type:
-          type: string
+          $ref: "#/components/schemas/OwnershipTypeEnum"
         blending_is_outsourced:
           type: boolean
         blender:
@@ -8611,6 +8618,10 @@ components:
         - Admin
         - Auditor
     SafTicket:
+      oneOf:
+        - $ref: "#/components/schemas/SafTicketBase"
+        - $ref: "#/components/schemas/SafTicketAirline"
+    SafTicketAirline:
       type: object
       properties:
         id:
@@ -8672,7 +8683,69 @@ components:
         - supplier
         - volume
         - year
+    SafTicketBase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
+        agreement_date:
+          type: string
+          format: date
+          nullable: true
+        supplier:
+          type: string
+          readOnly: true
+        client:
+          type: string
+          readOnly: true
+        volume:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        ghg_reduction:
+          type: number
+          format: double
+      required:
+        - assignment_period
+        - biofuel
+        - client
+        - country_of_origin
+        - feedstock
+        - id
+        - supplier
+        - volume
+        - year
     SafTicketDetails:
+      oneOf:
+        - $ref: "#/components/schemas/SafTicketDetailsBase"
+        - $ref: "#/components/schemas/SafTicketDetailsAirline"
+    SafTicketDetailsAirline:
       type: object
       properties:
         id:
@@ -8805,9 +8878,149 @@ components:
           allOf:
             - $ref: "#/components/schemas/EtsStatusEnum"
           nullable: true
-        ets_declaration_date:
+      required:
+        - assignment_period
+        - biofuel
+        - carbure_producer
+        - carbure_production_site
+        - client
+        - country_of_origin
+        - created_at
+        - feedstock
+        - id
+        - parent_ticket_source
+        - reception_airport
+        - supplier
+        - volume
+        - year
+    SafTicketDetailsBase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        supplier:
+          type: string
+          readOnly: true
+        client:
+          type: string
+          readOnly: true
+        free_field:
+          type: string
+          nullable: true
+        agreement_date:
           type: string
           format: date
+          nullable: true
+        agreement_reference:
+          type: string
+          nullable: true
+          maxLength: 64
+        volume:
+          type: number
+          format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        carbure_producer:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        unknown_producer:
+          type: string
+          nullable: true
+          maxLength: 64
+        carbure_production_site:
+          allOf:
+            - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        unknown_production_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_site_commissioning_date:
+          type: string
+          format: date
+          nullable: true
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        ghg_reduction:
+          type: number
+          format: double
+        ghg_total:
+          type: number
+          format: double
+        client_comment:
+          type: string
+          nullable: true
+        parent_ticket_source:
+          allOf:
+            - $ref: "#/components/schemas/SafTicketSourcePreview"
+          readOnly: true
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ShippingMethodEnum"
+          nullable: true
+        reception_airport:
+          allOf:
+            - $ref: "#/components/schemas/Airport"
+          readOnly: true
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
           nullable: true
       required:
         - assignment_period

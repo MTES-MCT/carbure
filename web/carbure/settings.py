@@ -305,7 +305,15 @@ CSP_DEFAULT_SRC = (
     "metabase.carbure.beta.gouv.fr",
     "www.data.gouv.fr",
     "https://*.tile.openstreetmap.org/",
+    "sentry.incubateur.net",
 )
+
+CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + ("https://tally.so",)
+
+CSP_FRAME_SRC = CSP_DEFAULT_SRC + ("https://tally.so",)
+
+CSP_IMG_SRC = CSP_DEFAULT_SRC + ("https://*.tile.openstreetmap.org/",)
+
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 
 # Metabase API key

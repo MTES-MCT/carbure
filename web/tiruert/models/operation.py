@@ -81,6 +81,14 @@ class Operation(models.Model):
             return False
         return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
 
+    def volume_to_quantity(self, volume, unit):
+        if unit == "mj":
+            return volume * self.biofuel.pci_litre
+        elif unit == "kg":
+            return volume * self.biofuel.masse_volumique
+        else:
+            return volume
+
 
 @transaction.atomic
 def create_tiruert_operations_from_lots(lots):

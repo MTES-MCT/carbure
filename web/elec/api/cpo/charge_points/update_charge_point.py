@@ -16,6 +16,7 @@ class ChargePointUpdateError:
     CP_ID_NOT_IN_TGD = "CP_ID_NOT_IN_TGD"
     CP_ID_ALREADY_EXISTS = "CP_ID_ALREADY_EXISTS"
     INITIAL_INDEX_CANNOT_BE_UPDATED = "INITIAL_INDEX_CANNOT_BE_UPDATED"
+    INITIAL_INDEX_CANNOT_BE_UPDATED_FOR_DC = "INITIAL_INDEX_CANNOT_BE_UPDATED_FOR_DC"
 
 
 @require_POST
@@ -54,10 +55,13 @@ def update_charge_point(request, entity, entity_id):
     # Update initial index of current meter
     # Only if there are no meter readings yet
     if "initial_index" in validated_data:
-        if not cp.current_meter.elec_meter_readings.exists():
-            cp.current_meter.initial_index = validated_data["initial_index"]
-            cp.current_meter.save()
+        if cp.current_meter:  # AC power case
+            if not cp.current_meter.elec_meter_readings.exists():
+                cp.current_meter.initial_index = validated_data["initial_index"]
+                cp.current_meter.save()
+            else:
+                return ErrorResponse(400, ChargePointUpdateError.INITIAL_INDEX_CANNOT_BE_UPDATED)
         else:
-            return ErrorResponse(400, ChargePointUpdateError.INITIAL_INDEX_CANNOT_BE_UPDATED)
+            return ErrorResponse(400, ChargePointUpdateError.INITIAL_INDEX_CANNOT_BE_UPDATED_FOR_DC)
 
     return SuccessResponse()

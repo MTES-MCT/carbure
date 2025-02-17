@@ -92,7 +92,10 @@ export function useColumns() {
     status: {
       header: t("Statut"),
       cell: (ticket: SafTicket) => (
-        <TicketTag status={ticket.status} ets={ticket.ets_status} />
+        <TicketTag
+          status={ticket.status}
+          ets={"ets_status" in ticket ? ticket.ets_status : undefined}
+        />
       ),
     },
 

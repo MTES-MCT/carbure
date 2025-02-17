@@ -10,7 +10,7 @@ class BalanceSerializer(serializers.Serializer):
     initial_balance = serializers.FloatField(required=False)
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
-    volume = serializers.DictField(child=serializers.FloatField())
+    quantity = serializers.DictField(child=serializers.FloatField())
     # avg_emission_rate_per_mj = serializers.FloatField()
     teneur = serializers.FloatField(required=False)
     yearly_teneur = serializers.FloatField(required=False)
@@ -29,7 +29,7 @@ class BalanceSerializer(serializers.Serializer):
         return self.calcul_available_balance(instance) - instance["teneur"]
 
     def calcul_available_balance(self, instance) -> float:
-        return instance["initial_balance"] + instance["volume"]["credit"] - instance["volume"]["debit"]
+        return instance["initial_balance"] + instance["quantity"]["credit"] - instance["quantity"]["debit"]
 
 
 class LotSerializer(serializers.Serializer):
@@ -63,8 +63,8 @@ class BalanceByLotSerializer(serializers.Serializer):
                 {
                     "lot": lot_id,
                     "volume": {
-                        "credit": value["volume"]["credit"],
-                        "debit": value["volume"]["debit"],
+                        "credit": value["quantity"]["credit"],
+                        "debit": value["quantity"]["debit"],
                     },
                     "emission_rate_per_mj": value["emission_rate_per_mj"],
                 },

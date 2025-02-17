@@ -141,6 +141,9 @@ export const ApplicationDetailsDialog = () => {
       <ApplicationDetailsDialogValidateQuotas
         application={application}
         onClose={close}
+        onValidate={() => {
+          navigate({ search: location.search, hash: "#" })
+        }}
       />
     ))
   }

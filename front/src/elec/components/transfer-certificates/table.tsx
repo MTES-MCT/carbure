@@ -31,6 +31,14 @@ export const ElecTransferCertificateTable = memo(
     tiruert = false,
   }: ElecTransferCertificateTableProps) => {
     const columns = useColumns(tiruert || false)
+    const displayedColumns = [
+      columns.status,
+      ...(tiruert ? [columns.consumption_date] : []),
+      displayCpo ? columns.cpo : columns.operator,
+      columns.transfer_date,
+      columns.energy_amount,
+      columns.certificate_id,
+    ]
     return (
       <Table
         loading={loading}
@@ -38,14 +46,7 @@ export const ElecTransferCertificateTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={transferCertificates}
-        columns={compact([
-          columns.status,
-          columns.consumption_date,
-          displayCpo ? columns.cpo : columns.operator,
-          columns.transfer_date,
-          columns.energy_amount,
-          columns.certificate_id,
-        ])}
+        columns={compact(displayedColumns)}
       />
     )
   }

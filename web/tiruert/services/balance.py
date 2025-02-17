@@ -22,7 +22,7 @@ class BalanceService:
                 "sector": None,
                 "customs_category": None,
                 "biofuel": None,
-                "volume": {"credit": 0, "debit": 0},
+                "quantity": {"credit": 0, "debit": 0},
                 "emission_rate_per_mj": 0,
                 "teneur": 0,
                 "pending": 0,
@@ -33,11 +33,13 @@ class BalanceService:
 
         operations = operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED])
 
+        conversion_factor_name = BalanceService.define_conversion_factor(unit)
+
         for operation in operations:
             if operation.is_credit(entity_id) and operation.status == Operation.PENDING:
                 continue
 
-            pci = operation.biofuel.pci_litre if unit == "mj" else 1  # pci = 1 if unit is in litres
+            conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
             for detail in operation.details.all():
                 key = (operation.sector, operation.customs_category, operation.biofuel.code)
@@ -56,12 +58,12 @@ class BalanceService:
                 balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
 
                 if operation.type == Operation.TENEUR and group_by != "lot":
-                    balance[key]["teneur"] += detail.volume * pci
+                    balance[key]["teneur"] += detail.volume * conversion_factor
                 else:
                     if operation.is_credit(entity_id):
-                        balance[key]["volume"]["credit"] += detail.volume * pci
+                        balance[key]["quantity"]["credit"] += detail.volume * conversion_factor
                     else:
-                        balance[key]["volume"]["debit"] += detail.volume * pci
+                        balance[key]["quantity"]["debit"] += detail.volume * conversion_factor
 
             if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
@@ -79,12 +81,16 @@ class BalanceService:
         """
         initial_balances = defaultdict(int)
 
+        conversion_factor_name = BalanceService.define_conversion_factor(unit)
+
         for operation in operations:
             key, balance = BalanceService.set_keys_and_initial_balance(operation, balance, group_by, unit)
-            pci = operation.biofuel.pci_litre if unit == "mj" else 1
+            conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
             for detail in operation.details.all():
-                initial_balances[key] += (detail.volume if operation.is_credit(entity_id) else -detail.volume) * pci
+                initial_balances[key] += (
+                    detail.volume if operation.is_credit(entity_id) else -detail.volume
+                ) * conversion_factor
 
         for key in balance:
             balance[key]["initial_balance"] = initial_balances[key]
@@ -110,13 +116,14 @@ class BalanceService:
         )
 
         yearly_teneurs = defaultdict(int)
+        conversion_factor_name = BalanceService.define_conversion_factor(unit)
 
         for operation in operations:
             key, balance = BalanceService.set_keys_and_initial_balance(operation, balance, group_by, unit)
-            pci = operation.biofuel.pci_litre if unit == "mj" else 1
+            conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
             for detail in operation.details.all():
-                yearly_teneurs[key] += detail.volume * pci
+                yearly_teneurs[key] += detail.volume * conversion_factor
 
         for key in balance:
             balance[key]["yearly_teneur"] = yearly_teneurs[key]
@@ -136,7 +143,7 @@ class BalanceService:
         # In this case, the key won't be in the balance dict
         if key not in balance:
             balance[key] = {
-                "volume": {"credit": 0, "debit": 0},
+                "quantity": {"credit": 0, "debit": 0},
                 "emission_rate_per_mj": 0,
                 "pending": 0,
                 "sector": operation.sector,
@@ -150,3 +157,12 @@ class BalanceService:
                 balance[key]["biofuel"] = operation.biofuel.code
 
         return key, balance
+
+    @staticmethod
+    def define_conversion_factor(unit):
+        if unit == "mj":
+            return "pci_litre"
+        elif unit == "kg":
+            return "masse_volumique"
+        else:
+            return None

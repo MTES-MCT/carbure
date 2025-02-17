@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, PolymorphicProxySerializer, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,7 +10,12 @@ from core.models import Entity, UserRights
 from saf.filters import TicketFilter
 from saf.models import SafTicket
 from saf.permissions import HasUserRights
-from saf.serializers import SafTicketDetailsSerializer, SafTicketSerializer
+from saf.serializers import (
+    SafTicketAirlineSerializer,
+    SafTicketBaseSerializer,
+    SafTicketDetailsAirlineSerializer,
+    SafTicketDetailsBaseSerializer,
+)
 
 from .mixins import ActionMixin
 
@@ -21,7 +26,7 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
         IsAuthenticated,
         HasUserRights(None, [Entity.OPERATOR, Entity.AIRLINE]),
     )
-    serializer_class = SafTicketSerializer
+    serializer_class = SafTicketBaseSerializer
     filterset_class = TicketFilter
     search_fields = [
         "carbure_id",
@@ -43,8 +48,15 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
         return super().get_permissions()
 
     def get_serializer_class(self):
-        if self.action == "retrieve":
-            return SafTicketDetailsSerializer
+        entity_id = self.request.query_params.get("entity_id")
+        entity = Entity.objects.filter(pk=entity_id).first()
+        is_airline = entity and entity.entity_type == Entity.AIRLINE
+
+        if self.action == "list":
+            return SafTicketAirlineSerializer if is_airline else SafTicketBaseSerializer
+        elif self.action == "retrieve":
+            return SafTicketDetailsAirlineSerializer if is_airline else SafTicketDetailsBaseSerializer
+
         return super().get_serializer_class()
 
     def get_queryset(self):
@@ -62,6 +74,19 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
         return queryset
 
     @extend_schema(
+        responses={
+            200: PolymorphicProxySerializer(
+                many=True,
+                component_name="SafTicket",
+                serializers=[SafTicketBaseSerializer, SafTicketAirlineSerializer],
+                resource_type_field_name=None,
+            )
+        },
+    )
+    def list(self, request):
+        return super().list(request)
+
+    @extend_schema(
         parameters=[
             OpenApiParameter(
                 "entity_id",
@@ -71,6 +96,13 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
                 required=True,
             )
         ],
+        responses={
+            200: PolymorphicProxySerializer(
+                component_name="SafTicketDetails",
+                serializers=[SafTicketDetailsBaseSerializer, SafTicketDetailsAirlineSerializer],
+                resource_type_field_name=None,
+            )
+        },
     )
     def retrieve(self, request, id):
         entity_id = self.request.query_params.get("entity_id")

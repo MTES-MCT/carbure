@@ -41,7 +41,7 @@ class TiruertOperationsTest(TestCase):
             "to_depot",
             "export_country",
             "created_at",
-            "volume",
+            "quantity",
             "unit",
         ]
 

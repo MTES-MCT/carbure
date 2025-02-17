@@ -25,7 +25,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
-    volume = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
 
     def get_type(self, instance) -> str:
@@ -41,9 +41,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     def get_volume_l(self, instance) -> float:
         return sum(detail.volume for detail in instance.details.all())
 
-    def get_volume(self, instance) -> float:
-        pci = instance.biofuel.pci_litre if self.context.get("unit") == "mj" else 1
-        return self.get_volume_l(instance) * pci
+    def get_quantity(self, instance) -> float:
+        volume = self.get_volume_l(instance)
+        return instance.volume_to_quantity(volume, self.context.get("unit"))
 
     def get_unit(self, instance) -> str:
         return self.context.get("unit")
@@ -71,7 +71,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "to_depot",
             "export_country",
             "created_at",
-            "volume",
+            "quantity",
             "unit",
             "details",
         ]
@@ -94,7 +94,7 @@ class OperationSerializer(BaseOperationSerializer):
             "export_country",
             "created_at",
             "validation_date",
-            "volume",
+            "quantity",
             "avoided_emissions",
             "unit",
             "details",
