@@ -44,14 +44,12 @@ class AgreementAdminListActionMixin:
 
         year = self.request.query_params.get("year", datetime.now().year)
 
-        agreements_active = (
-            queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year))
-            .select_related("production_site")
-            .order_by("production_site__name")
+        agreements_active = queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year)).order_by(
+            "production_site__name"
         )
 
-        agreements_incoming = queryset.filter(Q(valid_from__year__gt=year)).select_related("production_site")
-        agreements_expired = queryset.filter(Q(valid_until__year__lt=year)).select_related("production_site")
+        agreements_incoming = queryset.filter(Q(valid_from__year__gt=year))
+        agreements_expired = queryset.filter(Q(valid_until__year__lt=year))
 
         active_agreements = DoubleCountingRegistrationSerializer(agreements_active, many=True).data
         active_agreements_with_quotas = add_quotas_to_agreements(year, active_agreements)

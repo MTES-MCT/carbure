@@ -223,6 +223,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/agreements/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/applications/{id}/": {
     parameters: {
       query?: never
@@ -3725,6 +3741,8 @@ export interface operations {
   double_counting_agreements_list: {
     parameters: {
       query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        certificate_id?: string[]
         /** @description Entity ID */
         entity_id: number
         /** @description Ordre
@@ -3736,6 +3754,10 @@ export interface operations {
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        producers?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        production_sites?: string[]
         /** @description A search term. */
         search?: string
         /** @description Year */
@@ -3785,6 +3807,8 @@ export interface operations {
   double_counting_agreements_agreement_admin_retrieve: {
     parameters: {
       query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        certificate_id?: string[]
         /** @description Entity ID */
         entity_id: number
         /** @description Ordre
@@ -3796,6 +3820,10 @@ export interface operations {
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        producers?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        production_sites?: string[]
         /** @description A search term. */
         search?: string
         /** @description Year */
@@ -3820,6 +3848,8 @@ export interface operations {
   double_counting_agreements_agreement_public_list: {
     parameters: {
       query?: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        certificate_id?: string[]
         /** @description Ordre
          *
          *     * `production_site` - Production site
@@ -3829,6 +3859,10 @@ export interface operations {
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        producers?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        production_sites?: string[]
         /** @description A search term. */
         search?: string
       }
@@ -3851,6 +3885,8 @@ export interface operations {
   double_counting_agreements_export_retrieve: {
     parameters: {
       query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        certificate_id?: string[]
         /** @description Entity ID */
         entity_id: number
         /** @description Ordre
@@ -3862,6 +3898,10 @@ export interface operations {
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        producers?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        production_sites?: string[]
         /** @description A search term. */
         search?: string
         /** @description Year */
@@ -3879,6 +3919,45 @@ export interface operations {
         }
         content: {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
+      }
+    }
+  }
+  double_counting_agreements_filters_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        certificate_id?: string[]
+        /** @description Filter string to apply */
+        filter?: string
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        producers?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        production_sites?: string[]
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
         }
       }
     }

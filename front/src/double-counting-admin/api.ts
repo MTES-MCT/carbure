@@ -1,11 +1,12 @@
 import { download } from "common/services/api"
+import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import {
   api as apiFetch,
   download as downloadFetch,
   toFileArray,
 } from "common/services/api-fetch"
 import { PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by } from "api-schema"
-
+import { AgreementListQuery } from "../double-counting/types"
 // GLOBAL
 
 export function getSnapshot(entity_id: number) {
@@ -112,14 +113,14 @@ export function downloadDoubleCountingAgreementList(entity_id: number) {
 }
 
 export function getDoubleCountingAgreementList(
-  entity_id: number,
+  query: AgreementListQuery,
   order_by?: string,
   ordering?: string
 ) {
   return apiFetch.GET("/double-counting/agreements/agreement-admin/", {
     params: {
       query: {
-        entity_id,
+        ...query,
         ordering,
         order_by: order_by
           ? [
@@ -129,6 +130,25 @@ export function getDoubleCountingAgreementList(
       },
     },
   })
+}
+
+export function getAgrementFilters(
+  field: string,
+  query: AgreementListQuery,
+  tab: string
+) {
+  return apiFetch
+    .GET("/double-counting/agreements/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          status: tab,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
 }
 
 export function getDoubleCountingAgreement(
