@@ -1791,7 +1791,7 @@ export interface components {
       readonly available_balance: number
       /** Format: double */
       readonly final_balance: number
-      volume: {
+      quantity: {
         [key: string]: number
       }
       /** Format: double */
@@ -2629,7 +2629,7 @@ export interface components {
       /** Format: date */
       validation_date?: string | null
       /** Format: double */
-      readonly volume: number
+      readonly quantity: number
       /** Format: double */
       readonly avoided_emissions: number
       readonly unit: string
@@ -2668,7 +2668,7 @@ export interface components {
       /** Format: date-time */
       readonly created_at: string
       /** Format: double */
-      readonly volume: number
+      readonly quantity: number
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
@@ -2880,6 +2880,17 @@ export interface components {
      * @enum {string}
      */
     RoleEnum: RoleEnum
+    SafBiofuel: {
+      name: string
+      name_en: string
+      code: string
+      /** Format: double */
+      pci_kg?: number
+      /** Format: double */
+      pci_litre?: number
+      /** Format: double */
+      masse_volumique?: number
+    }
     SafTicket:
       | components["schemas"]["SafTicketBase"]
       | components["schemas"]["SafTicketAirline"]
@@ -2940,7 +2951,7 @@ export interface components {
       /** Format: double */
       volume: number
       readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly biofuel: components["schemas"]["SafBiofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
@@ -2994,7 +3005,7 @@ export interface components {
       /** Format: double */
       volume: number
       readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly biofuel: components["schemas"]["SafBiofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null

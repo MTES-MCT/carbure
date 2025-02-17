@@ -5853,7 +5853,7 @@ components:
           type: number
           format: double
           readOnly: true
-        volume:
+        quantity:
           type: object
           additionalProperties:
             type: number
@@ -5873,8 +5873,8 @@ components:
         - customs_category
         - final_balance
         - pending
+        - quantity
         - sector
-        - volume
     Biofuel:
       type: object
       properties:
@@ -7994,7 +7994,7 @@ components:
           type: string
           format: date
           nullable: true
-        volume:
+        quantity:
           type: number
           format: double
           readOnly: true
@@ -8017,11 +8017,11 @@ components:
         - debited_entity
         - from_depot
         - id
+        - quantity
         - sector
         - to_depot
         - type
         - unit
-        - volume
     OperationDetail:
       type: object
       properties:
@@ -8104,7 +8104,7 @@ components:
           type: string
           format: date-time
           readOnly: true
-        volume:
+        quantity:
           type: number
           format: double
           readOnly: true
@@ -8122,11 +8122,11 @@ components:
         - debited_entity
         - from_depot
         - id
+        - quantity
         - sector
         - to_depot
         - type
         - unit
-        - volume
     OtpResponse:
       type: object
       properties:
@@ -8617,6 +8617,31 @@ components:
         - ReadWrite
         - Admin
         - Auditor
+    SafBiofuel:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        name_en:
+          type: string
+          maxLength: 64
+        code:
+          type: string
+          maxLength: 16
+        pci_kg:
+          type: number
+          format: double
+        pci_litre:
+          type: number
+          format: double
+        masse_volumique:
+          type: number
+          format: double
+      required:
+        - code
+        - name
+        - name_en
     SafTicket:
       oneOf:
         - $ref: "#/components/schemas/SafTicketBase"
@@ -8796,7 +8821,7 @@ components:
           readOnly: true
         biofuel:
           allOf:
-            - $ref: "#/components/schemas/Biofuel"
+            - $ref: "#/components/schemas/SafBiofuel"
           readOnly: true
         country_of_origin:
           allOf:
@@ -8944,7 +8969,7 @@ components:
           readOnly: true
         biofuel:
           allOf:
-            - $ref: "#/components/schemas/Biofuel"
+            - $ref: "#/components/schemas/SafBiofuel"
           readOnly: true
         country_of_origin:
           allOf:
