@@ -14,7 +14,7 @@ from pandas._typing import Scalar
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import Carbure, CarbureUnit
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, GenericCertificate, TransactionDistance
+from core.models import Biocarburant, CarbureLot, Entity, GenericCertificate, TransactionDistance
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 
@@ -204,7 +204,10 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
         if (
-            producer is None or producer == "" or producer.upper() == entity.name.upper()
+            producer is None
+            or producer == ""
+            or producer.upper() == entity.name.upper()
+            or (entity.entity_type == Entity.PRODUCER and not entity.has_trading)
         ) and production_site.upper() in prefetched_data["my_production_sites"]:
             # I am the producer
             lot["carbure_production_site"] = production_site
