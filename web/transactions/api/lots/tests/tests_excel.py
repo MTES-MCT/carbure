@@ -173,7 +173,7 @@ class LotsExcelImportTest(TestCase):
         assert lots[3].carbure_supplier is None
         assert lots[3].supplier_certificate == ""
         assert lots[3].carbure_client == self.trader
-        assert lots[3].genericerror_set.count() == 2
+        assert lots[3].genericerror_set.count() == 3
 
         assert lots[4].carbure_producer == self.producer
         assert lots[4].carbure_production_site == self.producer_production_site
