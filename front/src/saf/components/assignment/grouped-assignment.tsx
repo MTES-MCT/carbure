@@ -43,8 +43,16 @@ const TicketsGroupedAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
+  const lastDeliveryPeriod = ticketSources.sort(
+    (a, b) => b.delivery_period - a.delivery_period
+  )[0]?.delivery_period
+
   const { value, bind, setField, setFieldError } =
-    useForm<GroupedAssignmentForm>(defaultAssignment)
+    useForm<GroupedAssignmentForm>({
+      ...defaultAssignment,
+      assignment_period:
+        lastDeliveryPeriod ?? defaultAssignment.assignment_period,
+    })
 
   const groupedAssignSafTicket = useMutation(api.groupedAssignSafTicket, {
     invalidates: ["ticket-sources", "operator-snapshot"],
@@ -87,10 +95,6 @@ const TicketsGroupedAssignment = ({
   const findAirports = (query: string) => {
     return apiResources.findAirports(query)
   }
-
-  const lastDeliveryPeriod = ticketSources.sort(
-    (a, b) => b.delivery_period - a.delivery_period
-  )[0]?.delivery_period
 
   return (
     <Portal onClose={onClose}>

@@ -90,7 +90,7 @@ export function Button<T>({
           action?.()
         }}
       >
-        {loading ? <Loader /> : icon}
+        <span>{loading ? <Loader /> : icon}</span>
         {variant !== "icon" && (center ? <span>{content}</span> : content)}
       </button>
     </LinkWrapper>
