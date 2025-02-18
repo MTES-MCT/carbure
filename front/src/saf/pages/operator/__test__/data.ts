@@ -22,7 +22,10 @@ import {
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
-import { CategoryEnum, SiteTypeEnum } from "api-schema"
+import {
+  PathsApiTiruertOperationsGetParametersQueryCustoms_category,
+  SiteTypeEnum,
+} from "api-schema"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,
@@ -43,7 +46,8 @@ const feedstock1: Feedstock = {
   name: "Lies de vin",
   name_en: "Lies de vin",
   is_double_compte: false,
-  category: CategoryEnum.ANN_IX_A,
+  category:
+    PathsApiTiruertOperationsGetParametersQueryCustoms_category.ANN_IX_A,
 }
 const biofuel1: Biofuel = {
   code: "HOC",

@@ -30,3 +30,4 @@ class ElecProvisionCertificate(models.Model):
     source = models.CharField(max_length=32, choices=SOURCES, null=True, default=None)
     energy_amount = models.FloatField()
     remaining_energy_amount = models.FloatField()
+    compensation = models.BooleanField(default=False)
