@@ -34,7 +34,7 @@ const ApplicationStatus = ({
     [DCStatusExt.ACCEPTED]: t("Acceptée"),
     [DCStatusExt.REJECTED]: t("Refusée"),
     [DCStatusExt.EXPIRED]: t("Expirée"),
-    [DCStatusExt.EXPIRES_SOON]: t("À renouveller"),
+    [DCStatusExt.EXPIRES_SOON]: t("À renouveler"),
     [DCStatusExt.INCOMING]: t("À venir"),
   }
 
