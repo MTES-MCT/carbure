@@ -47,6 +47,7 @@ dc_feedstock_to_carbure_feedstock = {
     "tournesol": "TOURNESOL",
     "triticale": "TRITICALE",
     "amidons résiduels déchets": "AMIDON_RESIDUEL_DECHETS",
+    "méthanol brut issu de la pâte kraft obtenue à partir de la pulpe de bois": "RAW_METHANOL_KRAFT_PULPING",
 }
 
 
