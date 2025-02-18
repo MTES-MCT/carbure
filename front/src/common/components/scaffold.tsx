@@ -71,12 +71,13 @@ export const Col = ({
   asideX,
   asideY,
   className,
+  grow,
   ...props
-}: JSX.IntrinsicElements["div"] & Layout) => (
+}: JSX.IntrinsicElements["div"] & Layout & { grow?: boolean }) => (
   <div
     {...props}
     {...layout({ asideX, asideY })}
-    className={cl(css.column, className)}
+    className={cl(css.column, grow && css["column--grow"], className)}
   />
 )
 
@@ -102,6 +103,10 @@ export const LoaderOverlay = () => (
   <Overlay className={css.loaderOverlay}>
     <Loader color="var(--black)" size={32} />
   </Overlay>
+)
+
+export const Divider = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={cl(css.divider, props.className)} />
 )
 
 export interface Layout {
