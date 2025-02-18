@@ -204,11 +204,10 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
         if (
-            producer is None
-            or producer == ""
-            or producer.upper() == entity.name.upper()
-            or (entity.entity_type == Entity.PRODUCER and not entity.has_trading)
-        ) and production_site.upper() in prefetched_data["my_production_sites"]:
+            entity.entity_type == Entity.PRODUCER
+            and production_site.upper() in prefetched_data["my_production_sites"]
+            and (producer is None or producer == "" or producer.upper() == entity.name.upper() or not entity.has_trading)
+        ):
             # I am the producer
             lot["carbure_production_site"] = production_site
             # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
