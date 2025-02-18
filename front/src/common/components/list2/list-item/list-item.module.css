@@ -1,5 +1,6 @@
 .list-item {
   display: flex;
+  justify-content: space-between;
   column-gap: var(--spacing-3v);
   padding: var(--spacing-3v) var(--spacing-2w);
   cursor: pointer;
