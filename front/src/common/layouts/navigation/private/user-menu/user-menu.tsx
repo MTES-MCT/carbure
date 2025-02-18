@@ -14,31 +14,33 @@ import {
   ChartLine,
   LogoutBoxLine,
 } from "common/components/icon"
+import { useTranslation } from "react-i18next"
 
 export const UserMenu = () => {
   const { user, getName } = useUser()
+  const { t } = useTranslation()
   const { isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
     useEntity()
   const routes = useRoutes()
   const items = useMemo(() => {
     const compactedItems = compact([
       {
-        label: "Mon compte",
+        label: t("Mon compte"),
         path: routes.MY_ACCOUNT.INDEX,
         icon: AccountLine,
       },
       (isOperator || isProducer) && {
-        label: "Statistiques",
+        label: t("Statistiques"),
         path: routes.STATISTICS,
         icon: ChartLine,
       },
       (isIndustry || isPowerOrHeatProducer) && {
-        label: "Annuaire",
+        label: t("Annuaire"),
         path: routes.REGISTRY,
         icon: BookLine,
       },
       {
-        label: "Déconnexion",
+        label: t("Déconnexion"),
         path: routes.LOGOUT,
         icon: LogoutBoxLine,
       },
@@ -49,7 +51,7 @@ export const UserMenu = () => {
       ...item,
       borderBottom: index === compactedItems.length - 2,
     }))
-  }, [isIndustry, isOperator, isPowerOrHeatProducer, isProducer, routes])
+  }, [isIndustry, isOperator, isPowerOrHeatProducer, isProducer, routes, t])
 
   return (
     <SimpleMenu
