@@ -47,6 +47,9 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
     if biofuel.is_graisse and feedstock.compatible_graisse is False:
         yield f"Matière première {feedstock} incompatible avec {biofuel}"
 
+    if biofuel.code not in ["MT", "MTBE"] and feedstock.code == "RAW_METHANOL_KRAFT_PULPING":
+        yield f"Matière première {feedstock} incompatible avec {biofuel}"
+
     if biofuel.code == "EMHU" and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
         yield f"{biofuel} doit être à base d'huiles alimentaires usagées"
 
