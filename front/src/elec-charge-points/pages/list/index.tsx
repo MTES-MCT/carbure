@@ -71,7 +71,7 @@ const ChargePointsList = ({ year, snapshot }: ChargePointsListProps) => {
   )
 
   const downloadChargePointsList = () => {
-    api.downloadChargePointsList(query, chargePointsListPagination?.ids || [])
+    api.downloadChargePointsList(query)
   }
 
   const openUpdateChargePointModal: ChargePointsListTableProps["rowLink"] = (
