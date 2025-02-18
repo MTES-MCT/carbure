@@ -57,7 +57,7 @@ export const Dialog = ({
       </Button>
       <div className={css["dialog__wrapper"]}>
         {header && <header className={css["dialog__header"]}>{header}</header>}
-        <main>{children}</main>
+        <main className={css["dialog__content"]}>{children}</main>
         {footer && <footer className={css["dialog__footer"]}>{footer}</footer>}
       </div>
     </div>

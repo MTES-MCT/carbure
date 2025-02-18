@@ -3,10 +3,12 @@ import { InputProps } from "@codegouvfr/react-dsfr/Input"
 import { ReactNode, useId } from "react"
 import cl from "clsx"
 import css from "./field.module.css"
+import { ExtendedInputProps, Label } from "./base-input"
 
 export type FieldProps = {
   children: ReactNode
-} & Omit<InputProps, "children" | "nativeSelectProps">
+} & Omit<InputProps, "children" | "nativeSelectProps"> &
+  ExtendedInputProps
 
 export const Field = ({
   children,
@@ -17,6 +19,9 @@ export const Field = ({
   stateRelatedMessage,
   className,
   disabled,
+  hasTooltip,
+  required,
+  title,
 }: FieldProps) => {
   const generatedId = useId()
   const selectId = idProps ?? generatedId
@@ -36,12 +41,19 @@ export const Field = ({
       )}
     >
       {Boolean(label || hintText) && (
-        <label className={fr.cx("fr-label")} htmlFor={selectId}>
-          {label}
-          {hintText !== undefined && (
-            <span className={fr.cx("fr-hint-text")}>{hintText}</span>
-          )}
-        </label>
+        <Label
+          hasTooltip={hasTooltip}
+          required={required}
+          title={title}
+          label={
+            <label className={fr.cx("fr-label")} htmlFor={selectId}>
+              {label}
+              {hintText !== undefined && (
+                <span className={fr.cx("fr-hint-text")}>{hintText}</span>
+              )}
+            </label>
+          }
+        />
       )}
       <div className={css["select-field-children"]}>{children}</div>
       {state !== "default" && (

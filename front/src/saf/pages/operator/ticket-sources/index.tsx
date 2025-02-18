@@ -21,7 +21,7 @@ import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
-import NoResult from "common/components/no-result"
+import { NoResult } from "common/components/no-result2"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
