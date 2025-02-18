@@ -73,7 +73,7 @@ export const Notice = ({
       )}
       style={style}
     >
-      <div className="fr-container">
+      <div className={cl(fr.cx("fr-container"), css.notice__container)}>
         <div className="fr-notice__body">
           <p>
             {Icon && <Icon size="md" className={css.notice__icon} />}

@@ -12,7 +12,7 @@ interface BaseIconProps {
 export type IconName = FrIconClassName | RiIconClassName
 export type IconProps = Omit<BaseIconProps, "name">
 
-const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
+export const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
   return (
     <span
       {...props}
