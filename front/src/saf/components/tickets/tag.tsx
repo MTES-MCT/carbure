@@ -6,9 +6,10 @@ import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 export interface TicketTagProps {
   status?: SafTicketStatus
   ets?: EtsStatusEnum | null
+  small?: boolean
 }
 
-export const TicketTag = ({ status, ets }: TicketTagProps) => {
+export const TicketTag = ({ status, ets, small = false }: TicketTagProps) => {
   const { t } = useTranslation()
 
   let label
@@ -50,7 +51,7 @@ export const TicketTag = ({ status, ets }: TicketTagProps) => {
   }
 
   return (
-    <Badge severity={variant} noIcon>
+    <Badge severity={variant} noIcon small={small}>
       {declared && <Certificate />}
       {label}
     </Badge>

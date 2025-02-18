@@ -1,3 +1,7 @@
 .dsfr-input--error :global(.fr-messages-group) {
   display: none;
 }
+
+.input-dsfr--no-margin:global(.fr-input-group) {
+  margin-bottom: 0;
+}
