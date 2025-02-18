@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
@@ -15,118 +16,78 @@ class LotsExcelImportTest(TestCase):
         "json/biofuels.json",
         "json/feedstock.json",
         "json/countries.json",
-        "json/depots.json",
-        "json/entities.json",
-        "json/productionsites.json",
-        "json/entities_sites.json",
     ]
 
-    def setupProducer(self):
-        self.producer = Entity.objects.create(
+    # create the entity that will import the excel file
+    def setupOwnerEntity(self):
+        self.owner = Entity.objects.create(
             is_enabled=True,
-            name="Producer",
-            entity_type=Entity.PRODUCER,
-            default_certificate="PRODUCER_CERTIFICATE",
+            name="Owner",
+            default_certificate="OWNER_CERTIFICATE",
         )
-        self.producer_production_site = Site.objects.create(
+        self.owner_production_site = Site.objects.create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             is_enabled=True,
-            name="Producer Production Site",
+            name="Owner Production Site",
             country=self.FR,
-            created_by=self.producer,
+            created_by=self.owner,
         )
-        EntitySite.objects.create(entity=self.producer, site=self.producer_production_site)
-
-    def setupProducerTrader(self):
-        self.producer_trader = Entity.objects.create(
-            is_enabled=True,
-            name="Producer Trader",
-            entity_type=Entity.PRODUCER,
-            has_trading=True,
-            default_certificate="PRODUCER_TRADER_CERTIFICATE",
-        )
-        self.producer_trader_production_site = Site.objects.create(
-            site_type=Site.PRODUCTION_BIOLIQUID,
-            is_enabled=True,
-            name="Producer Trader Production Site",
-            country=self.FR,
-            created_by=self.producer_trader,
-        )
-        EntitySite.objects.create(entity=self.producer, site=self.producer_production_site)
-
-    def setupTrader(self):
-        self.trader = Entity.objects.create(
-            is_enabled=True,
-            name="Trader",
-            entity_type=Entity.TRADER,
-            has_trading=True,
-            default_certificate="TRADER_CERTIFICATE",
-        )
-        self.trader_depot = Site.objects.create(
+        self.owner_depot = Site.objects.create(
             site_type=Site.EFPE,
             is_enabled=True,
-            name="Trader Depot",
+            name="Owner Depot",
             customs_id="AAA",
             country=self.FR,
         )
-        EntitySite.objects.create(entity=self.trader, site=self.trader_depot)
 
-    def setupOperator(self):
-        self.operator = Entity.objects.create(
+    # create another entity that will be involved in transactions
+    def setupOtherEntity(self):
+        self.other = Entity.objects.create(
             is_enabled=True,
-            name="Operator",
+            name="Other",
             entity_type=Entity.OPERATOR,
+            default_certificate="OTHER_CERTIFICATE",
             has_trading=True,
-            default_certificate="OPERATOR_CERTIFICATE",
         )
-        self.operator_depot = Site.objects.create(
+        self.other_depot = Site.objects.create(
             site_type=Site.EFPE,
             is_enabled=True,
-            name="Operator Depot",
+            name="Other Depot",
             customs_id="BBB",
             country=self.FR,
         )
-        EntitySite.objects.create(entity=self.operator, site=self.operator_depot)
-
-    def setupOperatorTrader(self):
-        self.operator_trader = Entity.objects.create(
-            is_enabled=True,
-            name="Operator Trader",
-            entity_type=Entity.OPERATOR,
-            has_trading=True,
-            default_certificate="OPERATOR_TRADER_CERTIFICATE",
-        )
-        self.operator_trader_depot = Site.objects.create(
-            site_type=Site.EFPE,
-            is_enabled=True,
-            name="Operator Trader Depot",
-            customs_id="CCC",
-            country=self.FR,
-        )
-        EntitySite.objects.create(entity=self.operator_trader, site=self.operator_trader_depot)
+        EntitySite.objects.create(entity=self.other, site=self.other_depot)
 
     def setUp(self):
         self.FR = Pays.objects.get(code_pays="FR")
 
-        self.setupProducer()
-        self.setupProducerTrader()
-        self.setupTrader()
-        self.setupOperator()
-        self.setupOperatorTrader()
+        self.setupOwnerEntity()
+        self.setupOtherEntity()
 
         self.user = setup_current_user(
             self,
             "tester@carbure.local",
             "Tester",
             "gogogo",
-            [
-                (self.producer, "ADMIN"),
-                (self.producer_trader, "ADMIN"),
-                (self.trader, "ADMIN"),
-                (self.operator, "ADMIN"),
-                (self.operator_trader, "ADMIN"),
-            ],
+            [(self.owner, "ADMIN")],
         )
+
+    def debug_lots(self, title, lots):
+        values = lots.values(
+            "free_field",
+            "carbure_producer",
+            "unknown_producer",
+            "carbure_production_site",
+            "unknown_production_site",
+            "carbure_supplier",
+            "unknown_supplier",
+            "carbure_vendor",
+            "carbure_client",
+            "unknown_client",
+        )
+
+        print(title)
+        print(pd.DataFrame(values).fillna(""))
 
     def send_excel(self, entity: Entity, excel_fixture: str):
         CarbureLot.objects.filter(added_by=entity).delete()
@@ -145,99 +106,127 @@ class LotsExcelImportTest(TestCase):
         return CarbureLot.objects.filter(added_by=entity).all().prefetch_related("genericerror_set")
 
     def test_producer_excel(self):
-        lots = self.send_excel(self.producer, "test_producer_template.xlsx")
+        self.owner.entity_type = Entity.PRODUCER
+        self.owner.has_trading = False
+        self.owner.has_stocks = False
+        self.owner.save()
 
-        assert lots[0].carbure_producer == self.producer
-        assert lots[0].carbure_production_site == self.producer_production_site
-        assert lots[0].carbure_supplier == self.producer
-        assert lots[0].supplier_certificate == self.producer.default_certificate
-        assert lots[0].carbure_client == self.trader
-        assert lots[0].genericerror_set.count() == 0
+        # add production site, remove depot
+        EntitySite.objects.update_or_create(entity=self.owner, site=self.owner_production_site)
+        EntitySite.objects.filter(entity=self.owner, site=self.owner_depot).delete()
 
-        assert lots[1].carbure_producer == self.producer
-        assert lots[1].carbure_production_site == self.producer_production_site
-        assert lots[1].carbure_supplier == self.producer
-        assert lots[1].supplier_certificate == self.producer.default_certificate
-        assert lots[1].carbure_client == self.operator
-        assert lots[1].genericerror_set.count() == 0
+        lots = self.send_excel(self.owner, "test_lot_template.xlsx")
 
-        assert lots[2].carbure_producer == self.producer
-        assert lots[2].carbure_production_site == self.producer_production_site
-        assert lots[2].carbure_supplier == self.producer
-        assert lots[2].supplier_certificate == self.producer.default_certificate
-        assert lots[2].carbure_client == self.operator_trader
-        assert lots[2].genericerror_set.count() == 0
+        assert lots.filter(carbure_producer=self.owner).count() == 4
+        assert lots.filter(carbure_producer=None, unknown_producer="").count() == 1
+        assert lots.filter(carbure_producer=None, unknown_producer="Unknown").count() == 3
 
-        assert lots[3].carbure_producer is None
-        assert lots[3].carbure_production_site is None
-        assert lots[3].carbure_supplier is None
-        assert lots[3].supplier_certificate == ""
-        assert lots[3].carbure_client == self.trader
-        assert lots[3].genericerror_set.count() == 3
+        assert lots.filter(carbure_production_site=self.owner_production_site).count() == 4
+        assert lots.filter(carbure_production_site=None, unknown_production_site="Unknown Production Site").count() == 3
 
-        assert lots[4].carbure_producer == self.producer
-        assert lots[4].carbure_production_site == self.producer_production_site
-        assert lots[4].carbure_supplier == self.producer
-        assert lots[4].supplier_certificate == self.producer.default_certificate
-        assert lots[4].carbure_client == self.operator
-        assert lots[4].genericerror_set.count() == 0
+        assert lots.filter(carbure_supplier=self.owner).count() == 6
+        assert lots.filter(carbure_supplier=None, unknown_supplier="UNKNOWN").count() == 2
+        assert lots.filter(supplier_certificate=self.owner.default_certificate).count() == 6
 
-        assert lots[5].carbure_producer == self.producer
-        assert lots[5].carbure_production_site == self.producer_production_site
-        assert lots[5].carbure_supplier == self.producer
-        assert lots[5].supplier_certificate == self.producer.default_certificate
-        assert lots[5].carbure_client == self.operator_trader
-        assert lots[5].genericerror_set.count() == 1
+        assert lots.filter(carbure_vendor=self.owner).count() == 0
+        assert lots.filter(vendor_certificate=self.owner.default_certificate).count() == 0
+
+        assert lots.filter(carbure_client=self.owner).count() == 1
+        assert lots.filter(carbure_client=self.other).count() == 5
+
+        assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
+        assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
 
     def test_producer_trader_excel(self):
-        lots = self.send_excel(self.producer_trader, "test_producer_trader_template.xlsx")
+        self.owner.entity_type = Entity.PRODUCER
+        self.owner.has_trading = True
+        self.owner.has_stocks = True
+        self.owner.save()
 
-        assert lots[0].carbure_producer == self.producer_trader
-        assert lots[0].carbure_production_site == self.producer_trader_production_site
-        assert lots[0].carbure_supplier == self.producer_trader
-        assert lots[0].supplier_certificate == self.producer_trader.default_certificate
-        assert lots[0].carbure_client == self.trader
-        assert lots[0].genericerror_set.count() == 0
+        # add production site, remove depot
+        EntitySite.objects.update_or_create(entity=self.owner, site=self.owner_production_site)
+        EntitySite.objects.filter(entity=self.owner, site=self.owner_depot).delete()
 
-        assert lots[1].carbure_producer is None
-        assert lots[1].unknown_producer == ""
-        assert lots[1].carbure_production_site is None
-        assert lots[1].unknown_production_site == ""
-        assert lots[1].carbure_supplier is None
-        assert lots[1].supplier_certificate == ""
-        assert lots[1].carbure_client == self.operator
-        assert lots[1].genericerror_set.count() == 3
+        lots = self.send_excel(self.owner, "test_lot_template.xlsx")
 
-        assert lots[2].carbure_producer is None
-        assert lots[2].unknown_producer == "Other Producer"
-        assert lots[2].carbure_production_site is None
-        assert lots[2].unknown_production_site == "Other Producer Production Site"
-        assert lots[2].carbure_supplier is None
-        assert lots[2].supplier_certificate == ""
-        assert lots[2].carbure_client == self.operator_trader
-        assert lots[2].genericerror_set.count() == 3
+        assert lots.filter(carbure_producer=self.owner).count() == 4
+        assert lots.filter(carbure_producer=None, unknown_producer="").count() == 1
+        assert lots.filter(unknown_producer="Unknown").count() == 3
 
-        assert lots[3].carbure_producer is None
-        assert lots[3].unknown_producer == "Producer Trader"
-        assert lots[3].carbure_production_site is None
-        assert lots[3].unknown_production_site == "Wrong Production Site"
-        assert lots[3].carbure_supplier is None
-        assert lots[3].supplier_certificate == ""
-        assert lots[3].carbure_client == self.trader
-        assert lots[3].genericerror_set.count() == 2
+        assert lots.filter(carbure_production_site=self.owner_production_site).count() == 4
+        assert lots.filter(unknown_production_site="Unknown Production Site").count() == 3
 
-        assert lots[4].carbure_producer == self.producer_trader
-        assert lots[4].carbure_production_site == self.producer_trader_production_site
-        assert lots[4].carbure_supplier == self.producer_trader
-        assert lots[4].supplier_certificate == self.producer_trader.default_certificate
-        assert lots[4].carbure_client == self.operator
-        assert lots[4].genericerror_set.count() == 0
+        assert lots.filter(carbure_supplier=self.owner).count() == 6
+        assert lots.filter(carbure_supplier=None, unknown_supplier="Unknown").count() == 2
+        assert lots.filter(supplier_certificate=self.owner.default_certificate).count() == 6
 
-        assert lots[5].carbure_producer is None
-        assert lots[5].unknown_producer == "Other Producer"
-        assert lots[5].carbure_production_site is None
-        assert lots[5].unknown_production_site == "Other Producer Production Site"
-        assert lots[5].carbure_supplier is None
-        assert lots[5].unknown_supplier == "Other Producer".upper()
-        assert lots[5].carbure_client == self.producer_trader
-        assert lots[5].genericerror_set.count() == 2
+        assert lots.filter(carbure_vendor=self.owner).count() == 1
+        assert lots.filter(vendor_certificate=self.owner.default_certificate).count() == 1
+
+        assert lots.filter(carbure_client=self.owner).count() == 1
+        assert lots.filter(carbure_client=self.other).count() == 5
+
+        assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
+        assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
+
+    def test_operator_excel(self):
+        self.owner.entity_type = Entity.OPERATOR
+        self.owner.has_trading = False
+        self.owner.has_stocks = False
+        self.owner.save()
+
+        # remove production site, add depot
+        EntitySite.objects.filter(entity=self.owner, site=self.owner_production_site).delete()
+        EntitySite.objects.update_or_create(entity=self.owner, site=self.owner_depot)
+
+        lots = self.send_excel(self.owner, "test_lot_template.xlsx")
+
+        assert lots.filter(carbure_producer=None).count() == 8
+        assert lots.filter(unknown_producer="Owner").count() == 3
+
+        assert lots.filter(carbure_production_site=None).count() == 8
+        assert lots.filter(unknown_production_site="Owner Production Site").count() == 4
+
+        assert lots.filter(carbure_supplier=self.owner).count() == 6
+        assert lots.filter(carbure_supplier=None, unknown_supplier="Unknown").count() == 2
+        assert lots.filter(supplier_certificate=self.owner.default_certificate).count() == 6
+
+        assert lots.filter(carbure_vendor=self.owner).count() == 1
+        assert lots.filter(vendor_certificate=self.owner.default_certificate).count() == 1
+
+        assert lots.filter(carbure_client=self.owner).count() == 2
+        assert lots.filter(carbure_client=self.other).count() == 5
+
+        assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
+        assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
+
+    def test_trader_excel(self):
+        self.owner.entity_type = Entity.TRADER
+        self.owner.has_trading = True
+        self.owner.has_stocks = True
+        self.owner.save()
+
+        # remove production site, add depot
+        EntitySite.objects.filter(entity=self.owner, site=self.owner_production_site).delete()
+        EntitySite.objects.update_or_create(entity=self.owner, site=self.owner_depot)
+
+        lots = self.send_excel(self.owner, "test_lot_template.xlsx")
+
+        assert lots.filter(carbure_producer=None).count() == 8
+        assert lots.filter(unknown_producer="Owner").count() == 3
+
+        assert lots.filter(carbure_production_site=None).count() == 8
+        assert lots.filter(unknown_production_site="Owner Production Site").count() == 4
+
+        assert lots.filter(carbure_supplier=self.owner).count() == 6
+        assert lots.filter(carbure_supplier=None, unknown_supplier="Unknown").count() == 2
+        assert lots.filter(supplier_certificate=self.owner.default_certificate).count() == 6
+
+        assert lots.filter(carbure_vendor=self.owner).count() == 1
+        assert lots.filter(vendor_certificate=self.owner.default_certificate).count() == 1
+
+        assert lots.filter(carbure_client=self.owner).count() == 1
+        assert lots.filter(carbure_client=self.other).count() == 5
+
+        assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
+        assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
