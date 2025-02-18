@@ -57,10 +57,24 @@
 
 .dialog__wrapper {
   padding: 0 var(--spacing-2w) var(--spacing-2w) var(--spacing-2w);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog__content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2w);
 }
 
 .dialog__title {
   color: var(--blue-france-sun-113-625);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1w);
 }
 
 .dialog__description {

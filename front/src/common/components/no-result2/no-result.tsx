@@ -27,7 +27,7 @@ export const NoResult = ({
 
   return (
     <Notice
-      variant="warning"
+      variant={loading ? "info" : "warning"}
       title={
         loading
           ? t("Chargement en cours...")
