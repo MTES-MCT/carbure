@@ -37,7 +37,8 @@ export const Field = ({
         fr.cx("fr-select-group"),
         className,
         disabled && "fr-select-group--disabled",
-        state !== "default" && `fr-select-group--${state}`
+        state !== "default" && `fr-select-group--${state}`,
+        css.field
       )}
     >
       {Boolean(label || hintText) && (

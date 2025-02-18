@@ -7,30 +7,30 @@ import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
 import cl from "clsx"
+import { Field, FieldProps } from "common/components/inputs2/field"
 
-export interface SelectProps<T, V = T> extends Trigger {
-  search?: boolean
-  value?: V | undefined
-  options?: T[]
-  defaultOptions?: T[]
-  placeholder?: string
-  getOptions?: () => Promise<T[]>
-  onChange?: (value: V | undefined) => void
-  normalize?: Normalizer<T, V>
+export type SelectProps<T, V = T> = Trigger &
+  FieldProps & {
+    search?: boolean
+    value?: V | undefined
+    options?: T[]
+    defaultOptions?: T[]
+    placeholder?: string
+    getOptions?: () => Promise<T[]>
+    onChange?: (value: V | undefined) => void
+    normalize?: Normalizer<T, V>
 
-  // Custom renderer for the displayed value
-  valueRenderer?: (item: T) => React.ReactNode
-  sort?: Sorter<T, V>
-  size?: ButtonProps["size"]
+    // Custom renderer for the displayed value
+    valueRenderer?: (item: T) => React.ReactNode
+    sort?: Sorter<T, V>
+    size?: ButtonProps["size"]
 
-  // If true, the select will take the full width of its container
-  full?: boolean
-  className?: string
-  children?: ListProps<T, V>["children"]
-  loading?: boolean
-  readOnly?: boolean
-  disabled?: boolean
-}
+    // If true, the select will take the full width of its container
+    full?: boolean
+    className?: string
+    children?: ListProps<T, V>["children"]
+    loading?: boolean
+  }
 
 export function Select<T, V>({
   search,
@@ -51,6 +51,7 @@ export function Select<T, V>({
   full,
   className,
   children,
+  label,
   ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -69,7 +70,7 @@ export function Select<T, V>({
   )
 
   return (
-    <>
+    <Field label={label}>
       <Button
         ref={triggerRef}
         iconId={loading ? "ri-loader-line" : "fr-icon-arrow-down-s-line"}
@@ -81,6 +82,7 @@ export function Select<T, V>({
           className
         )}
         size={size}
+        type="button"
       >
         <Text
           fontWeight="semibold"
@@ -122,6 +124,6 @@ export function Select<T, V>({
           </List>
         </Dropdown>
       )}
-    </>
+    </Field>
   )
 }
