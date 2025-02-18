@@ -52,6 +52,7 @@ export const BaseInput = ({
       ref={domRef}
       className={cl(
         props.className,
+        css["input-dsfr--no-margin"],
         props.state === "error" &&
           !props.stateRelatedMessage &&
           css["dsfr-input--error"]

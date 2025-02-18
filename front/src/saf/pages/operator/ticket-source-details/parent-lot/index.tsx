@@ -1,6 +1,5 @@
-import Button from "common/components/button"
-import Collapse from "common/components/collapse"
-import { Split } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Collapse } from "common/components/collapse2"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { LotPreview } from "saf/types"
@@ -19,17 +18,12 @@ const ParentLot = ({ parent_lot }: { parent_lot?: LotPreview }) => {
   }
 
   return (
-    <Collapse
-      isOpen={true}
-      variant="info"
-      icon={Split}
-      label={t("Lot initial")}
-    >
+    <Collapse label={t("Lot initial")} defaultExpanded>
       <section>
         <ul>
           <li>
             {parent_lot ? (
-              <Button variant="link" action={showLotDetails}>
+              <Button customPriority="link" onClick={showLotDetails}>
                 {`${t("Lot")} #${parent_lot.carbure_id}`}
               </Button>
             ) : (

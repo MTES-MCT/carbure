@@ -1,12 +1,12 @@
 import useEntity from "common/hooks/entity"
 import { EntityPreview, EntityType, Airport } from "common/types"
 import * as norm from "common/utils/normalizers"
-import Autocomplete from "common/components/autocomplete"
+import Autocomplete from "common/components/autocomplete/autocomplete"
 import Button from "common/components/button"
-import Dialog from "common/components/dialog"
+import { Dialog } from "common/components/dialog2"
 import Form, { useForm } from "common/components/form"
 import { Return, Send } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { TextInput } from "common/components/inputs2"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { formatPeriodFromDate } from "common/utils/formatters"
@@ -85,110 +85,106 @@ export const TicketAssignment = ({
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <h1>
+      <Dialog
+        onClose={onClose}
+        header={
+          <Dialog.Title>
             {t("Affecter le volume CAD n°")}
             {ticketSource?.carbure_id}
-          </h1>
-        </header>
+          </Dialog.Title>
+        }
+        footer={
+          <>
+            <Button
+              loading={assignSafTicket.loading}
+              icon={Send}
+              label={t("Affecter")}
+              variant="primary"
+              submit="assign-ticket"
+            />
 
-        <main>
-          <section>
-            <p>
-              {t(
-                "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume du lot à un client et générer un ticket de Carburant Durable d'Aviation"
-              )}
-            </p>
+            <Button icon={Return} label={t("Retour")} action={onClose} />
+          </>
+        }
+      >
+        <p>
+          {t(
+            "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume du lot à un client et générer un ticket de Carburant Durable d'Aviation"
+          )}
+        </p>
 
-            <Form id="assign-ticket" onSubmit={assignTicket}>
-              <VolumeInput
-                remainingVolume={remainingVolume}
-                onSetMaximumVolume={setMaximumVolume}
-                {...bind("volume")}
-              />
-              <PeriodSelect
-                deliveryPeriod={ticketSource.delivery_period}
-                {...bind("assignment_period")}
-              />
-
-              <Autocomplete
-                required
-                label={t("Client")}
-                getOptions={findSafClient}
-                normalize={norm.normalizeEntityPreview}
-                {...bind("client")}
-              />
-
-              {value.client?.entity_type === EntityType.Operator && (
-                <TextInput //TODO for transfer only
-                  required
-                  label={t("N° du certificat d'acquisition")}
-                  {...bind("agreement_reference")}
-                />
-              )}
-
-              {value.client?.entity_type === EntityType.Airline && (
-                <>
-                  <Autocomplete
-                    required
-                    label={t("Aéroport de réception")}
-                    getOptions={findAirports}
-                    normalize={norm.normalizeAirport}
-                    {...bind("reception_airport")}
-                  />
-
-                  <Select
-                    label={t("Mode d'expédition")}
-                    placeholder={t("Choisissez un mode")}
-                    {...bind("shipping_method")}
-                    options={[
-                      {
-                        value: ShippingMethodEnum.PIPELINE,
-                        label: t("Oléoduc"),
-                      },
-                      { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
-                      { value: ShippingMethodEnum.TRAIN, label: t("Train") },
-                      { value: ShippingMethodEnum.BARGE, label: t("Barge") },
-                    ]}
-                  />
-
-                  <Select
-                    label={t("Type de consommation")}
-                    placeholder={t("Choisissez un type")}
-                    {...bind("consumption_type")}
-                    options={[
-                      {
-                        value: ConsumptionTypeEnum.MAC,
-                        label: t("Mise à consommation mandat FR/EU"),
-                      },
-                      {
-                        value: ConsumptionTypeEnum.MAC_DECLASSEMENT,
-                        label: t(
-                          "Mise à consommation hors mandat (déclassement)"
-                        ),
-                      },
-                    ]}
-                  />
-                </>
-              )}
-
-              <TextInput label={t("Champ libre")} {...bind("free_field")} />
-            </Form>
-          </section>
-        </main>
-
-        <footer>
-          <Button
-            loading={assignSafTicket.loading}
-            icon={Send}
-            label={t("Affecter")}
-            variant="primary"
-            submit="assign-ticket"
+        <Form id="assign-ticket" onSubmit={assignTicket}>
+          <VolumeInput
+            remainingVolume={remainingVolume}
+            onSetMaximumVolume={setMaximumVolume}
+            {...bind("volume")}
+          />
+          <PeriodSelect
+            deliveryPeriod={ticketSource.delivery_period}
+            {...bind("assignment_period")}
           />
 
-          <Button icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
+          <Autocomplete
+            required
+            label={t("Client")}
+            getOptions={findSafClient}
+            normalize={norm.normalizeEntityPreview}
+            {...bind("client")}
+          />
+
+          {value.client?.entity_type === EntityType.Operator && (
+            <TextInput //TODO for transfer only
+              required
+              label={t("N° du certificat d'acquisition")}
+              {...bind("agreement_reference")}
+            />
+          )}
+
+          {value.client?.entity_type === EntityType.Airline && (
+            <>
+              <Autocomplete
+                required
+                label={t("Aéroport de réception")}
+                getOptions={findAirports}
+                normalize={norm.normalizeAirport}
+                {...bind("reception_airport")}
+              />
+
+              <Select
+                label={t("Mode d'expédition")}
+                placeholder={t("Choisissez un mode")}
+                {...bind("shipping_method")}
+                options={[
+                  {
+                    value: ShippingMethodEnum.PIPELINE,
+                    label: t("Oléoduc"),
+                  },
+                  { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
+                  { value: ShippingMethodEnum.TRAIN, label: t("Train") },
+                  { value: ShippingMethodEnum.BARGE, label: t("Barge") },
+                ]}
+              />
+
+              <Select
+                label={t("Type de consommation")}
+                placeholder={t("Choisissez un type")}
+                {...bind("consumption_type")}
+                options={[
+                  {
+                    value: ConsumptionTypeEnum.MAC,
+                    label: t("Mise à consommation mandat FR/EU"),
+                  },
+                  {
+                    value: ConsumptionTypeEnum.MAC_DECLASSEMENT,
+                    label: t("Mise à consommation hors mandat (déclassement)"),
+                  },
+                ]}
+              />
+            </>
+          )}
+
+          <TextInput label={t("Champ libre")} {...bind("free_field")} />
+        </Form>
       </Dialog>
     </Portal>
   )
