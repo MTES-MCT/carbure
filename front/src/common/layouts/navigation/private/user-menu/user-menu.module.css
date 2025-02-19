@@ -8,6 +8,6 @@
 
 .user-menu-item {
   display: flex;
-  align-items: baseline;
+  justify-content: flex-start;
   gap: var(--spacing-1w);
 }
