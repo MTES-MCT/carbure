@@ -10,6 +10,7 @@ import useEntity from "carbure/hooks/entity"
 import { useMemo } from "react"
 import {
   AccountLine,
+  BarChartLine,
   BookLine,
   ChartLine,
   LogoutBoxLine,
@@ -33,6 +34,11 @@ export const UserMenu = () => {
         label: t("Statistiques"),
         path: routes.STATISTICS,
         icon: ChartLine,
+      },
+      {
+        label: t("Statistiques publiques"),
+        path: routes.PUBLIC_STATS,
+        icon: BarChartLine,
       },
       (isIndustry || isPowerOrHeatProducer) && {
         label: t("Annuaire"),
