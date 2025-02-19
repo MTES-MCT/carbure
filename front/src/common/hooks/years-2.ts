@@ -9,6 +9,7 @@ import { useCallback, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { FetchResponseType } from "common/services/api-fetch.types"
 import { useYearsProvider } from "common/providers/years-provider"
+import { useTranslation } from "react-i18next"
 
 const currentYear = new Date().getFullYear()
 
@@ -19,6 +20,7 @@ function useYears(
   const location = useLocation()
   const params = useParams<"year">()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const entity = useEntity()
   const { setSelectedYear, setRoot } = useYearsProvider()
@@ -58,7 +60,10 @@ function useYears(
 
   return {
     loading: years.loading,
-    options: listYears(years.result?.data),
+    options: listYears(years.result?.data).map((year) => ({
+      label: `${t("Année")} ${year}`,
+      value: year,
+    })),
     selected,
     setYear,
   }

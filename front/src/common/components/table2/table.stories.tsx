@@ -128,3 +128,10 @@ export const OneRowSelected: Story = {
     ],
   },
 }
+
+export const WithSelectionText: Story = {
+  ...OneRowSelected,
+  args: {
+    selectionText: "Texte personnalisé",
+  },
+}

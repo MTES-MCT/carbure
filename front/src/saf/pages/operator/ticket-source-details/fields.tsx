@@ -6,8 +6,7 @@ import css from "common/components/form.module.css"
 import { SafTicketSourceDetails } from "saf/pages/operator/types"
 import DurabilityFields from "./parent-lot/durability-fields"
 import { DialogSection } from "saf/components/dialog-section"
-import { TextInput } from "common/components/inputs2"
-import { DateInput } from "common/components/inputs2/date"
+import { TextInput, DateInput } from "common/components/inputs2"
 
 interface TicketSourceFieldsProps {
   ticketSource: SafTicketSourceDetails | undefined

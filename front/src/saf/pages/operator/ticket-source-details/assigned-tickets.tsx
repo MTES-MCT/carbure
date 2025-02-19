@@ -1,4 +1,4 @@
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -41,7 +41,7 @@ const AssignedTickets = ({
         {ticketSource.assigned_tickets.map((ticket) => {
           return (
             <li key={ticket.id}>
-              <Button variant="link" action={() => showTicket(ticket)}>
+              <Button customPriority="link" onClick={() => showTicket(ticket)}>
                 {ticket.client} - {formatNumber(ticket.volume)} L -{" "}
                 {t("Affecté le")} {formatDate(ticket.created_at)}{" "}
               </Button>{" "}

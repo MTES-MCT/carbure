@@ -31,7 +31,7 @@ export type AutocompleteProps<T, V = T> = Trigger &
     sort?: Sorter<T, V>
   }
 
-function Autocomplete<T, V>({
+export function Autocomplete<T, V>({
   loading,
   value,
   options,
