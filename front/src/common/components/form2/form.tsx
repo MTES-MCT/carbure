@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useState } from "react"
 import cl from "clsx"
 import css from "./form.module.css"
-import { TextInputProps } from "../inputs2"
 
 export type FormVariant = "inline" | "columns"
 
@@ -197,7 +196,7 @@ export type Bind<T> = <N extends keyof T>(
 export interface BindProps<T, N extends keyof T> {
   name: N
   value: T[N]
-  state?: TextInputProps["state"]
+  state?: "success" | "error" | "default"
   checked: boolean | undefined
   disabled: boolean | undefined
   onChange: (value: T[N]) => void

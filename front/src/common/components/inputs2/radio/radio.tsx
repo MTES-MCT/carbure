@@ -3,35 +3,46 @@ import {
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons"
 import { ChangeEvent } from "react"
+import { Label, LabelProps } from "../base-input"
 
-// Simplify the u
-type OptionsProps = Omit<
+type RadioValueType =
+  RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
+// Simplify the usage of the RadioButtons component
+type OptionsProps<V extends RadioValueType> = Omit<
   RadioButtonsProps["options"][number],
   "nativeInputProps"
+> &
+  Omit<LabelProps, "required"> & {
+    value: V
+  }
+
+export type RadioGroupProps<V extends RadioValueType> = Omit<
+  RadioButtonsProps,
+  "options"
 > & {
-  value: RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
+  options: OptionsProps<V>[]
+  value?: V
+  onChange: (value: V) => void
+  required?: boolean
 }
 
-export type RadioGroupProps = Omit<RadioButtonsProps, "options"> & {
-  options: OptionsProps[]
-  value?: string | number
-  onChange: (value: string) => void
-}
-
-export const RadioGroup = ({
+export const RadioGroup = <V extends RadioValueType>({
   options,
   onChange,
+  required,
   ...props
-}: RadioGroupProps) => {
+}: RadioGroupProps<V>) => {
   const optionsWithNativeInputProps = options.map((option) => ({
     ...option,
+    label: <Label {...option} />,
     nativeInputProps: {
       value: option.value,
       onChange: (e: ChangeEvent<HTMLInputElement>) =>
-        onChange?.(e.target.value),
+        onChange?.(e.target.value as V),
       ...(Object.hasOwn(props, "value") // Handle uncontrolled value
         ? { checked: option.value === props.value }
         : {}),
+      required,
     },
   }))
 
