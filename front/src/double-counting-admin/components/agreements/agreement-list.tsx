@@ -4,7 +4,7 @@ import HashRoute from "common/components/hash-route"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
-} from "common/hooks/query-builder"
+} from "common/hooks/query-builder-2"
 
 import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
@@ -20,13 +20,13 @@ import * as api from "../../api"
 import {
   DoubleCountingAgreementOverview,
   DoubleCountingAgreementsSnapshot,
-  AgreementFilter,
 } from "../../../double-counting/types"
 import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import AgreementStatusTag from "./agreement-status"
 import { compact } from "common/utils/collection"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { AgreementFilters } from "../../filters"
+import { AgreementFilter, AgreementOrder } from "double-counting-admin/types"
 
 const AgreementList = ({
   snapshot = defaultCount,
@@ -42,11 +42,15 @@ const AgreementList = ({
   const [order, setOrder] = useState<Order | undefined>(undefined)
   const currentYear = new Date().getFullYear()
 
-  const [state, actions] = useCBQueryParamsStore(entity, currentYear, "")
-  const query = useCBQueryBuilder(state)
+  const [state, actions] = useCBQueryParamsStore<string, undefined>(
+    entity,
+    currentYear,
+    tab
+  )
+  const query = useCBQueryBuilder<AgreementOrder[], string, undefined>(state)
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
-    params: [query, order?.column, order?.direction],
+    params: [query],
   })
 
   const columns: Column<DoubleCountingAgreementOverview>[] = compact([
@@ -93,7 +97,7 @@ const AgreementList = ({
   const agreements = agreementsResponse.result?.data
 
   const getAgrementFilter = (filter: AgreementFilter) => {
-    return api.getAgrementFilters(filter, query, tab)
+    return api.getAgrementFilters(filter, query)
   }
 
   return (

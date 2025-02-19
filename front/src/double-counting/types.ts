@@ -1,11 +1,6 @@
 import { DoubleCountingStatus, DoubleCountingAgreementStatus } from "api-schema"
 import { Biofuel, Feedstock } from "carbure/types"
 import { apiTypes } from "common/services/api-fetch.types"
-import { CBQueryParams } from "common/hooks/query-builder"
-
-// import {
-//   CBQueryParams
-// } from "common/hooks/query-builder-2"
 
 export { DoubleCountingStatus }
 export { DoubleCountingAgreementStatus as AgreementStatus }
@@ -96,34 +91,6 @@ export interface DoubleCountingAgreementsOverview {
   active: DoubleCountingAgreementOverview[]
   incoming: DoubleCountingAgreementOverview[]
   expired: DoubleCountingAgreementOverview[]
-}
-
-export type SafQueryType = "assigned" | "received"
-
-// export interface SafStates
-//   extends CBQueryStates<DoubleCountingAgreementStatus, SafQueryType> {
-//   filters: SafFilterSelection
-//   snapshot?: DoubleCountingAgreementsSnapshot
-// }
-// export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
-
-// export interface SafQuery
-//   extends CBQueryParams<SafColumsOrder[], DoubleCountingAgreementStatus, SafQueryType> {
-//   [SafFilter.Feedstocks]?: string[]
-//   [SafFilter.Periods]?: number[]
-//   [SafFilter.Clients]?: string[]
-// }
-
-export type AgreementListQuery = CBQueryParams
-
-export type AgreementFilterSelection = Partial<
-  Record<AgreementFilter, string[]>
->
-
-export enum AgreementFilter {
-  Certificate_id = "certificate_id",
-  Producers = "producers",
-  ProductionSites = "production_sites",
 }
 
 export type DoubleCountingAgreementOverview =
