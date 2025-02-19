@@ -1,13 +1,130 @@
-.checkbox-without-label {
-  width: 24px;
-  height: 24px;
+.checkbox[type="checkbox"]:checked {
+  background-color: var(--background-active-blue-france);
+  background-image: radial-gradient(
+      at 5px 4px,
+      transparent 4px,
+      var(--border-active-blue-france) 4px,
+      var(--border-active-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-active-blue-france),
+      var(--border-active-blue-france)
+    ),
+    radial-gradient(
+      at calc(100% - 5px) 4px,
+      transparent 4px,
+      var(--border-active-blue-france) 4px,
+      var(--border-active-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-active-blue-france),
+      var(--border-active-blue-france)
+    ),
+    radial-gradient(
+      at calc(100% - 5px) calc(100% - 4px),
+      transparent 4px,
+      var(--border-active-blue-france) 4px,
+      var(--border-active-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-active-blue-france),
+      var(--border-active-blue-france)
+    ),
+    radial-gradient(
+      at 5px calc(100% - 4px),
+      transparent 4px,
+      var(--border-active-blue-france) 4px,
+      var(--border-active-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-active-blue-france),
+      var(--border-active-blue-france)
+    ),
+    var(--data-uri-svg);
+  --data-uri-svg: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f5f5fe' d='M10 15.17l9.2-9.2 1.4 1.42L10 18l-6.36-6.36 1.4-1.42z'/></svg>");
 }
 
-.checkbox-without-label--small {
-  width: 16px;
-  height: 16px;
+.checkbox[type="checkbox"] {
+  --checkbox-size: 24px;
+  content: "";
+  appearance: none;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  --data-uri-svg: none;
+  background-size:
+    0.25rem 0.25rem,
+    calc(100% - 0.25rem) 1px,
+    0.25rem 0.25rem,
+    1px calc(100% - 0.5rem),
+    0.25rem 0.25rem,
+    calc(100% - 0.5rem) 1px,
+    0.25rem 0.25rem,
+    1px calc(100% - 0.5rem),
+    1rem;
+  background-position:
+    0 0,
+    0.25rem 0,
+    100% 0,
+    0 0.25rem,
+    100% 100%,
+    calc(100% - 0.25rem) 100%,
+    0 100%,
+    100% 0.25rem,
+    center;
+  background-repeat: no-repeat;
+  background-image: radial-gradient(
+      at 5px 4px,
+      transparent 4px,
+      var(--border-action-high-blue-france) 4px,
+      var(--border-action-high-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-action-high-blue-france),
+      var(--border-action-high-blue-france)
+    ),
+    radial-gradient(
+      at calc(100% - 5px) 4px,
+      transparent 4px,
+      var(--border-action-high-blue-france) 4px,
+      var(--border-action-high-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-action-high-blue-france),
+      var(--border-action-high-blue-france)
+    ),
+    radial-gradient(
+      at calc(100% - 5px) calc(100% - 4px),
+      transparent 4px,
+      var(--border-action-high-blue-france) 4px,
+      var(--border-action-high-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-action-high-blue-france),
+      var(--border-action-high-blue-france)
+    ),
+    radial-gradient(
+      at 5px calc(100% - 4px),
+      transparent 4px,
+      var(--border-action-high-blue-france) 4px,
+      var(--border-action-high-blue-france) 5px,
+      transparent 6px
+    ),
+    linear-gradient(
+      var(--border-action-high-blue-france),
+      var(--border-action-high-blue-france)
+    ),
+    var(--data-uri-svg);
+
+  border-radius: 0.25rem;
 }
 
-.checkbox-without-label__no-margin::before {
-  margin-top: 0 !important;
+.checkbox--small[type="checkbox"] {
+  --checkbox-size: 16px;
 }

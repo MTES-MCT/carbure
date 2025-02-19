@@ -93,11 +93,12 @@ export function Table<T>({
                   captive
                   value={selected.length > 0}
                   onChange={() => onSelect?.([])}
-                  label={t("{{count}} lignes sélectionnées", {
-                    count: selected.length,
-                  })}
                   small
+                  style={{ marginRight: "8px" }}
                 />
+                {t("{{count}} lignes sélectionnées", {
+                  count: selected.length,
+                })}
               </span>
               {topActions?.map((action, i) => (
                 <div
@@ -215,7 +216,10 @@ export function selectionColumn<T, V>(
       <Checkbox
         captive
         value={selection.isSelected(identify(item))}
-        onChange={() => selection.onSelect(identify(item))}
+        onChange={() => {
+          console.log("on change", item)
+          selection.onSelect(identify(item))
+        }}
         small
       />
     ),

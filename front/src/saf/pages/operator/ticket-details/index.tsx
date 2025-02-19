@@ -1,8 +1,7 @@
 import useEntity from "common/hooks/entity"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross } from "common/components/icons"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -53,10 +52,8 @@ export const OperatorTicketDetails = ({
     portal((close) => (
       <CancelAssignment
         ticket={ticket!}
-        onClose={() => {
-          close()
-          closeDialog()
-        }}
+        onCancel={closeDialog}
+        onClose={close}
       />
     ))
   }
@@ -83,74 +80,76 @@ export const OperatorTicketDetails = ({
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
-        <header>
-          <TicketTag big status={ticket?.status} />
-          <h1>
+      <Dialog
+        onClose={closeDialog}
+        header={
+          <Dialog.Title>
+            <TicketTag status={ticket?.status} />
+
             {t("Ticket n°")}
             {ticket?.carbure_id ?? "..."}
-          </h1>
-        </header>
-
-        <main>
-          <section>
-            <TicketFields ticket={ticket} />
-          </section>
-          <ClientComment ticket={ticket} />
-
-          {ticket?.supplier === entity.name && (
-            <LinkedTicketSource
-              ticket_source={ticket.parent_ticket_source}
-              title={t("Volume parent")}
-            />
-          )}
-        </main>
-
-        <footer>
-          {ticket?.status === SafTicketStatus.PENDING &&
-            ticket?.client === entity.name && (
-              <>
-                <Button
-                  icon={Check}
-                  label={t("Accepter")}
-                  variant="success"
-                  action={showAcceptModal}
-                  disabled={!canUpdateTicket}
-                />
-                <Button
-                  icon={Cross}
-                  label={t("Refuser")}
-                  variant="danger"
-                  action={showRejectModal}
-                  disabled={!canUpdateTicket}
-                />
-              </>
-            )}
-
-          {ticket?.client !== entity.name &&
-            ticket?.status &&
-            [SafTicketStatus.PENDING, SafTicketStatus.REJECTED].includes(
-              ticket?.status
-            ) && (
-              <Button
-                icon={Cross}
-                label={t("Annuler l'affectation")}
-                variant="danger"
-                action={showCancelModal}
-                disabled={!canUpdateTicket}
+          </Dialog.Title>
+        }
+        footer={
+          <>
+            {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
+              <NavigationButtons
+                limit={limit}
+                total={total ?? 0}
+                fetchIdsForPage={fetchIdsForPage}
+                baseIdsList={baseIdsList}
               />
             )}
-          {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
-            <NavigationButtons
-              limit={limit}
-              total={total ?? 0}
-              fetchIdsForPage={fetchIdsForPage}
-              baseIdsList={baseIdsList}
-              closeAction={closeDialog}
-            />
-          )}
-        </footer>
+            {ticket?.status === SafTicketStatus.PENDING &&
+              ticket?.client === entity.name && (
+                <>
+                  <Button
+                    iconId="ri-check-line"
+                    customPriority="success"
+                    onClick={showAcceptModal}
+                    disabled={!canUpdateTicket}
+                  >
+                    {t("Accepter")}
+                  </Button>
+                  <Button
+                    iconId="ri-close-line"
+                    customPriority="danger"
+                    onClick={showRejectModal}
+                    disabled={!canUpdateTicket}
+                  >
+                    {t("Refuser")}
+                  </Button>
+                </>
+              )}
 
+            {ticket?.client !== entity.name &&
+              ticket?.status &&
+              [SafTicketStatus.PENDING, SafTicketStatus.REJECTED].includes(
+                ticket?.status
+              ) && (
+                <Button
+                  iconId="ri-close-line"
+                  customPriority="danger"
+                  onClick={showCancelModal}
+                  disabled={!canUpdateTicket}
+                >
+                  {t("Annuler l'affectation")}
+                </Button>
+              )}
+          </>
+        }
+      >
+        <section>
+          <TicketFields ticket={ticket} />
+        </section>
+        <ClientComment ticket={ticket} />
+
+        {ticket?.supplier === entity.name && (
+          <LinkedTicketSource
+            ticket_source={ticket.parent_ticket_source}
+            title={t("Volume parent")}
+          />
+        )}
         {ticketResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>

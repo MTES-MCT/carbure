@@ -16,3 +16,9 @@
   background-color: var(--border-default-grey);
   margin: var(--spacing-2w) 0;
 }
+
+.dialog-section__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2w);
+}

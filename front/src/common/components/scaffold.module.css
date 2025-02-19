@@ -142,6 +142,10 @@ section.actionbar {
   flex-grow: 1;
 }
 
+.column--gap-md {
+  gap: var(--spacing-2w);
+}
+
 .row {
   display: flex;
   white-space: pre-wrap;

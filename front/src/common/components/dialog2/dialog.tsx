@@ -64,8 +64,16 @@ export const Dialog = ({
   </div>
 )
 
-const DialogTitle = (props: Omit<TitleProps, "is" | "as">) => (
-  <Title is="h2" as="h5" className={css["dialog__title"]} {...props} />
+type DialogTitleProps = Omit<TitleProps, "is" | "as"> & {
+  wrap?: boolean // If true, wrap the title on multiple lines
+}
+const DialogTitle = ({ wrap = false, ...props }: DialogTitleProps) => (
+  <Title
+    is="h2"
+    as="h5"
+    className={cl(css["dialog__title"], !wrap && css["dialog__title--nowrap"])}
+    {...props}
+  />
 )
 
 const DialogDescription = <T extends React.ElementType>(

@@ -35,7 +35,11 @@ export const Input = ({
     label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
   }) => {
   if (readOnly) {
-    return <Field label={label}>{nativeInputProps?.value}</Field>
+    return (
+      <Field label={label} readOnly={readOnly}>
+        {nativeInputProps?.value}
+      </Field>
+    )
   }
   return (
     <BaseInput

@@ -82,6 +82,10 @@
   gap: var(--spacing-1w);
 }
 
+.dialog__title--nowrap {
+  white-space: nowrap;
+}
+
 .dialog__description {
   color: var(--light-text-default-grey);
 }
