@@ -306,11 +306,17 @@ CSP_DEFAULT_SRC = (
     "www.data.gouv.fr",
     "https://*.tile.openstreetmap.org/",
     "sentry.incubateur.net",
+    "https://tally.so",
+    "contact.carbure.beta.gouv.fr",
 )
 
-CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + ("https://tally.so",)
+CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
+    "'sha256-xVQ4mcypV0CvOtZpQgVcKpcoNvdUkR9BrwZBrtBbU+w='",
+    "'sha256-l0hQskZAA39ZNB1SAbclU+zKPtFeMvhhkjKEgiL2HI0='",
+    "'sha256-/kXZODfqoc2myS1eI6wr0HH8lUt+vRhW8H/oL+YJcMg='",
+)
 
-CSP_FRAME_SRC = CSP_DEFAULT_SRC + ("https://tally.so",)
+CSP_FRAME_SRC = CSP_DEFAULT_SRC
 
 CSP_IMG_SRC = CSP_DEFAULT_SRC + ("https://*.tile.openstreetmap.org/",)
 

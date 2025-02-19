@@ -3,10 +3,11 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { Text } from "common/components/text"
 import { useState } from "react"
-import { Trans } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import useLocalStorage from "common/hooks/storage"
 
 export const NewNavigationDialog = () => {
+  const { t } = useTranslation()
   const [hasSeen, setHasSeen] = useLocalStorage(
     "carbure-new-navigation-dialog",
     false
@@ -55,29 +56,29 @@ export const NewNavigationDialog = () => {
         </Text>
         <br />
         <Text>
-          <Trans components={{ b: <b /> }}>
-            <b>Comment changer d'entité ?</b> Rendez-vous en haut à gauche de la
-            barre latérale de navigation, ouvrez le menu déroulant puis cliquez
-            sur ajouter une entité.
-          </Trans>
+          <Trans
+            components={{ bold: <b /> }}
+            defaults="<bold>Comment changer d'entité ?</bold> Rendez-vous en haut à gauche de la barre latérale de navigation, ouvrez le menu déroulant puis cliquez sur ajouter une entité."
+            t={t}
+          />
         </Text>
         <Text>
-          <Trans components={{ b: <b /> }}>
-            <b>Où sont mes paramètres ?</b> Ils sont désormais situés en bas à
-            gauche de la page.
-          </Trans>
+          <Trans
+            components={{ bold: <b /> }}
+            defaults="<bold>Où sont mes paramètres ?</bold> Ils sont désormais situés en bas à gauche de la page."
+          />
         </Text>
         <Text>
-          <Trans components={{ b: <b /> }}>
-            <b>Vous avez besoin d'aide ?</b> Rendez-vous dans la rubrique Aide
-            en haut à droite pour compléter notre formulaire de contact.
-          </Trans>
+          <Trans
+            components={{ bold: <b /> }}
+            defaults="<bold>Vous avez besoin d'aide ?</bold> Rendez-vous dans la rubrique Aide en haut à droite pour compléter notre formulaire de contact."
+          />
         </Text>
         <Text>
-          <Trans components={{ b: <b /> }}>
-            <b>Où puis-je trouver mes statistiques et l'annuaire ?</b> Je clique
-            sur mon compte en haut à droite.
-          </Trans>
+          <Trans
+            components={{ bold: <b /> }}
+            defaults="<bold>Où puis-je trouver mes statistiques et l'annuaire ?</bold> Je clique sur mon compte en haut à droite."
+          />
         </Text>
       </Dialog>
     </Portal>

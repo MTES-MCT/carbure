@@ -31,6 +31,7 @@ import { ContactPage } from "contact"
 import { YearsProvider } from "common/providers/years-provider"
 import { MaterialAccounting } from "accounting"
 import { NewNavigationDialog } from "./components/new-navigation-dialog"
+import Dashboard from "dashboard"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -224,6 +225,7 @@ const Org = () => {
           />
         </>
       )}
+      {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
       {isAuditor && (
         <Route path="*" element={<Navigate replace to="controls" />} />
       )}

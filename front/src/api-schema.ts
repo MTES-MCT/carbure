@@ -1778,7 +1778,7 @@ export interface components {
       agreements_active: number
       agreements_expired: number
     }
-    ApprouveDoubleCountingRequest: {
+    ApproveDoubleCountingRequest: {
       dca_id: number
     }
     Balance: {
@@ -4002,9 +4002,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ApprouveDoubleCountingRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["ApprouveDoubleCountingRequest"]
-        "multipart/form-data": components["schemas"]["ApprouveDoubleCountingRequest"]
+        "application/json": components["schemas"]["ApproveDoubleCountingRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApproveDoubleCountingRequest"]
+        "multipart/form-data": components["schemas"]["ApproveDoubleCountingRequest"]
       }
     }
     responses: {

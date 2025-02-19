@@ -8,6 +8,7 @@ import {
   ExtAdminPagesEnum as ExternalAdminPages,
   CarbureNotificationTypeEnum as NotificationType,
   OwnershipTypeEnum as OwnershipType,
+  PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
@@ -75,3 +76,5 @@ export { ExternalAdminPages }
 export { NotificationType }
 
 export { OwnershipType }
+
+export { CategoryEnum }

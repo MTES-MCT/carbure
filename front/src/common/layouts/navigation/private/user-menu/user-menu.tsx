@@ -10,35 +10,48 @@ import useEntity from "carbure/hooks/entity"
 import { useMemo } from "react"
 import {
   AccountLine,
+  BarChartLine,
   BookLine,
   ChartLine,
   LogoutBoxLine,
 } from "common/components/icon"
+import { useTranslation } from "react-i18next"
 
 export const UserMenu = () => {
   const { user, getName } = useUser()
-  const { isIndustry, isPowerOrHeatProducer, isOperator, isProducer } =
-    useEntity()
+  const { t } = useTranslation()
+  const {
+    isIndustry,
+    isPowerOrHeatProducer,
+    isOperator,
+    isProducer,
+    isAirline,
+  } = useEntity()
   const routes = useRoutes()
   const items = useMemo(() => {
     const compactedItems = compact([
       {
-        label: "Mon compte",
+        label: t("Mon compte"),
         path: routes.MY_ACCOUNT.INDEX,
         icon: AccountLine,
       },
       (isOperator || isProducer) && {
-        label: "Statistiques",
+        label: t("Statistiques"),
         path: routes.STATISTICS,
         icon: ChartLine,
       },
-      (isIndustry || isPowerOrHeatProducer) && {
-        label: "Annuaire",
+      {
+        label: t("Statistiques publiques"),
+        path: routes.PUBLIC_STATS,
+        icon: BarChartLine,
+      },
+      (isIndustry || isPowerOrHeatProducer || isAirline) && {
+        label: t("Annuaire"),
         path: routes.REGISTRY,
         icon: BookLine,
       },
       {
-        label: "Déconnexion",
+        label: t("Déconnexion"),
         path: routes.LOGOUT,
         icon: LogoutBoxLine,
       },
@@ -49,7 +62,15 @@ export const UserMenu = () => {
       ...item,
       borderBottom: index === compactedItems.length - 2,
     }))
-  }, [isIndustry, isOperator, isPowerOrHeatProducer, isProducer, routes])
+  }, [
+    isIndustry,
+    isOperator,
+    isPowerOrHeatProducer,
+    isProducer,
+    routes,
+    isAirline,
+    t,
+  ])
 
   return (
     <SimpleMenu
@@ -72,21 +93,22 @@ export const UserMenu = () => {
               {user?.email}
             </Text>
           </div>
-          {items.map(({ icon: Icon, ...item }) => (
-            <ListItem
-              key={item.path}
-              label={item.label}
-              value={item.label}
-              hoverable
-              borderBottom={item.borderBottom}
-              onClick={close}
-            >
-              <NavLink to={item.path} className={css["user-menu-item"]}>
-                <Icon size="sm" />
-                {item.label}
+          {items.map(({ icon: Icon, ...item }) => {
+            return (
+              <NavLink to={item.path} onClick={close} key={item.path}>
+                <ListItem
+                  label={item.label}
+                  value={item.label}
+                  hoverable
+                  borderBottom={item.borderBottom}
+                  className={css["user-menu-item"]}
+                >
+                  <Icon size="sm" />
+                  {item.label}
+                </ListItem>
               </NavLink>
-            </ListItem>
-          ))}
+            )
+          })}
         </>
       )}
     </SimpleMenu>

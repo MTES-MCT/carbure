@@ -43,7 +43,7 @@ def generate_sample(request):
     if application_audits.filter(status=ElecAuditSample.AUDITED).count() > 0:
         return ErrorResponse(GenerateSampleErrors.ALREADY_AUDITED)
 
-    charge_points = ChargePointRepository.get_annotated_application_charge_points(application.cpo, application)
+    charge_points = ChargePointRepository.get_application_charge_points(application.cpo, application)
     charge_point_sample = extract_audit_sample(charge_points, percentage)
 
     new_audit = ElecAuditSample.objects.create(

@@ -5,6 +5,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
+from core.models import Entity
 from doublecount.helpers import get_quotas
 from doublecount.models import DoubleCountingApplication
 from doublecount.serializers import DoubleCountingApplicationPartialSerializer
@@ -32,6 +33,11 @@ class ListActionMixin(ListModelMixin):
     )
     def list(self, request, *args, **kwargs):
         entity_id = self.request.query_params.get("entity_id")
+        company_id = self.request.query_params.get("company_id")
+        entity = Entity.objects.get(id=entity_id)
+        if entity.entity_type == Entity.ADMIN:
+            entity_id = company_id
+
         producer_applications = DoubleCountingApplication.objects.filter(producer_id=entity_id)
         if len(producer_applications) == 0:
             return Response([])

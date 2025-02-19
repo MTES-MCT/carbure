@@ -6,7 +6,13 @@ import {
   productionSite,
   trader,
 } from "carbure/__test__/data"
-import { Airport, Biofuel, Country, Feedstock } from "carbure/types"
+import {
+  Airport,
+  Biofuel,
+  CategoryEnum,
+  Country,
+  Feedstock,
+} from "carbure/types"
 import {
   LotPreview,
   SafOperatorSnapshot,
@@ -22,10 +28,7 @@ import {
   SafTicketSourceDetails,
   SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
-import {
-  PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum,
-  SiteTypeEnum,
-} from "api-schema"
+import { SiteTypeEnum } from "api-schema"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,

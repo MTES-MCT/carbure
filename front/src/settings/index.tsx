@@ -81,7 +81,7 @@ const Settings = () => {
         {hasCertificates && <Certificates />}
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
-        {isProducer && <DoubleCountingSettings />}
+        {isProducer && <DoubleCountingSettings entity={entity} />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>
       <HashRoute

@@ -714,13 +714,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+              $ref: "#/components/schemas/ApproveDoubleCountingRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+              $ref: "#/components/schemas/ApproveDoubleCountingRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/ApprouveDoubleCountingRequest"
+              $ref: "#/components/schemas/ApproveDoubleCountingRequest"
         required: true
       security:
         - cookieAuth: []
@@ -5826,7 +5826,7 @@ components:
         - agreements_incoming
         - applications_pending
         - applications_rejected
-    ApprouveDoubleCountingRequest:
+    ApproveDoubleCountingRequest:
       type: object
       properties:
         dca_id:

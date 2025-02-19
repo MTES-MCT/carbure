@@ -7,9 +7,13 @@ import { CarbureFooter } from "./footer"
 import { PrivateNavigationProvider } from "./private/private-navigation.context"
 import { DevBanner } from "common/components/dev-banner"
 import css from "./navigation-layout.module.css"
+import { useLocation } from "react-router-dom"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const NavigationLayout = ({ children }: PropsWithChildren) => {
   const user = useUser()
+  const location = useLocation()
+  const isContact = location.pathname.includes(ROUTE_URLS.CONTACT)
   return (
     <div
       className={cl(
@@ -27,7 +31,7 @@ export const NavigationLayout = ({ children }: PropsWithChildren) => {
         <>
           <PublicNavigation />
           {children}
-          <CarbureFooter />
+          {!isContact && <CarbureFooter />}
         </>
       )}
     </div>

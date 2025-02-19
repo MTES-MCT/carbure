@@ -32,8 +32,10 @@ export const TicketAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const { value, bind, setField, setFieldError } =
-    useForm<AssignmentForm>(defaultAssignment)
+  const { value, bind, setField, setFieldError } = useForm<AssignmentForm>({
+    ...defaultAssignment,
+    assignment_period: ticketSource.delivery_period,
+  })
 
   const remainingVolume =
     ticketSource.total_volume - ticketSource.assigned_volume
@@ -60,9 +62,9 @@ export const TicketAssignment = ({
       value.client!,
       value.agreement_reference,
       value.free_field,
-      value.reception_airport!.id,
-      value.shipping_method!,
-      value.consumption_type!
+      value.reception_airport?.id,
+      value.shipping_method,
+      value.consumption_type
     )
 
     onTicketAssigned(value.volume!, value.client!.name)
