@@ -1503,6 +1503,179 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/operations/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve a list of operations with optional filtering and pagination. */
+    get: operations["list_operations"]
+    put?: never
+    /** @description Create a new operation. */
+    post: operations["create_operation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve one specific operation. */
+    get: operations["get_operation"]
+    put?: never
+    post?: never
+    /** @description Delete an operation. Only allowed for certain types and statuses. */
+    delete: operations["delete_operation"]
+    options?: never
+    head?: never
+    /** @description Update a part of operation. */
+    patch: operations["update_operation"]
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/accept/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Set status operation to ACCEPTED */
+    post: operations["accept_operation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/reject/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Set status operation to REJECTED */
+    post: operations["reject_operation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/balance/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve balances grouped by mp category / biofuel or by sector */
+    get: operations["list_balances"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/balance/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve content of a specific filter */
+    get: operations["filter_balances"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve content of a specific filter */
+    get: operations["filter_operations"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/simulate/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Simulate a blending operation */
+    post: operations["simulate"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/simulate/min_max/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Get bounds for blending operation */
+    post: operations["simulation_bounds"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/teneur/validate/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Set teneur operations to ACCEPTED */
+    post: operations["validate_teneur"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/user/": {
     parameters: {
       query?: never
@@ -1605,8 +1778,28 @@ export interface components {
       agreements_active: number
       agreements_expired: number
     }
-    ApprouveDoubleCountingRequest: {
+    ApproveDoubleCountingRequest: {
       dca_id: number
+    }
+    Balance: {
+      sector: components["schemas"]["SectorEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel?: string
+      /** Format: double */
+      initial_balance?: number
+      /** Format: double */
+      readonly available_balance: number
+      /** Format: double */
+      readonly final_balance: number
+      quantity: {
+        [key: string]: number
+      }
+      /** Format: double */
+      teneur?: number
+      /** Format: double */
+      yearly_teneur?: number
+      pending: number
+      unit?: string
     }
     Biofuel: {
       name: string
@@ -1699,21 +1892,45 @@ export interface components {
       dest: components["schemas"]["Entity"]
       /** Format: date-time */
       readonly datetime: string
-      type: components["schemas"]["TypeEnum"]
+      type: components["schemas"]["CarbureNotificationTypeEnum"]
       acked?: boolean
       send_by_email?: boolean
       email_sent?: boolean
       meta?: unknown
     }
     /**
+     * @description * `CORRECTION_REQUEST` - CORRECTION_REQUEST
+     *     * `CORRECTION_DONE` - CORRECTION_DONE
+     *     * `LOTS_REJECTED` - LOTS_REJECTED
+     *     * `LOTS_RECEIVED` - LOTS_RECEIVED
+     *     * `LOTS_RECALLED` - LOTS_RECALLED
+     *     * `CERTIFICATE_EXPIRED` - CERTIFICATE_EXPIRED
+     *     * `CERTIFICATE_REJECTED` - CERTIFICATE_REJECTED
+     *     * `DECLARATION_VALIDATED` - DECLARATION_VALIDATED
+     *     * `DECLARATION_CANCELLED` - DECLARATION_CANCELLED
+     *     * `METER_READINGS_APP_STARTED` - METER_READINGS_APP_STARTED
+     *     * `METER_READINGS_APP_ENDING_SOON` - METER_READINGS_APP_ENDING_SOON
+     *     * `DECLARATION_REMINDER` - DECLARATION_REMINDER
+     *     * `SAF_TICKET_REJECTED` - SAF_TICKET_REJECTED
+     *     * `SAF_TICKET_ACCEPTED` - SAF_TICKET_ACCEPTED
+     *     * `SAF_TICKET_RECEIVED` - SAF_TICKET_RECEIVED
+     *     * `LOTS_UPDATED_BY_ADMIN` - LOTS_UPDATED_BY_ADMIN
+     *     * `LOTS_DELETED_BY_ADMIN` - LOTS_DELETED_BY_ADMIN
+     *     * `ELEC_TRANSFER_CERTIFICATE` - ELEC_TRANSFER_CERTIFICATE
+     * @enum {string}
+     */
+    CarbureNotificationTypeEnum: CarbureNotificationTypeEnum
+    /**
      * @description * `CONV` - Conventionnel
      *     * `ANN-IX-A` - ANNEXE IX-A
      *     * `ANN-IX-B` - ANNEXE IX-B
      *     * `TALLOL` - Tallol
      *     * `OTHER` - Autre
+     *     * `EP2AM` - EP2AM
+     *     * `AM` - AM
      * @enum {string}
      */
-    CategoryEnum: CategoryEnum
+    CategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     /**
      * @description * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
      *     * `ISCC` - ISCC
@@ -1823,6 +2040,17 @@ export interface components {
       has_saf?: boolean
       has_elec?: boolean
     }
+    /**
+     * @description * `CONV` - Conventionnel
+     *     * `ANN-IX-A` - ANNEXE IX-A
+     *     * `ANN-IX-B` - ANNEXE IX-B
+     *     * `TALLOL` - Tallol
+     *     * `OTHER` - Autre
+     *     * `EP2AM` - EP2AM
+     *     * `AM` - AM
+     * @enum {string}
+     */
+    CustomsCategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     DeleteCertificateRequest: {
       certificate_id: string
       certificate_type: string
@@ -2353,6 +2581,13 @@ export interface components {
       email: string
       role: string
     }
+    LotRequest: {
+      id: number
+      /** Format: double */
+      volume: number
+      /** Format: double */
+      emission_rate_per_mj: number
+    }
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -2377,6 +2612,66 @@ export interface components {
     NotificationRequest: {
       notification_ids: number[]
     }
+    Operation: {
+      readonly id: number
+      readonly type: string
+      status?: components["schemas"]["StatusD22Enum"]
+      readonly sector: string
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      readonly biofuel: string
+      credited_entity: components["schemas"]["TiruertEntity"]
+      debited_entity: components["schemas"]["TiruertEntity"]
+      from_depot: components["schemas"]["TiruertDepot"]
+      to_depot: components["schemas"]["TiruertDepot"]
+      export_country?: number | null
+      /** Format: date-time */
+      readonly created_at: string
+      /** Format: date */
+      validation_date?: string | null
+      /** Format: double */
+      readonly quantity: number
+      /** Format: double */
+      readonly avoided_emissions: number
+      readonly unit: string
+      details?: components["schemas"]["OperationDetail"][]
+    }
+    OperationDetail: {
+      lot: number
+      /** Format: double */
+      volume?: number
+      /** Format: double */
+      emission_rate_per_mj?: number
+    }
+    OperationInputRequest: {
+      type: components["schemas"]["TypeDefEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel: number | null
+      credited_entity?: number | null
+      debited_entity: number | null
+      from_depot?: number | null
+      to_depot?: number | null
+      export_country?: number | null
+      lots: components["schemas"]["LotRequest"][]
+    }
+    OperationList: {
+      readonly id: number
+      readonly type: string
+      status?: components["schemas"]["StatusD22Enum"]
+      readonly sector: string
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      readonly biofuel: string
+      credited_entity: components["schemas"]["TiruertEntity"]
+      debited_entity: components["schemas"]["TiruertEntity"]
+      from_depot: components["schemas"]["TiruertDepot"]
+      to_depot: components["schemas"]["TiruertDepot"]
+      export_country?: number | null
+      /** Format: date-time */
+      readonly created_at: string
+      /** Format: double */
+      readonly quantity: number
+      readonly unit: string
+      details?: components["schemas"]["OperationDetail"][]
+    }
     OtpResponse: {
       valid_until: string
     }
@@ -2387,6 +2682,12 @@ export interface components {
      * @enum {string}
      */
     OwnershipTypeEnum: OwnershipTypeEnum
+    PaginatedBalance: {
+      count: number
+      next: string | null
+      previous: string | null
+      results: components["schemas"]["Balance"][]
+    }
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -2401,6 +2702,21 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["EntityPreview"][]
+    }
+    PaginatedOperationListList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["OperationList"][]
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -2431,6 +2747,16 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
+    }
+    PatchedOperationUpdateRequest: {
+      type?: components["schemas"]["TypeDefEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      biofuel?: number | null
+      credited_entity?: number | null
+      debited_entity?: number | null
+      from_depot?: number | null
+      to_depot?: number | null
+      export_country?: number | null
     }
     Pays: {
       code_pays: string
@@ -2554,6 +2880,17 @@ export interface components {
      * @enum {string}
      */
     RoleEnum: RoleEnum
+    SafBiofuel: {
+      name: string
+      name_en: string
+      code: string
+      /** Format: double */
+      pci_kg?: number
+      /** Format: double */
+      pci_litre?: number
+      /** Format: double */
+      masse_volumique?: number
+    }
     SafTicket:
       | components["schemas"]["SafTicketBase"]
       | components["schemas"]["SafTicketAirline"]
@@ -2614,7 +2951,7 @@ export interface components {
       /** Format: double */
       volume: number
       readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly biofuel: components["schemas"]["SafBiofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
@@ -2668,7 +3005,7 @@ export interface components {
       /** Format: double */
       volume: number
       readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly biofuel: components["schemas"]["SafBiofuel"]
       readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
@@ -2833,6 +3170,13 @@ export interface components {
     SeachCompanyRequest: {
       registration_id: string
     }
+    /**
+     * @description * `ESSENCE` - ESSENCE
+     *     * `DIESEL` - DIESEL
+     *     * `SAF` - SAF
+     * @enum {string}
+     */
+    SectorEnum: PathsApiTiruertOperationsGetParametersQuerySector
     SetBioFuelsRequest: {
       /** @description List of biocarburant codes. */
       biocarburant_codes: string[]
@@ -2854,6 +3198,29 @@ export interface components {
      * @enum {string}
      */
     ShippingMethodEnum: ShippingMethodEnum
+    SimulationInputRequest: {
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel: number | null
+      debited_entity: number | null
+      /** Format: double */
+      target_volume: number
+      /** Format: double */
+      target_emission: number
+      max_n_batches?: number
+      enforced_volumes?: number[]
+    }
+    SimulationLotOutput: {
+      lot_id: number
+      /** Format: double */
+      volume: number
+      /** Format: double */
+      emission_rate_per_mj: number
+    }
+    SimulationOutput: {
+      selected_lots: components["schemas"]["SimulationLotOutput"][]
+      /** Format: double */
+      fun: number
+    }
     /**
      * @description * `OTHER` - Autre
      *     * `EFS` - EFS
@@ -2871,6 +3238,22 @@ export interface components {
     SiteTypeEnum: SiteTypeEnum
     StatsResponse: {
       metabase_iframe_url: string
+    }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     * @enum {string}
+     */
+    StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
+    TiruertDepot: {
+      id: number
+      name: string
+    }
+    TiruertEntity: {
+      id: number
+      name: string
     }
     ToggleElecRequest: {
       /** @default false */
@@ -2899,27 +3282,16 @@ export interface components {
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
     /**
-     * @description * `CORRECTION_REQUEST` - CORRECTION_REQUEST
-     *     * `CORRECTION_DONE` - CORRECTION_DONE
-     *     * `LOTS_REJECTED` - LOTS_REJECTED
-     *     * `LOTS_RECEIVED` - LOTS_RECEIVED
-     *     * `LOTS_RECALLED` - LOTS_RECALLED
-     *     * `CERTIFICATE_EXPIRED` - CERTIFICATE_EXPIRED
-     *     * `CERTIFICATE_REJECTED` - CERTIFICATE_REJECTED
-     *     * `DECLARATION_VALIDATED` - DECLARATION_VALIDATED
-     *     * `DECLARATION_CANCELLED` - DECLARATION_CANCELLED
-     *     * `METER_READINGS_APP_STARTED` - METER_READINGS_APP_STARTED
-     *     * `METER_READINGS_APP_ENDING_SOON` - METER_READINGS_APP_ENDING_SOON
-     *     * `DECLARATION_REMINDER` - DECLARATION_REMINDER
-     *     * `SAF_TICKET_REJECTED` - SAF_TICKET_REJECTED
-     *     * `SAF_TICKET_ACCEPTED` - SAF_TICKET_ACCEPTED
-     *     * `SAF_TICKET_RECEIVED` - SAF_TICKET_RECEIVED
-     *     * `LOTS_UPDATED_BY_ADMIN` - LOTS_UPDATED_BY_ADMIN
-     *     * `LOTS_DELETED_BY_ADMIN` - LOTS_DELETED_BY_ADMIN
-     *     * `ELEC_TRANSFER_CERTIFICATE` - ELEC_TRANSFER_CERTIFICATE
+     * @description * `INCORPORATION` - INCORPORATION
+     *     * `CESSION` - CESSION
+     *     * `TENEUR` - TENEUR
+     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+     *     * `MAC_BIO` - MAC_BIO
+     *     * `EXPORTATION` - EXPORTATION
+     *     * `DEVALUATION` - DEVALUATION
      * @enum {string}
      */
-    TypeEnum: TypeEnum
+    TypeDefEnum: TypeDefEnum
     UnitRequest: {
       /** @default l */
       unit: components["schemas"]["PreferredUnitEnum"]
@@ -3630,9 +4002,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ApprouveDoubleCountingRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["ApprouveDoubleCountingRequest"]
-        "multipart/form-data": components["schemas"]["ApprouveDoubleCountingRequest"]
+        "application/json": components["schemas"]["ApproveDoubleCountingRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApproveDoubleCountingRequest"]
+        "multipart/form-data": components["schemas"]["ApproveDoubleCountingRequest"]
       }
     }
     responses: {
@@ -6281,6 +6653,458 @@ export interface operations {
       }
     }
   }
+  list_operations: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        depot?: string[]
+        /** @description Include detailed information if set to `1`. */
+        details?: boolean
+        /** @description Authorised entity ID. */
+        entity_id: number
+        from_to?: string
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        period?: string[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        /** @description Specify the volume unit (default is `l`). */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description A list of operations. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedOperationListList"]
+        }
+      }
+    }
+  }
+  create_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationInputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationInputRequest"]
+        "multipart/form-data": components["schemas"]["OperationInputRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created operation. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationList"]
+        }
+      }
+      /** @description Invalid input data. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  get_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Details of specific operation. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Operation"]
+        }
+      }
+    }
+  }
+  delete_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Operation deleted successfully. */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden. The operation type or status does not allow deletion. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  update_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedOperationUpdateRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedOperationUpdateRequest"]
+        "multipart/form-data": components["schemas"]["PatchedOperationUpdateRequest"]
+      }
+    }
+    responses: {
+      /** @description The updated operation. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Operation"]
+        }
+      }
+      /** @description Invalid input data. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  accept_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  reject_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  list_balances: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        depot?: string[]
+        /** @description Authorised entity ID. */
+        entity_id: number
+        from_to?: string
+        /** @description Group by sector or by lot. */
+        group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        period?: string[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        /** @description Specify the volume unit (default is `l`). */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Paginated response with balances grouped by mp category / biofuel or by sector */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedBalance"]
+        }
+      }
+    }
+  }
+  filter_balances: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        depot?: string[]
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
+        from_to?: string
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        period?: string[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+    }
+  }
+  filter_operations: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        biofuel?: string[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        date_from?: string
+        date_to?: string
+        depot?: string[]
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
+        from_to?: string
+        operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        period?: string[]
+        sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+    }
+  }
+  simulate: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SimulationInputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["SimulationInputRequest"]
+        "multipart/form-data": components["schemas"]["SimulationInputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SimulationOutput"]
+        }
+      }
+    }
+  }
+  simulation_bounds: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SimulationInputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["SimulationInputRequest"]
+        "multipart/form-data": components["schemas"]["SimulationInputRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SimulationOutput"]
+        }
+      }
+    }
+  }
+  validate_teneur: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
   user_retrieve: {
     parameters: {
       query?: never
@@ -6392,12 +7216,83 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
   PENDING = "PENDING",
   REJECTED = "REJECTED",
 }
-export enum CategoryEnum {
-  CONV = "CONV",
+export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
+  AM = "AM",
   ANN_IX_A = "ANN-IX-A",
   ANN_IX_B = "ANN-IX-B",
-  TALLOL = "TALLOL",
+  CONV = "CONV",
+  EP2AM = "EP2AM",
   OTHER = "OTHER",
+  TALLOL = "TALLOL",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryOperation {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
+  ACQUISITION = "ACQUISITION",
+}
+export enum PathsApiTiruertOperationsGetParametersQuerySector {
+  ESSENCE = "ESSENCE",
+  DIESEL = "DIESEL",
+  SAF = "SAF",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryStatus {
+  ACCEPTED = "ACCEPTED",
+  CANCELED = "CANCELED",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryType {
+  CREDIT = "CREDIT",
+  DEBIT = "DEBIT",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryUnit {
+  l = "l",
+  mj = "mj",
+}
+export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
+  lot = "lot",
+  sector = "sector",
+}
+export enum PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter {
+  biofuel = "biofuel",
+  customs_category = "customs_category",
+  sector = "sector",
+}
+export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
+  biofuel = "biofuel",
+  customs_category = "customs_category",
+  depot = "depot",
+  from_to = "from_to",
+  operation = "operation",
+  period = "period",
+  sector = "sector",
+  status = "status",
+  type = "type",
+}
+export enum CarbureNotificationTypeEnum {
+  CORRECTION_REQUEST = "CORRECTION_REQUEST",
+  CORRECTION_DONE = "CORRECTION_DONE",
+  LOTS_REJECTED = "LOTS_REJECTED",
+  LOTS_RECEIVED = "LOTS_RECEIVED",
+  LOTS_RECALLED = "LOTS_RECALLED",
+  CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED",
+  CERTIFICATE_REJECTED = "CERTIFICATE_REJECTED",
+  DECLARATION_VALIDATED = "DECLARATION_VALIDATED",
+  DECLARATION_CANCELLED = "DECLARATION_CANCELLED",
+  METER_READINGS_APP_STARTED = "METER_READINGS_APP_STARTED",
+  METER_READINGS_APP_ENDING_SOON = "METER_READINGS_APP_ENDING_SOON",
+  DECLARATION_REMINDER = "DECLARATION_REMINDER",
+  SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED",
+  SAF_TICKET_ACCEPTED = "SAF_TICKET_ACCEPTED",
+  SAF_TICKET_RECEIVED = "SAF_TICKET_RECEIVED",
+  LOTS_UPDATED_BY_ADMIN = "LOTS_UPDATED_BY_ADMIN",
+  LOTS_DELETED_BY_ADMIN = "LOTS_DELETED_BY_ADMIN",
+  ELEC_TRANSFER_CERTIFICATE = "ELEC_TRANSFER_CERTIFICATE",
 }
 export enum CertificateTypeEnum {
   SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
@@ -6523,25 +7418,14 @@ export enum TransportDocumentTypeEnum {
   DSP = "DSP",
   OTHER = "OTHER",
 }
-export enum TypeEnum {
-  CORRECTION_REQUEST = "CORRECTION_REQUEST",
-  CORRECTION_DONE = "CORRECTION_DONE",
-  LOTS_REJECTED = "LOTS_REJECTED",
-  LOTS_RECEIVED = "LOTS_RECEIVED",
-  LOTS_RECALLED = "LOTS_RECALLED",
-  CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED",
-  CERTIFICATE_REJECTED = "CERTIFICATE_REJECTED",
-  DECLARATION_VALIDATED = "DECLARATION_VALIDATED",
-  DECLARATION_CANCELLED = "DECLARATION_CANCELLED",
-  METER_READINGS_APP_STARTED = "METER_READINGS_APP_STARTED",
-  METER_READINGS_APP_ENDING_SOON = "METER_READINGS_APP_ENDING_SOON",
-  DECLARATION_REMINDER = "DECLARATION_REMINDER",
-  SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED",
-  SAF_TICKET_ACCEPTED = "SAF_TICKET_ACCEPTED",
-  SAF_TICKET_RECEIVED = "SAF_TICKET_RECEIVED",
-  LOTS_UPDATED_BY_ADMIN = "LOTS_UPDATED_BY_ADMIN",
-  LOTS_DELETED_BY_ADMIN = "LOTS_DELETED_BY_ADMIN",
-  ELEC_TRANSFER_CERTIFICATE = "ELEC_TRANSFER_CERTIFICATE",
+export enum TypeDefEnum {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
 }
 export enum UserRightsRequestsStatusEnum {
   Pending = "PENDING",

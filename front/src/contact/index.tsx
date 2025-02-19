@@ -53,7 +53,7 @@ export const ContactPage = () => {
 
   return (
     <iframe
-      data-tally-src="https://tally.so/embed/wodQbN?&dynamicHeight=1"
+      data-tally-src="https://contact.carbure.beta.gouv.fr/contact"
       loading="lazy"
       width="100%"
       height="100%"

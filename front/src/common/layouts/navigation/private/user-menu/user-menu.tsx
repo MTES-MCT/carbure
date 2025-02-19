@@ -10,13 +10,16 @@ import useEntity from "carbure/hooks/entity"
 import { useMemo } from "react"
 import {
   AccountLine,
+  BarChartLine,
   BookLine,
   ChartLine,
   LogoutBoxLine,
 } from "common/components/icon"
+import { useTranslation } from "react-i18next"
 
 export const UserMenu = () => {
   const { user, getName } = useUser()
+  const { t } = useTranslation()
   const {
     isIndustry,
     isPowerOrHeatProducer,
@@ -28,22 +31,27 @@ export const UserMenu = () => {
   const items = useMemo(() => {
     const compactedItems = compact([
       {
-        label: "Mon compte",
+        label: t("Mon compte"),
         path: routes.MY_ACCOUNT.INDEX,
         icon: AccountLine,
       },
       (isOperator || isProducer) && {
-        label: "Statistiques",
+        label: t("Statistiques"),
         path: routes.STATISTICS,
         icon: ChartLine,
       },
+      {
+        label: t("Statistiques publiques"),
+        path: routes.PUBLIC_STATS,
+        icon: BarChartLine,
+      },
       (isIndustry || isPowerOrHeatProducer || isAirline) && {
-        label: "Annuaire",
+        label: t("Annuaire"),
         path: routes.REGISTRY,
         icon: BookLine,
       },
       {
-        label: "Déconnexion",
+        label: t("Déconnexion"),
         path: routes.LOGOUT,
         icon: LogoutBoxLine,
       },
@@ -61,6 +69,7 @@ export const UserMenu = () => {
     isProducer,
     routes,
     isAirline,
+    t,
   ])
 
   return (

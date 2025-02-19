@@ -13,7 +13,8 @@ from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import Entity
 from core.utils import MultipleValueField
-from elec.models import ElecChargePoint, ElecMeterReading
+from elec.models import ElecMeterReading
+from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
 from elec.serializers.elec_charge_point_application import ElecChargePointApplication
 from elec.services.export_charge_point_excel import export_charge_points_to_excel
@@ -62,8 +63,7 @@ def get_charge_points(request, entity):
     from_idx = charge_points_sort_form.cleaned_data["from_idx"] or 0
     limit = charge_points_sort_form.cleaned_data["limit"] or 25
 
-    charge_points = ElecChargePoint.objects.filter(cpo=entity, is_deleted=False)
-    charge_points = charge_points.select_related("application")
+    charge_points = ChargePointRepository.get_cpo_charge_points(entity)
     if selection:
         charge_points = charge_points.filter(id__in=selection)
     charge_points = annotate_with_latest_meter_reading_date(charge_points)
