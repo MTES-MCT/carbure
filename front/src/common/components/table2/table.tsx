@@ -25,6 +25,9 @@ export interface TableProps<T> {
   rows: T[]
   order?: Order
 
+  // If hasSelectionColumn is true, this text will be displayed in the top actions section
+  selectionText?: string
+
   // List of selected rows
   selected?: number[]
 
@@ -50,6 +53,7 @@ export function Table<T>({
   loading,
   headless,
   hasSelectionColumn,
+  selectionText,
   selected = [],
   topActions,
   identify,
@@ -96,9 +100,10 @@ export function Table<T>({
                   small
                   style={{ marginRight: "8px" }}
                 />
-                {t("{{count}} lignes sélectionnées", {
-                  count: selected.length,
-                })}
+                {selectionText ??
+                  t("{{count}} lignes sélectionnées", {
+                    count: selected.length,
+                  })}
               </span>
               {topActions?.map((action, i) => (
                 <div

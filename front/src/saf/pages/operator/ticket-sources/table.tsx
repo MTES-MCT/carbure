@@ -1,8 +1,8 @@
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { Table, Cell, Order } from "common/components/table2"
 import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useNavigate } from "react-router-dom"
 import {
@@ -10,6 +10,9 @@ import {
   SafTicketSourceStatus,
 } from "saf/pages/operator/types"
 import { TicketSourceTag } from "./tag"
+import { usePortal } from "common/components/portal"
+import { useNotify } from "common/components/notifications"
+import TicketsGroupedAssignment from "saf/components/assignment/grouped-assignment"
 
 export interface TicketSourcesTableProps {
   loading: boolean
@@ -34,6 +37,55 @@ export const TicketSourcesTable = memo(
     status,
   }: TicketSourcesTableProps) => {
     const columns = useColumns()
+    const { t } = useTranslation()
+    const portal = usePortal()
+    const notify = useNotify()
+
+    const selectedTicketSources = useMemo(() => {
+      return ticketSources.filter((ticketSource) =>
+        selected.includes(ticketSource.id)
+      )
+    }, [ticketSources, selected])
+
+    const totalVolume = selectedTicketSources.reduce(
+      (total, ticketSource) => total + ticketSource.total_volume,
+      0
+    )
+    const assignedVolume = selectedTicketSources.reduce(
+      (total, ticketSource) => total + ticketSource.assigned_volume,
+      0
+    )
+    const remainingVolume = totalVolume - assignedVolume
+
+    const handleTicketsAssigned = (
+      volume: number,
+      clientName: string,
+      assignedTicketsCount: number
+    ) => {
+      notify(
+        t(
+          "{{volume}} litres ont bien été affectés à {{clientName}}. {{assignedTicketsCount}} tickets ont été générés.",
+          {
+            volume,
+            clientName,
+            assignedTicketsCount,
+          }
+        ),
+        { variant: "success" }
+      )
+    }
+
+    const showGroupedAssignement = () => {
+      portal((close) => (
+        <TicketsGroupedAssignment
+          ticketSources={selectedTicketSources}
+          remainingVolume={remainingVolume}
+          onClose={close}
+          onTicketsAssigned={handleTicketsAssigned}
+        />
+      ))
+    }
+
     return (
       <Table
         loading={loading}
@@ -42,6 +94,13 @@ export const TicketSourcesTable = memo(
         rowLink={rowLink}
         rows={ticketSources}
         hasSelectionColumn={status === SafTicketSourceStatus.AVAILABLE}
+        selectionText={t(
+          "{{count}} volumes sélectionnés pour un total de {{remainingVolume}} L",
+          {
+            count: selectedTicketSources.length,
+            remainingVolume: formatNumber(remainingVolume),
+          }
+        )}
         onSelect={onSelect}
         selected={selected}
         identify={(ticketSource) => ticketSource.id}
@@ -54,6 +113,17 @@ export const TicketSourcesTable = memo(
           columns.ghgReduction,
           columns.parentLot,
         ])}
+        topActions={[
+          <Button
+            priority="tertiary no outline"
+            iconId="ri-send-plane-line"
+            onClick={showGroupedAssignement}
+          >
+            {t("Affecter les {{count}} volumes", {
+              count: selectedTicketSources.length,
+            })}
+          </Button>,
+        ]}
       />
     )
   }
@@ -174,10 +244,11 @@ export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
   return (
     <Button
       captive
-      variant="link"
+      customPriority="link"
       title={t("Lot initial")}
-      label={`#${lot.carbure_id}`}
-      action={showLotDetails}
-    />
+      onClick={showLotDetails}
+    >
+      #{lot.carbure_id}
+    </Button>
   )
 }

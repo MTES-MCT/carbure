@@ -1,7 +1,6 @@
 import useEntity from "common/hooks/entity"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
-import { Return, Send } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -12,11 +11,13 @@ import * as api from "../api"
 interface CreditTicketSourceProps {
   ticket: SafTicket
   onClose: () => void
+  onCredit: () => void
 }
 
 export const CreditTicketSource = ({
   ticket,
   onClose,
+  onCredit,
 }: CreditTicketSourceProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -32,41 +33,38 @@ export const CreditTicketSource = ({
       { variant: "success" }
     )
     onClose()
+    onCredit()
   }
 
   const creditTicketSource = async () => {
-    //TO TEST comment below and add ticketSourceCredited()
-    await creditSafTicketSource.execute(entity.id, ticket.id) //TODO
+    await creditSafTicketSource.execute(entity.id, ticket.id)
     ticketSourceCredited()
   }
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <h1>{t("Accepter et créditer mes volumes disponibles ?")}</h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
-              {t(
-                "En acceptant ce ticket, vous déverserez le volume de ce ticket parmi vos volumes disponibles de Carburant d'Aviation Durable, afin de pouvoir l'affecter à un autre client. Ce ticket restera visible dans votre historique."
-              )}
-            </p>
-          </section>
-        </main>
-
-        <footer>
+      <Dialog
+        onClose={onClose}
+        header={
+          <Dialog.Title>
+            {t("Accepter et créditer mes volumes disponibles ?")}
+          </Dialog.Title>
+        }
+        footer={
           <Button
-            icon={Send}
-            label={t("Accepter et créditer")}
-            variant="primary"
-            action={creditTicketSource}
-          />
-
-          <Button icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
+            iconId="ri-send-plane-line"
+            priority="primary"
+            onClick={creditTicketSource}
+          >
+            {t("Accepter et créditer")}
+          </Button>
+        }
+      >
+        <p>
+          {t(
+            "En acceptant ce ticket, vous déverserez le volume de ce ticket parmi vos volumes disponibles de Carburant d'Aviation Durable, afin de pouvoir l'affecter à un autre client. Ce ticket restera visible dans votre historique."
+          )}
+        </p>
       </Dialog>
     </Portal>
   )

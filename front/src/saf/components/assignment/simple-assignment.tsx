@@ -1,7 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { EntityPreview, EntityType, Airport } from "common/types"
 import * as norm from "common/utils/normalizers"
-import Autocomplete from "common/components/autocomplete/autocomplete"
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import Form, { useForm } from "common/components/form"
@@ -15,8 +14,9 @@ import * as api from "../../pages/operator/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import Select from "common/components/select"
+import { Select } from "common/components/selects2"
 import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
+import { Autocomplete } from "common/components/autocomplete2"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails

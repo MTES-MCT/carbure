@@ -3,10 +3,9 @@ import { useLocation } from "react-router-dom"
 import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
-import { SearchInput } from "common/components/input"
+import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { compact } from "common/utils/collection"
 import {
   SafFilter,
   SafOperatorColumnsOrder,
@@ -19,7 +18,6 @@ import { useAutoStatus } from "./index.hooks"
 import { OperatorTicketDetails } from "../ticket-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
-import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
 import { NoResult } from "common/components/no-result2"
 import {
@@ -30,7 +28,7 @@ import { SafTicketSource, SafTicketSourceStatus } from "../types"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExportButton } from "saf/components/export"
-import { Pagination } from "common/components/pagination2/pagination"
+import { Pagination } from "common/components/pagination2"
 
 export interface TicketSourcesProps {
   year: number
@@ -68,13 +66,6 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const total = ticketSoucesData?.count ?? 0
   const count = ticketSoucesData?.results.length ?? 0
   const ticketSources = ticketSoucesData?.results
-
-  let selectedTicketSources
-  if (state.selection?.length > 0 && ticketSources) {
-    selectedTicketSources = state.selection.map(
-      (id) => ticketSources.find((t) => t.id === id)!
-    )
-  }
 
   const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
     return {
@@ -123,13 +114,6 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
             api.getTicketSourceFilters(filter, query)
           }
         />
-
-        {selectedTicketSources &&
-          status === SafTicketSourceStatus.AVAILABLE && (
-            <TicketSourcesSummary
-              ticketSources={compact(selectedTicketSources)}
-            />
-          )}
 
         {count > 0 && ticketSources ? (
           <>
