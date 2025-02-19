@@ -93,7 +93,6 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         <ActionBar>
           <ActionBar.Grow>
             <SearchInput
-              clear
               debounce={250}
               value={state.search}
               onChange={actions.setSearch}

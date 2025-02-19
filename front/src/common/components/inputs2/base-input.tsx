@@ -61,7 +61,7 @@ export const BaseInput = ({
   )
 }
 
-type LabelProps = Pick<
+export type LabelProps = Pick<
   BaseInputProps,
   "label" | "hasTooltip" | "required" | "title"
 >

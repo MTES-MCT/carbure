@@ -1,5 +1,5 @@
 import { Content, Main } from "common/components/scaffold"
-import Select from "common/components/select"
+import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
@@ -18,7 +18,6 @@ export const SafAirline = () => {
         <section>
           <Select
             loading={years.loading}
-            variant="inline"
             placeholder={t("Choisir une année")}
             value={years.selected}
             onChange={years.setYear}
