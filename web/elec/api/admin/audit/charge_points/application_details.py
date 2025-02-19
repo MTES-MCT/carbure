@@ -28,7 +28,7 @@ def get_application_details(request):
     export = form.cleaned_data["export"]
 
     if export:
-        charge_points = ChargePointRepository.get_annotated_application_charge_points(application.cpo, application)
+        charge_points = ChargePointRepository.get_application_charge_points(application.cpo, application)
         excel_file = export_charge_points_to_excel(charge_points, application.cpo)
         return ExcelResponse(excel_file)
 

@@ -28,12 +28,17 @@ class ChargePointRepository:
         return ChargePointRepository.get_annotated_applications().filter(cpo=cpo)
 
     @staticmethod
-    def get_annotated_application_charge_points(cpo, application: ElecChargePointApplication):
+    def get_cpo_charge_points(cpo):
         return (
-            ElecChargePoint.objects.filter(cpo=cpo, application=application.id, is_deleted=False)
+            ElecChargePoint.objects.filter(cpo=cpo, is_deleted=False)
             .order_by("station_id", "charge_point_id")
-            .select_related("cpo")
+            .select_related("cpo", "application", "current_meter")
+            .prefetch_related("current_meter__elec_meter_readings")
         )
+
+    @staticmethod
+    def get_application_charge_points(cpo, application: ElecChargePointApplication):
+        return ChargePointRepository.get_cpo_charge_points(cpo).filter(application=application)
 
     @staticmethod
     def get_registered_charge_points(cpo):

@@ -27,14 +27,10 @@ export function getChargePointsFilters(
 
 export function downloadChargePointsList(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  { year, ...params }: ChargePointsListQuery,
-  selection: number[]
+  { year, ...params }: ChargePointsListQuery
 ) {
   return download("/elec/cpo/charge-points", {
-    ...selectionOrQuery(
-      { ...params, from_idx: undefined, limit: undefined },
-      selection
-    ),
+    ...selectionOrQuery({ ...params, from_idx: undefined, limit: undefined }),
     export: true,
   })
 }

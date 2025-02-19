@@ -106,4 +106,5 @@ export const ROUTE_URLS = {
 
   HOME: "/",
   CONTACT: "/contact",
+  PUBLIC_STATS: "/stats",
 }
