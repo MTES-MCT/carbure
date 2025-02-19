@@ -1,10 +1,9 @@
 import useEntity from "common/hooks/entity"
 import { EntityType } from "common/types"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
-import Form from "common/components/form"
-import { Cross, Return } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
+import { Form } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -62,47 +61,42 @@ export const RejectAssignment = ({
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <TicketTag status={ticket.status} />
-          <h1>
+      <Dialog
+        onClose={onClose}
+        header={
+          <Dialog.Title>
+            <TicketTag status={ticket.status} />
             {t("Refuser le ticket n°")}
             {ticket?.carbure_id ?? "..."}
-          </h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
-              <strong>
-                {t("Pour quelle raison refusez-vous ce ticket ?")}
-              </strong>{" "}
-              {t(
-                "Cela entraînera la suppression du ticket. Le producteur sera notifié de votre refus."
-              )}
-            </p>
-            <Form id="reject-ticket" onSubmit={rejectTicket}>
-              <TextInput
-                value={comment}
-                label={t("Commentaire")}
-                onChange={setComment}
-                required
-                placeholder={t("Entrez un commentaire...")}
-              />
-            </Form>
-          </section>
-        </main>
-
-        <footer>
+          </Dialog.Title>
+        }
+        footer={
           <Button
-            icon={Cross}
-            label={t("Refuser l'affectation")}
-            variant="danger"
-            submit="reject-ticket"
+            iconId="ri-close-line"
+            customPriority="danger"
+            nativeButtonProps={{
+              form: "reject-ticket",
+            }}
+          >
+            {t("Refuser l'affectation")}
+          </Button>
+        }
+      >
+        <p>
+          <strong>{t("Pour quelle raison refusez-vous ce ticket ?")}</strong>{" "}
+          {t(
+            "Cela entraînera la suppression du ticket. Le producteur sera notifié de votre refus."
+          )}
+        </p>
+        <Form id="reject-ticket" onSubmit={rejectTicket}>
+          <TextInput
+            value={comment}
+            label={t("Commentaire")}
+            onChange={setComment}
+            required
+            placeholder={t("Entrez un commentaire...")}
           />
-
-          <Button icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
+        </Form>
       </Dialog>
     </Portal>
   )

@@ -10,7 +10,7 @@ import cl from "clsx"
 import { Field, FieldProps } from "common/components/inputs2/field"
 
 export type SelectProps<T, V = T> = Trigger &
-  FieldProps & {
+  Partial<Omit<FieldProps, "children">> & {
     search?: boolean
     value?: V | undefined
     options?: T[]
