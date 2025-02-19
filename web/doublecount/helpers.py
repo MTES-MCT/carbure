@@ -530,6 +530,8 @@ def send_dca_status_email(dca, request):
         Bonjour,
 
         Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
+        La décision de reconnaissance au double comptage correspondante est en cours de signature.
+        Cette dernière vous sera transmise par mail une fois finalisée.
 
         Bonne journée,
         L'équipe CarbuRe
