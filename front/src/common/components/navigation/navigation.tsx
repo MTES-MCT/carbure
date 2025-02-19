@@ -1,6 +1,5 @@
 import { useState } from "react"
-import Button from "common/components/button"
-import { ChevronLeft, ChevronRight, Return } from "common/components/icons"
+import { Button } from "common/components/button2"
 import { useHashMatch } from "common/components/hash-route"
 import { useQuery } from "common/hooks/async"
 import { useNavigation } from "./navigation.hooks"
@@ -26,7 +25,6 @@ export type NavigationButtonsProps = {
   total: number
   // Limit per page
   limit?: number
-  closeAction: () => void
 }
 
 /**
@@ -44,7 +42,6 @@ const NavigationButtons = ({
   baseIdsList = [],
   total,
   limit,
-  closeAction,
 }: NavigationButtonsProps) => {
   const { t } = useTranslation()
   const match = useHashMatch(":root/:id")
@@ -117,20 +114,23 @@ const NavigationButtons = ({
   return (
     <div data-asidex={true} className={cl(css.navigation)}>
       <Button
+        priority="secondary"
         disabled={!nav.hasPrev && page === 1}
         loading={loading}
-        icon={ChevronLeft}
-        label={t("Précédent")}
-        action={nav.prev}
-      />
+        iconId="ri-arrow-left-s-line"
+        onClick={nav.prev}
+      >
+        {t("Précédent")}
+      </Button>
       <Button
+        priority="secondary"
         disabled={!nav.hasNext && page === pageCount}
         loading={loading}
-        icon={ChevronRight}
-        label={t("Suivant")}
-        action={nav.next}
-      />
-      <Button icon={Return} label={t("Retour")} action={closeAction} />
+        iconId="ri-arrow-right-s-line"
+        onClick={nav.next}
+      >
+        {t("Suivant")}
+      </Button>
     </div>
   )
 }

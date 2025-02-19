@@ -22,6 +22,7 @@ export const Field = ({
   hasTooltip,
   required,
   title,
+  readOnly,
 }: FieldProps) => {
   const generatedId = useId()
   const selectId = idProps ?? generatedId
@@ -56,7 +57,14 @@ export const Field = ({
           }
         />
       )}
-      <div className={css["select-field-children"]}>{children}</div>
+      <div
+        className={cl(
+          css["select-field-children"],
+          readOnly && css["select-field-children--readOnly"]
+        )}
+      >
+        {children}
+      </div>
       {state !== "default" && (
         <p id={`${selectId}-desc`} className={stateClass[state]}>
           {stateRelatedMessage}

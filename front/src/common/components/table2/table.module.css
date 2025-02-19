@@ -44,9 +44,6 @@
 
 .rows > li {
   position: relative;
-}
-
-.rows > li.rowLink {
   padding-bottom: 0;
 }
 
@@ -220,6 +217,8 @@
 
 .top-actions__count {
   padding: var(--spacing-1w) var(--spacing-2w);
+  display: flex;
+  align-items: center;
 }
 
 .top-actions__item:not(:last-child) {

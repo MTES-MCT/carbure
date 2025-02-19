@@ -1,8 +1,7 @@
 import useEntity from "carbure/hooks/entity"
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Send } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -92,25 +91,25 @@ export const TicketSourceDetails = ({
         }
         footer={
           <>
-            <Button
-              icon={Send}
-              label={t("Affecter")}
-              variant="primary"
-              disabled={
-                !ticketSource ||
-                ticketSource.assigned_volume === ticketSource.total_volume
-              }
-              action={showAssignement}
-            />
             {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
               <NavigationButtons
                 limit={limit}
                 total={total ?? 0}
                 fetchIdsForPage={fetchIdsForPage}
                 baseIdsList={baseIdsList}
-                closeAction={closeDialog}
               />
             )}
+            <Button
+              iconId="ri-send-plane-line"
+              priority="primary"
+              disabled={
+                !ticketSource ||
+                ticketSource.assigned_volume === ticketSource.total_volume
+              }
+              onClick={showAssignement}
+            >
+              {t("Affecter")}
+            </Button>
           </>
         }
       >
