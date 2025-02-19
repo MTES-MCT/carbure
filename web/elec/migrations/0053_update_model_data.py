@@ -2,6 +2,9 @@ import pandas as pd
 from django.db import migrations
 from django.db.models import Sum
 
+METER_READINGS = "METER_READINGS"
+MANUAL = "MANUAL"
+
 
 def check_certificate_source(apps, cpo_id, last_year):
     ElecMeterReading = apps.get_model("elec", "ElecMeterReading")
@@ -38,13 +41,8 @@ def check_certificate_source(apps, cpo_id, last_year):
                     compensation=False,
                     operating_unit=operating_unit,
                 )
-                for elec_provision in elec_provisions:
-                    if elec_provision.energy_amount == energy_amount:
-                        elec_provision.source = ElecProvisionCertificate.METER_READINGS
-                        elec_provision.save()
-    ElecMeterReading.objects.exclude(source=ElecProvisionCertificate.METER_READINGS).update(
-        source=ElecProvisionCertificate.MANUAL
-    )
+                elec_provisions.filter(energy_amount=energy_amount).update(source=METER_READINGS)
+    ElecProvisionCertificate.objects.exclude(source=METER_READINGS).update(source=MANUAL)
 
 
 def update_model_data(apps, schema_editor):
