@@ -19,40 +19,44 @@ const Registry = () => {
   useTitle(t("Annuaire"))
   usePrivateNavigation(t("Annuaire"))
 
+  const defaultTabs = [
+    {
+      path: "#companies",
+      key: "companies",
+      label: t("Sociétés"),
+    },
+    {
+      path: "#feedstocks",
+      key: "feedstocks",
+      label: t("Matières premières"),
+    },
+    {
+      path: "#biofuels",
+      key: "biofuels",
+      label: t("Biocarburants"),
+    },
+    {
+      path: "#depots",
+      key: "depots",
+      label: t("Dépôts"),
+    },
+    {
+      path: "#double-counting",
+      key: "double-counting",
+      label: t("Double comptage"),
+    },
+  ]
+
   return (
     <Main>
       <Tabs
         variant="sticky"
         tabs={compact([
-          {
-            path: "#companies",
-            key: "companies",
-            label: t("Sociétés"),
-          },
-          {
-            path: "#feedstocks",
-            key: "feedstocks",
-            label: t("Matières premières"),
-          },
-          {
-            path: "#biofuels",
-            key: "biofuels",
-            label: t("Biocarburants"),
-          },
-          {
-            path: "#depots",
-            key: "depots",
-            label: t("Dépôts"),
-          },
+          ...(!isAirline ? defaultTabs : []),
           (isAirline || isOperator) && {
             path: "#airports",
             key: "airports",
             label: t("Aéroports"),
-          },
-          {
-            path: "#double-counting",
-            key: "double-counting",
-            label: t("Double comptage"),
           },
         ])}
       >
