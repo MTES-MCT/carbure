@@ -1,5 +1,6 @@
 export * from "./search/search-input"
 export * from "./number/number-input"
+export * from "./date/date-input"
 export * from "./text/text-input"
 export * from "./radio/radio"
 export * from "./checkbox/checkbox"

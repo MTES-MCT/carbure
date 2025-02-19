@@ -1,5 +1,6 @@
+import { Divider } from "common/components/divider"
 import { TextInput } from "common/components/inputs2"
-import { Col, Divider, Row } from "common/components/scaffold"
+import { Col, Row } from "common/components/scaffold"
 import {
   formatGHG,
   formatNumber,
@@ -17,7 +18,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
   return (
     <DialogSection label={t("Émissions/Réductions")}>
       <Row style={{ gap: "16px" }}>
-        <Col grow>
+        <Col grow gap="md">
           <TextInput
             hasTooltip
             label="EEC"
@@ -56,7 +57,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             readOnly
           />
         </Col>
-        <Col grow>
+        <Col grow gap="md">
           <TextInput
             label="ESCA"
             hasTooltip

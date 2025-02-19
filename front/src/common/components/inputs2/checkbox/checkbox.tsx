@@ -8,10 +8,10 @@ import {
   Normalizer,
 } from "common/utils/normalize"
 import { multipleSelection } from "common/utils/selection"
-import { ChangeEvent } from "react"
+import { ChangeEvent, useId } from "react"
 import cl from "clsx"
-import { fr } from "@codegouvfr/react-dsfr"
 import css from "./checkbox.module.css"
+
 type CheckboxProps = Omit<CheckboxDSFRProps, "options"> & {
   label?: string
   value?: boolean
@@ -27,6 +27,8 @@ export const Checkbox = ({
   small,
   ...props
 }: CheckboxProps) => {
+  const generatedId = useId()
+  const id = props.id ?? generatedId
   const options: CheckboxDSFRProps["options"] = [
     {
       label: label ?? "",
@@ -42,28 +44,19 @@ export const Checkbox = ({
   // The checkbox DSFR component does not support checkbox without label
   if (!label) {
     return (
-      <div
+      <input
+        {...props}
+        type="checkbox"
+        checked={value ?? false}
+        id={id}
         className={cl(
-          css["checkbox-without-label"],
-          fr.cx("fr-checkbox-group"),
-          small && fr.cx("fr-checkbox-group--sm"),
-          small && css["checkbox-without-label--small"]
+          props.className,
+          css["checkbox"],
+          small && css["checkbox--small"]
         )}
-      >
-        <input
-          type="checkbox"
-          {...props}
-          checked={value ?? false}
-          onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
-        />
-        <label
-          className={cl(
-            fr.cx("fr-label"),
-            css["checkbox-without-label__no-margin"]
-          )}
-          htmlFor={props.id}
-        />
-      </div>
+        onClick={captive ? (e) => e.stopPropagation() : undefined}
+        onChange={(e) => onChange?.(e.target.checked)}
+      />
     )
   }
   return <CheckboxDSFR {...props} options={options} small={small} />
