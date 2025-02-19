@@ -14,9 +14,9 @@ import * as api from "../../pages/operator/api"
 import * as apiResources from "carbure/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import Select from "common/components/select"
+import { Select } from "common/components/selects2"
 import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
-import Autocomplete from "common/components/autocomplete/autocomplete"
+import { Autocomplete } from "common/components/autocomplete2"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails

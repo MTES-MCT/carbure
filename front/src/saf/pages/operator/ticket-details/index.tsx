@@ -68,10 +68,8 @@ export const OperatorTicketDetails = ({
     portal((close) => (
       <CreditTicketSource
         ticket={ticket!}
-        onClose={() => {
-          close()
-          closeDialog()
-        }}
+        onClose={close}
+        onCredit={closeDialog}
       />
     ))
   }

@@ -12,30 +12,45 @@ export type ButtonProps = ButtonDSFRProps &
     // For our cases, we want to use the link style with a button
     customPriority?: "link" | "danger" | "success"
     loading?: boolean
+    captive?: boolean
   }
 
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   ButtonProps
->(({ customPriority, asideX, asideY, spread, loading, ...props }, ref) => {
-  return (
-    <ButtonDSFR
-      {...props}
-      iconId={loading ? "ri-loader-line" : props.iconId}
-      className={cl(props.className, {
-        [css["button-danger"] as string]: customPriority === "danger",
-        [css["button-success"] as string]: customPriority === "success",
-        [css["button-as-link-style"] as string]: customPriority === "link",
-      })}
-      priority={
-        customPriority && ["danger", "success"].includes(customPriority)
-          ? "tertiary"
-          : props.priority
-      }
-      {...layout({ asideX, asideY, spread })}
-      // @ts-ignore couldn't find a better way to manage different cases for button (anchor, button, icon only)
-      ref={ref}
-      disabled={loading}
-    />
-  )
-})
+>(
+  (
+    { customPriority, asideX, asideY, spread, loading, captive, ...props },
+    ref
+  ) => {
+    return (
+      <ButtonDSFR
+        {...props}
+        iconId={loading ? "ri-loader-line" : props.iconId}
+        className={cl(props.className, {
+          [css["button-danger"] as string]: customPriority === "danger",
+          [css["button-success"] as string]: customPriority === "success",
+          [css["button-as-link-style"] as string]: customPriority === "link",
+        })}
+        priority={
+          customPriority && ["danger", "success"].includes(customPriority)
+            ? "tertiary"
+            : props.priority
+        }
+        {...layout({ asideX, asideY, spread })}
+        // @ts-ignore couldn't find a better way to manage different cases for button (anchor, button, icon only)
+        ref={ref}
+        disabled={loading}
+        onClick={
+          captive
+            ? (e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                props.onClick?.(e)
+              }
+            : props.onClick
+        }
+      />
+    )
+  }
+)

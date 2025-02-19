@@ -59,7 +59,7 @@ export const ClientTicketDetails = ({
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          <TicketTag big status={ticket?.status} />
+          <TicketTag status={ticket?.status} />
           <h1>
             {t("Ticket n°")}
             {ticket?.carbure_id ?? "..."}
@@ -98,7 +98,6 @@ export const ClientTicketDetails = ({
               total={total}
               fetchIdsForPage={fetchIdsForPage}
               baseIdsList={baseIdsList}
-              closeAction={closeDialog}
             />
           )}
         </footer>
