@@ -1,13 +1,13 @@
 import * as norm from "common/utils/normalizers"
 import cl from "clsx"
-import { Fieldset } from "common/components/form"
-import { DateInput, TextInput } from "common/components/input"
+import { DateInput, TextInput } from "common/components/inputs2"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 import DurabilityFields from "saf/pages/operator/ticket-source-details/parent-lot/durability-fields"
 import { SafTicketDetails } from "../../types"
 import { EtsStatusEnum } from "api-schema"
+import { DialogSection } from "../dialog-section"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
@@ -25,7 +25,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   return (
     <div className={cl(css.form, css.columns)}>
-      <Fieldset label={t("Lot")}>
+      <DialogSection label={t("Lot")}>
         <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticket.volume)} L`}
@@ -46,8 +46,8 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={norm.normalizeCountry(ticket.country_of_origin).label}
           readOnly
         />
-      </Fieldset>
-      <Fieldset label={t("Producteur")}>
+      </DialogSection>
+      <DialogSection label={t("Producteur")}>
         <TextInput
           label={t("Production")}
           value={ticket.carbure_producer?.name ?? ticket.unknown_producer ?? ""}
@@ -76,8 +76,8 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={ticket.production_site_commissioning_date ?? ""}
           readOnly
         />
-      </Fieldset>
-      <Fieldset label={t("Affectation")}>
+      </DialogSection>
+      <DialogSection label={t("Affectation")}>
         <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
         <TextInput label={t("Client")} value={ticket.client} readOnly />
         <TextInput
@@ -120,7 +120,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
           />
         )}
-      </Fieldset>
+      </DialogSection>
       <DurabilityFields durability={ticket} />
     </div>
   )

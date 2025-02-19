@@ -2,10 +2,9 @@ import useEntity from "common/hooks/entity"
 import { EntityPreview, EntityType, Airport } from "common/types"
 import * as norm from "common/utils/normalizers"
 import Autocomplete from "common/components/autocomplete/autocomplete"
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import Form, { useForm } from "common/components/form"
-import { Return, Send } from "common/components/icons"
 import { TextInput } from "common/components/inputs2"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -94,17 +93,16 @@ export const TicketAssignment = ({
           </Dialog.Title>
         }
         footer={
-          <>
-            <Button
-              loading={assignSafTicket.loading}
-              icon={Send}
-              label={t("Affecter")}
-              variant="primary"
-              submit="assign-ticket"
-            />
-
-            <Button icon={Return} label={t("Retour")} action={onClose} />
-          </>
+          <Button
+            loading={assignSafTicket.loading}
+            iconId="ri-send-plane-line"
+            priority="primary"
+            nativeButtonProps={{
+              form: "assign-ticket",
+            }}
+          >
+            {t("Affecter")}
+          </Button>
         }
       >
         <p>

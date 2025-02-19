@@ -1,7 +1,6 @@
 import useEntity from "common/hooks/entity"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
-import { Cross, Return } from "common/components/icons"
+import { Button } from "common/components/button"
+import { Dialog } from "common/components/dialog"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -13,11 +12,13 @@ import TicketTag from "../../../components/tickets/tag"
 interface CancelAssignmentProps {
   ticket: SafTicket
   onClose: () => void
+  onCancel: () => void
 }
 
 export const CancelAssignment = ({
   ticket,
   onClose,
+  onCancel,
 }: CancelAssignmentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -39,44 +40,40 @@ export const CancelAssignment = ({
       { variant: "success" }
     )
     onClose()
+    onCancel()
   }
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <TicketTag status={ticket.status} />
-          <h1>
+      <Dialog
+        onClose={onClose}
+        header={
+          <Dialog.Title>
+            <TicketTag status={ticket.status} />
+
             {t("Annuler le ticket n°")}
             {ticket?.carbure_id ?? "..."}
-          </h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
-              <strong>
-                {t("Êtes-vous sûr de vouloir annuler ce ticket ?")}
-              </strong>
-            </p>
-            <p>
-              {t(
-                "Cela entrainera sa suppression et les quantités seront à nouveau disponible pour  être affectées."
-              )}
-            </p>
-          </section>
-        </main>
-
-        <footer>
+          </Dialog.Title>
+        }
+        footer={
           <Button
-            icon={Cross}
-            label={t("Annuler l'affectation")}
-            variant="danger"
-            action={cancelTicket}
-          />
-
-          <Button icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
+            iconId="ri-close-line"
+            customPriority="danger"
+            onClick={cancelTicket}
+            asideX
+          >
+            {t("Annuler l'affectation")}
+          </Button>
+        }
+      >
+        <p>
+          <strong>{t("Êtes-vous sûr de vouloir annuler ce ticket ?")}</strong>
+        </p>
+        <p>
+          {t(
+            "Cela entrainera sa suppression et les quantités seront à nouveau disponible pour  être affectées."
+          )}
+        </p>
       </Dialog>
     </Portal>
   )

@@ -35,3 +35,15 @@ export const Controlled: Story = {
     value: true,
   },
 }
+
+export const WithoutLabel: Story = {
+  args: {
+    label: undefined,
+    small: true,
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+
+    return <Checkbox {...args} value={value} onChange={setValue} />
+  },
+}

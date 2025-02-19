@@ -14,7 +14,7 @@ export const DialogSection = ({ label, children }: DialogSectionProps) => {
           {label}
         </Text>
       )}
-      <div>{children}</div>
+      <div className={css["dialog-section__content"]}>{children}</div>
     </div>
   )
 }

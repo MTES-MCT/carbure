@@ -72,12 +72,18 @@ export const Col = ({
   asideY,
   className,
   grow,
+  gap,
   ...props
-}: JSX.IntrinsicElements["div"] & Layout & { grow?: boolean }) => (
+}: JSX.IntrinsicElements["div"] & Layout & { grow?: boolean; gap?: "md" }) => (
   <div
     {...props}
     {...layout({ asideX, asideY })}
-    className={cl(css.column, grow && css["column--grow"], className)}
+    className={cl(
+      css.column,
+      grow && css["column--grow"],
+      gap && css[`column--gap-${gap}`],
+      className
+    )}
   />
 )
 
