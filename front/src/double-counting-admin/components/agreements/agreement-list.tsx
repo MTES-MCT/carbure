@@ -134,7 +134,12 @@ const AgreementList = ({
             <ExportAgreementsButton />
           )}
         </ActionBar>
-
+        <AgreementFilters
+          filters={CLIENT_FILTERS}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilterOptions={getAgrementFilter}
+        />
         {!agreements ||
         (tab === "active" && agreements["active"].length === 0) ||
         (tab === "expired" && agreements.expired.length === 0) ||
@@ -145,13 +150,6 @@ const AgreementList = ({
           />
         ) : (
           <>
-            <AgreementFilters
-              filters={CLIENT_FILTERS}
-              selected={state.filters}
-              onSelect={actions.setFilters}
-              getFilterOptions={getAgrementFilter}
-            />
-
             <Table
               loading={agreementsResponse.loading}
               columns={columns}
