@@ -28,3 +28,24 @@ export const patchOperation = (
 //     body: data,
 //   })
 // }
+
+export const simulateMinMax = (
+  entityId: number,
+  {
+    biofuel,
+    customs_category,
+    debited_entity,
+    target_volume,
+  }: apiTypes["SimulationInputRequest"]
+) => {
+  return api.POST("/tiruert/operations/simulate/min_max/", {
+    params: { query: { entity_id: entityId } },
+    body: {
+      biofuel,
+      customs_category,
+      debited_entity,
+      target_volume,
+      target_emission: 0, // why ?
+    },
+  })
+}

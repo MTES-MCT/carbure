@@ -57,7 +57,8 @@ export const BaseInput = ({
         props.state === "error" &&
           !props.stateRelatedMessage &&
           css["dsfr-input--error"],
-        !marginBottom && css["no-margin-bottom"]
+        !marginBottom && css["no-margin-bottom"],
+        props.addon && css.addon
       )}
     />
   )
