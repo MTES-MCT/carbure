@@ -16,7 +16,7 @@ const defaultSnapshot: ElecOperatorSnapshot = {
   acquired_energy: 0,
 }
 
-export const ElecOperator = () => {
+const ElecOperator = () => {
   const { t } = useTranslation()
   usePrivateNavigation(t("Certificats"))
 
@@ -80,3 +80,5 @@ export const ElecOperator = () => {
     </Main>
   )
 }
+
+export default ElecOperator

@@ -12,7 +12,8 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { Operations } from "./operations"
 import { Balances } from "./balances"
 import { useState } from "react"
-export const MaterialAccounting = () => {
+
+const MaterialAccounting = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const [operationCount, setOperationCount] = useState(0)
@@ -57,3 +58,5 @@ export const MaterialAccounting = () => {
     </Main>
   )
 }
+
+export default MaterialAccounting

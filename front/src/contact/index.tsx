@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-export const ContactPage = () => {
+const ContactPage = () => {
   const { t } = useTranslation()
   usePrivateNavigation(t("Contact"))
   // The code below will load the embed
@@ -60,3 +60,5 @@ export const ContactPage = () => {
     ></iframe>
   )
 }
+
+export default ContactPage
