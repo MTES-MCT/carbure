@@ -3,7 +3,7 @@ import css from "./operation-text.module.css"
 import { ReactNode } from "react"
 interface OperationTextProps {
   title: ReactNode
-  description: string
+  description: ReactNode
 }
 
 export const OperationText = ({ title, description }: OperationTextProps) => {

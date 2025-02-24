@@ -1,4 +1,4 @@
-import { Depot, Entity } from "carbure/types"
+import { Depot, Entity, EntityPreview } from "carbure/types"
 
 export enum CessionStepKey {
   FromDepot = "from_depot",
@@ -14,6 +14,6 @@ export type SessionDialogForm = {
   avoided_emissions_min?: number // Range determined by the simulation
   avoided_emissions_max?: number // Range determined by the simulation
   avoided_emissions?: number // Value selected by the user
-  credited_entity?: Entity
+  credited_entity?: EntityPreview
   to_depot?: Depot
 }
