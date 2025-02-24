@@ -36,7 +36,7 @@ export const UserMenu = () => {
         icon: AccountLine,
       },
       (isOperator || isProducer) && {
-        label: t("Statistiques"),
+        label: t("Mes statistiques"),
         path: routes.STATISTICS,
         icon: ChartLine,
       },
