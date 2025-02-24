@@ -59,8 +59,8 @@ class SimulateActionMixin:
     @extend_schema(
         operation_id="simulation_bounds",
         description="Get bounds for blending operation",
-        request=SimulationInputSerializer,
-        responses={status.HTTP_200_OK: SimulationOutputSerializer},
+        request=SimulationMinMaxInputSerializer,
+        responses={status.HTTP_200_OK: SimulationMinMaxOutputSerializer},
     )
     @action(
         detail=False,
