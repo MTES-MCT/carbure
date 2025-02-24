@@ -9,8 +9,6 @@ import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import { Notice } from "common/components/notice"
 import { useState } from "react"
-import { formatNumber, roundNumber } from "common/utils/formatters"
-
 type VolumeFormProps = {
   balance: Balance
 }
@@ -27,12 +25,18 @@ export const showNextStepVolumeForm = (values: SessionDialogForm) => {
   )
 }
 
+const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
+const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
+
 export const VolumeForm = ({ balance }: VolumeFormProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind, setField } = useFormContext<SessionDialogForm>()
   const mutation = useMutation(simulateMinMax)
-  const [volumeDeclared, setVolumeDeclared] = useState(false)
+  const [volumeDeclared, setVolumeDeclared] = useState(
+    value.avoided_emissions_min !== undefined &&
+      value.avoided_emissions_max !== undefined
+  )
 
   const declareQuantity = () => {
     mutation
@@ -52,23 +56,36 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
         setVolumeDeclared(true)
       })
   }
+
+  const resetVolumeDeclared = () => {
+    setField("avoided_emissions_min", undefined)
+    setField("avoided_emissions_max", undefined)
+    setVolumeDeclared(false)
+  }
   return (
     <>
       <NumberInput
         label={t("Saisir une quantité pour la cession")}
+        max={value.from_depot_available_volume}
         {...bind("volume")}
         addon={
           <>
             {!volumeDeclared && (
-              <Button onClick={declareQuantity} loading={mutation.loading}>
+              <Button
+                onClick={declareQuantity}
+                loading={mutation.loading}
+                disabled={
+                  !value.volume ||
+                  value.volume === 0 ||
+                  (value.from_depot_available_volume !== undefined &&
+                    value.volume > value.from_depot_available_volume)
+                }
+              >
                 {t("Déclarer la quantité")}
               </Button>
             )}
             {volumeDeclared && (
-              <Button
-                priority="secondary"
-                onClick={() => setVolumeDeclared(false)}
-              >
+              <Button priority="secondary" onClick={resetVolumeDeclared}>
                 {t("Modifier")}
               </Button>
             )}
@@ -79,6 +96,7 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
         )}
         state={volumeDeclared ? "default" : "info"}
         disabled={volumeDeclared || mutation.loading}
+        required
       />
       {volumeDeclared &&
         value.avoided_emissions_min &&
@@ -90,25 +108,18 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
                 t={t}
                 values={{
                   volume: value.volume,
-                  min: formatNumber(value.avoided_emissions_min, 0),
-                  max: formatNumber(value.avoided_emissions_max, 0),
+                  min: formatEmissionMin(value.avoided_emissions_min),
+                  max: formatEmissionMax(value.avoided_emissions_max),
                 }}
                 defaults="Pour une quantité de <strong>{{volume}} litres</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tC02 évitées</strong>."
               />
             </Notice>
             <NumberInput
-              label={
-                t("Saisir un montant en tCO2 évitées") +
-                (volumeDeclared
-                  ? ` (${t("entre {{min}} et {{max}}", {
-                      min: formatNumber(value.avoided_emissions_min, 0),
-                      max: formatNumber(value.avoided_emissions_max, 0),
-                    })})`
-                  : "")
-              }
-              min={roundNumber(value.avoided_emissions_min, 0)}
-              max={roundNumber(value.avoided_emissions_max, 0)}
+              label={t("Saisir un montant en tCO2 évitées")}
+              min={formatEmissionMin(value.avoided_emissions_min)}
+              max={formatEmissionMax(value.avoided_emissions_max)}
               {...bind("avoided_emissions")}
+              required
             />
           </>
         )}

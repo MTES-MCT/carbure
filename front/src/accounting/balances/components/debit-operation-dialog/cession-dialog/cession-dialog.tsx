@@ -17,6 +17,10 @@ import { Unit } from "carbure/types"
 import { Button } from "common/components/button2"
 import { showNextStepVolumeForm, VolumeForm } from "./volume-form"
 import { useMemo } from "react"
+import {
+  RecipientToDepotForm,
+  showNextStepRecipientToDepotForm,
+} from "./recipient-to-depot-form"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -60,8 +64,15 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
     if (currentStep?.key === CessionStepKey.Volume) {
       return showNextStepVolumeForm(form.value)
     }
+    if (currentStep?.key === CessionStepKey.ToDepot) {
+      return showNextStepRecipientToDepotForm(form.value)
+    }
     return true
   }, [currentStep, form.value])
+
+  const createOperation = () => {
+    console.log(form.value)
+  }
 
   return (
     <Portal>
@@ -76,7 +87,11 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
         footer={
           <>
             {previousStep && (
-              <Button priority="secondary" onClick={goToPreviousStep}>
+              <Button
+                priority="secondary"
+                onClick={goToPreviousStep}
+                iconId="ri-arrow-left-s-line"
+              >
                 {t("Précédent")}
               </Button>
             )}
@@ -85,8 +100,15 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
                 priority="secondary"
                 onClick={goToNextStep}
                 disabled={!showNextStep}
+                iconId="ri-arrow-right-s-line"
+                iconPosition="right"
               >
                 {t("Suivant")}
+              </Button>
+            )}
+            {currentStep?.key === CessionStepKey.Recap && (
+              <Button priority="primary" onClick={createOperation}>
+                {t("Céder")}
               </Button>
             )}
           </>
@@ -121,37 +143,67 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               }
             />
           </Grid>
-          <Grid>
-            {currentStepIndex > 1 &&
-            form.value.from_depot_available_volume &&
-            form.value.from_depot_available_volume > 0 ? (
-              <>
+          {currentStepIndex > 1 &&
+          form.value.from_depot_available_volume &&
+          form.value.from_depot_available_volume > 0 ? (
+            <Grid>
+              <OperationText
+                title={t("Dépôt d'expédition")}
+                description={form.value.from_depot?.name ?? ""}
+              />
+              <OperationText
+                title={t("Solde disponible dans le dépôt d'expédition")}
+                description={formatUnit(
+                  form.value.from_depot_available_volume,
+                  Unit.l,
+                  0
+                )}
+              />
+            </Grid>
+          ) : null}
+          {currentStepIndex > 2 &&
+          form.value.volume &&
+          form.value.avoided_emissions ? (
+            <Grid>
+              <OperationText
+                title={t("Quantité de la cession")}
+                description={formatUnit(form.value.volume, Unit.l, 0)}
+              />
+              <OperationText
+                title={t("TCO2 évitées équivalentes")}
+                description={form.value.avoided_emissions}
+              />
+            </Grid>
+          ) : null}
+          {currentStepIndex > 3 && form.value.credited_entity && (
+            <Grid>
+              <OperationText
+                title={t("Redevable")}
+                description={form.value.credited_entity.name}
+              />
+              {form.value.to_depot && (
                 <OperationText
-                  title={t("Dépôt d'expédition")}
-                  description={form.value.from_depot?.name ?? ""}
+                  title={t("Dépôt destinataire")}
+                  description={form.value.to_depot?.name ?? ""}
                 />
-                <OperationText
-                  title={t("Solde disponible dans le dépôt d'expédition")}
-                  description={formatUnit(
-                    form.value.from_depot_available_volume,
-                    Unit.l,
-                    0
-                  )}
-                />
-              </>
-            ) : null}
-          </Grid>
-
-          <div className={styles["cession-dialog__form"]}>
-            <Form form={form}>
-              {currentStep?.key === CessionStepKey.FromDepot && (
-                <FromDepotForm balance={balance} />
               )}
-              {currentStep?.key === CessionStepKey.Volume && (
-                <VolumeForm balance={balance} />
-              )}
-            </Form>
-          </div>
+            </Grid>
+          )}
+          {currentStep?.key !== CessionStepKey.Recap && (
+            <div className={styles["cession-dialog__form"]}>
+              <Form form={form}>
+                {currentStep?.key === CessionStepKey.FromDepot && (
+                  <FromDepotForm balance={balance} />
+                )}
+                {currentStep?.key === CessionStepKey.Volume && (
+                  <VolumeForm balance={balance} />
+                )}
+                {currentStep?.key === CessionStepKey.ToDepot && (
+                  <RecipientToDepotForm />
+                )}
+              </Form>
+            </div>
+          )}
         </Main>
       </Dialog>
     </Portal>

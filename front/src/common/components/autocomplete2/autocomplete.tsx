@@ -82,6 +82,11 @@ export function Autocomplete<T, V>({
           onOpen={autocomplete.execute}
           onToggle={autocomplete.setOpen}
           anchor={anchor}
+          onClose={() => {
+            if (value) {
+              autocomplete.onQuery
+            }
+          }}
         >
           {loading || autocomplete.loading ? (
             <Text style={{ padding: "10px", textAlign: "center" }}>
@@ -152,6 +157,13 @@ export function useAutocomplete<T, V>({
   useEffect(() => {
     if (value === undefined) setQuery("")
   }, [value])
+
+  // Reset query to the previous value when dropdown is closed
+  useEffect(() => {
+    if (!open && asyncOptions.label !== query) {
+      setQuery(asyncOptions.label)
+    }
+  }, [open])
 
   const [suggestions, setSuggestions] = useState(options ?? [])
   useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])

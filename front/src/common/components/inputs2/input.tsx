@@ -25,7 +25,6 @@ export const Input = ({
   nativeInputProps,
   readOnly,
   inputRef,
-  required,
   label,
   ...props
 }: Omit<InputPropsDSFR.RegularInput, "label"> &
@@ -44,7 +43,7 @@ export const Input = ({
         placeholder,
         type,
         readOnly,
-        required,
+        required: props.required,
         ref: inputRef as RefObject<HTMLInputElement>,
       }}
       textArea={false}
