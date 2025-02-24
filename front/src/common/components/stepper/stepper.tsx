@@ -28,6 +28,7 @@ export const useStepper = <Key extends string>(steps: Step<Key>[]) => {
 
   const currentStep = steps[currentStepIndex]
   const hasPreviousStep = currentStepIndex > 0
+  const previousStep = hasPreviousStep ? steps[currentStepIndex - 1] : null
   const hasNextStep = steps.length > currentStepIndex + 1
   const nextStep = hasNextStep ? steps[currentStepIndex + 1] : null
 
@@ -54,6 +55,7 @@ export const useStepper = <Key extends string>(steps: Step<Key>[]) => {
     currentStep,
     currentStepIndex: currentStepIndex + 1, // Index displayed in the stepper, starts at 1
     hasPreviousStep,
+    previousStep,
     hasNextStep,
     nextStep,
     setStep,

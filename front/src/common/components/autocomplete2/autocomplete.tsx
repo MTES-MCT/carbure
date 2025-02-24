@@ -29,6 +29,7 @@ export type AutocompleteProps<T, V = T> = Trigger &
     normalize?: Normalizer<T, V>
     children?: Renderer<T, V>
     sort?: Sorter<T, V>
+    debounce?: number
   }
 
 export function Autocomplete<T, V>({
@@ -45,6 +46,7 @@ export function Autocomplete<T, V>({
   normalize = defaultNormalizer,
   children = defaultRenderer,
   sort,
+  debounce = 300,
   ...props
 }: AutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
@@ -58,6 +60,7 @@ export function Autocomplete<T, V>({
     onQuery,
     create,
     normalize,
+    debounce,
   })
 
   return (
@@ -115,6 +118,7 @@ interface AutocompleteConfig<T, V> {
   onQuery?: (query: string) => void
   create?: (value: string) => V
   normalize?: Normalizer<T, V>
+  debounce?: number
 }
 
 export function useAutocomplete<T, V>({
@@ -126,9 +130,11 @@ export function useAutocomplete<T, V>({
   onQuery,
   create,
   normalize = defaultNormalizer,
+  debounce = 300,
 }: AutocompleteConfig<T, V>) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
+  const timeoutRef = useRef<number>()
 
   const asyncOptions = useAsyncList<T, V>({
     selectedValue: value,
@@ -196,8 +202,16 @@ export function useAutocomplete<T, V>({
 
     // if we fetch the options asyncly, start it now
     if (getOptions) {
-      const nextOptions = await asyncOptions.execute(query)
-      if (nextOptions) matchQuery(query, nextOptions)
+      const setOptions = async () => {
+        const nextOptions = await asyncOptions.execute(query)
+        if (nextOptions) matchQuery(query, nextOptions)
+      }
+
+      if (!debounce) setOptions()
+      else {
+        if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
+        timeoutRef.current = window.setTimeout(setOptions, debounce)
+      }
     }
   }
 
