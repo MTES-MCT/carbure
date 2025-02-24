@@ -5,3 +5,8 @@
 .no-margin-bottom {
   margin-bottom: 0 !important;
 }
+
+/* the addon button should not shrink */
+.addon :global(.fr-input-wrap--addon .fr-btn) {
+  flex-shrink: 0;
+}

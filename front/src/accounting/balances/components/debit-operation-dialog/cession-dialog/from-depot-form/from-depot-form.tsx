@@ -14,6 +14,12 @@ type FromDepotProps = {
   balance: Balance
 }
 
+export const showNextStepFromDepotForm = (values: SessionDialogForm) => {
+  return (
+    values.from_depot_available_volume && values.from_depot_available_volume > 0
+  )
+}
+
 export const FromDepotForm = ({ balance }: FromDepotProps) => {
   const { t } = useTranslation()
   const entity = useEntity()

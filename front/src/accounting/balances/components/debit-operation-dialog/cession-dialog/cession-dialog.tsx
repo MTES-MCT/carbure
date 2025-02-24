@@ -8,14 +8,15 @@ import { OperationText } from "accounting/components/operation-text"
 import { Trans, useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
 import { Stepper, useStepper } from "common/components/stepper"
-import { FromDepotForm } from "./from-depot-form"
+import { FromDepotForm, showNextStepFromDepotForm } from "./from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "carbure/types"
 import { Button } from "common/components/button2"
-import { VolumeForm } from "./volume-form"
+import { showNextStepVolumeForm, VolumeForm } from "./volume-form"
+import { useMemo } from "react"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -52,6 +53,16 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
   ])
   const form = useForm<SessionDialogForm>({})
 
+  const showNextStep = useMemo(() => {
+    if (currentStep?.key === CessionStepKey.FromDepot) {
+      return showNextStepFromDepotForm(form.value)
+    }
+    if (currentStep?.key === CessionStepKey.Volume) {
+      return showNextStepVolumeForm(form.value)
+    }
+    return true
+  }, [currentStep, form.value])
+
   return (
     <Portal>
       <Dialog
@@ -65,14 +76,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
         footer={
           <>
             {previousStep && (
-              <Button
-                priority="secondary"
-                onClick={goToPreviousStep}
-                // disabled={
-                //   !form.value.from_depot_available_volume ||
-                //   form.value.from_depot_available_volume === 0
-                // }
-              >
+              <Button priority="secondary" onClick={goToPreviousStep}>
                 {t("Précédent")}
               </Button>
             )}
@@ -80,10 +84,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               <Button
                 priority="secondary"
                 onClick={goToNextStep}
-                // disabled={
-                //   !form.value.from_depot_available_volume ||
-                //   form.value.from_depot_available_volume === 0
-                // }
+                disabled={!showNextStep}
               >
                 {t("Suivant")}
               </Button>
