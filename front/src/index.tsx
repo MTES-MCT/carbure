@@ -1,4 +1,4 @@
-import React, { Suspense } from "react"
+import React from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
 
@@ -7,7 +7,6 @@ import "./carbure/assets/css/index.css"
 
 import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
-import { LoaderOverlay } from "common/components/scaffold"
 import { SentryProvider, initSentry } from "./sentry"
 import "./setup-dsfr"
 
@@ -30,9 +29,7 @@ enableMocking().then(() =>
       <React.StrictMode>
         <BrowserRouter>
           <MatomoProvider>
-            <Suspense fallback={<LoaderOverlay />}>
-              <Carbure />
-            </Suspense>
+            <Carbure />
           </MatomoProvider>
         </BrowserRouter>
       </React.StrictMode>

@@ -1,37 +1,43 @@
-import Account from "account"
-import Auth from "auth"
 import { PortalProvider } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import Entities from "companies-admin"
 import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
-import Controls from "controls"
-import DoubleCounting from "double-counting-admin"
-import AgreementPublicList from "double-counting/components/agreement-public-list"
-import ElecAdmin from "elec-admin"
-import ElecAdminAudit from "elec-audit-admin"
-import ElecCPO from "elec/cpo"
-import ChargePoints from "elec-charge-points/charge-points"
-import { ElecOperator } from "elec/operator"
 import { Navigate, Route, Routes } from "react-router-dom"
-import Registry from "registry"
-import SafAirline from "saf/pages/airline"
-import SafOperator from "saf/pages/operator"
-import Settings from "settings"
-import Stats from "stats"
-import Transactions from "transactions"
-import AccessibilityDeclaration from "./components/accessibility-declaration"
-import Home from "./components/home"
-import Pending from "./components/pending"
-import PublicStats from "./components/public-stats"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
-import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
-import { ContactPage } from "contact"
 import { YearsProvider } from "common/providers/years-provider"
-import { MaterialAccounting } from "accounting"
 import { NewNavigationDialog } from "./components/new-navigation-dialog"
-import Dashboard from "dashboard"
+import { lazy, Suspense } from "react"
+
+const Account = lazy(() => import("account"))
+const Auth = lazy(() => import("auth"))
+const Entities = lazy(() => import("companies-admin"))
+const Controls = lazy(() => import("controls"))
+const DoubleCounting = lazy(() => import("double-counting-admin"))
+const AgreementPublicList = lazy(
+  () => import("double-counting/components/agreement-public-list")
+)
+const ElecAdmin = lazy(() => import("elec-admin"))
+const ElecAdminAudit = lazy(() => import("elec-audit-admin"))
+const ElecCPO = lazy(() => import("elec/cpo"))
+const ChargePoints = lazy(() => import("elec-charge-points/charge-points"))
+const ElecOperator = lazy(() => import("elec/operator"))
+const Registry = lazy(() => import("registry"))
+const SafAirline = lazy(() => import("saf/pages/airline"))
+const SafOperator = lazy(() => import("saf/pages/operator"))
+const Settings = lazy(() => import("settings"))
+const Stats = lazy(() => import("stats"))
+const Transactions = lazy(() => import("transactions"))
+const Dashboard = lazy(() => import("dashboard"))
+const MaterialAccounting = lazy(() => import("accounting"))
+const AccessibilityDeclaration = lazy(
+  () => import("./components/accessibility-declaration")
+)
+const Home = lazy(() => import("./components/home"))
+const Pending = lazy(() => import("./components/pending"))
+const PublicStats = lazy(() => import("./components/public-stats"))
+const ElecAudit = lazy(() => import("elec-auditor"))
+const ContactPage = lazy(() => import("contact"))
 
 const Carbure = () => {
   const user = useUserManager()
@@ -46,49 +52,51 @@ const Carbure = () => {
           <PortalProvider>
             <div id="app">
               <NavigationLayout>
-                <Routes>
-                  {!isAuth && <Route path="*" element={<Home />} />}
+                <Suspense fallback={<LoaderOverlay />}>
+                  <Routes>
+                    {!isAuth && <Route path="*" element={<Home />} />}
 
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/stats" element={<PublicStats />} />
-                  <Route
-                    path="/double-counting-list"
-                    element={<AgreementPublicList />}
-                  />
-                  <Route
-                    path="/accessibilite"
-                    element={<AccessibilityDeclaration />}
-                  />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/stats" element={<PublicStats />} />
+                    <Route
+                      path="/double-counting-list"
+                      element={<AgreementPublicList />}
+                    />
+                    <Route
+                      path="/accessibilite"
+                      element={<AccessibilityDeclaration />}
+                    />
 
-                  <Route path="/auth/*" element={<Auth />} />
+                    <Route path="/auth/*" element={<Auth />} />
 
-                  {isAuth && (
-                    <>
-                      <Route path="/pending" element={<Pending />} />
-                      <Route path="/account/*" element={<Account />} />
-                      <Route path="/org/:entity/*" element={<Org />} />
-                      {entity.isBlank && firstEntity && (
-                        <Route
-                          path="/"
-                          element={
-                            <Navigate replace to={`/org/${firstEntity.id}`} />
-                          }
-                        />
-                      )}
-                      {entity.isBlank && !firstEntity && (
-                        <Route
-                          path="/"
-                          element={<Navigate replace to={`/pending`} />}
-                        />
-                      )}
-                    </>
-                  )}
+                    {isAuth && (
+                      <>
+                        <Route path="/pending" element={<Pending />} />
+                        <Route path="/account/*" element={<Account />} />
+                        <Route path="/org/:entity/*" element={<Org />} />
+                        {entity.isBlank && firstEntity && (
+                          <Route
+                            path="/"
+                            element={
+                              <Navigate replace to={`/org/${firstEntity.id}`} />
+                            }
+                          />
+                        )}
+                        {entity.isBlank && !firstEntity && (
+                          <Route
+                            path="/"
+                            element={<Navigate replace to={`/pending`} />}
+                          />
+                        )}
+                      </>
+                    )}
 
-                  {!user.loading && (
-                    <Route path="*" element={<Navigate replace to="/" />} />
-                  )}
-                </Routes>
-                <NewNavigationDialog />
+                    {!user.loading && (
+                      <Route path="*" element={<Navigate replace to="/" />} />
+                    )}
+                  </Routes>
+                  <NewNavigationDialog />
+                </Suspense>
               </NavigationLayout>
 
               {user.loading && <LoaderOverlay />}
