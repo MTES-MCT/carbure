@@ -20,7 +20,7 @@ class TiruertBalancesTest(TestCase):
             {
                 "sector": "ESSENCE",
                 "customs_category": "CONV",
-                "biofuel": "ETH",
+                "biofuel": {"id": 33, "code": "ETH"},
                 "initial_balance": 0.0,
                 "available_balance": 10000.0,
                 "final_balance": 10000.0,
@@ -32,7 +32,7 @@ class TiruertBalancesTest(TestCase):
             {
                 "sector": "DIESEL",
                 "customs_category": "ANN-IX-A",
-                "biofuel": "EMAG",
+                "biofuel": {"id": 31, "code": "EMAG"},
                 "initial_balance": 0.0,
                 "available_balance": 5000.0,
                 "final_balance": 5000.0,

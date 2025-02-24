@@ -53,7 +53,7 @@ class BalanceService:
                 balance[key]["sector"] = operation.sector
                 if group_by != "sector":
                     balance[key]["customs_category"] = operation.customs_category
-                    balance[key]["biofuel"] = operation.biofuel.code
+                    balance[key]["biofuel"] = operation.biofuel
 
                 balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
 
@@ -154,7 +154,7 @@ class BalanceService:
             }
             if group_by != "sector":
                 balance[key]["customs_category"] = operation.customs_category
-                balance[key]["biofuel"] = operation.biofuel.code
+                balance[key]["biofuel"] = operation.biofuel
 
         return key, balance
 
