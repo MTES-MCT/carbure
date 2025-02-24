@@ -24,18 +24,25 @@ const Login = () => {
     username: "" as string | undefined,
     password: "" as string | undefined,
   })
-
   const login = useMutation(api.login, {
     onSuccess: () => {
       notify(t("Un code vient de vous être envoyé"), { variant: "success" })
       api.requestOTP()
       navigate("../otp")
     },
-    onError: () => {
-      notify(t("La connexion a échoué"), { variant: "danger" })
+    onError: (error) => {
+      let errorMessage = t("La connexion a échoué")
+      if (
+        (error as any).data &&
+        (error as any).data.message === "Account not activated"
+      ) {
+        errorMessage = t(
+          "Votre compte n'est pas activé. Merci de cliquer sur le lien de reactivation pour activer votre compte."
+        )
+      }
+      notify(errorMessage, { variant: "danger" })
     },
   })
-
   return (
     <Container>
       <section>
@@ -66,6 +73,11 @@ const Login = () => {
             variant="link"
             label={t("J'ai oublié mon mot de passe")}
             to="../reset-password-request"
+          />
+          <Button
+            variant="link"
+            label={t("Cliquer ici pour activer votre compte.")}
+            to="../activate-request"
           />
         </Form>
       </section>
