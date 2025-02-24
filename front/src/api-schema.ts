@@ -1581,7 +1581,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** @description Retrieve balances grouped by mp category / biofuel or by sector */
+    /** @description Retrieve balances grouped by mp category / biofuel or by sector or by depot */
     get: operations["list_balances"]
     put?: never
     post?: never
@@ -1784,7 +1784,7 @@ export interface components {
     Balance: {
       sector: components["schemas"]["SectorEnum"]
       customs_category: components["schemas"]["CustomsCategoryEnum"]
-      biofuel?: string
+      biofuel?: components["schemas"]["TiruertBiofuel"]
       /** Format: double */
       initial_balance?: number
       /** Format: double */
@@ -3216,6 +3216,19 @@ export interface components {
       /** Format: double */
       emission_rate_per_mj: number
     }
+    SimulationMinMaxInputRequest: {
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel: number | null
+      debited_entity: number | null
+      /** Format: double */
+      target_volume: number
+    }
+    SimulationMinMaxOutput: {
+      /** Format: double */
+      min_avoided_emissions: number
+      /** Format: double */
+      max_avoided_emissions: number
+    }
     SimulationOutput: {
       selected_lots: components["schemas"]["SimulationLotOutput"][]
       /** Format: double */
@@ -3247,6 +3260,10 @@ export interface components {
      * @enum {string}
      */
     StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
+    TiruertBiofuel: {
+      id: number
+      code: string
+    }
     TiruertDepot: {
       id: number
       name: string
@@ -6913,7 +6930,7 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
-        /** @description Group by sector or by lot. */
+        /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         period?: string[]
@@ -7057,9 +7074,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SimulationInputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["SimulationInputRequest"]
-        "multipart/form-data": components["schemas"]["SimulationInputRequest"]
+        "application/json": components["schemas"]["SimulationMinMaxInputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["SimulationMinMaxInputRequest"]
+        "multipart/form-data": components["schemas"]["SimulationMinMaxInputRequest"]
       }
     }
     responses: {
@@ -7068,7 +7085,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SimulationOutput"]
+          "application/json": components["schemas"]["SimulationMinMaxOutput"]
         }
       }
     }
@@ -7255,6 +7272,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryUnit {
   mj = "mj",
 }
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
+  depot = "depot",
   lot = "lot",
   sector = "sector",
 }
