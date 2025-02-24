@@ -14,6 +14,8 @@ import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "carbure/types"
+import { Button } from "common/components/button2"
+import { VolumeForm } from "./volume-form"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -22,7 +24,15 @@ interface CessionDialogProps {
 
 export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
   const { t } = useTranslation()
-  const { currentStep, currentStepIndex, steps, nextStep } = useStepper([
+  const {
+    currentStep,
+    currentStepIndex,
+    steps,
+    previousStep,
+    nextStep,
+    goToNextStep,
+    goToPreviousStep,
+  } = useStepper([
     {
       key: CessionStepKey.FromDepot,
       title: t("Dépôt d'expédition"),
@@ -51,6 +61,34 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
           <Dialog.Title>
             <Trans>Réaliser une cession</Trans>
           </Dialog.Title>
+        }
+        footer={
+          <>
+            {previousStep && (
+              <Button
+                priority="secondary"
+                onClick={goToPreviousStep}
+                // disabled={
+                //   !form.value.from_depot_available_volume ||
+                //   form.value.from_depot_available_volume === 0
+                // }
+              >
+                {t("Précédent")}
+              </Button>
+            )}
+            {nextStep && (
+              <Button
+                priority="secondary"
+                onClick={goToNextStep}
+                // disabled={
+                //   !form.value.from_depot_available_volume ||
+                //   form.value.from_depot_available_volume === 0
+                // }
+              >
+                {t("Suivant")}
+              </Button>
+            )}
+          </>
         }
       >
         <Main>
@@ -82,11 +120,34 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               }
             />
           </Grid>
+          <Grid>
+            {currentStepIndex > 1 &&
+            form.value.from_depot_available_volume &&
+            form.value.from_depot_available_volume > 0 ? (
+              <>
+                <OperationText
+                  title={t("Dépôt d'expédition")}
+                  description={form.value.from_depot?.name ?? ""}
+                />
+                <OperationText
+                  title={t("Solde disponible dans le dépôt d'expédition")}
+                  description={formatUnit(
+                    form.value.from_depot_available_volume,
+                    Unit.l,
+                    0
+                  )}
+                />
+              </>
+            ) : null}
+          </Grid>
 
           <div className={styles["cession-dialog__form"]}>
             <Form form={form}>
               {currentStep?.key === CessionStepKey.FromDepot && (
                 <FromDepotForm balance={balance} />
+              )}
+              {currentStep?.key === CessionStepKey.Volume && (
+                <VolumeForm balance={balance} />
               )}
             </Form>
           </div>

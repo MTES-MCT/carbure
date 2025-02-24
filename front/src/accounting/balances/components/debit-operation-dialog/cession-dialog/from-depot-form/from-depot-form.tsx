@@ -4,7 +4,6 @@ import { Autocomplete } from "common/components/autocomplete2"
 import { Trans, useTranslation } from "react-i18next"
 import * as common from "carbure/api"
 import { normalizeDepot } from "carbure/utils/normalizers"
-import { useState } from "react"
 import { Notice } from "common/components/notice"
 import { getVolumeByDepot } from "../api"
 import useEntity from "carbure/hooks/entity"
@@ -18,8 +17,7 @@ type FromDepotProps = {
 export const FromDepotForm = ({ balance }: FromDepotProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { value, bind } = useFormContext<SessionDialogForm>()
-  const [volume, setVolume] = useState<number | undefined>()
+  const { value, bind, setField } = useFormContext<SessionDialogForm>()
 
   const handleChangeDepot = async (
     depot?: ReturnType<typeof normalizeDepot>["value"]
@@ -28,18 +26,19 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
       const volume = await getVolumeByDepot(
         entity.id,
         balance.sector,
-        balance.customs_category!,
+        balance.customs_category,
         balance.biofuel!,
         depot.name
       )
 
-      setVolume(volume ?? 0)
+      setField("from_depot_available_volume", volume ?? 0)
     }
   }
   return (
     <>
       <Autocomplete
         label={t("Sélectionnez un dépôt d'expédition")}
+        placeholder={t("Rechercher un dépôt")}
         getOptions={(search) => common.findDepots(search)}
         normalize={normalizeDepot}
         required
@@ -49,20 +48,21 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
       />
       {value.from_depot && (
         <>
-          {volume && volume > 0 ? (
+          {value.from_depot_available_volume &&
+          value.from_depot_available_volume > 0 ? (
             <Notice noColor variant="info">
               <Trans
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
                   depot: value.from_depot.name,
-                  volume: formatNumber(volume, 0),
+                  volume: formatNumber(value.from_depot_available_volume, 0),
                 }}
                 defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{volume}} litres</strong>"
               />
             </Notice>
           ) : null}
-          {volume === 0 ? (
+          {value.from_depot_available_volume === 0 ? (
             <Notice noColor variant="warning">
               <Trans
                 t={t}

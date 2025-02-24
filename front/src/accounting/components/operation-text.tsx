@@ -1,7 +1,8 @@
 import { Text } from "common/components/text"
 import css from "./operation-text.module.css"
+import { ReactNode } from "react"
 interface OperationTextProps {
-  title: string
+  title: ReactNode
   description: string
 }
 
