@@ -7,22 +7,27 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 
 from tiruert.filters import OperationFilter
-from tiruert.serializers import BalanceByLotSerializer, BalanceSerializer, PaginatedBalanceSerializer
+from tiruert.serializers import (
+    BalanceByDepotSerializer,
+    BalanceByLotSerializer,
+    BalanceSerializer,
+    PaginatedBalanceSerializer,
+)
 from tiruert.services.balance import BalanceService
 
 
 class BalanceActionMixin:
     @extend_schema(
         operation_id="list_balances",
-        description="Retrieve balances grouped by mp category / biofuel or by sector",
+        description="Retrieve balances grouped by mp category / biofuel or by sector or by depot",
         filters=True,
         parameters=[
             OpenApiParameter(
                 name="group_by",
                 type=str,
-                enum=["sector", "lot"],
+                enum=["sector", "lot", "depot"],
                 location=OpenApiParameter.QUERY,
-                description="Group by sector or by lot.",
+                description="Group by sector, lot or depot.",
                 default="",
             ),
             OpenApiParameter(
@@ -58,7 +63,7 @@ class BalanceActionMixin:
 
         operations = self.filter_queryset(self.get_queryset())
 
-        if group_by == "lot":
+        if group_by in ["lot", "depot"]:
             # Calculate the balance
             balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
 
@@ -85,12 +90,12 @@ class BalanceActionMixin:
             balance = BalanceService.calculate_yearly_teneur(balance, entity_id, operations, date_from, group_by, unit)
 
         # Convert balance to a list of dictionaries for serialization
-        if group_by == "lot":
-            serializer_class = BalanceByLotSerializer
-            data = serializer_class.prepare_data(balance)
-        else:
-            data = list(balance.values())
-            serializer_class = self.get_serializer_class()
+        serializer_class = {
+            "lot": BalanceByLotSerializer,
+            "depot": BalanceByDepotSerializer,
+        }.get(group_by, self.get_serializer_class())
+
+        data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
 
         paginator = PageNumberPagination()
         paginated_data = paginator.paginate_queryset(data, request)

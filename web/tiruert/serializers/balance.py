@@ -78,6 +78,49 @@ class BalanceByLotSerializer(serializers.Serializer):
         return list(grouped_balance.values())
 
 
+class DepotSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    volume = serializers.DictField(child=serializers.FloatField())
+    unit = serializers.CharField(required=False)
+
+
+class BalanceByDepotSerializer(serializers.Serializer):
+    customs_category = serializers.CharField(required=False, allow_null=True)
+    biofuel = TiruertBiofuelSerializer(required=False, allow_null=True)
+    depots = DepotSerializer(many=True, required=False)
+
+    @staticmethod
+    def prepare_data(balance_dict):
+        # Group by customs_category and biofuel, and display balance by depot
+        grouped_balance = {}
+
+        for key, value in balance_dict.items():
+            sector, customs_cat, biofuel, depot = key
+            group_key = (customs_cat, biofuel)
+
+            if group_key not in grouped_balance:
+                grouped_balance[group_key] = {
+                    "customs_category": customs_cat,
+                    "biofuel": value["biofuel"],
+                    "depots": [],
+                }
+
+            grouped_balance[group_key]["depots"].append(
+                {
+                    "id": depot.id,
+                    "name": depot.name,
+                    "volume": {
+                        "credit": value["quantity"]["credit"],
+                        "debit": value["quantity"]["debit"],
+                    },
+                    "unit": value["unit"],
+                },
+            )
+
+        return list(grouped_balance.values())
+
+
 class PaginatedBalanceSerializer(serializers.Serializer):
     count = serializers.IntegerField()
     next = serializers.CharField(allow_null=True)

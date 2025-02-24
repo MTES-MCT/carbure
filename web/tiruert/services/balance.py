@@ -41,14 +41,19 @@ class BalanceService:
 
             conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
+            depot = operation.to_depot if operation.is_credit(entity_id) else operation.from_depot
+
             for detail in operation.details.all():
                 key = (operation.sector, operation.customs_category, operation.biofuel.code)
 
                 if group_by == "lot":
                     key = key + (detail.lot.id,)
 
-                if group_by == "sector":
+                elif group_by == "sector":
                     key = operation.sector
+
+                elif group_by == "depot":
+                    key = key + (depot,)
 
                 balance[key]["sector"] = operation.sector
                 if group_by != "sector":
@@ -57,7 +62,7 @@ class BalanceService:
 
                 balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
 
-                if operation.type == Operation.TENEUR and group_by != "lot":
+                if operation.type == Operation.TENEUR and group_by not in ["lot", "depot"]:
                     balance[key]["teneur"] += detail.volume * conversion_factor
                 else:
                     if operation.is_credit(entity_id):
