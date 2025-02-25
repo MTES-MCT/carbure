@@ -8,6 +8,11 @@ class TiruertBiofuelSerializer(serializers.Serializer):
     code = serializers.CharField()
 
 
+class BalanceQuantitySerializer(serializers.Serializer):
+    credit = serializers.FloatField(default=0.0)
+    debit = serializers.FloatField(default=0.0)
+
+
 class BalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
     customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES, required=False)
@@ -15,7 +20,7 @@ class BalanceSerializer(serializers.Serializer):
     initial_balance = serializers.FloatField()
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
-    quantity = serializers.DictField(child=serializers.FloatField())
+    quantity = BalanceQuantitySerializer()
     # avg_emission_rate_per_mj = serializers.FloatField()
     teneur = serializers.FloatField()
     yearly_teneur = serializers.FloatField(required=False)
@@ -78,17 +83,17 @@ class BalanceByLotSerializer(serializers.Serializer):
         return list(grouped_balance.values())
 
 
-class DepotSerializer(serializers.Serializer):
+class BalanceDepotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    volume = serializers.DictField(child=serializers.FloatField())
+    quantity = BalanceQuantitySerializer()
     unit = serializers.CharField(required=False)
 
 
 class BalanceByDepotSerializer(serializers.Serializer):
     customs_category = serializers.CharField()
     biofuel = TiruertBiofuelSerializer()
-    depots = DepotSerializer(many=True)
+    depots = BalanceDepotSerializer(many=True)
 
     @staticmethod
     def prepare_data(balance_dict):
@@ -110,7 +115,7 @@ class BalanceByDepotSerializer(serializers.Serializer):
                 {
                     "id": depot.id,
                     "name": depot.name,
-                    "volume": {
+                    "quantity": {
                         "credit": value["quantity"]["credit"],
                         "debit": value["quantity"]["debit"],
                     },
