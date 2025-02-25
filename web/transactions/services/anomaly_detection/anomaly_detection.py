@@ -80,6 +80,11 @@ def anomaly_detection(
     if_params=DEFAULT_IF_PARAMS,
     lof_params=DEFAULT_LOF_PARAMS,
 ):
+    """
+    Detect outliers in lots based on their categories and GHG profile.
+    Original implementation: https://gitlab.com/la-fabrique-numerique/carbure_datascience
+    """
+
     from sklearn.ensemble import IsolationForest
     from sklearn.neighbors import LocalOutlierFactor
 
@@ -113,6 +118,7 @@ def anomaly_detection(
         "country_of_origin_id": pays["name"],
     }
 
+    carbure_lots[emission_cols] = carbure_lots[emission_cols].clip(e_min, e_max)
     ghg = carbure_lots[emission_cols + categorical_variables]
     ddv_flags = flag_default_values(ghg, data_dir, emission_cols=emission_cols)
     flagged_df = ghg.join(ddv_flags)
