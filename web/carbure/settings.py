@@ -155,7 +155,7 @@ os.environ["DATABASE_URL"] = os.environ["DATABASE_URL"].replace("useSSL=true&ver
 DATABASES = {"default": env.db()}
 
 DATABASES["default"]["OPTIONS"] = {
-    **DATABASES["default"]["OPTIONS"],
+    **DATABASES["default"].get("OPTIONS", {}),
     "charset": "utf8mb4",
 }
 
