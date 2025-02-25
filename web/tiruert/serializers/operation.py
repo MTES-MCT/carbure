@@ -6,21 +6,21 @@ from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
 
 
-class TiruertDepotSerializer(serializers.Serializer):
+class OperationDepotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 
-class TiruertEntitySerializer(serializers.Serializer):
+class OperationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 
 class BaseOperationSerializer(serializers.ModelSerializer):
-    from_depot = TiruertDepotSerializer()
-    to_depot = TiruertDepotSerializer()
-    credited_entity = TiruertEntitySerializer()
-    debited_entity = TiruertEntitySerializer()
+    from_depot = OperationDepotSerializer()
+    to_depot = OperationDepotSerializer()
+    credited_entity = OperationEntitySerializer()
+    debited_entity = OperationEntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
@@ -106,7 +106,7 @@ class OperationSerializer(BaseOperationSerializer):
         return sum(detail.avoided_emissions for detail in instance.details.all())
 
 
-class LotSerializer(serializers.Serializer):
+class OperationLotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     volume = serializers.FloatField()
     emission_rate_per_mj = serializers.FloatField()
@@ -133,7 +133,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "lots": {"required": True},
         }
 
-    lots = LotSerializer(many=True)
+    lots = OperationLotSerializer(many=True)
 
     def create(self, validated_data):
         with transaction.atomic():
