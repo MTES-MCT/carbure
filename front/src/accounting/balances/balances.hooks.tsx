@@ -27,7 +27,7 @@ export const useBalancesColumns = () => {
     },
     {
       header: t("Biocarburant"),
-      cell: (item) => item.biofuel,
+      cell: (item) => item.biofuel?.code,
     },
     {
       header: t("Catégorie"),
@@ -50,7 +50,7 @@ export const useBalancesColumns = () => {
                 routes.MATERIAL_ACCOUNTING.OPERATIONS,
                 {
                   sector: item.sector,
-                  biofuel: item.biofuel,
+                  biofuel: item.biofuel?.code,
                   customs_category: item.customs_category,
                   status: OperationsStatus.PENDING,
                 }

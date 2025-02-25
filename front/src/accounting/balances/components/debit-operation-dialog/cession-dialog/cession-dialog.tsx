@@ -8,19 +8,33 @@ import { OperationText } from "accounting/components/operation-text"
 import { Trans, useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
 import { Stepper, useStepper } from "common/components/stepper"
-import { FromDepotForm, showNextStepFromDepotForm } from "./from-depot-form"
+import {
+  FromDepotForm,
+  FromDepotSummary,
+  showNextStepFromDepotForm,
+} from "./from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "carbure/types"
 import { Button } from "common/components/button2"
-import { showNextStepVolumeForm, VolumeForm } from "./volume-form"
+import {
+  showNextStepVolumeForm,
+  VolumeForm,
+  VolumeSummary,
+} from "./volume-form"
 import { useMemo } from "react"
 import {
   RecipientToDepotForm,
+  RecipientToDepotSummary,
   showNextStepRecipientToDepotForm,
 } from "./recipient-to-depot-form"
+import { simulate, createOperation } from "accounting/api"
+import { useMutation } from "common/hooks/async"
+import useEntity from "carbure/hooks/entity"
+import { CreateOperationType } from "accounting/types"
+import { useNotify } from "common/components/notifications"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -29,6 +43,8 @@ interface CessionDialogProps {
 
 export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
   const { t } = useTranslation()
+  const notify = useNotify()
+  const entity = useEntity()
   const {
     currentStep,
     currentStepIndex,
@@ -70,9 +86,50 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
     return true
   }, [currentStep, form.value])
 
-  const createOperation = () => {
-    console.log(form.value)
+  const onSubmit = () => {
+    return simulate(entity.id, {
+      customs_category: balance.customs_category,
+      biofuel: balance.biofuel?.id ?? null,
+      debited_entity: entity.id,
+      target_volume: form.value.volume!,
+      target_emission: form.value.avoided_emissions!,
+    }).then((response) => {
+      const lots = response.data?.selected_lots
+      if (lots) {
+        return createOperation(entity.id, {
+          lots: lots.map(({ lot_id, ...rest }) => ({
+            id: lot_id,
+            ...rest,
+          })),
+          biofuel: balance.biofuel?.id ?? null,
+          customs_category: balance.customs_category,
+          debited_entity: entity.id,
+          type: CreateOperationType.CESSION,
+          from_depot: form.value.from_depot?.id,
+          to_depot: form.value.to_depot?.id,
+          credited_entity: form.value.credited_entity?.id,
+        })
+      }
+    })
   }
+
+  const mutation = useMutation(onSubmit, {
+    onSuccess: () => {
+      onClose()
+      notify(
+        t(
+          "La cession d'une quantité de {{quantity}} a été réalisée avec succès",
+          { quantity: formatUnit(form.value.volume!, Unit.l, 0) }
+        ),
+        { variant: "success" }
+      )
+    },
+    onError: () => {
+      notify(t("Une erreur est survenue lors de la cession"), {
+        variant: "danger",
+      })
+    },
+  })
 
   return (
     <Portal>
@@ -107,7 +164,11 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               </Button>
             )}
             {currentStep?.key === CessionStepKey.Recap && (
-              <Button priority="primary" onClick={createOperation}>
+              <Button
+                priority="primary"
+                onClick={() => mutation.execute()}
+                loading={mutation.loading}
+              >
                 {t("Céder")}
               </Button>
             )}
@@ -132,7 +193,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
             />
             <OperationText
               title={t("Biocarburant")}
-              description={balance.biofuel ?? ""}
+              description={balance.biofuel ? balance.biofuel.code : ""}
             />
             <OperationText
               title={t("Solde disponible")}
@@ -143,51 +204,10 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               }
             />
           </Grid>
-          {currentStepIndex > 1 &&
-          form.value.from_depot_available_volume &&
-          form.value.from_depot_available_volume > 0 ? (
-            <Grid>
-              <OperationText
-                title={t("Dépôt d'expédition")}
-                description={form.value.from_depot?.name ?? ""}
-              />
-              <OperationText
-                title={t("Solde disponible dans le dépôt d'expédition")}
-                description={formatUnit(
-                  form.value.from_depot_available_volume,
-                  Unit.l,
-                  0
-                )}
-              />
-            </Grid>
-          ) : null}
-          {currentStepIndex > 2 &&
-          form.value.volume &&
-          form.value.avoided_emissions ? (
-            <Grid>
-              <OperationText
-                title={t("Quantité de la cession")}
-                description={formatUnit(form.value.volume, Unit.l, 0)}
-              />
-              <OperationText
-                title={t("TCO2 évitées équivalentes")}
-                description={form.value.avoided_emissions}
-              />
-            </Grid>
-          ) : null}
+          {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
+          {currentStepIndex > 2 && <VolumeSummary values={form.value} />}
           {currentStepIndex > 3 && form.value.credited_entity && (
-            <Grid>
-              <OperationText
-                title={t("Redevable")}
-                description={form.value.credited_entity.name}
-              />
-              {form.value.to_depot && (
-                <OperationText
-                  title={t("Dépôt destinataire")}
-                  description={form.value.to_depot?.name ?? ""}
-                />
-              )}
-            </Grid>
+            <RecipientToDepotSummary values={form.value} />
           )}
           {currentStep?.key !== CessionStepKey.Recap && (
             <div className={styles["cession-dialog__form"]}>

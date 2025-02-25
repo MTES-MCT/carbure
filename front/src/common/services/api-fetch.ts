@@ -1,6 +1,5 @@
 import createClient, { Middleware } from "openapi-fetch"
 import { getI18n } from "react-i18next"
-import { toFormData } from "./api"
 import {
   PathsWithGetMethod,
   QueryParams,
@@ -83,3 +82,47 @@ function isEmpty(value: any) {
   const isEmpty = Array.isArray(value) && value.length === 0
   return isNull || isUndefined || isEmpty
 }
+
+export function toFormData(obj: any): FormData {
+  const formData = new FormData()
+  for (const key in obj) {
+    if (obj[key] instanceof FileList) {
+      Array.from(obj[key]).forEach((value: any) => formData.append(key, value))
+    } else if (Array.isArray(obj[key])) {
+      obj[key].forEach((value: any) => formData.append(key, value.toString()))
+    } else if (!isEmpty(obj[key])) {
+      formData.append(key, obj[key])
+    }
+  }
+  return formData
+}
+// function toFormData(
+//   data: any,
+//   parentKey: string = "",
+//   formData: FormData = new FormData()
+// ): FormData {
+//   if (data === null || data === undefined) {
+//     return formData
+//   }
+
+//   if (typeof data === "object" && !(data instanceof File)) {
+//     if (Array.isArray(data)) {
+//       // Pour les tableaux, ajoute des indices dans la clé (ex: "items[0]")
+//       data.forEach((value, index) => {
+//         toFormData(value, `${parentKey}[${index}]`, formData)
+//       })
+//     } else {
+//       // Pour les objets, ajoute les clés récursivement
+//       Object.keys(data).forEach((key) => {
+//         const value = data[key]
+//         const newKey = parentKey ? `${parentKey}.${key}` : key
+//         toFormData(value, newKey, formData)
+//       })
+//     }
+//   } else {
+//     // Ajoute les valeurs simples (string, number, File, etc.)
+//     formData.append(parentKey, data)
+//   }
+
+//   return formData
+// }

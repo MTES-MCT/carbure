@@ -8,8 +8,7 @@ export enum CessionStepKey {
 }
 
 export type SessionDialogForm = {
-  from_depot?: Depot
-  from_depot_available_volume?: number // Value used to disable/enable the next step button
+  from_depot?: any
   volume?: number
   avoided_emissions_min?: number // Range determined by the simulation
   avoided_emissions_max?: number // Range determined by the simulation
