@@ -2,13 +2,14 @@ import { useFormContext } from "common/components/form2"
 import { SessionDialogForm } from "../cession-dialog.types"
 import { Autocomplete } from "common/components/autocomplete2"
 import { Trans, useTranslation } from "react-i18next"
-import * as common from "carbure/api"
-import { normalizeDepot } from "carbure/utils/normalizers"
 import { Notice } from "common/components/notice"
-import { getVolumeByDepot } from "../api"
+import { getDepotsWithBalance } from "../api"
 import useEntity from "carbure/hooks/entity"
 import { Balance } from "accounting/balances/types"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatUnit } from "common/utils/formatters"
+import { Unit } from "carbure/types"
+import { Grid } from "common/components/scaffold"
+import { OperationText } from "accounting/components/operation-text"
 
 type FromDepotProps = {
   balance: Balance
@@ -16,59 +17,66 @@ type FromDepotProps = {
 
 export const showNextStepFromDepotForm = (values: SessionDialogForm) => {
   return (
-    values.from_depot_available_volume && values.from_depot_available_volume > 0
+    values.from_depot?.volume?.credit && values.from_depot.volume.credit > 0
   )
 }
 
 export const FromDepotForm = ({ balance }: FromDepotProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { value, bind, setField } = useFormContext<SessionDialogForm>()
+  const { value, bind } = useFormContext<SessionDialogForm>()
 
-  const handleChangeDepot = async (
-    depot?: ReturnType<typeof normalizeDepot>["value"]
-  ) => {
-    if (depot) {
-      const volume = await getVolumeByDepot(
-        entity.id,
-        balance.sector,
-        balance.customs_category,
-        balance.biofuel!,
-        depot.name
-      )
-
-      setField("from_depot_available_volume", volume ?? 0)
-    }
-  }
   return (
     <>
       <Autocomplete
         label={t("Sélectionnez un dépôt d'expédition")}
         placeholder={t("Rechercher un dépôt")}
-        getOptions={(search) => common.findDepots(search)}
-        normalize={normalizeDepot}
-        required
-        {...bind("from_depot", {
-          onChange: handleChangeDepot,
+        getOptions={(search) =>
+          getDepotsWithBalance(entity.id, {
+            sector: balance.sector,
+            category: balance.customs_category,
+            biofuel: balance.biofuel?.code ?? "",
+            query: search,
+          })
+        }
+        normalize={(depot) => ({
+          label: depot.name,
+          value: depot,
         })}
-      />
+        required
+        {...bind("from_depot")}
+      >
+        {({ value: depot }) => (
+          <span>
+            <Trans
+              components={{ strong: <strong /> }}
+              t={t}
+              values={{
+                depot: depot.name,
+                volume: formatUnit(depot.volume.credit, Unit.l),
+              }}
+              defaults="{{depot}} (<strong>{{volume}}</strong> disponibles)"
+            />
+          </span>
+        )}
+      </Autocomplete>
       {value.from_depot && (
         <>
-          {value.from_depot_available_volume &&
-          value.from_depot_available_volume > 0 ? (
+          {value.from_depot.volume.credit &&
+          value.from_depot.volume.credit > 0 ? (
             <Notice noColor variant="info">
               <Trans
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
                   depot: value.from_depot.name,
-                  volume: formatNumber(value.from_depot_available_volume, 0),
+                  volume: formatNumber(value.from_depot.volume.credit, 0),
                 }}
                 defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{volume}} litres</strong>"
               />
             </Notice>
           ) : null}
-          {value.from_depot_available_volume === 0 ? (
+          {value.from_depot.volume.credit === 0 ? (
             <Notice noColor variant="warning">
               <Trans
                 t={t}
@@ -80,5 +88,30 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
         </>
       )}
     </>
+  )
+}
+
+// Recap form data after the step was submitted
+export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
+  const { t } = useTranslation()
+
+  if (
+    !values.from_depot?.volume?.credit ||
+    values.from_depot.volume.credit <= 0
+  ) {
+    return null
+  }
+
+  return (
+    <Grid>
+      <OperationText
+        title={t("Dépôt d'expédition")}
+        description={values.from_depot?.name ?? ""}
+      />
+      <OperationText
+        title={t("Solde disponible dans le dépôt d'expédition")}
+        description={formatUnit(values.from_depot.volume.credit, Unit.l, 0)}
+      />
+    </Grid>
   )
 }

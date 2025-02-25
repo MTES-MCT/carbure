@@ -19,16 +19,6 @@ export const patchOperation = (
   })
 }
 
-// export const createOperation = (
-//   entityId: number,
-//   data: apiTypes["OperationCreateRequest"]
-// ) => {
-//   return api.POST("/tiruert/operations/", {
-//     params: { query: { entity_id: entityId } },
-//     body: data,
-//   })
-// }
-
 export const simulateMinMax = (
   entityId: number,
   {
@@ -45,7 +35,28 @@ export const simulateMinMax = (
       customs_category,
       debited_entity,
       target_volume,
-      target_emission: 0, // why ?
     },
+  })
+}
+
+// Get the lots that can be used to create an operation
+export const simulate = (
+  entityId: number,
+  data: apiTypes["SimulationInputRequest"]
+) => {
+  return api.POST("/tiruert/operations/simulate/", {
+    params: { query: { entity_id: entityId } },
+    body: data,
+  })
+}
+
+export const createOperation = (
+  entityId: number,
+  data: apiTypes["OperationInputRequest"]
+) => {
+  return api.POST("/tiruert/operations/", {
+    params: { query: { entity_id: entityId } },
+    body: data,
+    bodySerializer: undefined,
   })
 }

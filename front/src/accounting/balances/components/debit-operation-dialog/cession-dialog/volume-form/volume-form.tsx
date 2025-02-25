@@ -9,6 +9,10 @@ import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import { Notice } from "common/components/notice"
 import { useState } from "react"
+import { Grid } from "common/components/scaffold"
+import { OperationText } from "accounting/components/operation-text"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "carbure/types"
 type VolumeFormProps = {
   balance: Balance
 }
@@ -41,7 +45,7 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
   const declareQuantity = () => {
     mutation
       .execute(entity.id, {
-        biofuel: 33,
+        biofuel: balance.biofuel?.id ?? null,
         customs_category: balance.customs_category,
         debited_entity: entity.id,
         target_volume: value.volume!,
@@ -49,10 +53,8 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
       })
       .then((response) => {
         const emissions = response.data
-        // @ts-ignore fixed soon by the backend
-        setField("avoided_emissions_min", emissions.min_avoided_emissions)
-        // @ts-ignore fixed soon by the backend
-        setField("avoided_emissions_max", emissions.max_avoided_emissions)
+        setField("avoided_emissions_min", emissions?.min_avoided_emissions)
+        setField("avoided_emissions_max", emissions?.max_avoided_emissions)
         setVolumeDeclared(true)
       })
   }
@@ -124,5 +126,26 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
           </>
         )}
     </>
+  )
+}
+
+export const VolumeSummary = ({ values }: { values: SessionDialogForm }) => {
+  const { t } = useTranslation()
+
+  if (!values.volume || !values.avoided_emissions) {
+    return null
+  }
+
+  return (
+    <Grid>
+      <OperationText
+        title={t("Quantité de la cession")}
+        description={formatUnit(values.volume, Unit.l, 0)}
+      />
+      <OperationText
+        title={t("TCO2 évitées équivalentes")}
+        description={values.avoided_emissions}
+      />
+    </Grid>
   )
 }

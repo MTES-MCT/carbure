@@ -82,11 +82,6 @@ export function Autocomplete<T, V>({
           onOpen={autocomplete.execute}
           onToggle={autocomplete.setOpen}
           anchor={anchor}
-          onClose={() => {
-            if (value) {
-              autocomplete.onQuery
-            }
-          }}
         >
           {loading || autocomplete.loading ? (
             <Text style={{ padding: "10px", textAlign: "center" }}>

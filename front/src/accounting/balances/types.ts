@@ -1,5 +1,8 @@
 import { CBQueryParams } from "common/hooks/query-builder-2"
-import { PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter } from "api-schema"
+import {
+  PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter,
+  PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
+} from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
   OperationBiofuelCategory,
@@ -7,7 +10,7 @@ import {
   OperationsStatus,
 } from "accounting/types"
 
-export { BalancesFilter }
+export { BalancesFilter, BalancesGroupBy }
 export type Balance = apiTypes["Balance"]
 
 export interface BalancesQuery

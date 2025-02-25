@@ -8,12 +8,14 @@ import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
   PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
+  TypeDefEnum as CreateOperationType,
 } from "api-schema"
 
 export {
   OperationsStatus,
   OperationSector,
-  OperationType,
+  OperationType, // List of operation types including ACQUISITION which is just used for display
+  CreateOperationType,
   OperationsFilter,
   OperationDebitOrCredit,
   OperationBiofuelCategory,
