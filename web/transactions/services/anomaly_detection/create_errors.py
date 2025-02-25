@@ -19,9 +19,9 @@ def create_error(error: str, emission_category: str, lot_id: int):
 
 def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
     processed_lots = CarbureLot.objects.exclude(lot_status__in=["DRAFT", "DELETED"]).filter(
-        production_site_commissioning_date__lte="2025-01-01",
+        # production_site_commissioning_date__lte="2025-01-01",
+        # delivery_date__gt="1970-01-01",
         production_site_commissioning_date__gt="1970-01-01",
-        delivery_date__gt="1970-01-01",
         delivery_date__gte="2022-03-01",
     )
 
@@ -48,6 +48,6 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
 
     lot_ids: list[int] = [e.lot_id for e in errors]
     GenericError.objects.filter(error__in=["LOF_OUTLIER", "IF_OUTLIER"], lot_id__in=lot_ids).delete()
-    GenericError.objects.bulk_create(errors)
+    GenericError.objects.bulk_create(errors, batch_size=1000)
 
     return lot_ids
