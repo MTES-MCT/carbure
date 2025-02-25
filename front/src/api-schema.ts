@@ -1783,10 +1783,10 @@ export interface components {
     }
     Balance: {
       sector: components["schemas"]["SectorEnum"]
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
       biofuel?: components["schemas"]["TiruertBiofuel"]
       /** Format: double */
-      initial_balance?: number
+      initial_balance: number
       /** Format: double */
       readonly available_balance: number
       /** Format: double */
@@ -1795,12 +1795,20 @@ export interface components {
         [key: string]: number
       }
       /** Format: double */
-      teneur?: number
+      teneur: number
       /** Format: double */
       yearly_teneur?: number
       pending: number
-      unit?: string
+      unit: string
     }
+    BalanceByDepot: {
+      customs_category: string
+      biofuel: components["schemas"]["TiruertBiofuel"]
+      depots: components["schemas"]["Depot"][]
+    }
+    BalanceResponse:
+      | components["schemas"]["BalanceByDepot"]
+      | components["schemas"]["Balance"]
     Biofuel: {
       name: string
       name_en: string
@@ -2682,11 +2690,20 @@ export interface components {
      * @enum {string}
      */
     OwnershipTypeEnum: OwnershipTypeEnum
-    PaginatedBalance: {
+    PaginatedBalanceResponseList: {
+      /** @example 123 */
       count: number
-      next: string | null
-      previous: string | null
-      results: components["schemas"]["Balance"][]
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["BalanceResponse"][]
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -6933,6 +6950,8 @@ export interface operations {
         /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description A page number within the paginated result set. */
+        page?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -6947,13 +6966,12 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Paginated response with balances grouped by mp category / biofuel or by sector */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedBalance"]
+          "application/json": components["schemas"]["PaginatedBalanceResponseList"]
         }
       }
     }

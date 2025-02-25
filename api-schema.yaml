@@ -5104,6 +5104,12 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `ACQUISITION` - ACQUISITION
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
         - in: query
           name: period
           schema:
@@ -5170,9 +5176,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedBalance"
-          description: Paginated response with balances grouped by mp category / biofuel
-            or by sector
+                $ref: "#/components/schemas/PaginatedBalanceResponseList"
+          description: ""
   /api/tiruert/operations/balance/filters/:
     get:
       operationId: filter_balances
@@ -5872,11 +5877,32 @@ components:
           type: string
       required:
         - available_balance
-        - customs_category
         - final_balance
+        - initial_balance
         - pending
         - quantity
         - sector
+        - teneur
+        - unit
+    BalanceByDepot:
+      type: object
+      properties:
+        customs_category:
+          type: string
+        biofuel:
+          $ref: "#/components/schemas/TiruertBiofuel"
+        depots:
+          type: array
+          items:
+            $ref: "#/components/schemas/Depot"
+      required:
+        - biofuel
+        - customs_category
+        - depots
+    BalanceResponse:
+      oneOf:
+        - $ref: "#/components/schemas/BalanceByDepot"
+        - $ref: "#/components/schemas/Balance"
     Biofuel:
       type: object
       properties:
@@ -8146,26 +8172,29 @@ components:
         * `OWN` - Propre
         * `THIRD_PARTY` - Tiers
         * `PROCESSING` - Processing
-    PaginatedBalance:
+    PaginatedBalanceResponseList:
       type: object
+      required:
+        - count
+        - results
       properties:
         count:
           type: integer
+          example: 123
         next:
           type: string
           nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
         previous:
           type: string
           nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
         results:
           type: array
           items:
-            $ref: "#/components/schemas/Balance"
-      required:
-        - count
-        - next
-        - previous
-        - results
+            $ref: "#/components/schemas/BalanceResponse"
     PaginatedEntityPreviewList:
       type: object
       required:

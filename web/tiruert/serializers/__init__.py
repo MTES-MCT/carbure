@@ -7,5 +7,4 @@ from .operation import OperationUpdateSerializer
 from .balance import BalanceSerializer
 from .balance import BalanceByLotSerializer
 from .balance import BalanceByDepotSerializer
-from .balance import PaginatedBalanceSerializer
 from .teneur import SimulationInputSerializer

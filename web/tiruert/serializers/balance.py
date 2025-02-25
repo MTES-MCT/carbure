@@ -10,17 +10,17 @@ class TiruertBiofuelSerializer(serializers.Serializer):
 
 class BalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
-    customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
+    customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES, required=False)
     biofuel = TiruertBiofuelSerializer(required=False)
-    initial_balance = serializers.FloatField(required=False)
+    initial_balance = serializers.FloatField()
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
     quantity = serializers.DictField(child=serializers.FloatField())
     # avg_emission_rate_per_mj = serializers.FloatField()
-    teneur = serializers.FloatField(required=False)
+    teneur = serializers.FloatField()
     yearly_teneur = serializers.FloatField(required=False)
     pending = serializers.IntegerField()
-    unit = serializers.CharField(required=False)
+    unit = serializers.CharField()
 
     def to_representation(self, instance):
         # Overrides the default representation to remove fields with null values.
@@ -86,9 +86,9 @@ class DepotSerializer(serializers.Serializer):
 
 
 class BalanceByDepotSerializer(serializers.Serializer):
-    customs_category = serializers.CharField(required=False, allow_null=True)
-    biofuel = TiruertBiofuelSerializer(required=False, allow_null=True)
-    depots = DepotSerializer(many=True, required=False)
+    customs_category = serializers.CharField()
+    biofuel = TiruertBiofuelSerializer()
+    depots = DepotSerializer(many=True)
 
     @staticmethod
     def prepare_data(balance_dict):
@@ -119,10 +119,3 @@ class BalanceByDepotSerializer(serializers.Serializer):
             )
 
         return list(grouped_balance.values())
-
-
-class PaginatedBalanceSerializer(serializers.Serializer):
-    count = serializers.IntegerField()
-    next = serializers.CharField(allow_null=True)
-    previous = serializers.CharField(allow_null=True)
-    results = BalanceSerializer(many=True)
