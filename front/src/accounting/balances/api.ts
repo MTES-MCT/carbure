@@ -1,12 +1,23 @@
 import { api } from "common/services/api-fetch"
-import { BalancesFilter, BalancesQuery } from "./types"
+import { Balance, BalancesFilter, BalancesQuery } from "./types"
 
 export const getBalances = (query: BalancesQuery) => {
-  return api.GET("/tiruert/operations/balance/", {
-    params: {
-      query,
-    },
-  })
+  return api
+    .GET("/tiruert/operations/balance/", {
+      params: {
+        query,
+      },
+    })
+    .then((response) => {
+      const results = response.data?.results
+      return {
+        ...response,
+        data: {
+          ...response.data,
+          results: results as Balance[],
+        },
+      }
+    })
 }
 
 export const getBalanceFilters = (

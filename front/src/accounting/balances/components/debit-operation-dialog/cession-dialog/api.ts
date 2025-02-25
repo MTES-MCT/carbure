@@ -1,6 +1,7 @@
 import { BalancesGroupBy } from "accounting/balances/types"
 import { OperationBiofuelCategory, OperationSector } from "accounting/types"
 import { api } from "common/services/api-fetch"
+import { apiTypes } from "common/services/api-fetch.types"
 
 export const getDepotsWithBalance = (
   entity_id: number,
@@ -30,11 +31,11 @@ export const getDepotsWithBalance = (
       },
     })
     .then((res) => {
-      const results = res.data?.results
+      const results = res.data?.results as apiTypes["BalanceByDepot"][]
       if (results && results.length > 0) {
-        // @ts-ignore backend will implement
-        return results[0].depots
+        return results[0]!.depots
       }
+
       return []
     })
 }

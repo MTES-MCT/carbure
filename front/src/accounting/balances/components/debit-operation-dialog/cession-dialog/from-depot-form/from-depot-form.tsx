@@ -46,7 +46,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
         required
         {...bind("from_depot")}
       >
-        {({ value: depot }) => (
+        {({ data: depot }) => (
           <span>
             <Trans
               components={{ strong: <strong /> }}
