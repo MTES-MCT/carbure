@@ -130,10 +130,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "biofuel": {"required": True},
             "customs_category": {"required": True},
             "debited_entity": {"required": True},
-            "lots": {"required": True},
         }
 
-    lots = OperationLotSerializer(many=True)
+    lots = OperationLotSerializer(many=True, required=True)
 
     def create(self, validated_data):
         with transaction.atomic():
