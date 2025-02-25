@@ -44,7 +44,9 @@ class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.Gene
         return [
             OrPermission(
                 lambda: HasUserRights(None, [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]),
-                lambda: HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING]),
+                lambda: HasAdminRights(
+                    allow_external=[ExternalAdminRights.DOUBLE_COUNTING, ExternalAdminRights.TRANSFERRED_ELEC]
+                ),
             )
         ]
 
