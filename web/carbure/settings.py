@@ -147,15 +147,14 @@ WSGI_APPLICATION = "carbure.wsgi.application"
 # id = models.AutoField(primary_key=True)
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+# replace Scalingo's DATABASE_URL options
+os.environ["DATABASE_URL"] = os.environ["DATABASE_URL"].replace("useSSL=true&verifyServerCertificate=false", "ssl=true")
+
 # Load db setup from DATABASE_URL env variable
 DATABASES = {"default": env.db()}
-
-DATABASES["default"]["OPTIONS"] = {
-    "charset": "utf8mb4",
-}
+DATABASES["default"]["OPTIONS"]["charset"] = "utf8mb4"
 
 if env("TEST") == 1:
-    print("DB TESTING MODE")
     DATABASES["default"]["OPTIONS"] = {
         **DATABASES["default"]["OPTIONS"],
         "auth_plugin": "mysql_native_password",
