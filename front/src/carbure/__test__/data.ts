@@ -1,7 +1,4 @@
-import {
-  PathsApiTiruertOperationsGetParametersQueryCustoms_category,
-  PreferredUnitEnum,
-} from "api-schema"
+import { PreferredUnitEnum } from "api-schema"
 import {
   Entity,
   EntityType,
@@ -180,7 +177,7 @@ export const matierePremiere: Feedstock = {
   code: "COLZA",
   name: "Colza",
   name_en: "Colza",
-  category: PathsApiTiruertOperationsGetParametersQueryCustoms_category.CONV,
+  category: CategoryEnum.CONV,
 }
 
 // BIOCARBURANT
