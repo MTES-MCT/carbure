@@ -68,7 +68,7 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
     <>
       <NumberInput
         label={t("Saisir une quantité pour la cession")}
-        max={value.from_depot_available_volume}
+        max={value.from_depot?.volume.credit}
         {...bind("volume")}
         addon={
           <>
@@ -79,8 +79,8 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
                 disabled={
                   !value.volume ||
                   value.volume === 0 ||
-                  (value.from_depot_available_volume !== undefined &&
-                    value.volume > value.from_depot_available_volume)
+                  (value.from_depot?.volume.credit !== undefined &&
+                    value.volume > value.from_depot?.volume.credit)
                 }
               >
                 {t("Déclarer la quantité")}

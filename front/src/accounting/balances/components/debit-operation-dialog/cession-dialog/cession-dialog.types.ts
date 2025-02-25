@@ -1,5 +1,5 @@
-import { Depot, Entity, EntityPreview } from "carbure/types"
-
+import { Depot, EntityPreview } from "carbure/types"
+import { apiTypes } from "common/services/api-fetch.types"
 export enum CessionStepKey {
   FromDepot = "from_depot",
   Volume = "volume",
@@ -8,7 +8,7 @@ export enum CessionStepKey {
 }
 
 export type SessionDialogForm = {
-  from_depot?: any
+  from_depot?: apiTypes["BalanceDepot"]
   volume?: number
   avoided_emissions_min?: number // Range determined by the simulation
   avoided_emissions_max?: number // Range determined by the simulation
