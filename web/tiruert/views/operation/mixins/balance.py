@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.utils.timezone import make_aware
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -11,7 +11,6 @@ from tiruert.serializers import (
     BalanceByDepotSerializer,
     BalanceByLotSerializer,
     BalanceSerializer,
-    PaginatedBalanceSerializer,
 )
 from tiruert.services.balance import BalanceService
 
@@ -40,9 +39,14 @@ class BalanceActionMixin:
             ),
         ],
         responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=PaginatedBalanceSerializer,
-                description="Paginated response with balances grouped by mp category / biofuel or by sector",
+            status.HTTP_200_OK: PolymorphicProxySerializer(
+                many=True,
+                component_name="BalanceResponse",
+                serializers=[
+                    BalanceByDepotSerializer,
+                    BalanceSerializer,
+                ],
+                resource_type_field_name=None,
             )
         },
     )
