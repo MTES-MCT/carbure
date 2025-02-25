@@ -6,9 +6,7 @@ See the argument parser's help for usage details.
 """
 
 import difflib
-import pathlib
 
-import connectorx as cx
 import pandas as pd
 
 
@@ -30,7 +28,7 @@ def reachable(mixed_df: pd.DataFrame, field: str):
 
 def load_db(
     database_url: str,
-    tables_names: pathlib.Path,
+    tables_names: list[str],
     filters: list[str],
     retrieve_unknown: list[str],
     retrieve_cutoff=0.75,
@@ -43,12 +41,10 @@ def load_db(
         AND delivery_date > '1970-01-01' \
         AND lot_status NOT IN ('DRAFT', 'DELETED')"
     ]
-    #   AND delivery_date <= '2025-01-01'\
     lots_query_filters.extend(f"AND {fil}" for fil in filters)
 
     # Load database
     conn = database_url
-    tables_names = [line[:-1] for line in open(tables_names).readlines()]
 
     all_tables: dict[str, pd.DataFrame] = {}
     for table in tables_names:
@@ -56,7 +52,7 @@ def load_db(
         if table == "carbure_lots":
             query = " ".join([query] + lots_query_filters)
         query += ";"
-        all_tables[table] = cx.read_sql(conn, query)
+        all_tables[table] = pd.read_sql(query, conn)
         try:
             all_tables[table].set_index("id", inplace=True)
         except KeyError:

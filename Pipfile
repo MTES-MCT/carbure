@@ -45,8 +45,8 @@ setuptools = "*"
 psutil = "*"
 scipy = "*"
 django-simple-history = "*"
-connectorx = "*"
 scikit-learn = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 django-stubs = "*"
