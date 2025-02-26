@@ -37,8 +37,8 @@ class DoubleCountingApplication(models.Model):
     download_link = models.CharField(max_length=512, default=None, null=True)
 
     def __str__(self):
-        producer = self.producer.name if self.producer else ""
-        return "%s - %s" % (self.certificate_id, producer)
+        psite = self.production_site.name if self.production_site else ""
+        return "%s - %s" % (self.certificate_id, psite)
 
     def natural_key(self):
         producer = self.producer.name if self.producer else ""
