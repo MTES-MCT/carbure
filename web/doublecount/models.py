@@ -38,7 +38,7 @@ class DoubleCountingApplication(models.Model):
 
     def __str__(self):
         producer = self.producer.name if self.producer else ""
-        return "%s %d - %d" % (producer, self.period_start.year, self.period_end.year)
+        return "%s - %s" % (self.certificate_id, producer)
 
     def natural_key(self):
         producer = self.producer.name if self.producer else ""
@@ -53,6 +53,7 @@ class DoubleCountingApplication(models.Model):
 
     class Meta:
         db_table = "double_counting_applications"
+        ordering = ["certificate_id"]
         verbose_name = "Dossier Double Compte"
         verbose_name_plural = "Dossiers Double Compte"
 
