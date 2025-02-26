@@ -8,7 +8,6 @@ const meta: Meta<typeof Notice> = {
   args: {
     title: "Titre principal",
     children: "Description de l'alerte",
-    icon: SurveyFill,
   },
 }
 
@@ -53,5 +52,12 @@ export const Closable: Story = {
   args: {
     variant: "info",
     isClosable: true,
+  },
+}
+
+export const WithIcon: Story = {
+  args: {
+    variant: "info",
+    icon: SurveyFill,
   },
 }

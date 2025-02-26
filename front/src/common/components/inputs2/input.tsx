@@ -1,7 +1,6 @@
 import { InputProps as InputPropsDSFR } from "@codegouvfr/react-dsfr/Input"
 import { RefObject } from "react"
 import { BaseInput, ExtendedInputProps } from "./base-input"
-import { Field } from "./field"
 
 // Props to be exposed to all inputs (text/number/date etc...)
 export type InputProps = Omit<
@@ -34,13 +33,6 @@ export const Input = ({
     inputRef?: React.RefObject<HTMLInputElement>
     label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
   }) => {
-  if (readOnly) {
-    return (
-      <Field label={label} readOnly={readOnly}>
-        {nativeInputProps?.value}
-      </Field>
-    )
-  }
   return (
     <BaseInput
       {...props}
@@ -57,6 +49,7 @@ export const Input = ({
       }}
       textArea={false}
       label={label ?? ""}
+      readOnly={readOnly}
     />
   )
 }

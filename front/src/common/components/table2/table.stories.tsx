@@ -132,6 +132,7 @@ export const OneRowSelected: Story = {
 export const WithSelectionText: Story = {
   ...OneRowSelected,
   args: {
+    ...OneRowSelected.args,
     selectionText: "Texte personnalisé",
   },
 }

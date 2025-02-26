@@ -15,6 +15,7 @@ export interface DialogProps {
   fullscreen?: boolean
   fullWidth?: boolean
   fullHeight?: boolean
+  fitContent?: boolean
   children?: React.ReactNode
   header?: React.ReactNode
   footer?: React.ReactNode
@@ -30,6 +31,7 @@ export const Dialog = ({
   fullscreen,
   fullWidth,
   fullHeight,
+  fitContent,
   onClose,
 }: DialogProps) => (
   <div className={css.screen}>
@@ -40,6 +42,7 @@ export const Dialog = ({
         fullscreen && css.fullscreen,
         fullWidth && css.fullWidth,
         fullHeight && css.fullHeight,
+        fitContent && css.fitContent,
         className
       )}
       style={style}
@@ -121,12 +124,7 @@ export const Confirm = ({
   return (
     <Dialog
       onClose={onClose}
-      header={
-        <>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </>
-      }
+      header={<DialogTitle>{title}</DialogTitle>}
       footer={
         <>
           {!hideCancel && (
@@ -144,6 +142,8 @@ export const Confirm = ({
           )}
         </>
       }
-    ></Dialog>
+    >
+      {description}
+    </Dialog>
   )
 }

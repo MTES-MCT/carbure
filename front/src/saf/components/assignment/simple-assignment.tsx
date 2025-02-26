@@ -14,7 +14,6 @@ import * as api from "../../pages/operator/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import { Select } from "common/components/selects2"
 import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
 
@@ -148,7 +147,7 @@ export const TicketAssignment = ({
                 {...bind("reception_airport")}
               />
 
-              <Select
+              <Autocomplete
                 label={t("Mode d'expédition")}
                 placeholder={t("Choisissez un mode")}
                 {...bind("shipping_method")}
@@ -163,7 +162,7 @@ export const TicketAssignment = ({
                 ]}
               />
 
-              <Select
+              <Autocomplete
                 label={t("Type de consommation")}
                 placeholder={t("Choisissez un type")}
                 {...bind("consumption_type")}
