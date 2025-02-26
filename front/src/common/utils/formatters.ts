@@ -47,12 +47,22 @@ export function formatCelsiusDegree(num: number) {
 
 export function formatUnit(num: number, unit: Unit, fractionDigits = 2) {
   const unitLabel = {
-    l: i18next.t("litres", { count: num }),
-    kg: i18next.t("kg"),
-    MJ: i18next.t("MJ"),
+    [Unit.l]: i18next.t("litres", { count: num }),
+    [Unit.kg]: i18next.t("kg"),
+    [Unit.MJ]: i18next.t("MJ"),
   }
 
   return `${formatNumber(num, fractionDigits)} ${unitLabel[unit]}`
+}
+
+export function formatUnitOnly(unit: Unit, count = 2) {
+  const unitLabel = {
+    [Unit.l]: i18next.t("litres", { count }),
+    [Unit.kg]: i18next.t("kg"),
+    [Unit.MJ]: i18next.t("MJ"),
+  }
+
+  return unitLabel[unit]
 }
 
 export function formatGHG(num: number) {

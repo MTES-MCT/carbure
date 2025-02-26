@@ -13,14 +13,14 @@ import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "carbure/types"
-type VolumeFormProps = {
+type QuantityFormProps = {
   balance: Balance
 }
 
-export const showNextStepVolumeForm = (values: SessionDialogForm) => {
+export const showNextStepQuantityForm = (values: SessionDialogForm) => {
   return (
-    values.volume &&
-    values.volume > 0 &&
+    values.quantity &&
+    values.quantity > 0 &&
     values.avoided_emissions &&
     values.avoided_emissions_min &&
     values.avoided_emissions_max &&
@@ -32,12 +32,12 @@ export const showNextStepVolumeForm = (values: SessionDialogForm) => {
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
 const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
-export const VolumeForm = ({ balance }: VolumeFormProps) => {
+export const QuantityForm = ({ balance }: QuantityFormProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind, setField } = useFormContext<SessionDialogForm>()
   const mutation = useMutation(simulateMinMax)
-  const [volumeDeclared, setVolumeDeclared] = useState(
+  const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
       value.avoided_emissions_max !== undefined
   )
@@ -48,46 +48,47 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
         biofuel: balance.biofuel?.id ?? null,
         customs_category: balance.customs_category,
         debited_entity: entity.id,
-        target_volume: value.volume!,
+        target_volume: value.quantity!,
         target_emission: 0,
+        unit: entity.preferred_unit,
       })
       .then((response) => {
         const emissions = response.data
         setField("avoided_emissions_min", emissions?.min_avoided_emissions)
         setField("avoided_emissions_max", emissions?.max_avoided_emissions)
-        setVolumeDeclared(true)
+        setQuantityDeclared(true)
       })
   }
 
-  const resetVolumeDeclared = () => {
+  const resetQuantityDeclared = () => {
     setField("avoided_emissions_min", undefined)
     setField("avoided_emissions_max", undefined)
-    setVolumeDeclared(false)
+    setQuantityDeclared(false)
   }
   return (
     <>
       <NumberInput
         label={t("Saisir une quantité pour la cession")}
-        max={value.from_depot?.volume.credit}
-        {...bind("volume")}
+        max={value.from_depot?.quantity.credit}
+        {...bind("quantity")}
         addon={
           <>
-            {!volumeDeclared && (
+            {!quantityDeclared && (
               <Button
                 onClick={declareQuantity}
                 loading={mutation.loading}
                 disabled={
-                  !value.volume ||
-                  value.volume === 0 ||
-                  (value.from_depot?.volume.credit !== undefined &&
-                    value.volume > value.from_depot?.volume.credit)
+                  !value.quantity ||
+                  value.quantity === 0 ||
+                  (value.from_depot?.quantity.credit !== undefined &&
+                    value.quantity > value.from_depot?.quantity.credit)
                 }
               >
                 {t("Déclarer la quantité")}
               </Button>
             )}
-            {volumeDeclared && (
-              <Button priority="secondary" onClick={resetVolumeDeclared}>
+            {quantityDeclared && (
+              <Button priority="secondary" onClick={resetQuantityDeclared}>
                 {t("Modifier")}
               </Button>
             )}
@@ -96,11 +97,11 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
         stateRelatedMessage={t(
           "Nous pourrons ensuite vous indiquer les tC02 évitées équivalentes pour cette quantité."
         )}
-        state={volumeDeclared ? "default" : "info"}
-        disabled={volumeDeclared || mutation.loading}
+        state={quantityDeclared ? "default" : "info"}
+        disabled={quantityDeclared || mutation.loading}
         required
       />
-      {volumeDeclared &&
+      {quantityDeclared &&
         value.avoided_emissions_min &&
         value.avoided_emissions_max && (
           <>
@@ -109,11 +110,15 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
-                  volume: value.volume,
+                  quantity: formatUnit(
+                    value.quantity!,
+                    entity.preferred_unit,
+                    0
+                  ),
                   min: formatEmissionMin(value.avoided_emissions_min),
                   max: formatEmissionMax(value.avoided_emissions_max),
                 }}
-                defaults="Pour une quantité de <strong>{{volume}} litres</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tC02 évitées</strong>."
+                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tC02 évitées</strong>."
               />
             </Notice>
             <NumberInput
@@ -129,10 +134,10 @@ export const VolumeForm = ({ balance }: VolumeFormProps) => {
   )
 }
 
-export const VolumeSummary = ({ values }: { values: SessionDialogForm }) => {
+export const QuantitySummary = ({ values }: { values: SessionDialogForm }) => {
   const { t } = useTranslation()
 
-  if (!values.volume || !values.avoided_emissions) {
+  if (!values.quantity || !values.avoided_emissions) {
     return null
   }
 
@@ -140,7 +145,7 @@ export const VolumeSummary = ({ values }: { values: SessionDialogForm }) => {
     <Grid>
       <OperationText
         title={t("Quantité de la cession")}
-        description={formatUnit(values.volume, Unit.l, 0)}
+        description={formatUnit(values.quantity, Unit.l, 0)}
       />
       <OperationText
         title={t("TCO2 évitées équivalentes")}

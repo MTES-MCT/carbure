@@ -21,14 +21,14 @@ export const RecipientToDepotForm = () => {
   return (
     <>
       <Autocomplete
-        label={t("Sélectionner un redevable")}
+        label={t("Rechercher un redevable")}
         getOptions={findBiofuelEntities}
         normalize={normalizeEntityPreview}
         {...bind("credited_entity")}
         required
       />
       <Autocomplete
-        label={t("Sélectionner un dépôt")}
+        label={t("Rechercher un dépôt")}
         getOptions={findDepots}
         normalize={normalizeDepot}
         {...bind("to_depot")}
