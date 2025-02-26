@@ -181,8 +181,3 @@ Ensuite, setup normalement le projet:
 - `(cd front; npm install)`
 - `docker-compose up --build -d`
 - `code .`
-
-## Double comptage : comment ajouter un biocarburant ou une matière premère
-
-1 - Modifier le fichier `biocarburant.csv` ou `matierespremieres.csv` en ajoutant les données concernées
-2 - mettre à jour le fichier `excel_to_carbure_convertor.py` en ajoutant dans les tableaux au moins une instance puis les variations de dénominations
