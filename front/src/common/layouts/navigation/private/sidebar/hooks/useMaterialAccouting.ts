@@ -9,14 +9,15 @@ export const useMaterialAccounting = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const user = useUser()
-  const { isIndustry, isPowerOrHeatProducer } = useEntity()
+  const { isProducer, isOperator, isPowerOrHeatProducer } = useEntity()
 
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
   const section: MenuSection = {
     title: t("Comptabilité"),
-    condition: !!userIsMTEDGEC && (isIndustry || isPowerOrHeatProducer),
+    condition:
+      !!userIsMTEDGEC && (isProducer || isOperator || isPowerOrHeatProducer),
     children: [
       {
         path: routes.MATERIAL_ACCOUNTING.OPERATIONS,

@@ -26,7 +26,6 @@ export const simulateMinMax = (
     customs_category,
     debited_entity,
     target_volume,
-    unit,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -36,7 +35,6 @@ export const simulateMinMax = (
       customs_category,
       debited_entity,
       target_volume,
-      unit,
     },
   })
 }
@@ -59,6 +57,6 @@ export const createOperation = (
   return api.POST("/tiruert/operations/", {
     params: { query: { entity_id: entityId } },
     body: data,
-    bodySerializer: undefined,
+    bodySerializer: (data) => JSON.stringify(data), // Body contains array of objects, our backend could not handle it in a formData
   })
 }

@@ -11,8 +11,8 @@ import { Notice } from "common/components/notice"
 import { useState } from "react"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
-import { formatUnit } from "common/utils/formatters"
-import { Unit } from "carbure/types"
+import { useUnit } from "common/hooks/unit"
+
 type QuantityFormProps = {
   balance: Balance
 }
@@ -35,6 +35,7 @@ const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 export const QuantityForm = ({ balance }: QuantityFormProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const { formatUnit, unit } = useUnit()
   const { value, bind, setField } = useFormContext<SessionDialogForm>()
   const mutation = useMutation(simulateMinMax)
   const [quantityDeclared, setQuantityDeclared] = useState(
@@ -68,7 +69,7 @@ export const QuantityForm = ({ balance }: QuantityFormProps) => {
   return (
     <>
       <NumberInput
-        label={t("Saisir une quantité pour la cession")}
+        label={`${t("Saisir une quantité pour la cession")} (${unit})`}
         max={value.from_depot?.quantity.credit}
         {...bind("quantity")}
         addon={
@@ -110,11 +111,7 @@ export const QuantityForm = ({ balance }: QuantityFormProps) => {
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
-                  quantity: formatUnit(
-                    value.quantity!,
-                    entity.preferred_unit,
-                    0
-                  ),
+                  quantity: formatUnit(value.quantity!, 0),
                   min: formatEmissionMin(value.avoided_emissions_min),
                   max: formatEmissionMax(value.avoided_emissions_max),
                 }}
@@ -136,7 +133,7 @@ export const QuantityForm = ({ balance }: QuantityFormProps) => {
 
 export const QuantitySummary = ({ values }: { values: SessionDialogForm }) => {
   const { t } = useTranslation()
-
+  const { formatUnit } = useUnit()
   if (!values.quantity || !values.avoided_emissions) {
     return null
   }
@@ -145,7 +142,7 @@ export const QuantitySummary = ({ values }: { values: SessionDialogForm }) => {
     <Grid>
       <OperationText
         title={t("Quantité de la cession")}
-        description={formatUnit(values.quantity, Unit.l, 0)}
+        description={formatUnit(values.quantity, 0)}
       />
       <OperationText
         title={t("TCO2 évitées équivalentes")}

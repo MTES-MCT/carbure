@@ -30,7 +30,13 @@ export const DebitOperationDialog = ({
   const handleNext = () => {
     switch (currentOperation) {
       case OperationType.CESSION:
-        portal((close) => <CessionDialog onClose={close} balance={balance} />)
+        portal((close) => (
+          <CessionDialog
+            onClose={close}
+            balance={balance}
+            onOperationCreated={onClose}
+          />
+        ))
         break
       case OperationType.DEVALUATION:
         portal((close) => <DevaluationDialog onClose={close} />)

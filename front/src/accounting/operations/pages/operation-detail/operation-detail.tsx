@@ -26,16 +26,18 @@ import {
 } from "./operation-detail.hooks"
 import { Form, useForm } from "common/components/form2"
 import { useNotify } from "common/components/notifications"
-import { Depot } from "carbure/types"
+import { Depot, UserRole } from "carbure/types"
 import { formatOperationType, formatSector } from "accounting/utils/formatters"
 import { OperationsStatus, OperationType } from "accounting/types"
 import { Autocomplete } from "common/components/autocomplete2"
+import { useUnit } from "common/hooks/unit"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { t } = useTranslation()
   const notify = useNotify()
+  const { formatUnit } = useUnit()
   const match = useHashMatch("operation/:id")
   const { value, bind, setField } = useForm<{
     to_depot?: Pick<Depot, "id" | "name">
@@ -52,6 +54,8 @@ export const OperationDetail = () => {
   })
 
   const operation = result?.data
+  const canUpdateOperation =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
@@ -117,7 +121,10 @@ export const OperationDetail = () => {
         { label: t("Biocarburant"), value: operation.biofuel },
         {
           label: t("Quantité"),
-          value: getOperationQuantity(operation),
+          value: getOperationQuantity(
+            operation,
+            formatUnit(operation.quantity, 0)
+          ),
         },
         {
           label: t("Tonnes CO2 eq evitées"),
@@ -161,7 +168,8 @@ export const OperationDetail = () => {
         footer={
           <>
             {operation?.type === OperationType.ACQUISITION &&
-              operation?.status === OperationsStatus.PENDING && (
+              operation?.status === OperationsStatus.PENDING &&
+              canUpdateOperation && (
                 <>
                   <Button
                     customPriority="danger"
@@ -184,7 +192,8 @@ export const OperationDetail = () => {
                 </>
               )}
             {operation?.type === OperationType.CESSION &&
-              operation?.status === OperationsStatus.PENDING && (
+              operation?.status === OperationsStatus.PENDING &&
+              canUpdateOperation && (
                 <Button
                   customPriority="danger"
                   iconId="fr-icon-close-line"
@@ -210,7 +219,8 @@ export const OperationDetail = () => {
                   </div>
                 ))}
                 {operation?.type === OperationType.ACQUISITION &&
-                  operation?.status === OperationsStatus.PENDING && (
+                  operation?.status === OperationsStatus.PENDING &&
+                  canUpdateOperation && (
                     <div className={css["operation-detail-fields-depot"]}>
                       <Form id="patch-operation" onSubmit={onAcceptOperation}>
                         <Autocomplete
@@ -236,7 +246,8 @@ export const OperationDetail = () => {
                   )}
               </Grid>
               {operation?.type === OperationType.ACQUISITION &&
-                operation?.status === OperationsStatus.PENDING && (
+                operation?.status === OperationsStatus.PENDING &&
+                canUpdateOperation && (
                   <>
                     <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
                     <div>
@@ -250,7 +261,8 @@ export const OperationDetail = () => {
                   </>
                 )}
               {operation?.type === OperationType.CESSION &&
-                operation?.status === OperationsStatus.PENDING && (
+                operation?.status === OperationsStatus.PENDING &&
+                canUpdateOperation && (
                   <>
                     <Text>
                       {t("Voulez-vous annuler ce certificat de cession ?")}

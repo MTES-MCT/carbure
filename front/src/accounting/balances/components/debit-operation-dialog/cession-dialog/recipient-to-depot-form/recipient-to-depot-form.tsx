@@ -1,7 +1,7 @@
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
 import { SessionDialogForm } from "../cession-dialog.types"
-import { findBiofuelEntities, findDepots } from "carbure/api"
+import { findDepots } from "carbure/api"
 import {
   normalizeDepot,
   normalizeEntityPreview,
@@ -9,6 +9,8 @@ import {
 import { useTranslation } from "react-i18next"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
+import { findEligibleTiruertEntities } from "../api"
+import useEntity from "carbure/hooks/entity"
 
 export const showNextStepRecipientToDepotForm = (values: SessionDialogForm) => {
   return values.credited_entity
@@ -17,18 +19,19 @@ export const showNextStepRecipientToDepotForm = (values: SessionDialogForm) => {
 export const RecipientToDepotForm = () => {
   const { t } = useTranslation()
   const { bind } = useFormContext<SessionDialogForm>()
+  const entity = useEntity()
 
   return (
     <>
       <Autocomplete
-        label={t("Rechercher un redevable")}
-        getOptions={findBiofuelEntities}
+        label={t("Sélectionnez un redevable")}
+        getOptions={(query) => findEligibleTiruertEntities(entity.id, query)}
         normalize={normalizeEntityPreview}
         {...bind("credited_entity")}
         required
       />
       <Autocomplete
-        label={t("Rechercher un dépôt")}
+        label={t("Sélectionnez un dépôt destinataire")}
         getOptions={findDepots}
         normalize={normalizeDepot}
         {...bind("to_depot")}

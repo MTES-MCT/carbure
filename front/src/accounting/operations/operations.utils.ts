@@ -1,6 +1,5 @@
 import { OperationType } from "accounting/types"
 import { Operation, OperationDebitOrCredit } from "./types"
-import { formatNumber } from "common/utils/formatters"
 
 export const formatOperationCreditOrDebit = (type: string) => {
   switch (type) {
@@ -31,7 +30,10 @@ export const getOperationEntity = (operation: Operation) =>
     ? operation.debited_entity
     : operation.credited_entity
 
-export const getOperationQuantity = (operation: Operation) =>
+export const getOperationQuantity = (
+  operation: Operation,
+  formattedQuantity: string
+) =>
   isOperationDebit(operation.type)
-    ? `-${formatNumber(operation.quantity)}`
-    : `+${formatNumber(operation.quantity)}`
+    ? `-${formattedQuantity}`
+    : `+${formattedQuantity}`
