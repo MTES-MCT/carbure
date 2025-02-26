@@ -1,5 +1,6 @@
 stages:
   - check
+  - pass
 
 
 workflow:
@@ -56,6 +57,15 @@ check-frontend:
     - npm run build
     - npm run chromatic
   interruptible: true
+
+
+# job: always succeed so we can merge MR that do not change front/back code
+pass:
+  stage: pass
+  script:
+    - echo "Forcing pipeline to pass"
+  rules:
+    - when: always
 
 
 .backend:
