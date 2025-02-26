@@ -14,6 +14,7 @@ import css from "./auth.module.css"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
+import { ROUTE_URLS } from "common/utils/routes"
 
 const Login = () => {
   const { t } = useTranslation()
@@ -24,18 +25,25 @@ const Login = () => {
     username: "" as string | undefined,
     password: "" as string | undefined,
   })
-
   const login = useMutation(api.login, {
     onSuccess: () => {
       notify(t("Un code vient de vous être envoyé"), { variant: "success" })
       api.requestOTP()
       navigate("../otp")
     },
-    onError: () => {
-      notify(t("La connexion a échoué"), { variant: "danger" })
+    onError: (error) => {
+      let errorMessage = t("La connexion a échoué")
+      if (
+        (error as any).data &&
+        (error as any).data.message === "Account not activated"
+      ) {
+        errorMessage = t(
+          "Votre compte n'est pas activé. Merci de cliquer sur le lien de réactivation pour activer votre compte."
+        )
+      }
+      notify(errorMessage, { variant: "danger" })
     },
   })
-
   return (
     <Container>
       <section>
@@ -65,7 +73,12 @@ const Login = () => {
           <Button
             variant="link"
             label={t("J'ai oublié mon mot de passe")}
-            to="../reset-password-request"
+            to={ROUTE_URLS.AUTH.RESET_PASSWORD_REQUEST}
+          />
+          <Button
+            variant="link"
+            label={t("Cliquez ici pour activer votre compte.")}
+            to={ROUTE_URLS.AUTH.ACTIVATE_REQUEST}
           />
         </Form>
       </section>
