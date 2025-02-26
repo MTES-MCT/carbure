@@ -16,14 +16,14 @@ import {
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
-import { formatUnit } from "common/utils/formatters"
+import { formatUnit, formatUnitOnly } from "common/utils/formatters"
 import { Unit } from "carbure/types"
 import { Button } from "common/components/button2"
 import {
-  showNextStepVolumeForm,
-  VolumeForm,
-  VolumeSummary,
-} from "./volume-form"
+  showNextStepQuantityForm,
+  QuantityForm,
+  QuantitySummary,
+} from "./quantity-form"
 import { useMemo } from "react"
 import {
   RecipientToDepotForm,
@@ -59,8 +59,10 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
       title: t("Dépôt d'expédition"),
     },
     {
-      key: CessionStepKey.Volume,
-      title: t("Volume de la cession en litres et tCO2 évitées"),
+      key: CessionStepKey.Quantity,
+      title: t("Quantité de la cession en {{unit}} et tCO2 évitées", {
+        unit: formatUnitOnly(entity.preferred_unit),
+      }),
     },
     {
       key: CessionStepKey.ToDepot,
@@ -77,8 +79,8 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
     if (currentStep?.key === CessionStepKey.FromDepot) {
       return showNextStepFromDepotForm(form.value)
     }
-    if (currentStep?.key === CessionStepKey.Volume) {
-      return showNextStepVolumeForm(form.value)
+    if (currentStep?.key === CessionStepKey.Quantity) {
+      return showNextStepQuantityForm(form.value)
     }
     if (currentStep?.key === CessionStepKey.ToDepot) {
       return showNextStepRecipientToDepotForm(form.value)
@@ -91,8 +93,9 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
-      target_volume: form.value.volume!,
+      target_volume: form.value.quantity!,
       target_emission: form.value.avoided_emissions!,
+      unit: entity.preferred_unit,
     }).then((response) => {
       const lots = response.data?.selected_lots
       if (lots) {
@@ -119,7 +122,13 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
       notify(
         t(
           "La cession d'une quantité de {{quantity}} a été réalisée avec succès",
-          { quantity: formatUnit(form.value.volume!, Unit.l, 0) }
+          {
+            quantity: formatUnit(
+              form.value.quantity!,
+              entity.preferred_unit,
+              0
+            ),
+          }
         ),
         { variant: "success" }
       )
@@ -205,7 +214,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
             />
           </Grid>
           {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
-          {currentStepIndex > 2 && <VolumeSummary values={form.value} />}
+          {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
           {currentStepIndex > 3 && form.value.credited_entity && (
             <RecipientToDepotSummary values={form.value} />
           )}
@@ -215,8 +224,8 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
                 {currentStep?.key === CessionStepKey.FromDepot && (
                   <FromDepotForm balance={balance} />
                 )}
-                {currentStep?.key === CessionStepKey.Volume && (
-                  <VolumeForm balance={balance} />
+                {currentStep?.key === CessionStepKey.Quantity && (
+                  <QuantityForm balance={balance} />
                 )}
                 {currentStep?.key === CessionStepKey.ToDepot && (
                   <RecipientToDepotForm />

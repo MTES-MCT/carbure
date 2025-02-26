@@ -17,7 +17,7 @@ type FromDepotProps = {
 
 export const showNextStepFromDepotForm = (values: SessionDialogForm) => {
   return (
-    values.from_depot?.volume?.credit && values.from_depot.volume.credit > 0
+    values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
   )
 }
 
@@ -53,30 +53,33 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
               t={t}
               values={{
                 depot: depot.name,
-                volume: formatUnit(depot.volume.credit, Unit.l),
+                quantity: formatUnit(
+                  depot.quantity.credit,
+                  entity.preferred_unit
+                ),
               }}
-              defaults="{{depot}} (<strong>{{volume}}</strong> disponibles)"
+              defaults="{{depot}} ({{quantity}} disponibles)"
             />
           </span>
         )}
       </Autocomplete>
       {value.from_depot && (
         <>
-          {value.from_depot.volume.credit &&
-          value.from_depot.volume.credit > 0 ? (
+          {value.from_depot.quantity.credit &&
+          value.from_depot.quantity.credit > 0 ? (
             <Notice noColor variant="info">
               <Trans
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
                   depot: value.from_depot.name,
-                  volume: formatNumber(value.from_depot.volume.credit, 0),
+                  quantity: formatNumber(value.from_depot.quantity.credit, 0),
                 }}
-                defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{volume}} litres</strong>"
+                defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{quantity}}</strong>"
               />
             </Notice>
           ) : null}
-          {value.from_depot.volume.credit === 0 ? (
+          {value.from_depot.quantity.credit === 0 ? (
             <Notice noColor variant="warning">
               <Trans
                 t={t}
@@ -96,8 +99,8 @@ export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
   const { t } = useTranslation()
 
   if (
-    !values.from_depot?.volume?.credit ||
-    values.from_depot.volume.credit <= 0
+    !values.from_depot?.quantity?.credit ||
+    values.from_depot.quantity.credit <= 0
   ) {
     return null
   }
@@ -110,7 +113,7 @@ export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
       />
       <OperationText
         title={t("Solde disponible dans le dépôt d'expédition")}
-        description={formatUnit(values.from_depot.volume.credit, Unit.l, 0)}
+        description={formatUnit(values.from_depot.quantity.credit, Unit.l, 0)}
       />
     </Grid>
   )
