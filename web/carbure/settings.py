@@ -119,6 +119,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "carbure.middlewares.logging.LoggingMiddleware",
     "carbure.middlewares.exception.ExceptionMiddleware",
+    "carbure.middlewares.entity.EntityMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
