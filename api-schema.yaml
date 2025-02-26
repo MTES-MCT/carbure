@@ -5789,6 +5789,8 @@ components:
           type: string
           nullable: true
           maxLength: 64
+        is_ue_airport:
+          type: boolean
       required:
         - country
         - id
@@ -6428,6 +6430,8 @@ components:
           type: string
           format: date
           nullable: true
+        is_ue_airport:
+          type: boolean
         country:
           type: integer
           nullable: true
