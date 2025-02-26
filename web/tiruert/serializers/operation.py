@@ -137,10 +137,11 @@ class OperationInputSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         with transaction.atomic():
             request = self.context.get("request")
-            entity_id = request.query_params.get("entity_id")
+            entity_id = request.entity.id
+            unit = request.unit
             selected_lots = validated_data.pop("lots")
 
-            OperationService.check_volumes_before_create(entity_id, selected_lots, validated_data)
+            OperationService.check_volumes_before_create(entity_id, selected_lots, validated_data, unit)
 
             if validated_data["type"] in [
                 Operation.INCORPORATION,

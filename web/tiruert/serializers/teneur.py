@@ -26,7 +26,7 @@ class SimulationInputSerializer(serializers.ModelSerializer):
     target_emission = serializers.FloatField(required=True)
     max_n_batches = serializers.IntegerField(required=False)
     enforced_volumes = serializers.ListField(child=serializers.IntegerField(), required=False)
-    unit = serializers.CharField(required=True)
+    unit = serializers.CharField(required=False)
 
 
 class SimulationLotOutputSerializer(serializers.Serializer):
@@ -57,7 +57,7 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
         }
 
     target_volume = serializers.FloatField(required=True)
-    unit = serializers.CharField(required=True)
+    unit = serializers.CharField(required=False)
 
 
 class SimulationMinMaxOutputSerializer(serializers.Serializer):

@@ -190,8 +190,8 @@ class TeneurService:
         return min_emissions_rate, max_emissions_rate
 
     @staticmethod
-    def prepare_data_and_optimize(entity_id, data):
-        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(entity_id, data)
+    def prepare_data_and_optimize(entity_id, data, unit):
+        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(entity_id, data, unit)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
@@ -210,13 +210,15 @@ class TeneurService:
         return selected_lots, lot_ids, emissions, fun
 
     @staticmethod
-    def get_min_and_max_emissions(entity_id, data):
+    def get_min_and_max_emissions(entity_id, data, unit):
         """
         Compute minimum and maximum feasible mix emissions.
         Return avoided emissions (tCO2)
         """
         volumes, emissions, _, _, target_volume = TeneurService.prepare_data(
-            entity_id, data
+            entity_id,
+            data,
+            unit,
         )  # volumes in L, emissions in gCO2/MJ
 
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
@@ -234,7 +236,7 @@ class TeneurService:
         return min_avoided_emissions, max_avoided_emissions
 
     @staticmethod
-    def prepare_data(entity_id, data):
+    def prepare_data(entity_id, data, unit):
         """
         Prepare data for optimization and operation creation
         """
@@ -248,8 +250,8 @@ class TeneurService:
             .distinct()
         )
 
-        # Calculate balance of debited entity
-        balance = BalanceService.calculate_balance(operations, entity_id, "lot")
+        # Calculate balance of debited entity, for each lot, always in liters
+        balance = BalanceService.calculate_balance(operations, entity_id, "lot", "l")
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
         # For each we have something like:
@@ -272,7 +274,7 @@ class TeneurService:
         # Convert target volume into L
         target_volume = None
         if data.get("target_volume", None) is not None:
-            target_volume = TeneurService.convert_in_liters(data["target_volume"], data["unit"], data["biofuel"])
+            target_volume = TeneurService.convert_in_liters(data["target_volume"], unit, data["biofuel"])
 
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
 

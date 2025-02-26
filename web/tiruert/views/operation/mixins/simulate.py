@@ -36,6 +36,7 @@ class SimulateActionMixin:
                 selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
                     data["debited_entity"].id,
                     data,
+                    request.unit,
                 )
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -80,6 +81,7 @@ class SimulateActionMixin:
                 min, max = TeneurService.get_min_and_max_emissions(
                     data["debited_entity"].id,
                     data,
+                    request.unit,
                 )
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

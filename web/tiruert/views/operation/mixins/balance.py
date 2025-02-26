@@ -29,15 +29,7 @@ class BalanceActionMixin:
                 location=OpenApiParameter.QUERY,
                 description="Group by sector, lot or depot.",
                 default="",
-            ),
-            OpenApiParameter(
-                name="unit",
-                type=str,
-                enum=["l", "mj"],
-                location=OpenApiParameter.QUERY,
-                description="Specify the volume unit (default is `l`).",
-                default="l",
-            ),
+            )
         ],
         responses={
             status.HTTP_200_OK: PolymorphicProxySerializer(
@@ -62,7 +54,8 @@ class BalanceActionMixin:
     def balance(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
-        unit = request.query_params.get("unit", "l")
+        unit = request.unit
+        print("UNIT", unit)
 
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
