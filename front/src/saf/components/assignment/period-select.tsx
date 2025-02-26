@@ -1,4 +1,4 @@
-import { Select } from "common/components/selects2"
+import { Autocomplete } from "common/components/autocomplete2"
 import { capitalize, formatDate, formatPeriod } from "common/utils/formatters"
 import { Option } from "common/utils/normalize"
 import { useEffect, useState } from "react"
@@ -50,13 +50,12 @@ export const PeriodSelect = ({
   }, [])
 
   return (
-    <Select
+    <Autocomplete
       label={t("Période d'affectation")}
       placeholder={t("Choisissez une année")}
       value={period}
       onChange={(period) => setPeriod(period!)}
       options={periodList}
-      full
     />
   )
 }

@@ -162,7 +162,6 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 }
 
 const FILTERS = [
-  SafFilter.Suppliers,
   SafFilter.Clients,
   SafFilter.Periods,
   SafFilter.Feedstocks,

@@ -28,17 +28,19 @@ export const TicketSourceFields = ({
         />
         <TextInput
           label={t("Biocarburant")}
-          value={ticketSource.biofuel.code}
+          value={ticketSource.biofuel.code ?? "-"}
           readOnly
         />
         <TextInput
           label={t("Matière première")}
-          value={ticketSource.feedstock.name}
+          value={ticketSource.feedstock.name ?? "-"}
           readOnly
         />
         <TextInput
           label={t("Pays d'origine")}
-          value={norm.normalizeCountry(ticketSource.country_of_origin).label}
+          value={
+            norm.normalizeCountry(ticketSource.country_of_origin).label ?? "-"
+          }
           readOnly
         />
         <TextInput

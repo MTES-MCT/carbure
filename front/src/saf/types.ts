@@ -101,7 +101,6 @@ export enum SafFilter {
   Feedstocks = "feedstocks",
   Periods = "periods",
   Clients = "clients",
-  Suppliers = "suppliers",
   CountriesOfOrigin = "countries_of_origin",
   ProductionSites = "production_sites",
   DeliverySites = "delivery_sites",

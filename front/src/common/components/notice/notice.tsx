@@ -69,6 +69,7 @@ export const Notice = ({
         fr.cx("fr-notice"),
         variant &&
           cl(fr.cx(`fr-notice--${variant}`), css[`notice--${variant}`]),
+        Icon && css["notice--remove-icon-dsfr"],
         className
       )}
       style={style}

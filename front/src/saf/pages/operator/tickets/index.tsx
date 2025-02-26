@@ -147,7 +147,6 @@ export const OperatorTickets = ({
 }
 
 const OPERATOR_RECEIVED_FILTERS = [
-  SafFilter.Suppliers,
   SafFilter.Periods,
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,

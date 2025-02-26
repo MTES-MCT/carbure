@@ -13,6 +13,7 @@ import { TicketSourceTag } from "./tag"
 import { usePortal } from "common/components/portal"
 import { useNotify } from "common/components/notifications"
 import TicketsGroupedAssignment from "saf/components/assignment/grouped-assignment"
+import { Text } from "common/components/text"
 
 export interface TicketSourcesTableProps {
   loading: boolean
@@ -166,7 +167,7 @@ export function useColumns() {
 
     period: {
       key: "delivery",
-      header: t("Livraison"),
+      header: t("Période"),
       cell: (ticketSource: SafTicketSource) => {
         return (
           <Cell
@@ -242,13 +243,20 @@ export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
   }
 
   return (
-    <Button
-      captive
-      customPriority="link"
-      title={t("Lot initial")}
-      onClick={showLotDetails}
-    >
-      #{lot.carbure_id}
-    </Button>
+    <Cell
+      text={
+        <Button
+          captive
+          customPriority="link"
+          title={t("Lot initial")}
+          onClick={showLotDetails}
+        >
+          <Text size="sm" is="span">
+            #{lot.carbure_id}
+          </Text>
+        </Button>
+      }
+      tooltipText={`#${lot.carbure_id}`}
+    />
   )
 }

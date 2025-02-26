@@ -42,6 +42,10 @@
   max-height: 720px;
 }
 
+.dialog.fitContent {
+  width: fit-content;
+}
+
 .dialog__header {
   padding: 0 var(--spacing-2w);
 }
