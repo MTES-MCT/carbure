@@ -175,6 +175,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/agreements/{id}/download-link/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_download_link_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/agreements/agreement-admin/": {
     parameters: {
       query?: never
@@ -1783,6 +1799,10 @@ export interface components {
       blending_is_outsourced: boolean
       blending_entity_id?: number
     }
+    AgreementDownloadLink: {
+      /** Format: uri */
+      download_link?: string
+    }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
       incoming: components["schemas"]["DoubleCountingRegistration"][]
@@ -2238,6 +2258,7 @@ export interface components {
       readonly sourcing: components["schemas"]["DoubleCountingSourcing"][]
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
+      readonly download_link: string
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
@@ -2264,6 +2285,7 @@ export interface components {
       readonly id: number
       file_name?: string
       file_type?: components["schemas"]["FileTypeEnum"]
+      url: string
     }
     DoubleCountingProduction: {
       readonly id: number
@@ -3886,6 +3908,31 @@ export interface operations {
       }
     }
   }
+  double_counting_agreements_download_link_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AgreementDownloadLink"]
+        }
+      }
+    }
+  }
   double_counting_agreements_agreement_admin_retrieve: {
     parameters: {
       query: {
@@ -4181,10 +4228,20 @@ export interface operations {
   double_counting_applications_check_admin_files_create: {
     parameters: {
       query: {
+        certificate_id?: string
         /** @description Entity ID */
         entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        producers?: string
+        production_sites?: string
         /** @description A search term. */
         search?: string
       }
@@ -4268,10 +4325,20 @@ export interface operations {
   double_counting_applications_filters_retrieve: {
     parameters: {
       query?: {
+        certificate_id?: string
         /** @description Filter string to apply */
         filter?: string
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        producers?: string
+        production_sites?: string
         /** @description A search term. */
         search?: string
       }
@@ -4303,10 +4370,20 @@ export interface operations {
   double_counting_applications_list_admin_retrieve: {
     parameters: {
       query: {
+        certificate_id?: string
         /** @description Entity ID */
         entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        producers?: string
+        production_sites?: string
         /** @description A search term. */
         search?: string
       }

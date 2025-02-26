@@ -4,6 +4,7 @@ from .list_admin import AgreementAdminListActionMixin
 from .export import ExportActionMixin
 from .retrieve import AgreementRetrieveActionMixin
 from .filter import FilterActionMixin
+from .download_link import AgreementDownloadLinkMixin
 
 class ActionMixin(
     ListActionMixin,
@@ -11,6 +12,7 @@ class ActionMixin(
     AgreementAdminListActionMixin,
     AgreementPublicListActionMixin,
     AgreementRetrieveActionMixin,
-    FilterActionMixin
+    FilterActionMixin,
+    AgreementDownloadLinkMixin,
 ):
     pass

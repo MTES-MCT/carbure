@@ -19,6 +19,7 @@ import { Fragment, useState } from "react"
 import { compact } from "common/utils/collection"
 import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
 import { ProductionTable } from "../../../double-counting/components/production-table"
+import { FilesTable } from "../../../double-counting/components/files-table"
 import Tabs from "common/components/tabs"
 import { ROUTE_URLS } from "common/utils/routes"
 import { ProductionSiteForm } from "settings/components/production-site-dialog"
@@ -30,6 +31,7 @@ export const AgreementDetailsDialog = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
+
   const portal = usePortal()
   const match = useHashMatch("agreement/:id")
 
@@ -185,6 +187,10 @@ const AgreementTabs = ({
               key: "production",
               label: t("Production"),
             },
+            {
+              key: "fichiers",
+              label: t("Fichiers"),
+            },
           ])}
           focus={focus}
           onFocus={setFocus}
@@ -214,6 +220,11 @@ const AgreementTabs = ({
             sourcing={agreement.application.sourcing ?? []}
             hasAgreement={true}
           />
+        </section>
+      )}
+      {focus === "fichiers" && (
+        <section>
+          <FilesTable application={agreement.application} />
         </section>
       )}
     </>

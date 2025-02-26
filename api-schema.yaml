@@ -393,6 +393,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
+  /api/double-counting/agreements/{id}/download-link/:
+    get:
+      operationId: double_counting_agreements_download_link_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementDownloadLink"
+          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -881,15 +909,47 @@ paths:
       operationId: double_counting_applications_check_admin_files_create
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -997,14 +1057,46 @@ paths:
       operationId: double_counting_applications_filters_retrieve
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: filter
           schema:
             type: string
           description: Filter string to apply
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -1056,15 +1148,47 @@ paths:
       operationId: double_counting_applications_list_admin_retrieve
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -6054,6 +6178,12 @@ components:
       required:
         - delivery_site_id
         - ownership_type
+    AgreementDownloadLink:
+      type: object
+      properties:
+        download_link:
+          type: string
+          format: uri
     AgreementLists:
       type: object
       properties:
@@ -7129,9 +7259,13 @@ components:
           items:
             $ref: "#/components/schemas/DoubleCountingDocFile"
           readOnly: true
+        download_link:
+          type: string
+          readOnly: true
       required:
         - created_at
         - documents
+        - download_link
         - id
         - period_end
         - period_start
@@ -7206,8 +7340,11 @@ components:
           maxLength: 128
         file_type:
           $ref: "#/components/schemas/FileTypeEnum"
+        url:
+          type: string
       required:
         - id
+        - url
     DoubleCountingProduction:
       type: object
       properties:
