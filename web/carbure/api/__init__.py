@@ -1,5 +1,5 @@
 from django.urls import path, include
-from rest_framework_nested.routers import SimpleRouter
+
 from .home_stats import get_home_stats
 from .nav_stats import get_nav_stats
 
