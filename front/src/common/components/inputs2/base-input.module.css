@@ -5,3 +5,7 @@
 .input-dsfr--no-margin:global(.fr-input-group) {
   margin-bottom: 0;
 }
+
+.label--read-only {
+  color: var(--text-mention-grey);
+}

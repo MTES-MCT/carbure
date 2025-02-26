@@ -14,7 +14,15 @@ const meta: Meta<typeof Dialog> = {
         </Dialog.Description>
       </>
     ),
-    children: <>une section</>,
+    children: (
+      <>
+        <div>element with small width</div>
+        <div>
+          element with large width lorem ipsum dolor sit amet consectetur
+          adipisicing elit. Quisquam, quos.
+        </div>
+      </>
+    ),
     footer: (
       <>
         <Button>Valider</Button>
@@ -48,5 +56,11 @@ export const FullWidth: Story = {
 export const FullHeight: Story = {
   args: {
     fullHeight: true,
+  },
+}
+
+export const FitContent: Story = {
+  args: {
+    fitContent: true,
   },
 }

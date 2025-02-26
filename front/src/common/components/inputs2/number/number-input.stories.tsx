@@ -47,6 +47,12 @@ export const Default: Story = {
 export const WithValue: Story = {
   args: {
     value: 1458,
+  },
+}
+
+export const ReadOnly: Story = {
+  args: {
     readOnly: true,
+    value: 1458,
   },
 }
