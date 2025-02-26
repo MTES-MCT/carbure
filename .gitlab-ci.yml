@@ -1,6 +1,6 @@
 stages:
   - check
-
+  - pass
 
 workflow:
   rules:
@@ -23,13 +23,11 @@ workflow:
     # 5. Else, don't run it
     - when: never
 
-
 variables:
   MYSQL_DATABASE: carbure_mysql_test_db
   MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PIPENV_VENV_IN_PROJECT: true
-
 
 # job: run linting and tests for backend
 check-backend:
@@ -46,7 +44,6 @@ check-backend:
     - pipenv run ruff format --check
     - TEST=1 pipenv run python web/manage.py test web
 
-
 # job: run linting and tests for frontend
 check-frontend:
   stage: check
@@ -57,6 +54,13 @@ check-frontend:
     - npm run chromatic
   interruptible: true
 
+# job: always succeed so we can merge MR that do not change front/back code
+pass:
+  stage: pass
+  script:
+    - echo "Forcing pipeline to pass"
+  rules:
+    - when: always
 
 .backend:
   image: python:3.12
@@ -72,9 +76,8 @@ check-frontend:
     - pipenv install --dev --deploy --ignore-pipfile
   rules:
     - changes:
-      - web/**/*
-      - .gitlab-ci.yml
-
+        - web/**/*
+        - .gitlab-ci.yml
 
 .frontend:
   image: node:latest
@@ -89,5 +92,5 @@ check-frontend:
     - npm ci --cache .npm --prefer-offline
   rules:
     - changes:
-      - front/**/*
-      - .gitlab-ci.yml
+        - front/**/*
+        - .gitlab-ci.yml
