@@ -77,9 +77,13 @@ class DoubleCountingRegistration(models.Model):
             else:
                 return DoubleCountingRegistration.INCOMING
 
+    def __str__(self):
+        psite = self.production_site.name if self.production_site else ""
+        return "%s - %s" % (self.certificate_id, psite)
+
     class Meta:
-        ordering = ["certificate_holder"]
         db_table = "double_counting_registrations"
+        ordering = ["certificate_id", "certificate_holder"]
         verbose_name = "Certificat Double Compte"
         verbose_name_plural = "Certificats Double Compte"
 
