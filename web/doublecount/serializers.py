@@ -222,7 +222,7 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingDocFile
-        fields = ["id", "file_name", "file_type"]
+        fields = ["id", "file_name", "file_type", "url"]
 
 
 class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
@@ -247,6 +247,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
             "sourcing",
             "production",
             "documents",
+            "download_link",
         ]
 
 
