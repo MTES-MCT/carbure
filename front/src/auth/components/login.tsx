@@ -14,6 +14,7 @@ import css from "./auth.module.css"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
+import { ROUTE_URLS } from "common/utils/routes"
 
 const Login = () => {
   const { t } = useTranslation()
@@ -37,7 +38,7 @@ const Login = () => {
         (error as any).data.message === "Account not activated"
       ) {
         errorMessage = t(
-          "Votre compte n'est pas activé. Merci de cliquer sur le lien de reactivation pour activer votre compte."
+          "Votre compte n'est pas activé. Merci de cliquer sur le lien de réactivation pour activer votre compte."
         )
       }
       notify(errorMessage, { variant: "danger" })
@@ -72,12 +73,12 @@ const Login = () => {
           <Button
             variant="link"
             label={t("J'ai oublié mon mot de passe")}
-            to="../reset-password-request"
+            to={ROUTE_URLS.AUTH.RESET_PASSWORD_REQUEST}
           />
           <Button
             variant="link"
-            label={t("Cliquer ici pour activer votre compte.")}
-            to="../activate-request"
+            label={t("Cliquez ici pour activer votre compte.")}
+            to={ROUTE_URLS.AUTH.ACTIVATE_REQUEST}
           />
         </Form>
       </section>
