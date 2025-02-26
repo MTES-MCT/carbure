@@ -11,7 +11,7 @@ import {
   formatOperationType,
   formatSector,
   getOperationEntity,
-  getOperationVolume,
+  getOperationQuantity,
 } from "accounting/operations/operations.utils"
 import { OperationBadge } from "accounting/operations/components/operation-badge"
 import css from "./operation-detail.module.css"
@@ -117,8 +117,8 @@ export const OperationDetail = () => {
         { label: t("Catégorie"), value: operation.customs_category },
         { label: t("Biocarburant"), value: operation.biofuel },
         {
-          label: t("Volume"),
-          value: getOperationVolume(operation),
+          label: t("Quantité"),
+          value: getOperationQuantity(operation),
         },
         {
           label: t("Tonnes CO2 eq evitées"),

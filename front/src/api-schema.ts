@@ -1783,17 +1783,40 @@ export interface components {
     }
     Balance: {
       sector: components["schemas"]["SectorEnum"]
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
-      biofuel?: components["schemas"]["TiruertBiofuel"]
       /** Format: double */
       initial_balance: number
       /** Format: double */
       readonly available_balance: number
       /** Format: double */
       readonly final_balance: number
-      quantity: {
-        [key: string]: number
-      }
+      quantity: components["schemas"]["BalanceQuantity"]
+      /** Format: double */
+      teneur: number
+      /** Format: double */
+      yearly_teneur?: number
+      pending: number
+      unit: string
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel: components["schemas"]["BalanceBiofuel"]
+    }
+    BalanceBiofuel: {
+      id: number
+      code: string
+    }
+    BalanceByDepot: {
+      customs_category: string
+      biofuel: components["schemas"]["BalanceBiofuel"]
+      depots: components["schemas"]["BalanceDepot"][]
+    }
+    BalanceBySector: {
+      sector: components["schemas"]["SectorEnum"]
+      /** Format: double */
+      initial_balance: number
+      /** Format: double */
+      readonly available_balance: number
+      /** Format: double */
+      readonly final_balance: number
+      quantity: components["schemas"]["BalanceQuantity"]
       /** Format: double */
       teneur: number
       /** Format: double */
@@ -1801,14 +1824,28 @@ export interface components {
       pending: number
       unit: string
     }
-    BalanceByDepot: {
-      customs_category: string
-      biofuel: components["schemas"]["TiruertBiofuel"]
-      depots: components["schemas"]["Depot"][]
+    BalanceDepot: {
+      id: number
+      name: string
+      quantity: components["schemas"]["BalanceQuantity"]
+      unit?: string
+    }
+    BalanceQuantity: {
+      /**
+       * Format: double
+       * @default 0
+       */
+      credit: number
+      /**
+       * Format: double
+       * @default 0
+       */
+      debit: number
     }
     BalanceResponse:
-      | components["schemas"]["BalanceByDepot"]
       | components["schemas"]["Balance"]
+      | components["schemas"]["BalanceByDepot"]
+      | components["schemas"]["BalanceBySector"]
     Biofuel: {
       name: string
       name_en: string
@@ -2589,13 +2626,6 @@ export interface components {
       email: string
       role: string
     }
-    LotRequest: {
-      id: number
-      /** Format: double */
-      volume: number
-      /** Format: double */
-      emission_rate_per_mj: number
-    }
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -2627,10 +2657,10 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
-      credited_entity: components["schemas"]["TiruertEntity"]
-      debited_entity: components["schemas"]["TiruertEntity"]
-      from_depot: components["schemas"]["TiruertDepot"]
-      to_depot: components["schemas"]["TiruertDepot"]
+      credited_entity: components["schemas"]["OperationEntity"]
+      debited_entity: components["schemas"]["OperationEntity"]
+      from_depot: components["schemas"]["OperationDepot"]
+      to_depot: components["schemas"]["OperationDepot"]
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
@@ -2643,12 +2673,20 @@ export interface components {
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
+    OperationDepot: {
+      id: number
+      name: string
+    }
     OperationDetail: {
       lot: number
       /** Format: double */
       volume?: number
       /** Format: double */
       emission_rate_per_mj?: number
+    }
+    OperationEntity: {
+      id: number
+      name: string
     }
     OperationInputRequest: {
       type: components["schemas"]["TypeDefEnum"]
@@ -2659,7 +2697,7 @@ export interface components {
       from_depot?: number | null
       to_depot?: number | null
       export_country?: number | null
-      lots: components["schemas"]["LotRequest"][]
+      lots: components["schemas"]["OperationLotRequest"][]
     }
     OperationList: {
       readonly id: number
@@ -2668,10 +2706,10 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
-      credited_entity: components["schemas"]["TiruertEntity"]
-      debited_entity: components["schemas"]["TiruertEntity"]
-      from_depot: components["schemas"]["TiruertDepot"]
-      to_depot: components["schemas"]["TiruertDepot"]
+      credited_entity: components["schemas"]["OperationEntity"]
+      debited_entity: components["schemas"]["OperationEntity"]
+      from_depot: components["schemas"]["OperationDepot"]
+      to_depot: components["schemas"]["OperationDepot"]
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
@@ -2679,6 +2717,13 @@ export interface components {
       readonly quantity: number
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
+    }
+    OperationLotRequest: {
+      id: number
+      /** Format: double */
+      volume: number
+      /** Format: double */
+      emission_rate_per_mj: number
     }
     OtpResponse: {
       valid_until: string
@@ -3225,6 +3270,7 @@ export interface components {
       target_emission: number
       max_n_batches?: number
       enforced_volumes?: number[]
+      unit: string
     }
     SimulationLotOutput: {
       lot_id: number
@@ -3239,6 +3285,7 @@ export interface components {
       debited_entity: number | null
       /** Format: double */
       target_volume: number
+      unit: string
     }
     SimulationMinMaxOutput: {
       /** Format: double */
@@ -3277,18 +3324,6 @@ export interface components {
      * @enum {string}
      */
     StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
-    TiruertBiofuel: {
-      id: number
-      code: string
-    }
-    TiruertDepot: {
-      id: number
-      name: string
-    }
-    TiruertEntity: {
-      id: number
-      name: string
-    }
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean

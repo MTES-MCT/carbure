@@ -20,6 +20,7 @@ import {
   OperationsStatus,
   OperationType,
 } from "./types"
+import useEntity from "carbure/hooks/entity"
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
 }
@@ -27,6 +28,7 @@ export const useOperationsColumns = ({
   onClickSector,
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
 
   const columns: Column<Operation>[] = [
     {
@@ -93,7 +95,7 @@ export const useOperationsColumns = ({
       },
     },
     {
-      header: t("Volume"),
+      header: `${t("Quantité")} (${entity.preferred_unit.toUpperCase()})`,
       cell: (item) =>
         isOperationDebit(item.type) ? (
           <Text

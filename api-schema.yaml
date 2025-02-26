@@ -5845,10 +5845,6 @@ components:
       properties:
         sector:
           $ref: "#/components/schemas/SectorEnum"
-        customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
-        biofuel:
-          $ref: "#/components/schemas/TiruertBiofuel"
         initial_balance:
           type: number
           format: double
@@ -5861,10 +5857,75 @@ components:
           format: double
           readOnly: true
         quantity:
-          type: object
-          additionalProperties:
-            type: number
-            format: double
+          $ref: "#/components/schemas/BalanceQuantity"
+        teneur:
+          type: number
+          format: double
+        yearly_teneur:
+          type: number
+          format: double
+        pending:
+          type: integer
+        unit:
+          type: string
+        customs_category:
+          $ref: "#/components/schemas/CustomsCategoryEnum"
+        biofuel:
+          $ref: "#/components/schemas/BalanceBiofuel"
+      required:
+        - available_balance
+        - biofuel
+        - customs_category
+        - final_balance
+        - initial_balance
+        - pending
+        - quantity
+        - sector
+        - teneur
+        - unit
+    BalanceBiofuel:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+      required:
+        - code
+        - id
+    BalanceByDepot:
+      type: object
+      properties:
+        customs_category:
+          type: string
+        biofuel:
+          $ref: "#/components/schemas/BalanceBiofuel"
+        depots:
+          type: array
+          items:
+            $ref: "#/components/schemas/BalanceDepot"
+      required:
+        - biofuel
+        - customs_category
+        - depots
+    BalanceBySector:
+      type: object
+      properties:
+        sector:
+          $ref: "#/components/schemas/SectorEnum"
+        initial_balance:
+          type: number
+          format: double
+        available_balance:
+          type: number
+          format: double
+          readOnly: true
+        final_balance:
+          type: number
+          format: double
+          readOnly: true
+        quantity:
+          $ref: "#/components/schemas/BalanceQuantity"
         teneur:
           type: number
           format: double
@@ -5884,25 +5945,37 @@ components:
         - sector
         - teneur
         - unit
-    BalanceByDepot:
+    BalanceDepot:
       type: object
       properties:
-        customs_category:
+        id:
+          type: integer
+        name:
           type: string
-        biofuel:
-          $ref: "#/components/schemas/TiruertBiofuel"
-        depots:
-          type: array
-          items:
-            $ref: "#/components/schemas/Depot"
+        quantity:
+          $ref: "#/components/schemas/BalanceQuantity"
+        unit:
+          type: string
       required:
-        - biofuel
-        - customs_category
-        - depots
+        - id
+        - name
+        - quantity
+    BalanceQuantity:
+      type: object
+      properties:
+        credit:
+          type: number
+          format: double
+          default: 0
+        debit:
+          type: number
+          format: double
+          default: 0
     BalanceResponse:
       oneOf:
-        - $ref: "#/components/schemas/BalanceByDepot"
         - $ref: "#/components/schemas/Balance"
+        - $ref: "#/components/schemas/BalanceByDepot"
+        - $ref: "#/components/schemas/BalanceBySector"
     Biofuel:
       type: object
       properties:
@@ -7923,21 +7996,6 @@ components:
       required:
         - email
         - role
-    LotRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        volume:
-          type: number
-          format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
-      required:
-        - emission_rate_per_mj
-        - id
-        - volume
     LotStatusEnum:
       enum:
         - DRAFT
@@ -8004,13 +8062,13 @@ components:
           type: string
           readOnly: true
         credited_entity:
-          $ref: "#/components/schemas/TiruertEntity"
+          $ref: "#/components/schemas/OperationEntity"
         debited_entity:
-          $ref: "#/components/schemas/TiruertEntity"
+          $ref: "#/components/schemas/OperationEntity"
         from_depot:
-          $ref: "#/components/schemas/TiruertDepot"
+          $ref: "#/components/schemas/OperationDepot"
         to_depot:
-          $ref: "#/components/schemas/TiruertDepot"
+          $ref: "#/components/schemas/OperationDepot"
         export_country:
           type: integer
           nullable: true
@@ -8050,6 +8108,16 @@ components:
         - to_depot
         - type
         - unit
+    OperationDepot:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     OperationDetail:
       type: object
       properties:
@@ -8063,6 +8131,16 @@ components:
           format: double
       required:
         - lot
+    OperationEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     OperationInputRequest:
       type: object
       properties:
@@ -8091,7 +8169,7 @@ components:
         lots:
           type: array
           items:
-            $ref: "#/components/schemas/LotRequest"
+            $ref: "#/components/schemas/OperationLotRequest"
       required:
         - biofuel
         - customs_category
@@ -8118,13 +8196,13 @@ components:
           type: string
           readOnly: true
         credited_entity:
-          $ref: "#/components/schemas/TiruertEntity"
+          $ref: "#/components/schemas/OperationEntity"
         debited_entity:
-          $ref: "#/components/schemas/TiruertEntity"
+          $ref: "#/components/schemas/OperationEntity"
         from_depot:
-          $ref: "#/components/schemas/TiruertDepot"
+          $ref: "#/components/schemas/OperationDepot"
         to_depot:
-          $ref: "#/components/schemas/TiruertDepot"
+          $ref: "#/components/schemas/OperationDepot"
         export_country:
           type: integer
           nullable: true
@@ -8155,6 +8233,21 @@ components:
         - to_depot
         - type
         - unit
+    OperationLotRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - emission_rate_per_mj
+        - id
+        - volume
     OtpResponse:
       type: object
       properties:
@@ -9533,12 +9626,16 @@ components:
           type: array
           items:
             type: integer
+        unit:
+          type: string
+          minLength: 1
       required:
         - biofuel
         - customs_category
         - debited_entity
         - target_emission
         - target_volume
+        - unit
     SimulationLotOutput:
       type: object
       properties:
@@ -9568,11 +9665,15 @@ components:
         target_volume:
           type: number
           format: double
+        unit:
+          type: string
+          minLength: 1
       required:
         - biofuel
         - customs_category
         - debited_entity
         - target_volume
+        - unit
     SimulationMinMaxOutput:
       type: object
       properties:
@@ -9643,36 +9744,6 @@ components:
         * `ACCEPTED` - ACCEPTED
         * `REJECTED` - REJECTED
         * `CANCELED` - CANCELED
-    TiruertBiofuel:
-      type: object
-      properties:
-        id:
-          type: integer
-        code:
-          type: string
-      required:
-        - code
-        - id
-    TiruertDepot:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
-    TiruertEntity:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
     ToggleElecRequest:
       type: object
       properties:

@@ -97,7 +97,7 @@ export const getOperationEntity = (operation: Operation) =>
     ? operation.debited_entity
     : operation.credited_entity
 
-export const getOperationVolume = (operation: Operation) =>
+export const getOperationQuantity = (operation: Operation) =>
   isOperationDebit(operation.type)
     ? `-${formatNumber(operation.quantity)}`
     : `+${formatNumber(operation.quantity)}`
