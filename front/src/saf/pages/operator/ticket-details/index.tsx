@@ -21,6 +21,7 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
+import { UserRole } from "carbure/types"
 
 export type TicketDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -45,7 +46,8 @@ export const OperatorTicketDetails = ({
   })
 
   const ticket = ticketResponse.result?.data
-  // const ticket = safTicketReceivedDetails //TO TEST
+  const canUpdateTicket =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const showCancelModal = () => {
     portal((close) => (
@@ -113,12 +115,14 @@ export const OperatorTicketDetails = ({
                   label={t("Accepter")}
                   variant="success"
                   action={showAcceptModal}
+                  disabled={!canUpdateTicket}
                 />
                 <Button
                   icon={Cross}
                   label={t("Refuser")}
                   variant="danger"
                   action={showRejectModal}
+                  disabled={!canUpdateTicket}
                 />
               </>
             )}
@@ -133,6 +137,7 @@ export const OperatorTicketDetails = ({
                 label={t("Annuler l'affectation")}
                 variant="danger"
                 action={showCancelModal}
+                disabled={!canUpdateTicket}
               />
             )}
           {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
