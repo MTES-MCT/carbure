@@ -19,29 +19,29 @@ Attention, uniquement la version 8.0 de MYSQL fonctionne sur notre configuration
 - supprimez toute autres versions `brew uninstall mysql`.
 - reinstallez la bonne version `brew install mysql@8.0`.
 - mysql risque de s'installer avec dans le dossier /opt/homebrew/opt/mysql@8.0 au lieu de /opt/homebrew/opt/mysql.
-Depuis le dossier d'installation `/opt/homebrew/opt` créez un lien symbolique :
- `ln -s mysql@8.0 mysql`
+  Depuis le dossier d'installation `/opt/homebrew/opt` créez un lien symbolique :
+  `ln -s mysql@8.0 mysql`
 
 - Ajouter le binaire au PATH
-`export PATH="/opt/homebrew/opt/mysql/bin:$PATH"`
+  `export PATH="/opt/homebrew/opt/mysql/bin:$PATH"`
 
 - /!\ Ne pas start mysql sur la machine (ou alors changer les ports si besoin)
-Si vous rencontrez cette erreur lors de l'importation de la bdd `NameError: name '_mysql' is not defined` ou
-`mysql: [Warning] Using a password on the command line interface can be insecure.`
-`ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)`
-c'est que mysql est lancé en local sur votre ordinateur. Vous pouvez vérifier avec `brew services`, puis fermez-le avec :
- `brew services stop mysql@8.0`
+  Si vous rencontrez cette erreur lors de l'importation de la bdd `NameError: name '_mysql' is not defined` ou
+  `mysql: [Warning] Using a password on the command line interface can be insecure.`
+  `ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)`
+  c'est que mysql est lancé en local sur votre ordinateur. Vous pouvez vérifier avec `brew services`, puis fermez-le avec :
+  `brew services stop mysql@8.0`
 
 ## Configuration et Installation
 
 - Clonez le repository: git clone <https://github.com/MTES-MCT/carbure.git>
 - Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier.
-- Tu peux retrouver la plupart des valeurs dans la section "Environnement" de carbure-prod sur scalingo <https://dashboard.scalingo.com/apps/osc-secnum-fr1/carbure-prod/environment>. 
+- Tu peux retrouver la plupart des valeurs dans la section "Environnement" de carbure-prod sur scalingo <https://dashboard.scalingo.com/apps/osc-secnum-fr1/carbure-prod/environment>.
 
 > **A savoir :**
 > Une fois les accès scalingo obtenus, il faut créer un compte avec ton adresse scalingo, et contacter scalingo via le tchat du site en leur indiquant que tu travailles sur un projet gouvernemental et que tu as besoin d'être whitelisté pour avoir accès à la région `osc-secnum-fr1`.
 
-  - Liste des variables nécessaires à récupérer : `SECRET_KEY`, `SCALINGO_MYSQL_UUID`, `METABASE_SECRET_KEY`, `SENTRY_DSN`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`
+- Liste des variables nécessaires à récupérer : `SECRET_KEY`, `SCALINGO_MYSQL_UUID`, `METABASE_SECRET_KEY`, `SENTRY_DSN`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`
 - créer un accès ssh à ton compte Scalingo (<https://dashboard.scalingo.com/account/keys>) et un API token (dans ton profile scalingo <https://dashboard.scalingo.com/account/tokens>)
 - remplir SCALINGO_TOKEN=le token que tu as créé dans tom compte
 
@@ -54,11 +54,11 @@ Ensuite, créez un environnement virtuel pour python 3.10:
 - `pipenv install --dev`
 
 - Dans le dossier /front, téléchargez les modules
- `npm install`
+  `npm install`
 
 - Vous pouvez désormais builder les images docker et lancer le projet:
- `docker-compose build`
- `docker-compose up -d`
+  `docker-compose build`
+  `docker-compose up -d`
 
 ## Se placer dans l'environnement python dédié au projet
 
@@ -121,9 +121,9 @@ Pour plus d'information sur `silk`, une documentation est disponible à l'adress
 # Lancer les tests backend
 
 - Run all the tests in the api.v5.saf module
-`python web/manage.py test api.v5.saf`
+  `python web/manage.py test api.v5.saf`
 - Run just one test
-`python web/manage.py test api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
+  `python web/manage.py test api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
 - Pour éviter de reconstruire la db de test à chaque fois, on peut ajouter l'option `--keepdb` à la fin de la commande
 
 # Utiliser la console scalingo
@@ -132,7 +132,7 @@ Pour plus d'information sur `silk`, une documentation est disponible à l'adress
 `scalingo -a carbure-prod run bash`
 `python web/manage.py shell`
 
-example :
+exemple :
 
 ```
 >>> from core.models import Entity
@@ -184,5 +184,5 @@ Ensuite, setup normalement le projet:
 
 ## Double comptage : comment ajouter un biocarburant ou une matière premère
 
-1 -  Modifier le fichier `biocarburant.csv` ou `matierespremieres.csv` en ajoutant les données concernées
+1 - Modifier le fichier `biocarburant.csv` ou `matierespremieres.csv` en ajoutant les données concernées
 2 - mettre à jour le fichier `excel_to_carbure_convertor.py` en ajoutant dans les tableaux au moins une instance puis les variations de dénominations
