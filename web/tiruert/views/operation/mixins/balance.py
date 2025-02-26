@@ -10,6 +10,7 @@ from tiruert.filters import OperationFilter
 from tiruert.serializers import (
     BalanceByDepotSerializer,
     BalanceByLotSerializer,
+    BalanceBySectorSerializer,
     BalanceSerializer,
 )
 from tiruert.services.balance import BalanceService
@@ -43,8 +44,9 @@ class BalanceActionMixin:
                 many=True,
                 component_name="BalanceResponse",
                 serializers=[
-                    BalanceByDepotSerializer,
                     BalanceSerializer,
+                    BalanceByDepotSerializer,
+                    BalanceBySectorSerializer,
                 ],
                 resource_type_field_name=None,
             )
@@ -97,6 +99,7 @@ class BalanceActionMixin:
         serializer_class = {
             "lot": BalanceByLotSerializer,
             "depot": BalanceByDepotSerializer,
+            "sector": BalanceBySectorSerializer,
         }.get(group_by, self.get_serializer_class())
 
         data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())

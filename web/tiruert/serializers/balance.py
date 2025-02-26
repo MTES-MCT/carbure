@@ -3,29 +3,26 @@ from rest_framework import serializers
 from core.models import MatierePremiere
 
 
-class TiruertBiofuelSerializer(serializers.Serializer):
+class BalanceBiofuelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     code = serializers.CharField()
 
 
-class BalanceSerializer(serializers.Serializer):
+class BalanceQuantitySerializer(serializers.Serializer):
+    credit = serializers.FloatField(default=0.0)
+    debit = serializers.FloatField(default=0.0)
+
+
+class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
-    customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES, required=False)
-    biofuel = TiruertBiofuelSerializer(required=False)
     initial_balance = serializers.FloatField()
     available_balance = serializers.SerializerMethodField()
     final_balance = serializers.SerializerMethodField()
-    quantity = serializers.DictField(child=serializers.FloatField())
-    # avg_emission_rate_per_mj = serializers.FloatField()
+    quantity = BalanceQuantitySerializer()
     teneur = serializers.FloatField()
     yearly_teneur = serializers.FloatField(required=False)
     pending = serializers.IntegerField()
     unit = serializers.CharField()
-
-    def to_representation(self, instance):
-        # Overrides the default representation to remove fields with null values.
-        representation = super().to_representation(instance)
-        return {key: value for key, value in representation.items() if value is not None}
 
     def get_available_balance(self, instance) -> float:
         return self.calcul_available_balance(instance)
@@ -37,16 +34,25 @@ class BalanceSerializer(serializers.Serializer):
         return instance["initial_balance"] + instance["quantity"]["credit"] - instance["quantity"]["debit"]
 
 
-class LotSerializer(serializers.Serializer):
+class BalanceSerializer(BaseBalanceSerializer):
+    customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
+    biofuel = BalanceBiofuelSerializer()
+
+
+class BalanceBySectorSerializer(BaseBalanceSerializer):
+    pass
+
+
+class BalanceLotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
-    volume = serializers.DictField(child=serializers.FloatField())
+    volume = BalanceQuantitySerializer()
     emission_rate_per_mj = serializers.FloatField()
 
 
 class BalanceByLotSerializer(serializers.Serializer):
     customs_category = serializers.CharField(required=False, allow_null=True)
     biofuel = serializers.CharField(required=False, allow_null=True)
-    lots = LotSerializer(many=True, required=False)
+    lots = BalanceLotSerializer(many=True, required=False)
 
     @staticmethod
     def prepare_data(balance_dict):
@@ -78,17 +84,17 @@ class BalanceByLotSerializer(serializers.Serializer):
         return list(grouped_balance.values())
 
 
-class DepotSerializer(serializers.Serializer):
+class BalanceDepotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    volume = serializers.DictField(child=serializers.FloatField())
+    quantity = BalanceQuantitySerializer()
     unit = serializers.CharField(required=False)
 
 
 class BalanceByDepotSerializer(serializers.Serializer):
     customs_category = serializers.CharField()
-    biofuel = TiruertBiofuelSerializer()
-    depots = DepotSerializer(many=True)
+    biofuel = BalanceBiofuelSerializer()
+    depots = BalanceDepotSerializer(many=True)
 
     @staticmethod
     def prepare_data(balance_dict):
@@ -110,7 +116,7 @@ class BalanceByDepotSerializer(serializers.Serializer):
                 {
                     "id": depot.id,
                     "name": depot.name,
-                    "volume": {
+                    "quantity": {
                         "credit": value["quantity"]["credit"],
                         "debit": value["quantity"]["debit"],
                     },

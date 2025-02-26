@@ -142,6 +142,7 @@ class TeneurService:
 
         return selected_batches_volumes, res.fun
 
+    @staticmethod
     def emission_bounds(
         batches_volumes: npt.NDArray, batches_emissions: npt.NDArray, target_volume: float
     ) -> tuple[float, float]:
@@ -190,17 +191,17 @@ class TeneurService:
 
     @staticmethod
     def prepare_data_and_optimize(entity_id, data):
-        volumes, emissions, lot_ids, enforced_volumes = TeneurService.prepare_data(entity_id, data)
+        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(entity_id, data)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
-        volume_energy = data["target_volume"] * pci  # MJ
+        volume_energy = target_volume * pci  # MJ
         target_emission = GHG_REFERENCE_RED_II - (data["target_emission"] * 1000000 / volume_energy)  # gCO2/MJ emis
 
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
-            data["target_volume"],
+            target_volume,
             target_emission,
             enforced_volumes,
             data.get("max_n_batches", None),
@@ -214,17 +215,19 @@ class TeneurService:
         Compute minimum and maximum feasible mix emissions.
         Return avoided emissions (tCO2)
         """
-        volumes, emissions, _, _ = TeneurService.prepare_data(entity_id, data)
+        volumes, emissions, _, _, target_volume = TeneurService.prepare_data(
+            entity_id, data
+        )  # volumes in L, emissions in gCO2/MJ
 
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
             emissions,
-            data["target_volume"],
+            target_volume,
         )
 
         # Transform producted emissions (gCO2/MJ) into avoided emissions (tCO2)
         pci = data["biofuel"].pci_litre
-        volume_energy = data["target_volume"] * pci  # MJ
+        volume_energy = target_volume * pci  # MJ
         max_avoided_emissions = (GHG_REFERENCE_RED_II - min_emissions_rate) * volume_energy / 1000000  # tCO2
         min_avoided_emissions = (GHG_REFERENCE_RED_II - max_emissions_rate) * volume_energy / 1000000  # tCO2
 
@@ -266,4 +269,18 @@ class TeneurService:
                 )
                 enforced_volumes = np.append(enforced_volumes, volume)
 
-        return volumes, emissions, lot_ids, enforced_volumes
+        # Convert target volume into L
+        target_volume = None
+        if data.get("target_volume", None) is not None:
+            target_volume = TeneurService.convert_in_liters(data["target_volume"], data["unit"], data["biofuel"])
+
+        return volumes, emissions, lot_ids, enforced_volumes, target_volume
+
+    @staticmethod
+    def convert_in_liters(quantity, unit, biofuel):
+        if unit == "mj":
+            return quantity / biofuel.pci_litre
+        elif unit == "kg":
+            return quantity / biofuel.masse_volumique
+        else:
+            return quantity
