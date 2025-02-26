@@ -1,6 +1,6 @@
 stages:
-  - check
   - pass
+  - check
 
 workflow:
   rules:
