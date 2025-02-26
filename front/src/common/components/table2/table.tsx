@@ -330,6 +330,7 @@ export interface CellProps {
   icon?: React.FunctionComponent | React.ReactNode
   text?: ReactNode
   sub?: ReactNode
+  tooltipText?: string // Text to be displayed in the tooltip
 }
 
 export const Cell = ({
@@ -339,8 +340,13 @@ export const Cell = ({
   icon: Icon,
   text,
   sub,
+  tooltipText,
 }: CellProps) => {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
+
+  const tooltipTitle =
+    tooltipText ??
+    (typeof text === "string" ? text : typeof sub === "string" ? sub : "")
 
   return (
     <Col
@@ -352,8 +358,8 @@ export const Cell = ({
       )}
       style={style}
     >
-      <Tooltip title={`${text || sub}`}>
-        <Text is="span" size={text && sub ? "sm" : undefined}>
+      <Tooltip title={tooltipTitle}>
+        <Text is="span" size="sm" className={css["cell__wrapper-text"]}>
           {text || sub}
           {icon}
         </Text>

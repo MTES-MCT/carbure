@@ -1,5 +1,4 @@
 import * as norm from "common/utils/normalizers"
-import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Normalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
 import { SafFilter, SafFilterSelection } from "../types"
@@ -24,7 +23,6 @@ export function SafFilters({
     [SafFilter.Periods]: t("Périodes"),
     [SafFilter.Feedstocks]: t("Matières Premières"),
     [SafFilter.Clients]: t("Clients"),
-    [SafFilter.Suppliers]: t("Fournisseur"),
     [SafFilter.CountriesOfOrigin]: t("Pays d'origine"),
     [SafFilter.ProductionSites]: t("Sites de production"),
     [SafFilter.DeliverySites]: t("Sites de livraison"),
@@ -44,39 +42,17 @@ export function SafFilters({
       getFilterOptions={getFilterOptions}
       selected={selected}
       onSelect={onSelect}
+      normalizers={filterNormalizers}
     />
   )
 }
 
-export type FilterSelectProps = { field: SafFilter } & Omit<
-  MultiSelectProps<string>,
-  "options"
->
+type FilterNormalizers = Partial<Record<SafFilter, Normalizer<any>>>
 
-export const FilterSelect = ({
-  field,
-  value = [],
-  onChange,
-  ...props
-}: FilterSelectProps) => (
-  <MultiSelect
-    {...props}
-    clear
-    search
-    variant="solid"
-    value={value}
-    onChange={onChange}
-    normalize={filterNormalizers[field]}
-    sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
-  />
-)
-
-type FilterNormalizers = Partial<Record<SafFilter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
   [SafFilter.Feedstocks]: norm.normalizeFeedstockFilter,
   [SafFilter.Periods]: norm.normalizePeriodFilter,
   [SafFilter.Clients]: norm.normalizeUnknownFilter,
-  [SafFilter.Suppliers]: norm.normalizeUnknownFilter,
   [SafFilter.CountriesOfOrigin]: norm.normalizeCountryFilter,
   [SafFilter.ProductionSites]: norm.normalizeUnknownFilter,
   [SafFilter.DeliverySites]: norm.normalizeUnknownFilter,

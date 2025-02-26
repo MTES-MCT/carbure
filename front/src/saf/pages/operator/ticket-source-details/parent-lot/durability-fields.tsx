@@ -23,14 +23,14 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             hasTooltip
             label="EEC"
             title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
-            value={formatNumberToText(durability.eec)}
+            value={durability.eec ? formatNumberToText(durability.eec) : "-"}
             readOnly
           />
           <TextInput
             hasTooltip
             label="EL"
             title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
-            value={formatNumberToText(durability.el)}
+            value={durability.el ? formatNumberToText(durability.el) : "-"}
             readOnly
           />
           <TextInput
@@ -38,7 +38,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             hasTooltip
             label="EP"
             title={t("Émissions résultant dela transformation")}
-            value={formatNumberToText(durability.ep)}
+            value={durability.ep ? formatNumberToText(durability.ep) : "-"}
             readOnly
           />
           <TextInput
@@ -46,14 +46,14 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             hasTooltip
             label="ETD"
             title={t("Émissions résultant du transport et de la distribution")}
-            value={formatNumberToText(durability.etd)}
+            value={durability.etd ? formatNumberToText(durability.etd) : "-"}
             readOnly
           />
           <TextInput
             label="EU"
             hasTooltip
             title={t("Émissions résultant du carburant à l'usage")}
-            value={formatNumberToText(durability.eu)}
+            value={durability.eu ? formatNumberToText(durability.eu) : "-"}
             readOnly
           />
         </Col>
@@ -62,28 +62,28 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             label="ESCA"
             hasTooltip
             title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
-            value={formatNumberToText(durability.esca)}
+            value={durability.esca ? formatNumberToText(durability.esca) : "-"}
             readOnly
           />
           <TextInput
             label="ECCS"
             hasTooltip
             title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
-            value={formatNumberToText(durability.eccs)}
+            value={durability.eccs ? formatNumberToText(durability.eccs) : "-"}
             readOnly
           />
           <TextInput
             label="ECCR"
             hasTooltip
             title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
-            value={formatNumberToText(durability.eccr)}
+            value={durability.eccr ? formatNumberToText(durability.eccr) : "-"}
             readOnly
           />
           <TextInput
             label="EEE"
             hasTooltip
             title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
-            value={formatNumberToText(durability.eee)}
+            value={durability.eee ? formatNumberToText(durability.eee) : "-"}
             readOnly
           />
         </Col>
@@ -93,14 +93,18 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
         readOnly
         hasTooltip
         label="Total"
-        value={formatGHG(durability.ghg_total ?? 0)}
+        value={durability.ghg_total ? formatGHG(durability.ghg_total) : "-"}
       />
 
       <TextInput
         readOnly
         hasTooltip
         label={t("Réduction")}
-        value={formatPercentage(durability.ghg_reduction ?? 0)}
+        value={
+          durability.ghg_reduction
+            ? formatPercentage(durability.ghg_reduction)
+            : "-"
+        }
       />
     </DialogSection>
   )

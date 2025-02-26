@@ -7,30 +7,27 @@ import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
 import cl from "clsx"
-import { Field, FieldProps } from "common/components/inputs2/field"
+export type SelectProps<T, V = T> = Trigger & {
+  search?: boolean
+  value?: V | undefined
+  options?: T[]
+  defaultOptions?: T[]
+  placeholder?: string
+  getOptions?: () => Promise<T[]>
+  onChange?: (value: V | undefined) => void
+  normalize?: Normalizer<T, V>
 
-export type SelectProps<T, V = T> = Trigger &
-  Partial<Omit<FieldProps, "children">> & {
-    search?: boolean
-    value?: V | undefined
-    options?: T[]
-    defaultOptions?: T[]
-    placeholder?: string
-    getOptions?: () => Promise<T[]>
-    onChange?: (value: V | undefined) => void
-    normalize?: Normalizer<T, V>
+  // Custom renderer for the displayed value
+  valueRenderer?: (item: T) => React.ReactNode
+  sort?: Sorter<T, V>
+  size?: ButtonProps["size"]
 
-    // Custom renderer for the displayed value
-    valueRenderer?: (item: T) => React.ReactNode
-    sort?: Sorter<T, V>
-    size?: ButtonProps["size"]
-
-    // If true, the select will take the full width of its container
-    full?: boolean
-    className?: string
-    children?: ListProps<T, V>["children"]
-    loading?: boolean
-  }
+  // If true, the select will take the full width of its container
+  full?: boolean
+  className?: string
+  children?: ListProps<T, V>["children"]
+  loading?: boolean
+}
 
 export function Select<T, V>({
   search,
@@ -51,8 +48,6 @@ export function Select<T, V>({
   full,
   className,
   children,
-  label,
-  ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
@@ -70,7 +65,7 @@ export function Select<T, V>({
   )
 
   return (
-    <Field label={label}>
+    <>
       <Button
         ref={triggerRef}
         iconId={loading ? "ri-loader-line" : "fr-icon-arrow-down-s-line"}
@@ -94,36 +89,35 @@ export function Select<T, V>({
             : asyncOptions.label || placeholder}
         </Text>
       </Button>
-      {!props.disabled && !props.readOnly && (
-        <Dropdown
-          open={open && asyncOptions.items.length > 0}
-          triggerRef={triggerRef}
-          anchor={anchor}
-          onClose={onClose}
-          onToggle={setOpen}
-          onOpen={() => {
-            onOpen?.()
-            asyncOptions.execute()
+
+      <Dropdown
+        open={open && asyncOptions.items.length > 0}
+        triggerRef={triggerRef}
+        anchor={anchor}
+        onClose={onClose}
+        onToggle={setOpen}
+        onOpen={() => {
+          onOpen?.()
+          asyncOptions.execute()
+        }}
+        className={cl(search && styles["select-dropdown"])}
+      >
+        <List
+          controlRef={triggerRef}
+          search={search}
+          items={asyncOptions.items}
+          selectedValue={value}
+          sort={sort}
+          normalize={normalize}
+          onFocus={onChange}
+          onSelectValue={(value) => {
+            onChange?.(value)
+            setOpen(false)
           }}
-          className={cl(search && styles["select-dropdown"])}
         >
-          <List
-            controlRef={triggerRef}
-            search={search}
-            items={asyncOptions.items}
-            selectedValue={value}
-            sort={sort}
-            normalize={normalize}
-            onFocus={onChange}
-            onSelectValue={(value) => {
-              onChange?.(value)
-              setOpen(false)
-            }}
-          >
-            {children}
-          </List>
-        </Dropdown>
-      )}
-    </Field>
+          {children}
+        </List>
+      </Dropdown>
+    </>
   )
 }
