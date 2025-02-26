@@ -4749,10 +4749,10 @@ paths:
           schema:
             type: string
             enum:
+              - kg
               - l
               - mj
-            default: l
-          description: Specify the volume unit (default is `l`).
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -4775,6 +4775,15 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -4852,6 +4861,15 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -4880,6 +4898,15 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -4931,6 +4958,15 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -4958,6 +4994,15 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -4993,6 +5038,15 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -5162,10 +5216,10 @@ paths:
           schema:
             type: string
             enum:
+              - kg
               - l
               - mj
-            default: l
-          description: Specify the volume unit (default is `l`).
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -5317,6 +5371,15 @@ paths:
               description: |-
                 * `CREDIT` - CREDIT
                 * `DEBIT` - DEBIT
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -5485,6 +5548,15 @@ paths:
               description: |-
                 * `CREDIT` - CREDIT
                 * `DEBIT` - DEBIT
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -5519,6 +5591,15 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -5554,6 +5635,15 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -5589,6 +5679,15 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -9635,7 +9734,6 @@ components:
         - debited_entity
         - target_emission
         - target_volume
-        - unit
     SimulationLotOutput:
       type: object
       properties:
@@ -9673,7 +9771,6 @@ components:
         - customs_category
         - debited_entity
         - target_volume
-        - unit
     SimulationMinMaxOutput:
       type: object
       properties:

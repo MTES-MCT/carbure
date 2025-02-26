@@ -3270,7 +3270,7 @@ export interface components {
       target_emission: number
       max_n_batches?: number
       enforced_volumes?: number[]
-      unit: string
+      unit?: string
     }
     SimulationLotOutput: {
       lot_id: number
@@ -3285,7 +3285,7 @@ export interface components {
       debited_entity: number | null
       /** Format: double */
       target_volume: number
-      unit: string
+      unit?: string
     }
     SimulationMinMaxOutput: {
       /** Format: double */
@@ -6747,7 +6747,7 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
-        /** @description Specify the volume unit (default is `l`). */
+        /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
@@ -6772,6 +6772,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -6808,6 +6810,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6834,6 +6838,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6865,6 +6871,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6904,6 +6912,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6939,6 +6949,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6992,7 +7004,7 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
-        /** @description Specify the volume unit (default is `l`). */
+        /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
@@ -7032,6 +7044,8 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7070,6 +7084,8 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7092,6 +7108,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7120,6 +7138,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7148,6 +7168,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7321,6 +7343,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryType {
   DEBIT = "DEBIT",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
+  kg = "kg",
   l = "l",
   mj = "mj",
 }

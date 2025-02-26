@@ -10,8 +10,8 @@ class OperationServiceErrors:
 
 class OperationService:
     @staticmethod
-    def check_volumes_before_create(entity_id, selected_lots, data):
-        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(entity_id, data)
+    def check_volumes_before_create(entity_id, selected_lots, data, unit):
+        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(entity_id, data, unit)
 
         available_volumes = dict(zip(map(int, np_lot_ids), map(float, np_volumes)))
         requested_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}

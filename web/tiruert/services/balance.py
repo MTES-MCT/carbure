@@ -8,7 +8,7 @@ from tiruert.models import Operation
 
 class BalanceService:
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit="l"):
+    def calculate_balance(operations, entity_id, group_by, unit):
         """
         Keep only PENDING and ACCEPTED operations
         Group by sector, customs_category and biofuel (and lot if needed)
@@ -26,7 +26,7 @@ class BalanceService:
                 "emission_rate_per_mj": 0,
                 "teneur": 0,
                 "pending": 0,
-                "unit": "l",
+                "unit": unit,
             }
         )
         key = None
@@ -39,9 +39,11 @@ class BalanceService:
             if operation.is_credit(entity_id) and operation.status == Operation.PENDING:
                 continue
 
-            conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
-
             depot = operation.to_depot if operation.is_credit(entity_id) else operation.from_depot
+            if depot is None:  # Should not happen
+                continue
+
+            conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
             for detail in operation.details.all():
                 key = (operation.sector, operation.customs_category, operation.biofuel.code)
@@ -72,9 +74,6 @@ class BalanceService:
 
             if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
-
-            if key:
-                balance[key]["unit"] = unit
 
         return balance
 
