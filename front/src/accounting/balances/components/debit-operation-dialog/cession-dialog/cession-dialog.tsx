@@ -16,8 +16,6 @@ import {
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
-import { formatUnit, formatUnitOnly } from "common/utils/formatters"
-import { Unit } from "carbure/types"
 import { Button } from "common/components/button2"
 import {
   showNextStepQuantityForm,
@@ -35,16 +33,23 @@ import { useMutation } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import { CreateOperationType } from "accounting/types"
 import { useNotify } from "common/components/notifications"
+import { useUnit } from "common/hooks/unit"
 
 interface CessionDialogProps {
   onClose: () => void
+  onOperationCreated: () => void
   balance: Balance
 }
 
-export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
+export const CessionDialog = ({
+  onClose,
+  onOperationCreated,
+  balance,
+}: CessionDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
+  const { formatUnit } = useUnit()
   const {
     currentStep,
     currentStepIndex,
@@ -60,9 +65,7 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
     },
     {
       key: CessionStepKey.Quantity,
-      title: t("Quantité de la cession en {{unit}} et tCO2 évitées", {
-        unit: formatUnitOnly(entity.preferred_unit),
-      }),
+      title: t("Quantité de la cession et tCO2 évitées"),
     },
     {
       key: CessionStepKey.ToDepot,
@@ -95,7 +98,6 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
       debited_entity: entity.id,
       target_volume: form.value.quantity!,
       target_emission: form.value.avoided_emissions!,
-      unit: entity.preferred_unit,
     }).then((response) => {
       const lots = response.data?.selected_lots
       if (lots) {
@@ -117,17 +119,15 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
   }
 
   const mutation = useMutation(onSubmit, {
+    invalidates: ["balances"],
     onSuccess: () => {
       onClose()
+      onOperationCreated()
       notify(
         t(
           "La cession d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatUnit(
-              form.value.quantity!,
-              entity.preferred_unit,
-              0
-            ),
+            quantity: formatUnit(form.value.quantity!, 0),
           }
         ),
         { variant: "success" }
@@ -205,10 +205,12 @@ export const CessionDialog = ({ onClose, balance }: CessionDialogProps) => {
               description={balance.biofuel ? balance.biofuel.code : ""}
             />
             <OperationText
-              title={t("Solde disponible")}
+              title={t("Solde disponible en {{biofuel}}", {
+                biofuel: balance.biofuel?.code,
+              })}
               description={
                 balance.available_balance
-                  ? formatUnit(balance.available_balance, Unit.l, 0)
+                  ? formatUnit(balance.available_balance, 0)
                   : ""
               }
             />

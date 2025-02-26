@@ -13,14 +13,21 @@ import * as api from "./api"
 import { formatSector } from "accounting/utils/formatters"
 import { OperationsStatus } from "accounting/types"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
+import useEntity from "carbure/hooks/entity"
+import { compact } from "common/utils/collection"
+import { UserRole } from "carbure/types"
 
 export const useBalancesColumns = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const routes = useRoutes()
   const portal = usePortal()
+  const entity = useEntity()
 
-  const columns: Column<apiTypes["Balance"]>[] = [
+  const canTransfer =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
+
+  const columns: Column<apiTypes["Balance"]>[] = compact([
     {
       header: t("Filière"),
       cell: (item) => t(formatSector(item.sector)),
@@ -41,7 +48,7 @@ export const useBalancesColumns = () => {
       header: t("Opérations en attente"),
       cell: (item) =>
         item.pending === 0 ? (
-          item.pending
+          "-"
         ) : (
           <Button
             customPriority="link"
@@ -62,7 +69,7 @@ export const useBalancesColumns = () => {
           </Button>
         ),
     },
-    {
+    canTransfer && {
       header: t("Céder"),
       cell: (balance) => (
         <Button
@@ -78,7 +85,7 @@ export const useBalancesColumns = () => {
         />
       ),
     },
-  ]
+  ])
 
   return columns
 }

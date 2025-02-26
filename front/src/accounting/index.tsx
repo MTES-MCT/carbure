@@ -12,11 +12,17 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { Operations } from "./operations"
 import { Balances } from "./balances"
 import { useState } from "react"
+import { compact } from "common/utils/collection"
+import useEntity from "carbure/hooks/entity"
+import { UserRole } from "carbure/types"
 
 const MaterialAccounting = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const [operationCount, setOperationCount] = useState(0)
+  const entity = useEntity()
+  const canTransfer =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   return (
     <Main>
@@ -24,8 +30,8 @@ const MaterialAccounting = () => {
         <Trans>Clôturer ma comptabilité mensuelle</Trans>
       </Button>
       <Tabs
-        tabs={[
-          {
+        tabs={compact([
+          canTransfer && {
             key: "balances",
             label: t("Soldes"),
             path: routes.MATERIAL_ACCOUNTING.BALANCES,
@@ -43,7 +49,7 @@ const MaterialAccounting = () => {
             path: "##",
             icon: ArrowRightLine,
           },
-        ]}
+        ])}
       />
       <Content>
         <Routes>
@@ -51,7 +57,7 @@ const MaterialAccounting = () => {
             path="operations"
             element={<Operations setOperationCount={setOperationCount} />}
           />
-          <Route path="balances" element={<Balances />} />
+          {canTransfer && <Route path="balances" element={<Balances />} />}
           <Route path="*" element={<Navigate replace to="operations" />} />
         </Routes>
       </Content>

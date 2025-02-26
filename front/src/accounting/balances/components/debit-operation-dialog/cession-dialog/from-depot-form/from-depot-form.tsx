@@ -6,10 +6,9 @@ import { Notice } from "common/components/notice"
 import { getDepotsWithBalance } from "../api"
 import useEntity from "carbure/hooks/entity"
 import { Balance } from "accounting/balances/types"
-import { formatNumber, formatUnit } from "common/utils/formatters"
-import { Unit } from "carbure/types"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
+import { useUnit } from "common/hooks/unit"
 
 type FromDepotProps = {
   balance: Balance
@@ -24,6 +23,7 @@ export const showNextStepFromDepotForm = (values: SessionDialogForm) => {
 export const FromDepotForm = ({ balance }: FromDepotProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const { formatUnit } = useUnit()
   const { value, bind } = useFormContext<SessionDialogForm>()
 
   return (
@@ -53,10 +53,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
               t={t}
               values={{
                 depot: depot.name,
-                quantity: formatUnit(
-                  depot.quantity.credit,
-                  entity.preferred_unit
-                ),
+                quantity: formatUnit(depot.quantity.credit, 0),
               }}
               defaults="{{depot}} ({{quantity}} disponibles)"
             />
@@ -73,7 +70,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
                 t={t}
                 values={{
                   depot: value.from_depot.name,
-                  quantity: formatNumber(value.from_depot.quantity.credit, 0),
+                  quantity: formatUnit(value.from_depot.quantity.credit, 0),
                 }}
                 defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{quantity}}</strong>"
               />
@@ -97,7 +94,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
 // Recap form data after the step was submitted
 export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
   const { t } = useTranslation()
-
+  const { formatUnit } = useUnit()
   if (
     !values.from_depot?.quantity?.credit ||
     values.from_depot.quantity.credit <= 0
@@ -113,7 +110,7 @@ export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
       />
       <OperationText
         title={t("Solde disponible dans le dépôt d'expédition")}
-        description={formatUnit(values.from_depot.quantity.credit, Unit.l, 0)}
+        description={formatUnit(values.from_depot.quantity.credit, 0)}
       />
     </Grid>
   )

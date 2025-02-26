@@ -73,6 +73,7 @@ export function Autocomplete<T, V>({
         inputRef={triggerRef}
         value={autocomplete.query}
         onChange={autocomplete.onQuery}
+        iconId="ri-arrow-down-s-line"
       />
 
       {!props.disabled && !props.readOnly && (
