@@ -57,10 +57,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-        if getattr(self.request, "entity", None):
-            entity = request.entity
-            unit = request.GET.get("unit") or entity.preferred_unit.lower() or "l"
-            setattr(request, "unit", unit)
+        # Get unit from request params or entity preference or default to liters
+        entity = getattr(request, "entity", None)
+        unit = request.GET.get("unit") or (entity.preferred_unit.lower() if entity else None) or "l"
+        setattr(request, "unit", unit)
         return request
 
     def get_serializer_context(self):

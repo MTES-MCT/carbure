@@ -55,7 +55,6 @@ class BalanceActionMixin:
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
         unit = request.unit
-        print("UNIT", unit)
 
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
