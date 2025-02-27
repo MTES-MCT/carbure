@@ -573,6 +573,7 @@
   "Demande d'agrément double comptage": "Demande d'agrément double comptage",
   "Enregistrer": "Enregistrer",
   "Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>": "Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>",
+  "Période de validité : <b>{{ period }}</b>": "Période de validité : <b>{{ period }}</b>",
   "Date de soumission": "Date de soumission",
   "En attente ({{count}})_one": "En attente ({{count}})",
   "En attente ({{count}})_many": "En attente ({{count}})",
