@@ -378,11 +378,11 @@ def fill_supplier_info(lot, data, entity):
     # I AM THE SUPPLIER
     if str(data.get("carbure_supplier_id")) == str(entity.id):
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get("supplier_certificate") or entity.default_certificate
+        lot.supplier_certificate = data.get("supplier_certificate", entity.default_certificate)
     # LOT FROM STOCK
     if lot.parent_stock:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get("supplier_certificate") or entity.default_certificate
+        lot.supplier_certificate = data.get("supplier_certificate", entity.default_certificate)
     # EXCEL: NO SUPPLIER IS SPECIFIED AND I AM THE PRODUCER
     if lot.carbure_producer and lot.carbure_producer.id == entity.id and not lot.carbure_supplier:
         lot.carbure_supplier = entity
@@ -394,13 +394,9 @@ def fill_supplier_info(lot, data, entity):
 
 def fill_vendor_data(lot, data, entity):
     # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING - OVERRIDE SOME FIELDS
-    if (
-        entity != lot.carbure_supplier
-        and entity != lot.carbure_client
-        and not (entity.entity_type == Entity.PRODUCER and not entity.has_trading)
-    ):
+    if entity != lot.carbure_supplier and entity != lot.carbure_client:
         lot.carbure_vendor = entity  # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)  # noqa: E501
-        lot.vendor_certificate = data.get("vendor_certificate") or entity.default_certificate
+        lot.vendor_certificate = data.get("vendor_certificate", entity.default_certificate)
     else:
         lot.vendor_certificate = None
         lot.carbure_vendor = None
