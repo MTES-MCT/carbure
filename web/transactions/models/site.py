@@ -140,6 +140,10 @@ class Site(models.Model):
         # Check if the site is a depot
         return self.site_type in self.DEPOT_TYPES
 
+    def __str__(self):
+        creator = self.created_by.name if self.created_by else ""
+        return "%s - %s (%s)" % (self.name, creator, self.site_type)
+
 
 class ContentToUpdate(models.Model):
     model = models.CharField(max_length=64, null=False, blank=False)
