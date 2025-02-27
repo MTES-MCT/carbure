@@ -6,10 +6,10 @@ class EntityMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        entity_id = request.POST.get("entity_id", request.GET.get("entity_id"))
+        entity_id = request.POST.get("entity_id", request.GET.get("entity_id")) or None
         request.entity = None
 
-        if entity_id:
+        if entity_id and entity_id.isdigit():
             try:
                 request.entity = Entity.objects.get(id=entity_id)
             except Entity.DoesNotExist:
