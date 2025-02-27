@@ -6052,7 +6052,7 @@ export interface operations {
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description Comma-separated list of supplier names */
-        suppliers?: string[]
+        suppliers?: string[][]
         year?: number
       }
       header?: never
@@ -6162,7 +6162,7 @@ export interface operations {
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description Comma-separated list of supplier names */
-        suppliers?: string[]
+        suppliers?: string[][]
         year?: number
       }
       header?: never
@@ -6218,7 +6218,7 @@ export interface operations {
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description Comma-separated list of supplier names */
-        suppliers?: string[]
+        suppliers?: string[][]
         year?: number
       }
       header?: never
