@@ -18,20 +18,23 @@ def get_lot_details(request, entity, entity_id):
     if not lot_id:
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, {"lot_id": "Missing lot id"})
 
-    lot = CarbureLot.objects.select_related(
-        "added_by",
-        "biofuel",
-        "feedstock",
-        "country_of_origin",
-        "carbure_producer",
-        "carbure_production_site",
-        "production_country",
-        "carbure_supplier",
-        "carbure_vendor",
-        "carbure_client",
-        "carbure_delivery_site",
-        "delivery_site_country",
-    ).get(pk=lot_id)
+    try:
+        lot = CarbureLot.objects.select_related(
+            "added_by",
+            "biofuel",
+            "feedstock",
+            "country_of_origin",
+            "carbure_producer",
+            "carbure_production_site",
+            "production_country",
+            "carbure_supplier",
+            "carbure_vendor",
+            "carbure_client",
+            "carbure_delivery_site",
+            "delivery_site_country",
+        ).get(pk=lot_id)
+    except CarbureLot.DoesNotExist:
+        return ErrorResponse(404, CarbureError.NOT_FOUND, {"lot_id": "Lot id not found"})
 
     if lot.carbure_client != entity and lot.carbure_supplier != entity and lot.added_by != entity:
         return ErrorResponse(403, CarbureError.ENTITY_NOT_ALLOWED)

@@ -4,7 +4,7 @@ import django_filters
 from django.db.models import Q
 from django.db.models.expressions import F
 from drf_spectacular.utils import extend_schema_field
-from rest_framework.serializers import CharField, ChoiceField
+from rest_framework.serializers import CharField, ChoiceField, ListField
 
 from saf.models import SafTicketSource
 
@@ -63,11 +63,14 @@ class TicketSourceFilter(django_filters.FilterSet):
         else:
             raise Exception(f"Status '{value}' does not exist for ticket sources")
 
-    @extend_schema_field(CharField(help_text="Comma-separated list of supplier names"))
+    @extend_schema_field(ListField(child=CharField(), help_text="Comma-separated list of supplier names"))
     def filter_suppliers(self, queryset, name, value):
-        suppliers_list = value.split(",")
+        suppliers = self.request.GET.getlist(name)
+        if not suppliers:
+            return queryset
+
         return queryset.filter(
-            Q(parent_lot__carbure_supplier__name__in=suppliers_list)
-            | Q(parent_lot__unknown_supplier__in=suppliers_list)
-            | Q(parent_ticket__supplier__name__in=suppliers_list)
+            Q(parent_lot__carbure_supplier__name__in=suppliers)
+            | Q(parent_lot__unknown_supplier__in=suppliers)
+            | Q(parent_ticket__supplier__name__in=suppliers)
         )

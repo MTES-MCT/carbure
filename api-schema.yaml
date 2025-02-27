@@ -3462,8 +3462,10 @@ paths:
           schema:
             type: array
             items:
-              type: string
-              minLength: 1
+              type: array
+              items:
+                type: string
+                minLength: 1
           description: Comma-separated list of supplier names
           explode: false
           style: form
@@ -3675,8 +3677,10 @@ paths:
           schema:
             type: array
             items:
-              type: string
-              minLength: 1
+              type: array
+              items:
+                type: string
+                minLength: 1
           description: Comma-separated list of supplier names
           explode: false
           style: form
@@ -3825,8 +3829,10 @@ paths:
           schema:
             type: array
             items:
-              type: string
-              minLength: 1
+              type: array
+              items:
+                type: string
+                minLength: 1
           description: Comma-separated list of supplier names
           explode: false
           style: form
