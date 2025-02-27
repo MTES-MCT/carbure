@@ -36,10 +36,11 @@ def get_nav_stats(request):
         return Response({})
 
     # @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-    entity_id = request.GET["entity_id"]
-    if not entity_id:
+    entity = request.entity
+    if not entity:
         return Response({"error": "Entity ID is required"}, status=400)
-    entity = Entity.objects.get(id=entity_id)
+
+    entity_id = entity.id
     response_data = {}
 
     if request.user == "ADMIN":
