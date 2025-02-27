@@ -56,17 +56,6 @@ def check_missing_production_site_comdate(lot: CarbureLot):
         )
 
 
-def check_production_info(lot: CarbureLot):
-    entity_is_simple_producer = lot.added_by.entity_type == Entity.PRODUCER and not lot.added_by.has_trading
-    if entity_is_simple_producer and not (lot.carbure_producer and lot.carbure_production_site):
-        return generic_error(
-            error=CarbureSanityCheckErrors.MISSING_PRODUCTION_INFO,
-            lot=lot,
-            field="production_site",
-            is_blocking=True,
-        )
-
-
 def check_missing_transport_document_reference(lot: CarbureLot):
     if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED] and not lot.transport_document_reference:
         return generic_error(
