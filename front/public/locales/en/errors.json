@@ -83,5 +83,6 @@
   "APPLICATION_ALREADY_RECEIVED": "An equivalent double counting application already exists or is being validated.",
   "MISSING_VENDOR_CERTIFICATE": "Your company is neither the supplier nor the client of this batch: you must provide your trading certificate to justify your role as an intermediary in this transaction.",
   "DECLARATION_ALREADY_VALIDATED": "The lot's period has already been declared: cancel the corresponding declaration in order to modify it.",
-  "DELIVERY_DATE_VALIDITY": "The delivery date of the batch is prior to the date of receipt of the stock from which it originates."
+  "DELIVERY_DATE_VALIDITY": "The delivery date of the batch is prior to the date of receipt of the stock from which it originates.",
+  "MISSING_PRODUCTION_INFO": "Production information are missing"
 }
