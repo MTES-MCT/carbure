@@ -42,8 +42,13 @@ class HasUserRights(BaseEntityPermission):
         return self
 
     def has_permission(self, request, view):
+        user = request.user
+        if not user or user.is_anonymous:
+            return False
+
         if not request.user.is_verified():
             return False
+
         entity = self.get_entity(request)
         if entity is None:
             return False
