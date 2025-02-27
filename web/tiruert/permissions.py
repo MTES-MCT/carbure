@@ -4,18 +4,6 @@ from core.models import Entity, ExternalAdminRights, UserRights
 
 
 class BaseEntityPermission(BasePermission):
-    def get_entity(self, request):
-        entity_id = request.POST.get("entity_id", request.GET.get("entity_id"))
-        if not entity_id:
-            return None
-
-        try:
-            entity = Entity.objects.get(pk=entity_id)
-        except Entity.DoesNotExist:
-            return None
-
-        return entity
-
     def get_user_rights(self, request, entity):
         try:
             rights = UserRights.objects.get(entity=entity, user=request.user)
@@ -44,7 +32,7 @@ class HasUserRights(BaseEntityPermission):
     def has_permission(self, request, view):
         if not request.user.is_verified():
             return False
-        entity = self.get_entity(request)
+        entity = request.entity
         if entity is None:
             return False
 
@@ -82,7 +70,7 @@ class HasAdminRights(BaseEntityPermission):
         return self
 
     def has_permission(self, request, view):
-        entity = self.get_entity(request)
+        entity = request.entity
         if entity is None or entity.entity_type not in [
             Entity.ADMIN,
             Entity.EXTERNAL_ADMIN,

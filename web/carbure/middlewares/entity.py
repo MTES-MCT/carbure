@@ -6,7 +6,7 @@ class EntityMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        entity_id = request.GET.get("entity_id")
+        entity_id = request.POST.get("entity_id", request.GET.get("entity_id"))
         request.entity = None
 
         if entity_id:
