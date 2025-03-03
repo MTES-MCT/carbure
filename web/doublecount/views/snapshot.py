@@ -10,8 +10,8 @@ from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
 from core.models import Entity
+from core.permissions import HasUserRights
 from doublecount.models import DoubleCountingApplication
-from saf.permissions import HasUserRights
 
 
 class ApplicationSnapshotSerializer(serializers.Serializer):
