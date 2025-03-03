@@ -7250,6 +7250,31 @@ components:
         - ReadWrite
         - Admin
         - Auditor
+    SafBiofuel:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        name_en:
+          type: string
+          maxLength: 64
+        code:
+          type: string
+          maxLength: 16
+        pci_kg:
+          type: number
+          format: double
+        pci_litre:
+          type: number
+          format: double
+        masse_volumique:
+          type: number
+          format: double
+      required:
+        - code
+        - name
+        - name_en
     SafTicket:
       oneOf:
         - $ref: "#/components/schemas/SafTicketBase"
@@ -7429,7 +7454,7 @@ components:
           readOnly: true
         biofuel:
           allOf:
-            - $ref: "#/components/schemas/Biofuel"
+            - $ref: "#/components/schemas/SafBiofuel"
           readOnly: true
         country_of_origin:
           allOf:
@@ -7577,7 +7602,7 @@ components:
           readOnly: true
         biofuel:
           allOf:
-            - $ref: "#/components/schemas/Biofuel"
+            - $ref: "#/components/schemas/SafBiofuel"
           readOnly: true
         country_of_origin:
           allOf:
