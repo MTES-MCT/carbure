@@ -6,8 +6,8 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
 from core.models import ExternalAdminRights, UserRights
+from core.permissions import HasAdminRights, HasUserRights
 from entity.views.users.mixins import UserActionMixin
-from saf.permissions import HasAdminRights, HasUserRights
 
 User = get_user_model()
 

@@ -4,10 +4,9 @@ from rest_framework.viewsets import GenericViewSet
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
 from core.models import Entity
+from core.permissions import HasAdminRights, HasUserRights
 from doublecount.filters import AgreementFilter
-from doublecount.permissions import HasAdminRights
 from doublecount.views.agreements.mixins import ActionMixin
-from saf.permissions import HasUserRights
 
 
 class AgreementViewSet(ActionMixin, GenericViewSet):

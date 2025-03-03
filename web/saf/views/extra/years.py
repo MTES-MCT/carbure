@@ -13,8 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Entity
+from core.permissions import HasUserRights
 from saf.models import SafTicket, SafTicketSource
-from saf.permissions import HasUserRights
 from saf.serializers.schema import ErrorResponseSerializer
 
 

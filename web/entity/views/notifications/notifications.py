@@ -11,8 +11,8 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
 from core.models import CarbureNotification
+from core.permissions import HasUserRights
 from core.serializers import CarbureNotificationSerializer
-from saf.permissions import HasUserRights
 
 
 class NotificationSerializer(serializers.Serializer):
