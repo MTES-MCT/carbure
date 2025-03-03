@@ -18,7 +18,7 @@ import { useQuery } from "common/hooks/async"
 import * as apiOperator from "../../api-operator"
 import * as apiCPO from "elec/api-cpo"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
-
+import { RoleEnum } from "api-schema"
 export interface ElecTransferDetailsDialogProps {
   displayCpo?: boolean
   tiruert?: boolean
@@ -185,7 +185,8 @@ export const ElecTransferDetailsDialog = ({
         <footer>
           {(transferCertificate?.client.id === entity.id || true) && (
             <>
-              {transferCertificate &&
+              {!entity.hasRights(RoleEnum.Auditor, RoleEnum.ReadOnly) &&
+                transferCertificate &&
                 (transferCertificate?.status ===
                   ElecTransferCertificateStatus.Pending ||
                   !transferCertificate?.used_in_tiruert) && (
