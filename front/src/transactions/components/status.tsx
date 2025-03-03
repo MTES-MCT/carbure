@@ -8,7 +8,7 @@ import { Bell, Loader } from "common/components/icons"
 import { Col, Row } from "common/components/scaffold"
 import css from "./status.module.css"
 import { formatNumber } from "common/utils/formatters"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 
 export interface StatusTabsProps {

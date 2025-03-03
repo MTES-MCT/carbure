@@ -1,4 +1,4 @@
-import { UploadCheckError, UploadCheckReportInfo } from "carbure/types"
+import { UploadCheckError, UploadCheckReportInfo } from "common/types"
 import Button from "common/components/button"
 import Collapse from "common/components/collapse"
 import { AlertCircle, Return } from "common/components/icons"

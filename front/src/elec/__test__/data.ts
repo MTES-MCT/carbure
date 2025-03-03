@@ -1,5 +1,5 @@
-import { cpo } from "carbure/__test__/data"
-import { EntityPreview, EntityType, UploadCheckError } from "carbure/types"
+import { cpo } from "common/__test__/data"
+import { EntityPreview, EntityType, UploadCheckError } from "common/types"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 import {
   ElecAuditApplicationStatus,

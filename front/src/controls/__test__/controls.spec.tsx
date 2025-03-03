@@ -6,7 +6,7 @@ import { render, TestRoot } from "setupTests"
 
 import Controls from "../index"
 
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import server from "./api"
 
 const ControlsWithUser = () => {

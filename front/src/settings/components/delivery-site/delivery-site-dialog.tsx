@@ -1,5 +1,5 @@
 import { Trans, useTranslation } from "react-i18next"
-import { EntityDepot } from "carbure/types"
+import { EntityDepot } from "common/types"
 import Button from "common/components/button"
 import { Return } from "common/components/icons"
 import { Dialog } from "common/components/dialog"

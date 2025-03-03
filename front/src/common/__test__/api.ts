@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw"
-import { EntityType } from "carbure/types"
+import { EntityType } from "common/types"
 
 import {
   country,
@@ -11,7 +11,6 @@ import {
   biocarburant,
   productionSite,
   generateUser,
-  notifications,
 } from "./data"
 import { mockGetWithResponseData } from "./helpers"
 
@@ -28,28 +27,6 @@ export const okStats = http.get("/api/home-stats", () => {
     },
   })
 })
-
-// First time notifications are fetched, they are not acked
-export const okNotifications = http.get(
-  "/api/entities/notifications",
-  () => {
-    return HttpResponse.json(notifications)
-  },
-  {
-    once: true,
-  }
-)
-
-// Second time notifications are fetched, they are acked
-export const okNotificationsAcked = http.get(
-  "/api/entities/notifications",
-  () => {
-    return HttpResponse.json(notifications.map((n) => ({ ...n, acked: true })))
-  },
-  {
-    once: true,
-  }
-)
 
 export const okEntitySearch = http.get("/api/resources/entities", () => {
   return HttpResponse.json({

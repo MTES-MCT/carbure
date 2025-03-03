@@ -1,4 +1,5 @@
-import { EntityType, Notification, NotificationType } from "carbure/types"
+import { EntityType } from "common/types"
+import { Notification, NotificationType } from "./types"
 import { formatDate, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 

@@ -1,4 +1,4 @@
-import { Country, SiteType, OwnershipType } from "carbure/types"
+import { Country, SiteType, OwnershipType } from "common/types"
 import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
 import { ReactNode, useMemo } from "react"

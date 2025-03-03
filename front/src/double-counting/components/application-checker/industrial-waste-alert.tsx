@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Alert from "common/components/alert"
 import Button, { ButtonVariant, ExternalLink } from "common/components/button"
 import { AlertTriangle, Send } from "common/components/icons"

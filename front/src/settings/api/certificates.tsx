@@ -1,5 +1,5 @@
 import { api as apiFetch } from "common/services/api-fetch"
-import { CertificateType } from "carbure/types"
+import { CertificateType } from "common/types"
 
 export function getCertificates(query: string) {
   return apiFetch.GET("/resources/certificates", {

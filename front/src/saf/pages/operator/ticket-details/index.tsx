@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
@@ -21,7 +21,7 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
-import { UserRole } from "carbure/types"
+import { UserRole } from "common/types"
 
 export type TicketDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">

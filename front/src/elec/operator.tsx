@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"

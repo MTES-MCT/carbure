@@ -1,4 +1,4 @@
-import { EntityPreview } from "carbure/types"
+import { EntityPreview } from "common/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import { SafFilter, SafOperatorQuery, SafQuery } from "../../types"
 import {

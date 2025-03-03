@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import Button, { ExternalLink as Ext } from "common/components/button"

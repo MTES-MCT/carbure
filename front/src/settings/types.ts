@@ -1,4 +1,4 @@
-import { UserRight, UserRightRequest } from "carbure/types"
+import { UserRight, UserRightRequest } from "common/types"
 
 export interface EntityRights {
   rights: UserRight[]

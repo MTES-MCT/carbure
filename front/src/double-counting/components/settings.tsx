@@ -1,5 +1,5 @@
-import { useRights } from "carbure/hooks/entity"
-import { Entity, UserRole } from "carbure/types"
+import { useRights } from "common/hooks/entity"
+import { Entity, UserRole } from "common/types"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"

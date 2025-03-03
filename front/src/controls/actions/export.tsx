@@ -3,7 +3,7 @@ import { Download } from "common/components/icons"
 import Button from "common/components/button"
 import { LotQuery } from "transactions/types"
 import pickApi from "../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 export interface ExportLotsButtonProps {
   query: LotQuery

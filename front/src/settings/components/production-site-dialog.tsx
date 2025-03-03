@@ -7,16 +7,16 @@ import {
   Feedstock,
   GESOption,
   ProductionSiteDetails,
-} from "carbure/types"
+} from "common/types"
 
-import * as common from "carbure/api"
+import * as common from "common/api"
 import Form, { useForm } from "common/components/form"
 
 import {
   normalizeBiofuel,
   normalizeCountry,
   normalizeFeedstock,
-} from "carbure/utils/normalizers"
+} from "common/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
 import Checkbox from "common/components/checkbox"
@@ -29,7 +29,7 @@ import { Row } from "common/components/scaffold"
 import TagAutocomplete from "common/components/tag-autocomplete"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api/production-sites"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 interface ProductionSiteFormValue {
   displayInDialog?: boolean
