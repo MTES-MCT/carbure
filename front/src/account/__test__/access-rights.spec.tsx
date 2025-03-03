@@ -4,8 +4,8 @@ import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 import Account from "../index"
 import server, { setAccessRequests } from "./api"
-import { producer } from "carbure/__test__/data"
-import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { producer } from "common/__test__/data"
+import { getField, waitWhileLoading } from "common/__test__/helpers"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 

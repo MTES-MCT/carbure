@@ -1,4 +1,4 @@
-import { company } from "carbure/__test__/data"
+import { company } from "common/__test__/data"
 import { EntityDetails } from "companies-admin/types"
 
 const companyPreview: EntityDetails = {
