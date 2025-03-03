@@ -38,11 +38,6 @@ def background_create_ticket_sources_from_lots(lots: QuerySet) -> None:
     create_ticket_sources_from_lots(lots)
 
 
-@db_task()
-def periodic_get_redcert_pdf_certificates() -> None:
-    call_command("get_redcert_pdf", "--no-pdf")
-
-
 if env.get("IMAGE_TAG") == "prod":
 
     @periodic_task(crontab(hour=23, minute=45))
@@ -61,9 +56,9 @@ if env.get("IMAGE_TAG") == "prod":
     def periodic_update_redcert_certificates() -> None:
         update_redcert_certificates(email=True)
 
-    # @db_periodic_task(crontab(day_of_week=7, hour=5, minute=10))
-    # def periodic_get_redcert_pdf_certificates() -> None:
-    #    call_command("get_redcert_pdf", "--no-pdf")
+    @db_periodic_task(crontab(day_of_week=7, hour=5, minute=10))
+    def periodic_get_redcert_pdf_certificates() -> None:
+        call_command("get_redcert_pdf", "--no-pdf")
 
     @db_periodic_task(crontab(hour="19,20,21,22,23", minute=30))
     def periodic_send_notification_emails() -> None:
