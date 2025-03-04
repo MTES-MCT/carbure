@@ -1,0 +1,77 @@
+.progress-bar {
+  height: 8px;
+  border-radius: 100px;
+  width: 100%;
+  border: 1px solid #000091;
+  position: relative;
+  display: flex;
+  padding: 2px 6px;
+}
+
+.progress-bar--quantity-declared {
+  background: #000091;
+  padding: 2px 0 2px 6px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 100px;
+  z-index: 1;
+}
+
+.progress-bar--quantity-available {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 100px;
+  background: #6a6af4;
+  padding: 2px 0 2px 6px;
+}
+
+.progress-bar__step {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.progress-bar__step::before {
+  position: absolute;
+  content: "";
+  width: 2px;
+  height: 2px;
+  background: #000091;
+  border-radius: 50%;
+}
+
+.progress-bar__step--filled::before {
+  width: 4px;
+  height: 4px;
+  background: white;
+  z-index: 1;
+}
+
+.progress-bar__footer {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-1v) 0 0 4px;
+}
+
+.progress-bar__text {
+  color: #666666;
+}
+
+.progress-bar__header {
+  display: flex;
+}
+
+.progress-bar__quantity-declared-value {
+  color: #000091;
+  position: relative;
+  text-align: right;
+}
+.progress-bar__quantity-available-value {
+  color: #6a6af4;
+  position: relative;
+  text-align: right;
+}
