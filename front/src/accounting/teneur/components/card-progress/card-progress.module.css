@@ -1,0 +1,16 @@
+.card-progress {
+  border: 1px solid var(--border-default-grey);
+  padding: var(--spacing-4w);
+}
+
+.card-progress__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-1w);
+  margin-bottom: var(--spacing-1w);
+}
+
+.card-progress__description {
+  color: var(--text-mention-grey);
+  margin-bottom: var(--spacing-1w);
+}
