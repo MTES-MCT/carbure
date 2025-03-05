@@ -1,7 +1,6 @@
 from django.db import models
 
 from core.models import MatierePremiere
-from tiruert.models import FossilFuelCategory
 
 
 class Objective(models.Model):
@@ -11,7 +10,9 @@ class Objective(models.Model):
     OBJECTIVE_TYPES = ((MAIN, MAIN), (SECTOR, SECTOR), (BIOFUEL_CATEGORY, BIOFUEL_CATEGORY))
 
     type = models.CharField(max_length=255, choices=OBJECTIVE_TYPES)
-    fuel_category = models.ForeignKey(FossilFuelCategory, on_delete=models.SET_NULL, related_name="fossil_fuels")
+    fuel_category = models.ForeignKey(
+        "tiruert.FossilFuelCategory", null=True, on_delete=models.SET_NULL, related_name="objective_fossil_fuels"
+    )
     customs_category = models.CharField(max_length=20, choices=MatierePremiere.MP_CATEGORIES, default=MatierePremiere.CONV)
     year = models.IntegerField()
     consideration_rate = models.FloatField()

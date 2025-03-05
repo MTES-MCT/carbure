@@ -1,11 +1,11 @@
 from django.db import models
 
-from tiruert.models import FossilFuelCategory
-
 
 class FossilFuel(models.Model):
     name = models.CharField(max_length=255)
-    fuel_category = models.ForeignKey(FossilFuelCategory, on_delete=models.SET_NULL, related_name="fossil_fuels")
+    fuel_category = models.ForeignKey(
+        "tiruert.FossilFuelCategory", null=True, on_delete=models.SET_NULL, related_name="fossil_fuels"
+    )
     pci_litre = models.FloatField()
 
     def __str__(self):
