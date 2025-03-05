@@ -1,14 +1,16 @@
 import css from "./progress-bar.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"
-import { useRef } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 
 export type ProgressBarProps = {
-  // Objectif à atteindre
-  quantityObjective: number
+  // Target objective
+  targetQuantity: number
 
-  quantityDeclared: number
+  // Currently declared quantity
+  declaredQuantity: number
 
+  // Available quantity that can be added
   availableQuantity: number
 }
 
@@ -19,63 +21,72 @@ const getHalfWidthElement = (element?: HTMLSpanElement) =>
   element && element.offsetWidth > 0 ? element.offsetWidth / 2 : 0
 
 export const ProgressBar = ({
-  quantityObjective,
-  quantityDeclared,
+  targetQuantity,
+  declaredQuantity,
   availableQuantity,
 }: ProgressBarProps) => {
-  const quantityDeclaredValueRef = useRef<HTMLSpanElement>()
-  const quantityAvailableValueRef = useRef<HTMLSpanElement>()
+  const declaredValueRef = useRef<HTMLSpanElement>()
+  const availableValueRef = useRef<HTMLSpanElement>()
 
-  const quantityDeclaredPercent = (quantityDeclared * 100) / quantityObjective
-  const availableQuantityPercent =
-    ((quantityDeclared + availableQuantity) * 100) / quantityObjective
+  const [declaredValueWidth, setDeclaredValueWidth] = useState("")
+  const [availableValueWidth, setAvailableValueWidth] = useState("")
 
-  // 14px est la moitié de la taille du texte (voir pour une ref)
-  const quantityDeclaredValueWidth = `calc(${quantityDeclaredPercent}% + ${getHalfWidthElement(quantityDeclaredValueRef?.current)}px)`
-  const quantityAvailableValueWidth = `calc(${availableQuantityPercent - quantityDeclaredPercent}% + ${quantityDeclaredPercent === 0 ? `${getHalfWidthElement(quantityAvailableValueRef?.current)}px` : "0px"})`
+  const declaredPercent = (declaredQuantity * 100) / targetQuantity
+  const availablePercent =
+    ((declaredQuantity + availableQuantity) * 100) / targetQuantity
+
+  // Get the width of the text to center it with the progress bar
+  useLayoutEffect(() => {
+    setDeclaredValueWidth(
+      `calc(${declaredPercent}% + ${getHalfWidthElement(declaredValueRef?.current)}px)`
+    )
+    setAvailableValueWidth(
+      `calc(${availablePercent - declaredPercent}% + ${declaredPercent === 0 ? `${getHalfWidthElement(availableValueRef?.current)}px` : "0px"})`
+    )
+  }, [declaredPercent, availablePercent])
 
   return (
     <div>
       <div className={css["progress-bar__header"]}>
-        {/* On affiche le pourcentage de quantité déclarée que si la valeur est supérieure à 0  */}
-        {quantityDeclared > 0 ? (
+        {/* Only show declared percentage if value is greater than 0 */}
+        {declaredQuantity > 0 ? (
           <span
             className={css["progress-bar__quantity-declared-value"]}
             style={{
-              width: quantityDeclaredValueWidth,
+              width: declaredValueWidth,
             }}
           >
-            <Text size="xs" is="span" ref={quantityDeclaredValueRef}>
-              {quantityDeclaredPercent}%
+            <Text size="xs" is="span" domRef={declaredValueRef}>
+              {declaredPercent}%
             </Text>
           </span>
         ) : null}
 
-        {/* On affiche le pourcentage que l'on peut atteindre avec la quantité dispo uniquement si la quantité dispo est supérieure à la quantité déclarée */}
-        {availableQuantity > quantityDeclared && (
+        {/* Only show available percentage if available quantity is greater than declared quantity */}
+        {availableQuantity > declaredQuantity && (
           <span
             className={css["progress-bar__quantity-available-value"]}
             style={{
-              width: quantityAvailableValueWidth,
+              width: availableValueWidth,
             }}
           >
-            <Text size="xs" is="span" ref={quantityAvailableValueRef}>
-              {availableQuantityPercent}%
+            <Text size="xs" is="span" domRef={availableValueRef}>
+              {availablePercent}%
             </Text>
           </span>
         )}
       </div>
       <div className={css["progress-bar"]}>
-        {quantityDeclared ? (
+        {declaredQuantity ? (
           <span
             className={css["progress-bar--quantity-declared"]}
-            style={{ width: `${quantityDeclaredPercent}%` }}
+            style={{ width: `${declaredPercent}%` }}
           />
         ) : null}
         {availableQuantity ? (
           <span
             className={css["progress-bar--quantity-available"]}
-            style={{ width: `${availableQuantityPercent}%` }}
+            style={{ width: `${availablePercent}%` }}
           />
         ) : null}
         {/*  Display points on the progress bar */}
@@ -84,8 +95,8 @@ export const ProgressBar = ({
             key={`step-${index}`}
             className={cl(
               css["progress-bar__step"],
-              STEP_VALUE * index <= availableQuantityPercent &&
-                availableQuantityPercent > 0 &&
+              STEP_VALUE * index <= availablePercent &&
+                availablePercent > 0 &&
                 css["progress-bar__step--filled"]
             )}
             style={{ left: `calc(${STEP_VALUE * index}% - 2px)` }}

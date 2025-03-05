@@ -14,24 +14,25 @@ export type CardProgressProps = {
   description?: string
   children?: ReactNode
 
-  // Objectif à atteindre
-  quantityObjective: number
+  // Target quantity
+  targetQuantity: number
 
-  quantityDeclared: number
+  // Currently declared quantity
+  declaredQuantity: number
 
   availableQuantity: number
 }
 export const CardProgress = ({
   title,
-  quantityDeclared,
-  quantityObjective,
+  declaredQuantity,
+  targetQuantity,
   availableQuantity,
   mainText,
   mainValue,
   description,
 }: CardProgressProps) => {
   const { t } = useTranslation()
-  const severity = quantityObjective > quantityDeclared ? "error" : "success"
+  const severity = targetQuantity > declaredQuantity ? "error" : "success"
   return (
     <div className={css["card-progress"]}>
       <div className={css["card-progress__header"]}>
@@ -41,9 +42,7 @@ export const CardProgress = ({
           </Text>
         ) : null}
         <Badge severity={severity}>
-          {quantityObjective > quantityDeclared
-            ? t("Non atteint")
-            : t("Atteint")}
+          {targetQuantity > declaredQuantity ? t("Non atteint") : t("Atteint")}
         </Badge>
       </div>
       {mainValue ? (
@@ -63,8 +62,8 @@ export const CardProgress = ({
         </div>
       )}
       <ProgressBar
-        quantityObjective={quantityObjective}
-        quantityDeclared={quantityDeclared}
+        targetQuantity={targetQuantity}
+        declaredQuantity={declaredQuantity}
         availableQuantity={availableQuantity}
       />
     </div>
