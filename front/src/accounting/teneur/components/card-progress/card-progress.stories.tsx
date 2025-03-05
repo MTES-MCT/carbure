@@ -7,8 +7,8 @@ const meta: Meta<typeof CardProgress> = {
   args: {
     title: "Essence",
     description: "Objectif en tonnes de CO2 évitées : 14",
-    quantityObjective: 200,
-    quantityDeclared: 57,
+    targetQuantity: 200,
+    declaredQuantity: 57,
     availableQuantity: 114,
     mainValue: 134,
     mainText: "GJ",
@@ -30,12 +30,12 @@ export const AvailableQuantityZero = {
 export const QuantityDeclaredAndAvailableZero = {
   args: {
     availableQuantity: 0,
-    quantityDeclared: 0,
+    declaredQuantity: 0,
   },
 }
 
 export const QuantityDeclaredZero = {
   args: {
-    quantityDeclared: 0,
+    declaredQuantity: 0,
   },
 }

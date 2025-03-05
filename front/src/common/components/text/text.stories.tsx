@@ -31,7 +31,6 @@ export const AllVariants: Story = {
 export const WithMargin: Story = {
   args: {
     children: "This is a default text",
-    margin: true,
   },
   parameters: {
     chromatic: { disableSnapshot: true },

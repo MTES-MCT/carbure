@@ -23,6 +23,8 @@ type TextOwnProps<T extends React.ElementType> = {
   style?: React.CSSProperties
 
   fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"
+
+  domRef?: React.RefObject<HTMLElement | undefined>
 }
 
 // Make mandatory the componentProps property if there are mandatory props for the generic component
@@ -33,7 +35,7 @@ export type TextProps<T extends React.ElementType> = TextOwnProps<T> &
 
 const defaultElement = "p"
 
-export const Text: <T extends React.ElementType = typeof defaultElement>(
+export const Text: <T extends React.ElementType>(
   props: TextProps<T>
 ) => React.ReactElement | null = ({
   is: TextTag = defaultElement,
@@ -42,10 +44,12 @@ export const Text: <T extends React.ElementType = typeof defaultElement>(
   className,
   fontWeight = "regular",
   componentProps,
+  domRef,
   ...props
 }) => {
   return (
     <TextTag
+      ref={domRef}
       {...componentProps}
       className={cl(
         styles.text,
