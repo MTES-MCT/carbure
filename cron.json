@@ -1,0 +1,8 @@
+{
+  "jobs": [
+    {
+      "command": "0 3 15 * * python web/manage.py trigger_anomaly_detection",
+      "size": "XL"
+    }
+  ]
+}

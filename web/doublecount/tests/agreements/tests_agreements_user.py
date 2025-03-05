@@ -44,8 +44,9 @@ class DoubleCountAgreementsTest(TestCase):
 
     def test_get_agreements(self):
         ### Setup
-        def create_application(start_year, production_site, status=DoubleCountingApplication.ACCEPTED):
+        def create_application(id, start_year, production_site, status=DoubleCountingApplication.ACCEPTED):
             return DoubleCountingApplicationFactory.create(
+                certificate_id=id,
                 producer=self.producer,
                 production_site=production_site,
                 period_start__year=start_year,
@@ -54,11 +55,13 @@ class DoubleCountAgreementsTest(TestCase):
             )
 
         # an application  with status pending  => En attente
-        create_application(self.requested_start_year + 1, self.production_site1, DoubleCountingApplication.PENDING)
+        create_application(
+            "FR_001_2024", self.requested_start_year + 1, self.production_site1, DoubleCountingApplication.PENDING
+        )
 
         # an agreement with status valid => Validé
         application = create_application(
-            self.requested_start_year - 1, self.production_site1, DoubleCountingApplication.ACCEPTED
+            "FR_002_2024", self.requested_start_year - 1, self.production_site1, DoubleCountingApplication.ACCEPTED
         )
         DoubleCountingRegistrationFactory.create(
             production_site=self.production_site1,
@@ -69,7 +72,9 @@ class DoubleCountAgreementsTest(TestCase):
         # an agreement to renew but already renewed => "Validé"
 
         # an application with status rejected => Rejeté
-        create_application(self.requested_start_year + 1, self.production_site2, DoubleCountingApplication.REJECTED)
+        create_application(
+            "FR_003_2024", self.requested_start_year + 1, self.production_site2, DoubleCountingApplication.REJECTED
+        )
 
         # an agreement to renew => A renouveler
 
@@ -83,6 +88,7 @@ class DoubleCountAgreementsTest(TestCase):
         )
         assert response.status_code == 200
         data = response.json()
+
         application1 = data[0]
         application2 = data[1]
         application3 = data[2]

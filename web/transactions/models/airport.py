@@ -24,4 +24,5 @@ class Airport(Site):
             "site_type": self.site_type,
             "address": self.address,
             "postal_code": self.postal_code,
+            "is_ue_airport": self.is_ue_airport,
         }

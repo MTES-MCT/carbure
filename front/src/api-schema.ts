@@ -1766,6 +1766,7 @@ export interface components {
       address?: string
       postal_code?: string
       gps_coordinates?: string | null
+      is_ue_airport?: boolean
     }
     ApplicationListe: {
       rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
@@ -2076,6 +2077,7 @@ export interface components {
       is_enabled?: boolean
       /** Format: date */
       date_mise_en_service?: string | null
+      is_ue_airport?: boolean
       country?: number | null
       created_by?: number | null
     }
@@ -6121,7 +6123,7 @@ export interface operations {
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description Comma-separated list of supplier names */
-        suppliers?: string[]
+        suppliers?: string[][]
         year?: number
       }
       header?: never
@@ -6231,7 +6233,7 @@ export interface operations {
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description Comma-separated list of supplier names */
-        suppliers?: string[]
+        suppliers?: string[][]
         year?: number
       }
       header?: never
@@ -6287,7 +6289,7 @@ export interface operations {
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description Comma-separated list of supplier names */
-        suppliers?: string[]
+        suppliers?: string[][]
         year?: number
       }
       header?: never

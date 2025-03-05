@@ -78,6 +78,7 @@ class Site(models.Model):
     is_enabled = models.BooleanField(default=True)
     date_mise_en_service = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL)
+    is_ue_airport = models.BooleanField(default=True)
 
     @property
     def producer(self):
@@ -139,6 +140,10 @@ class Site(models.Model):
     def is_depot(self):
         # Check if the site is a depot
         return self.site_type in self.DEPOT_TYPES
+
+    def __str__(self):
+        creator = self.created_by.name if self.created_by else ""
+        return "%s - %s (%s)" % (self.name, creator, self.site_type)
 
 
 class ContentToUpdate(models.Model):

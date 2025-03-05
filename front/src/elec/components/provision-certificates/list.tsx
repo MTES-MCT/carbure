@@ -24,6 +24,7 @@ import { ElecCPOProvisionCertificateTable } from "./table"
 import { EnergyTransferSummary } from "./transfer-summary"
 import { ElecAdminProvisionCertificateStates } from "elec-admin/pages/provision-certificates/types"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { RoleEnum } from "api-schema"
 
 type ProvisionCertificateListProps = {
   snapshot: ElecCPOSnapshot
@@ -95,7 +96,10 @@ const ProvisionCertificateList = ({
             snapshot={snapshot}
           />
         </ActionBar>
-        <EnergyTransferSummary remainingEnergy={snapshot.remaining_energy} />
+        <EnergyTransferSummary
+          remainingEnergy={snapshot.remaining_energy}
+          readonly={entity.hasRights(RoleEnum.Auditor, RoleEnum.ReadOnly)}
+        />
 
         {count > 0 && provisionCertificatesData ? (
           <>

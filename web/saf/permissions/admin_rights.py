@@ -26,19 +26,17 @@ class HasAdminRights(BasePermission):
         self.allow_role = allow_role
 
     def has_permission(self, request, view):
-        print("ho")
         # Check if the user is authenticated
         if not request.user.is_authenticated:
-            return self.error_response(403, AdminRightsError.USER_NOT_AUTHENTICATED)
-        print("hi")
+            return False
         # Check if the user is verified
         if not request.user.is_verified():
-            return self.error_response(403, AdminRightsError.USER_NOT_VERIFIED)
+            return False
 
         # Get entity_id from request
         entity_id = request.POST.get("entity_id", request.GET.get("entity_id"))
         if not entity_id:
-            return self.error_response(400, AdminRightsError.MISSING_ENTITY_ID)
+            return False
 
         # Fetch the entity
         try:
@@ -47,7 +45,7 @@ class HasAdminRights(BasePermission):
                 entity_type__in=[Entity.ADMIN, Entity.EXTERNAL_ADMIN],
             )
         except Entity.DoesNotExist:
-            return self.error_response(404, AdminRightsError.ENTITY_NOT_FOUND)
+            return False
 
         # Check if the user has rights to the entity
         try:
@@ -56,21 +54,21 @@ class HasAdminRights(BasePermission):
             else:
                 UserRights.objects.get(entity=entity, user=request.user)
         except UserRights.DoesNotExist:
-            return self.error_response(403, AdminRightsError.USER_HAS_NO_RIGHT)
+            return False
 
         # Check if the endpoint is admin-only
         is_admin_only = len(self.allow_external) == 0
 
         if is_admin_only:
             if entity.entity_type != Entity.ADMIN:
-                return self.error_response(403, AdminRightsError.ENTITY_NOT_ADMIN)
+                return False
             if not request.user.is_staff:
-                return self.error_response(403, AdminRightsError.USER_NOT_ADMIN)
+                return False
         elif entity.entity_type == Entity.EXTERNAL_ADMIN:
             try:
                 ExternalAdminRights.objects.get(entity=entity, right__in=self.allow_external)
             except ExternalAdminRights.DoesNotExist:
-                return self.error_response(403, AdminRightsError.ENTITY_HAS_NO_RIGHT)
+                return False
 
         # Store the entity and context for use in the view
         request.context = {"entity_id": entity_id, "entity": entity}

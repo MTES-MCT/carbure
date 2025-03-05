@@ -20,6 +20,7 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
+import { UserRole } from "carbure/types"
 
 export type TicketSourceDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -39,6 +40,9 @@ export const TicketSourceDetails = ({
   const entity = useEntity()
   const match = useHashMatch("ticket-source/:id")
   const portal = usePortal()
+
+  const canUpdateTicket =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
     key: "ticket-source-details",
@@ -109,7 +113,8 @@ export const TicketSourceDetails = ({
             variant="primary"
             disabled={
               !ticketSource ||
-              ticketSource.assigned_volume === ticketSource.total_volume
+              ticketSource.assigned_volume === ticketSource.total_volume ||
+              !canUpdateTicket
             }
             action={showAssignement}
           />

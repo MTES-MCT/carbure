@@ -52,7 +52,7 @@ export const UserMenu = () => {
       },
       {
         label: t("Déconnexion"),
-        path: routes.LOGOUT,
+        path: routes.AUTH.LOGOUT,
         icon: LogoutBoxLine,
       },
     ])

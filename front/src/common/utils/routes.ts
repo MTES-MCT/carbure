@@ -108,7 +108,11 @@ export const ROUTE_URLS = {
     INDEX: "/account",
     ADD_COMPANY: "/account/add-company",
   },
-  LOGOUT: "/auth/logout",
+  AUTH: {
+    LOGOUT: "/auth/logout",
+    RESET_PASSWORD_REQUEST: "/auth/reset-password-request",
+    ACTIVATE_REQUEST: "/auth/activate-request",
+  },
   STATISTICS: (entity_id: number) => urlWithOrgId(entity_id, "/stats"),
   REGISTRY: (entity_id: number) => urlWithOrgId(entity_id, "/registry"),
 

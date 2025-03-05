@@ -47,3 +47,4 @@ TALLOL,Tallol,0,1,0,0,1,TALLOL
 TOURNESOL,Tournesol,0,1,0,1,1,CONV
 TRITICALE,Triticale,1,0,0,0,1,CONV
 AMIDON_RESIDUEL_DECHETS,Amidons résiduels déchets,1,0,1,0,1,ANN-IX-A
+RAW_METHANOL_KRAFT_PULPING,Méthanol brut issu de la pâte kraft obtenue à partir de la pulpe de bois,0,0,1,0,1,ANN-IX-A

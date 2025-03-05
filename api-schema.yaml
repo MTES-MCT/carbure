@@ -3462,8 +3462,10 @@ paths:
           schema:
             type: array
             items:
-              type: string
-              minLength: 1
+              type: array
+              items:
+                type: string
+                minLength: 1
           description: Comma-separated list of supplier names
           explode: false
           style: form
@@ -3675,8 +3677,10 @@ paths:
           schema:
             type: array
             items:
-              type: string
-              minLength: 1
+              type: array
+              items:
+                type: string
+                minLength: 1
           description: Comma-separated list of supplier names
           explode: false
           style: form
@@ -3825,8 +3829,10 @@ paths:
           schema:
             type: array
             items:
-              type: string
-              minLength: 1
+              type: array
+              items:
+                type: string
+                minLength: 1
           description: Comma-separated list of supplier names
           explode: false
           style: form
@@ -5895,6 +5901,8 @@ components:
           type: string
           nullable: true
           maxLength: 64
+        is_ue_airport:
+          type: boolean
       required:
         - country
         - id
@@ -6628,6 +6636,8 @@ components:
           type: string
           format: date
           nullable: true
+        is_ue_airport:
+          type: boolean
         country:
           type: integer
           nullable: true

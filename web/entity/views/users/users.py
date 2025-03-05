@@ -46,6 +46,18 @@ class UserViewSet(ListModelMixin, viewsets.GenericViewSet, UserActionMixin):
 
         if self.action in [
             "rights_requests",
+        ]:
+            return [
+                HasAdminRights(
+                    allow_external=[
+                        ExternalAdminRights.AIRLINE,
+                        ExternalAdminRights.ELEC,
+                        ExternalAdminRights.TRANSFERRED_ELEC,
+                        ExternalAdminRights.DOUBLE_COUNTING,
+                    ]
+                )
+            ]
+        if self.action in [
             "update_right_request",
             "update_user_role",
         ]:
