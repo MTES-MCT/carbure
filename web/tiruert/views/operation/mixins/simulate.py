@@ -36,6 +36,7 @@ class SimulateActionMixin:
                 selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
                     data["debited_entity"].id,
                     data,
+                    request.unit,
                 )
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -59,8 +60,8 @@ class SimulateActionMixin:
     @extend_schema(
         operation_id="simulation_bounds",
         description="Get bounds for blending operation",
-        request=SimulationInputSerializer,
-        responses={status.HTTP_200_OK: SimulationOutputSerializer},
+        request=SimulationMinMaxInputSerializer,
+        responses={status.HTTP_200_OK: SimulationMinMaxOutputSerializer},
     )
     @action(
         detail=False,
@@ -80,6 +81,7 @@ class SimulateActionMixin:
                 min, max = TeneurService.get_min_and_max_emissions(
                     data["debited_entity"].id,
                     data,
+                    request.unit,
                 )
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

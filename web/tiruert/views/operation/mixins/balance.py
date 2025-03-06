@@ -1,43 +1,46 @@
 from datetime import datetime
 
 from django.utils.timezone import make_aware
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 
 from tiruert.filters import OperationFilter
-from tiruert.serializers import BalanceByLotSerializer, BalanceSerializer, PaginatedBalanceSerializer
+from tiruert.serializers import (
+    BalanceByDepotSerializer,
+    BalanceByLotSerializer,
+    BalanceBySectorSerializer,
+    BalanceSerializer,
+)
 from tiruert.services.balance import BalanceService
 
 
 class BalanceActionMixin:
     @extend_schema(
         operation_id="list_balances",
-        description="Retrieve balances grouped by mp category / biofuel or by sector",
+        description="Retrieve balances grouped by mp category / biofuel or by sector or by depot",
         filters=True,
         parameters=[
             OpenApiParameter(
                 name="group_by",
                 type=str,
-                enum=["sector", "lot"],
+                enum=["sector", "lot", "depot"],
                 location=OpenApiParameter.QUERY,
-                description="Group by sector or by lot.",
+                description="Group by sector, lot or depot.",
                 default="",
-            ),
-            OpenApiParameter(
-                name="unit",
-                type=str,
-                enum=["l", "mj"],
-                location=OpenApiParameter.QUERY,
-                description="Specify the volume unit (default is `l`).",
-                default="l",
-            ),
+            )
         ],
         responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=PaginatedBalanceSerializer,
-                description="Paginated response with balances grouped by mp category / biofuel or by sector",
+            status.HTTP_200_OK: PolymorphicProxySerializer(
+                many=True,
+                component_name="BalanceResponse",
+                serializers=[
+                    BalanceSerializer,
+                    BalanceByDepotSerializer,
+                    BalanceBySectorSerializer,
+                ],
+                resource_type_field_name=None,
             )
         },
     )
@@ -51,14 +54,14 @@ class BalanceActionMixin:
     def balance(self, request, pk=None):
         entity_id = request.query_params.get("entity_id")
         group_by = request.query_params.get("group_by", "")
-        unit = request.query_params.get("unit", "l")
+        unit = request.unit
 
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
 
         operations = self.filter_queryset(self.get_queryset())
 
-        if group_by == "lot":
+        if group_by in ["lot", "depot"]:
             # Calculate the balance
             balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
 
@@ -85,12 +88,13 @@ class BalanceActionMixin:
             balance = BalanceService.calculate_yearly_teneur(balance, entity_id, operations, date_from, group_by, unit)
 
         # Convert balance to a list of dictionaries for serialization
-        if group_by == "lot":
-            serializer_class = BalanceByLotSerializer
-            data = serializer_class.prepare_data(balance)
-        else:
-            data = list(balance.values())
-            serializer_class = self.get_serializer_class()
+        serializer_class = {
+            "lot": BalanceByLotSerializer,
+            "depot": BalanceByDepotSerializer,
+            "sector": BalanceBySectorSerializer,
+        }.get(group_by, self.get_serializer_class())
+
+        data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
 
         paginator = PageNumberPagination()
         paginated_data = paginator.paginate_queryset(data, request)

@@ -1581,7 +1581,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** @description Retrieve balances grouped by mp category / biofuel or by sector */
+    /** @description Retrieve balances grouped by mp category / biofuel or by sector or by depot */
     get: operations["list_balances"]
     put?: never
     post?: never
@@ -1784,24 +1784,69 @@ export interface components {
     }
     Balance: {
       sector: components["schemas"]["SectorEnum"]
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
-      biofuel?: string
       /** Format: double */
-      initial_balance?: number
+      initial_balance: number
       /** Format: double */
       readonly available_balance: number
       /** Format: double */
       readonly final_balance: number
-      quantity: {
-        [key: string]: number
-      }
+      quantity: components["schemas"]["BalanceQuantity"]
       /** Format: double */
-      teneur?: number
+      teneur: number
       /** Format: double */
       yearly_teneur?: number
       pending: number
+      unit: string
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel: components["schemas"]["BalanceBiofuel"]
+    }
+    BalanceBiofuel: {
+      id: number
+      code: string
+    }
+    BalanceByDepot: {
+      customs_category: string
+      biofuel: components["schemas"]["BalanceBiofuel"]
+      depots: components["schemas"]["BalanceDepot"][]
+    }
+    BalanceBySector: {
+      sector: components["schemas"]["SectorEnum"]
+      /** Format: double */
+      initial_balance: number
+      /** Format: double */
+      readonly available_balance: number
+      /** Format: double */
+      readonly final_balance: number
+      quantity: components["schemas"]["BalanceQuantity"]
+      /** Format: double */
+      teneur: number
+      /** Format: double */
+      yearly_teneur?: number
+      pending: number
+      unit: string
+    }
+    BalanceDepot: {
+      id: number
+      name: string
+      quantity: components["schemas"]["BalanceQuantity"]
       unit?: string
     }
+    BalanceQuantity: {
+      /**
+       * Format: double
+       * @default 0
+       */
+      credit: number
+      /**
+       * Format: double
+       * @default 0
+       */
+      debit: number
+    }
+    BalanceResponse:
+      | components["schemas"]["Balance"]
+      | components["schemas"]["BalanceByDepot"]
+      | components["schemas"]["BalanceBySector"]
     Biofuel: {
       name: string
       name_en: string
@@ -2583,13 +2628,6 @@ export interface components {
       email: string
       role: string
     }
-    LotRequest: {
-      id: number
-      /** Format: double */
-      volume: number
-      /** Format: double */
-      emission_rate_per_mj: number
-    }
     /**
      * @description * `DRAFT` - DRAFT
      *     * `PENDING` - PENDING
@@ -2621,10 +2659,10 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
-      credited_entity: components["schemas"]["TiruertEntity"]
-      debited_entity: components["schemas"]["TiruertEntity"]
-      from_depot: components["schemas"]["TiruertDepot"]
-      to_depot: components["schemas"]["TiruertDepot"]
+      credited_entity: components["schemas"]["OperationEntity"]
+      debited_entity: components["schemas"]["OperationEntity"]
+      from_depot: components["schemas"]["OperationDepot"]
+      to_depot: components["schemas"]["OperationDepot"]
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
@@ -2637,12 +2675,20 @@ export interface components {
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
+    OperationDepot: {
+      id: number
+      name: string
+    }
     OperationDetail: {
       lot: number
       /** Format: double */
       volume?: number
       /** Format: double */
       emission_rate_per_mj?: number
+    }
+    OperationEntity: {
+      id: number
+      name: string
     }
     OperationInputRequest: {
       type: components["schemas"]["TypeDefEnum"]
@@ -2653,7 +2699,7 @@ export interface components {
       from_depot?: number | null
       to_depot?: number | null
       export_country?: number | null
-      lots: components["schemas"]["LotRequest"][]
+      lots: components["schemas"]["OperationLotRequest"][]
     }
     OperationList: {
       readonly id: number
@@ -2662,10 +2708,10 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
-      credited_entity: components["schemas"]["TiruertEntity"]
-      debited_entity: components["schemas"]["TiruertEntity"]
-      from_depot: components["schemas"]["TiruertDepot"]
-      to_depot: components["schemas"]["TiruertDepot"]
+      credited_entity: components["schemas"]["OperationEntity"]
+      debited_entity: components["schemas"]["OperationEntity"]
+      from_depot: components["schemas"]["OperationDepot"]
+      to_depot: components["schemas"]["OperationDepot"]
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
@@ -2673,6 +2719,13 @@ export interface components {
       readonly quantity: number
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
+    }
+    OperationLotRequest: {
+      id: number
+      /** Format: double */
+      volume: number
+      /** Format: double */
+      emission_rate_per_mj: number
     }
     OtpResponse: {
       valid_until: string
@@ -2684,11 +2737,20 @@ export interface components {
      * @enum {string}
      */
     OwnershipTypeEnum: OwnershipTypeEnum
-    PaginatedBalance: {
+    PaginatedBalanceResponseList: {
+      /** @example 123 */
       count: number
-      next: string | null
-      previous: string | null
-      results: components["schemas"]["Balance"][]
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["BalanceResponse"][]
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -3210,6 +3272,7 @@ export interface components {
       target_emission: number
       max_n_batches?: number
       enforced_volumes?: number[]
+      unit?: string
     }
     SimulationLotOutput: {
       lot_id: number
@@ -3217,6 +3280,20 @@ export interface components {
       volume: number
       /** Format: double */
       emission_rate_per_mj: number
+    }
+    SimulationMinMaxInputRequest: {
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      biofuel: number | null
+      debited_entity: number | null
+      /** Format: double */
+      target_volume: number
+      unit?: string
+    }
+    SimulationMinMaxOutput: {
+      /** Format: double */
+      min_avoided_emissions: number
+      /** Format: double */
+      max_avoided_emissions: number
     }
     SimulationOutput: {
       selected_lots: components["schemas"]["SimulationLotOutput"][]
@@ -3249,14 +3326,6 @@ export interface components {
      * @enum {string}
      */
     StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
-    TiruertDepot: {
-      id: number
-      name: string
-    }
-    TiruertEntity: {
-      id: number
-      name: string
-    }
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean
@@ -6680,7 +6749,7 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
-        /** @description Specify the volume unit (default is `l`). */
+        /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
@@ -6705,6 +6774,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -6741,6 +6812,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6767,6 +6840,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6798,6 +6873,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6837,6 +6914,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6872,6 +6951,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path: {
@@ -6915,15 +6996,17 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
-        /** @description Group by sector or by lot. */
+        /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description A page number within the paginated result set. */
+        page?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
-        /** @description Specify the volume unit (default is `l`). */
+        /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
@@ -6932,13 +7015,12 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Paginated response with balances grouped by mp category / biofuel or by sector */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedBalance"]
+          "application/json": components["schemas"]["PaginatedBalanceResponseList"]
         }
       }
     }
@@ -6964,6 +7046,8 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7002,6 +7086,8 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7024,6 +7110,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7052,6 +7140,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7059,9 +7149,9 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SimulationInputRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["SimulationInputRequest"]
-        "multipart/form-data": components["schemas"]["SimulationInputRequest"]
+        "application/json": components["schemas"]["SimulationMinMaxInputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["SimulationMinMaxInputRequest"]
+        "multipart/form-data": components["schemas"]["SimulationMinMaxInputRequest"]
       }
     }
     responses: {
@@ -7070,7 +7160,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SimulationOutput"]
+          "application/json": components["schemas"]["SimulationMinMaxOutput"]
         }
       }
     }
@@ -7080,6 +7170,8 @@ export interface operations {
       query: {
         /** @description Authorised entity ID. */
         entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
       header?: never
       path?: never
@@ -7253,10 +7345,12 @@ export enum PathsApiTiruertOperationsGetParametersQueryType {
   DEBIT = "DEBIT",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
+  kg = "kg",
   l = "l",
   mj = "mj",
 }
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
+  depot = "depot",
   lot = "lot",
   sector = "sector",
 }

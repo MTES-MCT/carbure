@@ -6,21 +6,21 @@ from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
 
 
-class TiruertDepotSerializer(serializers.Serializer):
+class OperationDepotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 
-class TiruertEntitySerializer(serializers.Serializer):
+class OperationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 
 class BaseOperationSerializer(serializers.ModelSerializer):
-    from_depot = TiruertDepotSerializer()
-    to_depot = TiruertDepotSerializer()
-    credited_entity = TiruertEntitySerializer()
-    debited_entity = TiruertEntitySerializer()
+    from_depot = OperationDepotSerializer()
+    to_depot = OperationDepotSerializer()
+    credited_entity = OperationEntitySerializer()
+    debited_entity = OperationEntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
@@ -106,7 +106,7 @@ class OperationSerializer(BaseOperationSerializer):
         return sum(detail.avoided_emissions for detail in instance.details.all())
 
 
-class LotSerializer(serializers.Serializer):
+class OperationLotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     volume = serializers.FloatField()
     emission_rate_per_mj = serializers.FloatField()
@@ -130,18 +130,18 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "biofuel": {"required": True},
             "customs_category": {"required": True},
             "debited_entity": {"required": True},
-            "lots": {"required": True},
         }
 
-    lots = LotSerializer(many=True)
+    lots = OperationLotSerializer(many=True, required=True)
 
     def create(self, validated_data):
         with transaction.atomic():
             request = self.context.get("request")
-            entity_id = request.query_params.get("entity_id")
+            entity_id = request.entity.id
+            unit = request.unit
             selected_lots = validated_data.pop("lots")
 
-            OperationService.check_volumes_before_create(entity_id, selected_lots, validated_data)
+            OperationService.check_volumes_before_create(entity_id, selected_lots, validated_data, unit)
 
             if validated_data["type"] in [
                 Operation.INCORPORATION,

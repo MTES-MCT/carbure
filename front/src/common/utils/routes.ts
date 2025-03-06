@@ -19,6 +19,14 @@ export const ROUTE_URLS = {
       COMPANIES: `${baseUrl}/entities`,
     }
   },
+  MATERIAL_ACCOUNTING: (entity_id: number) => {
+    const baseUrl = urlWithOrgId(entity_id, "/accounting")
+
+    return {
+      OPERATIONS: `${baseUrl}/operations`,
+      BALANCE: `${baseUrl}/balance`,
+    }
+  },
 
   BIOFUELS: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/transactions/${year}`)

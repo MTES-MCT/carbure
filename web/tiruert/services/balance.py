@@ -8,7 +8,7 @@ from tiruert.models import Operation
 
 class BalanceService:
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit="l"):
+    def calculate_balance(operations, entity_id, group_by, unit):
         """
         Keep only PENDING and ACCEPTED operations
         Group by sector, customs_category and biofuel (and lot if needed)
@@ -26,7 +26,7 @@ class BalanceService:
                 "emission_rate_per_mj": 0,
                 "teneur": 0,
                 "pending": 0,
-                "unit": "l",
+                "unit": unit,
             }
         )
         key = None
@@ -39,6 +39,10 @@ class BalanceService:
             if operation.is_credit(entity_id) and operation.status == Operation.PENDING:
                 continue
 
+            depot = operation.to_depot if operation.is_credit(entity_id) else operation.from_depot
+            if depot is None:  # Should not happen
+                continue
+
             conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
             for detail in operation.details.all():
@@ -47,17 +51,20 @@ class BalanceService:
                 if group_by == "lot":
                     key = key + (detail.lot.id,)
 
-                if group_by == "sector":
+                elif group_by == "sector":
                     key = operation.sector
+
+                elif group_by == "depot":
+                    key = key + (depot,)
 
                 balance[key]["sector"] = operation.sector
                 if group_by != "sector":
                     balance[key]["customs_category"] = operation.customs_category
-                    balance[key]["biofuel"] = operation.biofuel.code
+                    balance[key]["biofuel"] = operation.biofuel
 
                 balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
 
-                if operation.type == Operation.TENEUR and group_by != "lot":
+                if operation.type == Operation.TENEUR and group_by not in ["lot", "depot"]:
                     balance[key]["teneur"] += detail.volume * conversion_factor
                 else:
                     if operation.is_credit(entity_id):
@@ -67,9 +74,6 @@ class BalanceService:
 
             if key and group_by != "lot" and operation.status == Operation.PENDING:
                 balance[key]["pending"] += 1
-
-            if key:
-                balance[key]["unit"] = unit
 
         return balance
 
@@ -154,7 +158,7 @@ class BalanceService:
             }
             if group_by != "sector":
                 balance[key]["customs_category"] = operation.customs_category
-                balance[key]["biofuel"] = operation.biofuel.code
+                balance[key]["biofuel"] = operation.biofuel
 
         return key, balance
 

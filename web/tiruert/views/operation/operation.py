@@ -28,6 +28,13 @@ from .mixins import ActionMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="unit",
+            type=str,
+            enum=["l", "mj", "kg"],
+            location=OpenApiParameter.QUERY,
+            description="Specify the volume unit.",
+        ),
     ]
 )
 class OperationViewSet(ModelViewSet, ActionMixin):
@@ -42,19 +49,28 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     http_method_names = ["get", "post", "patch", "delete"]
 
     def get_permissions(self):
-        if self.action in ["reject", "accept", "balance"]:
+        if self.action in ["reject", "accept", "simulate", "create", "partial_update", "destroy"]:
             return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
+        elif self.action in ["balance"]:
+            return [HasUserRights([UserRights.ADMIN, UserRights.RO, UserRights.RW])]
         return super().get_permissions()
 
-    def get_serializer(self, *args, **kwargs):
-        entity_id = self.request.GET.get("entity_id")
-        details = self.request.GET.get("details", "0") == "1"
-        unit = self.request.GET.get("unit", "l")
-        kwargs["context"] = self.get_serializer_context()
-        kwargs["context"]["entity_id"] = entity_id
-        kwargs["context"]["details"] = details
-        kwargs["context"]["unit"] = unit
-        return super().get_serializer(*args, **kwargs)
+    def initialize_request(self, request, *args, **kwargs):
+        request = super().initialize_request(request, *args, **kwargs)
+        # Get unit from request params or entity preference or default to liters
+        entity = getattr(request, "entity", None)
+        unit = request.GET.get("unit") or (entity.preferred_unit.lower() if entity else None) or "l"
+        setattr(request, "unit", unit)
+        return request
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        entity = self.request.entity
+        context["entity_id"] = entity.id
+        if getattr(self.request, "unit", None):
+            context["unit"] = self.request.unit
+        context["details"] = self.request.GET.get("details", "0") == "1"
+        return context
 
     @extend_schema(
         operation_id="list_operations",
@@ -67,15 +83,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 location=OpenApiParameter.QUERY,
                 description="Include detailed information if set to `1`.",
                 default="0",
-            ),
-            OpenApiParameter(
-                name="unit",
-                type=str,
-                enum=["l", "mj"],
-                location=OpenApiParameter.QUERY,
-                description="Specify the volume unit (default is `l`).",
-                default="l",
-            ),
+            )
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=OperationListSerializer, description="A list of operations.")
