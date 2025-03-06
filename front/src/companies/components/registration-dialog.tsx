@@ -1,70 +1,38 @@
-import { Certificate, Country, EntityType } from "carbure/types"
-import {
-  getEntityTypeLabel,
-  normalizeCertificate,
-  normalizeCountry,
-} from "carbure/utils/normalizers"
 import Alert from "common/components/alert"
-import Autocomplete from "common/components/autocomplete"
 import { Button, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import Form, { useForm } from "common/components/form"
 import { AlertCircle, Plus } from "common/components/icons"
-import { TextArea, TextInput } from "common/components/input"
-import { useNotify, useNotifyError } from "common/components/notifications"
-import Portal from "common/components/portal"
-import Select from "common/components/select"
-import { useMutation } from "common/hooks/async"
-import * as api from "companies/api"
-import {
-  CompanyRegistrationFormValue,
-  SearchCompanyPreview,
-} from "companies/types"
+import { useNotify } from "common/components/notifications"
+import Portal, { usePortal } from "common/components/portal"
+
+import { SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import { getCertificates } from "settings/api/certificates"
 import { SirenPicker } from "./siren-picker"
-import { findCountries } from "carbure/api"
-import { AxiosError } from "axios"
+import { ForeignCompanyDialog } from "./foreign-company-dialog"
+import { CompanyForm } from "./company-form"
+import { useRegisterCompany } from "./registration-dialog.hooks"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-
+  const portal = usePortal()
   const notify = useNotify()
-  const notifyError = useNotifyError()
   const [prefetchedCompany, setPrefetchedCompany] = useState<
     SearchCompanyPreview | undefined
   >(undefined)
   const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<
     string | undefined
   >(undefined)
-  const registerCompanyRequest = useMutation(api.registerCompany, {
-    invalidates: ["user-settings"],
-    onSuccess: () => {
-      notify(t("Votre demande d'inscription a bien été envoyée !"), {
-        variant: "success",
-      })
-      closeDialog()
-    },
-    onError: (err) => {
-      const errorCode = (err as AxiosError<{ error: string }>).response?.data
-        .error
-      if (errorCode === "COMPANY_NAME_ALREADY_USED") {
-        notifyError(
-          err,
-          t("Ce nom de société est déjà utilisé. Veuillez en choisir un autre.")
-        )
-      } else {
-        notifyError(err)
-      }
-    },
-  })
 
   const closeDialog = () => {
     navigate("/account/")
   }
+
+  const { registerCompanyRequest, onSubmitForm } = useRegisterCompany({
+    closeDialog,
+  })
 
   const fillFormWithFoundCompany = (
     company?: SearchCompanyPreview,
@@ -87,28 +55,8 @@ export const CompanyRegistrationDialog = () => {
     setPrefetchedCompany(company)
   }
 
-  const onSubmitForm = (
-    formValue: CompanyRegistrationFormValue | undefined
-  ) => {
-    if (!formValue) return
-    registerCompanyRequest.execute(
-      formValue.activity_description!,
-      formValue.entity_type!,
-      formValue.legal_name!,
-      formValue.name!,
-      formValue.registered_address!,
-      formValue.registered_city!,
-      formValue.registered_country?.code_pays || "",
-      formValue.registered_zipcode!,
-      formValue.registration_id!,
-      formValue.sustainability_officer_email!,
-      formValue.sustainability_officer_phone_number!.trim(),
-      formValue.sustainability_officer!,
-      formValue.website!,
-      formValue.vat_number!,
-      formValue.certificate?.certificate_id,
-      formValue.certificate?.certificate_type
-    )
+  const openForeignCompanyDialog = () => {
+    portal((close) => <ForeignCompanyDialog close={close} />)
   }
 
   return (
@@ -137,8 +85,8 @@ export const CompanyRegistrationDialog = () => {
               </Alert>
             )}
             {prefetchedCompany && (
-              <PrefetchedCompanyForm
-                prefetchedCompany={prefetchedCompany}
+              <CompanyForm
+                company={prefetchedCompany}
                 onSubmitForm={onSubmitForm}
               />
             )}
@@ -147,18 +95,9 @@ export const CompanyRegistrationDialog = () => {
           <section>
             <p>
               <Trans>Votre société n’est pas immatriculée en France ? </Trans>
-              <MailTo
-                user="carbure"
-                host="beta.gouv.fr"
-                subject={t(
-                  "[CarbuRe - Société] Je souhaite ajouter une société étrangère"
-                )}
-                body={t(
-                  "Bonjour%2C%E2%80%A8%E2%80%A8Je%20souhaite%20ajouter%20ma%20soci%C3%A9t%C3%A9%20sur%20CarbuRe%20mais%20celle-ci%20n%E2%80%99est%20pas%20immatricul%C3%A9e%20en%20France.%0A%0AVoici%20les%20informations%20la%20concernant%20%3A%0A%0A1%20-%20Nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0A%0A2%20-%20Description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0A%0A3%20-%20Justificatif%20d%E2%80%99enregistrement%20officiel%20local%20%3A%0A%0A4%20-%20Adresse%20postale%20%3A%E2%80%A8%0AMerci%20beaucoup%E2%80%A8Bien%20cordialement%2C"
-                )}
-              >
+              <Button variant="link" action={openForeignCompanyDialog}>
                 <Trans>Ajoutez une société étrangère</Trans>
-              </MailTo>
+              </Button>
             </p>
             <p>
               <Trans>Vous ne trouvez pas votre société ? </Trans>
@@ -192,176 +131,4 @@ export const CompanyRegistrationDialog = () => {
       </Dialog>
     </Portal>
   )
-}
-
-interface PrefetchedCompanyFormProps {
-  onSubmitForm: (formEntity: CompanyRegistrationFormValue | undefined) => void
-  prefetchedCompany: SearchCompanyPreview
-}
-
-const PrefetchedCompanyForm = ({
-  onSubmitForm,
-  prefetchedCompany,
-}: PrefetchedCompanyFormProps) => {
-  const { t } = useTranslation()
-  const companyForm = useCompanyForm(prefetchedCompany)
-
-  return (
-    <Form form={companyForm} id="add-company" onSubmit={onSubmitForm}>
-      <TextInput
-        required
-        label={t("N° d'enregistrement de la société (SIREN)")}
-        {...companyForm.bind("registration_id")}
-        disabled
-      />
-      <TextInput
-        required
-        label={t("Nom de la société (visible dans carbure)")}
-        {...companyForm.bind("name")}
-      />
-      <TextInput
-        required
-        label={t("Nom légal")}
-        {...companyForm.bind("legal_name")}
-      />
-      <TextInput
-        required
-        label={t("Adresse de la société (Numéro et rue)")}
-        {...companyForm.bind("registered_address")}
-      />
-      <TextInput
-        required
-        label={t("Ville")}
-        {...companyForm.bind("registered_city")}
-      />
-      <TextInput
-        required
-        label={t("Code postal")}
-        {...companyForm.bind("registered_zipcode")}
-      />
-      <Autocomplete
-        label={t("Pays")}
-        placeholder={t("Rechercher un pays...")}
-        getOptions={findCountries}
-        normalize={normalizeCountry}
-        {...companyForm.bind("registered_country")}
-      />
-      <TextInput
-        required
-        label={t("Responsable durabilité")}
-        placeholder="Jean-Pierre Champollion"
-        {...companyForm.bind("sustainability_officer")}
-      />
-      <TextInput
-        required
-        type="tel"
-        pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
-        label={t(
-          "N° téléphone responsable durabilité (commence par +33 pour la France)"
-        )}
-        placeholder="exemple : +33612345678"
-        {...companyForm.bind("sustainability_officer_phone_number")}
-      />
-      <TextInput
-        required
-        type="email"
-        label={t("Email responsable durabilité")}
-        {...companyForm.bind("sustainability_officer_email")}
-      />
-
-      <Select
-        required
-        label={t("Type d'activité")}
-        placeholder={t("Précisez le type d'activité")}
-        {...companyForm.bind("entity_type")}
-        options={[
-          {
-            value: EntityType.Producer,
-            label: getEntityTypeLabel(EntityType.Producer),
-          },
-          {
-            value: EntityType.Airline,
-            label: getEntityTypeLabel(EntityType.Airline),
-          },
-          {
-            value: EntityType.CPO,
-            label: getEntityTypeLabel(EntityType.CPO),
-          },
-          {
-            value: EntityType.Operator,
-            label: getEntityTypeLabel(EntityType.Operator),
-          },
-          {
-            value: EntityType.Trader,
-            label: getEntityTypeLabel(EntityType.Trader),
-          },
-          {
-            value: EntityType.Auditor,
-            label: getEntityTypeLabel(EntityType.Auditor),
-          },
-          {
-            value: EntityType.PowerOrHeatProducer,
-            label: getEntityTypeLabel(EntityType.PowerOrHeatProducer),
-          },
-        ]}
-      />
-      {companyForm.value?.entity_type &&
-        ![EntityType.Airline, EntityType.CPO].includes(
-          companyForm.value?.entity_type
-        ) && (
-          <Autocomplete
-            label={t("Certificat (schéma volontaire ou national)")}
-            normalize={normalizeCertificate}
-            getOptions={(query) =>
-              getCertificates(query).then((res) => res.data ?? [])
-            }
-            {...companyForm.bind("certificate")}
-          />
-        )}
-      <TextArea
-        required
-        label={t("Description de l'activité")}
-        maxLength={5000}
-        {...companyForm.bind("activity_description")}
-      />
-
-      <TextInput
-        placeholder="https://www.example.com"
-        type="url"
-        label={t("Site web (commençant par https://)")}
-        {...companyForm.bind("website")}
-      />
-
-      <TextInput
-        label={t("Numéro de TVA")}
-        {...companyForm.bind("vat_number")}
-      />
-    </Form>
-  )
-}
-
-const useCompanyForm = (prefetchedCompany: SearchCompanyPreview) => {
-  return useForm({
-    activity_description: undefined as string | undefined,
-    certificate: undefined as Certificate | undefined,
-    entity_type: undefined as EntityType | undefined,
-    legal_name: prefetchedCompany?.legal_name as string | undefined,
-    name: prefetchedCompany?.legal_name as string | undefined,
-    registered_address: prefetchedCompany?.registered_address as
-      | string
-      | undefined,
-    registered_city: prefetchedCompany?.registered_city as string | undefined,
-    registered_country: prefetchedCompany?.registered_country as
-      | Country
-      | undefined,
-    registered_zipcode: prefetchedCompany?.registered_zipcode as
-      | string
-      | undefined,
-    registration_id: prefetchedCompany?.registration_id as string | undefined,
-    sustainability_officer_email: undefined as string | undefined,
-    sustainability_officer_phone_number: undefined as string | undefined,
-    sustainability_officer: undefined as string | undefined,
-    website: undefined as string | undefined,
-    vat_number: undefined as string | undefined,
-  } as CompanyRegistrationFormValue)
 }
