@@ -1,6 +1,7 @@
 import { MultiSelect } from "common/components/selects2/multiselect"
 import { CBFilterSelection } from "common/hooks/query-builder-2"
 import styles from "./filter-multiselect2.module.css"
+import { ShowMore } from "common/components/show-more/show-more"
 
 export interface FilterMultiSelectProps2 {
   filterLabels: Record<string, string>
@@ -15,8 +16,9 @@ export const FilterMultiSelect2 = ({
   getFilterOptions,
 }: FilterMultiSelectProps2) => {
   const filters = Object.keys(filterLabels)
+
   return (
-    <div className={styles["filter-multiselect"]}>
+    <ShowMore>
       {filters.map((filter) => (
         <MultiSelect
           key={filter}
@@ -29,6 +31,6 @@ export const FilterMultiSelect2 = ({
           className={styles["filter-multiselect__filter"]}
         />
       ))}
-    </div>
+    </ShowMore>
   )
 }

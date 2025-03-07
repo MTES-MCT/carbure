@@ -9,10 +9,12 @@ import EnergyTransferDialog from "./transfer-dialog"
 
 export interface EnergyTransferSummaryProps {
   remainingEnergy: number
+  readonly: boolean
 }
 
 export const EnergyTransferSummary = ({
   remainingEnergy,
+  readonly,
 }: EnergyTransferSummaryProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
@@ -47,12 +49,14 @@ export const EnergyTransferSummary = ({
         })}
       </p>
 
-      <Button
-        asideX
-        variant="primary"
-        label={t("Réaliser une cession d'énergie")}
-        action={showEnergyTransferModal}
-      />
+      {!readonly && (
+        <Button
+          asideX
+          variant="primary"
+          label={t("Réaliser une cession d'énergie")}
+          action={showEnergyTransferModal}
+        />
+      )}
     </Alert>
   )
 }

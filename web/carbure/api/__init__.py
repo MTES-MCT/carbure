@@ -1,5 +1,5 @@
 from django.urls import path, include
-from rest_framework_nested.routers import SimpleRouter
+
 from .home_stats import get_home_stats
 from .nav_stats import get_nav_stats
 
@@ -13,5 +13,6 @@ urlpatterns = [
     path("user/", include("user.urls")),
     path("elec/", include("elec.api")),
     path("home-stats", get_home_stats, name="carbure-home-stats"),
+    path("tiruert/", include("tiruert.urls")),
     path("nav-stats", get_nav_stats, name="carbure-nav-stats"),
 ]

@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -46,6 +46,7 @@ class UserLoginAction:
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get("username", "")
         password = serializer.validated_data.get("password", "")
+        User = get_user_model()
 
         user = authenticate(username=username, password=password)
         try:
@@ -60,7 +61,12 @@ class UserLoginAction:
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception:
+            user = User.objects.filter(email=username).first()
+            if user and user.check_password(password):
+                message = CarbureError.ACCOUNT_NOT_ACTIVATED
+            else:
+                message = CarbureError.INVALID_LOGIN_CREDENTIALS
             return Response(
-                {"message": CarbureError.ACCOUNT_NOT_ACTIVATED},
+                {"message": message},
                 status=status.HTTP_400_BAD_REQUEST,
             )

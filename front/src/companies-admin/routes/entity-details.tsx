@@ -6,10 +6,14 @@ import UserRights from "../components/user-rights"
 import * as api from "../api"
 import DeliverySitesSettings from "settings/components/delivery-site/delivery-site"
 import ProductionSitesSettings from "settings/components/production-site"
+import DoubleCountingSettings from "double-counting/components/settings"
 import { EntityType } from "carbure/types"
 import Certificates from "companies-admin/components/certificates"
 import { Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
+import HashRoute from "common/components/hash-route"
+import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
+
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
@@ -38,6 +42,9 @@ const EntityDetails = () => {
   const isEnabled = Boolean(entityData?.is_enabled)
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
+  const canApprove =
+    entity.isExternal &&
+    (entity.hasAdminRight("AIRLINE") || entity.hasAdminRight("ELEC"))
 
   return (
     <Main>
@@ -63,6 +70,11 @@ const EntityDetails = () => {
           },
           !isAirline && { key: "depot", path: "#depot", label: "Depots" },
           isProducer && { key: "production", path: "#production", label: t("Sites de production") }, // prettier-ignore
+          isProducer && {
+            path: "#double-counting",
+            key: "double-counting",
+            label: t("Double comptage"),
+          },
           !isAirline && {
             key: "certificates",
             path: "#certificates",
@@ -72,7 +84,7 @@ const EntityDetails = () => {
       />
 
       <section>
-        {!isEnabled && entityData && (
+        {!isEnabled && entityData && canApprove && (
           <AuthorizeEntityBanner company={entityData} />
         )}
 
@@ -96,10 +108,23 @@ const EntityDetails = () => {
             }
           />
         )}
+        {entityData && isProducer && (
+          <DoubleCountingSettings
+            readOnly
+            entity={entityData}
+            getDoubleCountingAgreements={(companyId) =>
+              api.getCompanyDoubleCountingAgreements(entity.id, companyId)
+            }
+          />
+        )}
         {!isAirline && (
           <Certificates readOnly={!isEnabled} entity_id={companyId} />
         )}
       </section>
+      <HashRoute
+        path="double-counting/agreements/:id"
+        element={<AgreementDetailsDialog />}
+      />
     </Main>
   )
 }

@@ -19,7 +19,9 @@ export type ListItemProps<V> = {
 
   // Add a hover effect
   hoverable?: boolean
+  className?: string
 }
+
 export const ListItem = <V,>({
   label,
   disabled,
@@ -32,6 +34,7 @@ export const ListItem = <V,>({
   children,
   borderBottom,
   hoverable = false,
+  className,
 }: ListItemProps<V>) => {
   return (
     <Text
@@ -50,7 +53,8 @@ export const ListItem = <V,>({
       className={cl(
         css["list-item"],
         borderBottom && css["border-bottom"],
-        hoverable && css["hoverable"]
+        hoverable && css["hoverable"],
+        className
       )}
     >
       {children}

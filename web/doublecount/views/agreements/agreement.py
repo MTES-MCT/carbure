@@ -27,7 +27,7 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     def get_permissions(self):
         # TODO fix permissions if needed
         if self.action == "list":
-            return [IsAuthenticated(), HasUserRights(None, [Entity.PRODUCER])]
+            return [IsAuthenticated(), HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN])]
         if self.action == "agreements_public_list":
             return [AllowAny()]
         if self.action in ["agreements_admin", "export"]:

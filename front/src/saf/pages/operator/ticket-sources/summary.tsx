@@ -7,6 +7,8 @@ import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import TicketsGroupedAssignment from "../../../components/assignment/grouped-assignment"
 import { SafTicketSource } from "../types"
+import { UserRole } from "carbure/types"
+import useEntity from "carbure/hooks/entity"
 
 export interface TicketSourcesSummaryProps {
   ticketSources: SafTicketSource[]
@@ -17,7 +19,7 @@ export const TicketSourcesSummary = ({
 }: TicketSourcesSummaryProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-
+  const entity = useEntity()
   const notify = useNotify()
   const totalVolume = ticketSources.reduce(
     (total, ticketSource) => total + ticketSource.total_volume,
@@ -28,6 +30,9 @@ export const TicketSourcesSummary = ({
     0
   )
   const remainingVolume = totalVolume - assignedVolume
+
+  const canUpdateTicket =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const handleTicketsAssigned = (
     volume: number,
@@ -77,6 +82,7 @@ export const TicketSourcesSummary = ({
           volumeCount: ticketSources.length,
         })}
         action={showGroupedAssignement}
+        disabled={!canUpdateTicket}
       />
     </Alert>
   )

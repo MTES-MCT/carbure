@@ -78,6 +78,7 @@ class Site(models.Model):
     is_enabled = models.BooleanField(default=True)
     date_mise_en_service = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL)
+    is_ue_airport = models.BooleanField(default=True)
 
     @property
     def producer(self):
@@ -118,6 +119,13 @@ class Site(models.Model):
         # Check if customs_id is required for depot
         if self.site_type in self.DEPOT_TYPES and not self.customs_id:
             raise ValidationError({"customs_id": ["Ce champ est obligatoire pour les dépots."]})
+
+        # Check if customs_id is unique for depot, except for the current depot
+        if (
+            self.site_type in self.DEPOT_TYPES
+            and Site.objects.filter(customs_id=self.customs_id).exclude(id=self.id).exists()
+        ):
+            raise ValidationError({"customs_id": ["Ce numéro de douane est déjà utilisé."]})
 
         super().clean()
 

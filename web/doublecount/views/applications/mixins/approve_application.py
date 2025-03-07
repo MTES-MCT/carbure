@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
+from doublecount.helpers import send_dca_status_email
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 
 from .response_serializer import ResponseSerializer
@@ -21,11 +22,11 @@ class DoubleCountingApplicationApproveError:
     QUOTAS_NOT_APPROVED = "QUOTAS_NOT_APPROVED"
 
 
-class ApprouveDoubleCountingSerializer(serializers.Serializer):
+class ApproveDoubleCountingSerializer(serializers.Serializer):
     dca_id = serializers.PrimaryKeyRelatedField(queryset=DoubleCountingApplication.objects.all())
 
 
-class ApprouveActionMixin:
+class ApproveActionMixin:
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -36,7 +37,7 @@ class ApprouveActionMixin:
                 required=True,
             )
         ],
-        request=ApprouveDoubleCountingSerializer,
+        request=ApproveDoubleCountingSerializer,
         responses={200: ResponseSerializer},
         examples=[
             OpenApiExample(
@@ -49,7 +50,7 @@ class ApprouveActionMixin:
     )
     @action(methods=["post"], detail=False, url_path="approve")
     def approve(self, request, id=None):
-        serializer = ApprouveDoubleCountingSerializer(data=request.data)
+        serializer = ApproveDoubleCountingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         application = serializer.validated_data["dca_id"]
@@ -88,5 +89,5 @@ class ApprouveActionMixin:
             except Exception:
                 raise ValidationError({"message": "Error while creating Agreement"})
 
-        # send_dca_status_email(application, request) TODO: uncomment when email is ready
+        send_dca_status_email(application, request)
         return Response({"status": "success"})

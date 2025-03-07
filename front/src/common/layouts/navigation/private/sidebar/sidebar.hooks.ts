@@ -8,6 +8,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import { getNavStats } from "./api"
 import { useEffect } from "react"
+import { useMaterialAccounting } from "./hooks/useMaterialAccouting"
 
 export const usePrivateSidebar = () => {
   const entity = useEntity()
@@ -23,6 +24,7 @@ export const usePrivateSidebar = () => {
   const saf = useSaf(result?.data)
   const admin = useAdmin(result?.data)
   const doubleCount = useDoubleCount(result?.data)
+  const accounting = useMaterialAccounting()
 
   useEffect(() => {
     if (entity.id !== -1) {
@@ -30,7 +32,15 @@ export const usePrivateSidebar = () => {
     }
   }, [entity.id, execute])
 
-  return [admin, ...biofuels, doubleCount, ...elec, ...chargePoints, saf]
+  return [
+    admin,
+    ...biofuels,
+    doubleCount,
+    ...elec,
+    ...chargePoints,
+    saf,
+    accounting,
+  ]
     .filter(
       (category) =>
         category.condition === undefined || category.condition === true

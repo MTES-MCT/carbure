@@ -1,4 +1,4 @@
-import { CategoryEnum, PreferredUnitEnum } from "api-schema"
+import { PreferredUnitEnum } from "api-schema"
 import {
   Entity,
   EntityType,
@@ -13,6 +13,7 @@ import {
   Feedstock,
   ProductionSite,
   NotificationType,
+  CategoryEnum,
 } from "carbure/types"
 import { DeepPartial } from "common/types"
 import { mergeDeepRight } from "ramda"

@@ -41,12 +41,18 @@ class FilterActionMixin:
     )
     @action(methods=["get"], detail=False)
     def filters(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        query_params = request.GET.copy()
 
-        filter = self.request.query_params.get("filter")
+        filter = request.query_params.get("filter")
 
         if not filter:
-            raise ValidationError({"message": "No filter was specified"})
+            raise Exception("No filter was specified")
+
+        if filter in query_params:
+            query_params.pop(filter)
+
+        filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
+        queryset = filterset.qs
 
         if filter == "clients":
             column = "saf_tickets__client__name"

@@ -35,6 +35,8 @@ export const useRoutes = () => {
     CONTACT: entity.name
       ? `${ROUTE_URLS.CONTACT}?company=${entity.name}`
       : ROUTE_URLS.CONTACT,
+
+    MATERIAL_ACCOUNTING: ROUTE_URLS.MATERIAL_ACCOUNTING(entity.id),
   }
 
   return routes

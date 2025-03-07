@@ -1,5 +1,5 @@
 from .add_application import AddActionMixin
-from .approve_application import ApprouveActionMixin
+from .approve_application import ApproveActionMixin
 from .check_files import CheckAdminFilesActionMixin
 from .check_file import CheckFileActionMixin
 from .export import ExportActionMixin
@@ -11,7 +11,7 @@ from .update_quotas import UpdateQuotaActionMixin
 
 class ActionMixin(
     AddActionMixin,
-    ApprouveActionMixin,
+    ApproveActionMixin,
     CheckAdminFilesActionMixin,
     CheckFileActionMixin,
     ExportActionMixin,

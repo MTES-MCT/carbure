@@ -29,6 +29,7 @@ import ElecAudit from "elec-auditor"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { ContactPage } from "contact"
 import { YearsProvider } from "common/providers/years-provider"
+import { MaterialAccounting } from "accounting"
 import { NewNavigationDialog } from "./components/new-navigation-dialog"
 import Dashboard from "dashboard"
 
@@ -130,6 +131,7 @@ const Org = () => {
       <Route path="registry" element={<Registry />} />
       {(isIndustry || isPowerOrHeatProducer) && (
         <>
+          <Route path="accounting/*" element={<MaterialAccounting />} />
           <Route path="transactions/:year/*" element={<Transactions />} />
 
           <Route
