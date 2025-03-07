@@ -8,13 +8,13 @@ import {
   getOperationEntity,
   isOperationDebit,
 } from "./operations.utils"
-import * as api from "./api"
+import * as api from "accounting/api"
 import {
   Operation,
   OperationDebitOrCredit,
   OperationsFilter,
   OperationsQuery,
-} from "./types"
+} from "accounting/types"
 import useEntity from "carbure/hooks/entity"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import {

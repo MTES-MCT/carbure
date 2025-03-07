@@ -1,5 +1,5 @@
 import { OperationType } from "accounting/types"
-import { Operation, OperationDebitOrCredit } from "./types"
+import { Operation, OperationDebitOrCredit } from "../types"
 
 export const formatOperationCreditOrDebit = (type: string) => {
   switch (type) {

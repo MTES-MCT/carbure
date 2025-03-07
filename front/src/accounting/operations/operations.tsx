@@ -1,12 +1,12 @@
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { OperationsFilter } from "./types"
+import { OperationsFilter } from "accounting/types"
 import { useTranslation } from "react-i18next"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import useEntity from "carbure/hooks/entity"
-import * as api from "./api"
+import * as api from "accounting/api"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import { useGetFilterOptions, useOperationsColumns } from "./operations.hooks"

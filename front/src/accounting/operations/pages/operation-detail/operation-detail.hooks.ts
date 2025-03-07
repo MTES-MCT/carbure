@@ -1,8 +1,8 @@
 import { useMutation } from "common/hooks/async"
-import * as api from "./api"
+import * as api from "accounting/api"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
-import { Operation } from "accounting/operations/types"
+import { Operation } from "accounting/types"
 
 type UseDeleteOperationProps = {
   operation?: Operation

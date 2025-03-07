@@ -1,6 +1,8 @@
 /**
  * Common types used in the accounting module
  */
+import { CBQueryParams } from "common/hooks/query-builder-2"
+import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiTiruertOperationsGetParametersQueryStatus as OperationsStatus,
   PathsApiTiruertOperationsGetParametersQuerySector as OperationSector,
@@ -11,6 +13,21 @@ import {
   TypeDefEnum as CreateOperationType,
 } from "api-schema"
 
+// Type definitions
+export type Operation = apiTypes["OperationList"]
+
+export interface OperationsQuery
+  extends CBQueryParams<[], OperationsStatus[], string[]> {
+  [OperationsFilter.status]?: OperationsStatus[]
+  [OperationsFilter.sector]?: OperationSector[]
+  [OperationsFilter.customs_category]?: OperationBiofuelCategory[]
+  [OperationsFilter.biofuel]?: string[]
+  [OperationsFilter.type]?: OperationDebitOrCredit[]
+  [OperationsFilter.operation]?: OperationType[]
+  [OperationsFilter.depot]?: string[]
+}
+
+// Re-exports
 export {
   OperationsStatus,
   OperationSector,
