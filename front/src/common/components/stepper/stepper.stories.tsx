@@ -11,17 +11,8 @@ const meta: Meta<typeof Stepper> = {
       values: [{ name: "white", value: "white" }],
     },
   },
-  render: () => {
-    const {
-      currentStep,
-      currentStepIndex,
-      steps,
-      nextStep,
-      hasPreviousStep,
-      hasNextStep,
-      goToNextStep,
-      goToPreviousStep,
-    } = useStepper([
+  globals: {
+    steps: [
       {
         key: "step-1",
         title: "Step 1",
@@ -34,7 +25,24 @@ const meta: Meta<typeof Stepper> = {
         key: "step-3",
         title: "Step 3",
       },
-    ])
+      {
+        key: "step-4",
+        title: "Step 4",
+      },
+    ],
+  },
+  render: (_, context) => {
+    const {
+      currentStep,
+      currentStepIndex,
+      steps,
+      nextStep,
+      hasPreviousStep,
+      hasNextStep,
+      isNextStepAllowed,
+      goToNextStep,
+      goToPreviousStep,
+    } = useStepper(context.globals.steps)
 
     return (
       <>
@@ -51,7 +59,7 @@ const meta: Meta<typeof Stepper> = {
           </Button>
           <Button
             priority="secondary"
-            disabled={!hasNextStep}
+            disabled={!hasNextStep || !isNextStepAllowed}
             onClick={goToNextStep}
           >
             Suivant
@@ -66,4 +74,20 @@ type Story = StoryObj<typeof Stepper>
 
 export default meta
 
-export const Tertiary: Story = {}
+export const Default: Story = {}
+
+export const DisallowedNextStep: Story = {
+  globals: {
+    steps: [
+      {
+        key: "step-1",
+        title: "Step 1",
+        allowNextStep: () => false,
+      },
+      {
+        key: "step-2",
+        title: "Step 2",
+      },
+    ],
+  },
+}

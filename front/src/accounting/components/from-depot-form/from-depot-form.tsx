@@ -121,7 +121,7 @@ export const FromDepotSummary = ({
 }
 
 export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
-  return (
+  return Boolean(
     values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
   )
 }

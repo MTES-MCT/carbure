@@ -10,8 +10,8 @@ import { useHashMatch } from "common/components/hash-route"
 import {
   getOperationEntity,
   getOperationQuantity,
-} from "accounting/operations/operations.utils"
-import { OperationBadge } from "accounting/operations/components/operation-badge"
+} from "accounting/pages/operations/operations.utils"
+import { OperationBadge } from "accounting/pages/operations/components/operation-badge"
 import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"

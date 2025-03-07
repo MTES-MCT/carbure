@@ -18,12 +18,22 @@ export const Stepper = ({ marginBottom = false, ...props }: StepperProps) => {
   )
 }
 
-type Step<Key extends string> = {
+type Step<
+  Key extends string,
+  FormType extends Record<string, unknown> | undefined,
+> = {
   key: Key
   title: StepperProps["title"]
+  allowNextStep?: (form: FormType) => boolean
 }
 
-export const useStepper = <Key extends string>(steps: Step<Key>[]) => {
+export const useStepper = <
+  Key extends string,
+  FormType extends Record<string, unknown> | undefined,
+>(
+  steps: Step<Key, FormType>[],
+  form?: FormType
+) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
 
   const currentStep = steps[currentStepIndex]
@@ -32,7 +42,13 @@ export const useStepper = <Key extends string>(steps: Step<Key>[]) => {
   const hasNextStep = steps.length > currentStepIndex + 1
   const nextStep = hasNextStep ? steps[currentStepIndex + 1] : null
 
-  const setStep = (stepKey: Step<Key>["key"]) => {
+  // If a function is provided, it will be called to allow the next step
+  const isNextStepAllowed =
+    form && currentStep?.allowNextStep
+      ? currentStep?.allowNextStep?.(form)
+      : true
+
+  const setStep = (stepKey: Step<Key, FormType>["key"]) => {
     const stepIndex = steps.findIndex((step) => step.key === stepKey)
     if (stepIndex !== -1) {
       setCurrentStepIndex(stepIndex)
@@ -57,6 +73,7 @@ export const useStepper = <Key extends string>(steps: Step<Key>[]) => {
     hasPreviousStep,
     previousStep,
     hasNextStep,
+    isNextStepAllowed,
     nextStep,
     setStep,
     goToNextStep,

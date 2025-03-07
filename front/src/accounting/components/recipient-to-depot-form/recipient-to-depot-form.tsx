@@ -71,5 +71,5 @@ export const RecipientToDepotSummary = ({
 export const showNextStepRecipientToDepotForm = (
   values: RecipientToDepotFormProps
 ) => {
-  return values.credited_entity
+  return Boolean(values.credited_entity)
 }

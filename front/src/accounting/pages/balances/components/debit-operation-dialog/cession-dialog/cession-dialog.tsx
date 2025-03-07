@@ -20,7 +20,6 @@ import {
   QuantityForm,
   QuantitySummary,
 } from "accounting/components/quantity-form"
-import { useMemo } from "react"
 import {
   RecipientToDepotForm,
   RecipientToDepotSummary,
@@ -48,46 +47,41 @@ export const CessionDialog = ({
   const notify = useNotify()
   const entity = useEntity()
   const { formatUnit } = useUnit()
+  const form = useForm<SessionDialogForm>({})
+
   const {
     currentStep,
     currentStepIndex,
     steps,
     previousStep,
     nextStep,
+    isNextStepAllowed,
     goToNextStep,
     goToPreviousStep,
-  } = useStepper([
-    {
-      key: CessionStepKey.FromDepot,
-      title: t("Dépôt d'expédition"),
-    },
-    {
-      key: CessionStepKey.Quantity,
-      title: t("Quantité de la cession et tCO2 évitées"),
-    },
-    {
-      key: CessionStepKey.ToDepot,
-      title: t("Redevable et dépôt destinataire"),
-    },
-    {
-      key: CessionStepKey.Recap,
-      title: t("Récapitulatif"),
-    },
-  ])
-  const form = useForm<SessionDialogForm>({})
-
-  const showNextStep = useMemo(() => {
-    if (currentStep?.key === CessionStepKey.FromDepot) {
-      return showNextStepFromDepotForm(form.value)
-    }
-    if (currentStep?.key === CessionStepKey.Quantity) {
-      return showNextStepQuantityForm(form.value)
-    }
-    if (currentStep?.key === CessionStepKey.ToDepot) {
-      return showNextStepRecipientToDepotForm(form.value)
-    }
-    return true
-  }, [currentStep, form.value])
+  } = useStepper(
+    [
+      {
+        key: CessionStepKey.FromDepot,
+        title: t("Dépôt d'expédition"),
+        allowNextStep: showNextStepFromDepotForm,
+      },
+      {
+        key: CessionStepKey.Quantity,
+        title: t("Quantité de la cession et tCO2 évitées"),
+        allowNextStep: showNextStepQuantityForm,
+      },
+      {
+        key: CessionStepKey.ToDepot,
+        title: t("Redevable et dépôt destinataire"),
+        allowNextStep: showNextStepRecipientToDepotForm,
+      },
+      {
+        key: CessionStepKey.Recap,
+        title: t("Récapitulatif"),
+      },
+    ],
+    form.value
+  )
 
   const onSubmit = () => {
     return simulate(entity.id, {
@@ -163,7 +157,7 @@ export const CessionDialog = ({
               <Button
                 priority="secondary"
                 onClick={goToNextStep}
-                disabled={!showNextStep}
+                disabled={!isNextStepAllowed}
                 iconId="ri-arrow-right-s-line"
                 iconPosition="right"
               >
