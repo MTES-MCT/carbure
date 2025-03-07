@@ -104,7 +104,12 @@ export const useOperationsColumns = ({
           <Text
             size="sm"
             fontWeight="semibold"
-            style={{ color: "var(--text-default-error)" }}
+            style={{
+              color: "var(--text-default-error)",
+              ...(item.status === OperationsStatus.REJECTED && {
+                textDecoration: "line-through",
+              }),
+            }}
           >
             -{formatNumber(item.quantity)}
           </Text>

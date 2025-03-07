@@ -15,6 +15,7 @@ import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { OperationsStatus } from "accounting/types"
+import { NoResult } from "common/components/no-result2"
 const currentYear = new Date().getFullYear()
 
 export const Operations = ({
@@ -71,16 +72,20 @@ export const Operations = ({
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
-      <Table
-        columns={columns}
-        rows={result?.data?.results ?? []}
-        rowLink={(row) => ({
-          pathname: location.pathname,
-          search: location.search,
-          hash: `operation/${row.id}`,
-        })}
-        loading={loading}
-      />
+      {result?.data?.results && result?.data?.results?.length > 0 ? (
+        <Table
+          columns={columns}
+          rows={result?.data?.results ?? []}
+          rowLink={(row) => ({
+            pathname: location.pathname,
+            search: location.search,
+            hash: `operation/${row.id}`,
+          })}
+          loading={loading}
+        />
+      ) : (
+        <NoResult />
+      )}
       <Pagination
         defaultPage={query.page}
         total={result?.data?.count ?? 0}
