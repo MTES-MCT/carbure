@@ -2,8 +2,8 @@ import { useRoutes } from "common/hooks/routes"
 import { MenuSection } from "../sidebar.types"
 import { useTranslation } from "react-i18next"
 import { BarChartFill, BarChartLine } from "common/components/icon"
-import { useUser } from "carbure/hooks/user"
-import useEntity from "carbure/hooks/entity"
+import { useUser } from "common/hooks/user"
+import useEntity from "common/hooks/entity"
 
 export const useMaterialAccounting = () => {
   const routes = useRoutes()
