@@ -4,8 +4,8 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
 import * as api from "./api"
 import * as apiAccounting from "accounting/api"
-import { findDepots } from "carbure/api"
-import useEntity from "carbure/hooks/entity"
+import { findDepots } from "common/api"
+import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import {
   formatOperationType,
@@ -30,7 +30,7 @@ import {
 import { Form, useForm } from "common/components/form2"
 import { useNotify } from "common/components/notifications"
 import Autocomplete from "common/components/autocomplete/autocomplete"
-import { Depot } from "carbure/types"
+import { Depot } from "common/types"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()

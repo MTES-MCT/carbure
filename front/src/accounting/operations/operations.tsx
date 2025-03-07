@@ -5,7 +5,7 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import * as api from "./api"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"

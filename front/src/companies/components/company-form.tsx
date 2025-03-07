@@ -1,10 +1,10 @@
-import { findCountries } from "carbure/api"
-import { Certificate, Country, EntityType } from "carbure/types"
+import { findCountries } from "common/api"
+import { Certificate, Country, EntityType } from "common/types"
 import {
   getEntityTypeLabel,
   normalizeCertificate,
   normalizeCountry,
-} from "carbure/utils/normalizers"
+} from "common/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import { useForm, Form } from "common/components/form"
 import { TextArea, TextInput } from "common/components/input"
