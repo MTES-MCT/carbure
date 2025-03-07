@@ -1,9 +1,7 @@
 import Dialog from "common/components/dialog2/dialog"
-// import { Notice } from "common/components/notice"
 import Portal from "common/components/portal"
 import { Grid, Main } from "common/components/scaffold"
-// import { formatNumber } from "common/utils/formatters"
-import { Balance } from "accounting/balances/types"
+import { Balance } from "accounting/pages/balances/types"
 import { OperationText } from "accounting/components/operation-text"
 import { Trans, useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
@@ -12,7 +10,7 @@ import {
   FromDepotForm,
   FromDepotSummary,
   showNextStepFromDepotForm,
-} from "./from-depot-form"
+} from "accounting/components/from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
@@ -21,13 +19,13 @@ import {
   showNextStepQuantityForm,
   QuantityForm,
   QuantitySummary,
-} from "./quantity-form"
+} from "accounting/components/quantity-form"
 import { useMemo } from "react"
 import {
   RecipientToDepotForm,
   RecipientToDepotSummary,
   showNextStepRecipientToDepotForm,
-} from "./recipient-to-depot-form"
+} from "accounting/components/recipient-to-depot-form"
 import { simulate, createOperation } from "accounting/api"
 import { useMutation } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
@@ -227,7 +225,10 @@ export const CessionDialog = ({
                   <FromDepotForm balance={balance} />
                 )}
                 {currentStep?.key === CessionStepKey.Quantity && (
-                  <QuantityForm balance={balance} />
+                  <QuantityForm
+                    balance={balance}
+                    depot_quantity_max={form.value.from_depot?.quantity.credit}
+                  />
                 )}
                 {currentStep?.key === CessionStepKey.ToDepot && (
                   <RecipientToDepotForm />

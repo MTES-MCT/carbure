@@ -1,30 +1,30 @@
 import { useFormContext } from "common/components/form2"
-import { SessionDialogForm } from "../cession-dialog.types"
 import { Autocomplete } from "common/components/autocomplete2"
 import { Trans, useTranslation } from "react-i18next"
 import { Notice } from "common/components/notice"
-import { getDepotsWithBalance } from "../api"
+import { getDepotsWithBalance } from "./api"
 import useEntity from "carbure/hooks/entity"
-import { Balance } from "accounting/balances/types"
+import { Balance } from "accounting/pages/balances/types"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
+import { apiTypes } from "common/services/api-fetch.types"
 
-type FromDepotProps = {
-  balance: Balance
+// Type of the form part
+export type FromDepotFormProps = {
+  from_depot?: apiTypes["BalanceDepot"]
 }
 
-export const showNextStepFromDepotForm = (values: SessionDialogForm) => {
-  return (
-    values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
-  )
+// Type of the component
+type FromDepotProps = {
+  balance: Balance
 }
 
 export const FromDepotForm = ({ balance }: FromDepotProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { formatUnit } = useUnit()
-  const { value, bind } = useFormContext<SessionDialogForm>()
+  const { value, bind } = useFormContext<FromDepotFormProps>()
 
   return (
     <>
@@ -92,7 +92,11 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
 }
 
 // Recap form data after the step was submitted
-export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
+export const FromDepotSummary = ({
+  values,
+}: {
+  values: FromDepotFormProps
+}) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   if (
@@ -113,5 +117,11 @@ export const FromDepotSummary = ({ values }: { values: SessionDialogForm }) => {
         description={formatUnit(values.from_depot.quantity.credit, 0)}
       />
     </Grid>
+  )
+}
+
+export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
+  return (
+    values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
   )
 }

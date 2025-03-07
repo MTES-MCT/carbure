@@ -1,7 +1,6 @@
-import { Balance } from "accounting/balances/types"
+import { Balance } from "accounting/pages/balances/types"
 import { useFormContext } from "common/components/form2"
 import { Trans, useTranslation } from "react-i18next"
-import { SessionDialogForm } from "../cession-dialog.types"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { simulateMinMax } from "accounting/api"
@@ -13,11 +12,19 @@ import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
 
-type QuantityFormProps = {
-  balance: Balance
+export type QuantityFormProps = {
+  quantity?: number
+  avoided_emissions_min?: number // Range determined by the simulation
+  avoided_emissions_max?: number // Range determined by the simulation
+  avoided_emissions?: number // Value selected by the user
 }
 
-export const showNextStepQuantityForm = (values: SessionDialogForm) => {
+type QuantityFormComponentProps = {
+  balance: Balance
+  depot_quantity_max?: number
+}
+
+export const showNextStepQuantityForm = (values: QuantityFormProps) => {
   return (
     values.quantity &&
     values.quantity > 0 &&
@@ -32,11 +39,14 @@ export const showNextStepQuantityForm = (values: SessionDialogForm) => {
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
 const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
-export const QuantityForm = ({ balance }: QuantityFormProps) => {
+export const QuantityForm = ({
+  balance,
+  depot_quantity_max,
+}: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { formatUnit, unit } = useUnit()
-  const { value, bind, setField } = useFormContext<SessionDialogForm>()
+  const { value, bind, setField } = useFormContext<QuantityFormProps>()
   const mutation = useMutation(simulateMinMax)
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
@@ -66,11 +76,12 @@ export const QuantityForm = ({ balance }: QuantityFormProps) => {
     setField("avoided_emissions_max", undefined)
     setQuantityDeclared(false)
   }
+
   return (
     <>
       <NumberInput
         label={`${t("Saisir une quantité pour la cession")} (${unit})`}
-        max={value.from_depot?.quantity.credit}
+        max={depot_quantity_max}
         {...bind("quantity")}
         addon={
           <>
@@ -81,8 +92,8 @@ export const QuantityForm = ({ balance }: QuantityFormProps) => {
                 disabled={
                   !value.quantity ||
                   value.quantity === 0 ||
-                  (value.from_depot?.quantity.credit !== undefined &&
-                    value.quantity > value.from_depot?.quantity.credit)
+                  (depot_quantity_max !== undefined &&
+                    value.quantity > depot_quantity_max)
                 }
               >
                 {t("Déclarer la quantité")}
@@ -131,7 +142,7 @@ export const QuantityForm = ({ balance }: QuantityFormProps) => {
   )
 }
 
-export const QuantitySummary = ({ values }: { values: SessionDialogForm }) => {
+export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   if (!values.quantity || !values.avoided_emissions) {

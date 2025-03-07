@@ -1,6 +1,5 @@
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
-import { SessionDialogForm } from "../cession-dialog.types"
 import { findDepots } from "carbure/api"
 import {
   normalizeDepot,
@@ -9,16 +8,18 @@ import {
 import { useTranslation } from "react-i18next"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
-import { findEligibleTiruertEntities } from "../api"
+import { findEligibleTiruertEntities } from "./api"
 import useEntity from "carbure/hooks/entity"
+import { Depot, EntityPreview } from "carbure/types"
 
-export const showNextStepRecipientToDepotForm = (values: SessionDialogForm) => {
-  return values.credited_entity
+export type RecipientToDepotFormProps = {
+  credited_entity?: EntityPreview
+  to_depot?: Depot
 }
 
 export const RecipientToDepotForm = () => {
   const { t } = useTranslation()
-  const { bind } = useFormContext<SessionDialogForm>()
+  const { bind } = useFormContext<RecipientToDepotFormProps>()
   const entity = useEntity()
 
   return (
@@ -43,7 +44,7 @@ export const RecipientToDepotForm = () => {
 export const RecipientToDepotSummary = ({
   values,
 }: {
-  values: SessionDialogForm
+  values: RecipientToDepotFormProps
 }) => {
   const { t } = useTranslation()
 
@@ -65,4 +66,10 @@ export const RecipientToDepotSummary = ({
       )}
     </Grid>
   )
+}
+
+export const showNextStepRecipientToDepotForm = (
+  values: RecipientToDepotFormProps
+) => {
+  return values.credited_entity
 }
