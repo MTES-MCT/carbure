@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { useYearsProvider } from "common/providers/years-provider"
 import { Api } from "common/services/api"

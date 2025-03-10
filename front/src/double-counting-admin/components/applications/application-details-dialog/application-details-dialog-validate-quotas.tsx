@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Confirm } from "common/components/dialog"
 import { Check } from "common/components/icons"
 import { useNotify } from "common/components/notifications"

@@ -13,9 +13,9 @@ import { Filter, Return } from "common/components/icons"
 import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../../../common/components/no-result"
 import { useSummaryColumns } from "../lots/lot-summary"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import { Unit } from "carbure/types"
+import { Unit } from "common/types"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
   query: StockQuery

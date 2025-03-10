@@ -1,5 +1,5 @@
 import { Trans, useTranslation } from "react-i18next"
-import { useUser } from "carbure/hooks/user"
+import { useUser } from "common/hooks/user"
 import { TextInput } from "common/components/input"
 import { Button } from "common/components/button"
 import { Edit } from "common/components/icons"

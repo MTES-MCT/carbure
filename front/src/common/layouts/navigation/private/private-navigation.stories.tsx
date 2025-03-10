@@ -5,8 +5,8 @@ import {
   PrivateNavigationProvider,
   usePrivateNavigation,
 } from "./private-navigation.context"
-import { EntityType } from "carbure/types"
-import { mockGetWithResponseData, mockUser } from "carbure/__test__/helpers"
+import { EntityType } from "common/types"
+import { mockGetWithResponseData, mockUser } from "common/__test__/helpers"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 import { ExtAdminPagesEnum } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"

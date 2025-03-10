@@ -4,7 +4,7 @@ import { TestRoot } from "setupTests"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import Auth from "auth"
-import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { getField, waitWhileLoading } from "common/__test__/helpers"
 import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

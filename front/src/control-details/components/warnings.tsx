@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Checkbox, { CheckboxGroup } from "common/components/checkbox"
 import Collapse from "common/components/collapse"
 import { AlertTriangle } from "common/components/icons"

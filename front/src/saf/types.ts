@@ -4,7 +4,7 @@ import {
   Entity,
   Feedstock,
   ProductionSite,
-} from "carbure/types"
+} from "common/types"
 import {
   CBQueryParams,
   CBQueryStates,

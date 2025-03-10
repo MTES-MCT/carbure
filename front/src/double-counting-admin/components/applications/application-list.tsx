@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import HashRoute from "common/components/hash-route"
 import NoResult from "common/components/no-result"
 import { ActionBar } from "common/components/scaffold"

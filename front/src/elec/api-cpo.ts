@@ -1,5 +1,5 @@
-import { extract } from "carbure/api"
-import { EntityPreview } from "carbure/types"
+import { extract } from "common/api"
+import { EntityPreview } from "common/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder"
 import { api, Api, download } from "common/services/api"
 import {

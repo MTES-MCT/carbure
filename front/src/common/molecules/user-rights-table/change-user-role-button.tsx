@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { Edit, Return } from "common/components/icons"
-import { UserRightRequest, UserRole } from "carbure/types"
+import { UserRightRequest, UserRole } from "common/types"
 import Button from "common/components/button"
 import { usePortal } from "common/components/portal"
 import Dialog from "common/components/dialog"
@@ -9,8 +9,8 @@ import { type PortalInstance } from "common/components/portal"
 import { Form } from "common/components/form"
 import { RadioGroup } from "common/components/radio"
 
-import useEntity from "carbure/hooks/entity"
-import { getUserRoleOptions } from "carbure/utils/normalizers"
+import useEntity from "common/hooks/entity"
+import { getUserRoleOptions } from "common/utils/normalizers"
 
 type ChangeUserRoleDialogProps = {
   request: UserRightRequest

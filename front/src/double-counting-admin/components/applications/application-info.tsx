@@ -3,7 +3,7 @@ import { Trans } from "react-i18next"
 import { DoubleCountingApplicationDetails } from "../../../double-counting/types"
 import { Link } from "react-router-dom"
 import { ROUTE_URLS } from "common/utils/routes"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Fragment } from "react"
 
 export const ApplicationInfo = ({

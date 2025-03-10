@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../../api/user-rights"
 import { useTranslation } from "react-i18next"

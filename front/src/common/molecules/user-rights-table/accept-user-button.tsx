@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { UserRightRequest } from "carbure/types"
+import { UserRightRequest } from "common/types"
 import { usePortal } from "common/components/portal"
 import Button from "common/components/button"
 import { Check } from "common/components/icons"

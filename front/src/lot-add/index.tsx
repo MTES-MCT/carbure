@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import Dialog from "common/components/dialog"

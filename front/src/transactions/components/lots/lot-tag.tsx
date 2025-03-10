@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Tag, TagProps, TagVariant } from "common/components/tag"
 import { Lot, LotStatus, CorrectionStatus, DeliveryType } from "../../types"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import {
   AlertTriangle,
   Certificate,

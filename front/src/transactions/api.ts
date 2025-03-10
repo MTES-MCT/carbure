@@ -1,4 +1,4 @@
-import { EntityPreview } from "carbure/types"
+import { EntityPreview } from "common/types"
 import { api, Api, download } from "common/services/api"
 import { Option } from "common/utils/normalize"
 import {

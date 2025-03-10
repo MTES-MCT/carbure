@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw"
-import { OwnershipType } from "carbure/types"
+import { OwnershipType } from "common/types"
 
 import {
   deliverySite,
@@ -9,14 +9,13 @@ import {
   operator,
   producer,
   productionSite,
-} from "carbure/__test__/data"
+} from "common/__test__/data"
 import {
   Data,
-  clone,
   mockGetWithResponseData,
   mockPostWithResponseData,
   setEntity,
-} from "carbure/__test__/helpers"
+} from "common/__test__/helpers"
 import { dcApplicationErrors } from "./data"
 
 let deliverySites: any[] = []
@@ -26,13 +25,13 @@ setEntity(producer)
 
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
-    depot: clone(ds),
+    depot: ds,
     ownership_type: OwnershipType.THIRD_PARTY,
   }))
 }
 
 export function setProductionSites(nextProductionSites: any[]) {
-  productionSites = clone(nextProductionSites)
+  productionSites = nextProductionSites
 }
 
 export const okSettings = http.get("/api/user", () => {

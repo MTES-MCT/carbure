@@ -5,7 +5,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-} from "carbure/types"
+} from "common/types"
 
 export interface Lot {
   id: number

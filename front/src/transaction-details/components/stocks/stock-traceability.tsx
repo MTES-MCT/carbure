@@ -4,8 +4,8 @@ import Collapse from "common/components/collapse"
 import { Split } from "common/components/icons"
 import { formatUnit } from "common/utils/formatters"
 import { StockDetails } from "../../types"
-import useEntity from "carbure/hooks/entity"
-import { Unit } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { Unit } from "common/types"
 
 export interface TraceabilityProps {
   details: StockDetails | undefined

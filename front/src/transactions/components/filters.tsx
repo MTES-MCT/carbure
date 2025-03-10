@@ -6,7 +6,7 @@ import { Normalizer } from "common/utils/normalize"
 import { Grid, Row } from "common/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select" // prettier-ignore
 import Button from "common/components/button"
-import * as norm from "carbure/utils/normalizers"
+import * as norm from "common/utils/normalizers"
 
 export interface FiltersProps<Q> {
   query: Q

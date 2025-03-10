@@ -1,5 +1,5 @@
-import useEntity from "carbure/hooks/entity"
-import { EntityType } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { EntityType } from "common/types"
 import { Button } from "common/components/button"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"

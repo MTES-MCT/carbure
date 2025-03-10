@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import { useRoutes } from "common/hooks/routes"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { BookFill, BookLine, HomeFill, HomeLine } from "common/components/icon"
 import { apiTypes } from "common/services/api-fetch.types"
 

@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
@@ -22,7 +22,7 @@ import { ProductionTable } from "../../../double-counting/components/production-
 import Tabs from "common/components/tabs"
 import { ROUTE_URLS } from "common/utils/routes"
 import { ProductionSiteForm } from "settings/components/production-site-dialog"
-import { ProductionSiteDetails } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 import GenerateDecisionDialog from "../generate-decision-dialog/generate-decision-dialog"
 
 export const AgreementDetailsDialog = () => {
