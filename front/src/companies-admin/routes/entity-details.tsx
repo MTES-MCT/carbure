@@ -43,8 +43,9 @@ const EntityDetails = () => {
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
   const canApprove =
-    entity.isExternal &&
-    (entity.hasAdminRight("AIRLINE") || entity.hasAdminRight("ELEC"))
+    entity.isAdmin ||
+    (entity.isExternal &&
+      (entity.hasAdminRight("AIRLINE") || entity.hasAdminRight("ELEC")))
 
   return (
     <Main>

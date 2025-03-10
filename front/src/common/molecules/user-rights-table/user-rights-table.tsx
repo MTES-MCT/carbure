@@ -73,10 +73,11 @@ export const UserRightsTable = ({
   const portal = usePortal()
 
   const canEditOrDelete =
-    entity.isExternal &&
-    (entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
-      entity.hasAdminRight(ExtAdminPagesEnum.ELEC) ||
-      entity.hasAdminRight(ExtAdminPagesEnum.DCA))
+    entity.isAdmin ||
+    (entity.isExternal &&
+      (entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
+        entity.hasAdminRight(ExtAdminPagesEnum.ELEC) ||
+        entity.hasAdminRight(ExtAdminPagesEnum.DCA)))
   const displaySearchInput =
     isSearchable && (query.length > 0 || rights.length > 0)
   // Pass all the request as parameter to let the parent do anything
