@@ -99,6 +99,7 @@ export const TicketAssignment = ({
             nativeButtonProps={{
               form: "assign-ticket",
             }}
+            type="submit"
           >
             {t("Affecter")}
           </Button>
@@ -124,6 +125,7 @@ export const TicketAssignment = ({
           <Autocomplete
             required
             label={t("Client")}
+            placeholder={t("Sélectionnez un client")}
             getOptions={findSafClient}
             normalize={norm.normalizeEntityPreview}
             {...bind("client")}
@@ -133,6 +135,7 @@ export const TicketAssignment = ({
             <TextInput //TODO for transfer only
               required
               label={t("N° du certificat d'acquisition")}
+              placeholder={t("Ex: 1234567890")}
               {...bind("agreement_reference")}
             />
           )}
@@ -142,6 +145,7 @@ export const TicketAssignment = ({
               <Autocomplete
                 required
                 label={t("Aéroport de réception")}
+                placeholder={t("Sélectionnez un aéroport")}
                 getOptions={findAirports}
                 normalize={norm.normalizeAirport}
                 {...bind("reception_airport")}
@@ -149,7 +153,7 @@ export const TicketAssignment = ({
 
               <Autocomplete
                 label={t("Mode d'expédition")}
-                placeholder={t("Choisissez un mode")}
+                placeholder={t("Sélectionnez un mode")}
                 {...bind("shipping_method")}
                 options={[
                   {
@@ -164,7 +168,7 @@ export const TicketAssignment = ({
 
               <Autocomplete
                 label={t("Type de consommation")}
-                placeholder={t("Choisissez un type")}
+                placeholder={t("Sélectionnez un type")}
                 {...bind("consumption_type")}
                 options={[
                   {
@@ -180,7 +184,11 @@ export const TicketAssignment = ({
             </>
           )}
 
-          <TextInput label={t("Champ libre")} {...bind("free_field")} />
+          <TextInput
+            label={t("Champ libre")}
+            {...bind("free_field")}
+            placeholder={t("Ex: commentaire")}
+          />
         </Form>
       </Dialog>
     </Portal>
