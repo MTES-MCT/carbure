@@ -324,6 +324,8 @@ CSP_FRAME_SRC = CSP_DEFAULT_SRC
 
 CSP_IMG_SRC = CSP_DEFAULT_SRC + ("https://*.tile.openstreetmap.org/",)
 
+CSP_STYLE_SRC = ("'self'",)
+
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 
 # Metabase API key
