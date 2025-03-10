@@ -1,5 +1,4 @@
 .collapse :global(.fr-collapse) {
   margin: 0;
-  margin-top: var(--spacing-2w);
   background-color: var(--background-contrast-grey);
 }

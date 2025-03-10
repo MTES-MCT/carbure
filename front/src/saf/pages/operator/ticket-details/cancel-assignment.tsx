@@ -1,6 +1,6 @@
 import useEntity from "common/hooks/entity"
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"

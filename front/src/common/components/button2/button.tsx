@@ -20,7 +20,16 @@ export const Button = forwardRef<
   ButtonProps
 >(
   (
-    { customPriority, asideX, asideY, spread, loading, captive, ...props },
+    {
+      customPriority,
+      asideX,
+      asideY,
+      spread,
+      loading,
+      captive,
+      type = "button",
+      ...props
+    },
     ref
   ) => {
     return (
@@ -50,6 +59,7 @@ export const Button = forwardRef<
               }
             : props.onClick
         }
+        type={type}
       />
     )
   }
