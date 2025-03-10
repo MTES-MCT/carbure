@@ -93,7 +93,6 @@ class BiocarburantAdmin(admin.ModelAdmin):
         "compatible_diesel",
     )
     search_fields = ("name",)
-    readonly_fields = ("code",)
     list_filter = ("is_alcool", "is_graisse", "is_displayed")
 
 
@@ -109,7 +108,6 @@ class MatierePremiereAdmin(admin.ModelAdmin):
         "is_displayed",
     )
     search_fields = ("name",)
-    readonly_fields = ("code",)
     list_filter = (
         "compatible_alcool",
         "compatible_graisse",
