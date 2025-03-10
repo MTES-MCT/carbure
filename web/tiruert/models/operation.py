@@ -28,6 +28,7 @@ class Operation(models.Model):
     ACQUISITION = "ACQUISITION"  # Only for display purposes
     EXPORTATION = "EXPORTATION"
     DEVALUATION = "DEVALUATION"
+    CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -36,6 +37,7 @@ class Operation(models.Model):
         (MAC_BIO, MAC_BIO),
         (EXPORTATION, EXPORTATION),
         (DEVALUATION, DEVALUATION),
+        (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
     )
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
@@ -68,6 +70,10 @@ class Operation(models.Model):
             return "DIESEL"
         elif self.biofuel.code in SAF_BIOFUEL_TYPES:
             return "SAF"
+
+    @property
+    def volume(self):
+        return sum([detail.volume for detail in self.details.all()])
 
     class Meta:
         db_table = "tiruert_operations"

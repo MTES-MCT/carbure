@@ -3,6 +3,7 @@ from .reject import RejectActionMixin
 from .balance import BalanceActionMixin
 from .simulate import SimulateActionMixin
 from .filter import FilterActionMixin
+from .correct import CorrectActionMixin
 
 
 class ActionMixin(
@@ -11,5 +12,6 @@ class ActionMixin(
     BalanceActionMixin,
     SimulateActionMixin,
     FilterActionMixin,
+    CorrectActionMixin,
 ):
     pass
