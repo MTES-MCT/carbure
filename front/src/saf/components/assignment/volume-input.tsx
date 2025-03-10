@@ -1,4 +1,4 @@
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
@@ -27,11 +27,9 @@ export const VolumeInput = ({
       step={0.01}
       {...props}
       addon={
-        <Button
-          label={t("Maximum")}
-          action={onSetMaximumVolume}
-          variant="primary"
-        />
+        <Button onClick={onSetMaximumVolume} priority="primary">
+          {t("Maximum")}
+        </Button>
       }
     />
   )

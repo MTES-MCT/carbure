@@ -100,10 +100,12 @@ export function Table<T>({
                   small
                   style={{ marginRight: "8px" }}
                 />
-                {selectionText ??
-                  t("{{count}} lignes sélectionnées", {
-                    count: selected.length,
-                  })}
+                <Text size="sm" is="span">
+                  {selectionText ??
+                    t("{{count}} lignes sélectionnées", {
+                      count: selected.length,
+                    })}
+                </Text>
               </span>
               {topActions?.map((action, i) => (
                 <div
@@ -222,7 +224,6 @@ export function selectionColumn<T, V>(
         captive
         value={selection.isSelected(identify(item))}
         onChange={() => {
-          console.log("on change", item)
           selection.onSelect(identify(item))
         }}
         small
