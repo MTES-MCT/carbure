@@ -20,6 +20,7 @@ import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { ExtAdminPagesEnum } from "api-schema"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -45,7 +46,8 @@ const EntityDetails = () => {
   const canApprove =
     entity.isAdmin ||
     entity.hasAdminRight("AIRLINE") ||
-    entity.hasAdminRight("ELEC")
+    entity.hasAdminRight("ELEC") ||
+    entity.hasAdminRight(ExtAdminPagesEnum.DCA)
 
   return (
     <Main>
@@ -89,7 +91,7 @@ const EntityDetails = () => {
           <AuthorizeEntityBanner company={entityData} />
         )}
 
-        <UserRights readOnly={!isEnabled} />
+        <UserRights readOnly={!isEnabled || !canApprove} />
         {entityData && (
           <CompanyInfo readOnly company={entityData} key={entityData.id} />
         )}
