@@ -26,7 +26,7 @@ export const ApplicationInfo = ({
     <section>
       <p>
         <Trans
-          values={{ producer, productionSite, creationDate, user, period }}
+          values={{ producer, productionSite, creationDate, user }}
           components={{
             Link: application ? (
               <Link
@@ -41,9 +41,10 @@ export const ApplicationInfo = ({
               <Fragment />
             ),
           }}
-          defaults={t(
+          defaults={
             "Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
-          )}
+          }
+          t={t}
         />
       </p>
       <p>
