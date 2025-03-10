@@ -7,9 +7,12 @@ from tiruert.models.operation_detail import OperationDetail
 
 class Operation(models.Model):
     PENDING = "PENDING"
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
+    ACCEPTED = "ACCEPTED"  # Acquisition
+    REJECTED = "REJECTED"  # Acquisition
     CANCELED = "CANCELED"
+    DECLARED = "DECLARED"  # Teneur validation
+    CORRECTED = "CORRECTED"  # By customs
+    VALIDATED = "VALIDATED"  # By customs
     OPERATION_STATUSES = (
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
