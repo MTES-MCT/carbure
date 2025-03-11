@@ -49,13 +49,6 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             value={durability.etd ? formatNumberToText(durability.etd) : "-"}
             readOnly
           />
-          <TextInput
-            label="EU"
-            hasTooltip
-            title={t("Émissions résultant du carburant à l'usage")}
-            value={durability.eu ? formatNumberToText(durability.eu) : "-"}
-            readOnly
-          />
         </Col>
         <Col grow gap="md">
           <TextInput
@@ -91,14 +84,12 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
       <Divider />
       <TextInput
         readOnly
-        hasTooltip
         label="Total"
         value={durability.ghg_total ? formatGHG(durability.ghg_total) : "-"}
       />
 
       <TextInput
         readOnly
-        hasTooltip
         label={t("Réduction")}
         value={
           durability.ghg_reduction
