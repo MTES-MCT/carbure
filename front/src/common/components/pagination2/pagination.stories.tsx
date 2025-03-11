@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Pagination } from "./pagination"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
+import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
+import { useState } from "react"
 
 const meta: Meta<typeof Pagination> = {
   component: Pagination,
   title: "common/components/Pagination",
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
 }
 
 type Story = StoryObj<typeof Pagination>
@@ -26,5 +25,28 @@ export const Default: Story = {
         searchParams: { test: "url" },
       },
     }),
+  },
+}
+
+export const WithLimit: Story = {
+  args: {
+    total: 100,
+    limit: 10,
+    onLimit: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const { getByText } = within(canvasElement)
+    const select = await waitFor(() => getByText("10 résultats"))
+
+    await userEvent.click(select)
+    const option = await waitFor(() => getByText("25 résultats"))
+    await userEvent.click(option)
+
+    expect(args.onLimit).toHaveBeenCalledWith(25)
+  },
+  render: (args) => {
+    const [limit, setLimit] = useState(args.limit)
+
+    return <Pagination {...args} limit={limit} onLimit={setLimit} />
   },
 }

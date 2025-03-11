@@ -61,13 +61,12 @@ export const TicketsTable = memo(
               ])}
             />
 
-            {(state.limit || 0) < total && (
-              <Pagination
-                defaultPage={state.page}
-                limit={state.limit}
-                total={total}
-              />
-            )}
+            <Pagination
+              defaultPage={state.page}
+              limit={state.limit}
+              total={total}
+              onLimit={actions.setLimit}
+            />
           </>
         ) : (
           <NoResult
