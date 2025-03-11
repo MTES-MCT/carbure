@@ -4,8 +4,8 @@ import Collapse from "common/components/collapse"
 import { formatUnit } from "common/utils/formatters"
 import { LotDetails } from "transaction-details/types"
 import { Split } from "common/components/icons"
-import useEntity from "carbure/hooks/entity"
-import { Unit } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { Unit } from "common/types"
 
 export interface TraceabilityProps {
   details: LotDetails | undefined

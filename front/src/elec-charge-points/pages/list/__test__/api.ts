@@ -1,4 +1,4 @@
-import { mockGetWithResponseData } from "carbure/__test__/helpers"
+import { mockGetWithResponseData } from "common/__test__/helpers"
 import { http, HttpResponse } from "msw"
 import { ChargePointFilter } from "../types"
 import { chargePointsList } from "./data"

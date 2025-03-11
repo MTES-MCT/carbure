@@ -12,12 +12,12 @@ import { useQuery } from "common/hooks/async"
 import { compact, matchesSearch } from "common/utils/collection"
 import MultiSelect from "common/components/multi-select"
 import Select from "common/components/select"
-import { EntityType } from "carbure/types"
+import { EntityType } from "common/types"
 import {
   getEntityTypeLabel,
   normalizeEntityType,
-} from "carbure/utils/normalizers"
-import useEntity from "carbure/hooks/entity"
+} from "common/utils/normalizers"
+import useEntity from "common/hooks/entity"
 import Tag from "common/components/tag"
 
 type EntitySummaryProps = {

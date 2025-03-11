@@ -5,7 +5,7 @@ import Tabs from "common/components/tabs"
 import { useMatch, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import { compact } from "common/utils/collection"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 interface CategorySwitcherProps {
   category: string

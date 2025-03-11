@@ -1,9 +1,9 @@
 import { screen, waitFor } from "@testing-library/react"
-import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
+import { setEntity, waitWhileLoading } from "common/__test__/helpers"
 import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
-import { admin } from "carbure/__test__/data"
+import { admin } from "common/__test__/data"
 import ElecAdminAudit from "elec-audit-admin"
 import { setupServer } from "msw/node"
 import {

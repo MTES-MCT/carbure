@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
 import Portal from "common/components/portal"

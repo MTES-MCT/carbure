@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Stock, StockPayload } from "../types"
 import * as api from "../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import Button from "common/components/button"
@@ -9,7 +9,7 @@ import Dialog from "common/components/dialog"
 import { Drop, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import Form, { useForm } from "common/components/form"
-import { Country, Depot, type EntityPreview } from "carbure/types"
+import { Country, Depot, type EntityPreview } from "common/types"
 import { DateInput, NumberInput, TextInput } from "common/components/input"
 import Autocomplete from "common/components/autocomplete"
 import {
@@ -17,8 +17,8 @@ import {
   findCountries,
   findDepots,
   findMyCertificates,
-} from "carbure/api"
-import * as norm from "carbure/utils/normalizers"
+} from "common/api"
+import * as norm from "common/utils/normalizers"
 import { useMatomo } from "matomo"
 import Select from "common/components/select"
 import { formatNumber } from "common/utils/formatters"

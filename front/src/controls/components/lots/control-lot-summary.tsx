@@ -11,9 +11,9 @@ import {
   LotSummaryProps,
   useSummaryColumns,
 } from "transactions/components/lots/lot-summary"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import { Unit } from "carbure/types"
+import { Unit } from "common/types"
 
 export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
   const entity = useEntity()

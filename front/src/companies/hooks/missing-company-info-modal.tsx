@@ -1,5 +1,5 @@
-import useEntity from "carbure/hooks/entity"
-import { UserRole } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { UserRole } from "common/types"
 import { usePortal } from "common/components/portal"
 import CompanyInfoMissingSirenDialog from "companies/components/company-info-siren-missing-dialog"
 import { useEffect, useRef } from "react"

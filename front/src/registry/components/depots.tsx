@@ -1,4 +1,4 @@
-import { findDepots } from "carbure/api"
+import { findDepots } from "common/api"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import { SearchInput } from "common/components/input"

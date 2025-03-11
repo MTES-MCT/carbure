@@ -55,7 +55,12 @@ check-frontend:
   script:
     - npm run lint
     - npm run build
-    - npm run chromatic
+    - |
+      if [[ "$CI_COMMIT_BRANCH" != "dev" ]]; then
+        npm run chromatic
+      else
+        echo "Skipping Chromatic on dev branch"
+      fi
   interruptible: true
 
 

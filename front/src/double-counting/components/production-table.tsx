@@ -5,7 +5,7 @@ import { formatNumber, formatPercentage } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { DoubleCountingProduction, DoubleCountingSourcing } from "../types"
 import YearTable from "./year-table"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 
 type ProductionTableProps = {

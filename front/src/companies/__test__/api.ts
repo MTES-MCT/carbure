@@ -1,4 +1,4 @@
-import { mockPostWithResponseData } from "carbure/__test__/helpers"
+import { mockPostWithResponseData } from "common/__test__/helpers"
 import { companyResult } from "./data"
 import { setupServer } from "msw/node"
 

@@ -1,11 +1,11 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import HashRoute from "common/components/hash-route"
 import NoResult from "common/components/no-result"
 import { ActionBar } from "common/components/scaffold"
 import Table, { Cell, Column } from "common/components/table"
 import Tabs from "common/components/tabs"
 import { useQuery } from "common/hooks/async"
-import { formatDate } from "common/utils/formatters"
+import { formatDate, formatDateYear } from "common/utils/formatters"
 import { Fragment, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -51,6 +51,15 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     {
       header: t("Site de production"),
       cell: (a) => <Cell text={a.production_site.name} />,
+    },
+    {
+      header: t("Validité"),
+      key: "valid_until",
+      cell: (a) => (
+        <Cell
+          text={`${formatDateYear(a.period_start)}-${formatDateYear(a.period_end)}`}
+        />
+      ),
     },
     {
       header: t("Date de soumission"),

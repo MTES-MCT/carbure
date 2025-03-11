@@ -3,7 +3,7 @@
  * To simplify the migration between axios and the robust type checking with the backend,
  * some code will be duplicated, and removed after the migration ended.
  */
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { useCallback, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"

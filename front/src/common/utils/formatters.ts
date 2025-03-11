@@ -3,7 +3,7 @@ import formatTime from "date-fns/format"
 import formatDistanceToNow from "date-fns/formatDistanceToNow"
 import fr from "date-fns/locale/fr"
 import en from "date-fns/locale/en-GB"
-import { Unit } from "carbure/types"
+import { Unit } from "common/types"
 import i18next from "i18next"
 
 export function formatPeriod(period: number | string) {

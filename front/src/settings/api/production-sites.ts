@@ -1,5 +1,5 @@
 import { api as apiFetch } from "common/services/api-fetch"
-import { GESOption } from "carbure/types"
+import { GESOption } from "common/types"
 
 export function getProductionSites(entity_id: number) {
   return apiFetch.GET("/entities/production-sites/", {

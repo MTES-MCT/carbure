@@ -7,8 +7,8 @@ import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api"
 import { Confirm } from "common/components/dialog"
-import type { Entity } from "carbure/types"
-import useEntity from "carbure/hooks/entity"
+import type { Entity } from "common/types"
+import useEntity from "common/hooks/entity"
 import { Title } from "common/components/title"
 
 type AuthorizeEntityBannerProps = {

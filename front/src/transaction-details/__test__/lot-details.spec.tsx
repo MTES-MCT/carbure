@@ -2,9 +2,9 @@ import { Route } from "react-router-dom"
 import { render, TestRoot } from "setupTests"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 
-import { operator, producer } from "carbure/__test__/data"
+import { operator, producer } from "common/__test__/data"
 import LotDetails from "../components/lots/index"
 import { LotDetails as LotDetailsData } from "transaction-details/types"
 
@@ -15,7 +15,7 @@ import {
   getField,
   setEntity,
   waitWhileLoading,
-} from "carbure/__test__/helpers"
+} from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import {
   lotDetails,

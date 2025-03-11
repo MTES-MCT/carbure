@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Button } from "common/components/button"
 import HashRoute from "common/components/hash-route"
 import { Download } from "common/components/icons"

@@ -10,7 +10,7 @@ import DoubleCounting from "./components/double-counting"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { compact } from "common/utils/collection"
 import { Airports } from "./components/airports"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 const Registry = () => {
   const { t } = useTranslation()

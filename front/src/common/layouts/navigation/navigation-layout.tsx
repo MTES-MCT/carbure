@@ -1,4 +1,4 @@
-import { useUser } from "carbure/hooks/user"
+import { useUser } from "common/hooks/user"
 import cl from "clsx"
 import { PropsWithChildren } from "react"
 import { PrivateNavigation } from "./private/private-navigation"

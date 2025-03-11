@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
 
 import "./i18n"
-import "./carbure/assets/css/index.css"
+import "./common/assets/css/index.css"
 
-import Carbure from "./carbure"
+import Carbure from "./common"
 import { MatomoProvider } from "./matomo"
 import { SentryProvider, initSentry } from "./sentry"
 import "./setup-dsfr"

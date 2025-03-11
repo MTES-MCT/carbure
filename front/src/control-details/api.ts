@@ -1,4 +1,4 @@
-import { EntityManager } from "carbure/hooks/entity"
+import { EntityManager } from "common/hooks/entity"
 import api, { Api } from "common/services/api"
 import { LotDetails, StockDetails } from "transaction-details/types"
 

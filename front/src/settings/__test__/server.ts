@@ -2,7 +2,7 @@ import {
   okCountrySearch,
   okDeliverySitesSearch,
   okProductionSitesSearch,
-} from "carbure/__test__/api"
+} from "common/__test__/api"
 import {
   okChargePointsAddSuccess,
   okChargePointsApplications,

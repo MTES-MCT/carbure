@@ -13,8 +13,8 @@ import fields from "../public/locales/fr/fields.json"
 import feedstocks from "../public/locales/fr/feedstocks.json"
 import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
-import useUserManager, { UserContext } from "carbure/hooks/user"
-import { EntityContext, useEntityManager } from "carbure/hooks/entity"
+import useUserManager, { UserContext } from "common/hooks/user"
+import { EntityContext, useEntityManager } from "common/hooks/entity"
 import { PortalProvider } from "common/components/portal"
 
 configure({

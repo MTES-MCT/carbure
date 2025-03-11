@@ -1,5 +1,5 @@
 import { AxiosError } from "axios"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"

@@ -14,15 +14,16 @@ import {
   OperationDebitOrCredit,
   OperationsFilter,
   OperationsQuery,
+  OperationsStatus,
+  OperationType,
 } from "accounting/types"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import {
   formatOperationStatus,
   formatOperationType,
   formatSector,
 } from "accounting/utils/formatters"
-import { OperationsStatus, OperationType } from "accounting/types"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
