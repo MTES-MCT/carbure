@@ -3479,27 +3479,27 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of clients provided via
+            ?clients=client1&clients=client2&clients=client3
         - in: query
           name: countries_of_origin
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of countries of origin provided via
+            ?countries_of_origin=country1&countries_of_origin=country2
         - in: query
           name: delivery_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of delivery sites provided via
+            ?delivery_sites=site1&delivery_sites=site2
         - in: query
           name: entity_id
           schema:
@@ -3511,9 +3511,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of feedstocks provided via
+            ?feedstocks=feedstock1&feedstocks=feedstock2
         - in: query
           name: order
           schema:
@@ -3566,20 +3566,17 @@ paths:
             type: array
             items:
               type: integer
-              maximum: 2147483647
-              minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+          description: List of periods provided via
+            ?periods=period1&periods=period2&periods=period3
         - in: query
           name: production_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of production sites provided via
+            ?production_sites=site1&production_sites=site2
         - name: search
           required: false
           in: query
@@ -3601,13 +3598,10 @@ paths:
           schema:
             type: array
             items:
-              type: array
-              items:
-                type: string
-                minLength: 1
-          description: Comma-separated list of supplier names
-          explode: false
-          style: form
+              type: string
+              minLength: 1
+          description: List of suppliers provided via
+            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
         - in: query
           name: year
           schema:
@@ -3706,27 +3700,27 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of clients provided via
+            ?clients=client1&clients=client2&clients=client3
         - in: query
           name: countries_of_origin
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of countries of origin provided via
+            ?countries_of_origin=country1&countries_of_origin=country2
         - in: query
           name: delivery_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of delivery sites provided via
+            ?delivery_sites=site1&delivery_sites=site2
         - in: query
           name: entity_id
           schema:
@@ -3738,9 +3732,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of feedstocks provided via
+            ?feedstocks=feedstock1&feedstocks=feedstock2
         - in: query
           name: order
           schema:
@@ -3781,20 +3775,17 @@ paths:
             type: array
             items:
               type: integer
-              maximum: 2147483647
-              minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+          description: List of periods provided via
+            ?periods=period1&periods=period2&periods=period3
         - in: query
           name: production_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of production sites provided via
+            ?production_sites=site1&production_sites=site2
         - name: search
           required: false
           in: query
@@ -3816,13 +3807,10 @@ paths:
           schema:
             type: array
             items:
-              type: array
-              items:
-                type: string
-                minLength: 1
-          description: Comma-separated list of supplier names
-          explode: false
-          style: form
+              type: string
+              minLength: 1
+          description: List of suppliers provided via
+            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
         - in: query
           name: year
           schema:
@@ -3853,27 +3841,27 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of clients provided via
+            ?clients=client1&clients=client2&clients=client3
         - in: query
           name: countries_of_origin
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of countries of origin provided via
+            ?countries_of_origin=country1&countries_of_origin=country2
         - in: query
           name: delivery_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of delivery sites provided via
+            ?delivery_sites=site1&delivery_sites=site2
         - in: query
           name: entity_id
           schema:
@@ -3885,9 +3873,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of feedstocks provided via
+            ?feedstocks=feedstock1&feedstocks=feedstock2
         - in: query
           name: filter
           schema:
@@ -3933,20 +3921,17 @@ paths:
             type: array
             items:
               type: integer
-              maximum: 2147483647
-              minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+          description: List of periods provided via
+            ?periods=period1&periods=period2&periods=period3
         - in: query
           name: production_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of production sites provided via
+            ?production_sites=site1&production_sites=site2
         - name: search
           required: false
           in: query
@@ -3968,13 +3953,10 @@ paths:
           schema:
             type: array
             items:
-              type: array
-              items:
-                type: string
-                minLength: 1
-          description: Comma-separated list of supplier names
-          explode: false
-          style: form
+              type: string
+              minLength: 1
+          description: List of suppliers provided via
+            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
         - in: query
           name: year
           schema:
@@ -4052,18 +4034,18 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of clients provided via
+            ?clients=client1&clients=client2&clients=client3
         - in: query
           name: countries_of_origin
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of countries of origin provided via
+            ?countries_of_origin=country1&countries_of_origin=country2
         - in: query
           name: entity_id
           schema:
@@ -4075,9 +4057,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of feedstocks provided via
+            ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
         - in: query
           name: order
           schema:
@@ -4142,20 +4124,17 @@ paths:
             type: array
             items:
               type: integer
-              maximum: 2147483647
-              minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+          description: List of periods provided via
+            ?periods=period1&periods=period2&periods=period3
         - in: query
           name: production_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of production sites provided via
+            ?production_sites=site1&production_sites=site2
         - name: search
           required: false
           in: query
@@ -4180,9 +4159,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of suppliers provided via
+            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
         - in: query
           name: year
           schema:
@@ -4403,18 +4382,18 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of clients provided via
+            ?clients=client1&clients=client2&clients=client3
         - in: query
           name: countries_of_origin
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of countries of origin provided via
+            ?countries_of_origin=country1&countries_of_origin=country2
         - in: query
           name: entity_id
           schema:
@@ -4426,9 +4405,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of feedstocks provided via
+            ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
         - in: query
           name: order
           schema:
@@ -4481,20 +4460,17 @@ paths:
             type: array
             items:
               type: integer
-              maximum: 2147483647
-              minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+          description: List of periods provided via
+            ?periods=period1&periods=period2&periods=period3
         - in: query
           name: production_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of production sites provided via
+            ?production_sites=site1&production_sites=site2
         - name: search
           required: false
           in: query
@@ -4519,9 +4495,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of suppliers provided via
+            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
         - in: query
           name: year
           schema:
@@ -4552,18 +4528,18 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of clients provided via
+            ?clients=client1&clients=client2&clients=client3
         - in: query
           name: countries_of_origin
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of countries of origin provided via
+            ?countries_of_origin=country1&countries_of_origin=country2
         - in: query
           name: entity_id
           schema:
@@ -4575,9 +4551,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of feedstocks provided via
+            ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
         - in: query
           name: filter
           schema:
@@ -4635,20 +4611,17 @@ paths:
             type: array
             items:
               type: integer
-              maximum: 2147483647
-              minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+          description: List of periods provided via
+            ?periods=period1&periods=period2&periods=period3
         - in: query
           name: production_sites
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of production sites provided via
+            ?production_sites=site1&production_sites=site2
         - name: search
           required: false
           in: query
@@ -4673,9 +4646,9 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
+          description: List of suppliers provided via
+            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
         - in: query
           name: year
           schema:
@@ -4753,26 +4726,29 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
         - in: query
           name: customs_category
           schema:
             type: array
             items:
-              type: string
               enum:
-                - AM
+                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - CONV
-                - EP2AM
-                - OTHER
                 - TALLOL
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - OTHER
+                - EP2AM
+                - AM
+              type: string
+              description: |-
+                * `CONV` - Conventionnel
+                * `ANN-IX-A` - ANNEXE IX-A
+                * `ANN-IX-B` - ANNEXE IX-B
+                * `TALLOL` - Tallol
+                * `OTHER` - Autre
+                * `EP2AM` - EP2AM
+                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -4868,15 +4844,17 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - ACCEPTED
-                - CANCELED
                 - PENDING
+                - ACCEPTED
                 - REJECTED
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - CANCELED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
         - in: query
           name: type
           schema:
@@ -5222,26 +5200,29 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
         - in: query
           name: customs_category
           schema:
             type: array
             items:
-              type: string
               enum:
-                - AM
+                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - CONV
-                - EP2AM
-                - OTHER
                 - TALLOL
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - OTHER
+                - EP2AM
+                - AM
+              type: string
+              description: |-
+                * `CONV` - Conventionnel
+                * `ANN-IX-A` - ANNEXE IX-A
+                * `ANN-IX-B` - ANNEXE IX-B
+                * `TALLOL` - Tallol
+                * `OTHER` - Autre
+                * `EP2AM` - EP2AM
+                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5335,15 +5316,17 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - ACCEPTED
-                - CANCELED
                 - PENDING
+                - ACCEPTED
                 - REJECTED
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - CANCELED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
         - in: query
           name: type
           schema:
@@ -5388,26 +5371,29 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
         - in: query
           name: customs_category
           schema:
             type: array
             items:
-              type: string
               enum:
-                - AM
+                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - CONV
-                - EP2AM
-                - OTHER
                 - TALLOL
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - OTHER
+                - EP2AM
+                - AM
+              type: string
+              description: |-
+                * `CONV` - Conventionnel
+                * `ANN-IX-A` - ANNEXE IX-A
+                * `ANN-IX-B` - ANNEXE IX-B
+                * `TALLOL` - Tallol
+                * `OTHER` - Autre
+                * `EP2AM` - EP2AM
+                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5495,15 +5481,17 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - ACCEPTED
-                - CANCELED
                 - PENDING
+                - ACCEPTED
                 - REJECTED
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - CANCELED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
         - in: query
           name: type
           schema:
@@ -5559,26 +5547,29 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+              minLength: 1
         - in: query
           name: customs_category
           schema:
             type: array
             items:
-              type: string
               enum:
-                - AM
+                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - CONV
-                - EP2AM
-                - OTHER
                 - TALLOL
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - OTHER
+                - EP2AM
+                - AM
+              type: string
+              description: |-
+                * `CONV` - Conventionnel
+                * `ANN-IX-A` - ANNEXE IX-A
+                * `ANN-IX-B` - ANNEXE IX-B
+                * `TALLOL` - Tallol
+                * `OTHER` - Autre
+                * `EP2AM` - EP2AM
+                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5672,15 +5663,17 @@ paths:
           schema:
             type: array
             items:
-              type: string
               enum:
-                - ACCEPTED
-                - CANCELED
                 - PENDING
+                - ACCEPTED
                 - REJECTED
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+                - CANCELED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
         - in: query
           name: type
           schema:
@@ -6115,7 +6108,7 @@ components:
         unit:
           type: string
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           $ref: "#/components/schemas/BalanceBiofuel"
       required:
@@ -6805,24 +6798,6 @@ components:
           type: boolean
       required:
         - name
-    CustomsCategoryEnum:
-      enum:
-        - CONV
-        - ANN-IX-A
-        - ANN-IX-B
-        - TALLOL
-        - OTHER
-        - EP2AM
-        - AM
-      type: string
-      description: |-
-        * `CONV` - Conventionnel
-        * `ANN-IX-A` - ANNEXE IX-A
-        * `ANN-IX-B` - ANNEXE IX-B
-        * `TALLOL` - Tallol
-        * `OTHER` - Autre
-        * `EP2AM` - EP2AM
-        * `AM` - AM
     DeleteCertificateRequest:
       type: object
       properties:
@@ -8300,12 +8275,12 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/StatusD22Enum"
+          $ref: "#/components/schemas/OperationStatusEnum"
         sector:
           type: string
           readOnly: true
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           type: string
           readOnly: true
@@ -8393,9 +8368,9 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/TypeDefEnum"
+          $ref: "#/components/schemas/OperationTypeEnum"
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -8434,12 +8409,12 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/StatusD22Enum"
+          $ref: "#/components/schemas/OperationStatusEnum"
         sector:
           type: string
           readOnly: true
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           type: string
           readOnly: true
@@ -8496,6 +8471,36 @@ components:
         - emission_rate_per_mj
         - id
         - volume
+    OperationStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - CANCELED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `CANCELED` - CANCELED
+    OperationTypeEnum:
+      enum:
+        - INCORPORATION
+        - CESSION
+        - TENEUR
+        - LIVRAISON_DIRECTE
+        - MAC_BIO
+        - EXPORTATION
+        - DEVALUATION
+      type: string
+      description: |-
+        * `INCORPORATION` - INCORPORATION
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
+        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+        * `MAC_BIO` - MAC_BIO
+        * `EXPORTATION` - EXPORTATION
+        * `DEVALUATION` - DEVALUATION
     OtpResponse:
       type: object
       properties:
@@ -8632,9 +8637,9 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/TypeDefEnum"
+          $ref: "#/components/schemas/OperationTypeEnum"
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9855,7 +9860,7 @@ components:
       type: object
       properties:
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9902,7 +9907,7 @@ components:
       type: object
       properties:
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/CategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9978,18 +9983,6 @@ components:
           type: string
       required:
         - metabase_iframe_url
-    StatusD22Enum:
-      enum:
-        - PENDING
-        - ACCEPTED
-        - REJECTED
-        - CANCELED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `ACCEPTED` - ACCEPTED
-        * `REJECTED` - REJECTED
-        * `CANCELED` - CANCELED
     ToggleElecRequest:
       type: object
       properties:
@@ -10030,24 +10023,6 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
-    TypeDefEnum:
-      enum:
-        - INCORPORATION
-        - CESSION
-        - TENEUR
-        - LIVRAISON_DIRECTE
-        - MAC_BIO
-        - EXPORTATION
-        - DEVALUATION
-      type: string
-      description: |-
-        * `INCORPORATION` - INCORPORATION
-        * `CESSION` - CESSION
-        * `TENEUR` - TENEUR
-        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-        * `MAC_BIO` - MAC_BIO
-        * `EXPORTATION` - EXPORTATION
-        * `DEVALUATION` - DEVALUATION
     UnitRequest:
       type: object
       properties:

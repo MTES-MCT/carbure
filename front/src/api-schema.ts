@@ -1813,7 +1813,7 @@ export interface components {
       yearly_teneur?: number
       pending: number
       unit: string
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category: components["schemas"]["CategoryEnum"]
       biofuel: components["schemas"]["BalanceBiofuel"]
     }
     BalanceBiofuel: {
@@ -2103,17 +2103,6 @@ export interface components {
       has_saf?: boolean
       has_elec?: boolean
     }
-    /**
-     * @description * `CONV` - Conventionnel
-     *     * `ANN-IX-A` - ANNEXE IX-A
-     *     * `ANN-IX-B` - ANNEXE IX-B
-     *     * `TALLOL` - Tallol
-     *     * `OTHER` - Autre
-     *     * `EP2AM` - EP2AM
-     *     * `AM` - AM
-     * @enum {string}
-     */
-    CustomsCategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     DeleteCertificateRequest: {
       certificate_id: string
       certificate_type: string
@@ -2671,9 +2660,9 @@ export interface components {
     Operation: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["StatusD22Enum"]
+      status?: components["schemas"]["OperationStatusEnum"]
       readonly sector: string
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      customs_category?: components["schemas"]["CategoryEnum"]
       readonly biofuel: string
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
@@ -2707,8 +2696,8 @@ export interface components {
       name: string
     }
     OperationInputRequest: {
-      type: components["schemas"]["TypeDefEnum"]
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      type: components["schemas"]["OperationTypeEnum"]
+      customs_category: components["schemas"]["CategoryEnum"]
       biofuel: number | null
       credited_entity?: number | null
       debited_entity: number | null
@@ -2720,9 +2709,9 @@ export interface components {
     OperationList: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["StatusD22Enum"]
+      status?: components["schemas"]["OperationStatusEnum"]
       readonly sector: string
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      customs_category?: components["schemas"]["CategoryEnum"]
       readonly biofuel: string
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
@@ -2743,6 +2732,25 @@ export interface components {
       /** Format: double */
       emission_rate_per_mj: number
     }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     * @enum {string}
+     */
+    OperationStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
+    /**
+     * @description * `INCORPORATION` - INCORPORATION
+     *     * `CESSION` - CESSION
+     *     * `TENEUR` - TENEUR
+     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+     *     * `MAC_BIO` - MAC_BIO
+     *     * `EXPORTATION` - EXPORTATION
+     *     * `DEVALUATION` - DEVALUATION
+     * @enum {string}
+     */
+    OperationTypeEnum: OperationTypeEnum
     OtpResponse: {
       valid_until: string
     }
@@ -2829,8 +2837,8 @@ export interface components {
       results: components["schemas"]["SafTicketSource"][]
     }
     PatchedOperationUpdateRequest: {
-      type?: components["schemas"]["TypeDefEnum"]
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      type?: components["schemas"]["OperationTypeEnum"]
+      customs_category?: components["schemas"]["CategoryEnum"]
       biofuel?: number | null
       credited_entity?: number | null
       debited_entity?: number | null
@@ -3279,7 +3287,7 @@ export interface components {
      */
     ShippingMethodEnum: ShippingMethodEnum
     SimulationInputRequest: {
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category: components["schemas"]["CategoryEnum"]
       biofuel: number | null
       debited_entity: number | null
       /** Format: double */
@@ -3298,7 +3306,7 @@ export interface components {
       emission_rate_per_mj: number
     }
     SimulationMinMaxInputRequest: {
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category: components["schemas"]["CategoryEnum"]
       biofuel: number | null
       debited_entity: number | null
       /** Format: double */
@@ -3334,14 +3342,6 @@ export interface components {
     StatsResponse: {
       metabase_iframe_url: string
     }
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `ACCEPTED` - ACCEPTED
-     *     * `REJECTED` - REJECTED
-     *     * `CANCELED` - CANCELED
-     * @enum {string}
-     */
-    StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean
@@ -3368,17 +3368,6 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
-    /**
-     * @description * `INCORPORATION` - INCORPORATION
-     *     * `CESSION` - CESSION
-     *     * `TENEUR` - TENEUR
-     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-     *     * `MAC_BIO` - MAC_BIO
-     *     * `EXPORTATION` - EXPORTATION
-     *     * `DEVALUATION` - DEVALUATION
-     * @enum {string}
-     */
-    TypeDefEnum: TypeDefEnum
     UnitRequest: {
       /** @default l */
       unit: components["schemas"]["PreferredUnitEnum"]
@@ -6160,14 +6149,14 @@ export interface operations {
   saf_ticket_sources_list: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of delivery sites provided via ?delivery_sites=site1&delivery_sites=site2 */
         delivery_sites?: string[]
         entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2 */
         feedstocks?: string[]
         /** @description Ordre
          *
@@ -6186,17 +6175,17 @@ export interface operations {
         page?: number
         /** @description Number of results to return per page. */
         page_size?: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
         periods?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
         production_sites?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `HISTORY` - HISTORY
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
-        /** @description Comma-separated list of supplier names */
-        suppliers?: string[][]
+        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
+        suppliers?: string[]
         year?: number
       }
       header?: never
@@ -6274,14 +6263,14 @@ export interface operations {
   saf_ticket_sources_export_retrieve: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of delivery sites provided via ?delivery_sites=site1&delivery_sites=site2 */
         delivery_sites?: string[]
         entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2 */
         feedstocks?: string[]
         /** @description Ordre
          *
@@ -6296,17 +6285,17 @@ export interface operations {
         order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
         periods?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
         production_sites?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `HISTORY` - HISTORY
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
-        /** @description Comma-separated list of supplier names */
-        suppliers?: string[][]
+        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
+        suppliers?: string[]
         year?: number
       }
       header?: never
@@ -6328,14 +6317,14 @@ export interface operations {
   saf_ticket_sources_filters_retrieve: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of delivery sites provided via ?delivery_sites=site1&delivery_sites=site2 */
         delivery_sites?: string[]
         entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2 */
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
@@ -6352,17 +6341,17 @@ export interface operations {
         order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
         periods?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
         production_sites?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `HISTORY` - HISTORY
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
-        /** @description Comma-separated list of supplier names */
-        suppliers?: string[][]
+        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
+        suppliers?: string[]
         year?: number
       }
       header?: never
@@ -6420,12 +6409,12 @@ export interface operations {
   saf_tickets_list: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
         entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3 */
         feedstocks?: string[]
         /** @description Ordre
          *
@@ -6450,9 +6439,9 @@ export interface operations {
         page?: number
         /** @description Number of results to return per page. */
         page_size?: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
         periods?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
         production_sites?: string[]
         /** @description A search term. */
         search?: string
@@ -6460,7 +6449,7 @@ export interface operations {
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
         status?: PathsApiSafTicketsGetParametersQueryStatus
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
       }
@@ -6650,12 +6639,12 @@ export interface operations {
   saf_tickets_export_retrieve: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
         entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3 */
         feedstocks?: string[]
         /** @description Ordre
          *
@@ -6676,9 +6665,9 @@ export interface operations {
         order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
         periods?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
         production_sites?: string[]
         /** @description A search term. */
         search?: string
@@ -6686,7 +6675,7 @@ export interface operations {
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
         status?: PathsApiSafTicketsGetParametersQueryStatus
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
       }
@@ -6709,12 +6698,12 @@ export interface operations {
   saf_tickets_filters_retrieve: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
         entity_id: number
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3 */
         feedstocks?: string[]
         /** @description Filter string to apply */
         filter?: string
@@ -6737,9 +6726,9 @@ export interface operations {
         order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
         periods?: number[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
         production_sites?: string[]
         /** @description A search term. */
         search?: string
@@ -6747,7 +6736,7 @@ export interface operations {
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
         status?: PathsApiSafTicketsGetParametersQueryStatus
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
       }
@@ -6800,9 +6789,7 @@ export interface operations {
   list_operations: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -6819,7 +6806,6 @@ export interface operations {
         page_size?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
@@ -7059,9 +7045,7 @@ export interface operations {
   list_balances: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -7076,7 +7060,6 @@ export interface operations {
         page?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
@@ -7101,9 +7084,7 @@ export interface operations {
   filter_balances: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -7116,7 +7097,6 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
@@ -7141,9 +7121,7 @@ export interface operations {
   filter_operations: {
     parameters: {
       query: {
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         biofuel?: string[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -7156,7 +7134,6 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
@@ -7384,13 +7361,13 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
   REJECTED = "REJECTED",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
-  AM = "AM",
+  CONV = "CONV",
   ANN_IX_A = "ANN-IX-A",
   ANN_IX_B = "ANN-IX-B",
-  CONV = "CONV",
-  EP2AM = "EP2AM",
-  OTHER = "OTHER",
   TALLOL = "TALLOL",
+  OTHER = "OTHER",
+  EP2AM = "EP2AM",
+  AM = "AM",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   INCORPORATION = "INCORPORATION",
@@ -7408,10 +7385,10 @@ export enum PathsApiTiruertOperationsGetParametersQuerySector {
   SAF = "SAF",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
-  ACCEPTED = "ACCEPTED",
-  CANCELED = "CANCELED",
   PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
   REJECTED = "REJECTED",
+  CANCELED = "CANCELED",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryType {
   CREDIT = "CREDIT",
@@ -7544,6 +7521,15 @@ export enum LotStatusEnum {
   FROZEN = "FROZEN",
   DELETED = "DELETED",
 }
+export enum OperationTypeEnum {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
+}
 export enum OwnershipTypeEnum {
   OWN = "OWN",
   THIRD_PARTY = "THIRD_PARTY",
@@ -7586,15 +7572,6 @@ export enum TransportDocumentTypeEnum {
   DSAC = "DSAC",
   DSP = "DSP",
   OTHER = "OTHER",
-}
-export enum TypeDefEnum {
-  INCORPORATION = "INCORPORATION",
-  CESSION = "CESSION",
-  TENEUR = "TENEUR",
-  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
-  MAC_BIO = "MAC_BIO",
-  EXPORTATION = "EXPORTATION",
-  DEVALUATION = "DEVALUATION",
 }
 export enum UserRightsRequestsStatusEnum {
   Pending = "PENDING",
