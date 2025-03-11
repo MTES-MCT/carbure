@@ -1813,7 +1813,7 @@ export interface components {
       yearly_teneur?: number
       pending: number
       unit: string
-      customs_category: components["schemas"]["CategoryEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
       biofuel: components["schemas"]["BalanceBiofuel"]
     }
     BalanceBiofuel: {
@@ -2103,6 +2103,17 @@ export interface components {
       has_saf?: boolean
       has_elec?: boolean
     }
+    /**
+     * @description * `CONV` - Conventionnel
+     *     * `ANN-IX-A` - ANNEXE IX-A
+     *     * `ANN-IX-B` - ANNEXE IX-B
+     *     * `TALLOL` - Tallol
+     *     * `OTHER` - Autre
+     *     * `EP2AM` - EP2AM
+     *     * `AM` - AM
+     * @enum {string}
+     */
+    CustomsCategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     DeleteCertificateRequest: {
       certificate_id: string
       certificate_type: string
@@ -2660,9 +2671,9 @@ export interface components {
     Operation: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["OperationStatusEnum"]
+      status?: components["schemas"]["StatusD22Enum"]
       readonly sector: string
-      customs_category?: components["schemas"]["CategoryEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
@@ -2696,8 +2707,8 @@ export interface components {
       name: string
     }
     OperationInputRequest: {
-      type: components["schemas"]["OperationTypeEnum"]
-      customs_category: components["schemas"]["CategoryEnum"]
+      type: components["schemas"]["TypeDefEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
       biofuel: number | null
       credited_entity?: number | null
       debited_entity: number | null
@@ -2709,9 +2720,9 @@ export interface components {
     OperationList: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["OperationStatusEnum"]
+      status?: components["schemas"]["StatusD22Enum"]
       readonly sector: string
-      customs_category?: components["schemas"]["CategoryEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
       readonly biofuel: string
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
@@ -2732,25 +2743,6 @@ export interface components {
       /** Format: double */
       emission_rate_per_mj: number
     }
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `ACCEPTED` - ACCEPTED
-     *     * `REJECTED` - REJECTED
-     *     * `CANCELED` - CANCELED
-     * @enum {string}
-     */
-    OperationStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
-    /**
-     * @description * `INCORPORATION` - INCORPORATION
-     *     * `CESSION` - CESSION
-     *     * `TENEUR` - TENEUR
-     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-     *     * `MAC_BIO` - MAC_BIO
-     *     * `EXPORTATION` - EXPORTATION
-     *     * `DEVALUATION` - DEVALUATION
-     * @enum {string}
-     */
-    OperationTypeEnum: OperationTypeEnum
     OtpResponse: {
       valid_until: string
     }
@@ -2837,8 +2829,8 @@ export interface components {
       results: components["schemas"]["SafTicketSource"][]
     }
     PatchedOperationUpdateRequest: {
-      type?: components["schemas"]["OperationTypeEnum"]
-      customs_category?: components["schemas"]["CategoryEnum"]
+      type?: components["schemas"]["TypeDefEnum"]
+      customs_category?: components["schemas"]["CustomsCategoryEnum"]
       biofuel?: number | null
       credited_entity?: number | null
       debited_entity?: number | null
@@ -3287,7 +3279,7 @@ export interface components {
      */
     ShippingMethodEnum: ShippingMethodEnum
     SimulationInputRequest: {
-      customs_category: components["schemas"]["CategoryEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
       biofuel: number | null
       debited_entity: number | null
       /** Format: double */
@@ -3306,7 +3298,7 @@ export interface components {
       emission_rate_per_mj: number
     }
     SimulationMinMaxInputRequest: {
-      customs_category: components["schemas"]["CategoryEnum"]
+      customs_category: components["schemas"]["CustomsCategoryEnum"]
       biofuel: number | null
       debited_entity: number | null
       /** Format: double */
@@ -3342,6 +3334,14 @@ export interface components {
     StatsResponse: {
       metabase_iframe_url: string
     }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     * @enum {string}
+     */
+    StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean
@@ -3368,6 +3368,17 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
+    /**
+     * @description * `INCORPORATION` - INCORPORATION
+     *     * `CESSION` - CESSION
+     *     * `TENEUR` - TENEUR
+     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+     *     * `MAC_BIO` - MAC_BIO
+     *     * `EXPORTATION` - EXPORTATION
+     *     * `DEVALUATION` - DEVALUATION
+     * @enum {string}
+     */
+    TypeDefEnum: TypeDefEnum
     UnitRequest: {
       /** @default l */
       unit: components["schemas"]["PreferredUnitEnum"]
@@ -7521,15 +7532,6 @@ export enum LotStatusEnum {
   FROZEN = "FROZEN",
   DELETED = "DELETED",
 }
-export enum OperationTypeEnum {
-  INCORPORATION = "INCORPORATION",
-  CESSION = "CESSION",
-  TENEUR = "TENEUR",
-  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
-  MAC_BIO = "MAC_BIO",
-  EXPORTATION = "EXPORTATION",
-  DEVALUATION = "DEVALUATION",
-}
 export enum OwnershipTypeEnum {
   OWN = "OWN",
   THIRD_PARTY = "THIRD_PARTY",
@@ -7572,6 +7574,15 @@ export enum TransportDocumentTypeEnum {
   DSAC = "DSAC",
   DSP = "DSP",
   OTHER = "OTHER",
+}
+export enum TypeDefEnum {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
 }
 export enum UserRightsRequestsStatusEnum {
   Pending = "PENDING",

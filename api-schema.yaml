@@ -6108,7 +6108,7 @@ components:
         unit:
           type: string
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           $ref: "#/components/schemas/BalanceBiofuel"
       required:
@@ -6798,6 +6798,24 @@ components:
           type: boolean
       required:
         - name
+    CustomsCategoryEnum:
+      enum:
+        - CONV
+        - ANN-IX-A
+        - ANN-IX-B
+        - TALLOL
+        - OTHER
+        - EP2AM
+        - AM
+      type: string
+      description: |-
+        * `CONV` - Conventionnel
+        * `ANN-IX-A` - ANNEXE IX-A
+        * `ANN-IX-B` - ANNEXE IX-B
+        * `TALLOL` - Tallol
+        * `OTHER` - Autre
+        * `EP2AM` - EP2AM
+        * `AM` - AM
     DeleteCertificateRequest:
       type: object
       properties:
@@ -8275,12 +8293,12 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/OperationStatusEnum"
+          $ref: "#/components/schemas/StatusD22Enum"
         sector:
           type: string
           readOnly: true
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: string
           readOnly: true
@@ -8368,9 +8386,9 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/OperationTypeEnum"
+          $ref: "#/components/schemas/TypeDefEnum"
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -8409,12 +8427,12 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/OperationStatusEnum"
+          $ref: "#/components/schemas/StatusD22Enum"
         sector:
           type: string
           readOnly: true
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: string
           readOnly: true
@@ -8471,36 +8489,6 @@ components:
         - emission_rate_per_mj
         - id
         - volume
-    OperationStatusEnum:
-      enum:
-        - PENDING
-        - ACCEPTED
-        - REJECTED
-        - CANCELED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `ACCEPTED` - ACCEPTED
-        * `REJECTED` - REJECTED
-        * `CANCELED` - CANCELED
-    OperationTypeEnum:
-      enum:
-        - INCORPORATION
-        - CESSION
-        - TENEUR
-        - LIVRAISON_DIRECTE
-        - MAC_BIO
-        - EXPORTATION
-        - DEVALUATION
-      type: string
-      description: |-
-        * `INCORPORATION` - INCORPORATION
-        * `CESSION` - CESSION
-        * `TENEUR` - TENEUR
-        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-        * `MAC_BIO` - MAC_BIO
-        * `EXPORTATION` - EXPORTATION
-        * `DEVALUATION` - DEVALUATION
     OtpResponse:
       type: object
       properties:
@@ -8637,9 +8625,9 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/OperationTypeEnum"
+          $ref: "#/components/schemas/TypeDefEnum"
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9860,7 +9848,7 @@ components:
       type: object
       properties:
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9907,7 +9895,7 @@ components:
       type: object
       properties:
         customs_category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9983,6 +9971,18 @@ components:
           type: string
       required:
         - metabase_iframe_url
+    StatusD22Enum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - CANCELED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `CANCELED` - CANCELED
     ToggleElecRequest:
       type: object
       properties:
@@ -10023,6 +10023,24 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeDefEnum:
+      enum:
+        - INCORPORATION
+        - CESSION
+        - TENEUR
+        - LIVRAISON_DIRECTE
+        - MAC_BIO
+        - EXPORTATION
+        - DEVALUATION
+      type: string
+      description: |-
+        * `INCORPORATION` - INCORPORATION
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
+        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+        * `MAC_BIO` - MAC_BIO
+        * `EXPORTATION` - EXPORTATION
+        * `DEVALUATION` - DEVALUATION
     UnitRequest:
       type: object
       properties:
