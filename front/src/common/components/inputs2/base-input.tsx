@@ -50,7 +50,7 @@ export const BaseInput = ({
           title={title}
           readOnly={readOnly}
         />
-        <Text>
+        <Text size="sm">
           {props.nativeInputProps?.value ?? props.nativeTextAreaProps?.value}
         </Text>
       </div>
