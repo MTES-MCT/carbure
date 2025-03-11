@@ -226,3 +226,8 @@
 .top-actions__item:not(:last-child) {
   border-right: 1px solid var(--border-default-grey);
 }
+
+/* To prevent the badge from being cut off, we need to remove max-width: 100% defined by the DSFR */
+.cell :global(.fr-badge) {
+  max-width: unset;
+}

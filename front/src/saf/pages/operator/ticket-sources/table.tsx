@@ -14,6 +14,7 @@ import { usePortal } from "common/components/portal"
 import { useNotify } from "common/components/notifications"
 import TicketsGroupedAssignment from "saf/components/assignment/grouped-assignment"
 import { Text } from "common/components/text"
+import { useSafRules } from "saf/hooks/useSafRules"
 
 export interface TicketSourcesTableProps {
   loading: boolean
@@ -41,6 +42,7 @@ export const TicketSourcesTable = memo(
     const { t } = useTranslation()
     const portal = usePortal()
     const notify = useNotify()
+    const { canUpdateTicket } = useSafRules()
 
     const selectedTicketSources = useMemo(() => {
       return ticketSources.filter((ticketSource) =>
@@ -119,6 +121,8 @@ export const TicketSourcesTable = memo(
             priority="tertiary no outline"
             iconId="ri-send-plane-line"
             onClick={showGroupedAssignement}
+            disabled={!canUpdateTicket}
+            key="affect-volumes"
           >
             {t("Affecter les {{count}} volumes", {
               count: selectedTicketSources.length,
