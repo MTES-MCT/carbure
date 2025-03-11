@@ -127,13 +127,12 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
               status={status}
             />
 
-            {(state.limit ?? 0) < total && (
-              <Pagination
-                defaultPage={state.page}
-                limit={state.limit}
-                total={total}
-              />
-            )}
+            <Pagination
+              defaultPage={state.page}
+              limit={state.limit}
+              total={total}
+              onLimit={actions.setLimit}
+            />
           </>
         ) : (
           <NoResult

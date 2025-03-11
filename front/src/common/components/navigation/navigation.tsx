@@ -127,6 +127,7 @@ const NavigationButtons = ({
         disabled={!nav.hasNext && page === pageCount}
         loading={loading}
         iconId="ri-arrow-right-s-line"
+        iconPosition="right"
         onClick={nav.next}
       >
         {t("Suivant")}
