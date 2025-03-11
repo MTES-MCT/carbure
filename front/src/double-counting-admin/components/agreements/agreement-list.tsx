@@ -1,6 +1,11 @@
 import useEntity from "common/hooks/entity"
 import { Button } from "common/components/button"
 import HashRoute from "common/components/hash-route"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder-2"
+
 import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
 import { ActionBar } from "common/components/scaffold"
@@ -20,6 +25,8 @@ import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import AgreementStatusTag from "./agreement-status"
 import { compact } from "common/utils/collection"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { AgreementFilters } from "../../filters"
+import { AgreementFilter, AgreementOrder } from "double-counting-admin/types"
 
 const AgreementList = ({
   snapshot = defaultCount,
@@ -35,9 +42,15 @@ const AgreementList = ({
   const [order, setOrder] = useState<Order | undefined>(undefined)
   const currentYear = new Date().getFullYear()
 
+  const [state, actions] = useCBQueryParamsStore<string, undefined>(
+    entity,
+    currentYear,
+    tab
+  )
+  const query = useCBQueryBuilder<AgreementOrder[], string, undefined>(state)
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
-    params: [entity.id, order?.column, order?.direction],
+    params: [query],
   })
 
   const columns: Column<DoubleCountingAgreementOverview>[] = compact([
@@ -83,6 +96,10 @@ const AgreementList = ({
 
   const agreements = agreementsResponse.result?.data
 
+  const getAgrementFilter = (filter: AgreementFilter) => {
+    return api.getAgrementFilters(filter, query)
+  }
+
   return (
     <>
       <section>
@@ -112,11 +129,17 @@ const AgreementList = ({
               },
             ]}
           />
+
           {tab === "active" && agreements && agreements.active.length > 0 && (
             <ExportAgreementsButton />
           )}
         </ActionBar>
-
+        <AgreementFilters
+          filters={CLIENT_FILTERS}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilterOptions={getAgrementFilter}
+        />
         {!agreements ||
         (tab === "active" && agreements["active"].length === 0) ||
         (tab === "expired" && agreements.expired.length === 0) ||
@@ -126,26 +149,34 @@ const AgreementList = ({
             loading={agreementsResponse.loading}
           />
         ) : (
-          <Table
-            loading={agreementsResponse.loading}
-            columns={columns}
-            rows={
-              tab === "active"
-                ? agreements.active
-                : tab === "expired"
-                  ? agreements.expired
-                  : agreements.incoming
-            }
-            onAction={showApplicationDialog}
-            order={order}
-            onOrder={setOrder}
-          />
+          <>
+            <Table
+              loading={agreementsResponse.loading}
+              columns={columns}
+              rows={
+                tab === "active"
+                  ? agreements.active
+                  : tab === "expired"
+                    ? agreements.expired
+                    : agreements.incoming
+              }
+              onAction={showApplicationDialog}
+              order={order}
+              onOrder={setOrder}
+            />
+          </>
         )}
       </section>
       <HashRoute path="agreement/:id" element={<AgreementDetailsDialog />} />
     </>
   )
 }
+
+const CLIENT_FILTERS = [
+  AgreementFilter.Certificate_id,
+  AgreementFilter.Producers,
+  AgreementFilter.ProductionSites,
+]
 
 export default AgreementList
 

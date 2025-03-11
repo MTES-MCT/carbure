@@ -23,6 +23,7 @@ class CarbureError:
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
     ENTITY_NOT_ALLOWED = "ENTITY_NOT_ALLOWED"
     NOT_FOUND = "NOT_FOUND"
+    INVALID_FILTER = "No filter was specified"
 
 
 class CarbureMLGHGErrors:
