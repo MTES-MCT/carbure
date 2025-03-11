@@ -33,7 +33,7 @@ export const WithDebounce: Story = {
     await new Promise((resolve) => setTimeout(resolve, args.debounce))
 
     // Check that onChange has been called after the delay
-    expect(args.onChange).toHaveBeenCalledWith("test")
-    expect(args.onChange).toHaveBeenCalledTimes(1)
+    await expect(args.onChange).toHaveBeenCalledWith("test")
+    await expect(args.onChange).toHaveBeenCalledTimes(1)
   },
 }
