@@ -35,7 +35,7 @@ export const Pagination = ({
 
   const getLabel = useCallback(
     (value: number) => {
-      return t("{{count}} résultats", { count: value })
+      return t("{{count}} par page", { count: value })
     },
     [t]
   )
