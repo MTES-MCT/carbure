@@ -11,6 +11,7 @@ import {
   Biofuel,
   CategoryEnum,
   Country,
+  EntityType,
   Feedstock,
 } from "common/types"
 import {
@@ -29,6 +30,7 @@ import {
   SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
 import { SiteTypeEnum } from "api-schema"
+import { apiTypes } from "common/services/api-fetch.types"
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,
@@ -256,16 +258,6 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   reception_airport: safAirport,
 }
 
-// const safTicketSourceSummaryItem: SafTicketSourceSummaryItem = {
-//   id: 123,
-//   carbure_id: "1E2E2",
-//   year: 2022,
-//   delivery_period: 202202,
-//   total_volume: 3000,
-//   feedstock: feedstock1,
-//   biofuel: biofuel1,
-// }
-
 export const safTicketReceivedDetails: SafTicketDetails = {
   ...safTicketAssignedDetails,
   status: SafTicketStatus.ACCEPTED, // SafTicketStatus.PENDING
@@ -277,3 +269,26 @@ export const safTicketsResponse: SafTicketsResponse = {
   count: 2,
   results: [safTicket, safTicket],
 }
+
+export const safClients: apiTypes["EntityPreview"][] = [
+  {
+    id: 1,
+    name: "Compagnie aérienne 1",
+    entity_type: EntityType.Airline,
+  },
+  {
+    id: 2,
+    name: "Compagnie aérienne 2",
+    entity_type: EntityType.Airline,
+  },
+  {
+    id: 3,
+    name: "Opérateur 1",
+    entity_type: EntityType.Operator,
+  },
+  {
+    id: 4,
+    name: "Opérateur 2",
+    entity_type: EntityType.Operator,
+  },
+]

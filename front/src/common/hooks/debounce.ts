@@ -7,7 +7,7 @@ export const useDebounce = <T extends string | number | undefined>({
 }: {
   value: T
   delay: number
-  onChange: (value?: T) => void
+  onChange: (value?: T) => Promise<void>
 }) => {
   const timeoutRef = useRef<number>()
   const [search, setSearch] = useState<T | undefined>(value)
