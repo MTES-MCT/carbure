@@ -19,7 +19,6 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
-import { UserRole } from "common/types"
 
 export type TicketSourceDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -39,9 +38,6 @@ export const TicketSourceDetails = ({
   const entity = useEntity()
   const match = useHashMatch("ticket-source/:id")
   const portal = usePortal()
-
-  const canUpdateTicket =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
     key: "ticket-source-details",
@@ -103,18 +99,17 @@ export const TicketSourceDetails = ({
                 baseIdsList={baseIdsList}
               />
             )}
-            <Button
-              iconId="ri-send-plane-line"
-              priority="primary"
-              disabled={
-                !ticketSource ||
-                ticketSource.assigned_volume === ticketSource.total_volume ||
-                !canUpdateTicket
-              }
-              onClick={showAssignement}
-            >
-              {t("Affecter")}
-            </Button>
+            {ticketSource?.assigned_volume !== undefined &&
+              ticketSource?.total_volume !== undefined &&
+              ticketSource.assigned_volume < ticketSource.total_volume && (
+                <Button
+                  iconId="ri-send-plane-line"
+                  priority="primary"
+                  onClick={showAssignement}
+                >
+                  {t("Affecter")}
+                </Button>
+              )}
           </>
         }
       >

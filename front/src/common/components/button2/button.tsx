@@ -49,7 +49,7 @@ export const Button = forwardRef<
         {...layout({ asideX, asideY, spread })}
         // @ts-ignore couldn't find a better way to manage different cases for button (anchor, button, icon only)
         ref={ref}
-        disabled={loading}
+        disabled={loading || props.disabled}
         onClick={
           captive
             ? (e) => {

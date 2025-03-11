@@ -15,6 +15,8 @@ import {
 import { Text } from "../text"
 import { Trans } from "react-i18next"
 import { InputProps } from "../inputs2/input"
+import { LoaderLine } from "../icon"
+import { useDebounce } from "common/hooks/debounce"
 
 export type AutocompleteProps<T, V = T> = Trigger &
   InputProps & {
@@ -29,6 +31,7 @@ export type AutocompleteProps<T, V = T> = Trigger &
     normalize?: Normalizer<T, V>
     children?: Renderer<T, V>
     sort?: Sorter<T, V>
+    debounce?: number
   }
 
 export function Autocomplete<T, V>({
@@ -45,6 +48,7 @@ export function Autocomplete<T, V>({
   normalize = defaultNormalizer,
   children = defaultRenderer,
   sort,
+  debounce = 300,
   ...props
 }: AutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
@@ -60,6 +64,12 @@ export function Autocomplete<T, V>({
     normalize,
   })
 
+  const [search, debouncedSearch] = useDebounce({
+    value: autocomplete.query,
+    delay: debounce,
+    onChange: autocomplete.onQuery,
+  })
+
   return (
     <>
       <TextInput
@@ -68,8 +78,8 @@ export function Autocomplete<T, V>({
         autoComplete={false}
         loading={false}
         inputRef={triggerRef}
-        value={autocomplete.query}
-        onChange={autocomplete.onQuery}
+        value={search}
+        onChange={debouncedSearch}
         iconId="ri-arrow-down-s-line"
       />
 
@@ -84,6 +94,7 @@ export function Autocomplete<T, V>({
           {loading || autocomplete.loading ? (
             <Text style={{ padding: "10px", textAlign: "center" }}>
               <Trans>Chargement des résultats...</Trans>
+              <LoaderLine size="sm" style={{ marginLeft: "4px" }} />
             </Text>
           ) : (
             <List

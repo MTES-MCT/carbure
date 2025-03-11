@@ -31,7 +31,7 @@ export const StatusSwitcher = ({
         {
           key: SafTicketSourceStatus.HISTORY,
           path: SafTicketSourceStatus.HISTORY.toLowerCase(),
-          label: `${t("Tous")} (${count?.ticket_sources_history ?? 0})`,
+          label: `${t("Affectés")} (${count?.ticket_sources_history ?? 0})`,
           icon: SendPlaneLine,
         },
       ]}
