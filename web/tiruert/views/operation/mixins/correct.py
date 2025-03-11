@@ -1,4 +1,3 @@
-from django.db import transaction
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -29,16 +28,15 @@ class CorrectActionMixin:
     )
     @action(detail=True, methods=["post"])
     def correct(self, request, pk=None):
-        with transaction.atomic():
-            operation = self.get_object()
+        operation = self.get_object()
 
-            serializer = OperationCorrectionSerializer(
-                operation,
-                data=request.data,
-                context={"request": request},
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"status": "corrected"}, status=status.HTTP_200_OK)
+        serializer = OperationCorrectionSerializer(
+            operation,
+            data=request.data,
+            context={"request": request},
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "corrected"}, status=status.HTTP_200_OK)
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
