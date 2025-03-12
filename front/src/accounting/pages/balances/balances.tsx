@@ -12,6 +12,7 @@ import {
 import { Pagination } from "common/components/pagination2/pagination"
 import { BalancesFilter } from "./types"
 import { OperationsStatus } from "accounting/types"
+import { NoResult } from "common/components/no-result2"
 
 export const Balances = () => {
   const entity = useEntity()
@@ -46,16 +47,24 @@ export const Balances = () => {
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
-      <Table
-        columns={columns}
-        rows={result?.data?.results ?? []}
-        loading={loading}
-      />
-      <Pagination
-        defaultPage={query.page}
-        total={result?.data?.count ?? 0}
-        limit={query.limit}
-      />
+      {!loading &&
+      result?.data?.results &&
+      result?.data?.results?.length === 0 ? (
+        <NoResult />
+      ) : (
+        <>
+          <Table
+            columns={columns}
+            rows={result?.data?.results ?? []}
+            loading={loading}
+          />
+          <Pagination
+            defaultPage={query.page}
+            total={result?.data?.count ?? 0}
+            limit={query.limit}
+          />
+        </>
+      )}
     </>
   )
 }

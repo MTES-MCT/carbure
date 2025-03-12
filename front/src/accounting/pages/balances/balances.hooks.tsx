@@ -3,7 +3,6 @@ import { usePortal } from "common/components/portal"
 import { Column } from "common/components/table2"
 import { useRoutes } from "common/hooks/routes"
 import { apiTypes } from "common/services/api-fetch.types"
-import { formatNumber } from "common/utils/formatters"
 import { addQueryParams } from "common/utils/routes"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -16,6 +15,8 @@ import { useNormalizeSector } from "accounting/hooks/normalizers"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 import { UserRole } from "common/types"
+import { useUnit } from "common/hooks/unit"
+import { formatNumber } from "common/utils/formatters"
 
 export const useBalancesColumns = () => {
   const { t } = useTranslation()
@@ -23,7 +24,7 @@ export const useBalancesColumns = () => {
   const routes = useRoutes()
   const portal = usePortal()
   const entity = useEntity()
-
+  const { unit } = useUnit()
   const canTransfer =
     entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
@@ -41,8 +42,8 @@ export const useBalancesColumns = () => {
       cell: (item) => item.customs_category,
     },
     {
-      header: t("Solde disponible"),
-      cell: (item) => formatNumber(Number(item.available_balance), 0),
+      header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
+      cell: (item) => formatNumber(item.available_balance, 0),
     },
     {
       header: t("Opérations en attente"),

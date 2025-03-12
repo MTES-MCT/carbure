@@ -80,7 +80,7 @@ export const QuantityForm = ({
   return (
     <>
       <NumberInput
-        label={`${t("Saisir une quantité pour la cession")} (${unit})`}
+        label={`${t("Saisir une quantité pour la cession")} (${unit.toLocaleUpperCase()})`}
         max={depot_quantity_max}
         {...bind("quantity")}
         addon={

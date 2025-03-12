@@ -17,13 +17,15 @@ import {
   OperationsStatus,
   OperationType,
 } from "accounting/types"
-import useEntity from "common/hooks/entity"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import {
   formatOperationStatus,
   formatOperationType,
   formatSector,
 } from "accounting/utils/formatters"
+import styles from "./operations.module.css"
+import cl from "clsx"
+import { useUnit } from "common/hooks/unit"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -32,7 +34,7 @@ export const useOperationsColumns = ({
   onClickSector,
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
+  const { unit } = useUnit()
 
   const columns: Column<Operation>[] = [
     {
@@ -99,18 +101,17 @@ export const useOperationsColumns = ({
       },
     },
     {
-      header: `${t("Quantité")} (${entity.preferred_unit.toUpperCase()})`,
+      header: `${t("Quantité")} (${unit.toUpperCase()})`,
       cell: (item) =>
         isOperationDebit(item.type) ? (
           <Text
             size="sm"
             fontWeight="semibold"
-            style={{
-              color: "var(--text-default-error)",
-              ...(item.status === OperationsStatus.REJECTED && {
-                textDecoration: "line-through",
-              }),
-            }}
+            className={cl(
+              styles["operation-debit"],
+              item.status === OperationsStatus.REJECTED &&
+                styles["operation--rejected"]
+            )}
           >
             -{formatNumber(item.quantity)}
           </Text>
@@ -118,7 +119,11 @@ export const useOperationsColumns = ({
           <Text
             size="sm"
             fontWeight="semibold"
-            style={{ color: "var(--text-default-success)" }}
+            className={cl(
+              styles["operation-credit"],
+              item.status === OperationsStatus.REJECTED &&
+                styles["operation--rejected"]
+            )}
           >
             +{formatNumber(item.quantity)}
           </Text>

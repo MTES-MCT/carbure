@@ -76,22 +76,25 @@ export const Operations = ({
       result?.data?.results?.length === 0 ? (
         <NoResult />
       ) : (
-        <Table
-          columns={columns}
-          rows={result?.data?.results ?? []}
-          rowLink={(row) => ({
-            pathname: location.pathname,
-            search: location.search,
-            hash: `operation/${row.id}`,
-          })}
-          loading={loading}
-        />
+        <>
+          <Table
+            columns={columns}
+            rows={result?.data?.results ?? []}
+            rowLink={(row) => ({
+              pathname: location.pathname,
+              search: location.search,
+              hash: `operation/${row.id}`,
+            })}
+            loading={loading}
+          />
+          <Pagination
+            defaultPage={query.page}
+            total={result?.data?.count ?? 0}
+            limit={query.limit}
+          />
+        </>
       )}
-      <Pagination
-        defaultPage={query.page}
-        total={result?.data?.count ?? 0}
-        limit={query.limit}
-      />
+
       <HashRoute path="operation/:id" element={<OperationDetail />} />
     </>
   )

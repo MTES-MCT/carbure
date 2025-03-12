@@ -10,7 +10,8 @@ export const useUnit = () => {
   const entity = useEntity()
 
   return {
-    unit: formatUnitOnly(entity.preferred_unit),
+    unit: entity.preferred_unit,
+    unitLabel: formatUnitOnly(entity.preferred_unit),
     formatUnit: (value: number, fractionDigits = 2) =>
       formatUnit(value, entity.preferred_unit, fractionDigits),
   }
