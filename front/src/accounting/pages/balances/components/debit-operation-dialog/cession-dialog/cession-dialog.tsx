@@ -9,21 +9,21 @@ import { Stepper, useStepper } from "common/components/stepper"
 import {
   FromDepotForm,
   FromDepotSummary,
-  showNextStepFromDepotForm,
+  fromDepotStep,
 } from "accounting/components/from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
 import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
 import { Button } from "common/components/button2"
 import {
-  showNextStepQuantityForm,
   QuantityForm,
   QuantitySummary,
+  quantityFormStep,
 } from "accounting/components/quantity-form"
 import {
   RecipientToDepotForm,
+  recipientToDepotStep,
   RecipientToDepotSummary,
-  showNextStepRecipientToDepotForm,
 } from "accounting/components/recipient-to-depot-form"
 import { simulate, createOperation } from "accounting/api"
 import { useMutation } from "common/hooks/async"
@@ -60,21 +60,9 @@ export const CessionDialog = ({
     goToPreviousStep,
   } = useStepper(
     [
-      {
-        key: CessionStepKey.FromDepot,
-        title: t("Dépôt d'expédition"),
-        allowNextStep: showNextStepFromDepotForm,
-      },
-      {
-        key: CessionStepKey.Quantity,
-        title: t("Quantité de la cession et tCO2 évitées"),
-        allowNextStep: showNextStepQuantityForm,
-      },
-      {
-        key: CessionStepKey.ToDepot,
-        title: t("Redevable et dépôt destinataire"),
-        allowNextStep: showNextStepRecipientToDepotForm,
-      },
+      fromDepotStep,
+      quantityFormStep,
+      recipientToDepotStep,
       {
         key: CessionStepKey.Recap,
         title: t("Récapitulatif"),

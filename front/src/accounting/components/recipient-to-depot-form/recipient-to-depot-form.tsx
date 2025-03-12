@@ -11,6 +11,8 @@ import { OperationText } from "accounting/components/operation-text"
 import { findEligibleTiruertEntities } from "./api"
 import useEntity from "common/hooks/entity"
 import { Depot, EntityPreview } from "common/types"
+import { Step } from "common/components/stepper"
+import i18next from "i18next"
 
 export type RecipientToDepotFormProps = {
   credited_entity?: EntityPreview
@@ -68,8 +70,20 @@ export const RecipientToDepotSummary = ({
   )
 }
 
-export const showNextStepRecipientToDepotForm = (
+const showNextStepRecipientToDepotForm = (
   values: RecipientToDepotFormProps
 ) => {
   return Boolean(values.credited_entity)
+}
+
+const RecipientToDepotStepKey = "recipient_to_depot"
+export type RecipientToDepotStepKey = typeof RecipientToDepotStepKey
+
+export const recipientToDepotStep: Step<
+  RecipientToDepotStepKey,
+  RecipientToDepotFormProps
+> = {
+  key: RecipientToDepotStepKey,
+  title: i18next.t("Redevable et dépôt destinataire"),
+  allowNextStep: showNextStepRecipientToDepotForm,
 }

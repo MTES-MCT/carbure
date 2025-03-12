@@ -11,29 +11,11 @@ import { useState } from "react"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
-
-export type QuantityFormProps = {
-  quantity?: number
-  avoided_emissions_min?: number // Range determined by the simulation
-  avoided_emissions_max?: number // Range determined by the simulation
-  avoided_emissions?: number // Value selected by the user
-}
+import { QuantityFormProps } from "./quantity-form.types"
 
 type QuantityFormComponentProps = {
   balance: Balance
   depot_quantity_max?: number
-}
-
-export const showNextStepQuantityForm = (values: QuantityFormProps) => {
-  return Boolean(
-    values.quantity &&
-      values.quantity > 0 &&
-      values.avoided_emissions &&
-      values.avoided_emissions_min &&
-      values.avoided_emissions_max &&
-      values.avoided_emissions >= values.avoided_emissions_min &&
-      values.avoided_emissions <= values.avoided_emissions_max
-  )
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10

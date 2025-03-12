@@ -8,12 +8,7 @@ import { Balance } from "accounting/pages/balances/types"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
-import { apiTypes } from "common/services/api-fetch.types"
-
-// Type of the form part
-export type FromDepotFormProps = {
-  from_depot?: apiTypes["BalanceDepot"]
-}
+import { FromDepotFormProps } from "./from-depot-form.types"
 
 // Type of the component
 type FromDepotProps = {
@@ -117,11 +112,5 @@ export const FromDepotSummary = ({
         description={formatUnit(values.from_depot.quantity.credit, 0)}
       />
     </Grid>
-  )
-}
-
-export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
-  return Boolean(
-    values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
   )
 }

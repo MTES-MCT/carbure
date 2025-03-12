@@ -1,0 +1,18 @@
+import { Step } from "common/components/stepper"
+import { FromDepotFormProps } from "./from-depot-form.types"
+import i18next from "i18next"
+
+const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
+  return Boolean(
+    values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
+  )
+}
+
+const fromDepotStepKey = "from-depot"
+export type FromDepotStepKey = typeof fromDepotStepKey
+
+export const fromDepotStep: Step<FromDepotStepKey, FromDepotFormProps> = {
+  key: fromDepotStepKey,
+  title: i18next.t("Dépôt d'expédition"),
+  allowNextStep: showNextStepFromDepotForm,
+}

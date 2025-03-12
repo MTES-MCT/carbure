@@ -18,7 +18,7 @@ export const Stepper = ({ marginBottom = false, ...props }: StepperProps) => {
   )
 }
 
-type Step<
+export type Step<
   Key extends string,
   FormType extends Record<string, unknown> | undefined,
 > = {
@@ -28,10 +28,10 @@ type Step<
 }
 
 export const useStepper = <
-  Key extends string,
+  Steps extends Step<string, FormType>[],
   FormType extends Record<string, unknown> | undefined,
 >(
-  steps: Step<Key, FormType>[],
+  steps: Steps,
   form?: FormType
 ) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
@@ -48,7 +48,7 @@ export const useStepper = <
       ? currentStep?.allowNextStep?.(form)
       : true
 
-  const setStep = (stepKey: Step<Key, FormType>["key"]) => {
+  const setStep = (stepKey: Steps[number]["key"]) => {
     const stepIndex = steps.findIndex((step) => step.key === stepKey)
     if (stepIndex !== -1) {
       setCurrentStepIndex(stepIndex)
