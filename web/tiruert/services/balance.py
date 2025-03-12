@@ -10,7 +10,7 @@ class BalanceService:
     @staticmethod
     def calculate_balance(operations, entity_id, group_by, unit):
         """
-        Keep only PENDING and ACCEPTED operations
+        Keep only PENDING, ACCEPTED, VALIDATED AND DECLARED operations
         Group by sector, customs_category and biofuel (and lot if needed)
         Sum volume: credit when entity is credited, debit when entity is debited
         For credit operation, if PENDING, don't sum volume
@@ -31,7 +31,9 @@ class BalanceService:
         )
         key = None
 
-        operations = operations.filter(status__in=[Operation.PENDING, Operation.ACCEPTED])
+        operations = operations.filter(
+            status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED]
+        )
 
         conversion_factor_name = BalanceService.define_conversion_factor(unit)
 

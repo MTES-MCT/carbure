@@ -149,7 +149,6 @@ class TiruertBalancesTest(TestCase):
         response = self.client.post(reverse("operations-simulate"), query)
         assert response.status_code == 200
         data = response.json()
-        print(data)
         assert len(data) == 2
         assert list(data.keys()) == ["selected_lots", "fun"]
         assert len(data["selected_lots"]) == 2
