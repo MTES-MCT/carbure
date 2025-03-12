@@ -2,14 +2,25 @@ import {
   Stepper as DsfrStepper,
   StepperProps as DsfrStepperProps,
 } from "@codegouvfr/react-dsfr/Stepper"
-import { useState } from "react"
 import styles from "./stepper.module.css"
 import cl from "clsx"
+import { Button } from "../button2"
+import { useStepper } from "./stepper.provider"
+import { useTranslation } from "react-i18next"
 
-type StepperProps = DsfrStepperProps & {
+type AdditionalStepperProps = {
   marginBottom?: boolean
 }
-export const Stepper = ({ marginBottom = false, ...props }: StepperProps) => {
+
+type StepperProps = DsfrStepperProps & AdditionalStepperProps
+
+/**
+ * DSFR stepper with custom style
+ */
+export const BaseStepper = ({
+  marginBottom = false,
+  ...props
+}: StepperProps) => {
   return (
     <DsfrStepper
       {...props}
@@ -18,66 +29,62 @@ export const Stepper = ({ marginBottom = false, ...props }: StepperProps) => {
   )
 }
 
-export type Step<
-  Key extends string,
-  FormType extends Record<string, unknown> | undefined,
-> = {
-  key: Key
-  title: StepperProps["title"]
-  allowNextStep?: (form: FormType) => boolean
+const StepperNextButton = () => {
+  const { goToNextStep, currentStep, nextStep } = useStepper()
+  const { t } = useTranslation()
+
+  if (!nextStep) return null
+
+  return (
+    <Button
+      priority="secondary"
+      onClick={goToNextStep}
+      disabled={
+        currentStep.allowNextStep !== undefined
+          ? !currentStep.allowNextStep
+          : false
+      }
+      iconId="ri-arrow-right-s-line"
+      iconPosition="right"
+    >
+      {t("Suivant")}
+    </Button>
+  )
 }
 
-export const useStepper = <
-  Steps extends Step<string, FormType>[],
-  FormType extends Record<string, unknown> | undefined,
->(
-  steps: Steps,
-  form?: FormType
-) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
-  const currentStep = steps[currentStepIndex]
+const StepperPreviousButton = () => {
+  const { goToPreviousStep, previousStep } = useStepper()
+  const { t } = useTranslation()
 
-  const hasPreviousStep = currentStepIndex > 0
-  const previousStep = hasPreviousStep ? steps[currentStepIndex - 1] : null
-  const hasNextStep = steps.length > currentStepIndex + 1
-  const nextStep = hasNextStep ? steps[currentStepIndex + 1] : null
+  if (!previousStep) return null
 
-  // If a function is provided, it will be called to allow the next step
-  const isNextStepAllowed =
-    form && currentStep?.allowNextStep
-      ? currentStep?.allowNextStep?.(form)
-      : true
-
-  const setStep = (stepKey: Steps[number]["key"]) => {
-    const stepIndex = steps.findIndex((step) => step.key === stepKey)
-    if (stepIndex !== -1) {
-      setCurrentStepIndex(stepIndex)
-    }
-  }
-
-  const goToNextStep = () => {
-    if (hasNextStep) {
-      setCurrentStepIndex(currentStepIndex + 1)
-    }
-  }
-
-  const goToPreviousStep = () => {
-    if (hasPreviousStep) {
-      setCurrentStepIndex(currentStepIndex - 1)
-    }
-  }
-
-  return {
-    currentStep,
-    currentStepIndex: currentStepIndex + 1, // Index displayed in the stepper, starts at 1
-    hasPreviousStep,
-    previousStep,
-    hasNextStep,
-    isNextStepAllowed,
-    nextStep,
-    setStep,
-    goToNextStep,
-    goToPreviousStep,
-    steps,
-  }
+  return (
+    <Button
+      priority="secondary"
+      onClick={goToPreviousStep}
+      iconId="ri-arrow-left-s-line"
+    >
+      {t("Précédent")}
+    </Button>
+  )
 }
+
+/**
+ * Stepper with provider (used to simplify the usage of the stepper)
+ */
+export const Stepper = (props: AdditionalStepperProps) => {
+  const { currentStep, currentStepIndex, steps, nextStep } = useStepper()
+
+  return (
+    <BaseStepper
+      title={currentStep?.title}
+      stepCount={steps.length}
+      currentStep={currentStepIndex}
+      nextTitle={nextStep?.title}
+      {...props}
+    />
+  )
+}
+
+Stepper.Next = StepperNextButton
+Stepper.Previous = StepperPreviousButton

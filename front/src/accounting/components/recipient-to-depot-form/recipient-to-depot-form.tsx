@@ -79,11 +79,10 @@ const showNextStepRecipientToDepotForm = (
 export const recipientToDepotStepKey = "recipient_to_depot"
 type RecipientToDepotStepKey = typeof recipientToDepotStepKey
 
-export const recipientToDepotStep: Step<
-  RecipientToDepotStepKey,
-  RecipientToDepotFormProps
-> = {
+export const recipientToDepotStep: (
+  values: RecipientToDepotFormProps
+) => Step<RecipientToDepotStepKey> = (values) => ({
   key: recipientToDepotStepKey,
   title: i18next.t("Redevable et dépôt destinataire"),
-  allowNextStep: showNextStepRecipientToDepotForm,
-}
+  allowNextStep: showNextStepRecipientToDepotForm(values),
+})

@@ -8,8 +8,7 @@ import { Button } from "common/components/button2"
 import { CessionDialog } from "./cession-dialog"
 import { DevaluationDialog } from "./devaluation-dialog"
 import { ExportationDialog } from "./exportation-dialog"
-import { Balance } from "accounting/types"
-import { OperationType } from "accounting/types"
+import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
 interface DebitOperationDialogProps {
   onClose: () => void

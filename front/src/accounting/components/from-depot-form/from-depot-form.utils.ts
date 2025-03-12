@@ -11,8 +11,10 @@ const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
 export const fromDepotStepKey = "from-depot"
 type FromDepotStepKey = typeof fromDepotStepKey
 
-export const fromDepotStep: Step<FromDepotStepKey, FromDepotFormProps> = {
+export const fromDepotStep: (
+  values: FromDepotFormProps
+) => Step<FromDepotStepKey> = (values) => ({
   key: fromDepotStepKey,
   title: i18next.t("Dépôt d'expédition"),
-  allowNextStep: showNextStepFromDepotForm,
-}
+  allowNextStep: showNextStepFromDepotForm(values),
+})

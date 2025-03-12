@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Stepper, useStepper } from "./stepper"
-import { Button } from "../button2"
+import { Stepper } from "./stepper"
+import { StepperProvider } from "./stepper.provider"
+import { userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<typeof Stepper> = {
   component: Stepper,
@@ -31,39 +32,22 @@ const meta: Meta<typeof Stepper> = {
       },
     ],
   },
-  render: (_, context) => {
-    const {
-      currentStep,
-      currentStepIndex,
-      steps,
-      nextStep,
-      hasPreviousStep,
-      hasNextStep,
-      isNextStepAllowed,
-      goToNextStep,
-      goToPreviousStep,
-    } = useStepper(context.globals.steps)
-
+  decorators: [
+    (Story, context) => {
+      return (
+        <StepperProvider steps={context.globals.steps}>
+          <Story />
+        </StepperProvider>
+      )
+    },
+  ],
+  render: () => {
     return (
       <>
-        <Stepper
-          currentStep={currentStepIndex}
-          stepCount={steps.length}
-          title={currentStep?.title}
-          nextTitle={nextStep?.title}
-          marginBottom
-        />
-        <div>
-          <Button disabled={!hasPreviousStep} onClick={goToPreviousStep}>
-            Précédent
-          </Button>
-          <Button
-            priority="secondary"
-            disabled={!hasNextStep || !isNextStepAllowed}
-            onClick={goToNextStep}
-          >
-            Suivant
-          </Button>
+        <Stepper marginBottom />
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Stepper.Previous />
+          <Stepper.Next />
         </div>
       </>
     )
@@ -82,12 +66,30 @@ export const DisallowedNextStep: Story = {
       {
         key: "step-1",
         title: "Step 1",
-        allowNextStep: () => false,
+        allowNextStep: false,
       },
       {
         key: "step-2",
         title: "Step 2",
       },
     ],
+  },
+  decorators: [
+    (Story, context) => {
+      return (
+        <StepperProvider steps={context.globals.steps}>
+          <Story />
+        </StepperProvider>
+      )
+    },
+  ],
+}
+
+export const Step2: Story = {
+  play: async ({ canvasElement }) => {
+    const { getByRole } = within(canvasElement)
+    const button = await waitFor(() => getByRole("button", { name: "Suivant" }))
+
+    await userEvent.click(button)
   },
 }

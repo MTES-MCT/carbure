@@ -17,8 +17,10 @@ const showNextStepQuantityForm = (values: QuantityFormProps) => {
 export const quantityFormStepKey = "quantity-form"
 type QuantityFormStepKey = typeof quantityFormStepKey
 
-export const quantityFormStep: Step<QuantityFormStepKey, QuantityFormProps> = {
+export const quantityFormStep: (
+  values: QuantityFormProps
+) => Step<QuantityFormStepKey> = (values) => ({
   key: quantityFormStepKey,
   title: i18next.t("Quantité de la cession et tCO2 évitées"),
-  allowNextStep: showNextStepQuantityForm,
-}
+  allowNextStep: showNextStepQuantityForm(values),
+})
