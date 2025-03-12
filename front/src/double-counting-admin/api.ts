@@ -3,7 +3,6 @@ import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import {
   api as apiFetch,
   download as downloadFetch,
-  toFileArray,
 } from "common/services/api-fetch"
 import { AgreementListQuery } from "./types"
 // GLOBAL
@@ -148,6 +147,6 @@ export function getDoubleCountingAgreement(
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   return apiFetch.POST("/double-counting/applications/check-admin-files/", {
     params: { query: { entity_id } },
-    body: { files: toFileArray(files) },
+    body: { files: Array.from(files) },
   })
 }

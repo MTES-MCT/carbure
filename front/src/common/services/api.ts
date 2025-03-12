@@ -36,7 +36,9 @@ export function toFormData(obj: any): FormData {
     if (obj[key] instanceof FileList) {
       Array.from(obj[key]).forEach((value: any) => formData.append(key, value))
     } else if (Array.isArray(obj[key])) {
-      obj[key].forEach((value: any) => formData.append(key, value.toString()))
+      obj[key].forEach((value: any) =>
+        formData.append(key, value instanceof File ? value : value.toString())
+      )
     } else if (!isEmpty(obj[key])) {
       formData.append(key, obj[key])
     }
