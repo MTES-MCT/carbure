@@ -55,6 +55,7 @@ export const CreditTicketSource = ({
             iconId="ri-send-plane-line"
             priority="primary"
             onClick={creditTicketSource}
+            loading={creditSafTicketSource.loading}
           >
             {t("Accepter et créditer")}
           </Button>

@@ -18,6 +18,7 @@ import {
   NavigationButtonsProps,
 } from "common/components/navigation"
 import AcceptAssignment from "./accept-assignment"
+import { useSafRules } from "saf/hooks/useSafRules"
 
 export type TicketDetailsProps = Omit<NavigationButtonsProps, "closeAction">
 
@@ -34,6 +35,7 @@ export const ClientTicketDetails = ({
   const entity = useEntity()
   const match = useHashMatch("ticket/:id")
   const portal = usePortal()
+  const { canUpdateTicket } = useSafRules()
 
   const ticketResponse = useQuery(api.getAirlineTicketDetails, {
     key: "ticket-details",
@@ -75,7 +77,7 @@ export const ClientTicketDetails = ({
                 baseIdsList={baseIdsList}
               />
             )}
-            {ticket?.status === SafTicketStatus.PENDING && (
+            {ticket?.status === SafTicketStatus.PENDING && canUpdateTicket && (
               <>
                 <Button
                   iconId="ri-check-line"

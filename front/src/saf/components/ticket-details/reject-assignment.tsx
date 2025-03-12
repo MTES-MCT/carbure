@@ -74,6 +74,7 @@ export const RejectAssignment = ({
           <Button
             iconId="ri-close-line"
             customPriority="danger"
+            type="submit"
             nativeButtonProps={{
               form: "reject-ticket",
             }}

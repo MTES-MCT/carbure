@@ -61,6 +61,7 @@ export const CancelAssignment = ({
             customPriority="danger"
             onClick={cancelTicket}
             asideX
+            loading={cancelSafTicket.loading}
           >
             {t("Annuler l'affectation")}
           </Button>

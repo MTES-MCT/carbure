@@ -17,15 +17,15 @@ export const VolumeInput = ({
 
   return (
     <NumberInput
+      {...props}
       required
       label={t("Volume ({{volume}} litres disponibles)", {
         count: remainingVolume,
         volume: formatNumber(remainingVolume),
       })}
       max={remainingVolume}
-      min={0}
+      min={1}
       step={0.01}
-      {...props}
       addon={
         <Button onClick={onSetMaximumVolume} priority="primary">
           {t("Maximum")}
