@@ -15,7 +15,7 @@ export const TextInput = ({
     <Input
       {...props}
       nativeInputProps={{
-        value,
+        value: value ?? "",
         onChange: onChange ? (e) => onChange(e.target.value) : undefined,
         autoComplete: autoComplete ? "on" : undefined,
       }}

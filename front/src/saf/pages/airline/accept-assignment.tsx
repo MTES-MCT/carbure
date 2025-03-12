@@ -70,8 +70,8 @@ export const AcceptAssignment = ({
             iconId="ri-check-line"
             customPriority="success"
             disabled={!form.value.ets_status}
+            type="submit"
             nativeButtonProps={{
-              type: "submit",
               form: "accept-ticket",
             }}
           >

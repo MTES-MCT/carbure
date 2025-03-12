@@ -43,13 +43,6 @@ export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
     .then((res) => res.data ?? [])
 }
 
-// export function getSafAirlineTickets(query: SafQuery) {
-//   return api.get<Api<SafTicketsResponse>>("/saf/airline/tickets", {
-//     params: query,
-//   })
-// }
-
-// je récupère bien le nouvel objet de pagination, mais je n'ai plus la liste d'ids dans les résultats
 export function getSafAirlineTickets(query: SafQuery) {
   return apiFetch.GET("/saf/tickets/", {
     params: {
