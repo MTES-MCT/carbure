@@ -71,7 +71,11 @@ export const Operations = ({
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
-      {result?.data?.results && result?.data?.results?.length > 0 ? (
+      {!loading &&
+      result?.data?.results &&
+      result?.data?.results?.length === 0 ? (
+        <NoResult />
+      ) : (
         <Table
           columns={columns}
           rows={result?.data?.results ?? []}
@@ -82,8 +86,6 @@ export const Operations = ({
           })}
           loading={loading}
         />
-      ) : (
-        <NoResult />
       )}
       <Pagination
         defaultPage={query.page}

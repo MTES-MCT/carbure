@@ -1,16 +1,16 @@
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
-import { findDepots } from "carbure/api"
+import { findDepots } from "common/api"
 import {
   normalizeDepot,
   normalizeEntityPreview,
-} from "carbure/utils/normalizers"
+} from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
 import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { findEligibleTiruertEntities } from "./api"
-import useEntity from "carbure/hooks/entity"
-import { Depot, EntityPreview } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { Depot, EntityPreview } from "common/types"
 
 export type RecipientToDepotFormProps = {
   credited_entity?: EntityPreview

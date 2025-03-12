@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { formatUnit, formatUnitOnly } from "common/utils/formatters"
 
 /**

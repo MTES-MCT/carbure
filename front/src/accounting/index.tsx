@@ -13,8 +13,8 @@ import { Operations } from "./pages/operations"
 import { Balances } from "./pages/balances"
 import { useState } from "react"
 import { compact } from "common/utils/collection"
-import useEntity from "carbure/hooks/entity"
-import { UserRole } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { UserRole } from "common/types"
 
 const MaterialAccounting = () => {
   const { t } = useTranslation()

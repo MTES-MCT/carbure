@@ -27,7 +27,7 @@ import {
 } from "accounting/components/recipient-to-depot-form"
 import { simulate, createOperation } from "accounting/api"
 import { useMutation } from "common/hooks/async"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
 import { useNotify } from "common/components/notifications"
 import { useUnit } from "common/hooks/unit"

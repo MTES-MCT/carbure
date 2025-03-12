@@ -1,5 +1,5 @@
-import { findEntities } from "carbure/api"
-import { EntityType } from "carbure/types"
+import { findEntities } from "common/api"
+import { EntityType } from "common/types"
 
 export const findEligibleTiruertEntities = (
   entity_id: number,

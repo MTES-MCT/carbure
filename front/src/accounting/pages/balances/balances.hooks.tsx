@@ -13,9 +13,9 @@ import * as api from "./api"
 import { formatSector } from "accounting/utils/formatters"
 import { OperationsStatus } from "accounting/types"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import { UserRole } from "carbure/types"
+import { UserRole } from "common/types"
 
 export const useBalancesColumns = () => {
   const { t } = useTranslation()

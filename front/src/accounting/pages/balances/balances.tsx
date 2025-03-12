@@ -1,6 +1,6 @@
 import { useQuery } from "common/hooks/async"
 import * as api from "./api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useBalancesColumns, useGetFilterOptions } from "./balances.hooks"
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
@@ -31,7 +31,7 @@ export const Balances = () => {
 
   const query = useCBQueryBuilder<[], OperationsStatus[], undefined>(state)
 
-  const { result } = useQuery(api.getBalances, {
+  const { result, loading } = useQuery(api.getBalances, {
     key: "balances",
     params: [query],
   })
@@ -46,7 +46,11 @@ export const Balances = () => {
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
-      <Table columns={columns} rows={result?.data?.results ?? []} />
+      <Table
+        columns={columns}
+        rows={result?.data?.results ?? []}
+        loading={loading}
+      />
       <Pagination
         defaultPage={query.page}
         total={result?.data?.count ?? 0}
