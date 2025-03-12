@@ -28,7 +28,7 @@ export const RecapOperation = ({ balance }: RecapOperationProps) => {
         description={balance.biofuel ? balance.biofuel.code : ""}
       />
       <OperationText
-        title={t("Solde disponible en {{biofuel}}", {
+        title={t("Solde disponible {{biofuel}}", {
           biofuel: balance.biofuel?.code,
         })}
         description={

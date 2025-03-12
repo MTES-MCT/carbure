@@ -1,4 +1,4 @@
-import { Balance } from "accounting/types"
+import { Balance, CreateOperationType } from "accounting/types"
 import { useFormContext } from "common/components/form2"
 import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
@@ -12,10 +12,15 @@ import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
+import {
+  getQuantityInputLabel,
+  getQuantitySummaryTitle,
+} from "./quantity-form.utils"
 
 type QuantityFormComponentProps = {
   balance: Balance
   depot_quantity_max?: number
+  type: CreateOperationType
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
@@ -24,6 +29,7 @@ const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 export const QuantityForm = ({
   balance,
   depot_quantity_max,
+  type,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -62,7 +68,7 @@ export const QuantityForm = ({
   return (
     <>
       <NumberInput
-        label={`${t("Saisir une quantité pour la cession")} (${unit.toLocaleUpperCase()})`}
+        label={`${getQuantityInputLabel(type)} (${unit.toLocaleUpperCase()})`}
         max={depot_quantity_max}
         {...bind("quantity")}
         addon={
@@ -124,7 +130,13 @@ export const QuantityForm = ({
   )
 }
 
-export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
+export const QuantitySummary = ({
+  values,
+  type,
+}: {
+  values: QuantityFormProps
+  type: CreateOperationType
+}) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   if (!values.quantity || !values.avoided_emissions) {
@@ -134,7 +146,7 @@ export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
   return (
     <Grid>
       <OperationText
-        title={t("Quantité de la cession")}
+        title={getQuantitySummaryTitle(type)}
         description={formatUnit(values.quantity, 0)}
       />
       <OperationText

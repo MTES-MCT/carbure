@@ -48,7 +48,7 @@
   "Réaliser une cession": "Perform a transfer",
   "Précédent": "Previous",
   "Suivant": "Next",
-  "Solde disponible en {{biofuel}}": "Available balance in {{biofuel}}",
+  "Solde disponible {{biofuel}}": "Available balance {{biofuel}}",
   "Sélectionnez un dépôt d'expédition": "Select a shipping depot",
   "Rechercher un dépôt": "Search for a deposit",
   "{{depot}} ({{quantity}} disponibles)": "{{depot}} ({{quantity}} available)",

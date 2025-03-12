@@ -41,7 +41,9 @@ export const DebitOperationDialog = ({
         portal((close) => <DevaluationDialog onClose={close} />)
         break
       case OperationType.EXPORTATION:
-        portal((close) => <ExportationDialog onClose={close} />)
+        portal((close) => (
+          <ExportationDialog onClose={close} balance={balance} />
+        ))
         break
     }
   }

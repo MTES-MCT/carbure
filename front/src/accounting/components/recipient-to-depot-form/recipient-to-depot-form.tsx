@@ -45,8 +45,10 @@ export const RecipientToDepotForm = () => {
 
 export const RecipientToDepotSummary = ({
   values,
+  children,
 }: {
   values: RecipientToDepotFormProps
+  children?: React.ReactNode
 }) => {
   const { t } = useTranslation()
 
@@ -66,11 +68,12 @@ export const RecipientToDepotSummary = ({
           description={values.to_depot?.name ?? ""}
         />
       )}
+      {children}
     </Grid>
   )
 }
 
-const showNextStepRecipientToDepotForm = (
+export const showNextStepRecipientToDepotForm = (
   values: RecipientToDepotFormProps
 ) => {
   return Boolean(values.credited_entity)

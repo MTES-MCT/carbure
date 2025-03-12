@@ -87,6 +87,10 @@ export const LoaderOverlay = () => (
   </Overlay>
 )
 
+export const Box = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={cl(css.box, props.className)} />
+)
+
 export interface Layout {
   asideX?: boolean
   asideY?: boolean

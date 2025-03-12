@@ -48,7 +48,7 @@
   "Réaliser une cession": "Réaliser une cession",
   "Précédent": "Précédent",
   "Suivant": "Suivant",
-  "Solde disponible en {{biofuel}}": "Solde disponible en {{biofuel}}",
+  "Solde disponible {{biofuel}}": "Solde disponible {{biofuel}}",
   "Sélectionnez un dépôt d'expédition": "Sélectionnez un dépôt d'expédition",
   "Rechercher un dépôt": "Rechercher un dépôt",
   "{{depot}} ({{quantity}} disponibles)": "{{depot}} ({{quantity}} disponibles)",

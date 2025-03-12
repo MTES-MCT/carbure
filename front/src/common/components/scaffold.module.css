@@ -184,3 +184,11 @@ hr {
 [data-spread] {
   flex: 1;
 }
+
+.box {
+  border: 1px solid var(--border-default-grey);
+  padding: var(--spacing-4w);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3w);
+}
