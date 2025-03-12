@@ -10,12 +10,13 @@ import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
   PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
-  TypeDefEnum as CreateOperationType,
+  TypeC47Enum as CreateOperationType,
+  PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
 } from "api-schema"
 
 // Type definitions
 export type Operation = apiTypes["OperationList"]
-
+export type Balance = apiTypes["Balance"]
 export interface OperationsQuery
   extends CBQueryParams<[], OperationsStatus[], string[]> {
   [OperationsFilter.status]?: OperationsStatus[]
@@ -36,4 +37,5 @@ export {
   OperationsFilter,
   OperationDebitOrCredit,
   OperationBiofuelCategory,
+  BalancesGroupBy,
 }

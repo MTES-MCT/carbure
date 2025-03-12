@@ -8,8 +8,8 @@ const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
   )
 }
 
-const fromDepotStepKey = "from-depot"
-export type FromDepotStepKey = typeof fromDepotStepKey
+export const fromDepotStepKey = "from-depot"
+type FromDepotStepKey = typeof fromDepotStepKey
 
 export const fromDepotStep: Step<FromDepotStepKey, FromDepotFormProps> = {
   key: fromDepotStepKey,

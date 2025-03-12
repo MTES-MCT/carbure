@@ -3109,6 +3109,11 @@ paths:
             type: boolean
           description: Only show enabled entities
         - in: query
+          name: is_tiruert_liable
+          schema:
+            type: boolean
+          description: Only show liable entities
+        - in: query
           name: query
           schema:
             type: string
@@ -4680,6 +4685,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -4690,6 +4696,7 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
         - name: page
           required: false
@@ -5021,11 +5028,74 @@ paths:
               schema:
                 status: accepted
           description: Success message
+        "400":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_TYPE_NOT_ALLOWED
+          description: Error message
         "404":
           content:
             application/json:
               schema:
-                error: Operation not found
+                error: OPERATION_NOT_FOUND
+          description: Error message
+  /api/tiruert/operations/{id}/correct/:
+    post:
+      operationId: correct_operation
+      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+        remove
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - kg
+              - l
+              - mj
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationCorrectionRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/OperationCorrectionRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/OperationCorrectionRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: corected
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: NOT_ENOUGH_VOLUME
           description: Error message
   /api/tiruert/operations/{id}/reject/:
     post:
@@ -5069,7 +5139,7 @@ paths:
           content:
             application/json:
               schema:
-                error: Operation not found
+                error: OPERATION_NOT_FOUND
           description: Error message
   /api/tiruert/operations/balance/:
     get:
@@ -5153,6 +5223,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -5163,6 +5234,7 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
         - name: page
           required: false
@@ -5319,6 +5391,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -5329,6 +5402,7 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: period
@@ -5496,6 +5570,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -5506,6 +5581,7 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: period
@@ -5674,9 +5750,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/SimulationMinMaxOutput"
           description: ""
-  /api/tiruert/operations/teneur/validate/:
+  /api/tiruert/operations/teneur/declare/:
     post:
-      operationId: validate_teneur
+      operationId: declare_teneur
       description: Set teneur operations to ACCEPTED
       parameters:
         - in: query
@@ -5710,7 +5786,7 @@ paths:
           content:
             application/json:
               schema:
-                error: NOTHING_TO_VALIDATE
+                error: NOTHING_TO_DECLARE
           description: Error message
   /api/user/:
     get:
@@ -8217,6 +8293,14 @@ components:
         - to_depot
         - type
         - unit
+    OperationCorrectionRequest:
+      type: object
+      properties:
+        correction_volume:
+          type: number
+          format: double
+      required:
+        - correction_volume
     OperationDepot:
       type: object
       properties:
@@ -8254,7 +8338,7 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/TypeDefEnum"
+          $ref: "#/components/schemas/TypeC47Enum"
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
@@ -8493,7 +8577,7 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/TypeDefEnum"
+          $ref: "#/components/schemas/TypeC47Enum"
         customs_category:
           $ref: "#/components/schemas/CustomsCategoryEnum"
         biofuel:
@@ -9891,7 +9975,7 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
-    TypeDefEnum:
+    TypeC47Enum:
       enum:
         - INCORPORATION
         - CESSION
@@ -9900,6 +9984,7 @@ components:
         - MAC_BIO
         - EXPORTATION
         - DEVALUATION
+        - CUSTOMS_CORRECTION
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -9909,6 +9994,7 @@ components:
         * `MAC_BIO` - MAC_BIO
         * `EXPORTATION` - EXPORTATION
         * `DEVALUATION` - DEVALUATION
+        * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
     UnitRequest:
       type: object
       properties:

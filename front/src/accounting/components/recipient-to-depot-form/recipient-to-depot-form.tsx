@@ -76,14 +76,14 @@ const showNextStepRecipientToDepotForm = (
   return Boolean(values.credited_entity)
 }
 
-const RecipientToDepotStepKey = "recipient_to_depot"
-export type RecipientToDepotStepKey = typeof RecipientToDepotStepKey
+export const recipientToDepotStepKey = "recipient_to_depot"
+type RecipientToDepotStepKey = typeof recipientToDepotStepKey
 
 export const recipientToDepotStep: Step<
   RecipientToDepotStepKey,
   RecipientToDepotFormProps
 > = {
-  key: RecipientToDepotStepKey,
+  key: recipientToDepotStepKey,
   title: i18next.t("Redevable et dépôt destinataire"),
   allowNextStep: showNextStepRecipientToDepotForm,
 }

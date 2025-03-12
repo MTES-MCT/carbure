@@ -1,5 +1,6 @@
 import { api } from "common/services/api-fetch"
-import { Balance, BalancesFilter, BalancesQuery } from "./types"
+import { BalancesFilter, BalancesQuery } from "./types"
+import { Balance } from "accounting/types"
 
 export const getBalances = (query: BalancesQuery) => {
   return api

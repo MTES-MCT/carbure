@@ -1,4 +1,4 @@
-import { Balance } from "accounting/pages/balances/types"
+import { Balance } from "accounting/types"
 import { useFormContext } from "common/components/form2"
 import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"

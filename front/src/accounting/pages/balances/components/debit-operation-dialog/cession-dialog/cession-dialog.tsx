@@ -1,36 +1,37 @@
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
-import { Grid, Main } from "common/components/scaffold"
-import { Balance } from "accounting/pages/balances/types"
-import { OperationText } from "accounting/components/operation-text"
+import { Main } from "common/components/scaffold"
+import { Balance, CreateOperationType } from "accounting/types"
 import { Trans, useTranslation } from "react-i18next"
-import { formatSector } from "accounting/utils/formatters"
 import { Stepper, useStepper } from "common/components/stepper"
 import {
   FromDepotForm,
   FromDepotSummary,
   fromDepotStep,
+  fromDepotStepKey,
 } from "accounting/components/from-depot-form"
 import styles from "./cession-dialog.module.css"
 import { useForm, Form } from "common/components/form2"
-import { CessionStepKey, SessionDialogForm } from "./cession-dialog.types"
+import { SessionDialogForm } from "./cession-dialog.types"
 import { Button } from "common/components/button2"
 import {
   QuantityForm,
   QuantitySummary,
   quantityFormStep,
+  quantityFormStepKey,
 } from "accounting/components/quantity-form"
 import {
   RecipientToDepotForm,
   recipientToDepotStep,
+  recipientToDepotStepKey,
   RecipientToDepotSummary,
 } from "accounting/components/recipient-to-depot-form"
 import { simulate, createOperation } from "accounting/api"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { CreateOperationType } from "accounting/types"
 import { useNotify } from "common/components/notifications"
 import { useUnit } from "common/hooks/unit"
+import { RecapOperation } from "accounting/components/recap-operation"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -64,7 +65,7 @@ export const CessionDialog = ({
       quantityFormStep,
       recipientToDepotStep,
       {
-        key: CessionStepKey.Recap,
+        key: "recap",
         title: t("Récapitulatif"),
       },
     ],
@@ -152,7 +153,7 @@ export const CessionDialog = ({
                 {t("Suivant")}
               </Button>
             )}
-            {currentStep?.key === CessionStepKey.Recap && (
+            {currentStep?.key === "recap" && (
               <Button
                 priority="primary"
                 onClick={() => mutation.execute()}
@@ -171,48 +172,25 @@ export const CessionDialog = ({
             currentStep={currentStepIndex}
             nextTitle={nextStep?.title}
           />
-          <Grid>
-            <OperationText
-              title={t("Filière")}
-              description={formatSector(balance.sector)}
-            />
-            <OperationText
-              title={t("Catégorie")}
-              description={balance.customs_category ?? ""}
-            />
-            <OperationText
-              title={t("Biocarburant")}
-              description={balance.biofuel ? balance.biofuel.code : ""}
-            />
-            <OperationText
-              title={t("Solde disponible en {{biofuel}}", {
-                biofuel: balance.biofuel?.code,
-              })}
-              description={
-                balance.available_balance
-                  ? formatUnit(balance.available_balance, 0)
-                  : ""
-              }
-            />
-          </Grid>
+          <RecapOperation balance={balance} />
           {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
           {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
           {currentStepIndex > 3 && form.value.credited_entity && (
             <RecipientToDepotSummary values={form.value} />
           )}
-          {currentStep?.key !== CessionStepKey.Recap && (
+          {currentStep?.key !== "recap" && (
             <div className={styles["cession-dialog__form"]}>
               <Form form={form}>
-                {currentStep?.key === CessionStepKey.FromDepot && (
+                {currentStep?.key === fromDepotStepKey && (
                   <FromDepotForm balance={balance} />
                 )}
-                {currentStep?.key === CessionStepKey.Quantity && (
+                {currentStep?.key === quantityFormStepKey && (
                   <QuantityForm
                     balance={balance}
                     depot_quantity_max={form.value.from_depot?.quantity.credit}
                   />
                 )}
-                {currentStep?.key === CessionStepKey.ToDepot && (
+                {currentStep?.key === recipientToDepotStepKey && (
                   <RecipientToDepotForm />
                 )}
               </Form>

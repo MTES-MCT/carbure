@@ -35,8 +35,8 @@ export const useStepper = <
   form?: FormType
 ) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
-
   const currentStep = steps[currentStepIndex]
+
   const hasPreviousStep = currentStepIndex > 0
   const previousStep = hasPreviousStep ? steps[currentStepIndex - 1] : null
   const hasNextStep = steps.length > currentStepIndex + 1

@@ -1,5 +1,8 @@
-import { BalancesGroupBy } from "accounting/pages/balances/types"
-import { OperationBiofuelCategory, OperationSector } from "accounting/types"
+import {
+  BalancesGroupBy,
+  OperationBiofuelCategory,
+  OperationSector,
+} from "accounting/types"
 
 import { api } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"

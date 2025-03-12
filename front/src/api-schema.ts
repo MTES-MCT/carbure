@@ -1557,6 +1557,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/operations/{id}/correct/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or remove */
+    post: operations["correct_operation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/operations/{id}/reject/": {
     parameters: {
       query?: never
@@ -1659,7 +1676,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/tiruert/operations/teneur/validate/": {
+  "/api/tiruert/operations/teneur/declare/": {
     parameters: {
       query?: never
       header?: never
@@ -1669,7 +1686,7 @@ export interface paths {
     get?: never
     put?: never
     /** @description Set teneur operations to ACCEPTED */
-    post: operations["validate_teneur"]
+    post: operations["declare_teneur"]
     delete?: never
     options?: never
     head?: never
@@ -2675,6 +2692,10 @@ export interface components {
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
+    OperationCorrectionRequest: {
+      /** Format: double */
+      correction_volume: number
+    }
     OperationDepot: {
       id: number
       name: string
@@ -2691,7 +2712,7 @@ export interface components {
       name: string
     }
     OperationInputRequest: {
-      type: components["schemas"]["TypeDefEnum"]
+      type: components["schemas"]["TypeC47Enum"]
       customs_category: components["schemas"]["CustomsCategoryEnum"]
       biofuel: number | null
       credited_entity?: number | null
@@ -2813,7 +2834,7 @@ export interface components {
       results: components["schemas"]["SafTicketSource"][]
     }
     PatchedOperationUpdateRequest: {
-      type?: components["schemas"]["TypeDefEnum"]
+      type?: components["schemas"]["TypeC47Enum"]
       customs_category?: components["schemas"]["CustomsCategoryEnum"]
       biofuel?: number | null
       credited_entity?: number | null
@@ -3360,9 +3381,10 @@ export interface components {
      *     * `MAC_BIO` - MAC_BIO
      *     * `EXPORTATION` - EXPORTATION
      *     * `DEVALUATION` - DEVALUATION
+     *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
      * @enum {string}
      */
-    TypeDefEnum: TypeDefEnum
+    TypeC47Enum: TypeC47Enum
     UnitRequest: {
       /** @default l */
       unit: components["schemas"]["PreferredUnitEnum"]
@@ -5919,6 +5941,8 @@ export interface operations {
         entity_type?: string[]
         /** @description Only show enabled entities */
         is_enabled?: boolean
+        /** @description Only show liable entities */
+        is_tiruert_liable?: boolean
         /** @description Search within the field `name` */
         query?: string
       }
@@ -6936,6 +6960,58 @@ export interface operations {
         }
       }
       /** @description Error message */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  correct_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationCorrectionRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationCorrectionRequest"]
+        "multipart/form-data": components["schemas"]["OperationCorrectionRequest"]
+      }
+    }
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
       404: {
         headers: {
           [name: string]: unknown
@@ -7165,7 +7241,7 @@ export interface operations {
       }
     }
   }
-  validate_teneur: {
+  declare_teneur: {
     parameters: {
       query: {
         /** @description Authorised entity ID. */
@@ -7327,6 +7403,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   MAC_BIO = "MAC_BIO",
   EXPORTATION = "EXPORTATION",
   DEVALUATION = "DEVALUATION",
+  CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
   ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
@@ -7514,7 +7591,7 @@ export enum TransportDocumentTypeEnum {
   DSP = "DSP",
   OTHER = "OTHER",
 }
-export enum TypeDefEnum {
+export enum TypeC47Enum {
   INCORPORATION = "INCORPORATION",
   CESSION = "CESSION",
   TENEUR = "TENEUR",
@@ -7522,6 +7599,7 @@ export enum TypeDefEnum {
   MAC_BIO = "MAC_BIO",
   EXPORTATION = "EXPORTATION",
   DEVALUATION = "DEVALUATION",
+  CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
 }
 export enum UserRightsRequestsStatusEnum {
   Pending = "PENDING",
