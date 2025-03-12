@@ -1,13 +1,11 @@
 import {
   FromDepotForm,
-  FromDepotFormProps,
   fromDepotStep,
   fromDepotStepKey,
   FromDepotSummary,
 } from "accounting/components/from-depot-form"
 import {
   QuantityForm,
-  QuantityFormProps,
   quantityFormStep,
   quantityFormStepKey,
   QuantitySummary,
@@ -22,18 +20,17 @@ import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
 import { Trans, useTranslation } from "react-i18next"
 import {
   CountryForm,
-  CountryFormProps,
   countryFormStep,
   countryFormStepKey,
   CountryFormSummary,
 } from "./country-form"
 import { Button } from "common/components/button2"
+import { ExportationDialogForm } from "./exportation-dialog.types"
+import { useExportationDialog } from "./exportation-dialog.hooks"
 
-type ExportationDialogForm = FromDepotFormProps &
-  QuantityFormProps &
-  CountryFormProps
 interface ExportationDialogProps {
   onClose: () => void
+  onOperationCreated: () => void
   balance: Balance
 }
 interface ExportationDialogContentProps extends ExportationDialogProps {
@@ -44,9 +41,17 @@ export const ExportationDialogContent = ({
   onClose,
   form,
   balance,
+  onOperationCreated,
 }: ExportationDialogContentProps) => {
   const { currentStep, currentStepIndex } = useStepper()
   const { t } = useTranslation()
+
+  const mutation = useExportationDialog({
+    balance,
+    values: form.value,
+    onClose,
+    onOperationCreated,
+  })
   return (
     <Portal>
       <Dialog
@@ -62,7 +67,11 @@ export const ExportationDialogContent = ({
             <Stepper.Previous />
             <Stepper.Next />
             {currentStep?.key === "recap" && (
-              <Button priority="primary" onClick={() => {}}>
+              <Button
+                priority="primary"
+                onClick={() => mutation.execute()}
+                loading={mutation.loading}
+              >
                 {t("Déclarer une exportation")}
               </Button>
             )}
