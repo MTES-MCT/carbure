@@ -6,6 +6,10 @@ declare module "@codegouvfr/react-dsfr/spa" {
     Link: typeof Link
   }
 }
+
+// Don't known why but in some cases, the default color scheme is not applied
+window.localStorage.setItem("scheme", "light")
+
 startReactDsfr({
   defaultColorScheme: "light",
   Link: Link,

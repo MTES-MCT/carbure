@@ -17,8 +17,6 @@ import { RevokeUserButton } from "./revoke-user-button"
 import { RejectUserButton } from "./reject-user-button"
 import { useState } from "react"
 import { AddUserDialog, AddUserDialogProps } from "./add-user-dialog"
-import useEntity from "common/hooks/entity"
-import { ExtAdminPagesEnum } from "api-schema"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
@@ -67,16 +65,10 @@ export const UserRightsTable = ({
   onInputChange,
   onAddNewUser,
 }: EntityUserRightsProps) => {
-  const entity = useEntity()
   const { t } = useTranslation()
   const [query, setQuery] = useState<string>("")
   const portal = usePortal()
 
-  const canEditOrDelete =
-    entity.isExternal &&
-    (entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
-      entity.hasAdminRight(ExtAdminPagesEnum.ELEC) ||
-      entity.hasAdminRight(ExtAdminPagesEnum.DCA))
   const displaySearchInput =
     isSearchable && (query.length > 0 || rights.length > 0)
   // Pass all the request as parameter to let the parent do anything
@@ -170,13 +162,12 @@ export const UserRightsTable = ({
             !readOnly &&
               actionColumn<UserRightRequest>((request) =>
                 compact([
-                  request.status === UserRightStatus.Accepted &&
-                    canEditOrDelete && (
-                      <ChangeUserRoleButton
-                        request={request}
-                        onChangeUserRole={handleChangeUserRole(request)}
-                      />
-                    ),
+                  request.status === UserRightStatus.Accepted && (
+                    <ChangeUserRoleButton
+                      request={request}
+                      onChangeUserRole={handleChangeUserRole(request)}
+                    />
+                  ),
                   request.status !== UserRightStatus.Accepted && (
                     <AcceptUserButton
                       onAcceptUser={() => onAcceptUser(request)}
@@ -189,13 +180,12 @@ export const UserRightsTable = ({
                       request={request}
                     />
                   ),
-                  request.status === UserRightStatus.Accepted &&
-                    canEditOrDelete && (
-                      <RevokeUserButton
-                        onRevokeUser={() => onRevokeUser(request)}
-                        request={request}
-                      />
-                    ),
+                  request.status === UserRightStatus.Accepted && (
+                    <RevokeUserButton
+                      onRevokeUser={() => onRevokeUser(request)}
+                      request={request}
+                    />
+                  ),
                 ])
               ),
           ])}

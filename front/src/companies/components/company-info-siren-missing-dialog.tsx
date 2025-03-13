@@ -85,17 +85,17 @@ export const CompanyInfoMissingSirenDialog = ({
                 )}
                 {!entity.sustainability_officer && (
                   <li>
-                    <Trans>Nom du responsable durabilité</Trans>
+                    <Trans>Nom du contact Carbure</Trans>
                   </li>
                 )}
                 {!entity.sustainability_officer_email && (
                   <li>
-                    <Trans>Email du responsable durabilité</Trans>
+                    <Trans>Email du contact Carbure</Trans>
                   </li>
                 )}
                 {!entity.sustainability_officer_phone_number && (
                   <li>
-                    <Trans>Téléphone du responsable durabilité</Trans>
+                    <Trans>Téléphone du contact Carbure</Trans>
                   </li>
                 )}
                 {!entity.activity_description && (
