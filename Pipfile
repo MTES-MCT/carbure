@@ -43,7 +43,10 @@ drf-nested-routers = "*"
 undetected-chromedriver = "*"
 setuptools = "*"
 psutil = "*"
+scipy = "*"
 django-simple-history = "*"
+scikit-learn = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 django-stubs = "*"

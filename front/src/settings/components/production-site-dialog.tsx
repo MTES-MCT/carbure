@@ -57,7 +57,7 @@ type ProductionSiteDialogProps = {
   productionSite?: ProductionSiteDetails
   readOnly?: boolean
   onClose?: () => void
-  dispolayFormOnly?: boolean
+  displayFormOnly?: boolean
 }
 
 export const ProductionSiteDialog = ({
@@ -66,11 +66,11 @@ export const ProductionSiteDialog = ({
   productionSite,
   readOnly,
   onClose,
-  dispolayFormOnly,
+  displayFormOnly,
 }: ProductionSiteDialogProps) => {
   return (
     <Dialog onClose={() => onClose && onClose()}>
-      {!dispolayFormOnly && (
+      {!displayFormOnly && (
         <header>
           <h1>{title}</h1>
         </header>

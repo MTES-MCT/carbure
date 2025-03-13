@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "transactions",
     "elec",
     "simple_history",
+    "tiruert",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -118,6 +119,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "carbure.middlewares.logging.LoggingMiddleware",
     "carbure.middlewares.exception.ExceptionMiddleware",
+    "carbure.middlewares.entity.EntityMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
@@ -146,15 +148,18 @@ WSGI_APPLICATION = "carbure.wsgi.application"
 # id = models.AutoField(primary_key=True)
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+# replace Scalingo's DATABASE_URL options
+os.environ["DATABASE_URL"] = os.environ["DATABASE_URL"].replace("useSSL=true&verifyServerCertificate=false", "ssl=true")
+
 # Load db setup from DATABASE_URL env variable
 DATABASES = {"default": env.db()}
 
 DATABASES["default"]["OPTIONS"] = {
+    **DATABASES["default"].get("OPTIONS", {}),
     "charset": "utf8mb4",
 }
 
 if env("TEST") == 1:
-    print("DB TESTING MODE")
     DATABASES["default"]["OPTIONS"] = {
         **DATABASES["default"]["OPTIONS"],
         "auth_plugin": "mysql_native_password",
@@ -318,6 +323,8 @@ CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
 CSP_FRAME_SRC = CSP_DEFAULT_SRC
 
 CSP_IMG_SRC = CSP_DEFAULT_SRC + ("https://*.tile.openstreetmap.org/",)
+
+CSP_STYLE_SRC = ("'self'",)
 
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 

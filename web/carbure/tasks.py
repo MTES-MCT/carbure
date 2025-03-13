@@ -20,6 +20,7 @@ from ml.scripts.calc_ml_score import calc_ml_score
 from ml.scripts.load_data import load_ml_data
 from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 from saf.scripts.link_dgac_to_airlines import link_dgac_to_airlines
+from tiruert.models.operation import create_tiruert_operations_from_lots
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
 
 
@@ -36,6 +37,11 @@ def background_bulk_scoring(lots: QuerySet, prefetched_data: dict | None = None)
 @db_task()
 def background_create_ticket_sources_from_lots(lots: QuerySet) -> None:
     create_ticket_sources_from_lots(lots)
+
+
+@db_task()
+def background_create_tiruert_operations_from_lots(lots: QuerySet) -> None:
+    create_tiruert_operations_from_lots(lots)
 
 
 if env.get("IMAGE_TAG") == "prod":

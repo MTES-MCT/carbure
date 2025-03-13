@@ -5,6 +5,7 @@
   cursor: pointer;
   text-align: left;
   white-space: pre-wrap;
+  position: relative;
   /* white-space: nowrap; */
 }
 

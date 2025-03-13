@@ -16,6 +16,7 @@ import { useNotify } from "common/components/notifications"
 import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { ExtAdminPagesEnum } from "api-schema"
 
 const Entities = () => {
   const { t } = useTranslation()
@@ -39,6 +40,11 @@ const EntityList = () => {
   const entity = useEntity()
 
   const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
+  const canAdd =
+    entity.isAdmin ||
+    entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
+    entity.hasAdminRight(ExtAdminPagesEnum.ELEC) ||
+    entity.hasAdminRight(ExtAdminPagesEnum.DCA)
 
   const handleEntityAdded = (name: string) => {
     notify(
@@ -71,13 +77,15 @@ const EntityList = () => {
               },
             ])}
           />
-          <Button
-            asideX
-            variant="primary"
-            icon={Plus}
-            label={t("Ajouter une société")}
-            action={showEntityDialog}
-          />
+          {canAdd && (
+            <Button
+              asideX
+              variant="primary"
+              icon={Plus}
+              label={t("Ajouter une société")}
+              action={showEntityDialog}
+            />
+          )}
         </section>
       </header>
 

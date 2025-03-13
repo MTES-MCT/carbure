@@ -44,6 +44,7 @@ class AirportSerializer(serializers.ModelSerializer):
             "address",
             "postal_code",
             "gps_coordinates",
+            "is_ue_airport",
         ]
 
 

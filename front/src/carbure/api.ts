@@ -30,12 +30,21 @@ export async function findBiofuels(query: string) {
   return res.data ?? []
 }
 
-export async function findCountries(query: string) {
+export async function findCountries(
+  query: string,
+  options?: { exclude_france?: boolean }
+) {
   const res = await apiFetch.GET("/resources/countries", {
-    params: { query: { query } },
+    params: { query: { query, ...options } },
   })
 
-  return res.data ?? []
+  let data = res.data ?? []
+
+  if (options?.exclude_france) {
+    data = data.filter((country) => country.code_pays !== "FR") ?? []
+  }
+
+  return data
 }
 
 export async function findEntities(

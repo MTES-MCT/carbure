@@ -46,7 +46,6 @@ export const ShowMore = ({
       if (!hiddenElementsRef?.current?.children) return -1
 
       let totalWidth = defaultWidth
-
       // Check how many items can be displayed in the container
       const firstOverflowIndex = Array.from(
         hiddenElementsRef?.current?.children
@@ -63,7 +62,6 @@ export const ShowMore = ({
         totalWidth += widthWithGap
         return overflow
       })
-
       return firstOverflowIndex
     }
 
@@ -82,6 +80,8 @@ export const ShowMore = ({
 
     if (firstOverflowIndex !== -1) {
       _setVisibleItems(children.slice(0, firstOverflowIndex))
+    } else {
+      _setVisibleItems(children)
     }
   }, [getFirstOverflowIndex, _setVisibleItems, children])
 
@@ -101,8 +101,10 @@ export const ShowMore = ({
     resizeObserver.observe(hiddenElementsRef.current)
     resizeObserver.observe(showMoreButtonRef.current)
 
+    window.addEventListener("resize", setVisibleItems)
     return () => {
       resizeObserver.disconnect()
+      window.removeEventListener("resize", setVisibleItems)
     }
   }, [setVisibleItems])
 

@@ -6,8 +6,9 @@ import {
   UserRightsRequestsStatusEnum as UserRightStatus,
   RoleEnum as UserRole,
   ExtAdminPagesEnum as ExternalAdminPages,
-  TypeEnum as NotificationType,
+  CarbureNotificationTypeEnum as NotificationType,
   OwnershipTypeEnum as OwnershipType,
+  PathsApiTiruertOperationsGetParametersQueryCustoms_category as CategoryEnum,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
@@ -75,3 +76,5 @@ export { ExternalAdminPages }
 export { NotificationType }
 
 export { OwnershipType }
+
+export { CategoryEnum }

@@ -32,6 +32,9 @@ export function useEntityManager(
   const entity = entityRights?.entity
   const type = entity?.entity_type
 
+  const canTrade =
+    type === EntityType.Trader || !!entity?.has_stocks || !!entity?.has_trading
+
   return {
     id: entityID,
     name: entity?.name ?? "",
@@ -68,7 +71,7 @@ export function useEntityManager(
     isTrader: type === EntityType.Trader,
     isCPO: type === EntityType.CPO,
     isIndustry: isIndustry(type),
-    canTrade: !!entity?.has_stocks || !!entity?.has_trading,
+    canTrade: canTrade,
     website: entity?.website ?? "",
     vat_number: entity?.vat_number ?? "",
 
