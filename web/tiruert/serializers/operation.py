@@ -41,7 +41,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
         return instance.sector
 
     def get_volume_l(self, instance) -> float:
-        return sum(detail.volume for detail in instance.details.all())
+        return instance.volume
 
     def get_quantity(self, instance) -> float:
         volume = self.get_volume_l(instance)

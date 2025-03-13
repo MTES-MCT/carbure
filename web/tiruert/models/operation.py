@@ -5,6 +5,11 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation_detail import OperationDetail
 
 
+class OperationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("details", "biofuel")
+
+
 class Operation(models.Model):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"  # Acquisition
@@ -61,6 +66,8 @@ class Operation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
+
+    objects = OperationManager()
 
     @property
     def sector(self):
