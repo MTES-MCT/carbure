@@ -111,7 +111,7 @@ class Command(BaseCommand):
 
         for _, row in grouped_df.iterrows():
             siren = row["SIREN Redevable"]
-            depot_accise = str(row["N Accise Redevable"])[:8]  # keep only the first 8 characters
+            depot_customs_id = str(row["N Accise Redevable"])[5:8]  # keep only 3 characters
             fuel_nomenclature = row["Nomenclature combinee"]
             period = f"{row['Année de MAC']}{int(row['Mois de MAC']):02d}"  # YYYYMM
             volume = row["Nombre d'unite"] * 100  # convert hL to L
@@ -119,7 +119,7 @@ class Command(BaseCommand):
             mac_rows.append(
                 {
                     "siren": str(siren),
-                    "depot_accise": str(depot_accise),
+                    "depot_customs_id": str(depot_customs_id),
                     "fuel_nomenclature": int(fuel_nomenclature),
                     "period": int(period),
                     "volume": int(volume),
@@ -162,18 +162,18 @@ class Command(BaseCommand):
                     errors.add(f"Multiple entities with SIREN {row['siren']} found")
 
             # Consolidate depot
-            if row["depot_accise"] in not_found_depots:
+            if row["depot_customs_id"] in not_found_depots:
                 depot = None
-                errors.add(f"{row["siren"]} - Depot with accise number {row['depot_accise']} doesn't exist")
-            elif row["depot_accise"] in depot_cache:
-                depot = depot_cache[row["depot_accise"]]
+                errors.add(f"{row["siren"]} - Depot with accise number {row['depot_customs_id']} doesn't exist")
+            elif row["depot_customs_id"] in depot_cache:
+                depot = depot_cache[row["depot_customs_id"]]
             else:
                 try:
-                    depot = Depot.objects.get(accise=row["depot_accise"])
-                    depot_cache[row["depot_accise"]] = depot
+                    depot = Depot.objects.get(customs_id=row["depot_customs_id"])
+                    depot_cache[row["depot_customs_id"]] = depot
                 except Depot.DoesNotExist:
-                    errors.add(f"{row["siren"]} - Depot with accise number {row['depot_accise']} doesn't exist")
-                    not_found_depots.add(row["depot_accise"])
+                    errors.add(f"{row["siren"]} - Depot with accise number {row['depot_customs_id']} doesn't exist")
+                    not_found_depots.add(row["depot_customs_id"])
                     depot = None
 
             # Consolidate fuel
