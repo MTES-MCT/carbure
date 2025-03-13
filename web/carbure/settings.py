@@ -257,6 +257,9 @@ if env("TEST"):
         },
     }
 
+log_dir_mac = os.path.join("/tmp/", "mac")
+os.makedirs(log_dir_mac, exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -271,12 +274,23 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "file_mac_import": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join("/tmp/mac/", "import_mac.log"),
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "django.request": {
             "handlers": ["console"],
             "level": "ERROR",  # change debug level as appropiate
             "propagate": False,
+        },
+        "mac_import": {
+            "handlers": ["console", "file_mac_import"],
+            "level": "DEBUG",
+            "propagate": True,
         },
     },
 }
