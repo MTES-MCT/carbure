@@ -1,6 +1,11 @@
 from django.db import models
 
 
+class OperationDetailsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("lot", "operation", "lot__biofuel")
+
+
 class OperationDetail(models.Model):
     operation = models.ForeignKey("tiruert.Operation", on_delete=models.deletion.CASCADE, related_name="details")
     lot = models.ForeignKey("core.CarbureLot", on_delete=models.deletion.CASCADE, related_name="tiruert_operation")
@@ -20,3 +25,5 @@ class OperationDetail(models.Model):
         db_table = "tiruert_operation_details"
         verbose_name = "Détail d'opération"
         verbose_name_plural = "Détails d'opération"
+
+    objects = OperationDetailsManager()

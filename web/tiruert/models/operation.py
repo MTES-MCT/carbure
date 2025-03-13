@@ -7,7 +7,11 @@ from tiruert.models.operation_detail import OperationDetail
 
 class OperationManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("details", "biofuel")
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("details", "biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
+        )
 
 
 class Operation(models.Model):
