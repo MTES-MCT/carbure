@@ -1,19 +1,57 @@
-label,fuel_category,pci_litre,masse_volumique,nomenclatures
-Essences d’aviation,1,0,0,"2710123111,2710123119,2710123190"
-Supercarburants sans plomb,1,0,0,"2710124111,2710124119,2710124190,2710124511,2710124519,2710124590,2710124911,2710124919,2710124990"
-Superéthanol E85,1,0,0,"3824909266"
-Pétrole lampant,2,0,0,"2710192500"
-Gazole autre,2,0,0,"2710194321,2710194329,2710194330,2710194390"
-Fioul domestique 10 ppm < S < 20 ppm,2,0,0,"2710194621,2710194629,2710194630,2710194690"
-Fioul domestique 20 ppm < S < 1 000 ppm,2,0,0,"2710194721,2710194729,2710194730,2710194790"
-Fioul domestique 1 000 ppm < S,2,0,0,"2710194810,2710194890"
-Gazole S < 10 ppm,2,0,0,"2710201121,2710201129,2710201130"
-Gazole 10 ppm < S < 20 ppm,2,0,0,"2710201521,2710201529,2710201530"
-Gazole 20 ppm < S < 1 000 ppm,2,0,0,"2710201721,2710201729,2710201730,2710201790"
-Gazole 1 000 ppm < S,2,0,0,"2710201910,2710201990"
-Carburéacteurs type kérosène (ou type pétrole lampant),3,0,0,"2710192100"
-Carburéacteurs type essence,3,0,0,"2710127011,2710127019,2710127090"
-Fiouls lourds,4,0,0,"2710196200,2710196400,2710196800,2710203100,2710203500,2710203900"
-Propane,5,0,0,"2711121100,2711129400,2711129700"
-Butane,5,0,0,"2711139100,2711139700"
-GPL,5,0,0,"2711190000"
+nomenclature,fuel_category,label,pci_litre,masse_volumique
+2710123111,1,Essences d’aviation,1,1
+2710123119,1,Essences d’aviation,1,1
+2710123190,1,Essences d’aviation,1,1
+2710124111,1,Supercarburants sans plomb,1,1
+2710124119,1,Supercarburants sans plomb,1,1
+2710124190,1,Supercarburants sans plomb,1,1
+2710124511,1,Supercarburants sans plomb,1,1
+2710124519,1,Supercarburants sans plomb,1,1
+2710124590,1,Supercarburants sans plomb,1,1
+2710124911,1,Supercarburants sans plomb,1,1
+2710124919,1,Supercarburants sans plomb,1,1
+2710124990,1,Supercarburants sans plomb,1,1
+3824909266,1,Superéthanol E85,1,1
+2710192500,2,Pétrole lampant,1,1
+2710194321,2,Gazole autre,1,1
+2710194329,2,Gazole autre,1,1
+2710194330,2,Gazole autre,1,1
+2710194390,2,Gazole autre,1,1
+2710194621,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
+2710194629,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
+2710194630,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
+2710194690,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
+2710194721,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
+2710194729,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
+2710194730,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
+2710194790,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
+2710194810,2,Fioul domestique 1 000 ppm < S,1,1
+2710194890,2,Fioul domestique 1 000 ppm < S,1,1
+2710201121,2,Gazole S < 10 ppm,1,1
+2710201129,2,Gazole S < 10 ppm,1,1
+2710201130,2,Gazole S < 10 ppm,1,1
+2710201521,2,Gazole 10 ppm < S < 20 ppm,1,1
+2710201529,2,Gazole 10 ppm < S < 20 ppm,1,1
+2710201530,2,Gazole 10 ppm < S < 20 ppm,1,1
+2710201721,2,Gazole 20 ppm < S < 1 000 ppm,1,1
+2710201729,2,Gazole 20 ppm < S < 1 000 ppm,1,1
+2710201730,2,Gazole 20 ppm < S < 1 000 ppm,1,1
+2710201790,2,Gazole 20 ppm < S < 1 000 ppm,1,1
+2710201910,2,Gazole 1 000 ppm < S,1,1
+2710201990,2,Gazole 1 000 ppm < S,1,1
+2710192100,3,Carburéacteurs type kérosène (ou type pétrole lampant),1,1
+2710127011,3,Carburéacteurs type essence,1,1
+2710127019,3,Carburéacteurs type essence,1,1
+2710127090,3,Carburéacteurs type essence,1,1
+2710196200,4,Fiouls lourds,1,1
+2710196400,4,Fiouls lourds,1,1
+2710196800,4,Fiouls lourds,1,1
+2710203100,4,Fiouls lourds,1,1
+2710203500,4,Fiouls lourds,1,1
+2710203900,4,Fiouls lourds,1,1
+2711121100,5,Propane,1,1
+2711129400,5,Propane,1,1
+2711129700,5,Propane,1,1
+2711139100,5,Butane,1,1
+2711139700,5,Butane,1,1
+2711190000,5,GPL,1,1
