@@ -86,3 +86,23 @@ class ExcelElecAuditReportValidator(Validator):
                     "Le point de charge {charge_point_id} ne fait pas partie de l'échantillon sélectionné pour cet audit."
                 ).format(charge_point_id=charge_point_id),
             )
+
+        # Check if at least one audit field is filled
+        has_audit_data = any(
+            [
+                audited_charge_point.get("observed_mid_or_prm_id"),
+                audited_charge_point.get("current_type"),
+                audited_charge_point.get("audit_date"),
+                audited_charge_point.get("observed_energy_reading") != 0,
+                audited_charge_point.get("is_auditable") is not None,
+                audited_charge_point.get("has_dedicated_pdl") is not None,
+            ]
+        )
+
+        if not has_audit_data:
+            self.add_error(
+                "charge_point_id",
+                _("Le point de charge {charge_point_id} n'a aucune donnée d'audit renseignée.").format(
+                    charge_point_id=charge_point_id
+                ),
+            )
