@@ -4,7 +4,7 @@
  * compatible with the DSFR CSS.
  * This is why we are using the native HTML element and only style it with CSS.
  */
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import cl from "clsx"
 import css from "./notice.module.css"
 import { fr } from "@codegouvfr/react-dsfr"
@@ -17,7 +17,7 @@ export type NoticeVariant = "info" | "warning" | "alert"
 export interface NoticeProps {
   variant?: NoticeVariant
   icon?: React.ComponentType<IconProps>
-  title?: string
+  title?: ReactNode
   children?: React.ReactNode | CustomRenderer
 
   style?: React.CSSProperties
@@ -33,6 +33,9 @@ export interface NoticeProps {
 
   // Event triggered when the user clicks on the link
   onAction?: () => void
+
+  // Change the padding of the notice
+  size?: "small"
 }
 
 export const Notice = ({
@@ -47,6 +50,7 @@ export const Notice = ({
   linkText,
   linkHref,
   onAction,
+  size,
 }: NoticeProps) => {
   const [open, setOpen] = useState(true)
 
@@ -70,6 +74,7 @@ export const Notice = ({
         variant &&
           cl(fr.cx(`fr-notice--${variant}`), css[`notice--${variant}`]),
         Icon && css["notice--remove-icon-dsfr"],
+        size && css[`notice--${size}`],
         className
       )}
       style={style}

@@ -64,3 +64,17 @@ export const Button = forwardRef<
     )
   }
 )
+
+export const ExternalLink = (props: ButtonProps) => {
+  return (
+    <Button
+      {...props}
+      // @ts-ignore href is marked as required by typescript, but i don't know how to fix it
+      linkProps={{
+        ...props.linkProps,
+        rel: "noreferrer",
+        target: "_blank",
+      }}
+    />
+  )
+}

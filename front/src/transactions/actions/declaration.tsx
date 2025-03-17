@@ -9,25 +9,17 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation, useQuery } from "common/hooks/async"
 import Portal from "common/components/portal"
 import * as api from "../api"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
 import { LotSummary } from "../components/lots/lot-summary"
-import Select from "common/components/select"
-import Alert from "common/components/alert"
 import { capitalize, formatDate, formatPeriod } from "common/utils/formatters"
-import {
-  AlertCircle,
-  Certificate,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Cross,
-  Return,
-} from "common/components/icons"
+
 import { Entity } from "common/types"
 import { Row } from "common/components/scaffold"
 import { useMatomo } from "matomo"
 import { useHashMatch } from "common/components/hash-route"
+import { Button } from "common/components/button2"
+import { Select } from "common/components/selects2"
+import { Dialog as Dialog2 } from "common/components/dialog2"
+import { Notice } from "common/components/notice"
 
 export const DeclarationButton = () => {
   const { t } = useTranslation()
@@ -35,11 +27,11 @@ export const DeclarationButton = () => {
   return (
     <Button
       asideX
-      variant="primary"
-      icon={Certificate}
-      label={t("Gérer mes déclarations")}
-      to={{ search: location.search, hash: "#declaration" }}
-    />
+      iconId="ri-draft-line"
+      linkProps={{ to: { search: location.search, hash: "#declaration" } }}
+    >
+      {t("Gérer mes déclarations")}
+    </Button>
   )
 }
 
@@ -141,97 +133,116 @@ export const DeclarationDialog = () => {
 
   return (
     <Portal onClose={onClose}>
-      <Dialog style={{ width: "max(50vw, 960px)" }} onClose={onClose}>
-        <header>
-          <h1>{t("Déclaration de durabilité")}</h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
-              {t(
-                "Les tableaux suivants vous montrent un récapitulatif de vos entrées et sorties pour la période sélectionnée."
-              )}
-            </p>
-            <p>
-              {t(
-                "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validée, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration."
-              )}
-            </p>
-          </section>
-          <section>
-            <Row style={{ gap: "var(--spacing-s)" }}>
-              <Button disabled={!hasPrev} icon={ChevronLeft} action={prev} />
-              <Select
-                placeholder={t("Choisissez une année")}
-                value={timeline.year}
-                onChange={(year = initialYear) => setTimeline({ ...timeline, year })} // prettier-ignore
-                options={yearsData}
-                sort={(v) => -v.value}
-                style={{ flex: 1 }}
-              />
-              <Select
-                loading={declarations.loading}
-                placeholder={t("Choisissez un mois")}
-                value={period}
-                onChange={(period = initialPeriod) => setTimeline({ ...timeline, month: period % 100 })} // prettier-ignore
-                options={declarationsData}
-                normalize={normalizeDeclaration}
-                style={{ flex: 2 }}
-              />
-              <Button disabled={!hasNext} icon={ChevronRight} action={next} />
-            </Row>
-          </section>
-          {declaration && <LotSummary pending query={query} />}
-        </main>
-        <footer>
-          {declaration?.declaration?.declared ? (
-            <Button
-              icon={Cross}
-              loading={invalidateDeclaration.loading}
-              variant="warning"
-              label={t("Annuler la déclaration")}
-              action={() => {
-                matomo.push([
-                  "trackEvent",
-                  "declarations",
-                  "invalidate-declaration",
-                  declaration?.period,
-                ])
-                invalidateDeclaration.execute(entity.id, period)
-              }}
-            />
-          ) : (
-            <Button
-              disabled={hasPending}
-              loading={validateDeclaration.loading}
-              variant="primary"
-              icon={Check}
-              label={t("Valider la déclaration")}
-              action={() => {
-                matomo.push([
-                  "trackEvent",
-                  "declarations",
-                  "validate-declaration",
-                  declaration?.period,
-                ])
-                validateDeclaration.execute(entity.id, period)
-              }}
-            />
+      <Dialog2
+        style={{ minWidth: "min(100%, 700px)" }}
+        onClose={onClose}
+        header={<Dialog2.Title>{t("Déclaration de durabilité")}</Dialog2.Title>}
+        footer={
+          <>
+            {declaration && declaration.pending > 0 && (
+              <Notice
+                variant="warning"
+                title={
+                  <Trans
+                    count={declaration.pending}
+                    defaults="Encore <b>{{count}} lots</b> en attente de validation"
+                  />
+                }
+                size="small"
+              ></Notice>
+            )}
+            {declaration?.declaration?.declared ? (
+              <Button
+                iconId="ri-close-line"
+                loading={invalidateDeclaration.loading}
+                customPriority="danger"
+                asideX
+                onClick={() => {
+                  matomo.push([
+                    "trackEvent",
+                    "declarations",
+                    "invalidate-declaration",
+                    declaration?.period,
+                  ])
+                  invalidateDeclaration.execute(entity.id, period)
+                }}
+              >
+                {t("Annuler la déclaration")}
+              </Button>
+            ) : (
+              <Button
+                disabled={hasPending}
+                loading={validateDeclaration.loading}
+                iconId="ri-check-line"
+                onClick={() => {
+                  matomo.push([
+                    "trackEvent",
+                    "declarations",
+                    "validate-declaration",
+                    declaration?.period,
+                  ])
+                  validateDeclaration.execute(entity.id, period)
+                }}
+                asideX
+              >
+                {t("Valider la déclaration")}
+              </Button>
+            )}
+          </>
+        }
+      >
+        <p>
+          {t(
+            "Les tableaux suivants vous montrent un récapitulatif de vos entrées et sorties pour la période sélectionnée."
           )}
-          {declaration && declaration.pending > 0 && (
-            <Alert variant="warning" icon={AlertCircle}>
-              <p>
-                <Trans
-                  count={declaration.pending}
-                  defaults="Encore <b>{{count}} lots</b> en attente de validation"
-                />
-              </p>
-            </Alert>
+        </p>
+        <p>
+          {t(
+            "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validée, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration."
           )}
-          <Button asideX icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
-      </Dialog>
+        </p>
+        <section>
+          <Row style={{ gap: "var(--spacing-s)" }}>
+            <Button
+              disabled={!hasPrev}
+              iconId="ri-arrow-left-s-line"
+              onClick={prev}
+              title="Previous"
+              priority="tertiary"
+            />
+            <Select
+              loading={years.loading}
+              placeholder={t("Choisissez une année")}
+              value={timeline.year}
+              onChange={(year = initialYear) =>
+                setTimeline({ ...timeline, year })
+              }
+              options={yearsData}
+              sort={(v) => -v.value}
+              style={{ flex: 1 }}
+            />
+            <Select
+              loading={declarations.loading}
+              placeholder={t("Choisissez un mois")}
+              value={period}
+              onChange={(period = initialPeriod) =>
+                setTimeline({ ...timeline, month: period % 100 })
+              }
+              options={declarationsData}
+              normalize={normalizeDeclaration}
+              style={{ flex: 2 }}
+            />
+            <Button
+              disabled={!hasNext}
+              iconId="ri-arrow-right-s-line"
+              onClick={next}
+              title="Next"
+              priority="tertiary"
+            />
+          </Row>
+        </section>
+        {declaration && <LotSummary pending query={query} />}
+      </Dialog2>
     </Portal>
   )
 }

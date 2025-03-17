@@ -32,3 +32,7 @@
 .notice--remove-icon-dsfr :global(.fr-notice__title)::before {
   display: none;
 }
+
+.notice--small {
+  padding: var(--spacing-1w) 0;
+}

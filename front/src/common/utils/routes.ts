@@ -33,7 +33,10 @@ export const ROUTE_URLS = {
 
     return {
       DRAFT: `${baseUrl}/drafts`,
-      RECEIVED: `${baseUrl}/in`,
+      RECEIVED: {
+        ROOT: `${baseUrl}/in`,
+        HISTORY: `${baseUrl}/in/history`,
+      },
       STOCKS: `${baseUrl}/stocks`,
       SENT: `${baseUrl}/out`,
     }

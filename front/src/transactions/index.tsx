@@ -6,7 +6,7 @@ import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import * as api from "./api"
 import { Main } from "common/components/scaffold"
-import Select from "common/components/select"
+import { Select } from "common/components/selects2"
 import { DeclarationButton, DeclarationDialog } from "./actions/declaration"
 import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
@@ -37,7 +37,6 @@ export const Transactions = () => {
           <section>
             <Select
               loading={years.loading}
-              variant="inline"
               placeholder={t("Choisir une année")}
               value={years.selected}
               onChange={years.setYear}

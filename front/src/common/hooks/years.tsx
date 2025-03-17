@@ -5,6 +5,7 @@ import { useYearsProvider } from "common/providers/years-provider"
 import { Api } from "common/services/api"
 import { useCallback, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 const currentYear = new Date().getFullYear()
 
@@ -15,6 +16,7 @@ function useYears(
   const location = useLocation()
   const params = useParams<"year">()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const entity = useEntity()
   const { setSelectedYear, setRoot } = useYearsProvider()
@@ -55,7 +57,10 @@ function useYears(
 
   return {
     loading: years.loading,
-    options: listYears(years.result?.data.data),
+    options: listYears(years.result?.data.data).map((year) => ({
+      label: `${t("Année")} ${year}`,
+      value: year,
+    })),
     selected,
     setYear,
   }

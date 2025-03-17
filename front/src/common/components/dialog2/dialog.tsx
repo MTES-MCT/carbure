@@ -83,8 +83,14 @@ const DialogDescription = <T extends React.ElementType>(
   props: Omit<TextProps<T>, "size">
 ) => <Text size="sm" {...props} />
 
+// By default, a padding is apply to the whole dialog. In certain cases, we want to remove it.
+const DialogNoPadding = ({ children }: { children: ReactNode }) => (
+  <div className={css["dialog--no-padding"]}>{children}</div>
+)
+
 Dialog.Title = DialogTitle
 Dialog.Description = DialogDescription
+Dialog.NoPadding = DialogNoPadding
 
 export default Dialog
 

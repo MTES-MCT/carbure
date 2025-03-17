@@ -1521,7 +1521,7 @@
   "Choisissez un mois": "Choisissez un mois",
   "Annuler la déclaration": "Annuler la déclaration",
   "Valider la déclaration": "Valider la déclaration",
-  "Encore <b>{{count}} lots</b> en attente de validation_one": "Encore <b>{{count}} lots</b> en attente de validation",
+  "Encore <b>{{count}} lots</b> en attente de validation_one": "Encore <b>{{count}} lot</b> en attente de validation",
   "Encore <b>{{count}} lots</b> en attente de validation_many": "Encore <b>{{count}} lots</b> en attente de validation",
   "Encore <b>{{count}} lots</b> en attente de validation_other": "Encore <b>{{count}} lots</b> en attente de validation",
   "Supprimer la sélection": "Supprimer la sélection",

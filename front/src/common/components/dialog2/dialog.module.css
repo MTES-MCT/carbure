@@ -102,3 +102,8 @@
   gap: var(--spacing-2w);
   padding: 0 var(--spacing-2w) var(--spacing-2w) var(--spacing-2w);
 }
+
+.dialog--no-padding {
+  margin-left: calc(-1 * var(--spacing-2w));
+  margin-right: calc(-1 * var(--spacing-2w));
+}

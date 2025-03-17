@@ -12,15 +12,19 @@ import { toSearchParams } from "common/services/api"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import Alert from "common/components/alert"
-import Button, { ExternalLink } from "common/components/button"
+import Button from "common/components/button"
+import { ExternalLink } from "common/components/button2"
 import Dialog from "common/components/dialog"
-import Table, { Cell } from "common/components/table"
+import Table from "common/components/table"
+import { Table as Table2, Cell } from "common/components/table2"
 import { Filter, Return } from "common/components/icons"
 import { FilterManager, ResetButton } from "../filters"
-import NoResult from "../../../common/components/no-result"
 import { compact } from "common/utils/collection"
 import useEntity from "common/hooks/entity"
 import { Unit } from "common/types"
+import { NoResult } from "common/components/no-result2"
+import { Title } from "common/components/title"
+import { useRoutes } from "common/hooks/routes"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
@@ -186,21 +190,20 @@ export const LotSummary = ({
     <>
       {input.length === 0 && output.length === 0 && (
         <section>
-          <NoResult />
+          <NoResult label={t("Pas de lots pour cette période.")} />
         </section>
       )}
 
       {input.length > 0 && (
         <>
-          <h2>
+          <Title is="h2" as="h6">
             {t("Lots reçus")}
             {" ▸ "}
             {t("{{count}} lots", { count: inputLots })}
             {" ▸ "}
             {formatUnit(inputQuantity, unit)}
-          </h2>
-          <Table
-            style={{ width: "max(50vw, 960px)" }}
+          </Title>
+          <Table2
             rows={input}
             columns={compact([
               columns.supplier,
@@ -275,7 +278,7 @@ export function useSummaryColumns(query: LotQuery) {
       key: "biofuel",
       header: t("Biocarburant"),
       orderBy: (item: SummaryItem) =>
-        t(item.biofuel_code ?? "", { ns: "biofuels" }) as string,
+        t(item.biofuel_code ?? "", { ns: "biofuels" }),
       cell: (item: SummaryItem) => (
         <Cell text={t(item.biofuel_code ?? "", { ns: "biofuels" })} />
       ),
@@ -309,14 +312,12 @@ export function useSummaryColumns(query: LotQuery) {
       cell: (item: SummaryItem) => <RemainingQuantityCell item={item} />,
     },
     count: {
-      small: true,
       key: "lots",
       header: t("Lots"),
       orderBy: (item: SummaryItem) => item.total,
       cell: (item: SummaryItem) => <Cell text={item.total} />,
     },
     countWithPending: {
-      small: true,
       key: "validatedLots",
       header: t("Lots validés"),
       orderBy: (item: SummaryItem) => item.total - item.pending,
@@ -401,7 +402,7 @@ interface PreviewCellProps {
 
 export const PreviewCell = ({ status, item, query }: PreviewCellProps) => {
   const { t } = useTranslation()
-
+  const routes = useRoutes()
   const filters: Record<string, any> = {
     periods: query.periods,
     biofuels: [item.biofuel_code],
@@ -415,7 +416,11 @@ export const PreviewCell = ({ status, item, query }: PreviewCellProps) => {
 
   return (
     <ExternalLink
-      href={`../../${query.year}/${status}/history?${toSearchParams(filters)}`}
+      linkProps={{
+        to: `${routes.BIOFUELS(query.year).RECEIVED.HISTORY}?${toSearchParams(filters)}`,
+      }}
+      customPriority="link"
+      size="small"
     >
       {t("Voir")}
     </ExternalLink>

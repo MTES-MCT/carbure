@@ -37,7 +37,7 @@ export const useBiofuels = (params?: BiofuelsParams) => {
         iconActive: SurveyFill,
       },
       {
-        path: routes.BIOFUELS().RECEIVED,
+        path: routes.BIOFUELS().RECEIVED.ROOT,
         title: t("Reçus"),
         additionalInfo: params?.in_pending_lots,
         icon: InboxArchiveLine,

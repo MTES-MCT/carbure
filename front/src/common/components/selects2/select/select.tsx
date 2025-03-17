@@ -27,6 +27,7 @@ export type SelectProps<T, V = T> = Trigger & {
   className?: string
   children?: ListProps<T, V>["children"]
   loading?: boolean
+  style?: React.CSSProperties
 }
 
 export function Select<T, V>({
@@ -48,6 +49,7 @@ export function Select<T, V>({
   full,
   className,
   children,
+  style,
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
@@ -78,6 +80,7 @@ export function Select<T, V>({
         )}
         size={size}
         type="button"
+        style={style}
       >
         <Text
           fontWeight="semibold"
