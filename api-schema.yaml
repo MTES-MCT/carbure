@@ -992,6 +992,65 @@ paths:
                   value: file.docx
                   summary: Example of export response.
           description: ""
+  /api/double-counting/applications/filters/:
+    get:
+      operationId: double_counting_applications_filters_retrieve
+      parameters:
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                message: No filter was specified | NOT_FOUND
+              examples:
+                InvalidFilter:
+                  value:
+                    message: No filter was specified
+                  summary: Invalid filter
+                NotFound:
+                  value:
+                    message: NOT_FOUND
+                  summary: Not found
+          description: Bad request - invalid filter or not found.
   /api/double-counting/applications/list-admin/:
     get:
       operationId: double_counting_applications_list_admin_retrieve
@@ -1002,6 +1061,18 @@ paths:
             type: integer
           description: Entity ID
           required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
       tags:
         - double-counting
       security:

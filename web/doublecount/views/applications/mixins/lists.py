@@ -15,6 +15,7 @@ class ApplicationListeSerializer(serializers.Serializer):
 
 class ListActionMixin:
     @extend_schema(
+        filters=True,
         parameters=[
             OpenApiParameter(
                 "entity_id",
@@ -28,7 +29,8 @@ class ListActionMixin:
     )
     @action(methods=["get"], detail=False, url_path="list-admin")
     def list_admin(self, request, *args, **kwargs):
-        applications = self.get_queryset()
+        applications = self.filter_queryset(self.get_queryset())
+
         rejected_data = applications.filter(status=DoubleCountingApplication.REJECTED)
 
         pending_data = applications.filter(

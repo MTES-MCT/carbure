@@ -367,6 +367,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/applications/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/applications/list-admin/": {
     parameters: {
       query?: never
@@ -4249,11 +4265,50 @@ export interface operations {
       }
     }
   }
+  double_counting_applications_filters_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Filter string to apply */
+        filter?: string
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+      /** @description Bad request - invalid filter or not found. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
   double_counting_applications_list_admin_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
         entity_id: number
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
       }
       header?: never
       path?: never
