@@ -3,19 +3,13 @@ import { useFormContext } from "common/components/form2"
 import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
-import { simulateMinMax } from "accounting/api"
-import useEntity from "common/hooks/entity"
-import { useMutation } from "common/hooks/async"
 import { Notice } from "common/components/notice"
 import { useState } from "react"
-import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
-import {
-  getQuantityInputLabel,
-  getQuantitySummaryTitle,
-} from "./quantity-form.utils"
+import { getQuantityInputLabel } from "./quantity-form.utils"
+import { useQuantityForm } from "./quantity-form.hooks"
 
 type QuantityFormComponentProps = {
   balance: Balance
@@ -24,7 +18,7 @@ type QuantityFormComponentProps = {
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
-const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
+export const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
 export const QuantityForm = ({
   balance,
@@ -32,31 +26,21 @@ export const QuantityForm = ({
   type,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
   const { formatUnit, unit } = useUnit()
   const { value, bind, setField } = useFormContext<QuantityFormProps>()
-  const mutation = useMutation(simulateMinMax)
+  const mutation = useQuantityForm({ balance, values: value })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
       value.avoided_emissions_max !== undefined
   )
 
   const declareQuantity = () => {
-    mutation
-      .execute(entity.id, {
-        biofuel: balance.biofuel?.id ?? null,
-        customs_category: balance.customs_category,
-        debited_entity: entity.id,
-        target_volume: value.quantity!,
-        target_emission: 0,
-        unit: entity.preferred_unit,
-      })
-      .then((response) => {
-        const emissions = response.data
-        setField("avoided_emissions_min", emissions?.min_avoided_emissions)
-        setField("avoided_emissions_max", emissions?.max_avoided_emissions)
-        setQuantityDeclared(true)
-      })
+    mutation.execute().then((response) => {
+      const emissions = response.data
+      setField("avoided_emissions_min", emissions?.min_avoided_emissions)
+      setField("avoided_emissions_max", emissions?.max_avoided_emissions)
+      setQuantityDeclared(true)
+    })
   }
 
   const resetQuantityDeclared = () => {
@@ -130,13 +114,7 @@ export const QuantityForm = ({
   )
 }
 
-export const QuantitySummary = ({
-  values,
-  type,
-}: {
-  values: QuantityFormProps
-  type: CreateOperationType
-}) => {
+export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   if (!values.quantity || !values.avoided_emissions) {
@@ -144,15 +122,15 @@ export const QuantitySummary = ({
   }
 
   return (
-    <Grid>
+    <>
       <OperationText
-        title={getQuantitySummaryTitle(type)}
+        title={t("Quantité")}
         description={formatUnit(values.quantity, 0)}
       />
       <OperationText
         title={t("TCO2 évitées équivalentes")}
         description={values.avoided_emissions}
       />
-    </Grid>
+    </>
   )
 }

@@ -40,16 +40,3 @@ export const getQuantityInputLabel = (type: CreateOperationType) => {
       return i18next.t("Type inconnu")
   }
 }
-
-export const getQuantitySummaryTitle = (type: CreateOperationType) => {
-  switch (type) {
-    case CreateOperationType.CESSION:
-      return i18next.t("Quantité de la cession")
-    case CreateOperationType.EXPORTATION:
-      return i18next.t("Quantité de l'exportation")
-    case CreateOperationType.TENEUR:
-      return i18next.t("Quantité de la teneur")
-    default:
-      return i18next.t("Type inconnu")
-  }
-}

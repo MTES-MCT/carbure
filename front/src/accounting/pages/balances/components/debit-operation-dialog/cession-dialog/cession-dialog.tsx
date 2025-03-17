@@ -25,7 +25,10 @@ import {
   recipientToDepotStepKey,
   RecipientToDepotSummary,
 } from "accounting/components/recipient-to-depot-form"
-import { RecapOperation } from "accounting/components/recap-operation"
+import {
+  RecapOperation,
+  RecapOperationGrid,
+} from "accounting/components/recap-operation"
 
 import { useCessionDialog } from "./cession-dialog.hooks"
 
@@ -84,17 +87,14 @@ export const CessionDialogContent = ({
         <Main>
           <Stepper />
           <Box>
-            <RecapOperation balance={balance} />
-            {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
-            {currentStepIndex > 2 && (
-              <QuantitySummary
-                values={form.value}
-                type={CreateOperationType.CESSION}
-              />
-            )}
-            {currentStepIndex > 3 && form.value.credited_entity && (
-              <RecipientToDepotSummary values={form.value} />
-            )}
+            <RecapOperationGrid>
+              <RecapOperation balance={balance} />
+              {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
+              {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
+              {currentStepIndex > 3 && form.value.credited_entity && (
+                <RecipientToDepotSummary values={form.value} />
+              )}
+            </RecapOperationGrid>
           </Box>
 
           {currentStep?.key !== "recap" && (

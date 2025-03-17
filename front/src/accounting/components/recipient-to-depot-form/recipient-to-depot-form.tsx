@@ -6,7 +6,6 @@ import {
   normalizeEntityPreview,
 } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
-import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { findEligibleTiruertEntities } from "./api"
 import useEntity from "common/hooks/entity"
@@ -57,7 +56,7 @@ export const RecipientToDepotSummary = ({
   }
 
   return (
-    <Grid>
+    <>
       <OperationText
         title={t("Redevable")}
         description={values.credited_entity.name}
@@ -69,7 +68,7 @@ export const RecipientToDepotSummary = ({
         />
       )}
       {children}
-    </Grid>
+    </>
   )
 }
 

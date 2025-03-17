@@ -1,9 +1,5 @@
 import { Button } from "common/components/button2"
-import {
-  ArrowRightLine,
-  DraftFill,
-  SendPlaneLine,
-} from "common/components/icon"
+import { DraftFill, SendPlaneLine } from "common/components/icon"
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRoutes } from "common/hooks/routes"
@@ -42,12 +38,6 @@ const MaterialAccounting = () => {
             label: `${t("Opérations")} (${operationCount})`,
             path: routes.MATERIAL_ACCOUNTING.OPERATIONS,
             icon: SendPlaneLine,
-          },
-          {
-            key: "teneur",
-            label: t("Teneur"),
-            path: "##",
-            icon: ArrowRightLine,
           },
         ])}
       />

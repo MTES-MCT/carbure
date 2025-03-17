@@ -6597,6 +6597,9 @@ components:
     Country:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         name:
           type: string
           maxLength: 128
@@ -6610,6 +6613,7 @@ components:
           type: boolean
       required:
         - code_pays
+        - id
         - name
         - name_en
     CreateDepotRequest:

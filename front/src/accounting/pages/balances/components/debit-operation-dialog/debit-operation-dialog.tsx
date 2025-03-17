@@ -6,8 +6,6 @@ import { useState } from "react"
 import styles from "./debit-operation-dialog.module.css"
 import { Button } from "common/components/button2"
 import { CessionDialog } from "./cession-dialog"
-import { DevaluationDialog } from "./devaluation-dialog"
-import { ExportationDialog } from "./exportation-dialog"
 import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
 interface DebitOperationDialogProps {
@@ -35,14 +33,6 @@ export const DebitOperationDialog = ({
             balance={balance}
             onOperationCreated={onClose}
           />
-        ))
-        break
-      case OperationType.DEVALUATION:
-        portal((close) => <DevaluationDialog onClose={close} />)
-        break
-      case OperationType.EXPORTATION:
-        portal((close) => (
-          <ExportationDialog onClose={close} balance={balance} />
         ))
         break
     }

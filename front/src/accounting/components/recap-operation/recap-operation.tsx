@@ -1,9 +1,9 @@
 import { Balance } from "accounting/types"
 import { OperationText } from "../operation-text"
-import { Grid } from "common/components/scaffold"
 import { formatSector } from "accounting/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
+import { Grid } from "common/components/scaffold"
 
 type RecapOperationProps = {
   balance: Balance
@@ -14,7 +14,7 @@ export const RecapOperation = ({ balance }: RecapOperationProps) => {
   const { formatUnit } = useUnit()
 
   return (
-    <Grid>
+    <>
       <OperationText
         title={t("Filière")}
         description={formatSector(balance.sector)}
@@ -37,6 +37,18 @@ export const RecapOperation = ({ balance }: RecapOperationProps) => {
             : ""
         }
       />
+    </>
+  )
+}
+
+export const RecapOperationGrid = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
+  return (
+    <Grid style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "24px" }}>
+      {children}
     </Grid>
   )
 }

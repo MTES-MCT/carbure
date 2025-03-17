@@ -5,7 +5,6 @@ import { Notice } from "common/components/notice"
 import { getDepotsWithBalance } from "./api"
 import useEntity from "common/hooks/entity"
 import { Balance } from "accounting/types"
-import { Grid } from "common/components/scaffold"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
 import { FromDepotFormProps } from "./from-depot-form.types"
@@ -102,15 +101,15 @@ export const FromDepotSummary = ({
   }
 
   return (
-    <Grid>
+    <>
       <OperationText
         title={t("Dépôt d'expédition")}
         description={values.from_depot?.name ?? ""}
       />
       <OperationText
-        title={t("Solde disponible dans le dépôt d'expédition")}
+        title={t("Solde disponible")}
         description={formatUnit(values.from_depot.quantity.credit, 0)}
       />
-    </Grid>
+    </>
   )
 }

@@ -2044,6 +2044,7 @@ export interface components {
      */
     CorrectionStatusEnum: CorrectionStatusEnum
     Country: {
+      readonly id: number
       name: string
       name_en: string
       code_pays: string

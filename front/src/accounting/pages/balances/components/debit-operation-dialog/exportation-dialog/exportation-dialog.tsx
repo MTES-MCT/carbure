@@ -5,13 +5,10 @@ import {
   FromDepotSummary,
 } from "accounting/components/from-depot-form"
 import {
-  QuantityForm,
-  quantityFormStep,
-  quantityFormStepKey,
-  QuantitySummary,
-} from "accounting/components/quantity-form"
-import { RecapOperation } from "accounting/components/recap-operation"
-import { Balance, CreateOperationType } from "accounting/types"
+  RecapOperation,
+  RecapOperationGrid,
+} from "accounting/components/recap-operation"
+import { Balance } from "accounting/types"
 import Dialog from "common/components/dialog2/dialog"
 import { Form, FormManager, useForm } from "common/components/form2"
 import Portal from "common/components/portal"
@@ -27,6 +24,12 @@ import {
 import { Button } from "common/components/button2"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
+import {
+  ExportationQuantityForm,
+  exportationQuantityFormStep,
+  exportationQuantityFormStepKey,
+  ExportationQuantitySummary,
+} from "./exportation-quantity-form"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -81,15 +84,16 @@ export const ExportationDialogContent = ({
         <Main>
           <Stepper />
           <Box>
-            <RecapOperation balance={balance} />
-            {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
-            {currentStepIndex > 2 && (
-              <QuantitySummary
-                values={form.value}
-                type={CreateOperationType.EXPORTATION}
-              />
-            )}
-            {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
+            <RecapOperationGrid>
+              <RecapOperation balance={balance} />
+              {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
+              {currentStepIndex > 2 && (
+                <ExportationQuantitySummary values={form.value} />
+              )}
+              {currentStepIndex > 3 && (
+                <CountryFormSummary values={form.value} />
+              )}
+            </RecapOperationGrid>
           </Box>
           {currentStep?.key !== "recap" && (
             <Box>
@@ -97,11 +101,10 @@ export const ExportationDialogContent = ({
                 {currentStep?.key === fromDepotStepKey && (
                   <FromDepotForm balance={balance} />
                 )}
-                {currentStep?.key === quantityFormStepKey && (
-                  <QuantityForm
+                {currentStep?.key === exportationQuantityFormStepKey && (
+                  <ExportationQuantityForm
                     balance={balance}
                     depot_quantity_max={form.value.from_depot?.quantity.credit}
-                    type={CreateOperationType.EXPORTATION}
                   />
                 )}
                 {currentStep?.key === countryFormStepKey && <CountryForm />}
@@ -120,7 +123,7 @@ export const ExportationDialog = (props: ExportationDialogProps) => {
 
   const steps = [
     fromDepotStep(form.value),
-    quantityFormStep(form.value),
+    exportationQuantityFormStep(form.value),
     countryFormStep(form.value),
     { key: "recap", title: t("Récapitulatif") },
   ]

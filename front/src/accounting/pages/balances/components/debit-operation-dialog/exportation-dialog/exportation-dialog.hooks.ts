@@ -46,7 +46,7 @@ export const useExportationDialog = ({
           from_depot: values.from_depot?.id,
           to_depot: values.to_depot?.id,
           credited_entity: values.credited_entity?.id,
-          export_country: values.country?.name,
+          export_country: values.country?.id,
         })
       }
     })

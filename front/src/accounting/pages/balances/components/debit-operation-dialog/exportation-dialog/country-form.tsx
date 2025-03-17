@@ -47,13 +47,14 @@ export const CountryFormSummary = ({
   const { t } = useTranslation()
 
   return (
-    <RecipientToDepotSummary values={values}>
+    <>
+      <RecipientToDepotSummary values={values} />
       <OperationText title={t("Pays")} description={values.country?.name} />
       <OperationText
         title={t("Etat membre")}
         description={values?.country?.is_in_europe ? t("Oui") : t("Non")}
       />
-    </RecipientToDepotSummary>
+    </>
   )
 }
 
