@@ -7,6 +7,8 @@ class MacFossilFuel(models.Model):
     volume = models.FloatField(default=0.0)
     period = models.IntegerField(blank=False, null=False)
     depot = models.ForeignKey("transactions.Depot", null=True, on_delete=models.SET_NULL, related_name="fossil_fuel_mac")
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.fuel, self.operator, self.volume, self.period, self.depot
