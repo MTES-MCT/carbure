@@ -1,7 +1,8 @@
 from datetime import date
 
-from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum
-from django.db.models.functions import Coalesce
+from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
+from django.db.models.fields import DateField, FloatField
+from django.db.models.functions import Cast, Coalesce
 
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
@@ -96,21 +97,41 @@ class MeterReadingRepository:
     @staticmethod
     def annotate_charge_points_with_latest_readings(charge_points: QuerySet[ElecChargePoint], reference_date: date):
         latest_readings = ElecMeterReading.objects.filter(
-            meter=OuterRef("current_meter"), reading_date__lte=reference_date
+            meter=OuterRef("current_meter"),
+            reading_date__lte=reference_date,
         ).order_by("-reading_date", "-id")
 
-        # Annotate the ElecChargePoint queryset.
-        return charge_points.annotate(
-            latest_reading_index=Coalesce(
-                Subquery(latest_readings.values("extracted_energy")[:1]), F("current_meter__initial_index")
+        return charge_points.select_related("current_meter").annotate(
+            latest_reading_index=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("extracted_energy")[:1]),
+                    F("current_meter__initial_index"),
+                    Value(0.0),
+                ),
+                output_field=FloatField(),
             ),
-            latest_reading_date=Coalesce(
-                Subquery(latest_readings.values("reading_date")[:1]), F("current_meter__initial_index_date")
+            latest_reading_date=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("reading_date")[:1]),
+                    F("current_meter__initial_index_date"),
+                    Value(date.min),
+                ),
+                output_field=DateField(),
             ),
-            second_latest_reading_index=Coalesce(
-                Subquery(latest_readings.values("extracted_energy")[1:2]), F("current_meter__initial_index")
+            second_latest_reading_index=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("extracted_energy")[1:2]),
+                    F("current_meter__initial_index"),
+                    Value(0.0),
+                ),
+                output_field=FloatField(),
             ),
-            second_latest_reading_date=Coalesce(
-                Subquery(latest_readings.values("reading_date")[1:2]), F("current_meter__initial_index_date")
+            second_latest_reading_date=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("reading_date")[1:2]),
+                    F("current_meter__initial_index_date"),
+                    Value(date.min),
+                ),
+                output_field=DateField(),
             ),
         )
