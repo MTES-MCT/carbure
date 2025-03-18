@@ -1,6 +1,6 @@
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
-import { Box, Col, LoaderOverlay, Row } from "common/components/scaffold"
+import { Box, Col, Grid, LoaderOverlay, Row } from "common/components/scaffold"
 import { Trans, useTranslation } from "react-i18next"
 import { ObjectiveSection } from "./components/objective-section"
 import { CardProgress } from "./components/card-progress"
@@ -8,6 +8,8 @@ import { useQuery } from "common/hooks/async"
 import { getObjectives } from "./api"
 import useEntity from "common/hooks/entity"
 import { Text } from "common/components/text"
+import { formatSector } from "accounting/utils/formatters"
+import { RecapData } from "./components/recap-data"
 export const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
@@ -82,18 +84,14 @@ export const Teneur = () => {
               }
             >
               <ul>
-                <Text is="li" size="sm">
-                  {t("Teneur déclarée ce mois :")}{" "}
-                  {t("{{count}} tCO2 évitées", {
-                    count: result.global.teneur_declared_month,
-                  })}
-                </Text>
-                <Text is="li" size="sm">
-                  {t("Volume disponible :")}{" "}
-                  {t("{{count}} tCO2 évitées", {
-                    count: result.global.quantity_available,
-                  })}
-                </Text>
+                <RecapData.TeneurDeclaredMonth
+                  value={result.global.teneur_declared_month}
+                  unit={t("tCO2 évitées")}
+                />
+                <RecapData.QuantityAvailable
+                  value={result.global.quantity_available}
+                  unit={t("tCO2 évitées")}
+                />
               </ul>
             </CardProgress>
           )}
@@ -101,7 +99,44 @@ export const Teneur = () => {
         <ObjectiveSection
           title={t("Avancement par filière")}
           description={t("Retrouvez ici votre suivi d’objectif par filière.")}
-        ></ObjectiveSection>
+        >
+          <Grid>
+            {result?.sectors.map((sector) => (
+              <CardProgress
+                key={sector.code}
+                title={t(formatSector(sector.code))}
+                description={t("Objectif en GJ en {{date}}: {{objective}}", {
+                  date: "2025",
+                  objective: sector.objective,
+                })}
+                mainValue={sector.teneur_declared}
+                mainText={t("GJ")}
+                baseQuantity={sector.teneur_declared}
+                targetQuantity={sector.objective}
+                declaredQuantity={sector.teneur_declared_month}
+                badge={
+                  <CardProgress.DefaultBadge
+                    targetQuantity={sector.objective}
+                    declaredQuantity={
+                      sector.teneur_declared + sector.teneur_declared_month
+                    }
+                  />
+                }
+              >
+                <ul>
+                  <RecapData.TeneurDeclaredMonth
+                    value={sector.teneur_declared_month}
+                    unit="GJ"
+                  />
+                  <RecapData.QuantityAvailable
+                    value={sector.quantity_available}
+                    unit="GJ"
+                  />
+                </ul>
+              </CardProgress>
+            ))}
+          </Grid>
+        </ObjectiveSection>
       </Box>
     </>
   )

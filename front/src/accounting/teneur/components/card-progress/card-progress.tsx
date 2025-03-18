@@ -100,7 +100,11 @@ const DefaultBadge = ({
   const { t } = useTranslation()
   const severity = targetQuantity > declaredQuantity ? "error" : "success"
 
-  return <Badge severity={severity}>{t("Non atteint")}</Badge>
+  return (
+    <Badge severity={severity}>
+      {targetQuantity > declaredQuantity ? t("Non atteint") : t("Atteint")}
+    </Badge>
+  )
 }
 
 CardProgress.DefaultBadge = DefaultBadge

@@ -28,12 +28,11 @@ export const ProgressBar = ({
   baseQuantity, // 1
   declaredQuantity, // 100
 }: ProgressBarProps) => {
-  const declaredPercent = Number(
+  const basePercent = Number(
     formatNumber((baseQuantity * 100) / targetQuantity, 0)
   )
 
-  // Prevent available quantity to be greater than target quantity
-  const availablePercent = Number(
+  const declaredPercent = Number(
     formatNumber(
       (Math.min(baseQuantity + declaredQuantity, targetQuantity) * 100) /
         targetQuantity,
@@ -41,20 +40,18 @@ export const ProgressBar = ({
     )
   )
 
+  const baseValueRef = useRef<HTMLSpanElement>()
   const declaredValueRef = useRef<HTMLSpanElement>()
-  const availableValueRef = useRef<HTMLSpanElement>()
 
-  const [declaredValueWidth, setDeclaredValueWidth] = useState<string | number>(
+  const [baseValueWidth, setbaseValueWidth] = useState<string | number>(0)
+  const [declaredValueWidth, setdeclaredValueWidth] = useState<string | number>(
     0
   )
-  const [availableValueWidth, setAvailableValueWidth] = useState<
-    string | number
-  >(0)
 
   useLayoutEffect(() => {
-    setDeclaredValueWidth(getTextPercentWidth(declaredValueRef?.current))
-    setAvailableValueWidth(getTextPercentWidth(availableValueRef?.current))
-  }, [declaredValueRef, availableValueRef])
+    setbaseValueWidth(getTextPercentWidth(baseValueRef?.current))
+    setdeclaredValueWidth(getTextPercentWidth(declaredValueRef?.current))
+  }, [baseValueRef, declaredValueRef])
 
   return (
     <div className={css["progress-bar__container"]}>
@@ -63,16 +60,16 @@ export const ProgressBar = ({
         {baseQuantity && baseQuantity > 0 ? (
           <span
             className={css["progress-bar--quantity-declared"]}
-            style={{ width: `${declaredPercent}%` }}
+            style={{ width: `${basePercent}%` }}
           >
             <Text
               size="xs"
               is="span"
               className={css["progress-bar__quantity-declared-value"]}
-              style={{ right: declaredValueWidth }}
-              domRef={declaredValueRef}
+              style={{ right: baseValueWidth }}
+              domRef={baseValueRef}
             >
-              {declaredPercent}%
+              {basePercent}%
             </Text>
           </span>
         ) : null}
@@ -80,16 +77,16 @@ export const ProgressBar = ({
         {declaredQuantity && declaredQuantity > baseQuantity ? (
           <span
             className={css["progress-bar--quantity-available"]}
-            style={{ width: `${availablePercent}%` }}
+            style={{ width: `${declaredPercent}%` }}
           >
             <Text
               size="xs"
               is="span"
               className={css["progress-bar__quantity-available-value"]}
-              style={{ right: availableValueWidth }}
-              domRef={availableValueRef}
+              style={{ right: declaredValueWidth }}
+              domRef={declaredValueRef}
             >
-              {availablePercent}%
+              {declaredPercent}%
             </Text>
           </span>
         ) : null}
@@ -100,8 +97,8 @@ export const ProgressBar = ({
               key={`step-${index}`}
               className={cl(
                 css["progress-bar__step"],
-                STEP_VALUE * index <= availablePercent &&
-                  availablePercent > 0 &&
+                STEP_VALUE * index <= declaredPercent &&
+                  declaredPercent > 0 &&
                   css["progress-bar__step--filled"]
               )}
               style={{ left: `calc(${STEP_VALUE * index}% - 2px)` }}
