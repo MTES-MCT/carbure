@@ -1,10 +1,9 @@
 from datetime import date, timedelta
-from typing import Iterable, Optional, TypedDict
+from typing import Optional, TypedDict
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
-from elec.models import ElecChargePoint, ElecMeterReadingApplication
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 
 
@@ -120,65 +119,3 @@ def create_meter_readings_excel(
     file_path = f"/tmp/{name}.xlsx"
     workbook.save(file_path)
     return open(file_path, "rb")
-
-
-def create_meter_readings_data(
-    charge_points: Iterable[ElecChargePoint],
-    previous_application: ElecMeterReadingApplication,
-    current_readings: list[dict] = None,
-):
-    if current_readings is None:
-        current_readings = []
-    previous_readings_by_charge_point = get_previous_readings_by_charge_point(charge_points, previous_application)
-    current_readings_by_charge_point = get_current_readings_by_charge_point(current_readings)
-
-    meter_reading_data: list[MeterReadingData] = []
-    for charge_point in charge_points:
-        if charge_point.is_article_2:
-            continue
-
-        charge_point_id = charge_point.charge_point_id
-        current_reading = current_readings_by_charge_point.get(charge_point_id)
-
-        if len(current_readings) > 0 and current_reading is None:
-            continue
-
-        reading_data = {
-            "charge_point_id": charge_point_id,
-            "previous_reading": previous_readings_by_charge_point.get(charge_point_id),
-            "current_reading": current_reading.get("extracted_energy") if current_reading else 0,
-            "reading_date": current_reading.get("reading_date") if current_reading else 0,
-        }
-
-        meter_reading_data.append(reading_data)
-
-    return meter_reading_data
-
-
-def get_previous_readings_by_charge_point(
-    charge_points: Iterable[ElecChargePoint],
-    previous_application: ElecMeterReadingApplication,
-):
-    previous_readings_by_charge_point = {}
-
-    # initialize previous readings using the first one set during the charge point registration
-    for charge_point in charge_points:
-        previous_readings_by_charge_point[charge_point.charge_point_id] = (
-            charge_point.current_meter.initial_index if charge_point.current_meter else None
-        )
-
-    # then if there was a previous registration, use its data to specify the previous reading latest value
-    if previous_application:
-        for reading in previous_application.elec_meter_readings.all():
-            if reading.charge_point:
-                previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
-
-    return previous_readings_by_charge_point
-
-
-def get_current_readings_by_charge_point(current_readings: list[dict]):
-    current_readings_by_charge_point: dict[str, dict] = {}
-    for reading in current_readings:
-        current_readings_by_charge_point[reading.get("charge_point_id")] = reading
-
-    return current_readings_by_charge_point
