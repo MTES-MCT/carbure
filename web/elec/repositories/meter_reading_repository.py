@@ -1,4 +1,7 @@
-from django.db.models import Count, F, Q, Sum
+from datetime import date
+
+from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum
+from django.db.models.functions import Coalesce
 
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
@@ -89,3 +92,25 @@ class MeterReadingRepository:
                 distinct=True,
             ),
         ).filter(app_count=0, meter_readings_charge_points_count__gt=0, entity_type=Entity.CPO)
+
+    @staticmethod
+    def annotate_charge_points_with_latest_readings(charge_points: QuerySet[ElecChargePoint], reference_date: date):
+        latest_readings = ElecMeterReading.objects.filter(
+            meter=OuterRef("current_meter"), reading_date__lte=reference_date
+        ).order_by("-reading_date", "-id")
+
+        # Annotate the ElecChargePoint queryset.
+        return charge_points.annotate(
+            latest_reading_index=Coalesce(
+                Subquery(latest_readings.values("extracted_energy")[:1]), F("current_meter__initial_index")
+            ),
+            latest_reading_date=Coalesce(
+                Subquery(latest_readings.values("reading_date")[:1]), F("current_meter__initial_index_date")
+            ),
+            second_latest_reading_index=Coalesce(
+                Subquery(latest_readings.values("extracted_energy")[1:2]), F("current_meter__initial_index")
+            ),
+            second_latest_reading_date=Coalesce(
+                Subquery(latest_readings.values("reading_date")[1:2]), F("current_meter__initial_index_date")
+            ),
+        )
