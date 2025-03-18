@@ -742,7 +742,13 @@ class ElecMeterReadingsTest(TestCase):
                     "previous_reading": 700.0,
                     "current_reading": 800.0,
                     "reading_date": "2024-06-21",
-                }
+                },
+                {
+                    "charge_point_id": "FR00IJKL",
+                    "previous_reading": 500.0,
+                    "current_reading": 4.0,
+                    "reading_date": "2024-06-29",
+                },
             ],
         }
 

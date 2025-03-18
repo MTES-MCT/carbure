@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import forms
 from django.views.decorators.http import require_GET
 
@@ -6,9 +8,9 @@ from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import Entity
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.services.create_meter_reading_excel import create_meter_readings_data, create_meter_readings_excel
+from elec.services.create_meter_reading_excel import create_meter_readings_excel
+from elec.services.meter_readings_application_quarter import last_day_of_quarter
 
 
 class ApplicationDetailsForm(forms.Form):
@@ -33,17 +35,27 @@ def get_application_details(request, entity: Entity):
     if application.cpo != entity:
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
-    charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    previous_application = MeterReadingRepository.get_previous_application(entity, application.quarter, application.year)
-    meter_readings = MeterReadingRepository.get_application_meter_readings_summary(entity, application)
+    end_of_quarter = last_day_of_quarter(application.year, application.quarter) + timedelta(days=15)
 
-    meter_readings_data = create_meter_readings_data(charge_points, previous_application, meter_readings)
+    charge_points = MeterReadingRepository.get_application_charge_points(entity, application)
+    charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points, end_of_quarter)
+
+    meter_reading_data = []
+    for charge_point in charge_points:
+        meter_reading_data.append(
+            {
+                "charge_point_id": charge_point.charge_point_id,
+                "previous_reading": charge_point.second_latest_reading_index,
+                "current_reading": charge_point.latest_reading_index,
+                "reading_date": charge_point.latest_reading_date,
+            }
+        )
 
     if "export" in request.GET:
         file_name = f"meter_readings_{entity.slugify()}_Q{application.quarter}_{application.year}"
         excel_file = create_meter_readings_excel(
-            file_name, application.quarter, application.year, meter_readings_data, extended=True
+            file_name, application.quarter, application.year, meter_reading_data, extended=True
         )
         return ExcelResponse(excel_file)
 
-    return SuccessResponse(meter_readings_data)
+    return SuccessResponse(meter_reading_data)
