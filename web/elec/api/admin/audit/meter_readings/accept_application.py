@@ -49,8 +49,8 @@ def accept_application(request: HttpRequest):
 
     # creer un ElecProvisionCertificate groupant tous les meter readings par charge_poing.operating_unit
 
-    ## recuperer tous les MEterReadings de la demande
-    meter_readings = ElecMeterReading.objects.filter(application=application)
+    ## recuperer tous les MeterReadings de la demande, sauf ceux liés à des PDC de stations DC (gérés par qualicharge)
+    meter_readings = ElecMeterReading.objects.filter(application=application, meter__charge_point__is_article_2=False)
     data = [
         {
             "renewable_energy": meter_reading.renewable_energy,
