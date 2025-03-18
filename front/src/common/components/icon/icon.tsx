@@ -245,3 +245,15 @@ export const ChatDeleteLine = ({ ...props }: IconProps) => {
 export const LoaderLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-loader-line" />
 }
+
+export const InfoFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="fr-icon-info-fill" />
+}
+
+export const WarningFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="fr-icon-warning-fill" />
+}
+
+export const AlertFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="fr-icon-error-fill" />
+}

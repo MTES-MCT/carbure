@@ -7,7 +7,6 @@
 import { useState } from "react"
 import cl from "clsx"
 import css from "./notice.module.css"
-import { fr } from "@codegouvfr/react-dsfr"
 import { IconProps } from "../icon"
 import { Button } from "../button2"
 
@@ -16,7 +15,7 @@ export type NoticeVariant = "info" | "warning" | "alert"
 
 export interface NoticeProps {
   variant?: NoticeVariant
-  icon?: React.ComponentType<IconProps>
+  icon?: React.ComponentType<IconProps> | null
   title?: string
   children?: React.ReactNode | CustomRenderer
 
@@ -24,9 +23,6 @@ export interface NoticeProps {
   className?: string
   isClosable?: boolean
   onClose?: () => void
-
-  // If true, the notice will not have a color
-  noColor?: boolean
 
   // The text displayed in the link
   linkText?: string
@@ -36,10 +32,12 @@ export interface NoticeProps {
 
   // Event triggered when the user clicks on the link
   onAction?: () => void
+
+  noColor?: boolean
 }
 
 export const Notice = ({
-  variant,
+  variant = "info",
   icon: Icon,
   title,
   children,
@@ -49,8 +47,8 @@ export const Notice = ({
   onClose,
   linkText,
   linkHref,
-  noColor,
   onAction,
+  noColor,
 }: NoticeProps) => {
   const [open, setOpen] = useState(true)
 
@@ -70,55 +68,51 @@ export const Notice = ({
   return (
     <div
       className={cl(
-        fr.cx("fr-notice"),
-        variant &&
-          cl(fr.cx(`fr-notice--${variant}`), css[`notice--${variant}`]),
-        noColor && css["notice--no-color"],
-        Icon && css["notice--remove-icon-dsfr"],
-        className
+        variant && css[`notice--${variant}`],
+        className,
+        css["notice"],
+        noColor && css["notice--no-color"]
       )}
       style={style}
     >
-      <div className={cl(fr.cx("fr-container"), css.notice__container)}>
-        <div className="fr-notice__body">
-          <p>
-            {Icon && <Icon size="md" className={css.notice__icon} />}
-            {title && (
-              <span className={css.notice__title}>
-                <span className={fr.cx("fr-notice__title")}>{title}</span>
-              </span>
-            )}
-            {child && (
-              <span className={cl(fr.cx("fr-notice__desc"), css.notice__desc)}>
-                {child}
-              </span>
-            )}
-            {linkText && linkHref && (
-              <Button
-                customPriority="link"
-                linkProps={{ to: linkHref }}
-                className={css["notice__link"]}
-              >
-                {linkText}
-              </Button>
-            )}
-            {linkText && onAction && (
-              <Button
-                customPriority="link"
-                onClick={onAction}
-                className={css["notice__link"]}
-              >
-                {linkText}
-              </Button>
-            )}
-          </p>
-          {isClosable && (
-            <button
-              className={cl(fr.cx("fr-btn"), fr.cx("fr-btn--close"))}
-              onClick={handleClose}
-            ></button>
+      <div className={css.notice__body}>
+        <p>
+          {Icon ? <Icon size="md" className={css.notice__icon} /> : null}
+          {title && (
+            <span className={css.notice__title}>
+              <strong>{title}</strong>
+            </span>
           )}
-        </div>
+          {child}
+          {linkText && linkHref && (
+            <Button
+              customPriority="link"
+              linkProps={{ to: linkHref }}
+              className={css["notice__link"]}
+            >
+              {linkText}
+            </Button>
+          )}
+          {linkText && onAction && (
+            <Button
+              customPriority="link"
+              onClick={onAction}
+              className={css["notice__link"]}
+            >
+              {linkText}
+            </Button>
+          )}
+        </p>
+        {isClosable && (
+          <Button
+            iconId="fr-icon-close-line"
+            onClick={handleClose}
+            title="Close"
+            priority="tertiary no outline"
+            size="small"
+            className={css["notice__close"]}
+          />
+        )}
       </div>
     </div>
   )

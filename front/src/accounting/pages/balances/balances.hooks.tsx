@@ -54,15 +54,12 @@ export const useBalancesColumns = () => {
           <Button
             customPriority="link"
             onClick={() => {
-              const url = addQueryParams(
-                routes.MATERIAL_ACCOUNTING.OPERATIONS,
-                {
-                  sector: item.sector,
-                  biofuel: item.biofuel?.code,
-                  customs_category: item.customs_category,
-                  status: OperationsStatus.PENDING,
-                }
-              )
+              const url = addQueryParams(routes.ACCOUNTING.OPERATIONS, {
+                sector: item.sector,
+                biofuel: item.biofuel?.code,
+                customs_category: item.customs_category,
+                status: OperationsStatus.PENDING,
+              })
               navigate(url)
             }}
           >

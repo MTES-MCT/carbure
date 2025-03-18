@@ -8,7 +8,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { getNavStats } from "./api"
 import { useEffect } from "react"
-import { useMaterialAccounting } from "./hooks/useMaterialAccouting"
+import { useAccounting } from "./hooks/useAccounting"
 
 export const usePrivateSidebar = () => {
   const entity = useEntity()
@@ -24,7 +24,7 @@ export const usePrivateSidebar = () => {
   const saf = useSaf(result?.data)
   const admin = useAdmin(result?.data)
   const doubleCount = useDoubleCount(result?.data)
-  const accounting = useMaterialAccounting()
+  const accounting = useAccounting()
 
   useEffect(() => {
     if (entity.id !== -1) {

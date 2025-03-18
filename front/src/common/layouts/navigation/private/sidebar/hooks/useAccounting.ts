@@ -1,11 +1,16 @@
 import { useRoutes } from "common/hooks/routes"
 import { MenuSection } from "../sidebar.types"
 import { useTranslation } from "react-i18next"
-import { BarChartFill, BarChartLine } from "common/components/icon"
+import {
+  BarChartFill,
+  BarChartLine,
+  HomeFill,
+  HomeLine,
+} from "common/components/icon"
 import { useUser } from "common/hooks/user"
 import useEntity from "common/hooks/entity"
 
-export const useMaterialAccounting = () => {
+export const useAccounting = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const user = useUser()
@@ -20,10 +25,16 @@ export const useMaterialAccounting = () => {
       !!userIsMTEDGEC && (isProducer || isOperator || isPowerOrHeatProducer),
     children: [
       {
-        path: routes.MATERIAL_ACCOUNTING.OPERATIONS,
+        path: routes.ACCOUNTING.OPERATIONS,
         title: t("Comptabilité"),
         icon: BarChartLine,
         iconActive: BarChartFill,
+      },
+      {
+        path: routes.ACCOUNTING.TENEUR,
+        title: t("Objectifs annuels"),
+        icon: HomeLine,
+        iconActive: HomeFill,
       },
     ],
   }
