@@ -18,6 +18,12 @@ import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "../../../double-counting/components/application-status"
 import FilesCheckerUploadButton from "../files-checker/upload-button"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder-2"
+import { AgreementFilters } from "../../filters"
+import { AgreementFilter, AgreementOrder } from "double-counting-admin/types"
 
 type ApplicationListProps = {
   snapshot: DoubleCountingApplicationSnapshot | undefined
@@ -31,10 +37,22 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
+  const currentYear = new Date().getFullYear()
+
+  const [state, actions] = useCBQueryParamsStore<string, undefined>(
+    entity,
+    currentYear,
+    tab
+  )
+  const query = useCBQueryBuilder<AgreementOrder[], string, undefined>(state)
   const applicationsResponse = useQuery(api.getDoubleCountingApplicationList, {
     key: "dc-applications",
-    params: [entity.id],
+    params: [query],
   })
+
+  const getAgreementFilter = (filter: AgreementFilter) => {
+    return api.getApplicationFilters(filter, query)
+  }
 
   const columns: Column<DoubleCountingApplicationOverview>[] = [
     {
@@ -105,6 +123,13 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
           <FilesCheckerUploadButton />
         </ActionBar>
 
+        <AgreementFilters
+          filters={CLIENT_FILTERS}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilterOptions={getAgreementFilter}
+        />
+
         <Fragment>
           {!applications ||
           (tab === "pending" && applications.pending.length === 0) ||
@@ -134,6 +159,12 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     </>
   )
 }
+
+const CLIENT_FILTERS = [
+  AgreementFilter.Certificate_id,
+  AgreementFilter.Producers,
+  AgreementFilter.ProductionSites,
+]
 
 export default ApplicationList
 

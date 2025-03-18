@@ -15,10 +15,29 @@ export function getSnapshot(entity_id: number) {
 
 // APPLICATIONS
 
-export function getDoubleCountingApplicationList(entity_id: number) {
+export function getDoubleCountingApplicationList(query: AgreementListQuery) {
   return apiFetch.GET("/double-counting/applications/list-admin/", {
-    params: { query: { entity_id } },
+    params: {
+      query,
+    },
   })
+}
+
+export function getApplicationFilters(
+  field: string,
+  query: AgreementListQuery
+) {
+  return apiFetch
+    .GET("/double-counting/applications/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
 }
 
 export function getDoubleCountingApplication(
