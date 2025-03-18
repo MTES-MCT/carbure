@@ -5,4 +5,7 @@
 
 .objective-section__content {
   margin-top: var(--spacing-2w);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4w);
 }

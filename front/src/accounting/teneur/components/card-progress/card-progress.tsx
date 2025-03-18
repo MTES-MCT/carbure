@@ -1,4 +1,4 @@
-import { Fragment, ReactNode } from "react"
+import { ReactNode } from "react"
 import { Badge } from "@codegouvfr/react-dsfr/Badge"
 import { useTranslation } from "react-i18next"
 import css from "./card-progress.module.css"
@@ -17,17 +17,19 @@ export type CardProgressProps = {
   children?: ReactNode
 
   // Target quantity
-  targetQuantity: number
+  targetQuantity?: number
 
-  baseQuantity: number
+  baseQuantity?: number
 
   // Currently declared quantity
-  declaredQuantity: number
+  declaredQuantity?: number
 
   // Allow to display custom badge
   badge?: ReactNode
 
   onClick?: () => void
+
+  className?: string
 }
 export const CardProgress = ({
   title,
@@ -40,11 +42,14 @@ export const CardProgress = ({
   badge,
   children,
   onClick,
+  className,
 }: CardProgressProps) => {
   const ButtonOrFragment = onClick ? "button" : "div"
 
   return (
-    <ButtonOrFragment className={cl(onClick && css["card-progress-button"])}>
+    <ButtonOrFragment
+      className={cl(onClick && css["card-progress-button"], className)}
+    >
       <div className={css["card-progress"]}>
         <div className={css["card-progress__header"]}>
           {title ? (
@@ -72,12 +77,15 @@ export const CardProgress = ({
             </div>
           )}
         </div>
-
-        <ProgressBar
-          targetQuantity={targetQuantity}
-          baseQuantity={baseQuantity}
-          declaredQuantity={declaredQuantity}
-        />
+        {targetQuantity !== undefined &&
+          baseQuantity !== undefined &&
+          declaredQuantity !== undefined && (
+            <ProgressBar
+              targetQuantity={targetQuantity}
+              baseQuantity={baseQuantity}
+              declaredQuantity={declaredQuantity}
+            />
+          )}
         {children}
         {onClick && (
           <ArrowRightLine
@@ -101,7 +109,7 @@ const DefaultBadge = ({
   const severity = targetQuantity > declaredQuantity ? "error" : "success"
 
   return (
-    <Badge severity={severity}>
+    <Badge severity={severity} small>
       {targetQuantity > declaredQuantity ? t("Non atteint") : t("Atteint")}
     </Badge>
   )

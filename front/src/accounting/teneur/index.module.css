@@ -1,0 +1,5 @@
+.teneur-page-row {
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: var(--spacing-2w);
+  column-gap: var(--spacing-1w);
+}

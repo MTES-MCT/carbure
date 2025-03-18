@@ -7,9 +7,12 @@ import { CardProgress } from "./components/card-progress"
 import { useQuery } from "common/hooks/async"
 import { getObjectives } from "./api"
 import useEntity from "common/hooks/entity"
-import { Text } from "common/components/text"
 import { formatSector } from "accounting/utils/formatters"
 import { RecapData } from "./components/recap-data"
+import css from "./index.module.css"
+import Badge from "@codegouvfr/react-dsfr/Badge"
+import { CategoryEnum } from "common/types"
+
 export const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
@@ -23,6 +26,10 @@ export const Teneur = () => {
     return <LoaderOverlay />
   }
 
+  const onCategoryClick = (category: CategoryEnum) => {
+    console.log(category)
+  }
+
   return (
     <>
       <Notice noColor variant="info">
@@ -30,7 +37,7 @@ export const Teneur = () => {
           "Bienvenue dans votre espace de teneur et objectifs annuels. Vous pouvez simuler des conversions quantités et tCO2 eq. évitées, ainsi qu’y rentrer vos quantités de teneur mensuelle afin de clôturer votre comptabilité mensuelle."
         )}
       </Notice>
-      <Box>
+      <Box gap="lg">
         <Notice noColor variant="info">
           <Row style={{ alignItems: "center" }}>
             <Col spread>
@@ -100,7 +107,7 @@ export const Teneur = () => {
           title={t("Avancement par filière")}
           description={t("Retrouvez ici votre suivi d’objectif par filière.")}
         >
-          <Grid>
+          <Grid className={css["teneur-page-row"]}>
             {result?.sectors.map((sector) => (
               <CardProgress
                 key={sector.code}
@@ -136,6 +143,131 @@ export const Teneur = () => {
               </CardProgress>
             ))}
           </Grid>
+        </ObjectiveSection>
+        <ObjectiveSection
+          title={t("Avancement par catégorie de carburants alternatifs")}
+        >
+          <ObjectiveSection
+            title={t("Catégories plafonnées")}
+            description={t("Catégories dans lesquelles un plafond est fixé.")}
+            size="small"
+          >
+            <Grid className={css["teneur-page-row"]}>
+              {result?.capped_categories.map((category) => (
+                <CardProgress
+                  key={category.code}
+                  title={category.code}
+                  baseQuantity={category.teneur_declared}
+                  targetQuantity={category.limit}
+                  declaredQuantity={category.teneur_declared_month}
+                  badge={
+                    category.teneur_declared + category.teneur_declared_month >=
+                    category.limit ? (
+                      <Badge severity="error" small>
+                        {t("Plafond atteint")}
+                      </Badge>
+                    ) : null
+                  }
+                  onClick={() => onCategoryClick(category.code)}
+                >
+                  <ul>
+                    <RecapData.TeneurDeclaredMonth
+                      value={category.teneur_declared_month}
+                      unit="GJ"
+                    />
+                    <RecapData.RemainingQuantityBeforeLimit
+                      value={
+                        category.limit -
+                        category.teneur_declared -
+                        category.teneur_declared_month
+                      }
+                      unit="GJ"
+                    />
+                    <RecapData.QuantityAvailable
+                      value={category.quantity_available}
+                      unit="GJ"
+                    />
+                  </ul>
+                </CardProgress>
+              ))}
+            </Grid>
+          </ObjectiveSection>
+
+          <ObjectiveSection
+            title={t("Catégories objectivées")}
+            description={t(
+              "Catégories pour lesquelles un objectif minimal est requis."
+            )}
+            size="small"
+          >
+            <Grid className={css["teneur-page-row"]}>
+              {result?.objectivized_categories.map((category) => (
+                <CardProgress
+                  key={category.code}
+                  title={category.code}
+                  baseQuantity={category.teneur_declared}
+                  targetQuantity={category.objective}
+                  declaredQuantity={category.teneur_declared_month}
+                  badge={
+                    <CardProgress.DefaultBadge
+                      targetQuantity={category.objective}
+                      declaredQuantity={
+                        category.teneur_declared +
+                        category.teneur_declared_month
+                      }
+                    />
+                  }
+                  onClick={() => onCategoryClick(category.code)}
+                >
+                  <ul>
+                    <RecapData.TeneurDeclaredMonth
+                      value={category.teneur_declared_month}
+                      unit="GJ"
+                    />
+                    <RecapData.RemainingQuantityBeforeObjective
+                      value={
+                        category.objective -
+                        category.teneur_declared -
+                        category.teneur_declared_month
+                      }
+                      unit="GJ"
+                    />
+                    <RecapData.QuantityAvailable
+                      value={category.quantity_available}
+                      unit="GJ"
+                    />
+                  </ul>
+                </CardProgress>
+              ))}
+            </Grid>
+          </ObjectiveSection>
+
+          <ObjectiveSection
+            title={t("Catégories ni objectivées ni plafonnées")}
+            size="small"
+          >
+            <Grid className={css["teneur-page-row"]}>
+              {result?.unconstrained_categories.map((category) => (
+                <CardProgress key={category.code} title={category.code}>
+                  <ul>
+                    <RecapData.TeneurDeclared
+                      value={category.teneur_declared}
+                      unit="GJ"
+                    />
+                    <RecapData.TeneurDeclaredMonth
+                      value={category.teneur_declared_month}
+                      unit="GJ"
+                    />
+
+                    <RecapData.QuantityAvailable
+                      value={category.quantity_available}
+                      unit="GJ"
+                    />
+                  </ul>
+                </CardProgress>
+              ))}
+            </Grid>
+          </ObjectiveSection>
         </ObjectiveSection>
       </Box>
     </>
