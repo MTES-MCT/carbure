@@ -1,7 +1,8 @@
 import { fr, FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr"
 import cl from "clsx"
 import styles from "./icon.module.css"
-interface BaseIconProps {
+import { Layout, layout } from "../scaffold"
+interface BaseIconProps extends Layout {
   passthrough?: boolean
   size?: "xs" | "sm" | "md" | "lg"
   className?: string
@@ -12,10 +13,18 @@ interface BaseIconProps {
 export type IconName = FrIconClassName | RiIconClassName
 export type IconProps = Omit<BaseIconProps, "name">
 
-export const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
+const Icon = ({
+  size = "md",
+  name,
+  asideX,
+  asideY,
+  spread,
+  ...props
+}: BaseIconProps) => {
   return (
     <span
       {...props}
+      {...layout({ asideX, asideY, spread })}
       className={cl(props.className, styles[`fr-icon--${size}`], fr.cx(name))}
     />
   )

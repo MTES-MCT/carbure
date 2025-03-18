@@ -29,8 +29,11 @@ export const ProgressBar = ({
   availableQuantity,
 }: ProgressBarProps) => {
   const declaredPercent = (declaredQuantity * 100) / targetQuantity
+
+  // Prevent available quantity to be greater than target quantity
   const availablePercent =
-    ((declaredQuantity + availableQuantity) * 100) / targetQuantity
+    ((declaredQuantity + Math.min(availableQuantity, targetQuantity)) * 100) /
+    targetQuantity
 
   const declaredValueRef = useRef<HTMLSpanElement>()
   const availableValueRef = useRef<HTMLSpanElement>()

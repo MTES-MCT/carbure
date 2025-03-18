@@ -1,5 +1,5 @@
 .progress-bar__container {
-  padding-top: var(--spacing-5v);
+  padding: var(--spacing-5v) 0;
 }
 .progress-bar {
   height: 8px;
