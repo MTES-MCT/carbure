@@ -9,8 +9,8 @@ const meta: Meta<typeof CardProgress> = {
     title: "Essence",
     description: "Objectif en tonnes de CO2 évitées : 14",
     targetQuantity: 200,
-    declaredQuantity: 57,
-    availableQuantity: 114,
+    baseQuantity: 57,
+    declaredQuantity: 114,
     mainValue: 134,
     mainText: "GJ",
     badge: (
@@ -39,15 +39,15 @@ export default meta
 
 export const Default: Story = {}
 
-export const AvailableQuantityZero = {
+export const BaseQuantityZero = {
   args: {
-    availableQuantity: 0,
+    baseQuantity: 0,
   },
 }
 
-export const QuantityDeclaredAndAvailableZero = {
+export const QuantityDeclaredAndBaseZero = {
   args: {
-    availableQuantity: 0,
+    baseQuantity: 0,
     declaredQuantity: 0,
   },
 }

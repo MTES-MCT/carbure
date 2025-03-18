@@ -19,10 +19,10 @@ export type CardProgressProps = {
   // Target quantity
   targetQuantity: number
 
+  baseQuantity: number
+
   // Currently declared quantity
   declaredQuantity: number
-
-  availableQuantity: number
 
   // Allow to display custom badge
   badge?: ReactNode
@@ -31,9 +31,9 @@ export type CardProgressProps = {
 }
 export const CardProgress = ({
   title,
-  declaredQuantity,
+  baseQuantity,
   targetQuantity,
-  availableQuantity,
+  declaredQuantity,
   mainText,
   mainValue,
   description,
@@ -41,7 +41,7 @@ export const CardProgress = ({
   children,
   onClick,
 }: CardProgressProps) => {
-  const ButtonOrFragment = onClick ? "button" : Fragment
+  const ButtonOrFragment = onClick ? "button" : "div"
 
   return (
     <ButtonOrFragment className={cl(onClick && css["card-progress-button"])}>
@@ -75,8 +75,8 @@ export const CardProgress = ({
 
         <ProgressBar
           targetQuantity={targetQuantity}
+          baseQuantity={baseQuantity}
           declaredQuantity={declaredQuantity}
-          availableQuantity={availableQuantity}
         />
         {children}
         {onClick && (

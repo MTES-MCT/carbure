@@ -1,0 +1,8 @@
+.objective-section__text {
+  color: var(--text-default-grey);
+  margin-top: var(--spacing-1v);
+}
+
+.objective-section__content {
+  margin-top: var(--spacing-2w);
+}

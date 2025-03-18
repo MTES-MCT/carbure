@@ -217,3 +217,7 @@ hr {
   flex-direction: column;
   gap: var(--spacing-3w);
 }
+
+.box--gap-lg {
+  gap: var(--spacing-4w);
+}

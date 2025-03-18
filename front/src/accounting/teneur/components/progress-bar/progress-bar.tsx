@@ -1,17 +1,17 @@
 import css from "./progress-bar.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"
+import { formatNumber } from "common/utils/formatters"
 import { useLayoutEffect, useRef, useState } from "react"
 
 export type ProgressBarProps = {
   // Target objective
   targetQuantity: number
 
+  baseQuantity: number
+
   // Currently declared quantity
   declaredQuantity: number
-
-  // Available quantity that can be added
-  availableQuantity: number
 }
 
 const PROGRESS_BAR_STEPS = 5
@@ -24,16 +24,22 @@ const getTextPercentWidth = (element?: HTMLSpanElement) => {
 }
 
 export const ProgressBar = ({
-  targetQuantity,
-  declaredQuantity,
-  availableQuantity,
+  targetQuantity, // 16
+  baseQuantity, // 1
+  declaredQuantity, // 100
 }: ProgressBarProps) => {
-  const declaredPercent = (declaredQuantity * 100) / targetQuantity
+  const declaredPercent = Number(
+    formatNumber((baseQuantity * 100) / targetQuantity, 0)
+  )
 
   // Prevent available quantity to be greater than target quantity
-  const availablePercent =
-    ((declaredQuantity + Math.min(availableQuantity, targetQuantity)) * 100) /
-    targetQuantity
+  const availablePercent = Number(
+    formatNumber(
+      (Math.min(baseQuantity + declaredQuantity, targetQuantity) * 100) /
+        targetQuantity,
+      0
+    )
+  )
 
   const declaredValueRef = useRef<HTMLSpanElement>()
   const availableValueRef = useRef<HTMLSpanElement>()
@@ -54,7 +60,7 @@ export const ProgressBar = ({
     <div className={css["progress-bar__container"]}>
       <div className={css["progress-bar"]}>
         {/* Only show declared percentage if value is greater than 0 */}
-        {declaredQuantity && declaredQuantity > 0 ? (
+        {baseQuantity && baseQuantity > 0 ? (
           <span
             className={css["progress-bar--quantity-declared"]}
             style={{ width: `${declaredPercent}%` }}
@@ -71,7 +77,7 @@ export const ProgressBar = ({
           </span>
         ) : null}
         {/* Only show available percentage if available quantity is greater than declared quantity */}
-        {availableQuantity && availableQuantity > declaredQuantity ? (
+        {declaredQuantity && declaredQuantity > baseQuantity ? (
           <span
             className={css["progress-bar--quantity-available"]}
             style={{ width: `${availablePercent}%` }}

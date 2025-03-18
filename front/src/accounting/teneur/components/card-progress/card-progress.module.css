@@ -8,15 +8,15 @@
   transition: background 0.2s ease-in-out;
 }
 
-.card-progress:hover {
-  background: var(--background-default-grey-hover);
-}
-
 .card-progress-button {
   width: 100%;
   padding: 0;
   text-align: left;
   position: relative;
+}
+
+.card-progress-button .card-progress:hover {
+  background: var(--background-default-grey-hover);
 }
 
 .card-progress-button::before {
