@@ -8,10 +8,10 @@ import {
   TextInputProps,
 } from "common/components/input"
 import Select, { SelectProps } from "common/components/select"
-import * as api from "carbure/api"
-import * as norm from "carbure/utils/normalizers"
+import * as api from "common/api"
+import * as norm from "common/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
+import { Biofuel, Country, Feedstock, Unit } from "common/types"
 import { Option } from "common/utils/normalize"
 
 interface LotFieldsProps {

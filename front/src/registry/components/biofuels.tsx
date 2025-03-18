@@ -1,4 +1,4 @@
-import { findBiofuels } from "carbure/api"
+import { findBiofuels } from "common/api"
 import Table from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { Fragment } from "react"

@@ -1,4 +1,4 @@
-import { useUser } from "carbure/hooks/user"
+import { useUser } from "common/hooks/user"
 import { SimpleMenu } from "common/components/menu2"
 import { Text } from "common/components/text"
 import css from "./user-menu.module.css"
@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom"
 import { ListItem } from "common/components/list2/list-item"
 import { useRoutes } from "common/hooks/routes"
 import { compact } from "common/utils/collection"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useMemo } from "react"
 import {
   AccountLine,

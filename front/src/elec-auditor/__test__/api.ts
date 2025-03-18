@@ -1,7 +1,7 @@
 import {
   mockGetWithResponseData,
   mockPostWithResponseData,
-} from "carbure/__test__/helpers"
+} from "common/__test__/helpers"
 import {
   elecAuditApplicationCheckReportSuccess,
   elecAuditCPOFilters,

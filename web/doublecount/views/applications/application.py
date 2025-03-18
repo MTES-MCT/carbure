@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity, UserRights
+from doublecount.filters import ApplicationFilter
 from doublecount.models import DoubleCountingApplication
 from doublecount.permissions import HasAdminRights
 from doublecount.serializers import DoubleCountingApplicationSerializer
@@ -16,6 +17,7 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
     serializer_class = DoubleCountingApplicationSerializer
     pagination_class = None
     lookup_field = "id"
+    filterset_class = ApplicationFilter
     permission_classes = (
         IsAuthenticated,
         HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN]),

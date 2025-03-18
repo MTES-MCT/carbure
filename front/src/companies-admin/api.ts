@@ -1,5 +1,5 @@
 import { api as apiFetch } from "common/services/api-fetch"
-import { UserRightStatus, EntityType, UserRole } from "carbure/types"
+import { UserRightStatus, EntityType, UserRole } from "common/types"
 
 export function getCompanies(entity_id: number) {
   return apiFetch.GET("/entities/", {

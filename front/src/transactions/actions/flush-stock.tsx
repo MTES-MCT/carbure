@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Stock } from "../types"
 import * as api from "../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import { usePortal } from "common/components/portal"
 import { useNotify } from "common/components/notifications"

@@ -10,8 +10,8 @@ import {
   SettingsLine,
 } from "common/components/icon"
 import { EntitySelector } from "./entity-selector"
-import { useUser } from "carbure/hooks/user"
-import useEntity from "carbure/hooks/entity"
+import { useUser } from "common/hooks/user"
+import useEntity from "common/hooks/entity"
 
 export const PrivateSidebar = () => {
   const menuItems = usePrivateSidebar()

@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom"
 
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"

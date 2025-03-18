@@ -7,7 +7,7 @@ import {
   formatPercentage,
   formatUnit,
 } from "common/utils/formatters"
-import { getDeliveryLabel } from "carbure/utils/normalizers"
+import { getDeliveryLabel } from "common/utils/normalizers"
 import { toSearchParams } from "common/services/api"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -19,8 +19,8 @@ import { Filter, Return } from "common/components/icons"
 import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../../../common/components/no-result"
 import { compact } from "common/utils/collection"
-import useEntity from "carbure/hooks/entity"
-import { Unit } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { Unit } from "common/types"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery

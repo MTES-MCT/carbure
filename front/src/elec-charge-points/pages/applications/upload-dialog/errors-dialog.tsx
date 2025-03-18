@@ -7,7 +7,7 @@ import { ElecChargePointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
 import { TDGInfo } from "./tdg-info"
-import { UploadCheckError } from "carbure/types"
+import { UploadCheckError } from "common/types"
 
 export type ErrorsDetailsDialogProps = {
   fileData: ElecChargePointsApplicationCheckInfo

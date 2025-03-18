@@ -1,5 +1,5 @@
 import pickApi from "../../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import {
   StockSummaryBar,
   StockSummaryBarProps,

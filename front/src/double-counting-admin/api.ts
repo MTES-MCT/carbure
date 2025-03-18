@@ -1,11 +1,10 @@
 import { download } from "common/services/api"
+import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import {
   api as apiFetch,
   download as downloadFetch,
-  toFileArray,
 } from "common/services/api-fetch"
-import { PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by } from "api-schema"
-
+import { AgreementListQuery } from "./types"
 // GLOBAL
 
 export function getSnapshot(entity_id: number) {
@@ -16,10 +15,29 @@ export function getSnapshot(entity_id: number) {
 
 // APPLICATIONS
 
-export function getDoubleCountingApplicationList(entity_id: number) {
+export function getDoubleCountingApplicationList(query: AgreementListQuery) {
   return apiFetch.GET("/double-counting/applications/list-admin/", {
-    params: { query: { entity_id } },
+    params: {
+      query,
+    },
   })
+}
+
+export function getApplicationFilters(
+  field: string,
+  query: AgreementListQuery
+) {
+  return apiFetch
+    .GET("/double-counting/applications/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
 }
 
 export function getDoubleCountingApplication(
@@ -111,24 +129,26 @@ export function downloadDoubleCountingAgreementList(entity_id: number) {
   })
 }
 
-export function getDoubleCountingAgreementList(
-  entity_id: number,
-  order_by?: string,
-  ordering?: string
-) {
+export function getDoubleCountingAgreementList(query: AgreementListQuery) {
   return apiFetch.GET("/double-counting/agreements/agreement-admin/", {
     params: {
-      query: {
-        entity_id,
-        ordering,
-        order_by: order_by
-          ? [
-              order_by as PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by,
-            ]
-          : undefined,
-      },
+      query,
     },
   })
+}
+
+export function getAgrementFilters(field: string, query: AgreementListQuery) {
+  return apiFetch
+    .GET("/double-counting/agreements/filters/", {
+      params: {
+        query: {
+          filter: field,
+          ...query,
+          ...CBQUERY_RESET,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
 }
 
 export function getDoubleCountingAgreement(
@@ -146,6 +166,6 @@ export function getDoubleCountingAgreement(
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   return apiFetch.POST("/double-counting/applications/check-admin-files/", {
     params: { query: { entity_id } },
-    body: { files: toFileArray(files) },
+    body: { files: Array.from(files) },
   })
 }

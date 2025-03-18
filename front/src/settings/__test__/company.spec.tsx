@@ -3,7 +3,7 @@ import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
-import { admin, operator, producer, trader } from "carbure/__test__/data"
+import { admin, operator, producer, trader } from "common/__test__/data"
 import Settings from "../index"
 import {
   okDisableMac,
@@ -13,7 +13,7 @@ import {
   okEnableTrading,
 } from "./api"
 import server from "./server"
-import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
+import { setEntity, waitWhileLoading } from "common/__test__/helpers"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (

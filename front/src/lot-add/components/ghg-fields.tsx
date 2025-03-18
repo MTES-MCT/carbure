@@ -4,8 +4,8 @@ import { formatGHG, formatPercentage } from "common/utils/formatters"
 import isAfter from "date-fns/isAfter"
 import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
-import useEntity from "carbure/hooks/entity"
-import { EntityType, type Entity, SiteType } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { EntityType, type Entity, SiteType } from "common/types"
 
 interface GHGFieldsProps {
   readOnly?: boolean

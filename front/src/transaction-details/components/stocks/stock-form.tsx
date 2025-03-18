@@ -8,7 +8,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-} from "carbure/types"
+} from "common/types"
 import LotFields from "./lot-fields"
 import JourneyFields from "./journey-fields"
 

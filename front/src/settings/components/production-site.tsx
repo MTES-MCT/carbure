@@ -1,8 +1,8 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { Entity, ProductionSiteDetails, UserRole } from "carbure/types"
+import { Entity, ProductionSiteDetails, UserRole } from "common/types"
 
-import { useRights } from "carbure/hooks/entity"
+import { useRights } from "common/hooks/entity"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
 import { Confirm } from "common/components/dialog"

@@ -7,6 +7,7 @@ from .export_application import ExportApplicationActionMixin
 from .lists import ListActionMixin
 from .reject_application import RejectActionMixin
 from .update_quotas import UpdateQuotaActionMixin
+from .filter import FilterActionMixin
 
 
 class ActionMixin(
@@ -19,5 +20,6 @@ class ActionMixin(
     ListActionMixin,
     RejectActionMixin,
     UpdateQuotaActionMixin,
+    FilterActionMixin,
 ):
     pass

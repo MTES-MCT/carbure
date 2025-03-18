@@ -1,16 +1,16 @@
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 import { Route } from "react-router-dom"
 import { TestRoot } from "setupTests"
 
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { operator } from "carbure/__test__/data"
+import { operator } from "common/__test__/data"
 import {
   findByTextInNode,
   getField,
   setEntity,
   waitWhileLoading,
-} from "carbure/__test__/helpers"
+} from "common/__test__/helpers"
 import { SafOperator } from ".."
 import server from "./api"
 

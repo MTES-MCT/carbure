@@ -1,4 +1,4 @@
-import * as norm from "carbure/utils/normalizers"
+import * as norm from "common/utils/normalizers"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold"
 import { Normalizer } from "common/utils/normalize"

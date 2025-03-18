@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
 import { Fieldset, useBind, useFormContext } from "common/components/form"
 import {
@@ -8,11 +8,11 @@ import {
   TextInput,
   TextInputProps,
 } from "common/components/input"
-import * as api from "carbure/api"
-import * as norm from "carbure/utils/normalizers"
+import * as api from "common/api"
+import * as norm from "common/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common/components/icons"
-import { Country, ProductionSite, EntityPreview } from "carbure/types"
+import { Country, ProductionSite, EntityPreview } from "common/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common/utils/collection"
 

@@ -1,4 +1,4 @@
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 import { Order } from "common/components/table"
 import { ElecAdminSnapshot } from "elec-admin/types"
 
