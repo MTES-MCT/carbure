@@ -14,6 +14,15 @@ import {
   biofuelFormStep,
   biofuelFormStepKey,
 } from "./biofuel-form"
+import { CategoryEnum, ExtendedUnit, Unit } from "common/types"
+import { CreateOperationType } from "accounting/types"
+import { Text } from "common/components/text"
+import { ProgressBar } from "../progress-bar"
+import { RecapData } from "../recap-data"
+import {
+  RecapOperation,
+  RecapOperationGrid,
+} from "accounting/components/recap-operation"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
@@ -46,11 +55,43 @@ const DeclareTeneurDialogContent = ({
     >
       <Main>
         <Stepper />
-
+        {currentStep?.key !== biofuelFormStepKey && (
+          <>
+            <Box gap="xs">
+              <Text>{t("Rappel de votre progression")}</Text>
+              <ProgressBar
+                baseQuantity={0}
+                targetQuantity={100}
+                declaredQuantity={50}
+              />
+              {/* TODO: conditionner les phrases à afficher selon le type de catégorie */}
+              <RecapData.RemainingQuantityBeforeLimit
+                value={100}
+                unit={ExtendedUnit.GJ}
+              />
+            </Box>
+            <Box>
+              <RecapOperationGrid>
+                <RecapOperation
+                  balance={form.value.balance!}
+                  unit={ExtendedUnit.GJ}
+                />
+              </RecapOperationGrid>
+            </Box>
+          </>
+        )}
         {currentStep?.key !== "recap" && (
           <Box>
             <Form form={form}>
               {currentStep?.key === biofuelFormStepKey && <BiofuelForm />}
+              {currentStep?.key === quantityFormStepKey && (
+                <QuantityForm
+                  balance={form.value.balance!}
+                  type={CreateOperationType.TENEUR}
+                  depot_quantity_max={form.value.balance?.available_balance}
+                  unit={ExtendedUnit.GJ}
+                />
+              )}
             </Form>
           </Box>
         )}
@@ -64,7 +105,9 @@ export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const form = useForm<DeclareTeneurDialogForm>({})
   const steps = [
     biofuelFormStep(form.value),
-    quantityFormStep(form.value),
+    quantityFormStep(form.value, {
+      title: t("Quantité de la teneur et tC02 évitées"),
+    }),
     { key: "recap", title: t("Récapitulatif") },
   ]
   return (

@@ -23,6 +23,11 @@
 .notice__body {
   display: flex;
   justify-content: space-between;
+  gap: var(--spacing-1w);
+}
+
+.notice__body-content {
+  width: 100%;
 }
 
 .notice__close {

@@ -10,11 +10,13 @@ import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
 import { useQuantityForm } from "./quantity-form.hooks"
+import { ExtendedUnit, Unit } from "common/types"
 
 type QuantityFormComponentProps = {
   balance: Balance
   depot_quantity_max?: number
   type: CreateOperationType
+  unit?: Unit | ExtendedUnit
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
@@ -24,9 +26,11 @@ export const QuantityForm = ({
   balance,
   depot_quantity_max,
   type,
+  unit: customUnit,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit()
+  const { formatUnit, unit } = useUnit(customUnit)
+
   const { value, bind, setField } = useFormContext<QuantityFormProps>()
   const mutation = useQuantityForm({ balance, values: value })
   const [quantityDeclared, setQuantityDeclared] = useState(
@@ -94,7 +98,9 @@ export const QuantityForm = ({
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
-                  quantity: formatUnit(value.quantity!, 0),
+                  quantity: formatUnit(value.quantity!, {
+                    fractionDigits: 0,
+                  }),
                   min: formatEmissionMin(value.avoided_emissions_min),
                   max: formatEmissionMax(value.avoided_emissions_max),
                 }}
@@ -114,9 +120,15 @@ export const QuantityForm = ({
   )
 }
 
-export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
+export const QuantitySummary = ({
+  values,
+  unit,
+}: {
+  values: QuantityFormProps
+  unit?: Unit | ExtendedUnit
+}) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { formatUnit } = useUnit(unit)
   if (!values.quantity || !values.avoided_emissions) {
     return null
   }
@@ -125,7 +137,9 @@ export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
     <>
       <OperationText
         title={t("Quantité")}
-        description={formatUnit(values.quantity, 0)}
+        description={formatUnit(values.quantity, {
+          fractionDigits: 0,
+        })}
       />
       <OperationText
         title={t("TCO2 évitées équivalentes")}

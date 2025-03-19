@@ -1,5 +1,5 @@
 import { useQuery } from "common/hooks/async"
-import * as api from "./api"
+
 import useEntity from "common/hooks/entity"
 import { useBalancesColumns, useGetFilterOptions } from "./balances.hooks"
 import { Table } from "common/components/table2"
@@ -9,10 +9,10 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-import { Pagination } from "common/components/pagination2"
-import { BalancesFilter } from "./types"
-import { OperationsStatus } from "accounting/types"
+import { Pagination } from "common/components/pagination2/pagination"
+import { OperationsStatus, BalancesFilter } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
+import { getBalances } from "accounting/api/balances"
 
 export const Balances = () => {
   const entity = useEntity()
@@ -32,7 +32,7 @@ export const Balances = () => {
 
   const query = useCBQueryBuilder<[], OperationsStatus[], undefined>(state)
 
-  const { result, loading } = useQuery(api.getBalances, {
+  const { result, loading } = useQuery(getBalances, {
     key: "balances",
     params: [query],
   })

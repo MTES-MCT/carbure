@@ -7,10 +7,13 @@ import { addQueryParams } from "common/utils/routes"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { DebitOperationDialog } from "./components/debit-operation-dialog"
-import { BalancesFilter, BalancesQuery } from "./types"
-import * as api from "./api"
+import {
+  BalancesFilter,
+  BalancesQuery,
+  OperationsStatus,
+} from "accounting/types"
+import * as api from "accounting/api/balances"
 import { formatSector } from "accounting/utils/formatters"
-import { OperationsStatus } from "accounting/types"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"

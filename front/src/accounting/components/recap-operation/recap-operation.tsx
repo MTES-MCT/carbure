@@ -4,14 +4,19 @@ import { formatSector } from "accounting/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
 import { Grid } from "common/components/scaffold"
+import { ExtendedUnit, Unit } from "common/types"
 
 type RecapOperationProps = {
   balance: Balance
+  unit?: Unit | ExtendedUnit
 }
 
-export const RecapOperation = ({ balance }: RecapOperationProps) => {
+export const RecapOperation = ({
+  balance,
+  unit: customUnit,
+}: RecapOperationProps) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { formatUnit } = useUnit(customUnit)
 
   return (
     <>
@@ -33,7 +38,7 @@ export const RecapOperation = ({ balance }: RecapOperationProps) => {
         })}
         description={
           balance.available_balance
-            ? formatUnit(balance.available_balance, 0)
+            ? formatUnit(balance.available_balance, { fractionDigits: 0 })
             : ""
         }
       />

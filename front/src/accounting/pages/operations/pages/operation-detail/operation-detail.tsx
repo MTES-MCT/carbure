@@ -123,7 +123,9 @@ export const OperationDetail = () => {
           label: t("Quantité"),
           value: getOperationQuantity(
             operation,
-            formatUnit(operation.quantity, 0)
+            formatUnit(operation.quantity, {
+              fractionDigits: 0,
+            })
           ),
         },
         {

@@ -76,7 +76,7 @@ export const Notice = ({
       style={style}
     >
       <div className={css.notice__body}>
-        <div>
+        <div className={css["notice__body-content"]}>
           {Icon ? <Icon size="md" className={css.notice__icon} /> : null}
           {title && (
             <span className={css.notice__title}>

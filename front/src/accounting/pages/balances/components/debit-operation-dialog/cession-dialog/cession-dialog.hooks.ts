@@ -60,7 +60,9 @@ export const useCessionDialog = ({
         t(
           "La cession d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatUnit(values.quantity!, 0),
+            quantity: formatUnit(values.quantity!, {
+              fractionDigits: 0,
+            }),
           }
         ),
         { variant: "success" }

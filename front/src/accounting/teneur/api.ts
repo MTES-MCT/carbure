@@ -1,41 +1,8 @@
+import { getBalances } from "accounting/api/balances"
 import { OperationSector } from "accounting/types"
+import { PathsApiTiruertOperationsGetParametersQueryUnit } from "api-schema"
 import { CategoryEnum } from "common/types"
-
-type Objectives = {
-  global: {
-    objective: number // tCO2
-    teneur_declared: number // TC02
-    quantity_available: number // tC02
-    teneur_declared_month: number // TC02
-  }
-  sectors: {
-    code: OperationSector
-    objective: number // GJ
-    teneur_declared: number // GJ
-    quantity_available: number // GJ
-    teneur_declared_month: number // GJ
-  }[]
-  capped_categories: {
-    code: CategoryEnum
-    limit: number // GJ
-    teneur_declared: number // GJ
-    quantity_available: number // GJ
-    teneur_declared_month: number // GJ
-  }[]
-  objectivized_categories: {
-    code: CategoryEnum
-    objective: number // GJ
-    teneur_declared: number // GJ
-    quantity_available: number // GJ
-    teneur_declared_month: number // GJ
-  }[]
-  unconstrained_categories: {
-    code: CategoryEnum
-    teneur_declared: number // GJ
-    teneur_declared_month: number // GJ
-    quantity_available: number // GJ
-  }[]
-}
+import { Objectives } from "./types"
 
 export const getObjectives = async (
   entity_id: number,
@@ -44,7 +11,7 @@ export const getObjectives = async (
   return new Promise((resolve) => {
     resolve({
       global: {
-        objective: 16, // tCO2
+        target: 16, // tCO2
         teneur_declared: 1, // TC02
         teneur_declared_month: 14, // TC02
         quantity_available: 100, // tC02
@@ -52,21 +19,21 @@ export const getObjectives = async (
       sectors: [
         {
           code: OperationSector.ESSENCE,
-          objective: 9, // GJ
+          target: 9, // GJ
           teneur_declared: 1, // GJ
           quantity_available: 4000, // GJ
           teneur_declared_month: 2, // GJ
         },
         {
           code: OperationSector.DIESEL,
-          objective: 12, // GJ
+          target: 12, // GJ
           teneur_declared: 3, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 0, // GJ
         },
         {
           code: OperationSector.SAF,
-          objective: 12, // GJ
+          target: 12, // GJ
           teneur_declared: 4, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 8, // GJ
@@ -75,28 +42,28 @@ export const getObjectives = async (
       capped_categories: [
         {
           code: CategoryEnum.TALLOL,
-          limit: 12, // GJ
+          target: 12, // GJ
           teneur_declared: 1, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 0, // GJ
         },
         {
           code: CategoryEnum.ANN_IX_A,
-          limit: 8, // GJ
+          target: 8, // GJ
           teneur_declared: 1, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 2, // GJ
         },
         {
           code: CategoryEnum.CONV,
-          limit: 8, // GJ
+          target: 8, // GJ
           teneur_declared: 8, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 0, // GJ
         },
         {
           code: CategoryEnum.EP2AM,
-          limit: 8, // GJ
+          target: 8, // GJ
           teneur_declared: 8, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 0, // GJ
@@ -105,7 +72,7 @@ export const getObjectives = async (
       objectivized_categories: [
         {
           code: CategoryEnum.ANN_IX_B,
-          objective: 12, // GJ
+          target: 12, // GJ
           teneur_declared: 1, // GJ
           quantity_available: 2500, // GJ
           teneur_declared_month: 0, // GJ
@@ -117,10 +84,25 @@ export const getObjectives = async (
           teneur_declared: 1, // GJ
           quantity_available: 80, // GJ
           teneur_declared_month: 4, // GJ
+          target: null,
         },
       ],
     })
   })
 }
 
-export const getBiofuelsCategory = async () => {}
+/**
+  Get the balances for a category (used to get the biofuels category)
+ */
+export const getBalancesCategory = async (
+  entity_id: number,
+  category: CategoryEnum
+) => {
+  return getBalances({
+    entity_id,
+    page: 1,
+    customs_category: [category],
+    // TODO: change in the backend to use the same enum as the entity
+    unit: PathsApiTiruertOperationsGetParametersQueryUnit.mj,
+  })
+}

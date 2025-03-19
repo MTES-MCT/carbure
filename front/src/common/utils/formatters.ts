@@ -3,7 +3,7 @@ import formatTime from "date-fns/format"
 import formatDistanceToNow from "date-fns/formatDistanceToNow"
 import fr from "date-fns/locale/fr"
 import en from "date-fns/locale/en-GB"
-import { Unit } from "common/types"
+import { ExtendedUnit, Unit } from "common/types"
 import i18next from "i18next"
 
 export function formatPeriod(period: number | string) {
@@ -45,11 +45,16 @@ export function formatCelsiusDegree(num: number) {
   return formatNumber(num) + " °C"
 }
 
-export function formatUnit(num: number, unit: Unit, fractionDigits = 2) {
+export function formatUnit(
+  num: number,
+  unit: Unit | ExtendedUnit,
+  fractionDigits = 2
+) {
   const unitLabel = {
     [Unit.l]: i18next.t("litres", { count: num }),
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
+    [ExtendedUnit.GJ]: i18next.t("GJ"),
   }
 
   return `${formatNumber(num, fractionDigits)} ${unitLabel[unit]}`
@@ -147,4 +152,10 @@ export function chunk(str: string, size: number): string[] {
   }
 
   return chunks.reverse()
+}
+
+export const CONVERSIONS = {
+  energy: {
+    MJ_TO_GJ: (value: number) => value / 1000,
+  },
 }

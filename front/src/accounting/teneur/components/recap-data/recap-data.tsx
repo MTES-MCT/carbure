@@ -10,7 +10,7 @@ const RecapDataTeneurDeclaredMonth = ({
 }) => {
   const { t } = useTranslation()
   return (
-    <Text is="li" size="sm">
+    <Text size="sm">
       {t("Teneur déclarée ce mois :")}{" "}
       {t("{{count}} {{unit}}", {
         count: value,
@@ -29,7 +29,7 @@ const RecapDataTeneurDeclared = ({
 }) => {
   const { t } = useTranslation()
   return (
-    <Text is="li" size="sm">
+    <Text size="sm">
       {t("Teneur totale déclarée :")}{" "}
       {t("{{count}} {{unit}}", {
         count: value,
@@ -48,7 +48,7 @@ const RecapDataQuantityAvailable = ({
 }) => {
   const { t } = useTranslation()
   return (
-    <Text is="li" size="sm">
+    <Text size="sm">
       {t("Volume disponible :")}{" "}
       {t("{{count}} {{unit}}", { count: value, unit })}
     </Text>
@@ -64,7 +64,7 @@ const RemainingQuantityBeforeLimit = ({
 }) => {
   const { t } = useTranslation()
   return (
-    <Text is="li" size="sm">
+    <Text size="sm">
       {t("Volume restant jusqu’au plafond :")}{" "}
       {t("{{count}} {{unit}}", { count: value, unit })}
     </Text>
@@ -80,7 +80,7 @@ const RemainingQuantityBeforeObjective = ({
 }) => {
   const { t } = useTranslation()
   return (
-    <Text is="li" size="sm">
+    <Text size="sm">
       {t("Volume restant jusqu’à l’objectif :")}{" "}
       {t("{{count}} {{unit}}", { count: value, unit })}
     </Text>

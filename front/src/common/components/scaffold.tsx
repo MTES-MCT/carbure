@@ -113,9 +113,9 @@ export const LoaderOverlay = () => (
 )
 
 export const Box = ({
-  gap,
+  gap = "md",
   ...props
-}: JSX.IntrinsicElements["div"] & { gap?: "lg" }) => (
+}: JSX.IntrinsicElements["div"] & { gap?: "lg" | "md" | "sm" | "xs" }) => (
   <div
     {...props}
     className={cl(css.box, props.className, gap && css[`box--gap-${gap}`])}

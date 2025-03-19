@@ -47,7 +47,9 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
               t={t}
               values={{
                 depot: depot.name,
-                quantity: formatUnit(depot.quantity.credit, 0),
+                quantity: formatUnit(depot.quantity.credit, {
+                  fractionDigits: 0,
+                }),
               }}
               defaults="{{depot}} ({{quantity}} disponibles)"
             />
@@ -64,7 +66,9 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
                 t={t}
                 values={{
                   depot: value.from_depot.name,
-                  quantity: formatUnit(value.from_depot.quantity.credit, 0),
+                  quantity: formatUnit(value.from_depot.quantity.credit, {
+                    fractionDigits: 0,
+                  }),
                 }}
                 defaults="Solde disponible dans le dépôt {{depot}} : <strong>{{quantity}}</strong>"
               />
@@ -108,7 +112,9 @@ export const FromDepotSummary = ({
       />
       <OperationText
         title={t("Solde disponible")}
-        description={formatUnit(values.from_depot.quantity.credit, 0)}
+        description={formatUnit(values.from_depot.quantity.credit, {
+          fractionDigits: 0,
+        })}
       />
     </>
   )

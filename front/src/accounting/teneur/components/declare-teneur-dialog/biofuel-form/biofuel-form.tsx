@@ -1,25 +1,58 @@
+import { getBalancesCategory } from "accounting/teneur/api"
 import { Autocomplete } from "common/components/autocomplete2"
+import { useFormContext } from "common/components/form2"
 import { Step } from "common/components/stepper"
-import { Biofuel } from "common/types"
+import { useQuery } from "common/hooks/async"
+import useEntity from "common/hooks/entity"
+import { CategoryEnum } from "common/types"
 import i18next from "i18next"
+import { useTranslation } from "react-i18next"
+import { apiTypes } from "common/services/api-fetch.types"
 
 export type BiofuelFormProps = {
-  biofuel?: Biofuel
+  balance?: apiTypes["Balance"]
 }
 
 export const BiofuelForm = () => {
-  return <Autocomplete />
+  const entity = useEntity()
+  const { t } = useTranslation()
+  const { bind } = useFormContext<BiofuelFormProps>()
+
+  // TODO: get category from props
+  const result = useQuery(getBalancesCategory, {
+    key: "biofuels-category",
+    params: [entity.id, CategoryEnum.CONV],
+  })
+
+  return (
+    <Autocomplete
+      label={t("Sélectionnez un biocarburant")}
+      placeholder={t("Ex: EMHV")}
+      options={result.result?.data?.results ?? []}
+      normalize={(balance) => ({
+        value: balance,
+        label: balance.biofuel.code,
+      })}
+      loading={result.loading}
+      required
+      {...bind("balance")}
+    />
+  )
 }
 
 export const biofuelFormStepKey = "biofuel"
 type BiofuelFormStepKey = typeof biofuelFormStepKey
 
+const allowNextStep = (values: BiofuelFormProps) => {
+  return Boolean(values.balance)
+}
+
 export const biofuelFormStep: (
   values: BiofuelFormProps
-) => Step<BiofuelFormStepKey> = () => {
+) => Step<BiofuelFormStepKey> = (values) => {
   return {
     key: biofuelFormStepKey,
     title: i18next.t("Biocarburant"),
-    allowNextStep: true,
+    allowNextStep: allowNextStep(values),
   }
 }
