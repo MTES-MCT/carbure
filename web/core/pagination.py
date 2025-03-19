@@ -49,10 +49,10 @@ class MetadataPageNumberPagination(CustomPageNumberPagination):
         return Response(
             {
                 "count": self.page.paginator.count,
+                **self.get_extra_metadata(),
                 "next": self.get_next_link(),
                 "previous": self.get_previous_link(),
                 "results": data,
-                **self.get_extra_metadata(),
             }
         )
 
