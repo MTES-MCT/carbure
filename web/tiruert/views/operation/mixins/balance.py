@@ -52,40 +52,28 @@ class BalanceActionMixin:
         pagination_class=PageNumberPagination,
     )
     def balance(self, request, pk=None):
-        entity_id = request.query_params.get("entity_id")
+        entity_id = request.entity.id
         group_by = request.query_params.get("group_by", "")
         unit = request.unit
-
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
 
         operations = self.filter_queryset(self.get_queryset())
 
-        if group_by in ["lot", "depot"]:
-            # Calculate the balance
-            balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
-
-        else:
-            if not date_from:
-                # All operations from beginning of the current year by default
-                current_year = datetime.now().year
-                date_from = make_aware(datetime(current_year, 1, 1))
-                operations = operations.filter(created_at__gte=date_from)
-
-            # Calculate the balance
-            balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
-
-            # Get operations again but this time until the date_from
+        if date_from:
+            operations_with_date_from = operations
+            # Remove date_from filter from operations
             query_params = request.GET.copy()
             query_params.pop("date_from", None)
             filterset = self.filterset_class(data=query_params, queryset=self.get_queryset(), request=request)
-            operations_without_date_filter = filterset.qs
+            operations = filterset.qs
 
-            operations = operations_without_date_filter.filter(created_at__lt=date_from)
+        # First get the whole balance (from forever), so with no date_from filter
+        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
 
-            # Add initial balance and yearly teneur to the balance
-            balance = BalanceService.calculate_initial_balance(balance, entity_id, operations, group_by, unit)
-            balance = BalanceService.calculate_yearly_teneur(balance, entity_id, operations, date_from, group_by, unit)
+        # Then update the balance with quantity and teneur details for requested dates (if any)
+        operations = operations_with_date_from if date_from else operations
+        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit, balance, update_balance=True)
 
         # Convert balance to a list of dictionaries for serialization
         serializer_class = {
