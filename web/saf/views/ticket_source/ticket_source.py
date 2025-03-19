@@ -1,18 +1,23 @@
+from django.db.models import F, Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework.mixins import (
-    ListModelMixin,
-    RetrieveModelMixin,
-)
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity, UserRights
+from core.pagination import MetadataPageNumberPagination
 from saf.filters import TicketSourceFilter
 from saf.models import SafTicketSource
 from saf.permissions import HasUserRights
 from saf.serializers import SafTicketSourceDetailsSerializer, SafTicketSourceSerializer
 
 from .mixins import ActionMixin
+
+
+class SafTicketSourcePagination(MetadataPageNumberPagination):
+    aggregate_fields = {
+        "total_available_volume": Sum(F("total_volume") - F("assigned_volume")),
+    }
 
 
 class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, ActionMixin):
@@ -22,6 +27,7 @@ class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet,
         HasUserRights(None, [Entity.OPERATOR]),
     )
     serializer_class = SafTicketSourceSerializer
+    pagination_class = SafTicketSourcePagination
     filterset_class = TicketSourceFilter
     search_fields = [
         "carbure_id",
