@@ -29,3 +29,8 @@ export interface Objectives {
   objectivized_categories: CategoryObjective[]
   unconstrained_categories: UnconstrainedCategoryObjective[]
 }
+
+export enum TargetType {
+  REACH = "REACH",
+  CAP = "CAP",
+}

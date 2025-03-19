@@ -5,6 +5,8 @@ import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
 import { SectorObjective } from "accounting/teneur/types"
 import { CardGrid } from "../card-grid"
+import { formatEnergy } from "accounting/teneur/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -44,14 +46,16 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             <ul>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={sector.teneur_declared_month}
-                  unit="GJ"
+                  value={formatEnergy(sector.teneur_declared_month, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={sector.quantity_available}
-                  unit="GJ"
+                  value={formatEnergy(sector.quantity_available, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
             </ul>

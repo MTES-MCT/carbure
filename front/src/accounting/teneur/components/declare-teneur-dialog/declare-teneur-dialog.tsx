@@ -14,7 +14,7 @@ import {
   biofuelFormStep,
   biofuelFormStepKey,
 } from "./biofuel-form"
-import { CategoryEnum, ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnit } from "common/types"
 import { CreateOperationType } from "accounting/types"
 import { Text } from "common/components/text"
 import { ProgressBar } from "../progress-bar"
@@ -23,9 +23,21 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
+import {
+  CategoryObjective,
+  TargetType,
+  UnconstrainedCategoryObjective,
+} from "accounting/teneur/types"
+import { CONVERSIONS } from "common/utils/formatters"
+import {
+  computeObjectiveEnergy,
+  formatEnergy,
+} from "accounting/teneur/utils/formatters"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
+  objective: CategoryObjective | UnconstrainedCategoryObjective
+  targetType?: TargetType
 }
 
 interface DeclareTeneurDialogContentProps extends DeclareTeneurDialogProps {
@@ -35,6 +47,8 @@ interface DeclareTeneurDialogContentProps extends DeclareTeneurDialogProps {
 const DeclareTeneurDialogContent = ({
   onClose,
   form,
+  objective,
+  targetType,
 }: DeclareTeneurDialogContentProps) => {
   const { t } = useTranslation()
   const { currentStep, currentStepIndex } = useStepper()
@@ -59,21 +73,37 @@ const DeclareTeneurDialogContent = ({
           <>
             <Box gap="xs">
               <Text>{t("Rappel de votre progression")}</Text>
-              <ProgressBar
-                baseQuantity={0}
-                targetQuantity={100}
-                declaredQuantity={50}
-              />
-              {/* TODO: conditionner les phrases à afficher selon le type de catégorie */}
-              <RecapData.RemainingQuantityBeforeLimit
-                value={100}
-                unit={ExtendedUnit.GJ}
-              />
+              {targetType && objective.target && (
+                <ProgressBar
+                  baseQuantity={objective.teneur_declared}
+                  targetQuantity={objective.target}
+                  declaredQuantity={objective.teneur_declared_month}
+                />
+              )}
+              {targetType === TargetType.CAP && objective.target && (
+                <RecapData.RemainingQuantityBeforeLimit
+                  value={formatEnergy(computeObjectiveEnergy(objective), {
+                    unit: ExtendedUnit.GJ,
+                  })}
+                />
+              )}
+              {targetType === TargetType.REACH && objective.target && (
+                <RecapData.RemainingQuantityBeforeObjective
+                  value={formatEnergy(computeObjectiveEnergy(objective), {
+                    unit: ExtendedUnit.GJ,
+                  })}
+                />
+              )}
             </Box>
             <Box>
               <RecapOperationGrid>
                 <RecapOperation
-                  balance={form.value.balance!}
+                  balance={{
+                    ...form.value.balance!,
+                    available_balance: CONVERSIONS.energy.MJ_TO_GJ(
+                      form.value.balance!.available_balance
+                    ),
+                  }}
                   unit={ExtendedUnit.GJ}
                 />
               </RecapOperationGrid>

@@ -4,12 +4,16 @@ import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
 import { CategoryObjective } from "accounting/teneur/types"
 import Badge from "@codegouvfr/react-dsfr/Badge"
-import { CategoryEnum } from "common/types"
 import { CardGrid } from "../card-grid"
+import {
+  computeObjectiveEnergy,
+  formatEnergy,
+} from "accounting/teneur/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 type CappedCategoriesProgressProps = {
   categories?: CategoryObjective[]
-  onCategoryClick: (category: CategoryEnum) => void
+  onCategoryClick: (category: CategoryObjective) => void
 }
 
 export const CappedCategoriesProgress = ({
@@ -40,29 +44,28 @@ export const CappedCategoriesProgress = ({
                 </Badge>
               ) : null
             }
-            onClick={() => onCategoryClick(category.code)}
+            onClick={() => onCategoryClick(category)}
           >
             <ul>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={category.teneur_declared_month}
-                  unit="GJ"
+                  value={formatEnergy(category.teneur_declared_month, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
               <li>
                 <RecapData.RemainingQuantityBeforeLimit
-                  value={
-                    category.target -
-                    category.teneur_declared -
-                    category.teneur_declared_month
-                  }
-                  unit="GJ"
+                  value={formatEnergy(computeObjectiveEnergy(category), {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={category.quantity_available}
-                  unit="GJ"
+                  value={formatEnergy(category.quantity_available, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
             </ul>

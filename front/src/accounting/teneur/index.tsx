@@ -6,7 +6,6 @@ import { ObjectiveSection } from "./components/objective-section"
 import { useQuery } from "common/hooks/async"
 import { getObjectives } from "./api"
 import useEntity from "common/hooks/entity"
-import { CategoryEnum } from "common/types"
 import { usePortal } from "common/components/portal"
 import { DeclareTeneurDialog } from "./components/declare-teneur-dialog"
 import { OverallProgress } from "./components/overall-progress"
@@ -14,6 +13,7 @@ import { SectorProgress } from "./components/sector-progress/sector-progress"
 import { CappedCategoriesProgress } from "./components/capped-categories-progress"
 import { ObjectivizedCategoriesProgress } from "./components/objectivized-categories-progress"
 import { UnconstrainedCategoriesProgress } from "./components/unconstrained-categories-progress"
+import { CategoryObjective, UnconstrainedCategoryObjective } from "./types"
 
 export const Teneur = () => {
   const entity = useEntity()
@@ -29,8 +29,12 @@ export const Teneur = () => {
     return <LoaderOverlay />
   }
 
-  const onCategoryClick = (category: CategoryEnum) => {
-    portal((close) => <DeclareTeneurDialog onClose={close} />)
+  const onCategoryClick = (
+    objective: CategoryObjective | UnconstrainedCategoryObjective
+  ) => {
+    portal((close) => (
+      <DeclareTeneurDialog onClose={close} objective={objective} />
+    ))
   }
 
   return (
@@ -74,6 +78,7 @@ export const Teneur = () => {
           />
           <UnconstrainedCategoriesProgress
             categories={result?.unconstrained_categories}
+            onCategoryClick={onCategoryClick}
           />
         </ObjectiveSection>
       </Box>

@@ -3,6 +3,8 @@ import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { useTranslation } from "react-i18next"
 import { RecapData } from "../recap-data"
+import { formatEnergy } from "accounting/teneur/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 type OverallProgressProps = {
   objective?: BaseObjective
@@ -46,14 +48,16 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           <ul>
             <li>
               <RecapData.TeneurDeclaredMonth
-                value={objective.teneur_declared_month}
-                unit={t("tCO2 évitées")}
+                value={t("{{value}} tCO2 évitées", {
+                  value: objective.teneur_declared_month,
+                })}
               />
             </li>
             <li>
               <RecapData.QuantityAvailable
-                value={objective.quantity_available}
-                unit={t("tCO2 évitées")}
+                value={t("{{value}} tCO2 évitées", {
+                  value: objective.quantity_available,
+                })}
               />
             </li>
           </ul>

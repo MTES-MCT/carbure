@@ -4,13 +4,17 @@ import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
 import { UnconstrainedCategoryObjective } from "accounting/teneur/types"
 import { CardGrid } from "../card-grid"
+import { formatEnergy } from "accounting/teneur/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
+  onCategoryClick: (category: UnconstrainedCategoryObjective) => void
 }
 
 export const UnconstrainedCategoriesProgress = ({
   categories,
+  onCategoryClick,
 }: UnconstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
 
@@ -21,24 +25,31 @@ export const UnconstrainedCategoriesProgress = ({
     >
       <CardGrid>
         {categories?.map((category) => (
-          <CardProgress key={category.code} title={category.code}>
+          <CardProgress
+            key={category.code}
+            title={category.code}
+            onClick={() => onCategoryClick(category)}
+          >
             <ul>
               <li>
                 <RecapData.TeneurDeclared
-                  value={category.teneur_declared}
-                  unit="GJ"
+                  value={formatEnergy(category.teneur_declared, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={category.teneur_declared_month}
-                  unit="GJ"
+                  value={formatEnergy(category.teneur_declared_month, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={category.quantity_available}
-                  unit="GJ"
+                  value={formatEnergy(category.quantity_available, {
+                    unit: ExtendedUnit.GJ,
+                  })}
                 />
               </li>
             </ul>
