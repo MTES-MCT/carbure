@@ -10,3 +10,4 @@ from .balance import BalanceByLotSerializer
 from .balance import BalanceByDepotSerializer
 from .balance import BalanceBySectorSerializer
 from .teneur import SimulationInputSerializer
+from .objective import ObjectiveOutputSerializer

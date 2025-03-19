@@ -1,12 +1,12 @@
 from rest_framework_nested.routers import SimpleRouter
 
 from .views import (
-    # OperationDetailViewSet,
+    ObjectiveViewSet,
     OperationViewSet,
 )
 
 router = SimpleRouter()
 router.register("operations", OperationViewSet, basename="operations")
-# router.register("operations/detail", OperationDetailViewSet, basename="operation-details")
+router.register("objectives", ObjectiveViewSet, basename="objectives")
 
 urlpatterns = router.urls

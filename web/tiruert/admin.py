@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from tiruert.models import FossilFuel, FossilFuelCategory
+from tiruert.models import FossilFuel, FossilFuelCategory, Objective
 
 
 @admin.register(FossilFuel)
@@ -11,4 +11,9 @@ class FossilFuelAdmin(admin.ModelAdmin):
 
 @admin.register(FossilFuelCategory)
 class FossilFuelCategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Objective)
+class ObjectiveAdmin(admin.ModelAdmin):
     pass
