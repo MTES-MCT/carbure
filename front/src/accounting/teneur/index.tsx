@@ -12,10 +12,13 @@ import { RecapData } from "./components/recap-data"
 import css from "./index.module.css"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { CategoryEnum } from "common/types"
+import { usePortal } from "common/components/portal"
+import { DeclareTeneurDialog } from "./components/declare-teneur-dialog"
 
 export const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
+  const portal = usePortal()
 
   const { result, loading } = useQuery(getObjectives, {
     key: "teneur-objectives",
@@ -27,7 +30,7 @@ export const Teneur = () => {
   }
 
   const onCategoryClick = (category: CategoryEnum) => {
-    console.log(category)
+    portal((close) => <DeclareTeneurDialog onClose={close} />)
   }
 
   return (

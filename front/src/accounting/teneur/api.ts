@@ -122,3 +122,5 @@ export const getObjectives = async (
     })
   })
 }
+
+export const getBiofuelsCategory = async () => {}

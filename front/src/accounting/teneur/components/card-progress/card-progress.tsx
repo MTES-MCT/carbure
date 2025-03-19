@@ -49,6 +49,7 @@ export const CardProgress = ({
   return (
     <ButtonOrFragment
       className={cl(onClick && css["card-progress-button"], className)}
+      {...(onClick && { onClick })}
     >
       <div className={css["card-progress"]}>
         <div className={css["card-progress__header"]}>

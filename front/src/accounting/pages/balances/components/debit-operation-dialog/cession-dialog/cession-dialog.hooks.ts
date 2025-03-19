@@ -1,4 +1,4 @@
-import { createOperation, simulate } from "accounting/api"
+import { createOperation, simulate } from "accounting/api/operations"
 import useEntity from "common/hooks/entity"
 import { SessionDialogForm } from "./cession-dialog.types"
 import { Balance, CreateOperationType } from "accounting/types"

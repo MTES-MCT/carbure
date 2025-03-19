@@ -6,7 +6,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import useEntity from "common/hooks/entity"
-import * as api from "accounting/api"
+import * as api from "accounting/api/operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import { useGetFilterOptions, useOperationsColumns } from "./operations.hooks"

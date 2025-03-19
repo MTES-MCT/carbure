@@ -1,5 +1,5 @@
 import { useMutation } from "common/hooks/async"
-import * as api from "accounting/api"
+import * as api from "accounting/api/operations"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { Operation } from "accounting/types"

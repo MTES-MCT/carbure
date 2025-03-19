@@ -21,6 +21,7 @@ export const getBalances = (query: BalancesQuery) => {
     })
 }
 
+/** Balances */
 export const getBalanceFilters = (
   query: BalancesQuery,
   filter: BalancesFilter

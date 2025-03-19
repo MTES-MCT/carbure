@@ -8,7 +8,7 @@ import {
   getOperationEntity,
   isOperationDebit,
 } from "./operations.utils"
-import * as api from "accounting/api"
+import * as api from "accounting/api/operations"
 import {
   Operation,
   OperationDebitOrCredit,

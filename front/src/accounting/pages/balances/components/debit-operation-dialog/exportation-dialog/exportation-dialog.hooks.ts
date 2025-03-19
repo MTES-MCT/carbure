@@ -4,7 +4,7 @@ import useEntity from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
-import { createOperation, simulate } from "accounting/api"
+import { createOperation, simulate } from "accounting/api/operations"
 import { useMutation } from "common/hooks/async"
 
 type ExportationDialogProps = {
