@@ -10,7 +10,8 @@ class OperationManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .prefetch_related("details", "biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
+            .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
+            .prefetch_related("details")
         )
 
 
@@ -78,9 +79,9 @@ class Operation(models.Model):
         if self.biofuel.compatible_essence:
             return "ESSENCE"
         elif self.biofuel.compatible_diesel:
-            return "DIESEL"
+            return "GAZOLE"
         elif self.biofuel.code in SAF_BIOFUEL_TYPES:
-            return "SAF"
+            return "CARBURÉACTEUR"
 
     @property
     def volume(self):
