@@ -14,10 +14,8 @@ from tiruert.services.balance import BalanceService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-from .mixins import ActionMixin
 
-
-class ObjectiveViewSet(ModelViewSet, ActionMixin):
+class ObjectiveViewSet(ModelViewSet):
     queryset = MacFossilFuel.objects.all()
     serializer_class = ObjectiveOutputSerializer
     permission_classes = (IsAuthenticated,)
@@ -90,13 +88,13 @@ class ObjectiveViewSet(ModelViewSet, ActionMixin):
             Objective.SECTOR,
         )
 
+        global_objective_target = ObjectiveService.calculate_global_objective(objectives_qs, energy_basis)
+
         global_objective = {
             "available_balance": sum([sector["available_balance"] for sector in objective_per_sector])
             * GHG_REFERENCE_RED_II
             / 1000000,
-            "target": sum([sector["objective"]["target_mj"] for sector in objective_per_sector])
-            * GHG_REFERENCE_RED_II
-            / 1000000,
+            "target": global_objective_target * GHG_REFERENCE_RED_II / 1000000,
             "pending_teneur": sum([sector["pending_teneur"] for sector in objective_per_sector])
             * GHG_REFERENCE_RED_II
             / 1000000,

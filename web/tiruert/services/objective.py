@@ -89,3 +89,11 @@ class ObjectiveService:
                 }
 
         return list(balance.values())
+
+    @staticmethod
+    def calculate_global_objective(objective_queryset, energy_basis):
+        """
+        Calculate the global objective of CO2 emissions reduction
+        """
+        objectives = objective_queryset.filter(type=Objective.MAIN).values("target").first()
+        return objectives["target"] * energy_basis
