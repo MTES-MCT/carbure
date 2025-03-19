@@ -2828,6 +2828,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["SafTicket"][]
+      total_volume?: number
     }
     PaginatedSafTicketSourceList: {
       /** @example 123 */
@@ -2843,6 +2844,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
+      total_available_volume?: number
     }
     PatchedOperationUpdateRequest: {
       type?: components["schemas"]["TypeDefEnum"]
