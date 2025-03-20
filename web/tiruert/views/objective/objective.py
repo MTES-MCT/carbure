@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,6 +16,7 @@ class ObjectiveViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get"]
+    pagination_class = None
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
@@ -32,6 +34,46 @@ class ObjectiveViewSet(ModelViewSet):
             context["unit"] = self.request.unit
         return context
 
+    @extend_schema(
+        operation_id="objectives",
+        description="Get all objectives",
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="year",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Year of the objectives",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="date_from",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Date from which to calculate balance for teneur",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="date_to",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Date to which to calculate balance for teneur",
+                required=True,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=ObjectiveOutputSerializer,
+                description="All objectives.",
+            ),
+        },
+    )
     def list(self, request, *args, **kwargs):
         # Get queryset with filters for MacFossilFuel, Objective and Operation
         macs = MacFilter(request.GET, queryset=MacFossilFuel.objects.all(), request=request).qs
