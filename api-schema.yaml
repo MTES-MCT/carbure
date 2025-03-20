@@ -881,15 +881,47 @@ paths:
       operationId: double_counting_applications_check_admin_files_create
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -997,14 +1029,46 @@ paths:
       operationId: double_counting_applications_filters_retrieve
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: filter
           schema:
             type: string
           description: Filter string to apply
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -1056,15 +1120,47 @@ paths:
       operationId: double_counting_applications_list_admin_retrieve
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search

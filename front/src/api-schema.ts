@@ -4181,10 +4181,20 @@ export interface operations {
   double_counting_applications_check_admin_files_create: {
     parameters: {
       query: {
+        certificate_id?: string
         /** @description Entity ID */
         entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        producers?: string
+        production_sites?: string
         /** @description A search term. */
         search?: string
       }
@@ -4268,10 +4278,20 @@ export interface operations {
   double_counting_applications_filters_retrieve: {
     parameters: {
       query?: {
+        certificate_id?: string
         /** @description Filter string to apply */
         filter?: string
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        producers?: string
+        production_sites?: string
         /** @description A search term. */
         search?: string
       }
@@ -4303,10 +4323,20 @@ export interface operations {
   double_counting_applications_list_admin_retrieve: {
     parameters: {
       query: {
+        certificate_id?: string
         /** @description Entity ID */
         entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
+        producers?: string
+        production_sites?: string
         /** @description A search term. */
         search?: string
       }
