@@ -14,7 +14,7 @@ class BalanceQuantitySerializer(serializers.Serializer):
 
 
 class BaseBalanceSerializer(serializers.Serializer):
-    sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
+    sector = serializers.ChoiceField(choices=["ESSENCE", "GAZOLE", "CARBURÉACTEUR"])
     initial_balance = serializers.SerializerMethodField()
     available_balance = serializers.FloatField()
     quantity = BalanceQuantitySerializer()

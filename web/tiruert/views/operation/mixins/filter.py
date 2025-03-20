@@ -88,8 +88,8 @@ class FilterActionMixin:
             ),
             sector=Case(
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                When(biofuel__compatible_diesel=True, then=Value("DIESEL")),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
+                When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
                 default=Value(None),
                 output_field=CharField(),
             ),
@@ -193,8 +193,8 @@ class FilterActionMixin:
         queryset = queryset.annotate(
             sector=Case(
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                When(biofuel__compatible_diesel=True, then=Value("DIESEL")),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
+                When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
                 default=Value(None),
                 output_field=CharField(),
             ),

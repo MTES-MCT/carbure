@@ -43,7 +43,7 @@ class OperationFilter(FilterSet):
     def filter_entity(self, queryset, name, value):
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
 
-    @extend_schema_field(ListField(child=ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])))
+    @extend_schema_field(ListField(child=ChoiceField(choices=["ESSENCE", "GAZOLE", "CARBURÉACTEUR"])))
     def filter_sector(self, queryset, name, value):
         sectors = [sector.upper() for sector in self.request.GET.getlist(name)]
         if not sectors:
@@ -52,9 +52,9 @@ class OperationFilter(FilterSet):
         q_objects = Q()
         if "ESSENCE" in sectors:
             q_objects |= Q(biofuel__compatible_essence=True)
-        if "DIESEL" in sectors:
+        if "GAZOLE" in sectors:
             q_objects |= Q(biofuel__compatible_diesel=True)
-        if "SAF" in sectors:
+        if "CARBURÉACTEUR" in sectors:
             q_objects |= Q(biofuel__code__in=SAF_BIOFUEL_TYPES)
         return queryset.filter(q_objects).distinct()
 
