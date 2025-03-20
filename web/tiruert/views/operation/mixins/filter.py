@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
+from tiruert.models.operation import Operation
 
 
 class FilterActionMixin:
@@ -87,9 +88,9 @@ class FilterActionMixin:
                 "to_depot__name",
             ),
             sector=Case(
-                When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                When(biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
+                When(biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
                 default=Value(None),
                 output_field=CharField(),
             ),
@@ -192,9 +193,9 @@ class FilterActionMixin:
 
         queryset = queryset.annotate(
             sector=Case(
-                When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                When(biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
+                When(biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
                 default=Value(None),
                 output_field=CharField(),
             ),

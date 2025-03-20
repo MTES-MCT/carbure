@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.models import MatierePremiere
+from tiruert.models.operation import Operation
 
 
 class BalanceBiofuelSerializer(serializers.Serializer):
@@ -14,7 +15,7 @@ class BalanceQuantitySerializer(serializers.Serializer):
 
 
 class BaseBalanceSerializer(serializers.Serializer):
-    sector = serializers.ChoiceField(choices=["ESSENCE", "GAZOLE", "CARBURÉACTEUR"])
+    sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
     initial_balance = serializers.SerializerMethodField()
     available_balance = serializers.FloatField()
     quantity = BalanceQuantitySerializer()
