@@ -2,7 +2,10 @@ import { useTranslation } from "react-i18next"
 import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
-import { UnconstrainedCategoryObjective } from "accounting/teneur/types"
+import {
+  TargetType,
+  UnconstrainedCategoryObjective,
+} from "accounting/teneur/types"
 import { CardGrid } from "../card-grid"
 import { formatEnergy } from "accounting/teneur/utils/formatters"
 import { ExtendedUnit } from "common/types"

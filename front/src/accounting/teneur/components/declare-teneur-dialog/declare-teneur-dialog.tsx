@@ -110,15 +110,20 @@ const DeclareTeneurDialogContent = ({
             </Box>
           </>
         )}
-        {currentStep?.key !== "recap" && (
+        {currentStep?.key !== "recap" && objective.target && (
           <Box>
             <Form form={form}>
-              {currentStep?.key === biofuelFormStepKey && <BiofuelForm />}
+              {currentStep?.key === biofuelFormStepKey && (
+                <BiofuelForm category={objective.code} />
+              )}
               {currentStep?.key === quantityFormStepKey && (
                 <QuantityForm
                   balance={form.value.balance!}
                   type={CreateOperationType.TENEUR}
-                  depot_quantity_max={form.value.balance?.available_balance}
+                  depot_quantity_max={Math.min(
+                    form.value.balance!.available_balance,
+                    computeObjectiveEnergy(objective)
+                  )}
                   unit={ExtendedUnit.GJ}
                 />
               )}

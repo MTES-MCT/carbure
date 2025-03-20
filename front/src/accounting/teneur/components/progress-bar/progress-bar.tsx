@@ -1,7 +1,7 @@
 import css from "./progress-bar.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, roundNumber } from "common/utils/formatters"
 import { useLayoutEffect, useRef, useState } from "react"
 
 export type ProgressBarProps = {
@@ -20,38 +20,45 @@ const STEP_VALUE = 100 / (PROGRESS_BAR_STEPS - 1) // Don't count 0
 const getTextPercentWidth = (element?: HTMLSpanElement) => {
   if (!element) return 0
 
-  return `-${element.offsetWidth / 2}px`
+  return element.offsetWidth / 2
 }
 
 export const ProgressBar = ({
-  targetQuantity, // 16
-  baseQuantity, // 1
-  declaredQuantity, // 100
+  targetQuantity,
+  baseQuantity,
+  declaredQuantity,
 }: ProgressBarProps) => {
   const basePercent = Number(
-    formatNumber((baseQuantity * 100) / targetQuantity, 0)
+    roundNumber((baseQuantity * 100) / targetQuantity, 1)
   )
 
   const declaredPercent = Number(
-    formatNumber(
+    roundNumber(
       (Math.min(baseQuantity + declaredQuantity, targetQuantity) * 100) /
         targetQuantity,
-      0
+      1
     )
   )
 
   const baseValueRef = useRef<HTMLSpanElement>()
   const declaredValueRef = useRef<HTMLSpanElement>()
 
-  const [baseValueWidth, setbaseValueWidth] = useState<string | number>(0)
-  const [declaredValueWidth, setdeclaredValueWidth] = useState<string | number>(
+  const [baseValueWidth, setBaseValueWidth] = useState<string | number>(0)
+  const [declaredValueWidth, setDeclaredValueWidth] = useState<string | number>(
     0
   )
 
   useLayoutEffect(() => {
-    setbaseValueWidth(getTextPercentWidth(baseValueRef?.current))
-    setdeclaredValueWidth(getTextPercentWidth(declaredValueRef?.current))
-  }, [baseValueRef, declaredValueRef])
+    const baseValueWidth = baseValueRef?.current?.offsetWidth ?? 0
+    const declaredValueWidth = declaredValueRef?.current?.offsetWidth ?? 0
+    setBaseValueWidth(`-${baseValueWidth / 2}px`)
+
+    if (declaredPercent - basePercent < 10) {
+      setDeclaredValueWidth(`-${baseValueWidth + 10}px`)
+    } else {
+      setDeclaredValueWidth(`-${declaredValueWidth / 2}px`)
+    }
+  }, [baseValueRef, declaredValueRef, declaredPercent, basePercent])
 
   return (
     <div className={css["progress-bar__container"]}>

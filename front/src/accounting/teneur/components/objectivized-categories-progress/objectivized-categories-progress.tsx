@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
-import { CategoryObjective } from "accounting/teneur/types"
+import { CategoryObjective, TargetType } from "accounting/teneur/types"
 import { CardGrid } from "../card-grid"
 import {
   computeObjectiveEnergy,
@@ -12,7 +12,7 @@ import { ExtendedUnit } from "common/types"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
-  onCategoryClick: (category: CategoryObjective) => void
+  onCategoryClick: (category: CategoryObjective, targetType: TargetType) => void
 }
 
 export const ObjectivizedCategoriesProgress = ({
@@ -45,7 +45,7 @@ export const ObjectivizedCategoriesProgress = ({
                 }
               />
             }
-            onClick={() => onCategoryClick(category)}
+            onClick={() => onCategoryClick(category, TargetType.REACH)}
           >
             <ul>
               <li>

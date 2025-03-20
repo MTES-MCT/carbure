@@ -13,7 +13,11 @@ import { SectorProgress } from "./components/sector-progress/sector-progress"
 import { CappedCategoriesProgress } from "./components/capped-categories-progress"
 import { ObjectivizedCategoriesProgress } from "./components/objectivized-categories-progress"
 import { UnconstrainedCategoriesProgress } from "./components/unconstrained-categories-progress"
-import { CategoryObjective, UnconstrainedCategoryObjective } from "./types"
+import {
+  CategoryObjective,
+  TargetType,
+  UnconstrainedCategoryObjective,
+} from "./types"
 
 export const Teneur = () => {
   const entity = useEntity()
@@ -30,10 +34,15 @@ export const Teneur = () => {
   }
 
   const onCategoryClick = (
-    objective: CategoryObjective | UnconstrainedCategoryObjective
+    objective: CategoryObjective | UnconstrainedCategoryObjective,
+    targetType?: TargetType
   ) => {
     portal((close) => (
-      <DeclareTeneurDialog onClose={close} objective={objective} />
+      <DeclareTeneurDialog
+        onClose={close}
+        objective={objective}
+        targetType={targetType}
+      />
     ))
   }
 

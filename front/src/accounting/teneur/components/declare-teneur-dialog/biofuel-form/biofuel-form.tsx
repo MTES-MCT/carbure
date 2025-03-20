@@ -13,15 +13,18 @@ export type BiofuelFormProps = {
   balance?: apiTypes["Balance"]
 }
 
-export const BiofuelForm = () => {
+type BiofuelFormComponentProps = {
+  category: CategoryEnum
+}
+
+export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
   const { bind } = useFormContext<BiofuelFormProps>()
 
-  // TODO: get category from props
   const result = useQuery(getBalancesCategory, {
     key: "biofuels-category",
-    params: [entity.id, CategoryEnum.CONV],
+    params: [entity.id, category],
   })
 
   return (

@@ -19,71 +19,71 @@ export const getObjectives = async (
       sectors: [
         {
           code: OperationSector.ESSENCE,
-          target: 9, // GJ
-          teneur_declared: 1, // GJ
-          quantity_available: 4000, // GJ
-          teneur_declared_month: 2, // GJ
+          target: 9000,
+          teneur_declared: 1000,
+          quantity_available: 4000000,
+          teneur_declared_month: 2000,
         },
         {
           code: OperationSector.DIESEL,
-          target: 12, // GJ
-          teneur_declared: 3, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 0, // GJ
+          target: 12000,
+          teneur_declared: 3000,
+          quantity_available: 2500000,
+          teneur_declared_month: 0,
         },
         {
           code: OperationSector.SAF,
-          target: 12, // GJ
-          teneur_declared: 4, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 8, // GJ
+          target: 12000,
+          teneur_declared: 4000,
+          quantity_available: 2500000,
+          teneur_declared_month: 8000,
         },
       ],
       capped_categories: [
         {
           code: CategoryEnum.TALLOL,
-          target: 12, // GJ
-          teneur_declared: 1, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 0, // GJ
+          target: 100000,
+          teneur_declared: 5000,
+          quantity_available: 2500000,
+          teneur_declared_month: 0,
         },
         {
           code: CategoryEnum.ANN_IX_A,
-          target: 8, // GJ
-          teneur_declared: 1, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 2, // GJ
+          target: 666000,
+          teneur_declared: 8000,
+          quantity_available: 2500000,
+          teneur_declared_month: 14000,
         },
         {
           code: CategoryEnum.CONV,
-          target: 8, // GJ
-          teneur_declared: 8, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 0, // GJ
+          target: 24000,
+          teneur_declared: 8000,
+          quantity_available: 2500000,
+          teneur_declared_month: 0,
         },
         {
           code: CategoryEnum.EP2AM,
-          target: 8, // GJ
-          teneur_declared: 8, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 0, // GJ
+          target: 180000,
+          teneur_declared: 18000,
+          quantity_available: 2500000,
+          teneur_declared_month: 0,
         },
       ],
       objectivized_categories: [
         {
           code: CategoryEnum.ANN_IX_B,
-          target: 12, // GJ
-          teneur_declared: 1, // GJ
-          quantity_available: 2500, // GJ
-          teneur_declared_month: 0, // GJ
+          target: 12458000,
+          teneur_declared: 250000,
+          quantity_available: 2500000,
+          teneur_declared_month: 0,
         },
       ],
       unconstrained_categories: [
         {
           code: CategoryEnum.OTHER,
-          teneur_declared: 1, // GJ
-          quantity_available: 80, // GJ
-          teneur_declared_month: 4, // GJ
+          teneur_declared: 1000,
+          quantity_available: 80000,
+          teneur_declared_month: 4000,
           target: null,
         },
       ],
