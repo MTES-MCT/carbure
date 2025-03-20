@@ -35,6 +35,11 @@ def import_charge_point_excel(excel_file: UploadedFile):
         original_charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
         merged_charge_point_data = TransportDataGouv.merge_charge_point_data(original_charge_point_data)
+        merged_charge_point_data.loc[
+            (merged_charge_point_data["nominal_power"].isna()) | (merged_charge_point_data["nominal_power"] == 0),
+            "nominal_power",
+        ] = merged_charge_point_data["manual_nominal_power"]
+
         # parse the data and validate errors
         charge_point_data = ExcelChargePoints.validate_charge_points(merged_charge_point_data)
         return charge_point_data[0], charge_point_data[1], original_charge_point_data
@@ -56,6 +61,7 @@ class ExcelChargePoints:
         "_": [""],
         "current_type": ["Type de courant électrique associé au point de recharge"],
         "is_article_2": ["La station du point de recharge est soumise à l'article 2 du décret n°2022-1330"],
+        "manual_nominal_power": ["Puissance nominale"],
     }
 
     @staticmethod
@@ -145,6 +151,8 @@ class ExcelChargePointValidator(Validator):
                 ).format(charge_point_id=charge_point_id),
             )
         else:
+            if not charge_point.get("nominal_power"):
+                self.add_error("nominal_power", _("La puissance nominale est obligatoire"))
             if charge_point.get("is_article_2"):
                 if not charge_point.get("measure_reference_point_id"):
                     self.add_error(

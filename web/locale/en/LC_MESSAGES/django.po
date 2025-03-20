@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-10 16:28+0100\n"
+"POT-Creation-Date: 2025-03-17 09:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: FRENCH <LL@li.org>\n"
@@ -39,7 +39,7 @@ msgstr ""
 msgid "A user with that username already exists."
 msgstr ""
 
-#: web/core/admin.py:313
+#: web/core/admin.py:311
 msgid "Tous"
 msgstr "All"
 
@@ -48,7 +48,7 @@ msgstr "All"
 msgid "Le point de recharge {charge_point_id} existe déjà"
 msgstr "Charge point {charge_point_id} already exists"
 
-#: web/elec/services/import_charge_point_excel.py:144
+#: web/elec/services/import_charge_point_excel.py:150
 #, python-brace-format
 msgid ""
 "Le point de recharge {charge_point_id} n'est pas listé dans les données "
@@ -57,7 +57,13 @@ msgstr ""
 "The charging point {charge_point_id} is not listed in the consolidated data "
 "of transport.data.gouv.fr"
 
-#: web/elec/services/import_charge_point_excel.py:153
+#: web/elec/services/import_charge_point_excel.py:155
+#, fuzzy
+#| msgid "La date du dernier relevé est obligatoire."
+msgid "La puissance nominale est obligatoire"
+msgstr "The nominal power is mandatory."
+
+#: web/elec/services/import_charge_point_excel.py:161
 msgid ""
 "L'identifiant du point de mesure est obligatoire pour les stations ayant au "
 "moins un point de recharge en courant continu."
@@ -65,15 +71,15 @@ msgstr ""
 "The identifier of the measuring point is mandatory for stations with at "
 "least one DC charging point."
 
-#: web/elec/services/import_charge_point_excel.py:158
+#: web/elec/services/import_charge_point_excel.py:166
 msgid "Le numéro MID est obligatoire."
 msgstr "MID number is mandatory."
 
-#: web/elec/services/import_charge_point_excel.py:160
+#: web/elec/services/import_charge_point_excel.py:168
 msgid "La date du dernier relevé est obligatoire."
 msgstr "Date of the last reading is mandatory."
 
-#: web/elec/services/import_charge_point_excel.py:162
+#: web/elec/services/import_charge_point_excel.py:170
 msgid "L'énergie mesurée lors du dernier relevé est obligatoire."
 msgstr "Mesured energy during the last reading is mandatory."
 
@@ -89,11 +95,11 @@ msgstr ""
 "The charging point {charge_point_id} is not listed in the consolidated data "
 "of transport.data.gouv.fr"
 
-#: web/elec/services/import_meter_reading_excel.py:151
+#: web/elec/services/import_meter_reading_excel.py:155
 msgid "Le point de recharge n'a pas encore été inscrit sur la plateforme."
 msgstr "The charging point has not yet been registered on the platform."
 
-#: web/elec/services/import_meter_reading_excel.py:157
+#: web/elec/services/import_meter_reading_excel.py:161
 #, fuzzy
 #| msgid "Le point de recharge n'a pas encore été inscrit sur la plateforme."
 msgid ""
@@ -101,17 +107,17 @@ msgid ""
 "depuis la page dédiée."
 msgstr "The charging point has not yet been registered on the platform."
 
-#: web/elec/services/import_meter_reading_excel.py:163
+#: web/elec/services/import_meter_reading_excel.py:167
 msgid "La quantité d'énergie soutirée est inférieure au précédent relevé."
 msgstr "The amount of energy withdrawn is less than the previous reading."
 
-#: web/elec/services/import_meter_reading_excel.py:169
+#: web/elec/services/import_meter_reading_excel.py:173
 msgid ""
 "Ce point de recharge a été défini {len(lines)} fois (lignes {', '."
 "join(str(num) for num in lines)})"
 msgstr ""
 
-#: web/elec/services/import_meter_reading_excel.py:176
+#: web/elec/services/import_meter_reading_excel.py:180
 msgid ""
 "Un relevé plus récent est déjà enregistré pour ce point de recharge: "
 "{previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"
@@ -119,7 +125,7 @@ msgstr ""
 "A more recent reading is already recorded for this charging point: "
 "{previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"
 
-#: web/elec/services/import_meter_reading_excel.py:184
+#: web/elec/services/import_meter_reading_excel.py:188
 msgid ""
 "Le facteur de charge estimé depuis le dernier relevé enregistré est "
 "supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la "
@@ -129,15 +135,15 @@ msgstr ""
 "100%. Please check the values of the reading as well as the power of your "
 "charging point, entered on TDG."
 
-#: web/elec/services/import_meter_reading_excel.py:190
+#: web/elec/services/import_meter_reading_excel.py:195
 msgid "La date du relevé ne correspond pas au trimestre traité actuellement."
 msgstr "The reading date does not correspond to the current quarter."
 
-#: web/saf/serializers/saf_ticket.py:112
+#: web/saf/serializers/saf_ticket.py:123
 msgid "tickets"
 msgstr "tickets"
 
-#: web/saf/serializers/saf_ticket.py:149
+#: web/saf/serializers/saf_ticket.py:161
 msgid "aeroports"
 msgstr "airports"
 

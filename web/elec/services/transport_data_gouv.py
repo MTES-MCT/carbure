@@ -62,6 +62,7 @@ class TransportDataGouv:
         "station_name",
         "station_id",
         "nominal_power",
+        "manual_nominal_power",
         "cpo_name",
         "cpo_siren",
         "latitude",
