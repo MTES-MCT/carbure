@@ -18,6 +18,7 @@ import {
 import { useTranslation } from "react-i18next"
 
 export const UserMenu = () => {
+  const entity = useEntity()
   const { user, getName } = useUser()
   const { t } = useTranslation()
   const {
@@ -26,7 +27,9 @@ export const UserMenu = () => {
     isOperator,
     isProducer,
     isAirline,
+    isExternal,
   } = useEntity()
+  const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const routes = useRoutes()
   const items = useMemo(() => {
     const compactedItems = compact([
@@ -45,7 +48,7 @@ export const UserMenu = () => {
         path: routes.PUBLIC_STATS,
         icon: BarChartLine,
       },
-      (isIndustry || isPowerOrHeatProducer || isAirline) && {
+      (isIndustry || isPowerOrHeatProducer || isAirline || hasAirline) && {
         label: t("Annuaire"),
         path: routes.REGISTRY,
         icon: BookLine,

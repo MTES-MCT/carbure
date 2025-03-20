@@ -14,7 +14,9 @@ import useEntity from "common/hooks/entity"
 
 const Registry = () => {
   const { t } = useTranslation()
-  const { isAirline, isOperator } = useEntity()
+  const { isAirline, isOperator, isExternal } = useEntity()
+  const entity = useEntity()
+  const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
 
   useTitle(t("Annuaire"))
   usePrivateNavigation(t("Annuaire"))
@@ -52,8 +54,8 @@ const Registry = () => {
       <Tabs
         variant="sticky"
         tabs={compact([
-          ...(!isAirline ? defaultTabs : []),
-          (isAirline || isOperator) && {
+          ...(!isAirline && !hasAirline ? defaultTabs : []),
+          (isAirline || isOperator || hasAirline) && {
             path: "#airports",
             key: "airports",
             label: t("Aéroports"),
