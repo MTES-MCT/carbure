@@ -54,6 +54,9 @@ class Operation(models.Model):
         (ACCEPTED, ACCEPTED),
         (REJECTED, REJECTED),
         (CANCELED, CANCELED),
+        (DECLARED, DECLARED),
+        (CORRECTED, CORRECTED),
+        (VALIDATED, VALIDATED),
     )
 
     INCORPORATION = "INCORPORATION"
