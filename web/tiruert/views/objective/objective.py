@@ -1,25 +1,18 @@
-from datetime import datetime
-
-from django.utils.timezone import make_aware
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from tiruert.filters import ObjectiveFilter, OperationFilter
+from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilter
 from tiruert.models import MacFossilFuel, Objective, Operation
 from tiruert.serializers import ObjectiveOutputSerializer
-from tiruert.services.balance import BalanceService
 from tiruert.services.objective import ObjectiveService
-from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 
 class ObjectiveViewSet(ModelViewSet):
-    queryset = MacFossilFuel.objects.all()
     serializer_class = ObjectiveOutputSerializer
     permission_classes = (IsAuthenticated,)
-    filterset_class = ObjectiveFilter
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get"]
 
@@ -40,67 +33,52 @@ class ObjectiveViewSet(ModelViewSet):
         return context
 
     def list(self, request, *args, **kwargs):
-        mac_qs = self.filter_queryset(self.get_queryset())
-        year = request.GET.get("year") or datetime.now().year
-        entity_id = request.entity.id
-        date_from_str = request.query_params.get("date_from")
-        date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
-
-        objectives_qs = ObjectiveService.objectives_settings(year)
-
-        energy_basis = ObjectiveService.calculate_energy_basis(mac_qs, objectives_qs)
-
+        # Get queryset with filters for MacFossilFuel, Objective and Operation
+        macs = MacFilter(request.GET, queryset=MacFossilFuel.objects.all(), request=request).qs
+        objectives = ObjectiveFilter(request.GET, queryset=Objective.objects.all(), request=request).qs
         operations = OperationFilter(request.GET, queryset=Operation.objects.all(), request=request).qs
 
-        if date_from:
-            operations_with_date_from = operations
-            # Remove date_from filter from operations
-            query_params = request.GET.copy()
-            query_params.pop("date_from", None)
-            filterset = OperationFilter(data=query_params, queryset=self.get_queryset(), request=request)
-            operations = filterset.qs
+        entity_id = request.entity.id
 
-        # First get the whole balance (from forever), so with no date_from filter
-        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj")
-        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj")
+        date_from = request.query_params.get("date_from")
+        if not date_from:
+            return Response({"date_from": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Then update the balance with quantity and teneur details for requested dates (if any)
-        operations = operations_with_date_from if date_from else operations
+        # 1. Calculate "assiette" used for objectives calculation
+        energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
 
-        balance_per_category = BalanceService.calculate_balance(
-            operations, entity_id, "customs_category", "mj", balance_per_category, update_balance=True
-        )
-        balance_per_sector = BalanceService.calculate_balance(
-            operations, entity_id, "sector", "mj", balance_per_sector, update_balance=True
+        # 2. Calculate the balances per category and sector
+        balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
+            request, operations, entity_id
         )
 
+        # 3. Calculate the objectives per category and sector
         objective_per_category = ObjectiveService.calculate_objective(
             balance_per_category,
-            objectives_qs,
+            objectives,
             energy_basis,
             Objective.BIOFUEL_CATEGORY,
         )
 
         objective_per_sector = ObjectiveService.calculate_objective(
             balance_per_sector,
-            objectives_qs,
+            objectives,
             energy_basis,
             Objective.SECTOR,
         )
 
-        global_objective_target = ObjectiveService.calculate_global_objective(objectives_qs, energy_basis)
+        # 4. Calculate the global objective
+        global_objective_target = ObjectiveService.calculate_global_objective(objectives, energy_basis)
+
+        available_balance_sum = sum([sector["available_balance"] for sector in objective_per_sector])
+        pending_teneur_sum = sum([sector["pending_teneur"] for sector in objective_per_sector])
+        declared_teneur_sum = sum([sector["declared_teneur"] for sector in objective_per_sector])
 
         global_objective = {
-            "available_balance": sum([sector["available_balance"] for sector in objective_per_sector])
-            * GHG_REFERENCE_RED_II
-            / 1000000,
-            "target": global_objective_target * GHG_REFERENCE_RED_II / 1000000,
-            "pending_teneur": sum([sector["pending_teneur"] for sector in objective_per_sector])
-            * GHG_REFERENCE_RED_II
-            / 1000000,
-            "declared_teneur": sum([sector["declared_teneur"] for sector in objective_per_sector])
-            * GHG_REFERENCE_RED_II
-            / 1000000,
+            "available_balance": ObjectiveService.apply_ghg_conversion(available_balance_sum),
+            "target": ObjectiveService.apply_ghg_conversion(global_objective_target),
+            "pending_teneur": ObjectiveService.apply_ghg_conversion(pending_teneur_sum),
+            "declared_teneur": ObjectiveService.apply_ghg_conversion(declared_teneur_sum),
             "unit": "tCO2",
         }
 

@@ -3,7 +3,19 @@ from django.db import models
 
 class OperationDetailsManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related("lot", "operation", "lot__biofuel")
+        return (
+            super()
+            .get_queryset()
+            .select_related("lot", "operation", "lot__biofuel")
+            .only(
+                "id",
+                "volume",
+                "emission_rate_per_mj",
+                "lot__volume",
+                "operation__id",
+                "lot__biofuel__pci_litre",
+            )
+        )
 
 
 class OperationDetail(models.Model):

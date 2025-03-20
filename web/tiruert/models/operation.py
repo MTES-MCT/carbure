@@ -12,6 +12,32 @@ class OperationManager(models.Manager):
             .get_queryset()
             .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
             .prefetch_related("details")
+            .only(
+                # Champs de l'opération
+                "id",
+                "type",
+                "status",
+                "customs_category",
+                "validation_date",
+                "created_at",
+                # Relations nécessaires
+                "biofuel_id",
+                "credited_entity_id",
+                "debited_entity_id",
+                "from_depot_id",
+                "to_depot_id",
+                "export_country_id",
+                # Champs des modèles liés utilisés
+                "biofuel__code",
+                "biofuel__pci_litre",
+                "biofuel__compatible_essence",
+                "biofuel__compatible_diesel",
+                "biofuel__masse_volumique",
+                "credited_entity__name",
+                "debited_entity__name",
+                "from_depot__name",
+                "to_depot__name",
+            )
         )
 
 

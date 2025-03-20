@@ -3,7 +3,29 @@ from django.db import models
 
 class MacFossilFuelManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related("fuel", "fuel__fuel_category", "operator", "depot")
+        return (
+            super()
+            .get_queryset()
+            .select_related("fuel", "fuel__fuel_category", "operator", "depot")
+            .only(
+                "fuel_id",
+                "operator_id",
+                "volume",
+                "period",
+                "year",
+                "depot_id",
+                "start_date",
+                "end_date",
+                "fuel__label",
+                "fuel__nomenclature",
+                "fuel__fuel_category__name",
+                "fuel__fuel_category__pci_litre",
+                "fuel__pci_litre",
+                "fuel__masse_volumique",
+                "operator__name",
+                "depot__name",
+            )
+        )
 
 
 class MacFossilFuel(models.Model):
