@@ -29,6 +29,9 @@ import {
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExportButton } from "saf/components/export"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "common/types"
 
 export interface OperatorTicketsProps {
   type: SafQueryType
@@ -116,6 +119,13 @@ export const OperatorTickets = ({
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTicketFilter}
+        />
+
+        <RecapQuantity
+          text={t("{{count}} volumes pour un total de {{total}}", {
+            count: ticketsData?.count,
+            total: formatUnit(ticketsData?.total_volume ?? 0, Unit.l),
+          })}
         />
 
         <TicketsTable

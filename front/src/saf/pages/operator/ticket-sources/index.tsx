@@ -29,6 +29,9 @@ import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExportButton } from "saf/components/export"
 import { Pagination } from "common/components/pagination2"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "common/types"
 
 export interface TicketSourcesProps {
   year: number
@@ -60,12 +63,12 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
     params: [query],
   })
 
-  const ticketSoucesData = ticketSourcesResponse.result?.data
-  const ids = ticketSoucesData?.results.map((ticket) => ticket.id)
+  const ticketSourcesData = ticketSourcesResponse.result?.data
+  const ids = ticketSourcesData?.results.map((ticket) => ticket.id)
 
-  const total = ticketSoucesData?.count ?? 0
-  const count = ticketSoucesData?.results.length ?? 0
-  const ticketSources = ticketSoucesData?.results
+  const total = ticketSourcesData?.count ?? 0
+  const count = ticketSourcesData?.results.length ?? 0
+  const ticketSources = ticketSourcesData?.results
 
   const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
     return {
@@ -113,7 +116,15 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
             api.getTicketSourceFilters(filter, query)
           }
         />
-
+        <RecapQuantity
+          text={t("{{count}} volumes pour un total de {{total}}", {
+            count: count,
+            total: formatUnit(
+              ticketSourcesData?.total_available_volume ?? 0,
+              Unit.l
+            ),
+          })}
+        />
         {count > 0 && ticketSources ? (
           <>
             <TicketSourcesTable
@@ -148,7 +159,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         element={
           <TicketSourceDetail
             limit={state.limit}
-            total={ticketSoucesData?.count ?? 0}
+            total={ticketSourcesData?.count ?? 0}
             fetchIdsForPage={fetchIdsForPage}
             baseIdsList={ids}
           />
