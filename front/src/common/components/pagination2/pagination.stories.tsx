@@ -36,10 +36,10 @@ export const WithLimit: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const { getByText } = within(canvasElement)
-    const select = await waitFor(() => getByText("10 résultats"))
+    const select = await waitFor(() => getByText("10 par page"))
 
     await userEvent.click(select)
-    const option = await waitFor(() => getByText("25 résultats"))
+    const option = await waitFor(() => getByText("25 par page"))
     await userEvent.click(option)
 
     expect(args.onLimit).toHaveBeenCalledWith(25)
@@ -47,6 +47,15 @@ export const WithLimit: Story = {
   render: (args) => {
     const [limit, setLimit] = useState(args.limit)
 
-    return <Pagination {...args} limit={limit} onLimit={setLimit} />
+    return (
+      <Pagination
+        {...args}
+        limit={limit}
+        onLimit={(limit) => {
+          setLimit(limit)
+          args.onLimit(limit)
+        }}
+      />
+    )
   },
 }
