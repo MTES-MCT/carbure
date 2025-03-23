@@ -50,12 +50,6 @@ export const Search: Story = {
   },
 }
 
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-  },
-}
-
 export const FullWidth: Story = {
   args: {
     full: true,

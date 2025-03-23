@@ -12,7 +12,7 @@ interface BaseIconProps {
 export type IconName = FrIconClassName | RiIconClassName
 export type IconProps = Omit<BaseIconProps, "name">
 
-const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
+export const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
   return (
     <span
       {...props}
@@ -227,4 +227,12 @@ export const FileListLine = ({ ...props }: IconProps) => {
 
 export const FileListFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-file-list-fill" />
+}
+
+export const ChatDeleteLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-chat-delete-line" />
+}
+
+export const LoaderLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-loader-line" />
 }

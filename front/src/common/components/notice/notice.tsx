@@ -69,19 +69,18 @@ export const Notice = ({
         fr.cx("fr-notice"),
         variant &&
           cl(fr.cx(`fr-notice--${variant}`), css[`notice--${variant}`]),
+        Icon && css["notice--remove-icon-dsfr"],
         className
       )}
       style={style}
     >
-      <div className="fr-container">
+      <div className={cl(fr.cx("fr-container"), css.notice__container)}>
         <div className="fr-notice__body">
           <p>
             {Icon && <Icon size="md" className={css.notice__icon} />}
             {title && (
-              <span
-                className={cl(fr.cx("fr-notice__title"), css.notice__title)}
-              >
-                {title}
+              <span className={css.notice__title}>
+                <span className={fr.cx("fr-notice__title")}>{title}</span>
               </span>
             )}
             {child && (

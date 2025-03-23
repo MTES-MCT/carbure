@@ -1,0 +1,4 @@
+.collapse :global(.fr-collapse) {
+  margin: 0;
+  background-color: var(--background-contrast-grey);
+}

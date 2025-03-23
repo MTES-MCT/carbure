@@ -1,6 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { Main } from "common/components/scaffold"
-import Select from "common/components/select"
+import { Select } from "common/components/selects2"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
@@ -31,7 +31,6 @@ export const SafOperator = () => {
         <section>
           <Select
             loading={years.loading}
-            variant="inline"
             placeholder={t("Choisir une année")}
             value={years.selected}
             onChange={years.setYear}

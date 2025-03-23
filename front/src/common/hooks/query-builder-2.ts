@@ -15,6 +15,11 @@ export type CBSnapshot = Record<string, number>
 
 export type CBFilterSelection = Record<string, string[]>
 
+export type CBQueryFilterManager = {
+  filters: CBFilterSelection
+  onFilter: (filters: CBFilterSelection) => void
+}
+
 export const CBQUERY_RESET: Partial<CBQueryParams<[], undefined, undefined>> = {
   limit: undefined,
   page: 1,

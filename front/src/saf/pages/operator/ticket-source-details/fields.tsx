@@ -1,12 +1,12 @@
 import * as norm from "common/utils/normalizers"
 import cl from "clsx"
-import { Fieldset } from "common/components/form"
-import { DateInput, TextInput } from "common/components/input"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 import { SafTicketSourceDetails } from "saf/pages/operator/types"
 import DurabilityFields from "./parent-lot/durability-fields"
+import { DialogSection } from "saf/components/dialog-section"
+import { TextInput, DateInput } from "common/components/inputs2"
 
 interface TicketSourceFieldsProps {
   ticketSource: SafTicketSourceDetails | undefined
@@ -20,7 +20,7 @@ export const TicketSourceFields = ({
 
   return (
     <div className={cl(css.form, css.columns)}>
-      <Fieldset label={t("Lot")}>
+      <DialogSection label={t("Lot")}>
         <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticketSource.total_volume)} L`}
@@ -28,17 +28,19 @@ export const TicketSourceFields = ({
         />
         <TextInput
           label={t("Biocarburant")}
-          value={ticketSource.biofuel.code}
+          value={ticketSource.biofuel.code ?? "-"}
           readOnly
         />
         <TextInput
           label={t("Matière première")}
-          value={ticketSource.feedstock.name}
+          value={ticketSource.feedstock.name ?? "-"}
           readOnly
         />
         <TextInput
           label={t("Pays d'origine")}
-          value={norm.normalizeCountry(ticketSource.country_of_origin).label}
+          value={
+            norm.normalizeCountry(ticketSource.country_of_origin).label ?? "-"
+          }
           readOnly
         />
         <TextInput
@@ -50,8 +52,8 @@ export const TicketSourceFields = ({
           }
           readOnly
         />
-      </Fieldset>
-      <Fieldset label={t("Production")}>
+      </DialogSection>
+      <DialogSection label={t("Production")}>
         <TextInput
           label={t("Producteur")}
           value={
@@ -84,7 +86,7 @@ export const TicketSourceFields = ({
           value={ticketSource.production_site_commissioning_date ?? ""}
           readOnly
         />
-      </Fieldset>
+      </DialogSection>
       <DurabilityFields durability={ticketSource} />
     </div>
   )

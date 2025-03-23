@@ -1,8 +1,8 @@
-import Button from "common/components/button"
-import Table, { Cell, Order, selectionColumn } from "common/components/table"
+import { Button } from "common/components/button2"
+import { Table, Cell, Order } from "common/components/table2"
 import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useNavigate } from "react-router-dom"
 import {
@@ -10,6 +10,11 @@ import {
   SafTicketSourceStatus,
 } from "saf/pages/operator/types"
 import { TicketSourceTag } from "./tag"
+import { usePortal } from "common/components/portal"
+import { useNotify } from "common/components/notifications"
+import TicketsGroupedAssignment from "saf/components/assignment/grouped-assignment"
+import { Text } from "common/components/text"
+import { useSafRules } from "saf/hooks/useSafRules"
 
 export interface TicketSourcesTableProps {
   loading: boolean
@@ -34,6 +39,56 @@ export const TicketSourcesTable = memo(
     status,
   }: TicketSourcesTableProps) => {
     const columns = useColumns()
+    const { t } = useTranslation()
+    const portal = usePortal()
+    const notify = useNotify()
+    const { canUpdateTicket } = useSafRules()
+
+    const selectedTicketSources = useMemo(() => {
+      return ticketSources.filter((ticketSource) =>
+        selected.includes(ticketSource.id)
+      )
+    }, [ticketSources, selected])
+
+    const totalVolume = selectedTicketSources.reduce(
+      (total, ticketSource) => total + ticketSource.total_volume,
+      0
+    )
+    const assignedVolume = selectedTicketSources.reduce(
+      (total, ticketSource) => total + ticketSource.assigned_volume,
+      0
+    )
+    const remainingVolume = totalVolume - assignedVolume
+
+    const handleTicketsAssigned = (
+      volume: number,
+      clientName: string,
+      assignedTicketsCount: number
+    ) => {
+      notify(
+        t(
+          "{{volume}} litres ont bien été affectés à {{clientName}}. {{assignedTicketsCount}} tickets ont été générés.",
+          {
+            volume,
+            clientName,
+            assignedTicketsCount,
+          }
+        ),
+        { variant: "success" }
+      )
+    }
+
+    const showGroupedAssignement = () => {
+      portal((close) => (
+        <TicketsGroupedAssignment
+          ticketSources={selectedTicketSources}
+          remainingVolume={remainingVolume}
+          onClose={close}
+          onTicketsAssigned={handleTicketsAssigned}
+        />
+      ))
+    }
+
     return (
       <Table
         loading={loading}
@@ -41,14 +96,18 @@ export const TicketSourcesTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={ticketSources}
+        hasSelectionColumn={status === SafTicketSourceStatus.AVAILABLE}
+        selectionText={t(
+          "{{count}} volumes sélectionnés pour un total de {{remainingVolume}} L",
+          {
+            count: selectedTicketSources.length,
+            remainingVolume: formatNumber(remainingVolume),
+          }
+        )}
+        onSelect={onSelect}
+        selected={selected}
+        identify={(ticketSource) => ticketSource.id}
         columns={compact([
-          status === SafTicketSourceStatus.AVAILABLE &&
-            selectionColumn(
-              ticketSources,
-              selected,
-              onSelect,
-              (ticketSource) => ticketSource.id
-            ),
           columns.status,
           columns.availableVolume,
           columns.clients,
@@ -57,6 +116,19 @@ export const TicketSourcesTable = memo(
           columns.ghgReduction,
           columns.parentLot,
         ])}
+        topActions={[
+          <Button
+            priority="tertiary no outline"
+            iconId="ri-send-plane-line"
+            onClick={showGroupedAssignement}
+            disabled={!canUpdateTicket}
+            key="affect-volumes"
+          >
+            {t("Affecter les {{count}} volumes", {
+              count: selectedTicketSources.length,
+            })}
+          </Button>,
+        ]}
       />
     )
   }
@@ -99,7 +171,7 @@ export function useColumns() {
 
     period: {
       key: "delivery",
-      header: t("Livraison"),
+      header: t("Période"),
       cell: (ticketSource: SafTicketSource) => {
         return (
           <Cell
@@ -175,12 +247,20 @@ export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
   }
 
   return (
-    <Button
-      captive
-      variant="link"
-      title={t("Lot initial")}
-      label={`#${lot.carbure_id}`}
-      action={showLotDetails}
+    <Cell
+      text={
+        <Button
+          captive
+          customPriority="link"
+          title={t("Lot initial")}
+          onClick={showLotDetails}
+        >
+          <Text size="sm" is="span">
+            #{lot.carbure_id}
+          </Text>
+        </Button>
+      }
+      tooltipText={`#${lot.carbure_id}`}
     />
   )
 }

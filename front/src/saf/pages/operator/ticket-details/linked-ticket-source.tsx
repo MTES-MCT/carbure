@@ -1,6 +1,5 @@
-import Button from "common/components/button"
-import Collapse from "common/components/collapse"
-import { Split } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Collapse } from "common/components/collapse2"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketSourcePreview } from "saf/pages/operator/types"
 
@@ -23,16 +22,11 @@ const LinkedTicketSource = ({
   }
 
   return (
-    <section>
-      <Collapse isOpen={true} variant="info" icon={Split} label={title}>
-        <section>
-          <Button variant="link" action={showTicketSourceDetails}>
-            Volume #{ticket_source?.carbure_id}
-          </Button>
-        </section>
-        <footer></footer>
-      </Collapse>
-    </section>
+    <Collapse defaultExpanded label={title}>
+      <Button customPriority="link" onClick={showTicketSourceDetails}>
+        Volume #{ticket_source?.carbure_id}
+      </Button>
+    </Collapse>
   )
 }
 
