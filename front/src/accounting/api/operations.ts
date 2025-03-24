@@ -86,6 +86,60 @@ export const createOperation = (
   })
 }
 
+/**
+ * In the case of transfers and teneurs, we need to simulate the lots before creating the operation
+ *
+ */
+export const createOperationWithSimulation = (
+  entityId: number,
+  {
+    simulation,
+    operation,
+    customs_category,
+    biofuel,
+    debited_entity,
+  }: Pick<
+    apiTypes["OperationInputRequest"],
+    "customs_category" | "biofuel" | "debited_entity"
+  > & {
+    simulation: Pick<
+      apiTypes["SimulationInputRequest"],
+      "target_volume" | "target_emission" | "unit"
+    >
+    operation: Pick<
+      apiTypes["OperationInputRequest"],
+      "type" | "from_depot" | "to_depot" | "credited_entity"
+    >
+  }
+) => {
+  return simulate(entityId, {
+    customs_category,
+    biofuel,
+    debited_entity,
+    target_emission: simulation.target_emission,
+    target_volume: simulation.target_volume,
+    unit: simulation.unit,
+  }).then((response) => {
+    const lots = response.data?.selected_lots
+    if (lots) {
+      return createOperation(entityId, {
+        ...operation,
+        lots: lots.map(({ lot_id, ...rest }) => ({
+          id: lot_id,
+          ...rest,
+        })),
+        biofuel,
+        customs_category,
+        debited_entity,
+        type: operation.type,
+        from_depot: operation.from_depot,
+        to_depot: operation.to_depot,
+        credited_entity: operation.credited_entity,
+      })
+    }
+  })
+}
+
 export const getOperationDetail = (entity_id: number, id: number) => {
   return api.GET(`/tiruert/operations/{id}/`, {
     params: {

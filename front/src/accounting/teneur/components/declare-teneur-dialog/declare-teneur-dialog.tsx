@@ -7,6 +7,7 @@ import {
   QuantityForm,
   quantityFormStep,
   quantityFormStepKey,
+  QuantitySummary,
 } from "accounting/components/quantity-form"
 import { Box, Main } from "common/components/scaffold"
 import {
@@ -14,8 +15,8 @@ import {
   biofuelFormStep,
   biofuelFormStepKey,
 } from "./biofuel-form"
-import { CategoryEnum, ExtendedUnit, Unit } from "common/types"
-import { CreateOperationType, OperationSector } from "accounting/types"
+import { ExtendedUnit, Unit } from "common/types"
+import { CreateOperationType } from "accounting/types"
 import { Text } from "common/components/text"
 import { ProgressBar } from "../progress-bar"
 import { RecapData } from "../recap-data"
@@ -34,6 +35,8 @@ import {
   formatEnergy,
 } from "accounting/teneur/utils/formatters"
 import { useMemo } from "react"
+import { Button } from "common/components/button2"
+import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
@@ -53,7 +56,11 @@ const DeclareTeneurDialogContent = ({
 }: DeclareTeneurDialogContentProps) => {
   const { t } = useTranslation()
   const { currentStep, currentStepIndex } = useStepper()
-  // const currentStep = { key: "recap" }
+  const mutation = useDeclareTeneurDialog({
+    onClose,
+    onOperationCreated: () => {},
+    values: form.value,
+  })
 
   const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
     // Add quantity declared only if the "declare quantity" button has been clicked
@@ -62,26 +69,15 @@ const DeclareTeneurDialogContent = ({
         ? form.value.quantity
         : 0
 
-    let remainingEnergy = 0
-    if (targetType === TargetType.CAP && objective.target) {
-      remainingEnergy =
-        computeObjectiveEnergy(objective) -
-        (quantity ? CONVERSIONS.energy.GJ_TO_MJ(quantity) : 0)
-    }
-    if (targetType === TargetType.REACH && objective.target) {
-      remainingEnergy =
-        computeObjectiveEnergy(objective) -
-        (quantity ? CONVERSIONS.energy.GJ_TO_MJ(quantity) : 0)
-    }
+    const remainingEnergy = objective.target
+      ? computeObjectiveEnergy(objective) -
+        CONVERSIONS.energy.GJ_TO_MJ(quantity)
+      : 0
+
     return formatEnergy(remainingEnergy, {
       unit: ExtendedUnit.GJ,
     })
-  }, [
-    form.value.quantity,
-    form.value.avoided_emissions_min,
-    objective,
-    targetType,
-  ])
+  }, [form.value.quantity, form.value.avoided_emissions_min, objective])
 
   return (
     <Dialog
@@ -93,6 +89,15 @@ const DeclareTeneurDialogContent = ({
         <>
           <Stepper.Previous />
           <Stepper.Next />
+          {currentStep?.key === "recap" && (
+            <Button
+              priority="primary"
+              onClick={() => mutation.execute()}
+              loading={mutation.loading}
+            >
+              {t("Valider la teneur")}
+            </Button>
+          )}
         </>
       }
       fullWidth
@@ -137,6 +142,9 @@ const DeclareTeneurDialogContent = ({
                   }}
                   unit={ExtendedUnit.GJ}
                 />
+                {currentStepIndex > 1 && (
+                  <QuantitySummary values={form.value} />
+                )}
               </RecapOperationGrid>
             </Box>
           </>
@@ -152,8 +160,12 @@ const DeclareTeneurDialogContent = ({
                   balance={form.value.balance!}
                   type={CreateOperationType.TENEUR}
                   depot_quantity_max={Math.min(
-                    form.value.balance!.available_balance,
-                    computeObjectiveEnergy(objective)
+                    CONVERSIONS.energy.MJ_TO_GJ(
+                      form.value.balance!.available_balance
+                    ),
+                    CONVERSIONS.energy.MJ_TO_GJ(
+                      computeObjectiveEnergy(objective)
+                    )
                   )}
                   unit={ExtendedUnit.GJ}
                   backendUnit={Unit.MJ}
@@ -170,28 +182,7 @@ const DeclareTeneurDialogContent = ({
 
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
-  const form = useForm<DeclareTeneurDialogForm>({
-    // quantity: 1000,
-    // avoided_emissions: 1.5,
-    // balance: {
-    //   sector: OperationSector.DIESEL,
-    //   initial_balance: 0,
-    //   available_balance: 1564082157,
-    //   quantity: {
-    //     credit: 1569197157,
-    //     debit: 5115000,
-    //   },
-    //   pending_teneur: 0,
-    //   declared_teneur: 0,
-    //   pending_operations: 2,
-    //   unit: "mj",
-    //   customs_category: CategoryEnum.CONV,
-    //   biofuel: {
-    //     id: 16,
-    //     code: "EMHV",
-    //   },
-    // },
-  })
+  const form = useForm<DeclareTeneurDialogForm>({})
   const steps = [
     biofuelFormStep(form.value),
     quantityFormStep(form.value, {

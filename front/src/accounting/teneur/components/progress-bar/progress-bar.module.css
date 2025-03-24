@@ -37,6 +37,7 @@
   display: flex;
   align-items: center;
   position: relative;
+  width: fit-content;
 }
 
 .progress-bar__step::before {

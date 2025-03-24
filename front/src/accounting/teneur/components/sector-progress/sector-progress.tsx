@@ -7,6 +7,7 @@ import { SectorObjective } from "accounting/teneur/types"
 import { CardGrid } from "../card-grid"
 import { formatEnergy } from "accounting/teneur/utils/formatters"
 import { ExtendedUnit } from "common/types"
+import { formatNumber } from "common/utils/formatters"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -27,7 +28,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             title={t(formatSector(sector.code))}
             description={t("Objectif en GJ en {{date}}: {{objective}}", {
               date: "2025",
-              objective: sector.target,
+              objective: formatNumber(sector.target),
             })}
             mainValue={sector.teneur_declared}
             mainText={t("GJ")}

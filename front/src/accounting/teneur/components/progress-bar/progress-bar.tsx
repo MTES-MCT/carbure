@@ -1,7 +1,6 @@
 import css from "./progress-bar.module.css"
 import cl from "clsx"
 import { Text } from "common/components/text"
-import { formatNumber, roundNumber } from "common/utils/formatters"
 import { useLayoutEffect, useRef, useState } from "react"
 
 export type ProgressBarProps = {
@@ -17,27 +16,17 @@ export type ProgressBarProps = {
 const PROGRESS_BAR_STEPS = 5
 const STEP_VALUE = 100 / (PROGRESS_BAR_STEPS - 1) // Don't count 0
 
-const getTextPercentWidth = (element?: HTMLSpanElement) => {
-  if (!element) return 0
-
-  return element.offsetWidth / 2
-}
-
+const formatPercent = (num: number) => parseInt(`${num * 10}`) / 10
 export const ProgressBar = ({
   targetQuantity,
   baseQuantity,
   declaredQuantity,
 }: ProgressBarProps) => {
-  const basePercent = Number(
-    roundNumber((baseQuantity * 100) / targetQuantity, 1)
-  )
+  const basePercent = formatPercent((baseQuantity * 100) / targetQuantity)
 
-  const declaredPercent = Number(
-    roundNumber(
-      (Math.min(baseQuantity + declaredQuantity, targetQuantity) * 100) /
-        targetQuantity,
-      1
-    )
+  const declaredPercent = formatPercent(
+    (Math.min(baseQuantity + declaredQuantity, targetQuantity) * 100) /
+      targetQuantity
   )
 
   const baseValueRef = useRef<HTMLSpanElement>()
