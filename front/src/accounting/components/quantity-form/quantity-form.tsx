@@ -16,7 +16,15 @@ type QuantityFormComponentProps = {
   balance: Balance
   depot_quantity_max?: number
   type: CreateOperationType
+
+  // Unit of the quantity displayed to the user (default is the entity preferred unit)
   unit?: Unit | ExtendedUnit
+
+  // Unit of the quantity used by the backend (default is the entity preferred unit)
+  backendUnit?: Unit | ExtendedUnit
+
+  // Custom conversion function for the backend (default is the value passed as parameter)
+  converter?: (value: number) => number
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
@@ -27,12 +35,19 @@ export const QuantityForm = ({
   depot_quantity_max,
   type,
   unit: customUnit,
+  backendUnit: customBackendUnit,
+  converter,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit(customUnit)
 
   const { value, bind, setField } = useFormContext<QuantityFormProps>()
-  const mutation = useQuantityForm({ balance, values: value })
+  const mutation = useQuantityForm({
+    balance,
+    values: value,
+    unit: customBackendUnit,
+    converter,
+  })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
       value.avoided_emissions_max !== undefined

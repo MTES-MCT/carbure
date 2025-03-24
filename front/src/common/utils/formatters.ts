@@ -157,5 +157,6 @@ export function chunk(str: string, size: number): string[] {
 export const CONVERSIONS = {
   energy: {
     MJ_TO_GJ: (value: number) => value / 1000,
+    GJ_TO_MJ: (value: number) => value * 1000,
   },
 }

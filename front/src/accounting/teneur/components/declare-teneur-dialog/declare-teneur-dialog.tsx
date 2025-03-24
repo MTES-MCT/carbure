@@ -14,8 +14,8 @@ import {
   biofuelFormStep,
   biofuelFormStepKey,
 } from "./biofuel-form"
-import { ExtendedUnit } from "common/types"
-import { CreateOperationType } from "accounting/types"
+import { CategoryEnum, ExtendedUnit, Unit } from "common/types"
+import { CreateOperationType, OperationSector } from "accounting/types"
 import { Text } from "common/components/text"
 import { ProgressBar } from "../progress-bar"
 import { RecapData } from "../recap-data"
@@ -33,6 +33,7 @@ import {
   computeObjectiveEnergy,
   formatEnergy,
 } from "accounting/teneur/utils/formatters"
+import { useMemo } from "react"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
@@ -52,6 +53,35 @@ const DeclareTeneurDialogContent = ({
 }: DeclareTeneurDialogContentProps) => {
   const { t } = useTranslation()
   const { currentStep, currentStepIndex } = useStepper()
+  // const currentStep = { key: "recap" }
+
+  const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
+    // Add quantity declared only if the "declare quantity" button has been clicked
+    const quantity =
+      form.value.avoided_emissions_min && form.value.quantity
+        ? form.value.quantity
+        : 0
+
+    let remainingEnergy = 0
+    if (targetType === TargetType.CAP && objective.target) {
+      remainingEnergy =
+        computeObjectiveEnergy(objective) -
+        (quantity ? CONVERSIONS.energy.GJ_TO_MJ(quantity) : 0)
+    }
+    if (targetType === TargetType.REACH && objective.target) {
+      remainingEnergy =
+        computeObjectiveEnergy(objective) -
+        (quantity ? CONVERSIONS.energy.GJ_TO_MJ(quantity) : 0)
+    }
+    return formatEnergy(remainingEnergy, {
+      unit: ExtendedUnit.GJ,
+    })
+  }, [
+    form.value.quantity,
+    form.value.avoided_emissions_min,
+    objective,
+    targetType,
+  ])
 
   return (
     <Dialog
@@ -77,21 +107,22 @@ const DeclareTeneurDialogContent = ({
                 <ProgressBar
                   baseQuantity={objective.teneur_declared}
                   targetQuantity={objective.target}
-                  declaredQuantity={objective.teneur_declared_month}
+                  declaredQuantity={
+                    objective.teneur_declared_month +
+                    (form.value.quantity
+                      ? CONVERSIONS.energy.GJ_TO_MJ(form.value.quantity)
+                      : 0)
+                  }
                 />
               )}
               {targetType === TargetType.CAP && objective.target && (
                 <RecapData.RemainingQuantityBeforeLimit
-                  value={formatEnergy(computeObjectiveEnergy(objective), {
-                    unit: ExtendedUnit.GJ,
-                  })}
+                  value={remainingEnergyBeforeLimitOrObjective}
                 />
               )}
               {targetType === TargetType.REACH && objective.target && (
                 <RecapData.RemainingQuantityBeforeObjective
-                  value={formatEnergy(computeObjectiveEnergy(objective), {
-                    unit: ExtendedUnit.GJ,
-                  })}
+                  value={remainingEnergyBeforeLimitOrObjective}
                 />
               )}
             </Box>
@@ -125,6 +156,8 @@ const DeclareTeneurDialogContent = ({
                     computeObjectiveEnergy(objective)
                   )}
                   unit={ExtendedUnit.GJ}
+                  backendUnit={Unit.MJ}
+                  converter={CONVERSIONS.energy.GJ_TO_MJ}
                 />
               )}
             </Form>
@@ -137,7 +170,28 @@ const DeclareTeneurDialogContent = ({
 
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
-  const form = useForm<DeclareTeneurDialogForm>({})
+  const form = useForm<DeclareTeneurDialogForm>({
+    // quantity: 1000,
+    // avoided_emissions: 1.5,
+    // balance: {
+    //   sector: OperationSector.DIESEL,
+    //   initial_balance: 0,
+    //   available_balance: 1564082157,
+    //   quantity: {
+    //     credit: 1569197157,
+    //     debit: 5115000,
+    //   },
+    //   pending_teneur: 0,
+    //   declared_teneur: 0,
+    //   pending_operations: 2,
+    //   unit: "mj",
+    //   customs_category: CategoryEnum.CONV,
+    //   biofuel: {
+    //     id: 16,
+    //     code: "EMHV",
+    //   },
+    // },
+  })
   const steps = [
     biofuelFormStep(form.value),
     quantityFormStep(form.value, {

@@ -49,6 +49,7 @@ export const simulateMinMax = (
     customs_category,
     debited_entity,
     target_volume,
+    unit,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -58,6 +59,7 @@ export const simulateMinMax = (
       customs_category,
       debited_entity,
       target_volume,
+      unit,
     },
   })
 }
