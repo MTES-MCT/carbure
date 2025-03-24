@@ -151,7 +151,6 @@ authorized_sirens = [
     315281113,
     344059605,
     481361228,
-    8820,
     353261555,
     912194354,
     533247979,
@@ -331,7 +330,7 @@ class Command(BaseCommand):
                 entity = entity_cache[row["siren"]]
             else:
                 try:
-                    entity = Entity.objects.get(registration_id=row["siren"])
+                    entity = Entity.objects.get(registration_id=row["siren"], entity_type=Entity.OPERATOR)
                     entity_cache[row["siren"]] = entity
                     logger.info(f"Entity found: {entity}")
                 except Entity.DoesNotExist:
