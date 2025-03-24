@@ -77,7 +77,7 @@ export const CompanyForm = ({
       />
       <TextInput
         required
-        label={t("Responsable durabilité")}
+        label={t("Contact Carbure")}
         placeholder="Jean-Pierre Champollion"
         {...companyForm.bind("sustainability_officer")}
       />
@@ -86,7 +86,7 @@ export const CompanyForm = ({
         type="tel"
         pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
         label={t(
-          "N° téléphone responsable durabilité (commence par +33 pour la France)"
+          "N° téléphone contact Carbure (commence par +33 pour la France)"
         )}
         placeholder="exemple : +33612345678"
         {...companyForm.bind("sustainability_officer_phone_number")}
@@ -94,7 +94,7 @@ export const CompanyForm = ({
       <TextInput
         required
         type="email"
-        label={t("Email de contact")}
+        label={t("Email du contact Carbure")}
         {...companyForm.bind("sustainability_officer_email")}
       />
 

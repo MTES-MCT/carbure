@@ -85,7 +85,7 @@ class Command(BaseCommand):
         backup_path = f"{backup_folder}{filename}"
         with default_storage.open(s3_path, "rb") as f:
             default_storage.save(backup_path, f)
-        self.stdout.write(self.style.SUCCESS("File backed up successfully"))
+        logger.info("File backed up successfully")
 
     def parse_mac_excel(self, filepath):
         """
@@ -101,6 +101,8 @@ class Command(BaseCommand):
                     "Nomenclature combinee",
                     "Année de MAC",
                     "Mois de MAC",
+                    "Date de debut de periode",
+                    "Fin de periode",
                 ]
             )["Nombre d'unite"]
             .sum()
@@ -111,18 +113,24 @@ class Command(BaseCommand):
 
         for _, row in grouped_df.iterrows():
             siren = row["SIREN Redevable"]
-            depot_accise = str(row["N Accise Redevable"])[:8]  # keep only the first 8 characters
+            depot_customs_id = str(row["N Accise Redevable"])[5:8]  # keep only 3 characters
             fuel_nomenclature = row["Nomenclature combinee"]
             period = f"{row['Année de MAC']}{int(row['Mois de MAC']):02d}"  # YYYYMM
             volume = row["Nombre d'unite"] * 100  # convert hL to L
+            start_date = row["Date de debut de periode"]
+            end_date = row["Fin de periode"]
+            year = row["Année de MAC"]
 
             mac_rows.append(
                 {
                     "siren": str(siren),
-                    "depot_accise": str(depot_accise),
+                    "depot_customs_id": str(depot_customs_id),
                     "fuel_nomenclature": int(fuel_nomenclature),
                     "period": int(period),
                     "volume": int(volume),
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "year": int(year),
                 }
             )
 
@@ -162,18 +170,18 @@ class Command(BaseCommand):
                     errors.add(f"Multiple entities with SIREN {row['siren']} found")
 
             # Consolidate depot
-            if row["depot_accise"] in not_found_depots:
+            if row["depot_customs_id"] in not_found_depots:
                 depot = None
-                errors.add(f"{row["siren"]} - Depot with accise number {row['depot_accise']} doesn't exist")
-            elif row["depot_accise"] in depot_cache:
-                depot = depot_cache[row["depot_accise"]]
+                errors.add(f"{row["siren"]} - Depot with accise number {row['depot_customs_id']} doesn't exist")
+            elif row["depot_customs_id"] in depot_cache:
+                depot = depot_cache[row["depot_customs_id"]]
             else:
                 try:
-                    depot = Depot.objects.get(accise=row["depot_accise"])
-                    depot_cache[row["depot_accise"]] = depot
+                    depot = Depot.objects.get(customs_id=row["depot_customs_id"])
+                    depot_cache[row["depot_customs_id"]] = depot
                 except Depot.DoesNotExist:
-                    errors.add(f"{row["siren"]} - Depot with accise number {row['depot_accise']} doesn't exist")
-                    not_found_depots.add(row["depot_accise"])
+                    errors.add(f"{row["siren"]} - Depot with accise number {row['depot_customs_id']} doesn't exist")
+                    not_found_depots.add(row["depot_customs_id"])
                     depot = None
 
             # Consolidate fuel
@@ -184,7 +192,7 @@ class Command(BaseCommand):
                 fuel = fuel_cache[row["fuel_nomenclature"]]
             else:
                 try:
-                    fuel = FossilFuel.objects.get(nomenclatures__contains=row["fuel_nomenclature"])
+                    fuel = FossilFuel.objects.get(nomenclature__contains=row["fuel_nomenclature"])
                     fuel_cache[row["fuel_nomenclature"]] = fuel
                 except FossilFuel.DoesNotExist:
                     errors.add(f"{row["siren"]} - Fuel with nomenclature {row['fuel_nomenclature']} doesn't exist")
@@ -197,6 +205,9 @@ class Command(BaseCommand):
                     fuel=fuel,
                     period=row["period"],
                     volume=row["volume"],
+                    start_date=row["start_date"],
+                    end_date=row["end_date"],
+                    year=row["year"],
                 )
             )
 

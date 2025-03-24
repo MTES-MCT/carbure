@@ -54,10 +54,7 @@ const DoubleCountingFilesCheckerDialog = ({
 
   async function submitFiles() {
     if (!value.doubleCountingFiles) return
-    const resp = await uploadFiles.execute(
-      entity.id,
-      value.doubleCountingFiles as FileList
-    )
+    const resp = await uploadFiles.execute(entity.id, value.doubleCountingFiles)
     const checkedFiles = resp.data
     if (checkedFiles) {
       onClose()

@@ -83,7 +83,10 @@ const ChargePointsApplicationsTable: React.FC<
               title={t("Exporter les points de recharge")}
               action={() => onDownloadChargePointsApplication(application)}
             />,
-            application.status === ElecAuditApplicationStatus.Pending &&
+            [
+              ElecAuditApplicationStatus.Pending,
+              ElecAuditApplicationStatus.Rejected,
+            ].includes(application.status) &&
               onDeleteChargePointsApplication && (
                 <Button
                   captive

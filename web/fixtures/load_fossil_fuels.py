@@ -13,20 +13,20 @@ filename = "%s/web/fixtures/csv/fossil_fuels.csv" % (os.environ["CARBURE_HOME"])
 with open(filename) as csvfile:
     reader = csv.reader(csvfile, quotechar='"')
     for row in reader:
-        label = row[0]
-        if label == "label":
+        nomenclature = row[0]
+        if nomenclature == "nomenclature":
             # header
             continue
         fuel_category = FossilFuelCategory.objects.get(pk=row[1])
-        pci_litre = row[2]
-        masse_volumique = row[3]
-        nomenclatures = [int(x) for x in row[4].split(",")]
+        label = row[2]
+        pci_litre = row[3]
+        masse_volumique = row[4]
         obj, created = FossilFuel.objects.update_or_create(
-            label=label,
+            nomenclature=nomenclature,
             defaults={
                 "fuel_category": fuel_category,
                 "pci_litre": pci_litre,
                 "masse_volumique": masse_volumique,
-                "nomenclatures": nomenclatures,
+                "label": label,
             },
         )

@@ -5,6 +5,42 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation_detail import OperationDetail
 
 
+class OperationManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
+            .prefetch_related("details")
+            .only(
+                # Champs de l'opération
+                "id",
+                "type",
+                "status",
+                "customs_category",
+                "validation_date",
+                "created_at",
+                # Relations nécessaires
+                "biofuel_id",
+                "credited_entity_id",
+                "debited_entity_id",
+                "from_depot_id",
+                "to_depot_id",
+                "export_country_id",
+                # Champs des modèles liés utilisés
+                "biofuel__code",
+                "biofuel__pci_litre",
+                "biofuel__compatible_essence",
+                "biofuel__compatible_diesel",
+                "biofuel__masse_volumique",
+                "credited_entity__name",
+                "debited_entity__name",
+                "from_depot__name",
+                "to_depot__name",
+            )
+        )
+
+
 class Operation(models.Model):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"  # Acquisition
@@ -62,14 +98,16 @@ class Operation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
 
+    objects = OperationManager()
+
     @property
     def sector(self):
         if self.biofuel.compatible_essence:
             return "ESSENCE"
         elif self.biofuel.compatible_diesel:
-            return "DIESEL"
+            return "GAZOLE"
         elif self.biofuel.code in SAF_BIOFUEL_TYPES:
-            return "SAF"
+            return "CARBURÉACTEUR"
 
     @property
     def volume(self):

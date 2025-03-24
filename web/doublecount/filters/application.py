@@ -1,10 +1,10 @@
 import django_filters
 from django.db.models import Q
 
-from certificates.models import DoubleCountingRegistration
+from doublecount.models import DoubleCountingApplication
 
 
-class AgreementFilter(django_filters.FilterSet):
+class ApplicationFilter(django_filters.FilterSet):
     order_by = django_filters.OrderingFilter(
         fields=(
             ("production_site__name", "production_site"),
@@ -16,7 +16,7 @@ class AgreementFilter(django_filters.FilterSet):
     production_sites = django_filters.CharFilter(method="filter_production_sites")
 
     class Meta:
-        model = DoubleCountingRegistration
+        model = DoubleCountingApplication
         fields = ["order_by"]
 
     def filter_multiple_values(self, queryset, field_name, param_name):

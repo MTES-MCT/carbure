@@ -41,10 +41,10 @@ const EntityList = () => {
 
   const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
   const canAdd =
-    entity.isExternal &&
-    (entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
-      entity.hasAdminRight(ExtAdminPagesEnum.ELEC) ||
-      entity.hasAdminRight(ExtAdminPagesEnum.DCA))
+    entity.isAdmin ||
+    entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
+    entity.hasAdminRight(ExtAdminPagesEnum.ELEC) ||
+    entity.hasAdminRight(ExtAdminPagesEnum.DCA)
 
   const handleEntityAdded = (name: string) => {
     notify(

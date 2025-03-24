@@ -27,16 +27,15 @@ def delete_application(request: HttpRequest, entity: Entity):
     if application.cpo != entity:
         return ErrorResponse(400, RemoveChargePointApplicationError.WRONG_ENTITY)
 
-    if application.status != ElecChargePointApplication.PENDING:
+    if application.status not in (ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED):
         return ErrorResponse(400, RemoveChargePointApplicationError.APPLICATION_NOT_PENDING)
 
-    cp = application.elec_charge_points.all()
-    for cp_ in cp:
+    charge_points = application.elec_charge_points.all()
+    for cp in charge_points:
         # delete all elec_metes
-        em = cp_.elec_meters.all()
-        em.delete()
+        cp.elec_meters.all().delete()
     # delete all charge points
-    cp.delete()
+    charge_points.delete()
     # delete charge point application
     application.delete()
 

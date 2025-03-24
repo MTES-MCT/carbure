@@ -15,23 +15,16 @@ class BalanceQuantitySerializer(serializers.Serializer):
 
 class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
-    initial_balance = serializers.FloatField()
-    available_balance = serializers.SerializerMethodField()
-    final_balance = serializers.SerializerMethodField()
+    initial_balance = serializers.SerializerMethodField()
+    available_balance = serializers.FloatField()
     quantity = BalanceQuantitySerializer()
-    teneur = serializers.FloatField()
-    yearly_teneur = serializers.FloatField(required=False)
-    pending = serializers.IntegerField()
+    pending_teneur = serializers.FloatField()
+    declared_teneur = serializers.FloatField()
+    pending_operations = serializers.IntegerField()
     unit = serializers.CharField()
 
-    def get_available_balance(self, instance) -> float:
-        return self.calcul_available_balance(instance)
-
-    def get_final_balance(self, instance) -> float:
-        return self.calcul_available_balance(instance) - instance["teneur"]
-
-    def calcul_available_balance(self, instance) -> float:
-        return instance["initial_balance"] + instance["quantity"]["credit"] - instance["quantity"]["debit"]
+    def get_initial_balance(self, instance) -> float:
+        return instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
 
 
 class BalanceSerializer(BaseBalanceSerializer):

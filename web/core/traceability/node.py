@@ -1,5 +1,6 @@
 import datetime
 import json
+from numbers import Number
 
 from core.models import GenericError
 from core.serializers import GenericErrorSerializer
@@ -196,7 +197,7 @@ class Node:
         # generate a diff dict
         for attr, new_value in data.items():
             old_value = getattr(self.data, attr)
-            if new_value != old_value:
+            if not is_similar(new_value, old_value):
                 diff[attr] = (new_value, old_value)
 
         # if an entity_id is specified, check if it has the right to apply the diff
@@ -376,3 +377,12 @@ def serialize_integrity_errors(integrity_errors):
             errors.append(error)
 
     return GenericErrorSerializer(errors, many=True).data
+
+
+def is_similar(a, b):
+    if isinstance(a, Number) and isinstance(b, Number):
+        return round(a, 2) == round(b, 2)
+    if isinstance(a, str) and isinstance(b, str):
+        return a.strip() == b.strip()
+    else:
+        return a == b

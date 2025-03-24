@@ -33,16 +33,27 @@ const ReportValidSection = ({
       "elec-audit-snapshot",
       `nav-stats-${entity.id}`,
     ],
-    onSuccess: () => {
-      onReportAccepted()
-      notify(
-        t(
-          "Le rapport d'audit a été transmis à la DGEC. L'audit est à présent terminé."
-        ),
-        {
-          variant: "success",
-        }
-      )
+    onSuccess: (res) => {
+      if (res.data.data.all_charge_points_audited) {
+        onReportAccepted()
+        notify(
+          t(
+            "Le rapport d'audit a été transmis à la DGEC. L'audit est à présent terminé."
+          ),
+          {
+            variant: "success",
+          }
+        )
+      } else {
+        notify(
+          t(
+            "Le rapport d'audit a été transmis, mais tous les points de charge n'ont pas été audités."
+          ),
+          {
+            variant: "warning",
+          }
+        )
+      }
     },
     onError: () => {
       notify(

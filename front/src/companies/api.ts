@@ -34,7 +34,7 @@ export function registerCompany(
       name,
       registered_address,
       registered_city,
-      registered_country_code,
+      registered_country: registered_country_code,
       registered_zipcode,
       registration_id,
       sustainability_officer_email,

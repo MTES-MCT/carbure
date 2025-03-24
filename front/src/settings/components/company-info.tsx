@@ -172,7 +172,7 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
           <TextInput
             required
             readOnly={readOnly}
-            label={t("Responsable durabilité")}
+            label={t("Contact Carbure")}
             placeholder="Jean-Pierre Champollion"
             {...companyForm.bind("sustainability_officer")}
           />
@@ -181,7 +181,7 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
             type="tel"
             pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
             label={t(
-              "N° téléphone responsable durabilité (commence par +33 pour la France)"
+              "N° téléphone contact Carbure (commence par +33 pour la France)"
             )}
             placeholder="exemple : +33612345678"
             readOnly={readOnly}
@@ -191,7 +191,7 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
             required
             type="email"
             readOnly={readOnly}
-            label={t("Email responsable durabilité")}
+            label={t("Email contact Carbure")}
             {...companyForm.bind("sustainability_officer_email")}
           />
 
