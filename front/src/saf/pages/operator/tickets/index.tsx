@@ -4,7 +4,7 @@ import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { ActionBar, Content } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   SafColumsOrder,
@@ -22,13 +22,16 @@ import { OperatorTicketDetails } from "../ticket-details"
 import { SafStatusSwitcher } from "./status-switcher"
 import TicketsTable from "../../../components/tickets/table"
 import TicketSourceDetails from "../ticket-source-details"
-import { ExportButton } from "../ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { ExportButton } from "saf/components/export"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "common/types"
 
 export interface OperatorTicketsProps {
   type: SafQueryType
@@ -43,7 +46,7 @@ export const OperatorTickets = ({
 }: OperatorTicketsProps) => {
   const { t } = useTranslation()
   usePrivateNavigation(
-    type === "received" ? t("Tickets reçus") : t("Tickets assignés")
+    type === "received" ? t("Tickets reçus") : t("Tickets affectés")
   )
 
   const location = useLocation()
@@ -92,35 +95,38 @@ export const OperatorTickets = ({
 
   return (
     <>
-      <Bar>
+      <SafStatusSwitcher
+        onSwitch={actions.setStatus}
+        type={type}
+        count={snapshot}
+        status={status}
+      />
+      <Content>
+        <ActionBar>
+          <ActionBar.Grow>
+            <SearchInput
+              clear
+              debounce={250}
+              value={state.search}
+              onChange={actions.setSearch}
+            />
+          </ActionBar.Grow>
+          <ExportButton query={query} download={api.downloadOperatorTickets} />
+        </ActionBar>
+
         <SafFilters
           filters={filters}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTicketFilter}
         />
-      </Bar>
-      <section>
-        <ActionBar>
-          <SafStatusSwitcher
-            onSwitch={actions.setStatus}
-            type={type}
-            count={snapshot}
-            status={status}
-          />
 
-          <ExportButton
-            asideX
-            query={query}
-            download={api.downloadOperatorTickets}
-          />
-          <SearchInput
-            clear
-            debounce={250}
-            value={state.search}
-            onChange={actions.setSearch}
-          />
-        </ActionBar>
+        <RecapQuantity
+          text={t("{{count}} volumes pour un total de {{total}}", {
+            count: ticketsData?.count,
+            total: formatUnit(ticketsData?.total_volume ?? 0, Unit.l),
+          })}
+        />
 
         <TicketsTable
           loading={ticketsResponse.loading}
@@ -132,26 +138,25 @@ export const OperatorTickets = ({
           client={type === "received"}
           rowLink={showTicketDetail}
         />
-      </section>
 
-      <HashRoute
-        path="ticket/:id"
-        element={
-          <OperatorTicketDetails
-            limit={state.limit}
-            total={ticketsData?.count ?? 0}
-            fetchIdsForPage={fetchIdsForPage}
-            baseIdsList={ids}
-          />
-        }
-      />
-      <HashRoute path="ticket-source/:id" element={<TicketSourceDetails />} />
+        <HashRoute
+          path="ticket/:id"
+          element={
+            <OperatorTicketDetails
+              limit={state.limit}
+              total={ticketsData?.count ?? 0}
+              fetchIdsForPage={fetchIdsForPage}
+              baseIdsList={ids}
+            />
+          }
+        />
+        <HashRoute path="ticket-source/:id" element={<TicketSourceDetails />} />
+      </Content>
     </>
   )
 }
 
 const OPERATOR_RECEIVED_FILTERS = [
-  SafFilter.Suppliers,
   SafFilter.Periods,
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,

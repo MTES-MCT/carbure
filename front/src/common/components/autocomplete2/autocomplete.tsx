@@ -15,6 +15,7 @@ import {
 import { Text } from "../text"
 import { Trans } from "react-i18next"
 import { InputProps } from "../inputs2/input"
+import { LoaderLine } from "../icon"
 
 export type AutocompleteProps<T, V = T> = Trigger &
   InputProps & {
@@ -31,7 +32,7 @@ export type AutocompleteProps<T, V = T> = Trigger &
     sort?: Sorter<T, V>
   }
 
-function Autocomplete<T, V>({
+export function Autocomplete<T, V>({
   loading,
   value,
   options,
@@ -70,6 +71,7 @@ function Autocomplete<T, V>({
         inputRef={triggerRef}
         value={autocomplete.query}
         onChange={autocomplete.onQuery}
+        iconId="ri-arrow-down-s-line"
       />
 
       {!props.disabled && !props.readOnly && (
@@ -83,6 +85,7 @@ function Autocomplete<T, V>({
           {loading || autocomplete.loading ? (
             <Text style={{ padding: "10px", textAlign: "center" }}>
               <Trans>Chargement des résultats...</Trans>
+              <LoaderLine size="sm" style={{ marginLeft: "4px" }} />
             </Text>
           ) : (
             <List

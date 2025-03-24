@@ -1,5 +1,5 @@
-import Button from "common/components/button"
-import { NumberInput } from "common/components/input"
+import { Button } from "common/components/button2"
+import { NumberInput } from "common/components/inputs2"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 
@@ -17,23 +17,19 @@ export const VolumeInput = ({
 
   return (
     <NumberInput
+      {...props}
       required
       label={t("Volume ({{volume}} litres disponibles)", {
         count: remainingVolume,
         volume: formatNumber(remainingVolume),
       })}
-      style={{ flex: 1 }}
       max={remainingVolume}
-      min={0}
+      min={1}
       step={0.01}
-      type="number"
-      {...props}
-      rightContent={
-        <Button
-          label={t("Maximum")}
-          action={onSetMaximumVolume}
-          variant="primary"
-        />
+      addon={
+        <Button onClick={onSetMaximumVolume} priority="primary">
+          {t("Maximum")}
+        </Button>
       }
     />
   )

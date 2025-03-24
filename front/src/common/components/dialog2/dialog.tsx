@@ -15,6 +15,7 @@ export interface DialogProps {
   fullscreen?: boolean
   fullWidth?: boolean
   fullHeight?: boolean
+  fitContent?: boolean
   children?: React.ReactNode
   header?: React.ReactNode
   footer?: React.ReactNode
@@ -30,6 +31,7 @@ export const Dialog = ({
   fullscreen,
   fullWidth,
   fullHeight,
+  fitContent,
   onClose,
 }: DialogProps) => (
   <div className={css.screen}>
@@ -40,6 +42,7 @@ export const Dialog = ({
         fullscreen && css.fullscreen,
         fullWidth && css.fullWidth,
         fullHeight && css.fullHeight,
+        fitContent && css.fitContent,
         className
       )}
       style={style}
@@ -57,15 +60,23 @@ export const Dialog = ({
       </Button>
       <div className={css["dialog__wrapper"]}>
         {header && <header className={css["dialog__header"]}>{header}</header>}
-        <main>{children}</main>
+        <main className={css["dialog__content"]}>{children}</main>
         {footer && <footer className={css["dialog__footer"]}>{footer}</footer>}
       </div>
     </div>
   </div>
 )
 
-const DialogTitle = (props: Omit<TitleProps, "is" | "as">) => (
-  <Title is="h2" as="h5" className={css["dialog__title"]} {...props} />
+type DialogTitleProps = Omit<TitleProps, "is" | "as"> & {
+  wrap?: boolean // If true, wrap the title on multiple lines
+}
+const DialogTitle = ({ wrap = false, ...props }: DialogTitleProps) => (
+  <Title
+    is="h2"
+    as="h5"
+    className={cl(css["dialog__title"], !wrap && css["dialog__title--nowrap"])}
+    {...props}
+  />
 )
 
 const DialogDescription = <T extends React.ElementType>(
@@ -113,12 +124,7 @@ export const Confirm = ({
   return (
     <Dialog
       onClose={onClose}
-      header={
-        <>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </>
-      }
+      header={<DialogTitle>{title}</DialogTitle>}
       footer={
         <>
           {!hideCancel && (
@@ -136,6 +142,8 @@ export const Confirm = ({
           )}
         </>
       }
-    ></Dialog>
+    >
+      {description}
+    </Dialog>
   )
 }

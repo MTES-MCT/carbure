@@ -17,7 +17,14 @@ import "@codegouvfr/react-dsfr/main.css"
 import "../src/common/assets/css/index.css"
 
 // Init MSW
-initialize()
+initialize({
+  onUnhandledRequest: ({ url, method }) => {
+    const pathname = new URL(url).pathname
+    if (pathname.endsWith(".css")) {
+      return
+    }
+  },
+})
 
 const withI18next = (Story, context) => {
   const { locale } = context.globals
