@@ -1,8 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryFn, StoryObj } from "@storybook/react"
 import { Stepper } from "./stepper"
-import { StepperProvider } from "./stepper.provider"
+import { Step, StepperProvider } from "./stepper.provider"
 import { userEvent, waitFor, within } from "@storybook/test"
 
+const loadStepsDecorator = (steps: Step<string>[]) => (Story: StoryFn) => {
+  return (
+    <StepperProvider steps={steps}>
+      <Story />
+    </StepperProvider>
+  )
+}
 const meta: Meta<typeof Stepper> = {
   component: Stepper,
   title: "common/components/Stepper",
@@ -12,8 +19,8 @@ const meta: Meta<typeof Stepper> = {
       values: [{ name: "white", value: "white" }],
     },
   },
-  globals: {
-    steps: [
+  decorators: [
+    loadStepsDecorator([
       {
         key: "step-1",
         title: "Step 1",
@@ -30,16 +37,7 @@ const meta: Meta<typeof Stepper> = {
         key: "step-4",
         title: "Step 4",
       },
-    ],
-  },
-  decorators: [
-    (Story, context) => {
-      return (
-        <StepperProvider steps={context.globals.steps}>
-          <Story />
-        </StepperProvider>
-      )
-    },
+    ]),
   ],
   render: () => {
     return (
@@ -61,8 +59,8 @@ export default meta
 export const Default: Story = {}
 
 export const DisallowedNextStep: Story = {
-  globals: {
-    steps: [
+  decorators: [
+    loadStepsDecorator([
       {
         key: "step-1",
         title: "Step 1",
@@ -72,16 +70,7 @@ export const DisallowedNextStep: Story = {
         key: "step-2",
         title: "Step 2",
       },
-    ],
-  },
-  decorators: [
-    (Story, context) => {
-      return (
-        <StepperProvider steps={context.globals.steps}>
-          <Story />
-        </StepperProvider>
-      )
-    },
+    ]),
   ],
 }
 
