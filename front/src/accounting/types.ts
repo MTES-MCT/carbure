@@ -10,7 +10,7 @@ import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
   PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
-  TypeC47Enum as CreateOperationType,
+  OperationTypeEnum as CreateOperationType,
   PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
 } from "api-schema"
 

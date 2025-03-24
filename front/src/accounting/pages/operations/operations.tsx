@@ -90,7 +90,7 @@ export const Operations = ({
           <Pagination
             defaultPage={query.page}
             total={result?.data?.count ?? 0}
-            limit={query.limit}
+            limit={state.limit}
             onLimit={actions.setLimit}
           />
         </>

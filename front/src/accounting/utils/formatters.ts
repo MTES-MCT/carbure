@@ -13,9 +13,9 @@ export const formatSector = (sector: string) => {
   switch (sector) {
     case OperationSector.ESSENCE:
       return "Essence"
-    case OperationSector.DIESEL:
+    case OperationSector.GAZOLE:
       return "Gazole"
-    case OperationSector.SAF:
+    case OperationSector.CARBUR_ACTEUR:
       return "Carburéacteur"
     default:
       return "Inconnu"

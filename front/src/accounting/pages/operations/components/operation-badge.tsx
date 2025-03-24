@@ -10,6 +10,9 @@ export const OperationBadge = ({ status }: { status?: OperationsStatus }) => {
     [OperationsStatus.CANCELED]: "error",
     [OperationsStatus.PENDING]: "warning",
     [OperationsStatus.REJECTED]: "error",
+    [OperationsStatus.DECLARED]: "success",
+    [OperationsStatus.CORRECTED]: "success",
+    [OperationsStatus.VALIDATED]: "success",
   }
 
   if (!status) return null

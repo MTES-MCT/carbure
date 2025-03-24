@@ -46,7 +46,7 @@ export const useExportationDialog = ({
           from_depot: values.from_depot?.id,
           to_depot: values.to_depot?.id,
           credited_entity: values.credited_entity?.id,
-          export_country: values.country?.id,
+          export_country: 0, // TODO: when the exportation flow will be implemented, we will need to add the export country
         })
       }
     })

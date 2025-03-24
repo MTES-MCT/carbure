@@ -9,7 +9,7 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-import { Pagination } from "common/components/pagination2/pagination"
+import { Pagination } from "common/components/pagination2"
 import { BalancesFilter } from "./types"
 import { OperationsStatus } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
@@ -61,7 +61,8 @@ export const Balances = () => {
           <Pagination
             defaultPage={query.page}
             total={result?.data?.count ?? 0}
-            limit={query.limit}
+            limit={state.limit}
+            onLimit={actions.setLimit}
           />
         </>
       )}

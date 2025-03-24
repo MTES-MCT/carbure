@@ -48,7 +48,7 @@ export const useBalancesColumns = () => {
     {
       header: t("Opérations en attente"),
       cell: (item) =>
-        item.pending === 0 ? (
+        item.pending_operations === 0 ? (
           "-"
         ) : (
           <Button
@@ -66,7 +66,7 @@ export const useBalancesColumns = () => {
               navigate(url)
             }}
           >
-            {item.pending}
+            {item.pending_operations}
           </Button>
         ),
     },
