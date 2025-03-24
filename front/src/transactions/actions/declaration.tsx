@@ -4,7 +4,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common/utils/normalize"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation, useQuery } from "common/hooks/async"
 import Portal from "common/components/portal"
@@ -24,7 +24,7 @@ import {
   Cross,
   Return,
 } from "common/components/icons"
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 import { Row } from "common/components/scaffold"
 import { useMatomo } from "matomo"
 import { useHashMatch } from "common/components/hash-route"

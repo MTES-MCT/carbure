@@ -1,8 +1,8 @@
 import { useQuery, useMutation } from "common/hooks/async"
-import { UserRightStatus } from "carbure/types"
+import { UserRightStatus } from "common/types"
 import { useParams } from "react-router-dom"
 import * as api from "../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { UserRightsTable } from "common/molecules/user-rights-table"
 
 type UserRightsProps = {

@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
-import { getByTextContent, waitWhileLoading } from "carbure/__test__/helpers"
+import { getByTextContent, waitWhileLoading } from "common/__test__/helpers"
 import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"

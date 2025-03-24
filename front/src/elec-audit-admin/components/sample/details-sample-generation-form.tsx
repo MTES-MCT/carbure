@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Button } from "common/components/button"
 import Form from "common/components/form"
 import { Download } from "common/components/icons"

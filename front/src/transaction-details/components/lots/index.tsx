@@ -1,5 +1,5 @@
-import useEntity from "carbure/hooks/entity"
-import { Entity, UserRole } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { Entity, UserRole } from "common/types"
 import Alert from "common/components/alert"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"

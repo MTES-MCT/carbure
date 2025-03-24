@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, Navigate } from "react-router-dom"
 import * as api from "../../api"
-import { Entity, UserRole } from "carbure/types"
+import { Entity, UserRole } from "common/types"
 import {
   Lot,
   Snapshot,
@@ -11,7 +11,7 @@ import {
   LotQuery,
   Filter,
 } from "../../types"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useAutoStatus } from "../status"
 import { useQuery } from "common/hooks/async"
 import { Order } from "common/components/table"

@@ -1,4 +1,4 @@
-import * as norm from "carbure/utils/normalizers"
+import * as norm from "common/utils/normalizers"
 import cl from "clsx"
 import { Fieldset } from "common/components/form"
 import { DateInput, TextInput } from "common/components/input"

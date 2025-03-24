@@ -1,5 +1,5 @@
 import Stepper from "@codegouvfr/react-dsfr/Stepper"
-import { UploadCheckReportInfo } from "carbure/types"
+import { UploadCheckReportInfo } from "common/types"
 import {
   ElecAuditorApplicationDetails,
   ElecAuditorUploadCheckReportInfo,

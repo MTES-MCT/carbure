@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
-import useEntity, { useRights } from "carbure/hooks/entity"
+import useEntity, { useRights } from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useQuery, useMutation } from "common/hooks/async"
 import { usePortal } from "common/components/portal"
@@ -21,8 +21,8 @@ import {
 import {
   normalizeCertificate,
   normalizeEntityCertificate,
-} from "carbure/utils/normalizers"
-import { Certificate, EntityCertificate, UserRole } from "carbure/types"
+} from "common/utils/normalizers"
+import { Certificate, EntityCertificate, UserRole } from "common/types"
 import Alert from "common/components/alert"
 import Select from "common/components/select"
 import isBefore from "date-fns/isBefore"

@@ -1,16 +1,15 @@
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 
-import { UserRightStatus } from "carbure/types"
-import { producer, trader } from "carbure/__test__/data"
-import { clone } from "carbure/__test__/helpers"
-import { okEntitySearch } from "carbure/__test__/api"
+import { UserRightStatus } from "common/types"
+import { producer, trader } from "common/__test__/data"
+import { okEntitySearch } from "common/__test__/api"
 
 let accessRequests: any[] = []
 
 export function setAccessRequests(entities: any[]) {
   accessRequests = entities.map((e) => ({
-    entity: clone(e),
+    entity: e,
     date: new Date(),
     status: UserRightStatus.Pending,
   }))

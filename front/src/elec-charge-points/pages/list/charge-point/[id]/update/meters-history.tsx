@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Alert from "common/components/alert"
 import { Split } from "common/components/icons"
 import { useQuery } from "common/hooks/async"

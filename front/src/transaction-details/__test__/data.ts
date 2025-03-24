@@ -6,8 +6,7 @@ import {
   operator,
   producer,
   productionSite,
-} from "carbure/__test__/data"
-import { clone } from "carbure/__test__/helpers"
+} from "common/__test__/data"
 import { LotDetails } from "transaction-details/types"
 import {
   CorrectionStatus,
@@ -130,12 +129,12 @@ export const errors: LotError[] = [
 ]
 
 export const errorDetails: LotDetails = {
-  ...clone(lotDetails),
+  ...lotDetails,
   errors: errors,
 }
 
 export const tofixDetails: LotDetails = {
-  ...clone(lotDetails),
+  ...lotDetails,
   lot: {
     ...lot,
     lot_status: LotStatus.Pending,
@@ -153,7 +152,7 @@ export const tofixDetails: LotDetails = {
 }
 
 export const rejectedDetails: LotDetails = {
-  ...clone(lotDetails),
+  ...lotDetails,
   lot: {
     ...lot,
     lot_status: LotStatus.Rejected,
@@ -171,7 +170,7 @@ export const rejectedDetails: LotDetails = {
 }
 
 export const sentDetails: LotDetails = {
-  ...clone(lotDetails),
+  ...lotDetails,
   lot: {
     ...lot,
     lot_status: LotStatus.Pending,

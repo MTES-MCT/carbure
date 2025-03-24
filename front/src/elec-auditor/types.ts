@@ -1,4 +1,4 @@
-import { EntityPreview, UploadCheckReportInfo } from "carbure/types"
+import { EntityPreview, UploadCheckReportInfo } from "common/types"
 import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 

@@ -1,6 +1,6 @@
 import { AxiosError } from "axios"
-import useEntity from "carbure/hooks/entity"
-import { UploadCheckReportInfo } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { UploadCheckReportInfo } from "common/types"
 import Button from "common/components/button"
 import Form, { useForm } from "common/components/form"
 import { Check, ChevronLeft, Send, Upload } from "common/components/icons"

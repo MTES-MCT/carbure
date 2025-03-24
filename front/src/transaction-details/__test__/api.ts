@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { Data } from "carbure/__test__/helpers"
+import { Data } from "common/__test__/helpers"
 import { LotDetails } from "../types"
 import { CorrectionStatus, DeliveryType, LotStatus } from "transactions/types"
 import { okDeliverySites, okDynamicSettings } from "settings/__test__/api"
@@ -11,8 +11,8 @@ import {
   okEntitySearch,
   okMatierePremiereSearch,
   okProductionSitesSearch,
-} from "carbure/__test__/api"
-import { producer } from "carbure/__test__/data"
+} from "common/__test__/api"
+import { producer } from "common/__test__/data"
 
 export const okLotDetails = http.get("/api/transactions/lots/details", () => {
   return HttpResponse.json({

@@ -1,8 +1,8 @@
-import { producer } from "carbure/__test__/data"
+import { producer } from "common/__test__/data"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 
-import { Data } from "carbure/__test__/helpers"
+import { Data } from "common/__test__/helpers"
 import {
   okBiocarburantsSearch,
   okCountrySearch,
@@ -10,7 +10,7 @@ import {
   okEntitySearch,
   okMatierePremiereSearch,
   okProductionSitesSearch,
-} from "carbure/__test__/api"
+} from "common/__test__/api"
 
 import * as data from "./data"
 import {

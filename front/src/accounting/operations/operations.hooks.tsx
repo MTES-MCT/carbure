@@ -20,7 +20,7 @@ import {
   OperationsStatus,
   OperationType,
 } from "./types"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
 }

@@ -3,9 +3,9 @@ import { Fieldset, useBind } from "common/components/form"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
 import { DateInput, DateInputProps } from "common/components/input"
 import { UserCheck } from "common/components/icons"
-import * as norm from "carbure/utils/normalizers"
+import * as norm from "common/utils/normalizers"
 import { StockFormValue } from "./stock-form"
-import { Entity, Country, Depot, ProductionSite } from "carbure/types"
+import { Entity, Country, Depot, ProductionSite } from "common/types"
 
 export const JourneyFields = () => {
   const { t } = useTranslation()

@@ -1,5 +1,5 @@
 import { api as apiFetch } from "common/services/api-fetch"
-import { EntityType } from "carbure/types"
+import { EntityType } from "common/types"
 import { CertificateTypeEnum } from "api-schema"
 
 export function searchCompanyDataBySiren(registration_id: string) {

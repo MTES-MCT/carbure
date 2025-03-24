@@ -1,12 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Notifications } from "./notifications"
 import { userEvent, waitFor, within } from "@storybook/test"
+import { okNotifications, okNotificationsAcked } from "./__test__/api"
+import { COMMON_MOCKS } from "@storybook/mocks/common"
 
 const meta: Meta<typeof Notifications> = {
   component: Notifications,
   title: "common/layouts/navigation/private/notifications",
   parameters: {
     mockingDate: new Date(2024, 3, 1),
+    msw: {
+      handlers: [...COMMON_MOCKS, okNotifications, okNotificationsAcked],
+    },
   },
 }
 

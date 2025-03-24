@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntityCertificate } from "carbure/types"
+import { EntityCertificate } from "common/types"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { actionColumn, Cell } from "common/components/table"
 import Button from "common/components/button"
@@ -13,7 +13,7 @@ import NoResult from "common/components/no-result"
 import { compact, matchesSearch } from "common/utils/collection"
 import Select from "common/components/select"
 import { useState } from "react"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 type CertificatesProps = {
   search?: string

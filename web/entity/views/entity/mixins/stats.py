@@ -106,7 +106,7 @@ class EntityStatsActionMixin:
             }
             token = jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256")
             iframe_url = f"{METABASE_SITE_URL}/embed/dashboard/{token}#bordered=false&titled=false"
-            serializer = StatsResponseSerializer({"metabase_iframe_url": iframe_url})
+            serializer = StatsResponseSerializer(data={"metabase_iframe_url": iframe_url})
             serializer.is_valid(raise_exception=True)
             return Response(serializer.validated_data)
         except Exception:

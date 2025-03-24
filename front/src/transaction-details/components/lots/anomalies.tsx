@@ -4,12 +4,12 @@ import Collapse from "common/components/collapse"
 import { AlertOctagon, AlertTriangle } from "common/components/icons"
 import Checkbox, { CheckboxGroup } from "common/components/checkbox"
 import i18next from "i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import * as api from "../../api"
 import { Normalizer } from "common/utils/normalize"
 import { Fragment, useCallback, useEffect, useState } from "react"
-import { UserRole } from "carbure/types"
+import { UserRole } from "common/types"
 
 export interface BlockingAnomaliesProps {
   anomalies: LotError[]

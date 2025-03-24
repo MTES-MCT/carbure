@@ -1,4 +1,4 @@
-import { Unit } from "carbure/types"
+import { Unit } from "common/types"
 import { api as apiFetch } from "common/services/api-fetch"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {

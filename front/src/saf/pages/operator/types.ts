@@ -1,4 +1,4 @@
-import { Biofuel, Feedstock } from "carbure/types"
+import { Biofuel, Feedstock } from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus } from "api-schema"
 

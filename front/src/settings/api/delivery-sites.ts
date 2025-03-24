@@ -5,7 +5,7 @@ import {
   OwnershipType,
   EntityPreview,
   EntityDepot,
-} from "carbure/types"
+} from "common/types"
 
 export function getDeliverySites(entity_id: number) {
   return apiFetch.GET("/entities/depots/", {

@@ -8,7 +8,7 @@ import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Edit } from "common/components/icons"
 import pickApi from "controls/api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Lot } from "transactions/types"
 import Checkbox from "common/components/checkbox"
 

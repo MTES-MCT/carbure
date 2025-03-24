@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
-import { useUser } from "carbure/hooks/user"
+import { useUser } from "common/hooks/user"
 import css from "./pending.module.css"
 import { LoaderOverlay, Main } from "common/components/scaffold"
 import Alert from "common/components/alert"

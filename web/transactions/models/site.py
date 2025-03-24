@@ -144,14 +144,3 @@ class Site(models.Model):
     def __str__(self):
         creator = self.created_by.name if self.created_by else ""
         return "%s - %s (%s)" % (self.name, creator, self.site_type)
-
-
-class ContentToUpdate(models.Model):
-    model = models.CharField(max_length=64, null=False, blank=False)
-    field = models.CharField(max_length=64, null=False, blank=False)
-    content_id = models.IntegerField(null=False, blank=False)
-    production_site = models.ForeignKey("producers.ProductionSite", null=True, on_delete=models.DO_NOTHING)
-    depot = models.ForeignKey("core.Depot", null=True, on_delete=models.DO_NOTHING)
-
-    class Meta:
-        db_table = "_tmp_site_migration"

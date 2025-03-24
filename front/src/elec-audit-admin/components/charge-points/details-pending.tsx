@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import ApplicationSampleGeneration from "../sample/application-generation"
 import ApplicationSummary from "./details-application-summary"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 export type GenerationState =
   | "generation"

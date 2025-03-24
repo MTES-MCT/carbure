@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react"
 import { useQuery } from "common/hooks/async"
-import { Entity, User, UserRight, UserRightRequest } from "../types"
-import * as api from "../api"
+import { Entity, User, UserRight, UserRightRequest } from "common/types"
+import * as api from "common/api"
 import * as Sentry from "@sentry/react"
 export interface UserManager {
   loading: boolean

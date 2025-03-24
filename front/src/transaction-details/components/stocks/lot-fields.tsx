@@ -6,12 +6,12 @@ import {
   NumberInputProps,
   TextInput,
 } from "common/components/input"
-import * as norm from "carbure/utils/normalizers"
+import * as norm from "common/utils/normalizers"
 import { StockFormValue } from "./stock-form"
-import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
+import { Biofuel, Country, Feedstock, Unit } from "common/types"
 import { formatPercentage } from "common/utils/formatters"
 import { isRedII } from "lot-add/components/ghg-fields"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { useState } from "react"
 import { UnitSelect } from "lot-add/components/lot-fields"
 

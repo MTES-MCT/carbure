@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { DeliveryType, Lot, LotError } from "transactions/types"
 import {
   Entity,
@@ -11,7 +11,7 @@ import {
   ProductionSite,
   Unit,
   EntityPreview,
-} from "carbure/types"
+} from "common/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"

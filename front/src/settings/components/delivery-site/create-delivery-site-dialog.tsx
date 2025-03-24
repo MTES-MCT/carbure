@@ -10,7 +10,7 @@ import {
 } from "./create-delivery-site-form"
 import * as api from "../../api/delivery-sites"
 import { useNotify } from "common/components/notifications"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 
 type CreateDeliverySiteDialogProps = {
   onClose: PortalInstance["close"]

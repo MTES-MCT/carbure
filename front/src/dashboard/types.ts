@@ -1,4 +1,4 @@
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 
 export interface DashboardDeclaration {
   count: {

@@ -3,7 +3,7 @@ import { Trans, useTranslation } from "react-i18next"
 import Button from "common/components/button"
 import { AlertCircle } from "common/components/icons"
 import { Row } from "common/components/scaffold"
-import { isProduction } from "carbure/utils/production"
+import { isProduction } from "common/utils/production"
 import cl from "clsx"
 import styles from "./dev-banner.module.css"
 

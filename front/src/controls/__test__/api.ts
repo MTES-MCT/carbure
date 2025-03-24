@@ -1,4 +1,4 @@
-import { admin, entityRight } from "carbure/__test__/data"
+import { admin, entityRight } from "common/__test__/data"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 

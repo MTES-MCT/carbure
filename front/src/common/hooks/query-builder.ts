@@ -1,4 +1,4 @@
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import { useMemo } from "react"

@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react"
 
 import { NavigationLayout } from "./navigation-layout"
 
-import { okUnauthorizedUser } from "carbure/__test__/api"
-import { EntityType } from "carbure/types"
-import { mockUser } from "carbure/__test__/helpers"
+import { okUnauthorizedUser } from "common/__test__/api"
+import { EntityType } from "common/types"
+import { mockUser } from "common/__test__/helpers"
 import {
   PrivateNavigationProvider,
   usePrivateNavigation,

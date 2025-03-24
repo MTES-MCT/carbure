@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom"
 import pickApi from "../../api"
-import { EntityManager } from "carbure/hooks/entity"
+import { EntityManager } from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { useStatus } from "../status"
 import { Bar } from "common/components/scaffold"

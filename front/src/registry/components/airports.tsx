@@ -1,4 +1,4 @@
-import { findAirports } from "carbure/api"
+import { findAirports } from "common/api"
 import Alert from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import { SearchInput } from "common/components/input"

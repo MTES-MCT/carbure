@@ -14,7 +14,7 @@ import { usePortal } from "common/components/portal"
 import AddEntityDialog from "./components/add-entity-dialog"
 import { useNotify } from "common/components/notifications"
 import { compact } from "common/utils/collection"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExtAdminPagesEnum } from "api-schema"
 

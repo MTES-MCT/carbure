@@ -1,5 +1,6 @@
 import argparse
 import os
+from typing import Iterable
 
 import django
 from django.db import transaction
@@ -8,11 +9,11 @@ from tqdm import tqdm
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading import ElecMeterReading  # noqa: E402
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication  # noqa: E402
 from elec.repositories.charge_point_repository import ChargePointRepository  # noqa: E402
 from elec.repositories.meter_reading_repository import MeterReadingRepository  # noqa: E402
-from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point  # noqa: E402
 from transactions.models.year_config import YearConfig  # noqa: E402
 
 
@@ -47,3 +48,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     compute_meter_reading_renewable_energy(args.batch)
+
+
+def get_previous_readings_by_charge_point(
+    charge_points: Iterable[ElecChargePoint],
+    previous_application: ElecMeterReadingApplication,
+):
+    previous_readings_by_charge_point = {}
+
+    # initialize previous readings using the first one set during the charge point registration
+    for charge_point in charge_points:
+        previous_readings_by_charge_point[charge_point.charge_point_id] = (
+            charge_point.current_meter.initial_index if charge_point.current_meter else None
+        )
+
+    # then if there was a previous registration, use its data to specify the previous reading latest value
+    if previous_application:
+        for reading in previous_application.elec_meter_readings.all():
+            if reading.charge_point:
+                previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
+
+    return previous_readings_by_charge_point

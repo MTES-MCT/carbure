@@ -1,4 +1,4 @@
-import { EntityPreview, UploadCheckReportInfo } from "carbure/types"
+import { EntityPreview, UploadCheckReportInfo } from "common/types"
 import { ElecTransferCertificateStatus } from "./types-cpo"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 

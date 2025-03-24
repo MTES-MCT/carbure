@@ -1,5 +1,5 @@
-import { cpo } from "carbure/__test__/data"
-import { UploadCheckError } from "carbure/types"
+import { cpo } from "common/__test__/data"
+import { UploadCheckError } from "common/types"
 import {
   ElecAuditorApplication,
   ElecAuditorApplicationDetails,

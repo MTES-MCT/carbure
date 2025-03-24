@@ -9,7 +9,7 @@ import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Message } from "common/components/icons"
 import * as api from "transactions/api"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Lot } from "transactions/types"
 export interface CommentsProps {
   readOnly?: boolean

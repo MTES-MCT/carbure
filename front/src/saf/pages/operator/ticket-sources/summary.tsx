@@ -7,8 +7,8 @@ import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import TicketsGroupedAssignment from "../../../components/assignment/grouped-assignment"
 import { SafTicketSource } from "../types"
-import { UserRole } from "carbure/types"
-import useEntity from "carbure/hooks/entity"
+import { UserRole } from "common/types"
+import useEntity from "common/hooks/entity"
 
 export interface TicketSourcesSummaryProps {
   ticketSources: SafTicketSource[]

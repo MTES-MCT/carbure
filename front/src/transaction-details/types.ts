@@ -1,4 +1,4 @@
-import { Entity } from "carbure/types"
+import { Entity } from "common/types"
 import { Lot, LotError, Stock } from "transactions/types"
 
 export interface LotDetails {

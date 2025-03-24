@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import { LoaderOverlay, Panel } from "common/components/scaffold"

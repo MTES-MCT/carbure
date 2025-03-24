@@ -6,7 +6,7 @@ import Tag from "common/components/tag"
 import { ElecMeterReadingsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
-import { UploadCheckError } from "carbure/types"
+import { UploadCheckError } from "common/types"
 
 export type MeterReadingsErrorsDetailsDialogProps = {
   fileData: ElecMeterReadingsApplicationCheckInfo

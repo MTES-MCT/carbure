@@ -1,6 +1,6 @@
 import { useMatch } from "react-router-dom"
 import { createContext, useContext } from "react"
-import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
+import { Entity, EntityType, ExternalAdminPages, UserRole } from "common/types"
 import { UserManager } from "./user"
 import { PreferredUnitEnum } from "api-schema"
 

@@ -1,4 +1,4 @@
-import { ProductionSiteDetails } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import {

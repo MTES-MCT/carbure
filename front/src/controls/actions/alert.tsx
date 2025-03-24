@@ -1,4 +1,4 @@
-import useEntity, { EntityManager } from "carbure/hooks/entity"
+import useEntity, { EntityManager } from "common/hooks/entity"
 import Button from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import Dialog from "common/components/dialog"

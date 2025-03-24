@@ -3,8 +3,8 @@ import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
-import { operator, producer, trader } from "carbure/__test__/data"
-import { getField, setEntity } from "carbure/__test__/helpers"
+import { operator, producer, trader } from "common/__test__/data"
+import { getField, setEntity } from "common/__test__/helpers"
 import LotAdd from "../index"
 
 import server from "./api"

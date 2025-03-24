@@ -11,7 +11,7 @@ import logoEuropeanUnion from "common/assets/images/union-europeenne.webp"
 import { LinkedIn, Mail } from "common/components/icons"
 import { Footer } from "common/components/scaffold"
 import { MailTo } from "common/components/button"
-import { useUser } from "carbure/hooks/user"
+import { useUser } from "common/hooks/user"
 
 const CarbureFooter = ({ className }: { className?: string }) => {
   useTranslation()

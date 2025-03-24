@@ -6,19 +6,19 @@ import {
   EntityType,
   OwnershipType,
   EntityPreview,
-} from "carbure/types"
+} from "common/types"
 import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
-import { AutoCompleteCountries } from "carbure/components/autocomplete-countries"
-import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
+import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
+import { AutoCompleteOperators } from "common/molecules/autocomplete-operators"
 import {
   useDeliverySiteFlags,
   useGetDepotTypeOptions,
   useOwnerShipTypeOptions,
 } from "./delivery-site.hooks"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import Checkbox from "common/components/checkbox"
 
 type DeliverySiteFormProps = {

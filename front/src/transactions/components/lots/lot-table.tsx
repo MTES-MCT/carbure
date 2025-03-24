@@ -21,9 +21,9 @@ import { isRedII } from "lot-add/components/ghg-fields"
 import { DuplicateOneButton } from "transactions/actions/duplicate"
 import Score from "transaction-details/components/score"
 import { To } from "react-router-dom"
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import { Unit } from "carbure/types"
+import { Unit } from "common/types"
 
 export interface LotTableProps {
   loading: boolean

@@ -20,7 +20,7 @@ import {
   EntityCertificate,
   EntityDepot,
   EntityPreview,
-} from "carbure/types"
+} from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { formatPeriod } from "common/utils/formatters"
 

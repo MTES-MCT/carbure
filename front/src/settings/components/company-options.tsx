@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 
-import useEntity from "carbure/hooks/entity"
-import { UserRole } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { UserRole } from "common/types"
 import { useMutation } from "common/hooks/async"
 import { Panel, LoaderOverlay, Row } from "common/components/scaffold"
 import Checkbox from "common/components/checkbox"

@@ -5,14 +5,14 @@ import {
   producer,
   productionSite,
   trader,
-} from "carbure/__test__/data"
+} from "common/__test__/data"
 import {
   Airport,
   Biofuel,
   CategoryEnum,
   Country,
   Feedstock,
-} from "carbure/types"
+} from "common/types"
 import {
   LotPreview,
   SafOperatorSnapshot,

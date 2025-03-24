@@ -8,8 +8,8 @@ import {
   OutputSwitcher,
   StockSwitcher,
 } from "./category"
-import useEntity from "carbure/hooks/entity"
-import { UserRole } from "carbure/types"
+import useEntity from "common/hooks/entity"
+import { UserRole } from "common/types"
 import {
   ExportLotsButton,
   ExportStocksButton,

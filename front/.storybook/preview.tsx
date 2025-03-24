@@ -6,15 +6,15 @@ import { I18nextProvider } from "react-i18next"
 import { initialize, mswLoader } from "msw-storybook-addon"
 import { withRouter } from "storybook-addon-remix-react-router"
 import mswHandlers from "./mocks"
-import useUserManager, { UserContext } from "../src/carbure/hooks/user"
-import { EntityContext, useEntityManager } from "../src/carbure/hooks/entity"
+import useUserManager, { UserContext } from "../src/common/hooks/user"
+import { EntityContext, useEntityManager } from "../src/common/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { MatomoProvider } from "../src/matomo"
 
 import "../src/setup-dsfr"
 import "@codegouvfr/react-dsfr/main.css"
 // import css from our app
-import "../src/carbure/assets/css/index.css"
+import "../src/common/assets/css/index.css"
 
 // Init MSW
 initialize()

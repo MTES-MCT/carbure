@@ -1,4 +1,4 @@
-import useEntity from "carbure/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { ROUTE_URLS } from "common/utils/routes"
 
 const currentYear = new Date().getFullYear()

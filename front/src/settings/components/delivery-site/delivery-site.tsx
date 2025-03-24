@@ -7,8 +7,8 @@ import {
   EntityDepot,
   OwnershipType,
   EntityPreview,
-} from "carbure/types"
-import * as common from "carbure/api"
+} from "common/types"
+import * as common from "common/api"
 import * as api from "../../api/delivery-sites"
 import { LoaderOverlay } from "common/components/scaffold"
 import Checkbox from "common/components/checkbox"
@@ -20,9 +20,9 @@ import { Confirm, Dialog } from "common/components/dialog"
 import AutoComplete from "common/components/autocomplete"
 import { RadioGroup } from "common/components/radio"
 import { Form, useForm } from "common/components/form"
-import useEntity, { useRights } from "carbure/hooks/entity"
+import useEntity, { useRights } from "common/hooks/entity"
 import { Panel } from "common/components/scaffold"
-import { normalizeDepot } from "carbure/utils/normalizers"
+import { normalizeDepot } from "common/utils/normalizers"
 import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
@@ -33,7 +33,7 @@ import {
   useDepotTypeLabels,
   useOwnerShipTypeOptions,
 } from "./delivery-site.hooks"
-import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
+import { AutoCompleteOperators } from "common/molecules/autocomplete-operators"
 import Tag from "common/components/tag"
 
 interface DeliverySiteSettingsProps {
