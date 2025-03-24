@@ -10,6 +10,10 @@
   margin-right: var(--spacing-1w);
 }
 
+.notice__container {
+  max-width: 100%;
+}
+
 .notice--info .notice__link {
   color: var(--text-default-info);
   --shadow-link-color: var(--text-default-info);

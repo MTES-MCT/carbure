@@ -3,8 +3,7 @@ import { useLocation } from "react-router-dom"
 import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
-import { SearchInput } from "common/components/input"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { ActionBar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   SafColumsOrder,
@@ -18,11 +17,16 @@ import { SafFilters } from "../../components/filters"
 import { useAutoStatus } from "./tabs"
 import { ClientTicketDetails } from "./ticket-details"
 import TicketsTable from "../../components/tickets/table"
-import { ExportButton } from "../operator/ticket-source-details/export"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
+import { SearchInput } from "common/components/inputs2"
+import { ExportButton } from "saf/components/export"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "common/types"
+import { useTranslation } from "react-i18next"
 
 export interface AirlineTicketsProps {
   year: number
@@ -30,7 +34,7 @@ export interface AirlineTicketsProps {
 
 export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
   const location = useLocation()
-
+  const { t } = useTranslation()
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useCBQueryParamsStore<SafTicketStatus, undefined>(
@@ -78,40 +82,42 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
 
   return (
     <>
-      <Bar>
-        <SafFilters
-          filters={CLIENT_FILTERS}
-          selected={state.filters}
-          onSelect={actions.setFilters}
-          getFilterOptions={getTicketFilter}
-        />
-      </Bar>
-      <section>
-        <ActionBar>
-          <ExportButton
-            query={query}
-            download={api.downloadSafAirlineTickets}
-          />
+      <ActionBar>
+        <ActionBar.Grow>
           <SearchInput
-            asideX
-            clear
             debounce={250}
             value={state.search}
             onChange={actions.setSearch}
           />
-        </ActionBar>
+        </ActionBar.Grow>
 
-        <TicketsTable
-          client
-          loading={ticketsResponse.loading}
-          state={state}
-          actions={actions}
-          order={state.order}
-          status={status}
-          ticketsData={ticketsData}
-          rowLink={showTicketDetail}
-        />
-      </section>
+        <ExportButton query={query} download={api.downloadSafAirlineTickets} />
+      </ActionBar>
+
+      <SafFilters
+        filters={CLIENT_FILTERS}
+        selected={state.filters}
+        onSelect={actions.setFilters}
+        getFilterOptions={getTicketFilter}
+      />
+
+      <RecapQuantity
+        text={t("{{count}} volumes pour un total de {{total}}", {
+          count: ticketsData?.count,
+          total: formatUnit(ticketsData?.total_volume ?? 0, Unit.l),
+        })}
+      />
+
+      <TicketsTable
+        client
+        loading={ticketsResponse.loading}
+        state={state}
+        actions={actions}
+        order={state.order}
+        status={status}
+        ticketsData={ticketsData}
+        rowLink={showTicketDetail}
+      />
 
       {ticketsData && (
         <HashRoute
@@ -130,10 +136,6 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
   )
 }
 
-const CLIENT_FILTERS = [
-  SafFilter.Suppliers,
-  SafFilter.Periods,
-  SafFilter.Feedstocks,
-]
+const CLIENT_FILTERS = [SafFilter.Periods, SafFilter.Feedstocks]
 
 export default AirlineTickets

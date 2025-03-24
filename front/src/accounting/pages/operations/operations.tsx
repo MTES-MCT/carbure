@@ -91,6 +91,7 @@ export const Operations = ({
             defaultPage={query.page}
             total={result?.data?.count ?? 0}
             limit={query.limit}
+            onLimit={actions.setLimit}
           />
         </>
       )}

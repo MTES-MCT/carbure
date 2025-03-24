@@ -8757,6 +8757,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicket"
+        total_volume:
+          type: number
     PaginatedSafTicketSourceList:
       type: object
       required:
@@ -8780,6 +8782,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
+        total_available_volume:
+          type: number
     PatchedOperationUpdateRequest:
       type: object
       properties:

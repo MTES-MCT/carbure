@@ -23,7 +23,6 @@ export const Input = ({
   placeholder,
   type,
   nativeInputProps,
-  readOnly,
   inputRef,
   label,
   ...props
@@ -42,7 +41,7 @@ export const Input = ({
         pattern,
         placeholder,
         type,
-        readOnly,
+        readOnly: props.readOnly,
         required: props.required,
         ref: inputRef as RefObject<HTMLInputElement>,
       }}

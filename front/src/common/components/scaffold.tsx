@@ -13,8 +13,18 @@ export const Main = (props: JSX.IntrinsicElements["main"]) => (
 )
 
 // a div used inside Main component to remove the padding and set a background color
-export const Content = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.content, props.className)} />
+export const Content = ({
+  marginTop,
+  ...props
+}: JSX.IntrinsicElements["div"] & { marginTop?: boolean }) => (
+  <div
+    {...props}
+    className={cl(
+      css.content,
+      props.className,
+      marginTop && css["content--margin-top"]
+    )}
+  />
 )
 
 // bottom footer with links and info, divided into some vertical <section>
@@ -27,10 +37,17 @@ export const Bar = (props: JSX.IntrinsicElements["section"]) => (
   <section {...props} className={cl(css.bar, props.className)} />
 )
 
+// a div that grows to fill the available space (used in ActionBar)
+const ActionBarGrow = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={css["actionbar--grow"]} />
+)
+
 // a bar where you can put many buttons
-export const ActionBar = (props: JSX.IntrinsicElements["section"]) => (
+export const ActionBar = ({ ...props }: JSX.IntrinsicElements["section"]) => (
   <section {...props} className={cl(css.actionbar, props.className)} />
 )
+
+ActionBar.Grow = ActionBarGrow
 
 // a enclosed box with its own <header>, many <section> and <footer>
 export const Panel = ({
@@ -54,12 +71,19 @@ export const Col = ({
   asideX,
   asideY,
   className,
+  grow,
+  gap,
   ...props
-}: JSX.IntrinsicElements["div"] & Layout) => (
+}: JSX.IntrinsicElements["div"] & Layout & { grow?: boolean; gap?: "md" }) => (
   <div
     {...props}
     {...layout({ asideX, asideY })}
-    className={cl(css.column, className)}
+    className={cl(
+      css.column,
+      grow && css["column--grow"],
+      gap && css[`column--gap-${gap}`],
+      className
+    )}
   />
 )
 
@@ -89,6 +113,10 @@ export const LoaderOverlay = () => (
 
 export const Box = (props: JSX.IntrinsicElements["div"]) => (
   <div {...props} className={cl(css.box, props.className)} />
+)
+
+export const Divider = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={cl(css.divider, props.className)} />
 )
 
 export interface Layout {

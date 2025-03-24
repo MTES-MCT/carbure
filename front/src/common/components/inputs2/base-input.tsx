@@ -7,6 +7,8 @@ import { ReactNode } from "react"
 import { InformationLine } from "../icon"
 import cl from "clsx"
 import css from "./base-input.module.css"
+import { Text } from "../text"
+
 export type ExtendedInputProps = {
   loading?: boolean
   hasTooltip?: boolean
@@ -37,8 +39,26 @@ export const BaseInput = ({
   label,
   domRef,
   marginBottom,
+  readOnly,
   ...props
 }: BaseInputProps) => {
+  // Set a custom style for read only inputs
+  if (readOnly) {
+    return (
+      <div>
+        <Label
+          label={label}
+          hasTooltip={hasTooltip}
+          title={title}
+          readOnly={readOnly}
+        />
+        <Text size="sm">
+          {props.nativeInputProps?.value ?? props.nativeTextAreaProps?.value}
+        </Text>
+      </div>
+    )
+  }
+
   return (
     <InputDSFR
       {...props}
@@ -54,6 +74,7 @@ export const BaseInput = ({
       ref={domRef}
       className={cl(
         props.className,
+        css["input-dsfr--no-margin"],
         props.state === "error" &&
           !props.stateRelatedMessage &&
           css["dsfr-input--error"],
@@ -64,16 +85,26 @@ export const BaseInput = ({
   )
 }
 
-type LabelProps = Pick<
+export type LabelProps = Pick<
   BaseInputProps,
-  "label" | "hasTooltip" | "required" | "title"
+  "label" | "hasTooltip" | "required" | "title" | "readOnly"
 >
-export const Label = ({ label, hasTooltip, required, title }: LabelProps) => {
+export const Label = ({
+  label,
+  hasTooltip,
+  required,
+  title,
+  readOnly,
+}: LabelProps) => {
   let baseLabel = label
 
   // Add an icon if the input is required
-  if (required) {
+  if (!readOnly && required) {
     baseLabel = `${baseLabel} *`
+  }
+
+  if (readOnly) {
+    baseLabel = <span className={css["label--read-only"]}>{baseLabel}</span>
   }
 
   // Add a tooltip if the input has one

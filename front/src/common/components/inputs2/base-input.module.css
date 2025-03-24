@@ -10,3 +10,11 @@
 .addon :global(.fr-input-wrap--addon .fr-btn) {
   flex-shrink: 0;
 }
+
+.input-dsfr--no-margin:global(.fr-input-group) {
+  margin-bottom: 0;
+}
+
+.label--read-only {
+  color: var(--text-mention-grey);
+}

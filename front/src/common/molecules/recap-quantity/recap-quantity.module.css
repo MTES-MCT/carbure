@@ -1,0 +1,13 @@
+.recap-quantity {
+  color: var(--text-mention-grey);
+  display: flex;
+  align-items: baseline;
+}
+
+.recap-quantity-button {
+  all: unset;
+  margin-left: var(--spacing-1v);
+  color: var(--text-mention-grey);
+  text-decoration: underline;
+  cursor: pointer;
+}

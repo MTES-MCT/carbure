@@ -1,8 +1,7 @@
 import useEntity from "common/hooks/entity"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Send } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -11,7 +10,7 @@ import useScrollToRef from "common/hooks/scroll-to-ref"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import TicketAssignment from "../../../components/assignment/simple-assignment"
+import { TicketAssignment } from "../../../components/assignment/simple-assignment"
 import ParentLot from "./parent-lot"
 import TicketSourceTag from "../ticket-sources/tag"
 import AssignedTickets from "./assigned-tickets"
@@ -20,7 +19,6 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
-import { UserRole } from "common/types"
 
 export type TicketSourceDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -40,9 +38,6 @@ export const TicketSourceDetails = ({
   const entity = useEntity()
   const match = useHashMatch("ticket-source/:id")
   const portal = usePortal()
-
-  const canUpdateTicket =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
     key: "ticket-source-details",
@@ -83,52 +78,52 @@ export const TicketSourceDetails = ({
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
-        <header>
-          <TicketSourceTag big ticketSource={ticketSource} />
-          <h1>
-            {t("Volume CAD n°")}
-            {ticketSource?.carbure_id ?? "..."}
-          </h1>
-        </header>
-
-        <main>
-          <section>
-            <TicketSourceFields ticketSource={ticketSource} />
+      <Dialog
+        onClose={closeDialog}
+        header={
+          <Dialog.Title>
+            <TicketSourceTag ticketSource={ticketSource} />
+            <span>
+              {t("Volume CAD n°")}
+              {ticketSource?.carbure_id ?? "..."}
+            </span>
+          </Dialog.Title>
+        }
+        footer={
+          <>
+            {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
+              <NavigationButtons
+                limit={limit}
+                total={total ?? 0}
+                fetchIdsForPage={fetchIdsForPage}
+                baseIdsList={baseIdsList}
+              />
+            )}
+            {ticketSource?.assigned_volume !== undefined &&
+              ticketSource?.total_volume !== undefined &&
+              ticketSource.assigned_volume < ticketSource.total_volume && (
+                <Button
+                  iconId="ri-send-plane-line"
+                  priority="primary"
+                  onClick={showAssignement}
+                >
+                  {t("Affecter")}
+                </Button>
+              )}
+          </>
+        }
+      >
+        <section>
+          <TicketSourceFields ticketSource={ticketSource} />
+        </section>
+        {hasAssignements && (
+          <section ref={refToScroll}>
+            <AssignedTickets ticketSource={ticketSource} />
           </section>
-          {hasAssignements && (
-            <section ref={refToScroll}>
-              <AssignedTickets ticketSource={ticketSource} />
-            </section>
-          )}
-          <section>
-            <ParentLot parent_lot={ticketSource?.parent_lot} />
-          </section>
-        </main>
-
-        <footer>
-          <Button
-            icon={Send}
-            label={t("Affecter")}
-            variant="primary"
-            disabled={
-              !ticketSource ||
-              ticketSource.assigned_volume === ticketSource.total_volume ||
-              !canUpdateTicket
-            }
-            action={showAssignement}
-          />
-          {baseIdsList && baseIdsList.length > 0 && fetchIdsForPage && (
-            <NavigationButtons
-              limit={limit}
-              total={total ?? 0}
-              fetchIdsForPage={fetchIdsForPage}
-              baseIdsList={baseIdsList}
-              closeAction={closeDialog}
-            />
-          )}
-        </footer>
-
+        )}
+        <section>
+          <ParentLot parent_lot={ticketSource?.parent_lot} />
+        </section>
         {ticketSourceResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>
