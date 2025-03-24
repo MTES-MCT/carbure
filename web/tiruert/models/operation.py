@@ -54,6 +54,9 @@ class Operation(models.Model):
         (ACCEPTED, ACCEPTED),
         (REJECTED, REJECTED),
         (CANCELED, CANCELED),
+        (DECLARED, DECLARED),
+        (CORRECTED, CORRECTED),
+        (VALIDATED, VALIDATED),
     )
 
     INCORPORATION = "INCORPORATION"
@@ -75,6 +78,11 @@ class Operation(models.Model):
         (DEVALUATION, DEVALUATION),
         (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
     )
+
+    ESSENCE = "ESSENCE"
+    GAZOLE = "GAZOLE"
+    CARBUREACTEUR = "CARBURÉACTEUR"
+    SECTOR_CODE_CHOICES = (ESSENCE, GAZOLE, CARBUREACTEUR)
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)
@@ -103,11 +111,11 @@ class Operation(models.Model):
     @property
     def sector(self):
         if self.biofuel.compatible_essence:
-            return "ESSENCE"
+            return Operation.ESSENCE
         elif self.biofuel.compatible_diesel:
-            return "GAZOLE"
+            return Operation.GAZOLE
         elif self.biofuel.code in SAF_BIOFUEL_TYPES:
-            return "CARBURÉACTEUR"
+            return Operation.CARBUREACTEUR
 
     @property
     def volume(self):

@@ -3,7 +3,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilter
 from tiruert.models import MacFossilFuel, Objective, Operation
@@ -11,7 +11,9 @@ from tiruert.serializers import ObjectiveOutputSerializer
 from tiruert.services.objective import ObjectiveService
 
 
-class ObjectiveViewSet(ModelViewSet):
+class ObjectiveViewSet(GenericViewSet):
+    queryset = Objective.objects.all()
+    filterset_class = ObjectiveFilter
     serializer_class = ObjectiveOutputSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
@@ -76,8 +78,8 @@ class ObjectiveViewSet(ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         # Get queryset with filters for MacFossilFuel, Objective and Operation
+        objectives = self.filter_queryset(self.get_queryset())
         macs = MacFilter(request.GET, queryset=MacFossilFuel.objects.all(), request=request).qs
-        objectives = ObjectiveFilter(request.GET, queryset=Objective.objects.all(), request=request).qs
         operations = OperationFilter(request.GET, queryset=Operation.objects.all(), request=request).qs
 
         entity_id = request.entity.id
