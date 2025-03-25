@@ -12,7 +12,7 @@ class ObjectiveService:
     @staticmethod
     def calculate_energy_basis(mac_queryset, objective_queryset):
         """
-        Calculate the energy basis (from fossiel fuels mac), used for all objectives calculations
+        Calculate the energy basis (from fossil fuels mac), used for all objectives calculations
         """
         consideration_rates = ObjectiveService._get_consideration_rate_per_sector(objective_queryset)
 
@@ -93,7 +93,7 @@ class ObjectiveService:
         return value * GHG_REFERENCE_RED_II / 1000000  # tCO2
 
     @staticmethod
-    def get_balances_for_objectives_calculation(request, operations, entity_id, date_from):
+    def get_balances_for_objectives_calculation(operations, entity_id, date_from):
         # First get the whole balance (from forever), so with no date_from filter
         balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj")
         balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj")
@@ -109,3 +109,18 @@ class ObjectiveService:
         )
 
         return balance_per_category, balance_per_sector
+
+    @staticmethod
+    def get_capped_objectives(year):
+        """
+        Get capped objectives for the given year
+        Only for 'customs_category' objectives ('sector' and 'main' not handled for now)
+        """
+        return Objective.objects.filter(year=year, target_type=Objective.CAP, type=Objective.BIOFUEL_CATEGORY)
+
+    @staticmethod
+    def calculate_target_for_objective(objective, energy_basis):
+        """
+        Calculate the target for the given objective
+        """
+        return energy_basis * objective.target
