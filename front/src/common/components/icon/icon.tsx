@@ -13,7 +13,7 @@ interface BaseIconProps extends Layout {
 export type IconName = FrIconClassName | RiIconClassName
 export type IconProps = Omit<BaseIconProps, "name">
 
-const Icon = ({
+export const Icon = ({
   size = "md",
   name,
   asideX,

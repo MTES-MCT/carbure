@@ -19,7 +19,7 @@ import {
   UnconstrainedCategoryObjective,
 } from "./types"
 
-export const Teneur = () => {
+const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
@@ -94,3 +94,5 @@ export const Teneur = () => {
     </>
   )
 }
+
+export default Teneur

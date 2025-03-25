@@ -17,7 +17,7 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { NoResult } from "common/components/no-result2"
 const currentYear = new Date().getFullYear()
 
-export const Operations = ({
+const Operations = ({
   setOperationCount,
 }: {
   setOperationCount: (count: number) => void
@@ -101,3 +101,5 @@ export const Operations = ({
     </>
   )
 }
+
+export default Operations

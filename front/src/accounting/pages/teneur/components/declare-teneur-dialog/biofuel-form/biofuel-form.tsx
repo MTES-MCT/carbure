@@ -1,4 +1,4 @@
-import { getBalancesCategory } from "accounting/teneur/api"
+import { getBalancesCategory } from "../../../api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
 import { Step } from "common/components/stepper"

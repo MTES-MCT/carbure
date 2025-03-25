@@ -61,7 +61,3 @@
 .notice--no-color {
   color: inherit;
 }
-
-.notice--remove-icon-dsfr :global(.fr-notice__title)::before {
-  display: none;
-}

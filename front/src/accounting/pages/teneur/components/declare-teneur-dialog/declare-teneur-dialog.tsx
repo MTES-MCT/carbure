@@ -28,12 +28,9 @@ import {
   CategoryObjective,
   TargetType,
   UnconstrainedCategoryObjective,
-} from "accounting/teneur/types"
+} from "../../types"
 import { CONVERSIONS } from "common/utils/formatters"
-import {
-  computeObjectiveEnergy,
-  formatEnergy,
-} from "accounting/teneur/utils/formatters"
+import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
 import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"

@@ -14,7 +14,7 @@ import { OperationsStatus, BalancesFilter } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
 import { getBalances } from "accounting/api/balances"
 
-export const Balances = () => {
+const Balances = () => {
   const entity = useEntity()
   const { t } = useTranslation()
 
@@ -70,3 +70,5 @@ export const Balances = () => {
     </>
   )
 }
+
+export default Balances

@@ -2,12 +2,9 @@ import { useTranslation } from "react-i18next"
 import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
-import { CategoryObjective, TargetType } from "accounting/teneur/types"
+import { CategoryObjective, TargetType } from "../../types"
 import { CardGrid } from "../card-grid"
-import {
-  computeObjectiveEnergy,
-  formatEnergy,
-} from "accounting/teneur/utils/formatters"
+import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
 
 type ObjectivizedCategoriesProgressProps = {

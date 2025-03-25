@@ -1,18 +1,17 @@
-import { Button } from "common/components/button2"
 import { DraftFill, SendPlaneLine } from "common/components/icon"
 import { Content, Main, Row } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRoutes } from "common/hooks/routes"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes, useLocation } from "react-router-dom"
-import { Operations } from "./pages/operations"
-import { Balances } from "./pages/balances"
 import { useState } from "react"
 import { compact } from "common/utils/collection"
 import useEntity from "common/hooks/entity"
 import { UserRole } from "common/types"
-import { Teneur } from "./teneur"
 import { Select } from "common/components/selects2"
+import Operations from "./pages/operations"
+import Balances from "./pages/balances"
+import Teneur from "./pages/teneur"
 
 const MaterialAccounting = () => {
   const { t } = useTranslation()
@@ -34,9 +33,6 @@ const MaterialAccounting = () => {
             disabled
           />
         )}
-        <Button priority="primary" asideX>
-          <Trans>Clôturer ma comptabilité mensuelle</Trans>
-        </Button>
       </Row>
 
       {!isTeneurPage && (

@@ -1,4 +1,4 @@
-import { BaseObjective } from "accounting/teneur/types"
+import { BaseObjective } from "../../types"
 import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { useTranslation } from "react-i18next"
