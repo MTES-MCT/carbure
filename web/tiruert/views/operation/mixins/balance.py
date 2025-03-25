@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.utils.timezone import make_aware
-from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, PolymorphicProxySerializer, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -29,7 +29,14 @@ class BalanceActionMixin:
                 location=OpenApiParameter.QUERY,
                 description="Group by sector, lot or depot.",
                 default="",
-            )
+            ),
+            OpenApiParameter(
+                name="date_from",
+                type=OpenApiTypes.DATE,
+                location=OpenApiParameter.QUERY,
+                description="Date from where to calculate teneur and quantity",
+                default=None,
+            ),
         ],
         responses={
             status.HTTP_200_OK: PolymorphicProxySerializer(

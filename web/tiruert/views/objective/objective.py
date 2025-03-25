@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -56,14 +56,14 @@ class ObjectiveViewSet(GenericViewSet):
             ),
             OpenApiParameter(
                 name="date_from",
-                type=str,
+                type=OpenApiTypes.DATE,
                 location=OpenApiParameter.QUERY,
                 description="Date from which to calculate balance for teneur",
                 required=True,
             ),
             OpenApiParameter(
                 name="date_to",
-                type=str,
+                type=OpenApiTypes.DATE,
                 location=OpenApiParameter.QUERY,
                 description="Date to which to calculate balance for teneur",
                 required=True,
