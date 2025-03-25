@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils.timezone import make_aware
 
-from tiruert.filters import OperationFilter
-from tiruert.models import Objective, Operation
+from tiruert.models import Objective
 from tiruert.services.balance import BalanceService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
@@ -45,23 +45,6 @@ class ObjectiveService:
 
         return dict(consideration_rates)
 
-    def calculate_objectives_per_categories(energy_basis, objective_queryset):
-        """
-        Get objective per categories
-        """
-        categories = objective_queryset.filter(type=Objective.BIOFUEL_CATEGORY)
-        current_objectives = []
-
-        for objective in categories:
-            current_objectives.append(
-                {
-                    "customs_category": objective.customs_category,
-                    "target_mj": energy_basis * objective.target,
-                    "target_type": objective.target_type,
-                }
-            )
-        return current_objectives
-
     @staticmethod
     def calculate_objective(balance, objective_queryset, energy_basis, objective_type):
         """
@@ -75,6 +58,8 @@ class ObjectiveService:
             }
 
         objectives = objective_queryset.filter(type=objective_type)
+        if not objectives.exists():
+            return list(balance.values())
 
         for objective in objectives:
             if objective_type == Objective.BIOFUEL_CATEGORY:
@@ -99,25 +84,23 @@ class ObjectiveService:
         """
         Calculate the global objective of CO2 emissions reduction
         """
-        objectives = objective_queryset.filter(type=Objective.MAIN).values("target").first()
-        return objectives["target"] * energy_basis
+        objective = objective_queryset.filter(type=Objective.MAIN).values("target").first()
+
+        return objective["target"] * energy_basis if objective else 0
 
     @staticmethod
     def apply_ghg_conversion(value):
         return value * GHG_REFERENCE_RED_II / 1000000  # tCO2
 
     @staticmethod
-    def get_balances_for_objectives_calculation(request, operations_with_date_from, entity_id):
-        # Remove date_from filter from operations
-        query_params = request.GET.copy()
-        query_params.pop("date_from", None)
-        all_operations = OperationFilter(data=query_params, queryset=Operation.objects.all(), request=request).qs
-
+    def get_balances_for_objectives_calculation(request, operations, entity_id, date_from):
         # First get the whole balance (from forever), so with no date_from filter
-        balance_per_category = BalanceService.calculate_balance(all_operations, entity_id, "customs_category", "mj")
-        balance_per_sector = BalanceService.calculate_balance(all_operations, entity_id, "sector", "mj")
+        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj")
+        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj")
 
         # Then update the balance with quantity and teneur details for requested dates
+        date_from = make_aware(datetime.strptime(date_from, "%Y-%m-%d"))
+        operations_with_date_from = operations.filter(created_at__gte=date_from)
         balance_per_category = BalanceService.calculate_balance(
             operations_with_date_from, entity_id, "customs_category", "mj", balance_per_category, update_balance=True
         )
