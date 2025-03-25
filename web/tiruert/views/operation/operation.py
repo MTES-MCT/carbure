@@ -74,7 +74,9 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         request = super().initialize_request(request, *args, **kwargs)
         # Get unit from request params or entity preference or default to liters
         entity = getattr(request, "entity", None)
-        unit = request.GET.get("unit") or (entity.preferred_unit.lower() if entity else None) or "l"
+        unit = (
+            request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
+        )
         setattr(request, "unit", unit)
         return request
 

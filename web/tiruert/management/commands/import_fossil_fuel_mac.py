@@ -439,7 +439,7 @@ class Command(BaseCommand):
 
         try:
             entity = Entity.objects.create(
-                name=company_found["nom_complet"],
+                name=company_found["nom_complet"][:64],
                 legal_name=company_found["nom_raison_sociale"],
                 registration_id=company_found["siren"],
                 registered_address=company_address,

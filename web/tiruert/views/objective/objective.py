@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilter
+from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilterForBalance
 from tiruert.models import MacFossilFuel, Objective, Operation
 from tiruert.serializers import ObjectiveOutputSerializer
 from tiruert.services.objective import ObjectiveService
@@ -80,9 +80,14 @@ class ObjectiveViewSet(GenericViewSet):
         # Get queryset with filters for MacFossilFuel, Objective and Operation
         objectives = self.filter_queryset(self.get_queryset())
         macs = MacFilter(request.GET, queryset=MacFossilFuel.objects.all(), request=request).qs
-        operations = OperationFilter(request.GET, queryset=Operation.objects.all(), request=request).qs
-
+        operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
         entity_id = request.entity.id
+
+        # Some validations
+        if not objectives.exists():
+            return Response({"error": "No objectives found."}, status=status.HTTP_404_NOT_FOUND)
+        if not macs.exists():
+            return Response({"error": "No MACs found."}, status=status.HTTP_404_NOT_FOUND)
 
         date_from = request.query_params.get("date_from")
         if not date_from:
@@ -93,7 +98,7 @@ class ObjectiveViewSet(GenericViewSet):
 
         # 2. Calculate the balances per category and sector
         balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
-            request, operations, entity_id
+            request, operations, entity_id, date_from
         )
 
         # 3. Calculate the objectives per category and sector

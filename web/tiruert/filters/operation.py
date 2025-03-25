@@ -8,9 +8,8 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation import Operation
 
 
-class OperationFilter(FilterSet):
+class BaseFilter(FilterSet):
     entity_id = CharFilter(method="filter_entity")
-    date_from = DateFilter(field_name="created_at", lookup_expr="gte")
     date_to = DateFilter(field_name="created_at", lookup_expr="lte")
     operation = CharFilter(method="filter_operation")
     status = CharFilter(method="filter_status")
@@ -110,3 +109,11 @@ class OperationFilter(FilterSet):
             operations.remove("CESSION")
         q_objects |= Q(type__in=operations)
         return queryset.filter(q_objects).distinct()
+
+
+class OperationFilter(BaseFilter):
+    date_from = DateFilter(field_name="created_at", lookup_expr="gte")
+
+
+class OperationFilterForBalance(BaseFilter):
+    pass

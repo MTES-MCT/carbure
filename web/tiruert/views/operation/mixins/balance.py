@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 
-from tiruert.filters import OperationFilter
+from tiruert.filters import OperationFilterForBalance
 from tiruert.serializers import (
     BalanceByDepotSerializer,
     BalanceByLotSerializer,
@@ -48,7 +48,7 @@ class BalanceActionMixin:
         detail=False,
         methods=["get"],
         serializer_class=BalanceSerializer,
-        filterset_class=OperationFilter,
+        filterset_class=OperationFilterForBalance,
         pagination_class=PageNumberPagination,
     )
     def balance(self, request, pk=None):
@@ -60,19 +60,11 @@ class BalanceActionMixin:
 
         operations = self.filter_queryset(self.get_queryset())
 
-        if date_from:
-            operations_with_date_from = operations
-            # Remove date_from filter from operations
-            query_params = request.GET.copy()
-            query_params.pop("date_from", None)
-            filterset = self.filterset_class(data=query_params, queryset=self.get_queryset(), request=request)
-            operations = filterset.qs
-
         # First get the whole balance (from forever), so with no date_from filter
         balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
 
         # Then update the balance with quantity and teneur details for requested dates (if any)
-        operations = operations_with_date_from if date_from else operations
+        operations = operations.filter(created_at__gte=date_from) if date_from else operations
         balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit, balance, update_balance=True)
 
         # Convert balance to a list of dictionaries for serialization
