@@ -4896,12 +4896,14 @@ paths:
           name: date_from
           schema:
             type: string
+            format: date
           description: Date from which to calculate balance for teneur
           required: true
         - in: query
           name: date_to
           schema:
             type: string
+            format: date
           description: Date to which to calculate balance for teneur
           required: true
         - in: query
@@ -5508,6 +5510,7 @@ paths:
           schema:
             type: string
             format: date
+          description: Date from where to calculate teneur and quantity
         - in: query
           name: date_to
           schema:

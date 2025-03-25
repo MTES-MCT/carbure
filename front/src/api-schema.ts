@@ -7296,6 +7296,7 @@ export interface operations {
       query: {
         biofuel?: string[]
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        /** @description Date from where to calculate teneur and quantity */
         date_from?: string
         date_to?: string
         depot?: string[]
