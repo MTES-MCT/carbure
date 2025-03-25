@@ -143,7 +143,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             unit = request.unit
             selected_lots = validated_data.pop("lots")
 
-            OperationService.check_volumes_before_create(entity_id, selected_lots, validated_data, unit)
+            OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, unit)
 
             if validated_data["type"] in [
                 Operation.INCORPORATION,

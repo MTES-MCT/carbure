@@ -100,7 +100,7 @@ class ObjectiveViewSet(GenericViewSet):
 
         # 2. Calculate the balances per category and sector
         balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
-            request, operations, entity_id, date_from
+            operations, entity_id, date_from
         )
 
         # 3. Calculate the objectives per category and sector
