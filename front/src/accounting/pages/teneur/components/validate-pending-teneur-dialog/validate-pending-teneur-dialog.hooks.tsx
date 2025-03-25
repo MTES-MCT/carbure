@@ -15,7 +15,7 @@ const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
 
 // Format all values in the table to GJ
 const formatValue = (value: number) =>
-  formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 0)
+  formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 1)
 
 export const useValidatePendingTeneurDialog = () => {
   const { t } = useTranslation()
@@ -23,13 +23,19 @@ export const useValidatePendingTeneurDialog = () => {
   const columns: Column<apiTypes["BalanceBySector"]>[] = [
     {
       header: t("Filière"),
-      cell: (item) => t(formatSector(item.sector)),
+      cell: (item) => <Cell text={t(formatSector(item.sector))} />,
     },
     {
       header: (
         <HeaderWithSup>{`${t("Solde initial")} (${unit.toLocaleUpperCase()})`}</HeaderWithSup>
       ),
-      cell: (item) => <Cell text={formatValue(item.initial_balance)} />,
+      cell: (item) => (
+        <Cell
+          text={formatValue(
+            item.initial_balance < 1 ? 0 : item.initial_balance
+          )}
+        />
+      ),
     },
     {
       header: <HeaderWithSup>{t("Entrées")}</HeaderWithSup>,
@@ -41,7 +47,11 @@ export const useValidatePendingTeneurDialog = () => {
     },
     {
       header: <HeaderWithSup>{t("Solde disponible")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.available_balance)} />,
+      cell: (item) => (
+        <Cell
+          text={formatValue(item.available_balance - item.declared_teneur)}
+        />
+      ),
     },
     {
       header: <HeaderWithSup>{t("Teneur déclarée")}</HeaderWithSup>,

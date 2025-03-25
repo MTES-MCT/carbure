@@ -17,11 +17,7 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { NoResult } from "common/components/no-result2"
 const currentYear = new Date().getFullYear()
 
-const Operations = ({
-  setOperationCount,
-}: {
-  setOperationCount: (count: number) => void
-}) => {
+const Operations = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   usePrivateNavigation(t("Comptabilité"))
@@ -47,9 +43,6 @@ const Operations = ({
   const { result, loading } = useQuery(api.getOperations, {
     key: "operations",
     params: [query],
-    onSuccess: (data) => {
-      setOperationCount(data?.data?.count ?? 0)
-    },
   })
 
   const columns = useOperationsColumns({

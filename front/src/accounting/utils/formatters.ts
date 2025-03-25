@@ -60,6 +60,12 @@ export const formatOperationStatus = (status: OperationsStatus) => {
       return "En attente"
     case OperationsStatus.REJECTED:
       return "Rejeté"
+    case OperationsStatus.DECLARED:
+      return "Déclaré"
+    case OperationsStatus.CORRECTED:
+      return "Corrigé"
+    case OperationsStatus.VALIDATED:
+      return "Validé"
     default:
       return "Inconnu"
   }

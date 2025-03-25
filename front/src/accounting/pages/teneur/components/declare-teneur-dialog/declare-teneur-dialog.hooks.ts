@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { formatUnit } from "common/utils/formatters"
-import { ExtendedUnit } from "common/types"
+import { CONVERSIONS, formatUnit } from "common/utils/formatters"
+import { ExtendedUnit, Unit } from "common/types"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -26,9 +26,9 @@ export const useDeclareTeneurDialog = ({
   const onSubmit = () =>
     createOperationWithSimulation(entity.id, {
       simulation: {
-        target_volume: values.quantity!,
+        target_volume: CONVERSIONS.energy.GJ_TO_MJ(values.quantity!),
         target_emission: values.avoided_emissions!,
-        unit: values.balance!.unit,
+        unit: Unit.MJ,
       },
       operation: {
         type: CreateOperationType.TENEUR,

@@ -19,11 +19,13 @@ import {
   UnconstrainedCategoryObjective,
 } from "./types"
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
 const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
+  usePrivateNavigation(t("Objectifs annuels"))
 
   const { result, loading } = useQuery(getObjectives, {
     key: "teneur-objectives",

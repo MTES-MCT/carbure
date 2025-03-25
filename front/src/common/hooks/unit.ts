@@ -15,7 +15,7 @@ export const useUnit = (customUnit?: Unit | ExtendedUnit) => {
   return {
     entityUnit: entity.preferred_unit,
     unit,
-    unitLabel: formatUnitOnly(entity.preferred_unit),
+    unitLabel: formatUnitOnly(unit),
     // Use the customUnit passed as parameter if provided, otherwise use the unit defined in the hook or the entity's preferred unit
     formatUnit: (
       value: number,

@@ -76,6 +76,18 @@ const DeclareTeneurDialogContent = ({
     })
   }, [form.value.quantity, form.value.avoided_emissions_min, objective])
 
+  // Define the maximum quantity that can be declared for the teneur
+  // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
+  // Otherwise, the maximum quantity is the available balance
+  const depotQuantityMax = form.value.balance
+    ? objective.target
+      ? Math.min(
+          CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance),
+          CONVERSIONS.energy.MJ_TO_GJ(computeObjectiveEnergy(objective))
+        )
+      : CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance)
+    : 0
+
   return (
     <Dialog
       onClose={onClose}
@@ -103,9 +115,9 @@ const DeclareTeneurDialogContent = ({
         <Stepper />
         {currentStep?.key !== biofuelFormStepKey && (
           <>
-            <Box gap="xs">
-              <Text>{t("Rappel de votre progression")}</Text>
-              {targetType && objective.target && (
+            {targetType && objective.target && (
+              <Box gap="xs">
+                <Text>{t("Rappel de votre progression")}</Text>
                 <ProgressBar
                   baseQuantity={objective.teneur_declared}
                   targetQuantity={objective.target}
@@ -116,18 +128,20 @@ const DeclareTeneurDialogContent = ({
                       : 0)
                   }
                 />
-              )}
-              {targetType === TargetType.CAP && objective.target && (
-                <RecapData.RemainingQuantityBeforeLimit
-                  value={remainingEnergyBeforeLimitOrObjective}
-                />
-              )}
-              {targetType === TargetType.REACH && objective.target && (
-                <RecapData.RemainingQuantityBeforeObjective
-                  value={remainingEnergyBeforeLimitOrObjective}
-                />
-              )}
-            </Box>
+
+                {targetType === TargetType.CAP && objective.target && (
+                  <RecapData.RemainingQuantityBeforeLimit
+                    value={remainingEnergyBeforeLimitOrObjective}
+                  />
+                )}
+                {targetType === TargetType.REACH && objective.target && (
+                  <RecapData.RemainingQuantityBeforeObjective
+                    value={remainingEnergyBeforeLimitOrObjective}
+                  />
+                )}
+              </Box>
+            )}
+
             <Box>
               <RecapOperationGrid>
                 <RecapOperation
@@ -139,14 +153,14 @@ const DeclareTeneurDialogContent = ({
                   }}
                   unit={ExtendedUnit.GJ}
                 />
-                {currentStepIndex > 1 && (
-                  <QuantitySummary values={form.value} />
+                {currentStepIndex > 2 && (
+                  <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
                 )}
               </RecapOperationGrid>
             </Box>
           </>
         )}
-        {currentStep?.key !== "recap" && objective.target && (
+        {currentStep?.key !== "recap" && (
           <Box>
             <Form form={form}>
               {currentStep?.key === biofuelFormStepKey && (
@@ -156,14 +170,7 @@ const DeclareTeneurDialogContent = ({
                 <QuantityForm
                   balance={form.value.balance!}
                   type={CreateOperationType.TENEUR}
-                  depot_quantity_max={Math.min(
-                    CONVERSIONS.energy.MJ_TO_GJ(
-                      form.value.balance!.available_balance
-                    ),
-                    CONVERSIONS.energy.MJ_TO_GJ(
-                      computeObjectiveEnergy(objective)
-                    )
-                  )}
+                  depot_quantity_max={depotQuantityMax}
                   unit={ExtendedUnit.GJ}
                   backendUnit={Unit.MJ}
                   converter={CONVERSIONS.energy.GJ_TO_MJ}

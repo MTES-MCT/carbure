@@ -1,6 +1,5 @@
 import { getBalances } from "accounting/api/balances"
-import { PathsApiTiruertOperationsGetParametersQueryUnit } from "api-schema"
-import { CategoryEnum } from "common/types"
+import { CategoryEnum, Unit } from "common/types"
 import {
   CategoryObjective,
   Objectives,
@@ -101,8 +100,7 @@ export const getBalancesCategory = async (
     entity_id,
     page: 1,
     customs_category: [category],
-    // TODO: change in the backend to use the same enum as the entity
-    unit: PathsApiTiruertOperationsGetParametersQueryUnit.mj,
+    unit: Unit.MJ,
   })
 }
 
@@ -111,7 +109,16 @@ export const getBalancesBySector = async (entity_id: number) => {
     entity_id,
     page: 1,
     group_by: BalancesGroupBy.sector,
-    // TODO: change in the backend to use the same enum as the entity
-    unit: PathsApiTiruertOperationsGetParametersQueryUnit.mj,
+    unit: Unit.MJ,
+  })
+}
+
+export const validateTeneur = async (entity_id: number) => {
+  return api.POST("/tiruert/operations/teneur/declare/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
   })
 }

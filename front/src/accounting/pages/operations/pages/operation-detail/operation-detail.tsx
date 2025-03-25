@@ -140,7 +140,7 @@ export const OperationDetail = () => {
           label: t("Destinataire"),
           value: getOperationEntity(operation)?.name ?? "-",
         },
-        {
+        operation.type !== OperationType.TENEUR && {
           label: t("Dépôt expéditeur"),
           value: operation.from_depot?.name ?? "-",
         },

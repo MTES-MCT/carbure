@@ -60,11 +60,12 @@ export function formatUnit(
   return `${formatNumber(num, fractionDigits)} ${unitLabel[unit]}`
 }
 
-export function formatUnitOnly(unit: Unit, count = 2) {
+export function formatUnitOnly(unit: Unit | ExtendedUnit, count = 2) {
   const unitLabel = {
     [Unit.l]: i18next.t("litres", { count }),
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
+    [ExtendedUnit.GJ]: i18next.t("GJ"),
   }
 
   return unitLabel[unit]
