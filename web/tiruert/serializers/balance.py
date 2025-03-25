@@ -39,6 +39,7 @@ class BalanceBySectorSerializer(BaseBalanceSerializer):
 
 class BalanceLotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
+    available_balance = serializers.FloatField()
     volume = BalanceQuantitySerializer()
     emission_rate_per_mj = serializers.FloatField()
 
@@ -67,6 +68,7 @@ class BalanceByLotSerializer(serializers.Serializer):
             grouped_balance[group_key]["lots"].append(
                 {
                     "lot": lot_id,
+                    "available_balance": value["available_balance"],
                     "volume": {
                         "credit": value["quantity"]["credit"],
                         "debit": value["quantity"]["debit"],

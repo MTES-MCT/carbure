@@ -78,6 +78,7 @@ class BalanceService:
         """
         volume_sign = 1 if operation.is_credit(entity_id) else -1
         balance[key]["available_balance"] += detail.volume * volume_sign * conversion_factor
+        balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
         return
 
     @staticmethod
@@ -87,7 +88,6 @@ class BalanceService:
         'operations' is a queryset of already filtered operations
         """
         # Use a defaultdict with a factory function that creates an appropriate balance entry
-
         balance = balance if balance else defaultdict(partial(BalanceService._init_balance_entry, unit))
 
         operations = operations.filter(
