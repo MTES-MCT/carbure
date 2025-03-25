@@ -167,6 +167,11 @@ class TeneurService:
         thresh_min = (target_volume < batches_volumes[emissions_sorter].cumsum()).argmax()
         thresh_max = (target_volume < batches_volumes[emissions_inv_sorter].cumsum()).argmax()
 
+        # Handle case where the target volume is exactly the sum of the batches volumes
+        if target_volume == batches_volumes.sum():
+            thresh_min = len(batches_volumes) - 1
+            thresh_max = len(batches_volumes) - 1
+
         min_emissions_rate = (
             np.dot(
                 batches_volumes[emissions_sorter][:thresh_min],
