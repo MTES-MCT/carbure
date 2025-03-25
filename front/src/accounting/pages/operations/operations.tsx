@@ -92,6 +92,7 @@ export const Operations = ({
             total={result?.data?.count ?? 0}
             limit={state.limit}
             onLimit={actions.setLimit}
+            disabled={loading}
           />
         </>
       )}
