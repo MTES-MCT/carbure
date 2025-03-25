@@ -1,6 +1,6 @@
 import { Balance, BalancesFilter, BalancesQuery } from "accounting/types"
 import { api } from "common/services/api-fetch"
-import { QueryParams } from "common/services/api-fetch.types"
+import { apiTypes, QueryParams } from "common/services/api-fetch.types"
 
 /** Balances */
 export const getBalanceFilters = (
@@ -12,7 +12,12 @@ export const getBalanceFilters = (
   })
 }
 
-export const getBalances = (
+export const getBalances = <
+  BalanceType extends
+    | Balance
+    | apiTypes["BalanceBySector"]
+    | apiTypes["BalanceByDepot"] = Balance,
+>(
   query: QueryParams<"/tiruert/operations/balance/">
 ) => {
   return api
@@ -27,7 +32,7 @@ export const getBalances = (
         ...response,
         data: {
           ...response.data,
-          results: results as Balance[],
+          results: results as BalanceType[],
         },
       }
     })

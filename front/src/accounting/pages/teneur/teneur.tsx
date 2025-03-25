@@ -18,6 +18,7 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "./types"
+import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 
 const Teneur = () => {
   const entity = useEntity()
@@ -46,6 +47,10 @@ const Teneur = () => {
     ))
   }
 
+  const onValidatePendingTeneurClick = () => {
+    portal((close) => <ValidatePendingTeneurDialog onClose={close} />)
+  }
+
   return (
     <>
       <Notice noColor variant="info">
@@ -66,7 +71,7 @@ const Teneur = () => {
               </p>
             </Col>
 
-            <Button priority="primary">
+            <Button priority="primary" onClick={onValidatePendingTeneurClick}>
               {t("Valider ma teneur mensuelle")}
             </Button>
           </Row>

@@ -7,6 +7,8 @@ import {
   UnconstrainedCategoryObjective,
 } from "./types"
 import { api } from "common/services/api-fetch"
+import { BalancesGroupBy } from "accounting/types"
+import { apiTypes } from "common/services/api-fetch.types"
 
 export const getObjectives = async (
   entity_id: number,
@@ -99,6 +101,16 @@ export const getBalancesCategory = async (
     entity_id,
     page: 1,
     customs_category: [category],
+    // TODO: change in the backend to use the same enum as the entity
+    unit: PathsApiTiruertOperationsGetParametersQueryUnit.mj,
+  })
+}
+
+export const getBalancesBySector = async (entity_id: number) => {
+  return getBalances<apiTypes["BalanceBySector"]>({
+    entity_id,
+    page: 1,
+    group_by: BalancesGroupBy.sector,
     // TODO: change in the backend to use the same enum as the entity
     unit: PathsApiTiruertOperationsGetParametersQueryUnit.mj,
   })
