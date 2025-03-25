@@ -5091,9 +5091,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5122,9 +5122,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5208,9 +5208,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5245,9 +5245,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5305,9 +5305,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5341,9 +5341,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5392,9 +5392,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5448,9 +5448,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5635,9 +5635,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5808,9 +5808,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5998,9 +5998,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -6041,9 +6041,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -6085,9 +6085,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -6129,9 +6129,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert

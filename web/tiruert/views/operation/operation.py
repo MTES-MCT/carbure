@@ -45,7 +45,7 @@ class CustomPagination(PageNumberPagination):
         OpenApiParameter(
             name="unit",
             type=str,
-            enum=["l", "mj", "kg"],
+            enum=[choice[0] for choice in Entity.UNIT_CHOICE],
             location=OpenApiParameter.QUERY,
             description="Specify the volume unit.",
         ),
@@ -77,7 +77,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         unit = (
             request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
         )
-        setattr(request, "unit", unit)
+        setattr(request, "unit", unit.lower())
         return request
 
     def get_serializer_context(self):

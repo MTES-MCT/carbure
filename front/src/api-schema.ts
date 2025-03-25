@@ -2964,7 +2964,7 @@ export interface components {
      *     * `MJ` - MJ
      * @enum {string}
      */
-    PreferredUnitEnum: PreferredUnitEnum
+    PreferredUnitEnum: PathsApiTiruertOperationsGetParametersQueryUnit
     ProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -7649,9 +7649,9 @@ export enum PathsApiTiruertOperationsGetParametersQueryType {
   DEBIT = "DEBIT",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
+  MJ = "MJ",
   kg = "kg",
   l = "l",
-  mj = "mj",
 }
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
   depot = "depot",
@@ -7789,11 +7789,6 @@ export enum OwnershipTypeEnum {
   OWN = "OWN",
   THIRD_PARTY = "THIRD_PARTY",
   PROCESSING = "PROCESSING",
-}
-export enum PreferredUnitEnum {
-  l = "l",
-  kg = "kg",
-  MJ = "MJ",
 }
 export enum RoleEnum {
   ReadOnly = "RO",
