@@ -24,8 +24,10 @@ class ObjectiveViewSet(GenericViewSet):
         request = super().initialize_request(request, *args, **kwargs)
         # Get unit from request params or entity preference or default to liters
         entity = getattr(request, "entity", None)
-        unit = request.GET.get("unit") or (entity.preferred_unit.lower() if entity else None) or "l"
-        setattr(request, "unit", unit)
+        unit = (
+            request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
+        )
+        setattr(request, "unit", unit.lower())
         return request
 
     def get_serializer_context(self):
