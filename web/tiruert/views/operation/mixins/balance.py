@@ -4,7 +4,6 @@ from django.utils.timezone import make_aware
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, PolymorphicProxySerializer, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 
 from core.pagination import MetadataPageNumberPagination
 from tiruert.filters import OperationFilterForBalance
@@ -68,7 +67,7 @@ class BalanceActionMixin:
         methods=["get"],
         serializer_class=BalanceSerializer,
         filterset_class=OperationFilterForBalance,
-        pagination_class=PageNumberPagination,
+        pagination_class=BalancePagination,
     )
     def balance(self, request, pk=None):
         entity_id = request.entity.id
