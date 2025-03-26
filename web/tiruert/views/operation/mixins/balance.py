@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 
+from core.pagination import MetadataPageNumberPagination
 from tiruert.filters import OperationFilterForBalance
 from tiruert.serializers import (
     BalanceByDepotSerializer,
@@ -14,6 +15,17 @@ from tiruert.serializers import (
     BalanceSerializer,
 )
 from tiruert.services.balance import BalanceService
+
+
+class BalancePagination(MetadataPageNumberPagination):
+    aggregate_fields = {"total_quantity": 0}
+
+    def get_extra_metadata(self):
+        metadata = {"total_quantity": 0}
+
+        for balance in self.queryset:
+            metadata["total_quantity"] += balance["available_balance"]
+        return metadata
 
 
 class BalanceActionMixin:
@@ -83,7 +95,7 @@ class BalanceActionMixin:
 
         data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
 
-        paginator = PageNumberPagination()
+        paginator = BalancePagination()
         paginated_data = paginator.paginate_queryset(data, request)
 
         serializer = serializer_class(paginated_data, many=True)
