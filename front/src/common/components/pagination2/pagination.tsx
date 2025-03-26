@@ -17,6 +17,7 @@ type PaginationProps = Omit<
   total: number
   limit?: number
   onLimit: (limit: number | undefined) => void
+  disabled?: boolean
 }
 /**
  * Same component as the one in the DSFR, but if changes are needed,
@@ -26,6 +27,7 @@ export const Pagination = ({
   limit = 10,
   onLimit,
   total,
+  disabled,
   ...props
 }: PaginationProps) => {
   const pageCount = limit ? Math.ceil(total / limit) : 1
@@ -52,6 +54,7 @@ export const Pagination = ({
         value={limit}
         onChange={onLimit}
         size="medium"
+        disabled={disabled}
       />
       <DsfrPagination
         {...props}

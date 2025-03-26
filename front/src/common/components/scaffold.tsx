@@ -111,6 +111,10 @@ export const LoaderOverlay = () => (
   </Overlay>
 )
 
+export const Box = (props: JSX.IntrinsicElements["div"]) => (
+  <div {...props} className={cl(css.box, props.className)} />
+)
+
 export const Divider = (props: JSX.IntrinsicElements["div"]) => (
   <div {...props} className={cl(css.divider, props.className)} />
 )

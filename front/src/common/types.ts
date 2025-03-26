@@ -2,7 +2,7 @@ import {
   EntityTypeEnum as EntityType,
   SiteTypeEnum as SiteType,
   GesOptionEnum as GESOption,
-  PreferredUnitEnum as Unit,
+  PathsApiTiruertOperationsGetParametersQueryUnit as Unit,
   UserRightsRequestsStatusEnum as UserRightStatus,
   RoleEnum as UserRole,
   ExtAdminPagesEnum as ExternalAdminPages,

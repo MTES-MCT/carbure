@@ -23,6 +23,7 @@ export type ExtendedInputProps = {
   type?: string
   domRef?: React.RefObject<HTMLDivElement>
   label?: InputPropsDSFR["label"]
+  marginBottom?: boolean
 }
 type BaseInputProps = InputPropsDSFR & ExtendedInputProps
 
@@ -37,6 +38,7 @@ export const BaseInput = ({
   title,
   label,
   domRef,
+  marginBottom,
   readOnly,
   ...props
 }: BaseInputProps) => {
@@ -75,7 +77,9 @@ export const BaseInput = ({
         css["input-dsfr--no-margin"],
         props.state === "error" &&
           !props.stateRelatedMessage &&
-          css["dsfr-input--error"]
+          css["dsfr-input--error"],
+        !marginBottom && css["no-margin-bottom"],
+        props.addon && css.addon
       )}
     />
   )

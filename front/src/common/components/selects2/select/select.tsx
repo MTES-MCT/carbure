@@ -27,6 +27,7 @@ export type SelectProps<T, V = T> = Trigger & {
   className?: string
   children?: ListProps<T, V>["children"]
   loading?: boolean
+  disabled?: boolean
 }
 
 export function Select<T, V>({
@@ -47,6 +48,7 @@ export function Select<T, V>({
   size = "medium",
   full,
   className,
+  disabled,
   children,
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -78,6 +80,7 @@ export function Select<T, V>({
         )}
         size={size}
         type="button"
+        disabled={disabled}
       >
         <Text
           fontWeight="semibold"

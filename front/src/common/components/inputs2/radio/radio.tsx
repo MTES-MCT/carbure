@@ -4,6 +4,8 @@ import {
 } from "@codegouvfr/react-dsfr/RadioButtons"
 import { ChangeEvent } from "react"
 import { Label, LabelProps } from "../base-input"
+import styles from "./radio.module.css"
+import cl from "clsx"
 
 type RadioValueType =
   RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
@@ -46,5 +48,11 @@ export const RadioGroup = <V extends RadioValueType>({
     },
   }))
 
-  return <RadioButtons {...props} options={optionsWithNativeInputProps} />
+  return (
+    <RadioButtons
+      {...props}
+      options={optionsWithNativeInputProps}
+      className={cl(props.className, styles["radio-group"])}
+    />
+  )
 }

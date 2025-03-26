@@ -1535,6 +1535,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/objectives/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Get all objectives */
+    get: operations["objectives"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/operations/": {
     parameters: {
       query?: never
@@ -1583,6 +1600,23 @@ export interface paths {
     put?: never
     /** @description Set status operation to ACCEPTED */
     post: operations["accept_operation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/operations/{id}/correct/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or remove */
+    post: operations["correct_operation"]
     delete?: never
     options?: never
     head?: never
@@ -1691,7 +1725,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/tiruert/operations/teneur/validate/": {
+  "/api/tiruert/operations/teneur/declare/": {
     parameters: {
       query?: never
       header?: never
@@ -1701,7 +1735,7 @@ export interface paths {
     get?: never
     put?: never
     /** @description Set teneur operations to ACCEPTED */
-    post: operations["validate_teneur"]
+    post: operations["declare_teneur"]
     delete?: never
     options?: never
     head?: never
@@ -1815,21 +1849,19 @@ export interface components {
       dca_id: number
     }
     Balance: {
-      sector: components["schemas"]["SectorEnum"]
+      sector: components["schemas"]["ObjectiveSectorCodeEnum"]
       /** Format: double */
-      initial_balance: number
+      readonly initial_balance: number
       /** Format: double */
-      readonly available_balance: number
-      /** Format: double */
-      readonly final_balance: number
+      available_balance: number
       quantity: components["schemas"]["BalanceQuantity"]
       /** Format: double */
-      teneur: number
+      pending_teneur: number
       /** Format: double */
-      yearly_teneur?: number
-      pending: number
+      declared_teneur: number
+      pending_operations: number
       unit: string
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category: components["schemas"]["MPCategoriesEnum"]
       biofuel: components["schemas"]["BalanceBiofuel"]
     }
     BalanceBiofuel: {
@@ -1842,19 +1874,17 @@ export interface components {
       depots: components["schemas"]["BalanceDepot"][]
     }
     BalanceBySector: {
-      sector: components["schemas"]["SectorEnum"]
+      sector: components["schemas"]["ObjectiveSectorCodeEnum"]
       /** Format: double */
-      initial_balance: number
+      readonly initial_balance: number
       /** Format: double */
-      readonly available_balance: number
-      /** Format: double */
-      readonly final_balance: number
+      available_balance: number
       quantity: components["schemas"]["BalanceQuantity"]
       /** Format: double */
-      teneur: number
+      pending_teneur: number
       /** Format: double */
-      yearly_teneur?: number
-      pending: number
+      declared_teneur: number
+      pending_operations: number
       unit: string
     }
     BalanceDepot: {
@@ -1999,17 +2029,6 @@ export interface components {
      */
     CarbureNotificationTypeEnum: CarbureNotificationTypeEnum
     /**
-     * @description * `CONV` - Conventionnel
-     *     * `ANN-IX-A` - ANNEXE IX-A
-     *     * `ANN-IX-B` - ANNEXE IX-B
-     *     * `TALLOL` - Tallol
-     *     * `OTHER` - Autre
-     *     * `EP2AM` - EP2AM
-     *     * `AM` - AM
-     * @enum {string}
-     */
-    CategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
-    /**
      * @description * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
      *     * `ISCC` - ISCC
      *     * `REDCERT` - REDCERT
@@ -2119,17 +2138,6 @@ export interface components {
       has_saf?: boolean
       has_elec?: boolean
     }
-    /**
-     * @description * `CONV` - Conventionnel
-     *     * `ANN-IX-A` - ANNEXE IX-A
-     *     * `ANN-IX-B` - ANNEXE IX-B
-     *     * `TALLOL` - Tallol
-     *     * `OTHER` - Autre
-     *     * `EP2AM` - EP2AM
-     *     * `AM` - AM
-     * @enum {string}
-     */
-    CustomsCategoryEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
     DeleteCertificateRequest: {
       certificate_id: string
       certificate_type: string
@@ -2478,7 +2486,7 @@ export interface components {
       name: string
       name_en: string
       code: string
-      category?: components["schemas"]["CategoryEnum"]
+      category?: components["schemas"]["MPCategoriesEnum"]
       is_double_compte?: boolean
     }
     EntityMetrics: {
@@ -2581,7 +2589,7 @@ export interface components {
       name: string
       name_en: string
       code: string
-      category?: components["schemas"]["CategoryEnum"]
+      category?: components["schemas"]["MPCategoriesEnum"]
       is_double_compte?: boolean
     }
     FieldData: {
@@ -2670,6 +2678,28 @@ export interface components {
      * @enum {string}
      */
     LotStatusEnum: LotStatusEnum
+    /**
+     * @description * `CONV` - Conventionnel
+     *     * `ANN-IX-A` - ANNEXE IX-A
+     *     * `ANN-IX-B` - ANNEXE IX-B
+     *     * `TALLOL` - Tallol
+     *     * `OTHER` - Autre
+     *     * `EP2AM` - EP2AM
+     *     * `AM` - AM
+     * @enum {string}
+     */
+    MPCategoriesEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
+    MainObjective: {
+      /** Format: double */
+      available_balance: number
+      /** Format: double */
+      target: number
+      /** Format: double */
+      pending_teneur: number
+      /** Format: double */
+      declared_teneur: number
+      unit: string
+    }
     NavStats: {
       total_pending_action_for_admin?: number
       pending_draft_lots?: number
@@ -2684,12 +2714,51 @@ export interface components {
     NotificationRequest: {
       notification_ids: number[]
     }
+    Objective: {
+      /** Format: double */
+      target_mj: number
+      target_type: string
+    }
+    ObjectiveCategory: {
+      code: components["schemas"]["MPCategoriesEnum"]
+      /** Format: double */
+      pending_teneur: number
+      /** Format: double */
+      declared_teneur: number
+      /** Format: double */
+      available_balance: number
+      unit: string
+      objective: components["schemas"]["Objective"]
+    }
+    ObjectiveOutput: {
+      main: components["schemas"]["MainObjective"]
+      sectors: components["schemas"]["ObjectiveSector"][]
+      categories: components["schemas"]["ObjectiveCategory"][]
+    }
+    ObjectiveSector: {
+      code: components["schemas"]["ObjectiveSectorCodeEnum"]
+      /** Format: double */
+      pending_teneur: number
+      /** Format: double */
+      declared_teneur: number
+      /** Format: double */
+      available_balance: number
+      unit: string
+      objective: components["schemas"]["Objective"]
+    }
+    /**
+     * @description * `ESSENCE` - ESSENCE
+     *     * `GAZOLE` - GAZOLE
+     *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+     * @enum {string}
+     */
+    ObjectiveSectorCodeEnum: PathsApiTiruertOperationsGetParametersQuerySector
     Operation: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["StatusD22Enum"]
+      status?: components["schemas"]["OperationStatusEnum"]
       readonly sector: string
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      customs_category?: components["schemas"]["MPCategoriesEnum"]
       readonly biofuel: string
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
@@ -2707,6 +2776,10 @@ export interface components {
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
     }
+    OperationCorrectionRequest: {
+      /** Format: double */
+      correction_volume: number
+    }
     OperationDepot: {
       id: number
       name: string
@@ -2723,8 +2796,8 @@ export interface components {
       name: string
     }
     OperationInputRequest: {
-      type: components["schemas"]["TypeDefEnum"]
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      type: components["schemas"]["OperationTypeEnum"]
+      customs_category: components["schemas"]["MPCategoriesEnum"]
       biofuel: number | null
       credited_entity?: number | null
       debited_entity: number | null
@@ -2736,9 +2809,9 @@ export interface components {
     OperationList: {
       readonly id: number
       readonly type: string
-      status?: components["schemas"]["StatusD22Enum"]
+      status?: components["schemas"]["OperationStatusEnum"]
       readonly sector: string
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      customs_category?: components["schemas"]["MPCategoriesEnum"]
       readonly biofuel: string
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
@@ -2759,6 +2832,29 @@ export interface components {
       /** Format: double */
       emission_rate_per_mj: number
     }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     *     * `DECLARED` - DECLARED
+     *     * `CORRECTED` - CORRECTED
+     *     * `VALIDATED` - VALIDATED
+     * @enum {string}
+     */
+    OperationStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
+    /**
+     * @description * `INCORPORATION` - INCORPORATION
+     *     * `CESSION` - CESSION
+     *     * `TENEUR` - TENEUR
+     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+     *     * `MAC_BIO` - MAC_BIO
+     *     * `EXPORTATION` - EXPORTATION
+     *     * `DEVALUATION` - DEVALUATION
+     *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+     * @enum {string}
+     */
+    OperationTypeEnum: OperationTypeEnum
     OtpResponse: {
       valid_until: string
     }
@@ -2847,8 +2943,8 @@ export interface components {
       total_available_volume?: number
     }
     PatchedOperationUpdateRequest: {
-      type?: components["schemas"]["TypeDefEnum"]
-      customs_category?: components["schemas"]["CustomsCategoryEnum"]
+      type?: components["schemas"]["OperationTypeEnum"]
+      customs_category?: components["schemas"]["MPCategoriesEnum"]
       biofuel?: number | null
       credited_entity?: number | null
       debited_entity?: number | null
@@ -2868,7 +2964,7 @@ export interface components {
      *     * `MJ` - MJ
      * @enum {string}
      */
-    PreferredUnitEnum: PreferredUnitEnum
+    PreferredUnitEnum: PathsApiTiruertOperationsGetParametersQueryUnit
     ProductionSite: {
       readonly id: number
       readonly producer: components["schemas"]["Entity"]
@@ -3268,13 +3364,6 @@ export interface components {
     SeachCompanyRequest: {
       registration_id: string
     }
-    /**
-     * @description * `ESSENCE` - ESSENCE
-     *     * `DIESEL` - DIESEL
-     *     * `SAF` - SAF
-     * @enum {string}
-     */
-    SectorEnum: PathsApiTiruertOperationsGetParametersQuerySector
     SetBioFuelsRequest: {
       /** @description List of biocarburant codes. */
       biocarburant_codes: string[]
@@ -3297,7 +3386,7 @@ export interface components {
      */
     ShippingMethodEnum: ShippingMethodEnum
     SimulationInputRequest: {
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category: components["schemas"]["MPCategoriesEnum"]
       biofuel: number | null
       debited_entity: number | null
       /** Format: double */
@@ -3316,7 +3405,7 @@ export interface components {
       emission_rate_per_mj: number
     }
     SimulationMinMaxInputRequest: {
-      customs_category: components["schemas"]["CustomsCategoryEnum"]
+      customs_category: components["schemas"]["MPCategoriesEnum"]
       biofuel: number | null
       debited_entity: number | null
       /** Format: double */
@@ -3352,14 +3441,6 @@ export interface components {
     StatsResponse: {
       metabase_iframe_url: string
     }
-    /**
-     * @description * `PENDING` - PENDING
-     *     * `ACCEPTED` - ACCEPTED
-     *     * `REJECTED` - REJECTED
-     *     * `CANCELED` - CANCELED
-     * @enum {string}
-     */
-    StatusD22Enum: PathsApiTiruertOperationsGetParametersQueryStatus
     ToggleElecRequest: {
       /** @default false */
       has_elec: boolean
@@ -3386,17 +3467,6 @@ export interface components {
      * @enum {string}
      */
     TransportDocumentTypeEnum: TransportDocumentTypeEnum
-    /**
-     * @description * `INCORPORATION` - INCORPORATION
-     *     * `CESSION` - CESSION
-     *     * `TENEUR` - TENEUR
-     *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-     *     * `MAC_BIO` - MAC_BIO
-     *     * `EXPORTATION` - EXPORTATION
-     *     * `DEVALUATION` - DEVALUATION
-     * @enum {string}
-     */
-    TypeDefEnum: TypeDefEnum
     UnitRequest: {
       /** @default l */
       unit: components["schemas"]["PreferredUnitEnum"]
@@ -6079,6 +6149,8 @@ export interface operations {
         entity_type?: string[]
         /** @description Only show enabled entities */
         is_enabled?: boolean
+        /** @description Only show liable entities */
+        is_tiruert_liable?: boolean
         /** @description Search within the field `name` */
         query?: string
       }
@@ -6884,6 +6956,35 @@ export interface operations {
       }
     }
   }
+  objectives: {
+    parameters: {
+      query: {
+        /** @description Date from which to calculate balance for teneur */
+        date_from: string
+        /** @description Date to which to calculate balance for teneur */
+        date_to: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Year of the objectives */
+        year: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description All objectives. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ObjectiveOutput"][]
+        }
+      }
+    }
+  }
   list_operations: {
     parameters: {
       query: {
@@ -6900,8 +7001,6 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
-        /** @description Number of results to return per page. */
-        page_size?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7093,6 +7192,58 @@ export interface operations {
         }
       }
       /** @description Error message */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  correct_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OperationCorrectionRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["OperationCorrectionRequest"]
+        "multipart/form-data": components["schemas"]["OperationCorrectionRequest"]
+      }
+    }
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
       404: {
         headers: {
           [name: string]: unknown
@@ -7145,6 +7296,7 @@ export interface operations {
       query: {
         biofuel?: string[]
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
+        /** @description Date from where to calculate teneur and quantity */
         date_from?: string
         date_to?: string
         depot?: string[]
@@ -7313,7 +7465,7 @@ export interface operations {
       }
     }
   }
-  validate_teneur: {
+  declare_teneur: {
     parameters: {
       query: {
         /** @description Authorised entity ID. */
@@ -7475,27 +7627,31 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   MAC_BIO = "MAC_BIO",
   EXPORTATION = "EXPORTATION",
   DEVALUATION = "DEVALUATION",
+  CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
   ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
-  DIESEL = "DIESEL",
-  SAF = "SAF",
+  GAZOLE = "GAZOLE",
+  CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
   PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
   REJECTED = "REJECTED",
   CANCELED = "CANCELED",
+  DECLARED = "DECLARED",
+  CORRECTED = "CORRECTED",
+  VALIDATED = "VALIDATED",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryType {
   CREDIT = "CREDIT",
   DEBIT = "DEBIT",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
+  MJ = "MJ",
   kg = "kg",
   l = "l",
-  mj = "mj",
 }
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
   depot = "depot",
@@ -7619,15 +7775,20 @@ export enum LotStatusEnum {
   FROZEN = "FROZEN",
   DELETED = "DELETED",
 }
+export enum OperationTypeEnum {
+  INCORPORATION = "INCORPORATION",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
+  MAC_BIO = "MAC_BIO",
+  EXPORTATION = "EXPORTATION",
+  DEVALUATION = "DEVALUATION",
+  CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+}
 export enum OwnershipTypeEnum {
   OWN = "OWN",
   THIRD_PARTY = "THIRD_PARTY",
   PROCESSING = "PROCESSING",
-}
-export enum PreferredUnitEnum {
-  l = "l",
-  kg = "kg",
-  MJ = "MJ",
 }
 export enum RoleEnum {
   ReadOnly = "RO",
@@ -7661,15 +7822,6 @@ export enum TransportDocumentTypeEnum {
   DSAC = "DSAC",
   DSP = "DSP",
   OTHER = "OTHER",
-}
-export enum TypeDefEnum {
-  INCORPORATION = "INCORPORATION",
-  CESSION = "CESSION",
-  TENEUR = "TENEUR",
-  LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
-  MAC_BIO = "MAC_BIO",
-  EXPORTATION = "EXPORTATION",
-  DEVALUATION = "DEVALUATION",
 }
 export enum UserRightsRequestsStatusEnum {
   Pending = "PENDING",

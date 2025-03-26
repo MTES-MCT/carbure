@@ -167,6 +167,11 @@ class TeneurService:
         thresh_min = (target_volume < batches_volumes[emissions_sorter].cumsum()).argmax()
         thresh_max = (target_volume < batches_volumes[emissions_inv_sorter].cumsum()).argmax()
 
+        # Handle case where the target volume is exactly the sum of the batches volumes
+        if target_volume == batches_volumes.sum():
+            thresh_min = len(batches_volumes) - 1
+            thresh_max = len(batches_volumes) - 1
+
         min_emissions_rate = (
             np.dot(
                 batches_volumes[emissions_sorter][:thresh_min],
@@ -261,21 +266,18 @@ class TeneurService:
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
-            volumes = np.append(volumes, value["quantity"]["credit"] - value["quantity"]["debit"])
+            volumes = np.append(volumes, value["available_balance"])
             emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)
 
             if enforced_volumes is not None:
-                volume = (
-                    value["quantity"]["credit"] - value["quantity"]["debit"] if lot_id in data["enforced_volumes"] else 0
-                )
+                volume = value["available_balance"] if lot_id in data["enforced_volumes"] else 0
                 enforced_volumes = np.append(enforced_volumes, volume)
 
         # Convert target volume into L
         target_volume = None
         if data.get("target_volume", None) is not None:
             target_volume = TeneurService.convert_in_liters(data["target_volume"], unit, data["biofuel"])
-
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
 
     @staticmethod

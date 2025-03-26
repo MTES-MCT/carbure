@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.models import MatierePremiere
+from tiruert.models.operation import Operation
 
 
 class BalanceBiofuelSerializer(serializers.Serializer):
@@ -14,24 +15,17 @@ class BalanceQuantitySerializer(serializers.Serializer):
 
 
 class BaseBalanceSerializer(serializers.Serializer):
-    sector = serializers.ChoiceField(choices=["ESSENCE", "DIESEL", "SAF"])
-    initial_balance = serializers.FloatField()
-    available_balance = serializers.SerializerMethodField()
-    final_balance = serializers.SerializerMethodField()
+    sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
+    initial_balance = serializers.SerializerMethodField()
+    available_balance = serializers.FloatField()
     quantity = BalanceQuantitySerializer()
-    teneur = serializers.FloatField()
-    yearly_teneur = serializers.FloatField(required=False)
-    pending = serializers.IntegerField()
+    pending_teneur = serializers.FloatField()
+    declared_teneur = serializers.FloatField()
+    pending_operations = serializers.IntegerField()
     unit = serializers.CharField()
 
-    def get_available_balance(self, instance) -> float:
-        return self.calcul_available_balance(instance)
-
-    def get_final_balance(self, instance) -> float:
-        return self.calcul_available_balance(instance) - instance["teneur"]
-
-    def calcul_available_balance(self, instance) -> float:
-        return instance["initial_balance"] + instance["quantity"]["credit"] - instance["quantity"]["debit"]
+    def get_initial_balance(self, instance) -> float:
+        return instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
 
 
 class BalanceSerializer(BaseBalanceSerializer):
@@ -45,6 +39,7 @@ class BalanceBySectorSerializer(BaseBalanceSerializer):
 
 class BalanceLotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
+    available_balance = serializers.FloatField()
     volume = BalanceQuantitySerializer()
     emission_rate_per_mj = serializers.FloatField()
 
@@ -73,6 +68,7 @@ class BalanceByLotSerializer(serializers.Serializer):
             grouped_balance[group_key]["lots"].append(
                 {
                     "lot": lot_id,
+                    "available_balance": value["available_balance"],
                     "volume": {
                         "credit": value["quantity"]["credit"],
                         "debit": value["quantity"]["debit"],

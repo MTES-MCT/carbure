@@ -88,6 +88,7 @@ class Entity(models.Model):
     registered_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.CASCADE)
 
     is_enabled = models.BooleanField(default=True)
+    is_tiruert_liable = models.BooleanField(default=False)
 
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
@@ -97,6 +98,7 @@ class Entity(models.Model):
     activity_description = models.TextField(blank=True, default="")
     website = models.URLField(blank=True, default="")
     vat_number = models.CharField(max_length=32, blank=True, default="")
+    accise_number = models.CharField(max_length=32, blank=True, default="")
 
     def __str__(self):
         return self.name
