@@ -4,7 +4,7 @@ import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { getYears } from "saf/api"
-import AirlineTickets from "./tickets"
+import AirlineTickets from "./pages/tickets"
 import { SafTicketStatus } from "../../types"
 
 export const SafAirline = () => {

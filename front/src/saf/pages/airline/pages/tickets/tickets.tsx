@@ -13,10 +13,10 @@ import {
   SafTicketStatus,
 } from "saf/types"
 import { getTicketFilters, getTickets, downloadTickets } from "saf/api"
-import { SafFilters } from "../../components/filters"
-import { useAutoStatus } from "./tabs"
-import { ClientTicketDetails } from "./ticket-details"
-import TicketsTable from "../../components/tickets/table"
+import { SafFilters } from "saf/components/filters"
+import { useAutoStatus } from "./tickets.hooks"
+import ClientTicketDetails from "./ticket-details"
+import TicketsTable from "saf/components/tickets/table"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
