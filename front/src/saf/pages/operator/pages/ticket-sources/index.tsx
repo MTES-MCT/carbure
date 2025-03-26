@@ -12,11 +12,11 @@ import {
   SafOperatorSnapshot,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
-import * as api from "../api"
-import { SafFilters } from "../../../components/filters"
+import * as api from "../../api"
+import { SafFilters } from "saf/components/filters"
 import { useAutoStatus } from "./index.hooks"
-import { OperatorTicketDetails } from "../ticket-details"
-import TicketSourceDetail from "../ticket-source-details"
+import { OperatorTicketDetails } from "../../components/ticket-details/ticket-details"
+import TicketSourceDetail from "../../components/ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import TicketSourcesTable from "./table"
 import { NoResult } from "common/components/no-result2"
@@ -24,7 +24,7 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-import { SafTicketSource, SafTicketSourceStatus } from "../types"
+import { SafTicketSource, SafTicketSourceStatus } from "../../types"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExportButton } from "saf/components/export"

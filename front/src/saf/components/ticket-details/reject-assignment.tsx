@@ -1,5 +1,4 @@
 import useEntity from "common/hooks/entity"
-import { EntityType } from "common/types"
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { Form } from "common/components/form2"
@@ -11,9 +10,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SafTicket } from "saf/types"
 import TicketTag from "../tickets/tag"
-import { rejectSafAirlineTicket } from "saf/pages/airline/api"
-import { rejectSafOperatorTicket } from "saf/pages/operator/api"
-
+import { rejectTicket as rejectTicketApi } from "saf/api"
 interface RejectAssignmentProps {
   ticket: SafTicket
   onClose: () => void
@@ -28,21 +25,16 @@ export const RejectAssignment = ({
   const notify = useNotify()
   const [comment, setComment] = useState<string | undefined>()
 
-  const rejectSafTicket = useMutation(
-    entity.entity_type === EntityType.Airline
-      ? rejectSafAirlineTicket
-      : rejectSafOperatorTicket,
-    {
-      invalidates: [
-        "ticket-details",
-        "airline-snapshot",
-        "operator-snapshot",
-        "tickets",
-        `nav-stats-${entity.id}`,
-      ],
-      onSuccess: () => ticketRejected(),
-    }
-  )
+  const rejectSafTicket = useMutation(rejectTicketApi, {
+    invalidates: [
+      "ticket-details",
+      "airline-snapshot",
+      "operator-snapshot",
+      "tickets",
+      `nav-stats-${entity.id}`,
+    ],
+    onSuccess: () => ticketRejected(),
+  })
 
   const ticketRejected = () => {
     notify(

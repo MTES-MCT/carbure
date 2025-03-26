@@ -1,4 +1,3 @@
-// import Tabs from "common/components/tabs"
 import { ChatDeleteLine, CheckLine, DraftFill } from "common/components/icon"
 import { Tabs } from "common/components/tabs2"
 import { compact } from "common/utils/collection"

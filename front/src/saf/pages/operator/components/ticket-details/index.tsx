@@ -8,19 +8,19 @@ import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
-import * as api from "../api"
-import TicketTag from "../../../components/tickets/tag"
+import TicketTag from "saf/components/tickets/tag"
 import CancelAssignment from "./cancel-assignment"
-import ClientComment from "../../../components/ticket-details/client-comment"
+import ClientComment from "saf/components/ticket-details/client-comment"
 import CreditTicketSource from "./credit-ticket-source"
-import { TicketFields } from "../../../components/ticket-details/fields"
+import { TicketFields } from "saf/components/ticket-details/fields"
 import LinkedTicketSource from "./linked-ticket-source"
-import RejectAssignment from "../../../components/ticket-details/reject-assignment"
+import RejectAssignment from "saf/components/ticket-details/reject-assignment"
 import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
 import { UserRole } from "common/types"
+import { getTicketDetails } from "saf/api"
 
 export type TicketDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -39,7 +39,7 @@ export const OperatorTicketDetails = ({
   const match = useHashMatch("ticket/:id")
   const portal = usePortal()
 
-  const ticketResponse = useQuery(api.getOperatorTicketDetails, {
+  const ticketResponse = useQuery(getTicketDetails, {
     key: "ticket-details",
     params: [entity.id, parseInt(match?.params.id ?? "")],
   })

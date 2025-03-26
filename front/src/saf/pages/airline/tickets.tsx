@@ -12,7 +12,7 @@ import {
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
-import * as api from "./api"
+import { getTicketFilters, getTickets, downloadTickets } from "saf/api"
 import { SafFilters } from "../../components/filters"
 import { useAutoStatus } from "./tabs"
 import { ClientTicketDetails } from "./ticket-details"
@@ -47,7 +47,7 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
     state
   )
   const apiGetTickets = (query: SafQuery) => {
-    return api.getSafAirlineTickets(query)
+    return getTickets(query)
   }
 
   const ticketsResponse = useQuery(apiGetTickets, {
@@ -77,7 +77,7 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
   }
 
   const getTicketFilter = (filter: SafFilter) => {
-    return api.getAirlineTicketFilters(filter, query)
+    return getTicketFilters(filter, query)
   }
 
   return (
@@ -91,7 +91,7 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
           />
         </ActionBar.Grow>
 
-        <ExportButton query={query} download={api.downloadSafAirlineTickets} />
+        <ExportButton query={query} download={downloadTickets} />
       </ActionBar>
 
       <SafFilters
