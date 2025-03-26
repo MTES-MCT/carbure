@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom"
 import useEntity from "common/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
-import { SearchInput } from "common/components/input"
+import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
@@ -104,7 +104,6 @@ export const OperatorTickets = ({
         <ActionBar>
           <ActionBar.Grow>
             <SearchInput
-              clear
               debounce={250}
               value={state.search}
               onChange={actions.setSearch}
