@@ -25,6 +25,9 @@ type QuantityFormComponentProps = {
 
   // Custom conversion function for the backend (default is the value passed as parameter)
   converter?: (value: number) => number
+
+  // Depot id can be used to known in which depot the quantity will be picked up
+  depotId?: number
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
@@ -36,6 +39,7 @@ export const QuantityForm = ({
   type,
   unit: customUnit,
   backendUnit: customBackendUnit,
+  depotId,
   converter,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
@@ -47,6 +51,7 @@ export const QuantityForm = ({
     values: value,
     unit: customBackendUnit,
     converter,
+    depotId,
   })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&

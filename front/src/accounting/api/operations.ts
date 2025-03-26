@@ -98,6 +98,7 @@ export const createOperationWithSimulation = (
     customs_category,
     biofuel,
     debited_entity,
+    depot_id,
   }: Pick<
     apiTypes["OperationInputRequest"],
     "customs_category" | "biofuel" | "debited_entity"
@@ -110,7 +111,7 @@ export const createOperationWithSimulation = (
       apiTypes["OperationInputRequest"],
       "type" | "from_depot" | "to_depot" | "credited_entity"
     >
-  }
+  } & { depot_id?: number }
 ) => {
   return simulate(entityId, {
     customs_category,
@@ -119,6 +120,7 @@ export const createOperationWithSimulation = (
     target_emission: simulation.target_emission,
     target_volume: simulation.target_volume,
     unit: simulation.unit,
+    depot_id,
   }).then((response) => {
     const lots = response.data?.selected_lots
     if (lots) {

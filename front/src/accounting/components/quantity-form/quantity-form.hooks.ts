@@ -16,6 +16,8 @@ type UseQuantityFormProps = {
   unit?: Unit | ExtendedUnit
   // Custom conversion function for the backend (default is the value passed as parameter)
   converter?: (value: number) => number
+
+  depotId?: number
 }
 export const useQuantityForm = ({
   balance,
@@ -23,6 +25,7 @@ export const useQuantityForm = ({
   mutationOptions,
   unit: customUnit,
   converter = (value) => value,
+  depotId,
 }: UseQuantityFormProps) => {
   const entity = useEntity()
   const { unit } = useUnit(customUnit)
@@ -35,6 +38,7 @@ export const useQuantityForm = ({
       target_volume: converter(values.quantity!),
       target_emission: 0,
       unit: unit,
+      depot_id: depotId,
     })
 
   const mutation = useMutation(declareQuantity, mutationOptions)
