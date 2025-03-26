@@ -3396,6 +3396,7 @@ export interface components {
       max_n_batches?: number
       enforced_volumes?: number[]
       unit?: string
+      from_depot?: number | null
     }
     SimulationLotOutput: {
       lot_id: number
@@ -3411,6 +3412,7 @@ export interface components {
       /** Format: double */
       target_volume: number
       unit?: string
+      from_depot?: number | null
     }
     SimulationMinMaxOutput: {
       /** Format: double */

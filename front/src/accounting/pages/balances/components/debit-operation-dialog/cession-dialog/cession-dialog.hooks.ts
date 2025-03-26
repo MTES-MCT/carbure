@@ -40,7 +40,7 @@ export const useCessionDialog = ({
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
-      depot_id: values.from_depot?.id,
+      from_depot: values.from_depot?.id,
     })
 
   return useMutation(onSubmit, {

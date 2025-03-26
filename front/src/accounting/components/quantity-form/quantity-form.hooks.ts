@@ -38,7 +38,7 @@ export const useQuantityForm = ({
       target_volume: converter(values.quantity!),
       target_emission: 0,
       unit: unit,
-      depot_id: depotId,
+      from_depot: depotId,
     })
 
   const mutation = useMutation(declareQuantity, mutationOptions)

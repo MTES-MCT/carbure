@@ -50,6 +50,7 @@ export const simulateMinMax = (
     debited_entity,
     target_volume,
     unit,
+    from_depot,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -60,6 +61,7 @@ export const simulateMinMax = (
       debited_entity,
       target_volume,
       unit,
+      from_depot,
     },
   })
 }
@@ -98,10 +100,10 @@ export const createOperationWithSimulation = (
     customs_category,
     biofuel,
     debited_entity,
-    depot_id,
+    from_depot,
   }: Pick<
     apiTypes["OperationInputRequest"],
-    "customs_category" | "biofuel" | "debited_entity"
+    "customs_category" | "biofuel" | "debited_entity" | "from_depot"
   > & {
     simulation: Pick<
       apiTypes["SimulationInputRequest"],
@@ -111,7 +113,7 @@ export const createOperationWithSimulation = (
       apiTypes["OperationInputRequest"],
       "type" | "from_depot" | "to_depot" | "credited_entity"
     >
-  } & { depot_id?: number }
+  }
 ) => {
   return simulate(entityId, {
     customs_category,
@@ -120,7 +122,7 @@ export const createOperationWithSimulation = (
     target_emission: simulation.target_emission,
     target_volume: simulation.target_volume,
     unit: simulation.unit,
-    depot_id,
+    from_depot,
   }).then((response) => {
     const lots = response.data?.selected_lots
     if (lots) {
