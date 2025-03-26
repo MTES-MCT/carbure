@@ -4,7 +4,7 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 import { SafTicketSourceDetails } from "saf/pages/operator/types"
-import DurabilityFields from "./parent-lot/durability-fields"
+import DurabilityFields from "saf/components/durability-fields"
 import { DialogSection } from "saf/components/dialog-section"
 import { TextInput, DateInput } from "common/components/inputs2"
 

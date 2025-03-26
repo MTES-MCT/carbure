@@ -15,13 +15,13 @@ import {
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
-import * as api from "../api"
-import { SafFilters } from "../../../components/filters"
-import { useAutoStatus } from "../tabs"
-import { OperatorTicketDetails } from "../ticket-details"
+import { getTicketFilters, getTickets, downloadTickets } from "saf/api"
+import { SafFilters } from "saf/components/filters"
+import { useAutoStatus } from "./index.hooks"
+import OperatorTicketDetails from "../../components/ticket-details"
 import { SafStatusSwitcher } from "./status-switcher"
-import TicketsTable from "../../../components/tickets/table"
-import TicketSourceDetails from "../ticket-source-details"
+import TicketsTable from "saf/components/tickets/table"
+import TicketSourceDetails from "../../components/ticket-source-details"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
@@ -59,7 +59,7 @@ export const OperatorTickets = ({
     SafTicketStatus,
     SafQueryType
   >(state)
-  const apiGetTickets = (query: SafQuery) => api.getOperatorTickets(query)
+  const apiGetTickets = (query: SafQuery) => getTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {
     key: "tickets",
@@ -77,8 +77,7 @@ export const OperatorTickets = ({
     }
   }
 
-  const getTicketFilter = (filter: SafFilter) =>
-    api.getOperatorTicketFilters(filter, query)
+  const getTicketFilter = (filter: SafFilter) => getTicketFilters(filter, query)
 
   const fetchIdsForPage = async (page: number) => {
     const response = await apiGetTickets({
@@ -111,7 +110,7 @@ export const OperatorTickets = ({
               onChange={actions.setSearch}
             />
           </ActionBar.Grow>
-          <ExportButton query={query} download={api.downloadOperatorTickets} />
+          <ExportButton query={query} download={downloadTickets} />
         </ActionBar>
 
         <SafFilters

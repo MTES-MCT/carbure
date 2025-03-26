@@ -8,9 +8,9 @@ import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { SafTicket } from "saf/types"
 import TicketTag from "../../components/tickets/tag"
-import * as api from "./api"
 import { EtsStatusEnum } from "api-schema"
 import { RadioGroup } from "common/components/inputs2"
+import { acceptTicket as acceptTicketApi } from "saf/api"
 
 interface AcceptAssignmentProps {
   ticket: SafTicket
@@ -35,7 +35,7 @@ export const AcceptAssignment = ({
 
   const form = useForm<AcceptFormValue>(defaultAcceptFormValue)
 
-  const acceptSafTicket = useMutation(api.acceptSafTicket, {
+  const acceptSafTicket = useMutation(acceptTicketApi, {
     invalidates: [
       "ticket-details",
       "airline-snapshot",

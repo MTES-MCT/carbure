@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { SafOperatorSnapshot } from "saf/types"
-import { SafTicketSourceStatus } from "../types"
+import { SafTicketSourceStatus } from "../../types"
 import { Tabs } from "common/components/tabs2"
 import { DraftFill, SendPlaneLine } from "common/components/icon"
 

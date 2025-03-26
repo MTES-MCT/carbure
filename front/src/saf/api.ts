@@ -1,14 +1,12 @@
-import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
-import { SafFilter, SafQuery } from "../../types"
+import { SafFilter, SafQuery } from "./types"
+import { CBQUERY_RESET } from "common/hooks/query-builder-2"
 import { EtsStatusEnum } from "api-schema"
 
-//AIRLINE
-
-export function getAirlineYears(entity_id: number) {
+export function getYears(entity_id: number) {
   return apiFetch.GET("/saf/years/", {
     params: {
       query: {
@@ -18,7 +16,7 @@ export function getAirlineYears(entity_id: number) {
   })
 }
 
-export function getAirlineSnapshot(entity_id: number, year: number) {
+export function getSnapshot(entity_id: number, year: number) {
   return apiFetch.GET("/saf/snapshot/", {
     params: {
       query: {
@@ -29,7 +27,7 @@ export function getAirlineSnapshot(entity_id: number, year: number) {
   })
 }
 
-export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
+export function getTicketFilters(field: SafFilter, query: SafQuery) {
   return apiFetch
     .GET("/saf/tickets/filters/", {
       params: {
@@ -43,7 +41,7 @@ export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
     .then((res) => res.data ?? [])
 }
 
-export function getSafAirlineTickets(query: SafQuery) {
+export function getTickets(query: SafQuery) {
   return apiFetch.GET("/saf/tickets/", {
     params: {
       query,
@@ -51,13 +49,13 @@ export function getSafAirlineTickets(query: SafQuery) {
   })
 }
 
-export function downloadSafAirlineTickets(query: SafQuery) {
+export function downloadTickets(query: SafQuery) {
   return downloadFetch("/saf/tickets/export/", {
     ...query,
   })
 }
 
-export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
+export function getTicketDetails(entity_id: number, ticket_id: number) {
   return apiFetch.GET(`/saf/tickets/{id}/`, {
     params: {
       path: {
@@ -70,27 +68,7 @@ export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
   })
 }
 
-export function acceptSafTicket(
-  entity_id: number,
-  ticket_id: number,
-  ets_status: EtsStatusEnum
-) {
-  return apiFetch.POST("/saf/tickets/{id}/accept/", {
-    params: {
-      path: {
-        id: ticket_id,
-      },
-      query: {
-        entity_id,
-      },
-    },
-    body: {
-      ets_status,
-    },
-  })
-}
-
-export function rejectSafAirlineTicket(
+export function rejectTicket(
   entity_id: number,
   ticket_id: number,
   comment: string
@@ -106,6 +84,26 @@ export function rejectSafAirlineTicket(
     },
     body: {
       comment,
+    },
+  })
+}
+
+export function acceptTicket(
+  entity_id: number,
+  ticket_id: number,
+  ets_status: EtsStatusEnum
+) {
+  return apiFetch.POST("/saf/tickets/{id}/accept/", {
+    params: {
+      path: {
+        id: ticket_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      ets_status,
     },
   })
 }

@@ -27,7 +27,6 @@ import {
 import {
   SafTicketSource,
   SafTicketSourceDetails,
-  SafTicketSourcesResponse,
 } from "saf/pages/operator/types"
 import { SiteTypeEnum } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
@@ -187,26 +186,6 @@ export const safTicketSource2: SafTicketSource = {
     id: 1,
     carbure_id: "1",
   },
-}
-
-export const safTicketSourcesResponse: SafTicketSourcesResponse = {
-  saf_ticket_sources: [
-    safTicketSource,
-    safTicketSource2,
-    safTicketSource,
-    safTicketSource2,
-    safTicketSource2,
-    safTicketSource,
-    safTicketSource,
-    safTicketSource,
-    safTicketSource,
-    safTicketSource,
-    safTicketSource,
-  ],
-  from: 1,
-  returned: 1,
-  total: 11,
-  ids: [22343, 12343],
 }
 
 export const safTicket: SafTicket = {

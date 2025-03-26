@@ -3,8 +3,8 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketPreview } from "saf/types"
-import TicketTag from "../../../components/tickets/tag"
-import { SafTicketSource } from "../types"
+import TicketTag from "saf/components/tickets/tag"
+import { SafTicketSource } from "saf/pages/operator/types"
 import { Collapse } from "common/components/collapse2"
 
 const AssignedTickets = ({
