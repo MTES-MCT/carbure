@@ -1,12 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Entity, UserRights
+from core.pagination import MetadataPageNumberPagination
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.permissions import HasUserRights
@@ -20,17 +20,15 @@ from tiruert.serializers import (
 from .mixins import ActionMixin
 
 
-class CustomPagination(PageNumberPagination):
-    def get_paginated_response(self, data):
-        return Response(
-            {
-                "count": self.page.paginator.count,
-                "next": self.get_next_link(),
-                "previous": self.get_previous_link(),
-                "total_quantity": getattr(self, "total_quantity", 0),
-                "results": data,
-            }
-        )
+class OperationPagination(MetadataPageNumberPagination):
+    aggregate_fields = {"total_quantity": 0}
+
+    def get_extra_metadata(self):
+        metadata = {"total_quantity": 0}
+        for operation in self.queryset:
+            quantity = operation.volume_to_quantity(operation.volume, self.request.unit)
+            metadata["total_quantity"] += quantity
+        return metadata
 
 
 @extend_schema(
@@ -61,7 +59,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     filterset_class = OperationFilter
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get", "post", "patch", "delete"]
-    pagination_class = CustomPagination
+    pagination_class = OperationPagination
 
     def get_permissions(self):
         if self.action in ["reject", "accept", "simulate", "create", "partial_update", "destroy"]:
@@ -107,23 +105,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         },
     )
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        total_quantity = 0
-        for operation in queryset:
-            quantity = operation.volume_to_quantity(operation.volume, request.unit)
-            total_quantity += quantity
-
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(queryset, request)
-        paginator.total_quantity = total_quantity
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return super().list(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="get_operation",
