@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import make_aware
 
-from tiruert.models import Objective
+from tiruert.models import MacFossilFuel, Objective
 from tiruert.services.balance import BalanceService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
@@ -94,24 +95,15 @@ class ObjectiveService:
 
     @staticmethod
     def get_balances_for_objectives_calculation(operations, entity_id, date_from):
-        # First get the whole balance (from forever), so with no date_from filter
-        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj")
-        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj")
-
-        # Then update the balance with quantity and teneur details for requested dates
         date_from = make_aware(datetime.strptime(date_from, "%Y-%m-%d"))
-        operations_with_date_from = operations.filter(created_at__gte=date_from)
-        balance_per_category = BalanceService.calculate_balance(
-            operations_with_date_from, entity_id, "customs_category", "mj", balance_per_category, update_balance=True
-        )
-        balance_per_sector = BalanceService.calculate_balance(
-            operations_with_date_from, entity_id, "sector", "mj", balance_per_sector, update_balance=True
-        )
+
+        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from)
+        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj", date_from)
 
         return balance_per_category, balance_per_sector
 
     @staticmethod
-    def get_capped_objectives(year):
+    def _get_capped_objectives(year):
         """
         Get capped objectives for the given year
         Only for 'customs_category' objectives ('sector' and 'main' not handled for now)
@@ -119,8 +111,29 @@ class ObjectiveService:
         return Objective.objects.filter(year=year, target_type=Objective.CAP, type=Objective.BIOFUEL_CATEGORY)
 
     @staticmethod
-    def calculate_target_for_objective(objective, energy_basis):
+    def _calculate_target_for_objective(objective, energy_basis):
         """
         Calculate the target for the given objective
         """
-        return energy_basis * objective.target
+        return energy_basis * objective.target  # MJ
+
+    @staticmethod
+    def calculate_target_for_specific_category(customs_category, entity_id):
+        """
+        Calculate the objective target for a specific customs category
+        """
+        # 1. Get the capped objective for the given year and customs category
+        year = timezone.now().year
+        capped_objectives = ObjectiveService._get_capped_objectives(year)
+        objective = capped_objectives.filter(customs_category=customs_category).first()
+        if not objective:
+            pass
+
+        # 2. Calculate "assiette" used for objectives calculations
+        macs = MacFossilFuel.objects.filter(operator_id=entity_id, year=year)
+        objectives = Objective.objects.filter(year=year)
+        energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
+
+        # 3. Calculate the target objective for the customs category
+        target = ObjectiveService._calculate_target_for_objective(objective, energy_basis)  # MJ
+        return target

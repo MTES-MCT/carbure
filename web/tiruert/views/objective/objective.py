@@ -133,6 +133,7 @@ class ObjectiveViewSet(GenericViewSet):
             "unit": "tCO2",
         }
 
+        # 5. Return the results
         result = {
             "main": global_objective,
             "sectors": objective_per_sector,

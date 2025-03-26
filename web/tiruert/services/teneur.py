@@ -280,11 +280,11 @@ class TeneurService:
         # Convert target volume into L
         target_volume = None
         if data.get("target_volume", None) is not None:
-            target_volume = TeneurService.convert_in_liters(data["target_volume"], unit, data["biofuel"])
+            target_volume = TeneurService._convert_in_liters(data["target_volume"], unit, data["biofuel"])
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
 
     @staticmethod
-    def convert_in_liters(quantity, unit, biofuel):
+    def _convert_in_liters(quantity, unit, biofuel):
         if unit == "mj":
             return quantity / biofuel.pci_litre
         elif unit == "kg":
