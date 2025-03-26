@@ -4928,9 +4928,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ObjectiveOutput"
+                $ref: "#/components/schemas/ObjectiveOutput"
           description: All objectives.
   /api/tiruert/operations/:
     get:
