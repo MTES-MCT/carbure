@@ -15,11 +15,13 @@ class SimulationInputSerializer(serializers.ModelSerializer):
             "max_n_batches",
             "enforced_volumes",
             "unit",
+            "from_depot",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
             "customs_category": {"required": True},
             "debited_entity": {"required": True},
+            "from_depot": {"required": False},
         }
 
     target_volume = serializers.FloatField(required=True)
@@ -49,11 +51,13 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
             "debited_entity",
             "target_volume",
             "unit",
+            "from_depot",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
             "customs_category": {"required": True},
             "debited_entity": {"required": True},
+            "from_depot": {"required": False},
         }
 
     target_volume = serializers.FloatField(required=True)

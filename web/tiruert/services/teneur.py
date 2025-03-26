@@ -255,6 +255,9 @@ class TeneurService:
             .distinct()
         )
 
+        if data["from_depot"] is not None:
+            operations = operations.filter(to_depot=data["from_depot"])
+
         # Calculate balance of debited entity, for each lot, always in liters
         balance = BalanceService.calculate_balance(operations, entity_id, "lot", "l")
 
