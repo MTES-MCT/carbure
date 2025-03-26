@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from "react"
+import { PropsWithChildren, useContext, useState } from "react"
 import cl from "clsx"
 import { PrivateNavigationContext } from "./private-navigation.context"
 import styles from "./private-navigation.module.css"
@@ -18,11 +18,18 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
   const { title } = useContext(PrivateNavigationContext)
   const { t } = useTranslation()
   const routes = useRoutes()
-
+  const [isCollapsed, setIsCollapsed] = useState(false)
   return (
     <>
       <header className={styles.header}>
         <div className={styles["header-left"]}>
+          <Button
+            iconId="ri-menu-line"
+            priority="tertiary"
+            size="small"
+            title="Collapse"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          />
           <NavLink to={ROUTE_URLS.HOME} className={styles.logo}>
             <img
               src={marianne}
@@ -55,7 +62,12 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
         </div>
       </header>
       <div className={cl(styles["body"])}>
-        <div className={styles["sidebar"]}>
+        <div
+          className={cl(
+            styles["sidebar"],
+            isCollapsed && styles["sidebar--collapsed"]
+          )}
+        >
           <PrivateSidebar />
         </div>
 
