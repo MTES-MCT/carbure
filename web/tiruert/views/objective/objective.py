@@ -78,7 +78,7 @@ class ObjectiveViewSet(GenericViewSet):
             ),
         },
     )
-    def list(self, request, *args, **kwargs):
+    def get_objectives(self, request):
         # Get queryset with filters for MacFossilFuel, Objective and Operation
         objectives = self.filter_queryset(self.get_queryset())
         macs = MacFilter(request.GET, queryset=MacFossilFuel.objects.all(), request=request).qs
