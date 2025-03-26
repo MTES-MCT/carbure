@@ -15,12 +15,15 @@ import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { NoResult } from "common/components/no-result2"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { useUnit } from "common/hooks/unit"
 const currentYear = new Date().getFullYear()
 
 const Operations = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   usePrivateNavigation(t("Comptabilité"))
+  const { formatUnit } = useUnit()
   const filterLabels = {
     [OperationsFilter.depot]: t("Dépôts"),
     [OperationsFilter.status]: t("Statut"),
@@ -70,6 +73,12 @@ const Operations = () => {
         <NoResult />
       ) : (
         <>
+          <RecapQuantity
+            text={t("{{count}} opérations pour un total de {{total}}", {
+              count: result?.data?.count ?? 0,
+              total: formatUnit(result?.data?.total_quantity ?? 0),
+            })}
+          />
           <Table
             columns={columns}
             rows={result?.data?.results ?? []}

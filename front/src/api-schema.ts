@@ -2879,6 +2879,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["BalanceResponse"][]
+      total_quantity?: number
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -2909,6 +2910,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["OperationList"][]
+      total_quantity?: number
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -7003,6 +7005,8 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7310,6 +7314,8 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]

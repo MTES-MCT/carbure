@@ -13,11 +13,13 @@ import { Pagination } from "common/components/pagination2/pagination"
 import { OperationsStatus, BalancesFilter } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
 import { getBalances } from "accounting/api/balances"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { useUnit } from "common/hooks/unit"
 
 const Balances = () => {
   const entity = useEntity()
   const { t } = useTranslation()
-
+  const { formatUnit } = useUnit()
   const columns = useBalancesColumns()
 
   const filterLabels = {
@@ -53,6 +55,11 @@ const Balances = () => {
         <NoResult />
       ) : (
         <>
+          <RecapQuantity
+            text={t("Le solde affiché représente {{total}}", {
+              total: formatUnit(result?.data?.total_quantity ?? 0),
+            })}
+          />
           <Table
             columns={columns}
             rows={result?.data?.results ?? []}
