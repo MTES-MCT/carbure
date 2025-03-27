@@ -1,5 +1,5 @@
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet
+from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
@@ -20,6 +20,8 @@ class BaseFilter(FilterSet):
     depot = CharFilter(method="filter_depot")
     type = CharFilter(method="filter_type")
     period = CharFilter(method="filter_period")
+
+    order_by = OrderingFilter(fields=(("created_at", "created_at"),))
 
     def filter_multiple_values(self, queryset, field_name, param_name):
         values = self.data.getlist(param_name)
