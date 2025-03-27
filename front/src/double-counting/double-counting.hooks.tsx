@@ -3,8 +3,10 @@ import { getDoubleCountingAgreements } from "./api"
 import useEntity from "common/hooks/entity"
 import { useMemo, useState } from "react"
 import { isAgreementExpired } from "./utils"
-import { DoubleCountingStatus } from "./types"
-import { apiTypes } from "common/services/api-fetch.types"
+import {
+  DoubleCountingApplicationOverview,
+  DoubleCountingStatus,
+} from "./types"
 import { Column, Cell } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import ApplicationStatus from "./components/application-status"
@@ -49,7 +51,7 @@ export const useDoubleCounting = () => {
 
 export const useDoubleCountingColumns = () => {
   const { t } = useTranslation()
-  const columns: Column<apiTypes["DoubleCountingApplicationPartial"]>[] = [
+  const columns: Column<DoubleCountingApplicationOverview>[] = [
     {
       header: t("Statut"),
       cell: (dc) => (
