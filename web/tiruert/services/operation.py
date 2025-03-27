@@ -1,9 +1,8 @@
-from django.utils import timezone
 from rest_framework import serializers
 
 from core.models import CarbureLot
 from tiruert.filters import OperationFilterForBalance
-from tiruert.models import MacFossilFuel, Objective, Operation
+from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
@@ -19,7 +18,7 @@ class OperationService:
     @staticmethod
     def perform_checks_before_create(request, entity_id, selected_lots, data, unit):
         OperationService.check_volumes(entity_id, selected_lots, data, unit)
-        OperationService.check_objectives(request, selected_lots, data, entity_id)
+        OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
 
     @staticmethod
     def check_volumes(entity_id, selected_lots, data, unit):
@@ -39,21 +38,13 @@ class OperationService:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
 
     @staticmethod
-    def check_objectives(request, selected_lots, data, entity_id):
+    def check_objectives_compliance(request, selected_lots, data, entity_id):
         """
         Check if the TENEUR operation respects the capped objective for the customs category
         """
         if data["type"] == Operation.TENEUR:
-            year = timezone.now().year
-            capped_objectives = ObjectiveService.get_capped_objectives(year)
-            objective = capped_objectives.filter(customs_category=data["customs_category"]).first()
-            if not objective:
-                pass
-
-            # 1. Calculate "assiette" used for objectives calculations
-            macs = MacFossilFuel.objects.filter(operator_id=entity_id, year=year)
-            objectives = Objective.objects.filter(year=year)
-            energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
+            # 1. Get the target for the customs category
+            target = ObjectiveService.calculate_target_for_specific_category(data["customs_category"], request.entity.id)
 
             # 2. Calculate the balance for requested biofuel and customs category
             request.GET = request.GET.copy()
@@ -61,19 +52,15 @@ class OperationService:
             request.GET["biofuel"] = data["biofuel"].code
             operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
             balance = BalanceService.calculate_balance(operations, entity_id, None, "mj")
-            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj", balance, update_balance=True)
-            balance = list(balance.values())[0]  # keep the first (and only) element
+            balance = list(balance.values())[0]  # keep the first (and only one) element
 
-            # 3. Calculate the target objective for the customs category
-            target = ObjectiveService.calculate_target_for_objective(objective, energy_basis)  # MJ
-
-            # 4. Check if the objective is respected
+            # 3. Convert the teneur to add from liters to MJ
             teneur_to_add = 0
-            # Need to convert volumes from liter to MJ
             for lot in selected_lots:
                 pci = CarbureLot.objects.get(id=lot["id"]).biofuel.pci_litre
                 teneur_to_add += lot["volume"] * pci
 
+            # 4. Check if the futur teneur is below the target
             futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
 
             if futur_teneur > target:

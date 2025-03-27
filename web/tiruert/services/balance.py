@@ -36,7 +36,7 @@ class BalanceService:
         """
         Calculates the conversion factor based on the requested unit
         """
-        conversion_factor_name = BalanceService.define_conversion_factor(unit)
+        conversion_factor_name = BalanceService._define_conversion_factor(unit)
         return getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
     @staticmethod
@@ -82,13 +82,13 @@ class BalanceService:
         return
 
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit, balance=None, update_balance=False):
+    def calculate_balance(operations, entity_id, group_by, unit, date_from=None):
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
         """
         # Use a defaultdict with a factory function that creates an appropriate balance entry
-        balance = balance if balance else defaultdict(partial(BalanceService._init_balance_entry, unit))
+        balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
 
         operations = operations.filter(
             status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED]
@@ -107,29 +107,28 @@ class BalanceService:
             for detail in operation.details.all():
                 key = BalanceService._get_key(operation, group_by, detail, depot)
 
-                if not update_balance:
+                if group_by != BalanceService.GROUP_BY_CATEGORY:
+                    balance[key]["sector"] = operation.sector
+
+                if group_by != BalanceService.GROUP_BY_SECTOR:
+                    balance[key]["customs_category"] = operation.customs_category
                     if group_by != BalanceService.GROUP_BY_CATEGORY:
-                        balance[key]["sector"] = operation.sector
+                        balance[key]["biofuel"] = operation.biofuel
 
-                    if group_by != BalanceService.GROUP_BY_SECTOR:
-                        balance[key]["customs_category"] = operation.customs_category
-                        if group_by != BalanceService.GROUP_BY_CATEGORY:
-                            balance[key]["biofuel"] = operation.biofuel
+                # Update available balance
+                BalanceService._update_available_balance(balance, key, operation, detail, entity_id, conversion_factor)
 
-                    # Update available balance
-                    BalanceService._update_available_balance(balance, key, operation, detail, entity_id, conversion_factor)
-
-                else:
-                    # Update quantity and teneur based on the operation details
+                # Update quantity and teneur only if the operation date is after the date_from
+                if date_from is None or operation.created_at >= date_from:
                     BalanceService._update_quantity_and_teneur(balance, key, operation, detail, entity_id, conversion_factor)
 
-            if not update_balance and operation.status == Operation.PENDING:
+            if operation.status == Operation.PENDING:
                 balance[key]["pending_operations"] += 1
 
         return balance
 
     @staticmethod
-    def define_conversion_factor(unit):
+    def _define_conversion_factor(unit):
         """
         Determines the conversion factor based on the unit
         """

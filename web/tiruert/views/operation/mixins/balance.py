@@ -71,19 +71,14 @@ class BalanceActionMixin:
     )
     def balance(self, request, pk=None):
         entity_id = request.entity.id
-        group_by = request.query_params.get("group_by", "")
         unit = request.unit
+        group_by = request.query_params.get("group_by", "")
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
 
         operations = self.filter_queryset(self.get_queryset())
 
-        # First get the whole balance (from forever), so with no date_from filter
-        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit)
-
-        # Then update the balance with quantity and teneur details for requested dates (if any)
-        operations = operations.filter(created_at__gte=date_from) if date_from else operations
-        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit, balance, update_balance=True)
+        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit, date_from)
 
         # Convert balance to a list of dictionaries for serialization
         serializer_class = {
