@@ -13,6 +13,7 @@ export interface Tab<T extends string> {
   key: T
   label: React.ReactNode
   icon?: React.ComponentType<IconProps>
+  iconActive?: React.ComponentType<IconProps>
   path?: string
 }
 
@@ -46,7 +47,7 @@ export const Tabs = <T extends string>({
   }, [controlledFocus, match?.key])
   return (
     <nav {...layout(props)} className={cl(css.tabs, className)} style={style}>
-      {tabs.map(({ icon: Icon, ...tab }) => {
+      {tabs.map(({ icon: Icon, iconActive: IconActive, ...tab }) => {
         const props = {
           className: cl(
             css.tab,
@@ -63,7 +64,10 @@ export const Tabs = <T extends string>({
         if (!tab.path) {
           return (
             <Text is="button" fontWeight="bold" {...props} key={tab.key}>
-              {Icon && <Icon size="sm" />}
+              {((Icon && tab.key !== focus) || (!IconActive && Icon)) && (
+                <Icon size="sm" />
+              )}
+              {IconActive && tab.key === focus && <IconActive size="sm" />}
               {tab.label}
             </Text>
           )

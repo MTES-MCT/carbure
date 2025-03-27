@@ -5,7 +5,7 @@ import { Tabs } from "common/components/tabs2"
 import { useRights } from "common/hooks/entity"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import { UserRole } from "common/types"
 import { Table } from "common/components/table2"
 import {
@@ -14,6 +14,13 @@ import {
   useDoubleCountingColumns,
 } from "./double-counting.hooks"
 import { NoResult } from "common/components/no-result2"
+import {
+  DoubleCountingApplicationOverview,
+  DoubleCountingStatus,
+} from "./types"
+import HashRoute from "common/components/hash-route"
+import { ApplicationDetailsDialog } from "./components/application-details-dialog"
+import { AgreementDetailsDialog } from "./components/agreement-details-dialog"
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -21,9 +28,30 @@ const DoubleCounting = () => {
   const { tab, setTab, applications, loading } = useDoubleCounting()
   const columns = useDoubleCountingColumns()
   const rights = useRights()
-
+  const navigate = useNavigate()
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
+  function showApplicationDialog(
+    application: DoubleCountingApplicationOverview
+  ) {
+    if (
+      [
+        DoubleCountingStatus.PENDING,
+        DoubleCountingStatus.INPROGRESS,
+        DoubleCountingStatus.REJECTED,
+      ].includes(application.status)
+    ) {
+      navigate({
+        pathname: location.pathname,
+        hash: `double-counting/applications/${application.id}`,
+      })
+    } else {
+      navigate({
+        pathname: location.pathname,
+        hash: `double-counting/agreements/${application.agreement_id}`,
+      })
+    }
+  }
   return (
     <Main>
       <header>
@@ -67,7 +95,7 @@ const DoubleCounting = () => {
               ) : (
                 <Table
                   rows={applications}
-                  onAction={() => {}}
+                  onAction={showApplicationDialog}
                   columns={columns}
                   loading={loading}
                 />
@@ -80,6 +108,14 @@ const DoubleCounting = () => {
           />
         </Routes>
       </Content>
+      <HashRoute
+        path="double-counting/applications/:id"
+        element={<ApplicationDetailsDialog />}
+      />
+      <HashRoute
+        path="double-counting/agreements/:id"
+        element={<AgreementDetailsDialog />}
+      />
     </Main>
   )
 }

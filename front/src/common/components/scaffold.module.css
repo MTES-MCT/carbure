@@ -190,6 +190,10 @@ section.actionbar {
   margin: var(--spacing-2w) 0;
 }
 
+.divider--no-margin::after {
+  margin: 0;
+}
+
 hr {
   width: 100%;
   border-width: 0px;

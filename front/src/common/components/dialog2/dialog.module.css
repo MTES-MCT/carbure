@@ -64,7 +64,6 @@
 }
 
 .dialog__wrapper {
-  /* padding: 0 var(--spacing-2w) var(--spacing-2w) var(--spacing-2w); */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -79,6 +78,10 @@
   padding: 0 var(--spacing-2w);
 }
 
+.dialog__content--gap-lg {
+  gap: var(--spacing-3w);
+}
+
 .dialog__title {
   color: var(--blue-france-sun-113-625);
   display: flex;
@@ -91,7 +94,8 @@
 }
 
 .dialog__description {
-  color: var(--light-text-default-grey);
+  color: var(--text-default-grey);
+  margin-top: var(--spacing-1w);
 }
 
 .dialog__footer {
