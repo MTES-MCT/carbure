@@ -45,3 +45,9 @@ export const Controlled: Story = {
     value: "2",
   },
 }
+
+export const WithLabel: Story = {
+  args: {
+    label: "Label",
+  },
+}
