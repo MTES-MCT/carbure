@@ -9,24 +9,24 @@ import { IconProps } from "../icon"
 
 export type TabVariant = "header"
 
-export interface Tab {
-  key: string
+export interface Tab<T extends string> {
+  key: T
   label: React.ReactNode
   icon?: React.ComponentType<IconProps>
   path?: string
 }
 
-export interface TabsProps extends Layout {
+export interface TabsProps<T extends string> extends Layout {
   className?: string
   style?: React.CSSProperties
   variant?: TabVariant
   keepSearch?: boolean
-  tabs: Tab[]
-  focus?: string
-  onFocus?: (tab: string) => void
+  tabs: Tab<T>[]
+  focus?: T
+  onFocus?: (tab: T) => void
   // children?: (tab: string) => React.ReactNode
 }
-export const Tabs = ({
+export const Tabs = <T extends string>({
   className,
   style,
   keepSearch,
@@ -34,7 +34,7 @@ export const Tabs = ({
   focus: controlledFocus,
   onFocus,
   ...props
-}: TabsProps) => {
+}: TabsProps<T>) => {
   const matcher = useMatcher()
   const location = useLocation()
   const tabs = tabsConfig.filter(Boolean)
