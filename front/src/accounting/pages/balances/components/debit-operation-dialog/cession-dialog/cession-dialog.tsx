@@ -108,6 +108,7 @@ export const CessionDialogContent = ({
                     balance={balance}
                     depot_quantity_max={form.value.from_depot?.quantity.credit}
                     type={CreateOperationType.CESSION}
+                    depotId={form.value.from_depot?.id}
                   />
                 )}
                 {currentStep?.key === recipientToDepotStepKey && (
