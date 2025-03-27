@@ -1,5 +1,5 @@
 import { ProductionSiteDetails } from "common/types"
-import Tabs from "common/components/tabs"
+import { Tabs } from "common/components/tabs2"
 import { compact } from "common/utils/collection"
 import {
   DoubleCountingProduction,
@@ -12,6 +12,15 @@ import { ProductionSiteForm } from "settings/components/production-site-dialog"
 import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
 import { ProductionTable } from "../../../double-counting/components/production-table"
 import { FilesTable } from "../../../double-counting/components/files-table"
+import { Box } from "common/components/scaffold"
+import {
+  BuildingFill,
+  BuildingLine,
+  ProfileFill,
+  ProfileLine,
+  UserFill,
+  UserLine,
+} from "common/components/icon"
 
 interface ApplicationDetailsProps {
   production?: DoubleCountingProduction[]
@@ -39,53 +48,52 @@ const ApplicationTabs = ({
 
   return (
     <>
-      <section>
-        <Tabs
-          variant="switcher"
-          tabs={compact([
-            productionSite && {
-              key: "production_site",
-              label: t("Site de production"),
-            },
-            {
-              key: "sourcing_forecast",
-              label: t("Approvisionnement"),
-            },
-            {
-              key: "production",
-              label: t("Production"),
-            },
-            {
-              key: "fichiers",
-              label: t("Fichiers"),
-            },
-          ])}
-          focus={focus}
-          onFocus={setFocus}
-        />
-      </section>
+      <Tabs
+        tabs={compact([
+          productionSite && {
+            key: "production_site",
+            label: t("Site de production"),
+            icon: BuildingLine,
+            iconActive: BuildingFill,
+          },
+          {
+            key: "sourcing_forecast",
+            label: t("Approvisionnement"),
+            icon: ProfileLine,
+            iconActive: ProfileFill,
+          },
+          {
+            key: "production",
+            label: t("Production"),
+            icon: UserLine,
+            iconActive: UserFill,
+          },
+          {
+            key: "fichiers",
+            label: t("Fichiers"),
+          },
+        ])}
+        focus={focus}
+        onFocus={setFocus}
+      />
       {focus === "production_site" && productionSite && (
-        <section>
+        <Box>
           <ProductionSiteForm readOnly productionSite={productionSite} />
-        </section>
+        </Box>
       )}
 
       {focus === "sourcing_forecast" && (
-        <section>
-          <SourcingFullTable sourcing={sourcing ?? []} />
-        </section>
+        <SourcingFullTable sourcing={sourcing ?? []} />
       )}
 
       {focus === "production" && (
-        <section>
-          <ProductionTable
-            production={production ?? []}
-            quotas={quotas ?? {}}
-            setQuotas={setQuotas}
-            hasAgreement={hasAgreement}
-            sourcing={sourcing ?? []}
-          />
-        </section>
+        <ProductionTable
+          production={production ?? []}
+          quotas={quotas ?? {}}
+          setQuotas={setQuotas}
+          hasAgreement={hasAgreement}
+          sourcing={sourcing ?? []}
+        />
       )}
       {focus === "fichiers" && application && (
         <section>
