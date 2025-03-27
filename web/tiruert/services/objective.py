@@ -47,7 +47,7 @@ class ObjectiveService:
         return dict(consideration_rates)
 
     @staticmethod
-    def calculate_objective(balance, objective_queryset, energy_basis, objective_type):
+    def calculate_objectives_and_penalties(balance, objective_queryset, energy_basis, objective_type):
         """
         Calculate the objective per category or sector
         """
@@ -56,6 +56,7 @@ class ObjectiveService:
             balance[key]["objective"] = {
                 "target_mj": None,
                 "target_type": None,
+                "penalty": None,
             }
 
         objectives = objective_queryset.filter(type=objective_type)
@@ -73,21 +74,30 @@ class ObjectiveService:
             if key not in balance:
                 continue
             else:
+                target = ObjectiveService._calculate_target_for_objective(objective.target, energy_basis)
+                penalty_amout = ObjectiveService._calcule_penalty(
+                    objective.penalty,
+                    balance[key]["pending_teneur"] + balance[key]["declared_teneur"],
+                    target,
+                )
+
                 balance[key]["objective"] = {
-                    "target_mj": energy_basis * objective.target,
+                    "target_mj": target,
                     "target_type": objective.target_type,
+                    "penalty": penalty_amout,
                 }
 
         return list(balance.values())
 
     @staticmethod
-    def calculate_global_objective(objective_queryset, energy_basis):
+    def get_global_objective_and_penalty(objective_queryset, energy_basis):
         """
         Calculate the global objective of CO2 emissions reduction
         """
-        objective = objective_queryset.filter(type=Objective.MAIN).values("target").first()
-
-        return objective["target"] * energy_basis if objective else 0
+        objective = objective_queryset.filter(type=Objective.MAIN).values("target", "penalty").first()
+        target = ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis) if objective else 0
+        penalty = objective["penalty"] if objective else 0
+        return target, penalty
 
     @staticmethod
     def apply_ghg_conversion(value):
@@ -111,11 +121,11 @@ class ObjectiveService:
         return Objective.objects.filter(year=year, target_type=Objective.CAP, type=Objective.BIOFUEL_CATEGORY)
 
     @staticmethod
-    def _calculate_target_for_objective(objective, energy_basis):
+    def _calculate_target_for_objective(target, energy_basis):
         """
         Calculate the target for the given objective
         """
-        return energy_basis * objective.target  # MJ
+        return energy_basis * target  # MJ
 
     @staticmethod
     def calculate_target_for_specific_category(customs_category, entity_id):
@@ -135,5 +145,27 @@ class ObjectiveService:
         energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
 
         # 3. Calculate the target objective for the customs category
-        target = ObjectiveService._calculate_target_for_objective(objective, energy_basis)  # MJ
+        target = ObjectiveService._calculate_target_for_objective(objective.target, energy_basis)  # MJ
         return target
+
+    @staticmethod
+    def _calcule_penalty(penalty, teneur, target, tCO2=False):
+        """
+        Calculate the penalty for the given objective
+        If tCO2 is True, the penalty is in c€/tCO2
+        - teneur is in tCO2
+        - target is in tCO2
+        If tCO2 is False, the penalty is in c€/GJ
+        - teneur is in MJ (need to convert to GJ)
+        - target is in MJ (need to convert to GJ)
+        """
+        if not penalty or not target:
+            return 0
+
+        if teneur < target:
+            diff = target - teneur
+            diff = diff / 1000 if not tCO2 else diff
+            penalty_amount = diff * penalty
+            return penalty_amount
+        else:
+            return 0

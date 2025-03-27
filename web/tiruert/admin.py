@@ -18,7 +18,28 @@ class FossilFuelCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Objective)
 class ObjectiveAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "type",
+        "fuel_category",
+        "customs_category",
+        "year",
+        "target_",
+        "target_type",
+        "consideration_rate_",
+        "penalty_",
+    ]
+
+    def target_(self, obj):
+        if obj.target is not None:
+            return f"{obj.target * 100:.2f} %"
+
+    def consideration_rate_(self, obj):
+        if obj.consideration_rate is not None:
+            return f"{obj.consideration_rate * 100:.2f} %"
+
+    def penalty_(self, obj):
+        if obj.penalty is not None:
+            return f"{obj.penalty / 100} €"
 
 
 @admin.register(Operation)
