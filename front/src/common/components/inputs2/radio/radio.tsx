@@ -2,7 +2,7 @@ import {
   RadioButtons,
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons"
-import { ChangeEvent } from "react"
+import { ChangeEvent, ReactNode } from "react"
 import { Label, LabelProps } from "../base-input"
 import styles from "./radio.module.css"
 import cl from "clsx"
@@ -26,12 +26,14 @@ export type RadioGroupProps<V extends RadioValueType> = Omit<
   value?: V
   onChange: (value: V) => void
   required?: boolean
+  label?: ReactNode
 }
 
 export const RadioGroup = <V extends RadioValueType>({
   options,
   onChange,
   required,
+  label,
   ...props
 }: RadioGroupProps<V>) => {
   const optionsWithNativeInputProps = options.map((option) => ({
@@ -53,6 +55,7 @@ export const RadioGroup = <V extends RadioValueType>({
       {...props}
       options={optionsWithNativeInputProps}
       className={cl(props.className, styles["radio-group"])}
+      legend={label}
     />
   )
 }
