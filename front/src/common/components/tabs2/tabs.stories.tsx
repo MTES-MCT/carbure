@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Tabs } from "./tabs"
-import { InboxArchiveFill } from "../icon"
+import { InboxArchiveFill, InboxArchiveLine } from "../icon"
 
 const meta: Meta<typeof Tabs> = {
   component: Tabs,
@@ -27,6 +27,24 @@ export const WithIcon: Story = {
     tabs: [
       { key: "1", label: "Tab 1", icon: InboxArchiveFill },
       { key: "2", label: "Tab 2", icon: InboxArchiveFill },
+    ],
+  },
+}
+
+export const WithIconActive: Story = {
+  args: {
+    tabs: [
+      {
+        key: "1",
+        label: "Tab 1",
+        icon: InboxArchiveLine,
+        iconActive: InboxArchiveFill,
+      },
+      {
+        key: "2",
+        label: "Tab 2",
+        icon: InboxArchiveLine,
+      },
     ],
   },
 }
