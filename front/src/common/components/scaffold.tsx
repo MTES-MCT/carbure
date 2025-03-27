@@ -139,8 +139,18 @@ export const Box = ({
   />
 )
 
-export const Divider = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.divider, props.className)} />
+export const Divider = ({
+  noMargin,
+  ...props
+}: JSX.IntrinsicElements["div"] & { noMargin?: boolean }) => (
+  <div
+    {...props}
+    className={cl(
+      css.divider,
+      props.className,
+      noMargin && css["divider--no-margin"]
+    )}
+  />
 )
 
 export interface Layout {
