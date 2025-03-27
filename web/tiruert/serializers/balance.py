@@ -62,6 +62,7 @@ class BalanceByLotSerializer(serializers.Serializer):
                 grouped_balance[group_key] = {
                     "customs_category": customs_cat,
                     "biofuel": biofuel,
+                    "available_balance": 0,
                     "lots": [],
                 }
 
@@ -76,6 +77,9 @@ class BalanceByLotSerializer(serializers.Serializer):
                     "emission_rate_per_mj": value["emission_rate_per_mj"],
                 },
             )
+
+            # Sum up the available_balance for all lots
+            grouped_balance[group_key]["available_balance"] += value["available_balance"]
 
         return list(grouped_balance.values())
 
@@ -105,6 +109,7 @@ class BalanceByDepotSerializer(serializers.Serializer):
                 grouped_balance[group_key] = {
                     "customs_category": customs_cat,
                     "biofuel": value["biofuel"],
+                    "available_balance": 0,
                     "depots": [],
                 }
 
@@ -119,5 +124,8 @@ class BalanceByDepotSerializer(serializers.Serializer):
                     "unit": value["unit"],
                 },
             )
+
+            # Sum up the available_balance for all depots
+            grouped_balance[group_key]["available_balance"] += value["available_balance"]
 
         return list(grouped_balance.values())
