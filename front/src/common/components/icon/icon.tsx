@@ -274,3 +274,19 @@ export const ElecFill = ({ ...props }: IconProps) => {
 export const BiofuelFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="fr-icon-gas-station-fill" />
 }
+
+export const ProfileFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-profile-fill" />
+}
+
+export const ProfileLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-profile-line" />
+}
+
+export const UserLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-user-line" />
+}
+
+export const UserFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-user-fill" />
+}
