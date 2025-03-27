@@ -19,6 +19,8 @@ export interface DialogProps {
   children?: React.ReactNode
   header?: React.ReactNode
   footer?: React.ReactNode
+  // Define the gap inside content
+  gap?: "lg"
   onClose: () => void
 }
 
@@ -32,6 +34,7 @@ export const Dialog = ({
   fullWidth,
   fullHeight,
   fitContent,
+  gap,
   onClose,
 }: DialogProps) => (
   <div className={css.screen}>
@@ -60,7 +63,14 @@ export const Dialog = ({
       </Button>
       <div className={css["dialog__wrapper"]}>
         {header && <header className={css["dialog__header"]}>{header}</header>}
-        <main className={css["dialog__content"]}>{children}</main>
+        <main
+          className={cl(
+            css["dialog__content"],
+            gap && css[`dialog__content--gap-${gap}`]
+          )}
+        >
+          {children}
+        </main>
         {footer && <footer className={css["dialog__footer"]}>{footer}</footer>}
       </div>
     </div>
@@ -72,16 +82,22 @@ type DialogTitleProps = Omit<TitleProps, "is" | "as"> & {
 }
 const DialogTitle = ({ wrap = false, ...props }: DialogTitleProps) => (
   <Title
+    {...props}
     is="h2"
     as="h5"
     className={cl(css["dialog__title"], !wrap && css["dialog__title--nowrap"])}
-    {...props}
   />
 )
 
 const DialogDescription = <T extends React.ElementType>(
   props: Omit<TextProps<T>, "size">
-) => <Text size="sm" {...props} />
+) => (
+  <Text
+    {...props}
+    size="sm"
+    className={cl(props.className, css["dialog__description"])}
+  />
+)
 
 Dialog.Title = DialogTitle
 Dialog.Description = DialogDescription

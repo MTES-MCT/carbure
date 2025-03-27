@@ -1,11 +1,11 @@
 import useEntity from "common/hooks/entity"
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
 import { Return } from "common/components/icons"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
+import { Tabs } from "common/components/tabs2"
 import { useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { useState } from "react"
@@ -17,6 +17,14 @@ import { ProductionTable } from "./production-table"
 import { QuotasTable } from "./quotas-table"
 import { SourcingFullTable } from "./sourcing-table"
 import { AgreementDetails, DoubleCountingStatus } from "../types"
+import {
+  BuildingFill,
+  BuildingLine,
+  ProfileFill,
+  ProfileLine,
+  UserFill,
+  UserLine,
+} from "common/components/icon"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -40,19 +48,19 @@ export const AgreementDetailsDialog = () => {
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog fullscreen onClose={closeDialog}>
-        <header>
-          <AgreementStatusTag status={agreement?.status} />
-          <h1>
-            {t("Agrément double comptage n°{{dcNumber}}", {
-              dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
-            })}{" "}
-          </h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
+      <Dialog
+        fullscreen
+        onClose={closeDialog}
+        gap="lg"
+        header={
+          <>
+            <Dialog.Title style={{ justifyContent: "space-between" }}>
+              {t("Agrément double comptage n°{{dcNumber}}", {
+                dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
+              })}
+              <AgreementStatusTag status={agreement?.status} />
+            </Dialog.Title>
+            <Dialog.Description>
               <Trans
                 values={{
                   producer: agreement?.producer ?? "N/A",
@@ -60,51 +68,43 @@ export const AgreementDetailsDialog = () => {
                 }}
                 defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>"
               />
+            </Dialog.Description>
+          </>
+        }
+      >
+        {!application && !applicationResponse.loading && (
+          <section>
+            <p>
+              <Trans>
+                Aucune demande n'a été associée. Pour afficher les quotas
+                approuvés, ajouter le demande associée à cet agrément dans
+                l'onglet "demandes en attente".
+              </Trans>
             </p>
           </section>
-
-          {!application && !applicationResponse.loading && (
+        )}
+        {application &&
+          application.status !== DoubleCountingStatus.ACCEPTED && (
             <section>
-              <p>
-                <Trans>
-                  Aucune demande n'a été associée. Pour afficher les quotas
-                  approuvés, ajouter le demande associée à cet agrément dans
-                  l'onglet "demandes en attente".
-                </Trans>
-              </p>
+              <p>La demande est en cours de traitement...</p>
+              <Button
+                customPriority="link"
+                asideY
+                onClick={() =>
+                  navigate(
+                    `/org/${entity.id}/double-counting/applications#application/${application.id}`
+                  )
+                }
+              >
+                {"Voir la demande d'agrément à valider"}
+              </Button>
             </section>
           )}
-          {application &&
-            application.status !== DoubleCountingStatus.ACCEPTED && (
-              <section>
-                <p>La demande est en cours de traitement...</p>
-                <Button
-                  variant="link"
-                  asideY
-                  action={() =>
-                    navigate(
-                      `/org/${entity.id}/double-counting/applications#application/${application.id}`
-                    )
-                  }
-                >
-                  {"Voir la demande d'agrément à valider"}
-                </Button>
-              </section>
-            )}
 
-          {application &&
-            application.status === DoubleCountingStatus.ACCEPTED && (
-              <>
-                <AgreementTabs agreement={agreement} />
-              </>
-            )}
-        </main>
-
-        <footer>
-          <Button icon={Return} action={closeDialog}>
-            <Trans>Retour</Trans>
-          </Button>
-        </footer>
+        {application &&
+          application.status === DoubleCountingStatus.ACCEPTED && (
+            <AgreementTabs agreement={agreement} />
+          )}
 
         {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
@@ -118,48 +118,42 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
 
   return (
     <>
-      <section>
-        <Tabs
-          variant="switcher"
-          tabs={compact([
-            {
-              key: "quotas",
-              label: t("Quotas"),
-            },
-            {
-              key: "sourcing_forecast",
-              label: t("Approvisionnement"),
-            },
-            {
-              key: "production",
-              label: t("Production"),
-            },
-          ])}
-          focus={focus}
-          onFocus={setFocus}
-        />
-      </section>
-
-      {focus === "quotas" && (
-        <section>
-          <QuotasTable quotas={agreement.quotas} />
-        </section>
-      )}
+      <Tabs
+        tabs={compact([
+          {
+            key: "quotas",
+            label: t("Quotas"),
+            icon: BuildingLine,
+            iconActive: BuildingFill,
+          },
+          {
+            key: "sourcing_forecast",
+            label: t("Approvisionnement"),
+            icon: ProfileLine,
+            iconActive: ProfileFill,
+          },
+          {
+            key: "production",
+            label: t("Production"),
+            icon: UserLine,
+            iconActive: UserFill,
+          },
+        ])}
+        focus={focus}
+        onFocus={setFocus}
+      />
+      {focus === "quotas" && <QuotasTable quotas={agreement.quotas} />}
 
       {focus === "sourcing_forecast" && (
-        <section>
-          <SourcingFullTable sourcing={agreement.application.sourcing ?? []} />
-        </section>
+        <SourcingFullTable sourcing={agreement.application.sourcing ?? []} />
       )}
 
       {focus === "production" && (
-        <section>
-          <ProductionTable
-            production={agreement.application.production ?? []}
-            sourcing={agreement.application.sourcing ?? []}
-            hasAgreement={true}
-          />
-        </section>
+        <ProductionTable
+          production={agreement.application.production ?? []}
+          sourcing={agreement.application.sourcing ?? []}
+          hasAgreement={true}
+        />
       )}
     </>
   )
