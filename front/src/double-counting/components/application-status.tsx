@@ -1,26 +1,23 @@
-import Tag, { TagVariant } from "common/components/tag"
+import { BadgeProps, Badge } from "@codegouvfr/react-dsfr/Badge"
 import { useTranslation } from "react-i18next"
 import {
   DoubleCountingStatus as DCStatus,
   DoubleCountingExtendedStatus as DCStatusExt,
 } from "double-counting/types"
 
-const statusToVariant: Record<DCStatusExt, TagVariant> = {
+const statusToVariant: Record<DCStatusExt, BadgeProps["severity"]> = {
   [DCStatusExt.ACCEPTED]: "success",
   [DCStatusExt.INPROGRESS]: "info",
   [DCStatusExt.PENDING]: "info",
-  [DCStatusExt.REJECTED]: "danger",
-  [DCStatusExt.EXPIRED]: "none",
+  [DCStatusExt.REJECTED]: "error",
+  [DCStatusExt.EXPIRED]: "new",
   [DCStatusExt.EXPIRES_SOON]: "warning",
-  [DCStatusExt.INCOMING]: "success",
 }
 
 const ApplicationStatus = ({
   expirationDate,
-  big,
   status,
 }: {
-  big?: boolean
   status: DCStatus
   expirationDate?: string
 }) => {
@@ -35,7 +32,6 @@ const ApplicationStatus = ({
     [DCStatusExt.REJECTED]: t("Refusée"),
     [DCStatusExt.EXPIRED]: t("Expirée"),
     [DCStatusExt.EXPIRES_SOON]: t("À renouveler"),
-    [DCStatusExt.INCOMING]: t("À venir"),
   }
 
   if (expirationDate && extStatus !== DCStatusExt.REJECTED) {
@@ -51,16 +47,13 @@ const ApplicationStatus = ({
       if (expires_soon_date < new Date()) {
         extStatus = DCStatusExt.EXPIRES_SOON
       }
-      //  else if (extStatus === DCStatus.Accepted) {
-      //   extStatus = DCStatus.Incoming
-      // }
     }
   }
 
   return (
-    <Tag big={big} variant={statusToVariant[extStatus]}>
+    <Badge severity={statusToVariant[extStatus]}>
       {statusLabels[extStatus]}
-    </Tag>
+    </Badge>
   )
 }
 

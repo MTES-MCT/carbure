@@ -21,6 +21,8 @@ export const useRoutes = () => {
     BIOFUELS_CONTROLS: (year: number = currentYear) =>
       ROUTE_URLS.BIOFUELS_CONTROLS(entity.id, year),
 
+    DOUBLE_COUNTING: () => ROUTE_URLS.DOUBLE_COUNTING(entity.id),
+
     ELEC: (year: number = currentYear) => ROUTE_URLS.ELEC(entity.id, year),
     ELEC_ADMIN: (year: number = currentYear) =>
       ROUTE_URLS.ELEC_ADMIN(entity.id, year),

@@ -13,7 +13,8 @@ const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
 const Entities = lazy(() => import("companies-admin"))
 const Controls = lazy(() => import("controls"))
-const DoubleCounting = lazy(() => import("double-counting-admin"))
+const DoubleCounting = lazy(() => import("double-counting"))
+const DoubleCountingAdmin = lazy(() => import("double-counting-admin"))
 const AgreementPublicList = lazy(
   () => import("double-counting/components/agreement-public-list")
 )
@@ -185,6 +186,21 @@ const Org = () => {
           />
         </>
       )}
+      {isProducer && (
+        <>
+          <Route
+            path="double-counting/agreements/*"
+            element={<DoubleCounting />}
+          />
+          <Route
+            path="double-counting/*"
+            element={<Navigate replace to="agreements" />}
+          />
+        </>
+      )}
+      {(isAdmin || isAdminDC) && (
+        <Route path="double-counting/*" element={<DoubleCountingAdmin />} />
+      )}
 
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
@@ -244,9 +260,6 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="controls" />} />
       )}
 
-      {(isAdmin || isAdminDC) && (
-        <Route path="double-counting/*" element={<DoubleCounting />} />
-      )}
       {isAdminDC && (
         <Route path="*" element={<Navigate replace to="double-counting" />} />
       )}

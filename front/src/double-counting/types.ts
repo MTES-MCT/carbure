@@ -18,7 +18,6 @@ export enum DoubleCountingExtendedStatus {
   REJECTED = DoubleCountingStatus.REJECTED,
   EXPIRED = DoubleCountingAgreementStatus.EXPIRED,
   EXPIRES_SOON = DoubleCountingAgreementStatus.EXPIRES_SOON,
-  INCOMING = DoubleCountingAgreementStatus.INCOMING,
 }
 
 export type DoubleCountingApplicationOverview =
