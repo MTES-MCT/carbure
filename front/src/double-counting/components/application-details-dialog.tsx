@@ -1,8 +1,6 @@
 import useEntity from "common/hooks/entity"
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
+import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Return } from "common/components/icons"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -13,6 +11,7 @@ import ApplicationStatus from "./application-status"
 import ApplicationTabs from "double-counting-admin/components/applications/application-tabs"
 import { DoubleCountingStatus as DCStatus } from "double-counting/types"
 import * as api from "double-counting/api"
+import { formatDateYear } from "common/utils/formatters"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -32,6 +31,9 @@ export const ApplicationDetailsDialog = () => {
 
   const application = applicationResponse.result?.data
   const dcaStatus = application?.status ?? DCStatus.PENDING
+  const period = application?.period_start
+    ? `${formatDateYear(application.period_start)}-${formatDateYear(application.period_end)}`
+    : "N/A"
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#double-counting" })
@@ -39,29 +41,35 @@ export const ApplicationDetailsDialog = () => {
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog fullscreen onClose={closeDialog}>
-        <header>
-          <ApplicationStatus big status={dcaStatus} />
-          <h1>{t("Demande d'agrément double comptage")} </h1>
-        </header>
-
-        <main>
-          <ApplicationInfo application={application} />
-
-          {application && (
-            <ApplicationTabs
-              productionSite={application.production_site}
-              sourcing={application.sourcing}
-              production={application.production}
-            />
-          )}
-        </main>
-
-        <footer>
-          <Button icon={Return} action={closeDialog}>
-            <Trans>Retour</Trans>
-          </Button>
-        </footer>
+      <Dialog
+        fullscreen
+        onClose={closeDialog}
+        gap="lg"
+        header={
+          <>
+            <Dialog.Title style={{ justifyContent: "space-between" }}>
+              {t("Demande d'agrément double comptage")}
+              <ApplicationStatus status={dcaStatus} />
+            </Dialog.Title>
+            <Dialog.Description>
+              <ApplicationInfo application={application} />
+            </Dialog.Description>
+          </>
+        }
+      >
+        <p>
+          <Trans
+            values={{ period }}
+            defaults="Période de validité : <b>{{ period }}</b>"
+          />
+        </p>
+        {application && (
+          <ApplicationTabs
+            productionSite={application.production_site}
+            sourcing={application.sourcing}
+            production={application.production}
+          />
+        )}
 
         {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
