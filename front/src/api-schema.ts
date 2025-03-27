@@ -1734,7 +1734,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** @description Set teneur operations to ACCEPTED */
+    /** @description Set teneur operations to DECLARED */
     post: operations["declare_teneur"]
     delete?: never
     options?: never
@@ -2685,7 +2685,6 @@ export interface components {
      *     * `TALLOL` - Tallol
      *     * `OTHER` - Autre
      *     * `EP2AM` - EP2AM
-     *     * `AM` - AM
      * @enum {string}
      */
     MPCategoriesEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
@@ -7003,6 +7002,11 @@ export interface operations {
         entity_id: number
         from_to?: string
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
@@ -7312,6 +7316,11 @@ export interface operations {
         /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
@@ -7353,6 +7362,11 @@ export interface operations {
         filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
         from_to?: string
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7390,6 +7404,11 @@ export interface operations {
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7625,7 +7644,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   TALLOL = "TALLOL",
   OTHER = "OTHER",
   EP2AM = "EP2AM",
-  AM = "AM",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   INCORPORATION = "INCORPORATION",
@@ -7637,6 +7655,10 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   DEVALUATION = "DEVALUATION",
   CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
   ACQUISITION = "ACQUISITION",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
+  ValueMinuscreated_at = "-created_at",
+  created_at = "created_at",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",

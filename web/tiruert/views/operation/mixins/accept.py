@@ -57,7 +57,7 @@ class AcceptActionMixin:
 
     @extend_schema(
         operation_id="declare_teneur",
-        description="Set teneur operations to ACCEPTED",
+        description="Set teneur operations to DECLARED",
         request=None,
         responses={
             status.HTTP_200_OK: OpenApiResponse(response={"status": "validated"}, description="Success message"),

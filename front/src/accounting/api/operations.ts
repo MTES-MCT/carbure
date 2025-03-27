@@ -1,6 +1,7 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import { api } from "common/services/api-fetch"
 import { OperationsFilter, OperationsQuery } from "../types"
+import { PathsApiTiruertOperationsGetParametersQueryOrder_by } from "api-schema"
 
 export const getOperationsFilters = (
   filter: string,
@@ -19,7 +20,12 @@ export const getOperationsFilters = (
 export const getOperations = (query: OperationsQuery) => {
   return api.GET("/tiruert/operations/", {
     params: {
-      query,
+      query: {
+        ...query,
+        order_by: [
+          PathsApiTiruertOperationsGetParametersQueryOrder_by.ValueMinuscreated_at,
+        ],
+      },
     },
   })
 }

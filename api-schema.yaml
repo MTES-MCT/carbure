@@ -4954,7 +4954,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -4963,7 +4962,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5023,6 +5021,22 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
@@ -5499,7 +5513,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5508,7 +5521,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5573,6 +5585,22 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
@@ -5685,7 +5713,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5694,7 +5721,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5758,6 +5784,22 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - in: query
           name: period
           schema:
@@ -5869,7 +5911,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5878,7 +5919,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5948,6 +5988,22 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - in: query
           name: period
           schema:
@@ -6126,7 +6182,7 @@ paths:
   /api/tiruert/operations/teneur/declare/:
     post:
       operationId: declare_teneur
-      description: Set teneur operations to ACCEPTED
+      description: Set teneur operations to DECLARED
       parameters:
         - in: query
           name: entity_id
@@ -8534,7 +8590,6 @@ components:
         - TALLOL
         - OTHER
         - EP2AM
-        - AM
       type: string
       description: |-
         * `CONV` - Conventionnel
@@ -8543,7 +8598,6 @@ components:
         * `TALLOL` - Tallol
         * `OTHER` - Autre
         * `EP2AM` - EP2AM
-        * `AM` - AM
     MainObjective:
       type: object
       properties:

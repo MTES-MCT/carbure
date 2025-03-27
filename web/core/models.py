@@ -291,7 +291,6 @@ class MatierePremiere(models.Model):
     TALLOL = "TALLOL"  # Tall
     OTHER = "OTHER"
     EP2AM = "EP2AM"  # EP2 résiduel
-    AM = "AM"  # AM résiduel
 
     MP_CATEGORIES = (
         (CONV, "Conventionnel"),
@@ -300,7 +299,6 @@ class MatierePremiere(models.Model):
         (TALLOL, "Tallol"),
         (OTHER, "Autre"),
         (EP2AM, "EP2AM"),
-        (AM, "AM"),
     )
 
     name = models.CharField(max_length=128)
