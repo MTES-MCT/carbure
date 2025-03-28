@@ -14,14 +14,16 @@ with open(filename) as csvfile:
     reader = csv.reader(csvfile, quotechar='"')
 
     for row in reader:
-        name = row[0]
-        if name == "name":
+        id = row[0]
+        if id == "id":
             # header
             continue
-        pci_litre = row[1]
+        name = row[1]
+        pci_litre = row[2]
         obj, created = FossilFuelCategory.objects.update_or_create(
-            name=name,
+            id=id,
             defaults={
+                "name": name,
                 "pci_litre": pci_litre,
             },
         )
