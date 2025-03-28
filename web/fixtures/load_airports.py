@@ -22,6 +22,8 @@ with open(filename) as csvfile:
         icao = row[1]
         name = row[2]
         city = row[3]
+        coordinates = f"{row[4]},{row[5]}"
+        is_eu_airport = row[6]
         obj, created = Airport.objects.update_or_create(
             icao_code=icao,
             defaults={
@@ -29,5 +31,7 @@ with open(filename) as csvfile:
                 "city": city,
                 "country": country,
                 "site_type": "AIRPORT",
+                "is_ue_airport": is_eu_airport,
+                "gps_coordinates": coordinates,
             },
         )
