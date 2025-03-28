@@ -104,14 +104,14 @@ class ObjectiveViewSet(GenericViewSet):
         )
 
         # 3. Calculate the objectives per category and sector
-        objective_per_category = ObjectiveService.calculate_objective(
+        objective_per_category = ObjectiveService.calculate_objectives_and_penalties(
             balance_per_category,
             objectives,
             energy_basis,
             Objective.BIOFUEL_CATEGORY,
         )
 
-        objective_per_sector = ObjectiveService.calculate_objective(
+        objective_per_sector = ObjectiveService.calculate_objectives_and_penalties(
             balance_per_sector,
             objectives,
             energy_basis,
@@ -119,7 +119,9 @@ class ObjectiveViewSet(GenericViewSet):
         )
 
         # 4. Calculate the global objective
-        global_objective_target = ObjectiveService.calculate_global_objective(objectives, energy_basis)
+        global_objective_target, global_objective_penalty = ObjectiveService.get_global_objective_and_penalty(
+            objectives, energy_basis
+        )
 
         available_balance_sum = sum([sector["available_balance"] for sector in objective_per_sector])
         pending_teneur_sum = sum([sector["pending_teneur"] for sector in objective_per_sector])
@@ -132,6 +134,14 @@ class ObjectiveViewSet(GenericViewSet):
             "declared_teneur": ObjectiveService.apply_ghg_conversion(declared_teneur_sum),
             "unit": "tCO2",
         }
+        penalty = ObjectiveService._calcule_penalty(
+            global_objective_penalty,
+            global_objective["pending_teneur"] + global_objective["declared_teneur"],
+            global_objective["target"],
+            tCO2=True,
+        )
+
+        global_objective["penalty"] = penalty
 
         # 5. Return the results
         result = {
