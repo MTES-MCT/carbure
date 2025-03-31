@@ -1,32 +1,11 @@
 import { EntityPreview } from "common/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
-import { SafFilter, SafOperatorQuery, SafQuery } from "../../types"
+import { SafFilter, SafOperatorQuery } from "../../types"
 import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
 import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
-
-export function getOperatorYears(entity_id: number) {
-  return apiFetch.GET("/saf/years/", {
-    params: {
-      query: {
-        entity_id,
-      },
-    },
-  })
-}
-
-export function getOperatorSnapshot(entity_id: number, year: number) {
-  return apiFetch.GET("/saf/snapshot/", {
-    params: {
-      query: {
-        entity_id,
-        year,
-      },
-    },
-  })
-}
 
 export function getTicketSourceFilters(
   field: SafFilter,
@@ -67,47 +46,6 @@ export function getOperatorTicketSourceDetails(
     params: {
       path: {
         id: ticket_source_id,
-      },
-      query: {
-        entity_id,
-      },
-    },
-  })
-}
-
-export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
-  return apiFetch
-    .GET("/saf/tickets/filters/", {
-      params: {
-        query: {
-          filter: field,
-          ...query,
-          ...CBQUERY_RESET,
-        },
-      },
-    })
-    .then((res) => res.data ?? [])
-}
-
-export function getOperatorTickets(query: SafQuery) {
-  return apiFetch.GET("/saf/tickets/", {
-    params: {
-      query,
-    },
-  })
-}
-
-export function downloadOperatorTickets(query: SafQuery) {
-  return downloadFetch("/saf/tickets/export/", {
-    ...query,
-  })
-}
-
-export function getOperatorTicketDetails(entity_id: number, ticket_id: number) {
-  return apiFetch.GET(`/saf/tickets/{id}/`, {
-    params: {
-      path: {
-        id: ticket_id,
       },
       query: {
         entity_id,
@@ -192,26 +130,6 @@ export function cancelSafTicket(entity_id: number, ticket_id: number) {
       query: {
         entity_id,
       },
-    },
-  })
-}
-
-export function rejectSafOperatorTicket(
-  entity_id: number,
-  ticket_id: number,
-  comment: string
-) {
-  return apiFetch.POST("/saf/tickets/{id}/reject/", {
-    params: {
-      path: {
-        id: ticket_id,
-      },
-      query: {
-        entity_id,
-      },
-    },
-    body: {
-      comment,
     },
   })
 }
