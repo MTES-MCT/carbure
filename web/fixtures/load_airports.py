@@ -33,5 +33,6 @@ with open(filename) as csvfile:
                 "site_type": "AIRPORT",
                 "is_ue_airport": is_eu_airport,
                 "gps_coordinates": coordinates,
+                "is_enabled": True if is_eu_airport == "1" else False,
             },
         )
