@@ -61,10 +61,7 @@ const DeclareTeneurDialogContent = ({
 
   const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
     // Add quantity declared only if the "declare quantity" button has been clicked
-    const quantity =
-      form.value.avoided_emissions_min && form.value.quantity
-        ? form.value.quantity
-        : 0
+    const quantity = form.value.quantity ?? 0
 
     const remainingEnergy = objective.target
       ? computeObjectiveEnergy(objective) -
@@ -74,7 +71,7 @@ const DeclareTeneurDialogContent = ({
     return formatEnergy(remainingEnergy, {
       unit: ExtendedUnit.GJ,
     })
-  }, [form.value.quantity, form.value.avoided_emissions_min, objective])
+  }, [form.value.quantity, objective])
 
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
@@ -129,16 +126,20 @@ const DeclareTeneurDialogContent = ({
                   }
                 />
 
-                {targetType === TargetType.CAP && objective.target && (
+                {targetType === TargetType.CAP && objective.target ? (
                   <RecapData.RemainingQuantityBeforeLimit
                     value={remainingEnergyBeforeLimitOrObjective}
+                    bold
+                    size="md"
                   />
-                )}
-                {targetType === TargetType.REACH && objective.target && (
+                ) : null}
+                {targetType === TargetType.REACH && objective.target ? (
                   <RecapData.RemainingQuantityBeforeObjective
                     value={remainingEnergyBeforeLimitOrObjective}
+                    bold
+                    size="md"
                   />
-                )}
+                ) : null}
               </Box>
             )}
 

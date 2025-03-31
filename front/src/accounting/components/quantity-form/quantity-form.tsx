@@ -61,8 +61,15 @@ export const QuantityForm = ({
   const declareQuantity = () => {
     mutation.execute().then((response) => {
       const emissions = response.data
-      setField("avoided_emissions_min", emissions?.min_avoided_emissions)
-      setField("avoided_emissions_max", emissions?.max_avoided_emissions)
+      const emissionsMin = emissions?.min_avoided_emissions
+        ? Math.trunc(emissions.min_avoided_emissions)
+        : 0
+      const emissionsMax = emissions?.max_avoided_emissions
+        ? Math.trunc(emissions?.max_avoided_emissions)
+        : 0
+
+      setField("avoided_emissions_min", emissionsMin)
+      setField("avoided_emissions_max", emissionsMax)
       setQuantityDeclared(true)
     })
   }
