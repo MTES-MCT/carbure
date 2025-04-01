@@ -188,6 +188,7 @@ export const OperationDetail = () => {
                     iconId="fr-icon-check-line"
                     nativeButtonProps={{ form: "patch-operation" }}
                     loading={acceptOperationLoading || patchOperationLoading}
+                    type="submit"
                   >
                     {t("Accepter")}
                   </Button>

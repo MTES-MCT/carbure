@@ -63,6 +63,7 @@ class ElecChargePointSampleSerializer(serializers.ModelSerializer):
             "mid_id",
             "measure_reference_point_id",
             "is_article_2",
+            "nominal_power",
         ]
 
 
