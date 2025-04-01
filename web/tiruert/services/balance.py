@@ -40,6 +40,14 @@ class BalanceService:
         return getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
 
     @staticmethod
+    def _define_conversion_factor(unit):
+        """
+        Determines the conversion factor based on the unit
+        """
+        conversion_factors = {"mj": "pci_litre", "kg": "masse_volumique"}
+        return conversion_factors.get(unit)
+
+    @staticmethod
     def _init_balance_entry(unit, operation=None, group_by=None):
         """
         Initializes a balance entry with default values
@@ -125,12 +133,59 @@ class BalanceService:
             if operation.status == Operation.PENDING:
                 balance[key]["pending_operations"] += 1
 
+        if group_by == BalanceService.GROUP_BY_DEPOT:
+            teneurs_per_depots = BalanceService._get_teneur_per_depot(entity_id)
+            for key, volume in teneurs_per_depots.items():
+                balance[key]["quantity"]["debit"] += volume
+
         return balance
 
     @staticmethod
-    def _define_conversion_factor(unit):
+    def _get_teneur_per_depot(entity_id):
         """
-        Determines the conversion factor based on the unit
+        Returns a dictionary with the total volume of teneur operations per depot
         """
-        conversion_factors = {"mj": "pci_litre", "kg": "masse_volumique"}
-        return conversion_factors.get(unit)
+        teneurs = Operation.objects.filter(
+            debited_entity=entity_id,
+            type=Operation.TENEUR,
+            status__in=[Operation.PENDING, Operation.DECLARED],
+        ).prefetch_related("details__lot")
+
+        lot_ids = []
+        for teneur in teneurs:
+            for detail in teneur.details.all():
+                lot_ids.append(detail.lot.id)
+
+        credited_operations = {}
+        operations_with_lots = (
+            Operation.objects.filter(
+                credited_entity=entity_id,
+                details__lot_id__in=lot_ids,
+                status__in=[Operation.VALIDATED, Operation.ACCEPTED, Operation.CORRECTED],
+            )
+            .prefetch_related("details__lot")
+            .order_by("details__lot_id", "-created_at")
+        )
+
+        for operation in operations_with_lots:
+            for detail in operation.details.all():
+                if detail.lot_id in lot_ids:
+                    if detail.lot_id not in credited_operations:
+                        credited_operations[detail.lot_id] = {
+                            "operation": operation,
+                            "depot": operation.to_depot,
+                        }
+
+        teneur_per_depot = {}
+        for teneur in teneurs:
+            for detail in teneur.details.all():
+                if detail.lot_id in credited_operations:
+                    depot_key = credited_operations[detail.lot_id]["depot"]
+                    key = (teneur.sector, teneur.customs_category, teneur.biofuel.code, depot_key)
+
+                    if key not in teneur_per_depot:
+                        teneur_per_depot[key] = 0
+
+                    teneur_per_depot[key] += detail.volume
+
+        return teneur_per_depot
