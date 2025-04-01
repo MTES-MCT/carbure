@@ -35,6 +35,7 @@ export const UnconstrainedCategoriesProgress = ({
                 <RecapData.TeneurDeclared
                   value={formatEnergy(category.teneur_declared, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -42,6 +43,7 @@ export const UnconstrainedCategoriesProgress = ({
                 <RecapData.TeneurDeclaredMonth
                   value={formatEnergy(category.teneur_declared_month, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -49,6 +51,7 @@ export const UnconstrainedCategoriesProgress = ({
                 <RecapData.QuantityAvailable
                   value={formatEnergy(category.quantity_available, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>

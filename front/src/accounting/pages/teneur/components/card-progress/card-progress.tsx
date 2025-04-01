@@ -11,8 +11,8 @@ import { ArrowRightLine } from "common/components/icon"
 export type CardProgressProps = {
   title?: string
 
-  mainValue?: number
-  mainText?: string
+  mainValue?: ReactNode
+  mainText?: ReactNode
   description?: string
   children?: ReactNode
 
@@ -61,10 +61,10 @@ export const CardProgress = ({
           {badge}
         </div>
         <div>
-          {mainValue ? (
+          {mainValue !== undefined ? (
             <Title is="p" as="h1">
               {mainValue}
-              {mainText ? (
+              {mainText !== undefined ? (
                 <Title is="span" as="h5">
                   {" "}
                   {mainText}

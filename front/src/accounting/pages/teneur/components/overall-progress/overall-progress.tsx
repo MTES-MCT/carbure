@@ -3,7 +3,7 @@ import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { useTranslation } from "react-i18next"
 import { RecapData } from "../recap-data"
-import { formatNumber } from "common/utils/formatters"
+import { ceilNumber, formatNumber } from "common/utils/formatters"
 
 type OverallProgressProps = {
   objective?: BaseObjective
@@ -27,14 +27,17 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             "Objectif en tC02 évitées en {{date}}: {{objective}} tC02 évitées",
             {
               date: "2025",
-              objective: formatNumber(objective.target),
+              objective: formatNumber(objective.target, {
+                fractionDigits: 0,
+                mode: "ceil",
+              }),
             }
           )}
-          mainValue={objective.teneur_declared}
+          mainValue={ceilNumber(objective.teneur_declared, 0)}
           mainText={t("tCO2 évitées")}
-          baseQuantity={objective.teneur_declared}
-          targetQuantity={objective.target}
-          declaredQuantity={objective.teneur_declared_month}
+          baseQuantity={ceilNumber(objective.teneur_declared, 0)}
+          targetQuantity={ceilNumber(objective.target, 0)}
+          declaredQuantity={ceilNumber(objective.teneur_declared_month, 0)}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}
@@ -48,14 +51,19 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             <li>
               <RecapData.TeneurDeclaredMonth
                 value={t("{{value}} tCO2 évitées", {
-                  value: formatNumber(objective.teneur_declared_month),
+                  value: formatNumber(objective.teneur_declared_month, {
+                    fractionDigits: 0,
+                    mode: "ceil",
+                  }),
                 })}
               />
             </li>
             <li>
               <RecapData.QuantityAvailable
                 value={t("{{value}} tCO2 évitées", {
-                  value: formatNumber(objective.quantity_available),
+                  value: formatNumber(objective.quantity_available, {
+                    fractionDigits: 0,
+                  }),
                 })}
               />
             </li>

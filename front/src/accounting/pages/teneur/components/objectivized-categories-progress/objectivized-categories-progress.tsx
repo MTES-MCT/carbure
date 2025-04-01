@@ -6,6 +6,7 @@ import { CategoryObjective, TargetType } from "../../types"
 import { CardGrid } from "../card-grid"
 import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
+import { ceilNumber } from "common/utils/formatters"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -31,9 +32,9 @@ export const ObjectivizedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={category.code}
-            baseQuantity={category.teneur_declared}
-            targetQuantity={category.target}
-            declaredQuantity={category.teneur_declared_month}
+            baseQuantity={ceilNumber(category.teneur_declared)}
+            targetQuantity={ceilNumber(category.target)}
+            declaredQuantity={ceilNumber(category.teneur_declared_month)}
             badge={
               <CardProgress.DefaultBadge
                 targetQuantity={category.target}
@@ -49,6 +50,7 @@ export const ObjectivizedCategoriesProgress = ({
                 <RecapData.TeneurDeclaredMonth
                   value={formatEnergy(category.teneur_declared_month, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -56,6 +58,7 @@ export const ObjectivizedCategoriesProgress = ({
                 <RecapData.RemainingQuantityBeforeObjective
                   value={formatEnergy(computeObjectiveEnergy(category), {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -63,6 +66,7 @@ export const ObjectivizedCategoriesProgress = ({
                 <RecapData.QuantityAvailable
                   value={formatEnergy(category.quantity_available, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>

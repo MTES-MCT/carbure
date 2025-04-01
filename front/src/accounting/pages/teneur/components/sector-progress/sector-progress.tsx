@@ -7,7 +7,7 @@ import { SectorObjective } from "../../types"
 import { CardGrid } from "../card-grid"
 import { formatEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { formatNumber } from "common/utils/formatters"
+import { CONVERSIONS, floorNumber } from "common/utils/formatters"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -28,13 +28,19 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             title={t(formatSector(sector.code))}
             description={t("Objectif en GJ en {{date}}: {{objective}}", {
               date: "2025",
-              objective: formatNumber(sector.target),
+              objective: formatEnergy(sector.target, {
+                unit: ExtendedUnit.GJ,
+                fractionDigits: 0,
+              }),
             })}
-            mainValue={sector.teneur_declared}
+            mainValue={floorNumber(
+              CONVERSIONS.energy.MJ_TO_GJ(sector.teneur_declared),
+              0
+            )}
             mainText={t("GJ")}
-            baseQuantity={sector.teneur_declared}
-            targetQuantity={sector.target}
-            declaredQuantity={sector.teneur_declared_month}
+            baseQuantity={floorNumber(sector.teneur_declared, 0)}
+            targetQuantity={floorNumber(sector.target, 0)}
+            declaredQuantity={floorNumber(sector.teneur_declared_month, 0)}
             badge={
               <CardProgress.DefaultBadge
                 targetQuantity={sector.target}
@@ -49,6 +55,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 <RecapData.TeneurDeclaredMonth
                   value={formatEnergy(sector.teneur_declared_month, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -56,6 +63,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 <RecapData.QuantityAvailable
                   value={formatEnergy(sector.quantity_available, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
