@@ -7,11 +7,7 @@ export const findEligibleTiruertEntities = (
 ) => {
   return findEntities(query, {
     is_enabled: true,
+    entity_type: [EntityType.Operator],
     is_tiruert_liable: true,
-    entity_type: [
-      EntityType.Producer,
-      EntityType.Operator,
-      EntityType.PowerOrHeatProducer,
-    ],
   }).then((response) => response.filter((entity) => entity.id !== entity_id))
 }
