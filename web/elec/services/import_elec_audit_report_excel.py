@@ -1,10 +1,11 @@
+import numpy as np
 import pandas as pd
 from django import forms
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from core.utils import Validator, is_true
+from core.utils import Validator, is_bool_or_none
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_charge_point import ElecChargePoint
 
@@ -37,11 +38,23 @@ class ExcelElecAuditReport:
             inplace=True,
         )
         meter_readings_data = meter_readings_data.drop_duplicates("charge_point_id")
-        meter_readings_data.dropna(inplace=True, how="all")
-        meter_readings_data.fillna("", inplace=True)
 
-        meter_readings_data["is_auditable"] = is_true(meter_readings_data, "is_auditable")
-        meter_readings_data["has_dedicated_pdl"] = is_true(meter_readings_data, "has_dedicated_pdl")
+        required_columns = [
+            "observed_mid_or_prm_id",
+            "is_auditable",
+            "has_dedicated_pdl",
+            "current_type",
+            "audit_date",
+            "observed_energy_reading",
+        ]
+        mask = meter_readings_data[required_columns].notna().any(axis=1)
+        meter_readings_data = meter_readings_data[mask]
+
+        meter_readings_data.dropna(inplace=True, how="all")
+        meter_readings_data = meter_readings_data.replace({np.nan: None})
+
+        meter_readings_data["is_auditable"] = is_bool_or_none(meter_readings_data["is_auditable"])
+        meter_readings_data["has_dedicated_pdl"] = is_bool_or_none(meter_readings_data["has_dedicated_pdl"])
 
         return meter_readings_data.to_dict(orient="records")
 
@@ -71,7 +84,7 @@ class ExcelElecAuditReportValidator(Validator):
 
         observed_energy_reading = report.get("observed_energy_reading")
         if not observed_energy_reading:
-            report["observed_energy_reading"] = 0
+            report["observed_energy_reading"] = None
 
         return report
 
@@ -88,12 +101,12 @@ class ExcelElecAuditReportValidator(Validator):
             )
 
         # Check if at least one audit field is filled
-        has_audit_data = any(
+        has_audit_data = all(
             [
                 audited_charge_point.get("observed_mid_or_prm_id"),
                 audited_charge_point.get("current_type"),
-                audited_charge_point.get("audit_date"),
-                audited_charge_point.get("observed_energy_reading") != 0,
+                audited_charge_point.get("audit_date") is not None,
+                audited_charge_point.get("observed_energy_reading") is not None,
                 audited_charge_point.get("is_auditable") is not None,
                 audited_charge_point.get("has_dedicated_pdl") is not None,
             ]
@@ -102,7 +115,7 @@ class ExcelElecAuditReportValidator(Validator):
         if not has_audit_data:
             self.add_error(
                 "charge_point_id",
-                _("Le point de charge {charge_point_id} n'a aucune donnée d'audit renseignée.").format(
+                _("Les informations relatives au point de charge {charge_point_id} sont incomplètes ou absentes.").format(
                     charge_point_id=charge_point_id
                 ),
             )

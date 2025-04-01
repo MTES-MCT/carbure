@@ -47,6 +47,8 @@ def accept_report(request: HttpRequest, entity: Entity):
     audited_charge_points = audit_sample.audited_charge_points.select_related("charge_point").all()
     charge_point_reports, errors = import_elec_audit_report_excel(excel_file, audited_charge_points)
 
+    all_charge_points_audited = False
+
     if len(errors) == 0:
         reports_by_charge_point_id = {report["charge_point_id"]: report for report in charge_point_reports}
 
@@ -59,34 +61,9 @@ def accept_report(request: HttpRequest, entity: Entity):
                 setattr(charge_point_audit, key, report[key])
             updated_audited_charge_point.append(charge_point_audit)
 
-        all_charge_points_audited = True
-
-        for charge_point_audit in updated_audited_charge_point:
-            is_audited = (
-                charge_point_audit.observed_mid_or_prm_id
-                or charge_point_audit.has_dedicated_pdl is not None
-                or charge_point_audit.observed_energy_reading
-                or charge_point_audit.current_type in ["CA", "CC"]
-                or charge_point_audit.audit_date
-                or charge_point_audit.observed_energy_reading is not None
-            )
-
-            if not is_audited:
-                all_charge_points_audited = False
-
         with transaction.atomic():
-            if all_charge_points_audited:
-                audit_sample.auditor = entity
-                audit_sample.status = ElecAuditSample.AUDITED
-                audit_sample.save()
-
-                if audit_sample.charge_point_application:
-                    audit_sample.charge_point_application.status = ElecChargePointApplication.AUDIT_DONE
-                    audit_sample.charge_point_application.save()
-
-                if audit_sample.meter_reading_application:
-                    audit_sample.meter_reading_application.status = ElecMeterReadingApplication.AUDIT_DONE
-                    audit_sample.meter_reading_application.save()
+            audit_sample.auditor = entity
+            audit_sample.save()
 
             ElecAuditChargePoint.objects.bulk_update(
                 updated_audited_charge_point,
@@ -100,6 +77,19 @@ def accept_report(request: HttpRequest, entity: Entity):
                     "comment",
                 ],
             )
+
+            all_charge_points_audited = audit_sample.audited_charge_points.filter(audit_date=None).count() == 0
+            if all_charge_points_audited:
+                audit_sample.status = ElecAuditSample.AUDITED
+                audit_sample.save()
+
+                if audit_sample.charge_point_application:
+                    audit_sample.charge_point_application.status = ElecChargePointApplication.AUDIT_DONE
+                    audit_sample.charge_point_application.save()
+
+                if audit_sample.meter_reading_application:
+                    audit_sample.meter_reading_application.status = ElecMeterReadingApplication.AUDIT_DONE
+                    audit_sample.meter_reading_application.save()
 
     data = {}
     data["file_name"] = excel_file.name
