@@ -195,8 +195,8 @@ class TeneurService:
         return min_emissions_rate, max_emissions_rate
 
     @staticmethod
-    def prepare_data_and_optimize(entity_id, data, unit):
-        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(entity_id, data, unit)
+    def prepare_data_and_optimize(data, unit):
+        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data, unit)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
@@ -221,7 +221,6 @@ class TeneurService:
         Return avoided emissions (tCO2)
         """
         volumes, emissions, _, _, target_volume = TeneurService.prepare_data(
-            entity_id,
             data,
             unit,
         )  # volumes in L, emissions in gCO2/MJ
@@ -241,7 +240,7 @@ class TeneurService:
         return min_avoided_emissions, max_avoided_emissions
 
     @staticmethod
-    def prepare_data(entity_id, data, unit):
+    def prepare_data(data, unit):
         """
         Prepare data for optimization and operation creation
         """
@@ -259,7 +258,7 @@ class TeneurService:
             operations = operations.filter(to_depot=data["from_depot"])
 
         # Calculate balance of debited entity, for each lot, always in liters
-        balance = BalanceService.calculate_balance(operations, entity_id, "lot", "l")
+        balance = BalanceService.calculate_balance(operations, data["debited_entity"].id, "lot", "l")
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
         # For each we have something like:

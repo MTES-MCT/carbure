@@ -17,15 +17,15 @@ class OperationServiceErrors:
 class OperationService:
     @staticmethod
     def perform_checks_before_create(request, entity_id, selected_lots, data, unit):
-        OperationService.check_volumes(entity_id, selected_lots, data, unit)
+        OperationService.check_volumes(selected_lots, data, unit)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
 
     @staticmethod
-    def check_volumes(entity_id, selected_lots, data, unit):
+    def check_volumes(selected_lots, data, unit):
         """
         Check if the selected lots exist and have enough volume to perform the operation
         """
-        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(entity_id, data, unit)
+        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
 
         available_volumes = dict(zip(map(int, np_lot_ids), map(float, np_volumes)))
         requested_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}
