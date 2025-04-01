@@ -8615,9 +8615,12 @@ components:
           format: double
         unit:
           type: string
+        penalty:
+          type: integer
       required:
         - available_balance
         - declared_teneur
+        - penalty
         - pending_teneur
         - target
         - unit
@@ -8659,7 +8662,10 @@ components:
           format: double
         target_type:
           type: string
+        penalty:
+          type: integer
       required:
+        - penalty
         - target_mj
         - target_type
     ObjectiveCategory:
@@ -10795,6 +10801,9 @@ components:
           items:
             $ref: "#/components/schemas/ExtAdminPagesEnum"
           readOnly: true
+        is_tiruert_liable:
+          type: boolean
+          readOnly: true
       required:
         - activity_description
         - default_certificate
@@ -10808,6 +10817,7 @@ components:
         - has_trading
         - id
         - is_enabled
+        - is_tiruert_liable
         - legal_name
         - name
         - preferred_unit

@@ -2698,6 +2698,7 @@ export interface components {
       /** Format: double */
       declared_teneur: number
       unit: string
+      penalty: number
     }
     NavStats: {
       total_pending_action_for_admin?: number
@@ -2717,6 +2718,7 @@ export interface components {
       /** Format: double */
       target_mj: number
       target_type: string
+      penalty: number
     }
     ObjectiveCategory: {
       code: components["schemas"]["MPCategoriesEnum"]
@@ -3577,6 +3579,7 @@ export interface components {
       readonly website: string
       readonly vat_number: string
       readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
+      readonly is_tiruert_liable: boolean
     }
     UserLoginRequest: {
       username: string

@@ -24,14 +24,15 @@ const MaterialAccounting = () => {
           <Route path="operations" element={<Operations />} />
           {canTransfer && <Route path="balances" element={<Balances />} />}
         </Route>
-
-        <Route element={<TeneurLayout />}>
-          <Route
-            path="teneur"
-            element={<Navigate replace to={`${currentYear}`} />}
-          />
-          <Route path="teneur/:year" element={<Teneur />} />
-        </Route>
+        {entity.is_tiruert_liable && (
+          <Route element={<TeneurLayout />}>
+            <Route
+              path="teneur"
+              element={<Navigate replace to={`${currentYear}`} />}
+            />
+            <Route path="teneur/:year" element={<Teneur />} />
+          </Route>
+        )}
         <Route path="*" element={<Navigate replace to="operations" />} />
       </Routes>
     </Main>

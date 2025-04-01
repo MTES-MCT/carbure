@@ -65,6 +65,7 @@ export function useEntityManager(
     has_saf: entity?.has_saf ?? false,
     has_elec: entity?.has_elec ?? false,
     ext_admin_pages: entity?.ext_admin_pages ?? [],
+    is_tiruert_liable: entity?.is_tiruert_liable ?? false,
     isBlank: entityID === -1,
     isAdmin: type === EntityType.Administration,
     isExternal: type === EntityType.ExternalAdmin,
