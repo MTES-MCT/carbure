@@ -17,8 +17,6 @@ import {
 } from "./biofuel-form"
 import { ExtendedUnit, Unit } from "common/types"
 import { CreateOperationType } from "accounting/types"
-import { Text } from "common/components/text"
-import { ProgressBar } from "../progress-bar"
 import { RecapData } from "../recap-data"
 import {
   RecapOperation,
@@ -26,6 +24,7 @@ import {
 } from "accounting/components/recap-operation"
 import {
   CategoryObjective,
+  SectorObjective,
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
@@ -34,10 +33,13 @@ import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
 import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
+import { DeclareTeneurProgressBar } from "./declare-teneur-progress-bar"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | UnconstrainedCategoryObjective
+  // Only used for unconstrained categories
+  sectorObjectives: SectorObjective[]
   targetType?: TargetType
 }
 
@@ -50,6 +52,7 @@ const DeclareTeneurDialogContent = ({
   form,
   objective,
   targetType,
+  sectorObjectives,
 }: DeclareTeneurDialogContentProps) => {
   const { t } = useTranslation()
   const { currentStep, currentStepIndex } = useStepper()
@@ -98,6 +101,14 @@ const DeclareTeneurDialogContent = ({
       : 0,
     0
   )
+  // Get the current sector objective when the biofuel is selected
+  const currentSectorObjective = useMemo(() => {
+    if (!form.value.balance?.sector) return undefined
+
+    return sectorObjectives.find(
+      (sectorObjective) => sectorObjective.code === form.value.balance!.sector
+    )
+  }, [sectorObjectives, form.value.balance])
 
   return (
     <Dialog
@@ -126,43 +137,46 @@ const DeclareTeneurDialogContent = ({
         <Stepper />
         {currentStep?.key !== biofuelFormStepKey && (
           <>
-            {targetType && objective.target && (
-              <Box gap="xs">
-                <Text>{t("Rappel de votre progression")}</Text>
-
-                <ProgressBar
-                  baseQuantity={formatNumber(
-                    CONVERSIONS.energy.MJ_TO_GJ(objective.teneur_declared),
-                    0
-                  )}
-                  targetQuantity={formatNumber(
-                    CONVERSIONS.energy.MJ_TO_GJ(objective.target),
-                    0
-                  )}
-                  declaredQuantity={formatNumber(
-                    CONVERSIONS.energy.MJ_TO_GJ(
-                      objective.teneur_declared_month
-                    ) + (form.value.quantity ?? 0),
-                    0
-                  )}
+            <Box gap="xs">
+              {targetType && objective.target && (
+                <>
+                  <DeclareTeneurProgressBar
+                    teneurDeclared={objective.teneur_declared}
+                    teneurDeclaredMonth={objective.teneur_declared_month}
+                    target={objective.target}
+                    quantity={form.value.quantity ?? 0}
+                    targetType={targetType}
+                  />
+                  {targetType === TargetType.CAP && objective.target ? (
+                    <RecapData.RemainingQuantityBeforeLimit
+                      value={remainingEnergyBeforeLimitOrObjective}
+                      bold
+                      size="md"
+                    />
+                  ) : null}
+                  {targetType === TargetType.REACH && objective.target ? (
+                    <RecapData.RemainingQuantityBeforeObjective
+                      value={remainingEnergyBeforeLimitOrObjective}
+                      bold
+                      size="md"
+                    />
+                  ) : null}
+                </>
+              )}
+              {/* Setup progress bar related to the sector objective for unconstrained categories */}
+              {!targetType ? (
+                <DeclareTeneurProgressBar
+                  teneurDeclared={currentSectorObjective?.teneur_declared ?? 0}
+                  teneurDeclaredMonth={
+                    currentSectorObjective?.teneur_declared_month ?? 0
+                  }
+                  target={currentSectorObjective?.target ?? 0}
+                  quantity={form.value.quantity ?? 0}
+                  sector={currentSectorObjective?.code}
+                  targetType={targetType}
                 />
-
-                {targetType === TargetType.CAP && objective.target ? (
-                  <RecapData.RemainingQuantityBeforeLimit
-                    value={remainingEnergyBeforeLimitOrObjective}
-                    bold
-                    size="md"
-                  />
-                ) : null}
-                {targetType === TargetType.REACH && objective.target ? (
-                  <RecapData.RemainingQuantityBeforeObjective
-                    value={remainingEnergyBeforeLimitOrObjective}
-                    bold
-                    size="md"
-                  />
-                ) : null}
-              </Box>
-            )}
+              ) : null}
+            </Box>
 
             <Box>
               <RecapOperationGrid>

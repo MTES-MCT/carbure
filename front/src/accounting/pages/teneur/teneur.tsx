@@ -45,6 +45,7 @@ const Teneur = () => {
         onClose={close}
         objective={objective}
         targetType={targetType}
+        sectorObjectives={result?.sectors ?? []}
       />
     ))
   }
