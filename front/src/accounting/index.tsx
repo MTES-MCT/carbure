@@ -1,21 +1,24 @@
 import { Button } from "common/components/button2"
-import {
-  ArrowRightLine,
-  DraftFill,
-  SendPlaneLine,
-} from "common/components/icon"
+import { DraftFill, SendPlaneLine } from "common/components/icon"
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRoutes } from "common/hooks/routes"
 import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-import { Operations } from "./operations"
-import { Balance } from "./balance"
+import { Operations } from "./pages/operations"
+import { Balances } from "./pages/balances"
 import { useState } from "react"
-export const MaterialAccounting = () => {
+import { compact } from "common/utils/collection"
+import useEntity from "common/hooks/entity"
+import { UserRole } from "common/types"
+
+const MaterialAccounting = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const [operationCount, setOperationCount] = useState(0)
+  const entity = useEntity()
+  const canTransfer =
+    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   return (
     <Main>
@@ -23,11 +26,11 @@ export const MaterialAccounting = () => {
         <Trans>Clôturer ma comptabilité mensuelle</Trans>
       </Button>
       <Tabs
-        tabs={[
-          {
-            key: "balance",
+        tabs={compact([
+          canTransfer && {
+            key: "balances",
             label: t("Soldes"),
-            path: routes.MATERIAL_ACCOUNTING.BALANCE,
+            path: routes.MATERIAL_ACCOUNTING.BALANCES,
             icon: DraftFill,
           },
           {
@@ -36,13 +39,7 @@ export const MaterialAccounting = () => {
             path: routes.MATERIAL_ACCOUNTING.OPERATIONS,
             icon: SendPlaneLine,
           },
-          {
-            key: "teneur",
-            label: t("Teneur"),
-            path: "##",
-            icon: ArrowRightLine,
-          },
-        ]}
+        ])}
       />
       <Content>
         <Routes>
@@ -50,10 +47,12 @@ export const MaterialAccounting = () => {
             path="operations"
             element={<Operations setOperationCount={setOperationCount} />}
           />
-          <Route path="balance" element={<Balance />} />
+          {canTransfer && <Route path="balances" element={<Balances />} />}
           <Route path="*" element={<Navigate replace to="operations" />} />
         </Routes>
       </Content>
     </Main>
   )
 }
+
+export default MaterialAccounting

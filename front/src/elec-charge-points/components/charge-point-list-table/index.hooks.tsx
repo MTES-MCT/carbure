@@ -13,6 +13,7 @@ export const useChargePointsColumns = () => {
     | "charge_point_id"
     | "station_id"
     | "current_type"
+    | "nominal_power"
     | "measure_energy"
     | "is_article_2",
     Column<ChargePoint>
@@ -40,6 +41,10 @@ export const useChargePointsColumns = () => {
     current_type: {
       header: t("CA/CC"),
       cell: (chargePoint) => <Cell text={chargePoint.current_type} />,
+    },
+    nominal_power: {
+      header: t("Puissance nominale"),
+      cell: (chargePoint) => <Cell text={chargePoint.nominal_power} />,
     },
     measure_energy: {
       header: t("Dernier index en kWh"),

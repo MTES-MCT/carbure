@@ -1,4 +1,3 @@
-import { PreferredUnitEnum } from "api-schema"
 import {
   Entity,
   EntityType,
@@ -13,8 +12,9 @@ import {
   Feedstock,
   ProductionSite,
   CategoryEnum,
+  Unit,
+  DeepPartial,
 } from "common/types"
-import { DeepPartial } from "common/types"
 import { mergeDeepRight } from "ramda"
 
 // COUNTRIES
@@ -45,7 +45,7 @@ export const company: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
-  preferred_unit: PreferredUnitEnum.l,
+  preferred_unit: Unit.l,
   is_enabled: true,
   sustainability_officer_email: "",
   vat_number: "",
