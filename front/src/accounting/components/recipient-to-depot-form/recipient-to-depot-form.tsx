@@ -26,7 +26,7 @@ export const RecipientToDepotForm = () => {
   return (
     <>
       <Autocomplete
-        label={t("Sélectionnez un redevable")}
+        label={t("Sélectionnez un destinataire")}
         getOptions={(query) => findEligibleTiruertEntities(entity.id, query)}
         normalize={normalizeEntityPreview}
         {...bind("credited_entity")}
@@ -58,7 +58,7 @@ export const RecipientToDepotSummary = ({
   return (
     <>
       <OperationText
-        title={t("Redevable")}
+        title={t("Destinataire")}
         description={values.credited_entity.name}
       />
       {values.to_depot && (

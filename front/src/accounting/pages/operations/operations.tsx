@@ -34,7 +34,7 @@ export const Operations = ({
     [OperationsFilter.period]: t("Date"),
     [OperationsFilter.type]: t("Débit / Crédit"),
     [OperationsFilter.operation]: t("Opération"),
-    [OperationsFilter.from_to]: t("Redevable"),
+    [OperationsFilter.from_to]: t("Destinataire"),
   }
 
   const [state, actions] = useCBQueryParamsStore<OperationsStatus[], undefined>(
