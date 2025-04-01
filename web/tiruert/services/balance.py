@@ -106,9 +106,11 @@ class BalanceService:
             if operation.is_credit(entity_id) and operation.status == Operation.PENDING:
                 continue
 
-            depot = operation.to_depot if operation.is_credit(entity_id) else operation.from_depot
-            if depot is None:
-                continue
+            depot = None
+            if group_by == BalanceService.GROUP_BY_DEPOT:
+                depot = operation.to_depot if operation.is_credit(entity_id) else operation.from_depot
+                if depot is None:
+                    continue
 
             conversion_factor = BalanceService._get_conversion_factor(operation, unit)
 
@@ -134,30 +136,28 @@ class BalanceService:
                 balance[key]["pending_operations"] += 1
 
         if group_by == BalanceService.GROUP_BY_DEPOT:
-            teneurs_per_depots = BalanceService._get_teneur_per_depot(entity_id)
-            for key, volume in teneurs_per_depots.items():
-                balance[key]["quantity"]["debit"] += volume
+            balance = BalanceService._update_depot_debit_with_teneur(entity_id, balance, operations)
 
         return balance
 
     @staticmethod
-    def _get_teneur_per_depot(entity_id):
+    def _update_depot_debit_with_teneur(entity_id, balance, operations):
         """
-        Returns a dictionary with the total volume of teneur operations per depot
+        Updates the balance by distributing teneur volumes across depots as debits
         """
-        teneurs = Operation.objects.filter(
-            debited_entity=entity_id,
+        # Fetch all teneur operations
+        teneurs = operations.filter(
             type=Operation.TENEUR,
-            status__in=[Operation.PENDING, Operation.DECLARED],
         ).prefetch_related("details__lot")
 
+        # Collect all lot_ids from the teneur operations
         lot_ids = []
         for teneur in teneurs:
             for detail in teneur.details.all():
                 lot_ids.append(detail.lot.id)
 
-        credited_operations = {}
-        operations_with_lots = (
+        # Group credited operations by lot_id
+        credit_operations_with_lots = (
             Operation.objects.filter(
                 credited_entity=entity_id,
                 details__lot_id__in=lot_ids,
@@ -167,25 +167,47 @@ class BalanceService:
             .order_by("details__lot_id", "-created_at")
         )
 
-        for operation in operations_with_lots:
+        # Create a mapping of lot_id to operations
+        credited_operations = {}
+        for operation in credit_operations_with_lots:
             for detail in operation.details.all():
                 if detail.lot_id in lot_ids:
                     if detail.lot_id not in credited_operations:
-                        credited_operations[detail.lot_id] = {
+                        credited_operations[detail.lot_id] = []
+                    credited_operations[detail.lot_id].append(
+                        {
                             "operation": operation,
                             "depot": operation.to_depot,
                         }
+                    )
 
-        teneur_per_depot = {}
+        # Process each teneur operation and distribute its volume across depots
         for teneur in teneurs:
             for detail in teneur.details.all():
+                remaining_volume = detail.volume  # Initialize volume to distribute between depots
+
                 if detail.lot_id in credited_operations:
-                    depot_key = credited_operations[detail.lot_id]["depot"]
-                    key = (teneur.sector, teneur.customs_category, teneur.biofuel.code, depot_key)
+                    operations = credited_operations[detail.lot_id]
 
-                    if key not in teneur_per_depot:
-                        teneur_per_depot[key] = 0
+                    # Try to distribute the teneur volume across all available depots
+                    for operation in operations:
+                        if remaining_volume <= 0:
+                            break
 
-                    teneur_per_depot[key] += detail.volume
+                        depot = operation["depot"]
+                        key = (teneur.sector, teneur.customs_category, teneur.biofuel.code, depot)
 
-        return teneur_per_depot
+                        # Calculate how much volume can be debited from this depot
+                        credit = balance[key]["quantity"]["credit"]
+                        current_debit = balance[key]["quantity"]["debit"]
+                        available_credit = max(0, credit - current_debit)
+
+                        # Determine the volume to debit from this depot
+                        volume_to_debit = min(remaining_volume, available_credit)
+
+                        if volume_to_debit > 0:
+                            # Update the debit amount
+                            balance[key]["quantity"]["debit"] += volume_to_debit
+                            remaining_volume -= volume_to_debit
+
+        return balance
