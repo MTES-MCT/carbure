@@ -15,7 +15,9 @@ const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
 
 // Format all values in the table to GJ
 const formatValue = (value: number) =>
-  formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 1)
+  formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), {
+    fractionDigits: 1,
+  })
 
 export const useValidatePendingTeneurDialog = () => {
   const { t } = useTranslation()

@@ -46,7 +46,8 @@ export const useBalancesColumns = () => {
     },
     {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
-      cell: (item) => formatNumber(item.available_balance, 0),
+      cell: (item) =>
+        formatNumber(item.available_balance, { fractionDigits: 0 }),
     },
     {
       header: t("Opérations en attente"),

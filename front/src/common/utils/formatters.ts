@@ -15,8 +15,21 @@ export function formatPeriodFromDate(date: Date) {
   return date.getFullYear() * 100 + date.getMonth() + 1
 }
 
-export function formatNumber(num: number, fractionDigits = 2) {
-  const integer = Math.floor(num).toFixed(0)
+export type FormatNumberOptions = {
+  fractionDigits?: number
+  mode?: "round" | "ceil" | "floor"
+}
+
+export function formatNumber(
+  num: number,
+  customOptions: FormatNumberOptions = {}
+) {
+  const defaultOptions: FormatNumberOptions = {
+    fractionDigits: 2,
+    mode: "floor",
+  }
+  const { fractionDigits, mode } = { ...defaultOptions, ...customOptions }
+  const integer = Math[mode ?? "floor"](num).toFixed(0)
   let decimal = num % 1
 
   // add space to separate thousands
@@ -37,6 +50,16 @@ export function roundNumber(num: number, fractionDigits = 2) {
   return Math.round(num * factor) / factor
 }
 
+export function ceilNumber(num: number, fractionDigits = 2) {
+  const factor = Math.pow(10, fractionDigits)
+  return Math.ceil(num * factor) / factor
+}
+
+export const floorNumber = (num: number, fractionDigits = 2) => {
+  const factor = Math.pow(10, fractionDigits)
+  return Math.floor(num * factor) / factor
+}
+
 export function formatPercentage(num: number) {
   return formatNumber(num) + "%"
 }
@@ -48,8 +71,12 @@ export function formatCelsiusDegree(num: number) {
 export function formatUnit(
   num: number,
   unit: Unit | ExtendedUnit,
-  fractionDigits = 2
+  customOptions: FormatNumberOptions = {}
 ) {
+  const defaultOptions: FormatNumberOptions = {
+    fractionDigits: 2,
+  }
+  const options = { ...defaultOptions, ...customOptions }
   const unitLabel = {
     [Unit.l]: i18next.t("litres", { count: num }),
     [Unit.kg]: i18next.t("kg"),
@@ -57,7 +84,7 @@ export function formatUnit(
     [ExtendedUnit.GJ]: i18next.t("GJ"),
   }
 
-  return `${formatNumber(num, fractionDigits)} ${unitLabel[unit]}`
+  return `${formatNumber(num, options)} ${unitLabel[unit]}`
 }
 
 export function formatUnitOnly(unit: Unit | ExtendedUnit, count = 2) {

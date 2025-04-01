@@ -7,6 +7,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge"
 import { CardGrid } from "../card-grid"
 import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
+import { floorNumber } from "common/utils/formatters"
 
 type CappedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -30,9 +31,9 @@ export const CappedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={category.code}
-            baseQuantity={category.teneur_declared}
-            targetQuantity={category.target}
-            declaredQuantity={category.teneur_declared_month}
+            baseQuantity={floorNumber(category.teneur_declared, 0)}
+            targetQuantity={floorNumber(category.target, 0)}
+            declaredQuantity={floorNumber(category.teneur_declared_month, 0)}
             badge={
               category.teneur_declared + category.teneur_declared_month >=
               category.target ? (
@@ -48,6 +49,7 @@ export const CappedCategoriesProgress = ({
                 <RecapData.TeneurDeclaredMonth
                   value={formatEnergy(category.teneur_declared_month, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -55,6 +57,7 @@ export const CappedCategoriesProgress = ({
                 <RecapData.RemainingQuantityBeforeLimit
                   value={formatEnergy(computeObjectiveEnergy(category), {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>
@@ -62,6 +65,7 @@ export const CappedCategoriesProgress = ({
                 <RecapData.QuantityAvailable
                   value={formatEnergy(category.quantity_available, {
                     unit: ExtendedUnit.GJ,
+                    fractionDigits: 0,
                   })}
                 />
               </li>

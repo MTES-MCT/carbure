@@ -1,6 +1,10 @@
 import useEntity from "common/hooks/entity"
 import { ExtendedUnit, Unit } from "common/types"
-import { formatUnit, formatUnitOnly } from "common/utils/formatters"
+import {
+  FormatNumberOptions,
+  formatUnit,
+  formatUnitOnly,
+} from "common/utils/formatters"
 
 /**
  * This hook formats a value according to the unit defined in the entity.
@@ -20,9 +24,9 @@ export const useUnit = (customUnit?: Unit | ExtendedUnit) => {
     formatUnit: (
       value: number,
       {
-        fractionDigits = 2,
         unit: unitParam,
-      }: { fractionDigits?: number; unit?: Unit | ExtendedUnit } = {}
-    ) => formatUnit(value, unitParam ?? unit, fractionDigits),
+        ...options
+      }: { unit?: Unit | ExtendedUnit } & FormatNumberOptions = {}
+    ) => formatUnit(value, unitParam ?? unit, options),
   }
 }

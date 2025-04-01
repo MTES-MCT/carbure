@@ -52,7 +52,9 @@ const Teneur = () => {
   const onValidatePendingTeneurClick = () => {
     portal((close) => <ValidatePendingTeneurDialog onClose={close} />)
   }
-
+  console.log({
+    result,
+  })
   return (
     <>
       <Notice noColor variant="info">

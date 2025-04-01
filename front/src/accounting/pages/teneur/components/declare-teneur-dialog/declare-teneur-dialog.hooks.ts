@@ -47,7 +47,9 @@ export const useDeclareTeneurDialog = ({
         t(
           "La mise en teneur d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatUnit(values.quantity!, ExtendedUnit.GJ, 0),
+            quantity: formatUnit(values.quantity!, ExtendedUnit.GJ, {
+              fractionDigits: 0,
+            }),
           }
         ),
         { variant: "success" }

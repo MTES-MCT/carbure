@@ -1,5 +1,9 @@
 import { ExtendedUnit, Unit } from "common/types"
-import { CONVERSIONS, formatUnit } from "common/utils/formatters"
+import {
+  CONVERSIONS,
+  FormatNumberOptions,
+  formatUnit,
+} from "common/utils/formatters"
 import { CategoryObjective } from "../types"
 
 // Calculate the amount of energy before reaching the objective or the limit
@@ -12,11 +16,13 @@ export const formatEnergy = (
   energy: number,
   {
     unit = Unit.MJ,
-    fractionDigits = 2,
-  }: { unit: Unit | ExtendedUnit; fractionDigits?: number }
+    ...options
+  }: {
+    unit: Unit | ExtendedUnit
+  } & FormatNumberOptions
 ) => {
   const convertedEnergy =
     unit === ExtendedUnit.GJ ? CONVERSIONS.energy.MJ_TO_GJ(energy) : energy
 
-  return formatUnit(convertedEnergy, unit, fractionDigits)
+  return formatUnit(convertedEnergy, unit, options)
 }

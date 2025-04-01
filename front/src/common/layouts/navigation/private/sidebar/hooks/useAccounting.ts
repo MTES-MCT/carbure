@@ -20,7 +20,7 @@ export const useAccounting = () => {
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
-  console.log("is ", is_tiruert_liable)
+
   const section: MenuSection = {
     title: t("Comptabilité"),
     condition:
