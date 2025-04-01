@@ -29,7 +29,7 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import { CONVERSIONS } from "common/utils/formatters"
+import { ceilNumber, CONVERSIONS, floorNumber } from "common/utils/formatters"
 import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
@@ -59,31 +59,45 @@ const DeclareTeneurDialogContent = ({
     values: form.value,
   })
 
+  const formatNumber =
+    targetType && targetType === TargetType.REACH ? ceilNumber : floorNumber
+
   const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
     // Add quantity declared only if the "declare quantity" button has been clicked
     const quantity = form.value.quantity ?? 0
 
-    const remainingEnergy = objective.target
-      ? computeObjectiveEnergy(objective) -
-        CONVERSIONS.energy.GJ_TO_MJ(quantity)
-      : 0
+    const remainingEnergy = Math.max(
+      0,
+      objective.target
+        ? computeObjectiveEnergy(objective) -
+            CONVERSIONS.energy.GJ_TO_MJ(quantity)
+        : 0
+    )
 
     return formatEnergy(remainingEnergy, {
       unit: ExtendedUnit.GJ,
+      fractionDigits: 0,
+      // If the target is a reach, we need to ceil the remaining energy
+      // Ex: if the remaining energy to declare is 145.88 GJ, we need to declare 146 GJ
+      // because the objective is to reach a certain quantity
+      mode: targetType === TargetType.REACH ? "ceil" : "floor",
     })
-  }, [form.value.quantity, objective])
+  }, [form.value.quantity, objective, targetType])
 
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
   // Otherwise, the maximum quantity is the available balance
-  const depotQuantityMax = form.value.balance
-    ? objective.target
-      ? Math.min(
-          CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance),
-          CONVERSIONS.energy.MJ_TO_GJ(computeObjectiveEnergy(objective))
-        )
-      : CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance)
-    : 0
+  const depotQuantityMax = formatNumber(
+    form.value.balance
+      ? objective.target
+        ? Math.min(
+            CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance),
+            CONVERSIONS.energy.MJ_TO_GJ(computeObjectiveEnergy(objective))
+          )
+        : CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance)
+      : 0,
+    0
+  )
 
   return (
     <Dialog
@@ -115,15 +129,22 @@ const DeclareTeneurDialogContent = ({
             {targetType && objective.target && (
               <Box gap="xs">
                 <Text>{t("Rappel de votre progression")}</Text>
+
                 <ProgressBar
-                  baseQuantity={objective.teneur_declared}
-                  targetQuantity={objective.target}
-                  declaredQuantity={
-                    objective.teneur_declared_month +
-                    (form.value.quantity
-                      ? CONVERSIONS.energy.GJ_TO_MJ(form.value.quantity)
-                      : 0)
-                  }
+                  baseQuantity={formatNumber(
+                    CONVERSIONS.energy.MJ_TO_GJ(objective.teneur_declared),
+                    0
+                  )}
+                  targetQuantity={formatNumber(
+                    CONVERSIONS.energy.MJ_TO_GJ(objective.target),
+                    0
+                  )}
+                  declaredQuantity={formatNumber(
+                    CONVERSIONS.energy.MJ_TO_GJ(
+                      objective.teneur_declared_month
+                    ) + (form.value.quantity ?? 0),
+                    0
+                  )}
                 />
 
                 {targetType === TargetType.CAP && objective.target ? (

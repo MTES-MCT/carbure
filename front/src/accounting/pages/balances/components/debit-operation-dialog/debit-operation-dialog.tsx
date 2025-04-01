@@ -64,7 +64,6 @@ export const DebitOperationDialog = ({
             options={[
               {
                 label: formatOperationType(OperationType.CESSION),
-                hintText: "Additional information",
                 value: OperationType.CESSION,
               },
               // {

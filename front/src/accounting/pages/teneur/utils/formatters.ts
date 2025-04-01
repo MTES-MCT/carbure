@@ -18,7 +18,7 @@ export const formatEnergy = (
     unit = Unit.MJ,
     ...options
   }: {
-    unit: Unit | ExtendedUnit
+    unit?: Unit | ExtendedUnit
   } & FormatNumberOptions
 ) => {
   const convertedEnergy =

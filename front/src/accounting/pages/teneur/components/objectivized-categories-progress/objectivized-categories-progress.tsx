@@ -59,6 +59,7 @@ export const ObjectivizedCategoriesProgress = ({
                   value={formatEnergy(computeObjectiveEnergy(category), {
                     unit: ExtendedUnit.GJ,
                     fractionDigits: 0,
+                    mode: "ceil",
                   })}
                 />
               </li>

@@ -9,3 +9,8 @@
 .operation-credit {
   color: var(--text-default-success);
 }
+
+.operation-table__sector {
+  color: var(--info-425-625);
+  padding: 0;
+}

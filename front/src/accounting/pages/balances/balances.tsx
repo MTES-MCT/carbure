@@ -57,7 +57,9 @@ const Balances = () => {
         <>
           <RecapQuantity
             text={t("Le solde affiché représente {{total}}", {
-              total: formatUnit(result?.data?.total_quantity ?? 0),
+              total: formatUnit(result?.data?.total_quantity ?? 0, {
+                fractionDigits: 0,
+              }),
             })}
           />
           <Table
