@@ -4210,6 +4210,20 @@ paths:
           description: List of clients provided via
             ?clients=client1&clients=client2&clients=client3
         - in: query
+          name: consumption_types
+          schema:
+            type: array
+            items:
+              enum:
+                - MAC
+                - MAC_DECLASSEMENT
+              type: string
+              description: |-
+                * `MAC` - MAC
+                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          description: List of consumption types provided via
+            ?consumption_types=consumption_type1&consumption_types=consumption_type2
+        - in: query
           name: countries_of_origin
           schema:
             type: array
@@ -4240,6 +4254,7 @@ paths:
               type: string
               enum:
                 - -client
+                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
@@ -4247,6 +4262,7 @@ paths:
                 - -suppliers
                 - -volume
                 - client
+                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
@@ -4270,6 +4286,8 @@ paths:
             * `-created_at` - Created at (décroissant)
             * `suppliers` - Suppliers
             * `-suppliers` - Suppliers (décroissant)
+            * `consumption_type` - Consumption type
+            * `-consumption_type` - Consumption type (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4558,6 +4576,20 @@ paths:
           description: List of clients provided via
             ?clients=client1&clients=client2&clients=client3
         - in: query
+          name: consumption_types
+          schema:
+            type: array
+            items:
+              enum:
+                - MAC
+                - MAC_DECLASSEMENT
+              type: string
+              description: |-
+                * `MAC` - MAC
+                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          description: List of consumption types provided via
+            ?consumption_types=consumption_type1&consumption_types=consumption_type2
+        - in: query
           name: countries_of_origin
           schema:
             type: array
@@ -4588,6 +4620,7 @@ paths:
               type: string
               enum:
                 - -client
+                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
@@ -4595,6 +4628,7 @@ paths:
                 - -suppliers
                 - -volume
                 - client
+                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
@@ -4618,6 +4652,8 @@ paths:
             * `-created_at` - Created at (décroissant)
             * `suppliers` - Suppliers
             * `-suppliers` - Suppliers (décroissant)
+            * `consumption_type` - Consumption type
+            * `-consumption_type` - Consumption type (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4704,6 +4740,20 @@ paths:
           description: List of clients provided via
             ?clients=client1&clients=client2&clients=client3
         - in: query
+          name: consumption_types
+          schema:
+            type: array
+            items:
+              enum:
+                - MAC
+                - MAC_DECLASSEMENT
+              type: string
+              description: |-
+                * `MAC` - MAC
+                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          description: List of consumption types provided via
+            ?consumption_types=consumption_type1&consumption_types=consumption_type2
+        - in: query
           name: countries_of_origin
           schema:
             type: array
@@ -4739,6 +4789,7 @@ paths:
               type: string
               enum:
                 - -client
+                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
@@ -4746,6 +4797,7 @@ paths:
                 - -suppliers
                 - -volume
                 - client
+                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
@@ -4769,6 +4821,8 @@ paths:
             * `-created_at` - Created at (décroissant)
             * `suppliers` - Suppliers
             * `-suppliers` - Suppliers (décroissant)
+            * `consumption_type` - Consumption type
+            * `-consumption_type` - Consumption type (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -9501,6 +9555,10 @@ components:
         ghg_reduction:
           type: number
           format: double
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
         ets_status:
           allOf:
             - $ref: "#/components/schemas/EtsStatusEnum"
@@ -9563,6 +9621,10 @@ components:
         ghg_reduction:
           type: number
           format: double
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
       required:
         - assignment_period
         - biofuel
@@ -9896,7 +9958,12 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
       required:
+        - assignment_period
         - client
         - created_at
         - id
