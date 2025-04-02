@@ -3,7 +3,6 @@ import Portal from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
 import * as api from "accounting/api/operations"
-import * as apiAccounting from "accounting/api/operations"
 import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
@@ -80,7 +79,7 @@ export const OperationDetail = () => {
     })
 
   const { execute: patchOperation, loading: patchOperationLoading } =
-    useMutation(apiAccounting.patchOperation, {
+    useMutation(api.patchOperation, {
       onError: () => {
         notify(
           t(

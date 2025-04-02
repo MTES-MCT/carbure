@@ -3,7 +3,7 @@ import { Column, Cell } from "common/components/table2"
 import { useUnit } from "common/hooks/unit"
 import { apiTypes } from "common/services/api-fetch.types"
 import { ExtendedUnit } from "common/types"
-import { CONVERSIONS, formatNumber } from "common/utils/formatters"
+import { CONVERSIONS, floorNumber, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 
 const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
@@ -16,8 +16,11 @@ const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
 // Format all values in the table to GJ
 const formatValue = (value: number) =>
   formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), {
-    fractionDigits: 1,
+    fractionDigits: 0,
   })
+
+const floorValue = (value: number) =>
+  floorNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 0)
 
 export const useValidatePendingTeneurDialog = () => {
   const { t } = useTranslation()
@@ -51,7 +54,13 @@ export const useValidatePendingTeneurDialog = () => {
       header: <HeaderWithSup>{t("Solde disponible")}</HeaderWithSup>,
       cell: (item) => (
         <Cell
-          text={formatValue(item.available_balance - item.declared_teneur)}
+          text={formatNumber(
+            floorValue(item.available_balance) +
+              floorValue(item.declared_teneur),
+            {
+              fractionDigits: 0,
+            }
+          )}
         />
       ),
     },

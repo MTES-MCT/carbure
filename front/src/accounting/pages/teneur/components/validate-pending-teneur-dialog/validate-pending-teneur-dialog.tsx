@@ -11,6 +11,10 @@ import { useUnit } from "common/hooks/unit"
 import { ExtendedUnit } from "common/types"
 import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
+import { capitalize } from "common/utils/formatters"
+
+const currentMonth = new Date().toLocaleString("default", { month: "long" })
+
 export const ValidatePendingTeneurDialog = ({
   onClose,
 }: {
@@ -48,7 +52,8 @@ export const ValidatePendingTeneurDialog = ({
       onClose={onClose}
       header={
         <Dialog.Title>
-          {t("Valider ma teneur mensuelle") + " - Mars 2025"}
+          {t("Valider ma teneur mensuelle") +
+            ` - ${capitalize(currentMonth)} 2025`}
         </Dialog.Title>
       }
       footer={
@@ -67,15 +72,15 @@ export const ValidatePendingTeneurDialog = ({
         <NoResult />
       ) : (
         <>
+          <Text fontWeight="bold" size="sm">
+            <sup>*</sup>
+            {`${t("Toutes les quantités sont exprimées en")} ${unitLabel}`}
+          </Text>
           <Table
             columns={columns}
             rows={result?.data?.results ?? []}
             loading={loading}
           />
-          <Text fontWeight="bold" size="sm">
-            <sup>*</sup>
-            {`${t("Toutes les quantités sont exprimées en")} ${unitLabel}`}
-          </Text>
         </>
       )}
     </Dialog>
