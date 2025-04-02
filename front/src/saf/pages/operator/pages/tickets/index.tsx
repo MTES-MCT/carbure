@@ -159,6 +159,7 @@ const OPERATOR_RECEIVED_FILTERS = [
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,
   SafFilter.ProductionSites,
+  SafFilter.ConsumptionTypes,
 ]
 
 const OPERATOR_ASSIGNED_FILTERS = [
@@ -167,6 +168,7 @@ const OPERATOR_ASSIGNED_FILTERS = [
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,
   SafFilter.ProductionSites,
+  SafFilter.ConsumptionTypes,
 ]
 
 export default OperatorTickets

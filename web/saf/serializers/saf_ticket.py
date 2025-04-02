@@ -28,6 +28,7 @@ class SafTicketBaseSerializer(serializers.ModelSerializer):
             "biofuel",
             "country_of_origin",
             "ghg_reduction",
+            "consumption_type",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)

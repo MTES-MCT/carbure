@@ -13,7 +13,7 @@ from saf.models import SafTicket, SafTicketSource
 class SafTicketPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = SafTicket
-        fields = ["id", "carbure_id", "client", "agreement_date", "volume", "status", "created_at"]
+        fields = ["id", "carbure_id", "client", "agreement_date", "volume", "status", "created_at", "assignment_period"]
 
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
 

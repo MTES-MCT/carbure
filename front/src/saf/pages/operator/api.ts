@@ -1,11 +1,11 @@
 import { EntityPreview } from "common/types"
 import { CBQUERY_RESET } from "common/hooks/query-builder-2"
-import { SafFilter, SafOperatorQuery } from "../../types"
+import { ConsumptionType, SafFilter, SafOperatorQuery } from "../../types"
 import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
-import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
+import { ShippingMethodEnum } from "api-schema"
 
 export function getTicketSourceFilters(
   field: SafFilter,
@@ -64,7 +64,7 @@ export function assignSafTicket(
   free_field?: string,
   reception_airport?: number,
   shipping_method?: ShippingMethodEnum,
-  consumption_type?: ConsumptionTypeEnum
+  consumption_type?: ConsumptionType
 ) {
   return apiFetch.POST("/saf/ticket-sources/{id}/assign/", {
     params: {
@@ -99,7 +99,7 @@ export function groupedAssignSafTicket(
   free_field?: string,
   reception_airport?: number,
   shipping_method?: ShippingMethodEnum,
-  consumption_type?: ConsumptionTypeEnum
+  consumption_type?: ConsumptionType
 ) {
   return apiFetch.POST("/saf/ticket-sources/group-assign/", {
     params: {

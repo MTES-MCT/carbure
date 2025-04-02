@@ -217,3 +217,9 @@ hr {
   flex-direction: column;
   gap: var(--spacing-3w);
 }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
