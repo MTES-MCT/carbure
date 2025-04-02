@@ -4,9 +4,9 @@ import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
 import { CategoryObjective, TargetType } from "../../types"
 import { CardGrid } from "../card-grid"
-import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
+import { computeObjectiveEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber } from "common/utils/formatters"
+import { ceilNumber, formatUnit } from "common/utils/formatters"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -48,27 +48,36 @@ export const ObjectivizedCategoriesProgress = ({
             <ul>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={formatEnergy(category.teneur_declared_month, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    category.teneur_declared_month,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
               <li>
                 <RecapData.RemainingQuantityBeforeObjective
-                  value={formatEnergy(computeObjectiveEnergy(category), {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                    mode: "ceil",
-                  })}
+                  value={formatUnit(
+                    computeObjectiveEnergy(category),
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                      mode: "ceil",
+                    }
+                  )}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={formatEnergy(category.quantity_available, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    category.quantity_available,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
             </ul>

@@ -4,8 +4,8 @@ import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
 import { UnconstrainedCategoryObjective } from "../../types"
 import { CardGrid } from "../card-grid"
-import { formatEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
+import { formatUnit } from "common/utils/formatters"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
@@ -33,26 +33,31 @@ export const UnconstrainedCategoriesProgress = ({
             <ul>
               <li>
                 <RecapData.TeneurDeclared
-                  value={formatEnergy(category.teneur_declared, {
-                    unit: ExtendedUnit.GJ,
+                  value={formatUnit(category.teneur_declared, ExtendedUnit.GJ, {
                     fractionDigits: 0,
                   })}
                 />
               </li>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={formatEnergy(category.teneur_declared_month, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    category.teneur_declared_month,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={formatEnergy(category.quantity_available, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    category.quantity_available,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
             </ul>

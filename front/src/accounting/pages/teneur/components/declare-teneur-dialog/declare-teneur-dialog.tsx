@@ -28,8 +28,13 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import { ceilNumber, CONVERSIONS, floorNumber } from "common/utils/formatters"
-import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
+import {
+  ceilNumber,
+  CONVERSIONS,
+  floorNumber,
+  formatUnit,
+} from "common/utils/formatters"
+import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
 import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
@@ -71,14 +76,10 @@ const DeclareTeneurDialogContent = ({
 
     const remainingEnergy = Math.max(
       0,
-      objective.target
-        ? computeObjectiveEnergy(objective) -
-            CONVERSIONS.energy.GJ_TO_MJ(quantity)
-        : 0
+      objective.target ? computeObjectiveEnergy(objective) - quantity : 0
     )
 
-    return formatEnergy(remainingEnergy, {
-      unit: ExtendedUnit.GJ,
+    return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
       fractionDigits: 0,
       // If the target is a reach, we need to ceil the remaining energy
       // Ex: if the remaining energy to declare is 145.88 GJ, we need to declare 146 GJ
@@ -94,10 +95,10 @@ const DeclareTeneurDialogContent = ({
     form.value.balance
       ? objective.target
         ? Math.min(
-            CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance),
-            CONVERSIONS.energy.MJ_TO_GJ(computeObjectiveEnergy(objective))
+            form.value.balance!.available_balance,
+            computeObjectiveEnergy(objective)
           )
-        : CONVERSIONS.energy.MJ_TO_GJ(form.value.balance!.available_balance)
+        : form.value.balance!.available_balance
       : 0,
     0
   )
@@ -181,12 +182,7 @@ const DeclareTeneurDialogContent = ({
             <Box>
               <RecapOperationGrid>
                 <RecapOperation
-                  balance={{
-                    ...form.value.balance!,
-                    available_balance: CONVERSIONS.energy.MJ_TO_GJ(
-                      form.value.balance!.available_balance
-                    ),
-                  }}
+                  balance={form.value.balance!}
                   unit={ExtendedUnit.GJ}
                 />
                 {currentStepIndex > 2 && (

@@ -5,9 +5,9 @@ import { RecapData } from "../recap-data"
 import { CategoryObjective, TargetType } from "../../types"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { CardGrid } from "../card-grid"
-import { computeObjectiveEnergy, formatEnergy } from "../../utils/formatters"
+import { computeObjectiveEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { floorNumber } from "common/utils/formatters"
+import { floorNumber, formatUnit } from "common/utils/formatters"
 
 type CappedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -47,26 +47,35 @@ export const CappedCategoriesProgress = ({
             <ul>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={formatEnergy(category.teneur_declared_month, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    category.teneur_declared_month,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
               <li>
                 <RecapData.RemainingQuantityBeforeLimit
-                  value={formatEnergy(computeObjectiveEnergy(category), {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    computeObjectiveEnergy(category),
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={formatEnergy(category.quantity_available, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    category.quantity_available,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
             </ul>

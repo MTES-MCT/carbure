@@ -8,6 +8,7 @@ import {
 import { api } from "common/services/api-fetch"
 import { BalancesGroupBy } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
+import { CONVERSIONS } from "common/utils/formatters"
 
 export const getObjectives = async (
   entity_id: number,
@@ -37,10 +38,16 @@ export const getObjectives = async (
         sectors:
           objectives?.sectors.map((sector) => ({
             code: sector.code,
-            target: sector.objective.target_mj,
-            teneur_declared: sector.declared_teneur,
-            teneur_declared_month: sector.pending_teneur,
-            quantity_available: sector.available_balance,
+            target: CONVERSIONS.energy.MJ_TO_GJ(sector.objective.target_mj),
+            teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(
+              sector.declared_teneur
+            ),
+            teneur_declared_month: CONVERSIONS.energy.MJ_TO_GJ(
+              sector.pending_teneur
+            ),
+            quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
+              sector.available_balance
+            ),
           })) ?? [],
       }
 
@@ -58,10 +65,18 @@ export const getObjectives = async (
         objectives?.categories.reduce((objCategories, category) => {
           const cat = {
             code: category.code,
-            target: category.objective.target_mj ?? null,
-            teneur_declared: category.declared_teneur,
-            teneur_declared_month: category.pending_teneur,
-            quantity_available: category.available_balance,
+            target: category.objective.target_mj
+              ? CONVERSIONS.energy.MJ_TO_GJ(category.objective.target_mj)
+              : 0,
+            teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(
+              category.declared_teneur
+            ),
+            teneur_declared_month: CONVERSIONS.energy.MJ_TO_GJ(
+              category.pending_teneur
+            ),
+            quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
+              category.available_balance
+            ),
           }
           if (!category.objective.target_mj) {
             objCategories.unconstrained_categories.push({

@@ -8,6 +8,7 @@ import { CategoryEnum } from "common/types"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 import { apiTypes } from "common/services/api-fetch.types"
+import { CONVERSIONS } from "common/utils/formatters"
 
 export type BiofuelFormProps = {
   balance?: apiTypes["Balance"]
@@ -33,7 +34,12 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
       placeholder={t("Ex: EMHV")}
       options={result.result?.data?.results ?? []}
       normalize={(balance) => ({
-        value: balance,
+        value: {
+          ...balance,
+          available_balance: CONVERSIONS.energy.MJ_TO_GJ(
+            balance.available_balance
+          ),
+        },
         label: balance.biofuel.code,
       })}
       loading={result.loading}

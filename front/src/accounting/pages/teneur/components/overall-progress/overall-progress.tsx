@@ -3,7 +3,7 @@ import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { useTranslation } from "react-i18next"
 import { RecapData } from "../recap-data"
-import { ceilNumber, formatNumber } from "common/utils/formatters"
+import { ceilNumber, floorNumber, formatNumber } from "common/utils/formatters"
 
 type OverallProgressProps = {
   objective?: BaseObjective
@@ -33,11 +33,16 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
               }),
             }
           )}
-          mainValue={ceilNumber(objective.teneur_declared, 0)}
+          mainValue={formatNumber(
+            objective.teneur_declared + objective.teneur_declared_month,
+            {
+              fractionDigits: 0,
+            }
+          )}
           mainText={t("tCO2 évitées")}
-          baseQuantity={ceilNumber(objective.teneur_declared, 0)}
+          baseQuantity={floorNumber(objective.teneur_declared, 0)}
           targetQuantity={ceilNumber(objective.target, 0)}
-          declaredQuantity={ceilNumber(objective.teneur_declared_month, 0)}
+          declaredQuantity={floorNumber(objective.teneur_declared_month, 0)}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}
@@ -53,7 +58,6 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
                 value={t("{{value}} tCO2 évitées", {
                   value: formatNumber(objective.teneur_declared_month, {
                     fractionDigits: 0,
-                    mode: "ceil",
                   }),
                 })}
               />

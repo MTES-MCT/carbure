@@ -5,9 +5,8 @@ import { ObjectiveSection } from "../objective-section"
 import { RecapData } from "../recap-data"
 import { SectorObjective } from "../../types"
 import { CardGrid } from "../card-grid"
-import { formatEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { CONVERSIONS, floorNumber } from "common/utils/formatters"
+import { floorNumber, formatUnit } from "common/utils/formatters"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -28,13 +27,12 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             title={t(formatSector(sector.code))}
             description={t("Objectif en GJ en {{date}}: {{objective}}", {
               date: "2025",
-              objective: formatEnergy(sector.target, {
-                unit: ExtendedUnit.GJ,
+              objective: formatUnit(sector.target, ExtendedUnit.GJ, {
                 fractionDigits: 0,
               }),
             })}
             mainValue={floorNumber(
-              CONVERSIONS.energy.MJ_TO_GJ(sector.teneur_declared),
+              sector.teneur_declared + sector.teneur_declared_month,
               0
             )}
             mainText={t("GJ")}
@@ -53,18 +51,24 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             <ul>
               <li>
                 <RecapData.TeneurDeclaredMonth
-                  value={formatEnergy(sector.teneur_declared_month, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    sector.teneur_declared_month,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
               <li>
                 <RecapData.QuantityAvailable
-                  value={formatEnergy(sector.quantity_available, {
-                    unit: ExtendedUnit.GJ,
-                    fractionDigits: 0,
-                  })}
+                  value={formatUnit(
+                    sector.quantity_available,
+                    ExtendedUnit.GJ,
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}
                 />
               </li>
             </ul>

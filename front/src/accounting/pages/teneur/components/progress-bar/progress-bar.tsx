@@ -37,6 +37,9 @@ export const ProgressBar = ({
     0
   )
 
+  // This code is used to positionnate percents on top of the progress bar
+  // There is a special case when the diff between percents is less than 10
+  // In this case, we need to add space between the two values
   useLayoutEffect(() => {
     const baseValueWidth = baseValueRef?.current?.offsetWidth ?? 0
     const declaredValueWidth = declaredValueRef?.current?.offsetWidth ?? 0
@@ -53,7 +56,7 @@ export const ProgressBar = ({
     <div className={css["progress-bar__container"]}>
       <div className={css["progress-bar"]}>
         {/* Only show declared percentage if value is greater than 0 */}
-        {baseQuantity && baseQuantity > 0 ? (
+        {baseQuantity && basePercent > 0 ? (
           <span
             className={css["progress-bar--quantity-declared"]}
             style={{ width: `${basePercent}%` }}
