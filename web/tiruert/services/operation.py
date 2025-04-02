@@ -46,6 +46,10 @@ class OperationService:
             # 1. Get the target for the customs category
             target = ObjectiveService.calculate_target_for_specific_category(data["customs_category"], request.entity.id)
 
+            # Case for reach objective and no objective, no need to do this check compliance
+            if target is None:
+                return
+
             # 2. Calculate the balance for requested biofuel and customs category
             request.GET = request.GET.copy()
             request.GET["customs_category"] = data["customs_category"]
