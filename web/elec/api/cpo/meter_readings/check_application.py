@@ -55,7 +55,6 @@ def check_application(request: HttpRequest, entity):
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
-    past_readings = MeterReadingRepository.get_cpo_meter_readings(entity)
 
     # get the first and last day of this quarter so we can verify that the readings are for the current quarter
     beginning_of_quarter = first_day_of_quarter(year, quarter)
@@ -64,7 +63,6 @@ def check_application(request: HttpRequest, entity):
     meter_reading_data, errors = import_meter_reading_excel(
         excel_file,
         charge_points,
-        past_readings,
         renewable_share,
         beginning_of_quarter,
         end_of_quarter,
