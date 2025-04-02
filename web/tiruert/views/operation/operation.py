@@ -206,7 +206,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.type == Operation.CESSION and instance.status in [Operation.PENDING, Operation.REJECTED]:
+        if instance.type in [Operation.CESSION, Operation.TENEUR] and instance.status in [
+            Operation.PENDING,
+            Operation.REJECTED,
+        ]:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_403_FORBIDDEN)

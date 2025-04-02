@@ -72,19 +72,18 @@ class AcceptActionMixin:
         url_path="teneur/declare",
     )
     def declare_teneur(self, request):
-        queryset = (
-            self.filter_queryset(self.get_queryset())
-            .filter(type=Operation.TENEUR, status=Operation.PENDING)
-            .order_by("created_at")
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
         )
 
         if not queryset.exists():
             return Response({"error": AcceptActionMixinErrors.NOTHING_TO_DECLARE}, status=status.HTTP_400_BAD_REQUEST)
 
         # Get the first one to know which month to validate
-        month = queryset.first().created_at.month
-        queryset = queryset.filter(created_at__month=month)
+        # month = queryset.first().created_at.month
+        # queryset = queryset.filter(created_at__month=month)
 
         queryset.update(status=Operation.DECLARED)
 
-        return Response({"status": "declared", "month": month}, status=status.HTTP_200_OK)
+        return Response({"status": "declared"}, status=status.HTTP_200_OK)
