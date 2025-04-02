@@ -137,7 +137,7 @@ class ObjectiveService:
         capped_objectives = ObjectiveService._get_capped_objectives(year)
         objective = capped_objectives.filter(customs_category=customs_category).first()
         if not objective:
-            pass
+            return None
 
         # 2. Calculate "assiette" used for objectives calculations
         macs = MacFossilFuel.objects.filter(operator_id=entity_id, year=year)
