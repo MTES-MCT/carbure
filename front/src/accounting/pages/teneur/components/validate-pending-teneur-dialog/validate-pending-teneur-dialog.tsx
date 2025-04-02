@@ -11,9 +11,6 @@ import { useUnit } from "common/hooks/unit"
 import { ExtendedUnit } from "common/types"
 import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
-import { capitalize } from "common/utils/formatters"
-
-const currentMonth = new Date().toLocaleString("default", { month: "long" })
 
 export const ValidatePendingTeneurDialog = ({
   onClose,
@@ -50,18 +47,13 @@ export const ValidatePendingTeneurDialog = ({
   return (
     <Dialog
       onClose={onClose}
-      header={
-        <Dialog.Title>
-          {t("Valider ma teneur mensuelle") +
-            ` - ${capitalize(currentMonth)} 2025`}
-        </Dialog.Title>
-      }
+      header={<Dialog.Title>{t("Valider ma teneur")}</Dialog.Title>}
       footer={
         <Button
           onClick={() => mutation.execute(entity.id)}
           loading={mutation.loading}
         >
-          {t("Valider ma teneur mensuelle")}
+          {t("Valider ma teneur")}
         </Button>
       }
       fullWidth
