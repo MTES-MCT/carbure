@@ -8,9 +8,9 @@ from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity, UserRights
 from core.pagination import MetadataPageNumberPagination
+from core.permissions import HasUserRights
 from saf.filters import TicketFilter
 from saf.models import SafTicket
-from saf.permissions import HasUserRights
 from saf.serializers import (
     SafTicketAirlineSerializer,
     SafTicketBaseSerializer,
