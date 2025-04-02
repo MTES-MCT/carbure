@@ -105,7 +105,8 @@ class InactiveUser(User):
                 "is_active": False,
             }
             if user.is_active or not user.email.endswith("@anonymized.carbure"):
-                user.update(**sanitized_values)
+                for field, value in sanitized_values.items():
+                    setattr(user, field, value)
                 user.save(update_fields=sanitized_values.keys())
                 count += 1
         return count

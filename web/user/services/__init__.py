@@ -1,1 +1,1 @@
-from .inactive_user import InactiveUser
+from .inactive_user import UserAnonymizationService
