@@ -9,6 +9,7 @@ import { useHashMatch } from "common/components/hash-route"
 import {
   getOperationEntity,
   getOperationQuantity,
+  isOperationDebit,
 } from "accounting/pages/operations/operations.utils"
 import { OperationBadge } from "accounting/pages/operations/components/operation-badge"
 import css from "./operation-detail.module.css"
@@ -129,7 +130,9 @@ export const OperationDetail = () => {
         },
         {
           label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(operation.avoided_emissions),
+          value: formatNumber(operation.avoided_emissions, {
+            fractionDigits: 0,
+          }),
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
@@ -193,7 +196,7 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {operation?.type === OperationType.CESSION &&
+            {isOperationDebit(operation?.type ?? "") &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button
@@ -202,7 +205,10 @@ export const OperationDetail = () => {
                   onClick={() => deleteOperation(entity.id, operation.id)}
                   loading={deleteOperationLoading}
                 >
-                  {t("Annuler le certificat de cession")}
+                  {operation?.type === OperationType.CESSION &&
+                    t("Annuler le certificat de cession")}
+                  {operation?.type === OperationType.TENEUR &&
+                    t("Annuler le certificat de teneur")}
                 </Button>
               )}
           </>
