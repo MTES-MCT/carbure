@@ -4222,7 +4222,7 @@ paths:
                 * `MAC` - MAC
                 * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
           description: List of consumption types provided via
-            ?consumption_types=consumption_type1&consumption_types=consumption_type2
+            ?consumption_types=value1&consumption_types=value2
         - in: query
           name: countries_of_origin
           schema:
@@ -4254,7 +4254,6 @@ paths:
               type: string
               enum:
                 - -client
-                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
@@ -4262,7 +4261,6 @@ paths:
                 - -suppliers
                 - -volume
                 - client
-                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
@@ -4286,8 +4284,6 @@ paths:
             * `-created_at` - Created at (décroissant)
             * `suppliers` - Suppliers
             * `-suppliers` - Suppliers (décroissant)
-            * `consumption_type` - Consumption type
-            * `-consumption_type` - Consumption type (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4588,7 +4584,7 @@ paths:
                 * `MAC` - MAC
                 * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
           description: List of consumption types provided via
-            ?consumption_types=consumption_type1&consumption_types=consumption_type2
+            ?consumption_types=value1&consumption_types=value2
         - in: query
           name: countries_of_origin
           schema:
@@ -4620,7 +4616,6 @@ paths:
               type: string
               enum:
                 - -client
-                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
@@ -4628,7 +4623,6 @@ paths:
                 - -suppliers
                 - -volume
                 - client
-                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
@@ -4652,8 +4646,6 @@ paths:
             * `-created_at` - Created at (décroissant)
             * `suppliers` - Suppliers
             * `-suppliers` - Suppliers (décroissant)
-            * `consumption_type` - Consumption type
-            * `-consumption_type` - Consumption type (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4752,7 +4744,7 @@ paths:
                 * `MAC` - MAC
                 * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
           description: List of consumption types provided via
-            ?consumption_types=consumption_type1&consumption_types=consumption_type2
+            ?consumption_types=value1&consumption_types=value2
         - in: query
           name: countries_of_origin
           schema:
@@ -4789,7 +4781,6 @@ paths:
               type: string
               enum:
                 - -client
-                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
@@ -4797,7 +4788,6 @@ paths:
                 - -suppliers
                 - -volume
                 - client
-                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
@@ -4821,8 +4811,6 @@ paths:
             * `-created_at` - Created at (décroissant)
             * `suppliers` - Suppliers
             * `-suppliers` - Suppliers (décroissant)
-            * `consumption_type` - Consumption type
-            * `-consumption_type` - Consumption type (décroissant)
           explode: false
           style: form
         - name: ordering

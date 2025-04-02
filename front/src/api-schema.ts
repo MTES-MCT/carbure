@@ -6584,7 +6584,7 @@ export interface operations {
       query: {
         /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description List of consumption types provided via ?consumption_types=consumption_type1&consumption_types=consumption_type2 */
+        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
         consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
         /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
@@ -6606,9 +6606,7 @@ export interface operations {
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
-         *     * `-suppliers` - Suppliers (décroissant)
-         *     * `consumption_type` - Consumption type
-         *     * `-consumption_type` - Consumption type (décroissant) */
+         *     * `-suppliers` - Suppliers (décroissant) */
         order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -6818,7 +6816,7 @@ export interface operations {
       query: {
         /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description List of consumption types provided via ?consumption_types=consumption_type1&consumption_types=consumption_type2 */
+        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
         consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
         /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
@@ -6840,9 +6838,7 @@ export interface operations {
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
-         *     * `-suppliers` - Suppliers (décroissant)
-         *     * `consumption_type` - Consumption type
-         *     * `-consumption_type` - Consumption type (décroissant) */
+         *     * `-suppliers` - Suppliers (décroissant) */
         order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -6881,7 +6877,7 @@ export interface operations {
       query: {
         /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
-        /** @description List of consumption types provided via ?consumption_types=consumption_type1&consumption_types=consumption_type2 */
+        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
         consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
         /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
@@ -6905,9 +6901,7 @@ export interface operations {
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
-         *     * `-suppliers` - Suppliers (décroissant)
-         *     * `consumption_type` - Consumption type
-         *     * `-consumption_type` - Consumption type (décroissant) */
+         *     * `-suppliers` - Suppliers (décroissant) */
         order?: PathsApiSafTicketsGetParametersQueryOrder[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -7610,7 +7604,6 @@ export enum PathsApiSafTicketsGetParametersQueryConsumption_types {
 }
 export enum PathsApiSafTicketsGetParametersQueryOrder {
   ValueMinusclient = "-client",
-  ValueMinusconsumption_type = "-consumption_type",
   ValueMinuscreated_at = "-created_at",
   ValueMinusfeedstock = "-feedstock",
   ValueMinusghg_reduction = "-ghg_reduction",
@@ -7618,7 +7611,6 @@ export enum PathsApiSafTicketsGetParametersQueryOrder {
   ValueMinussuppliers = "-suppliers",
   ValueMinusvolume = "-volume",
   client = "client",
-  consumption_type = "consumption_type",
   created_at = "created_at",
   feedstock = "feedstock",
   ghg_reduction = "ghg_reduction",
