@@ -4,9 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
 
+from core import private_storage
 from core.models import Entity, ExternalAdminRights
 from doublecount.models import DoubleCountingApplication
-from doublecount.utils import generate_presigned_url
 
 
 class AgreementDownloadLinkSerializer(serializers.Serializer):
@@ -36,7 +36,7 @@ class AgreementDownloadLinkMixin(RetrieveModelMixin):
         if entity.entity_type in [Entity.ADMIN, Entity.PRODUCER] or entity.has_external_admin_right(
             ExternalAdminRights.DOUBLE_COUNTING
         ):
-            download_link = generate_presigned_url(application.download_link)
+            download_link = private_storage.url(application.download_link)
         else:
             download_link = None
 

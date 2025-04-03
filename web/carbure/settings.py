@@ -236,6 +236,14 @@ STORAGES = {
             "querystring_auth": False,
         },
     },
+    "private": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "default_acl": "private",
+            "file_overwrite": True,
+            "querystring_auth": True,
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
