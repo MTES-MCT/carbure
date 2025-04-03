@@ -393,6 +393,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
+  /api/double-counting/agreements/{id}/download-link/:
+    get:
+      operationId: double_counting_agreements_download_link_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementDownloadLink"
+          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -6332,6 +6360,12 @@ components:
       required:
         - delivery_site_id
         - ownership_type
+    AgreementDownloadLink:
+      type: object
+      properties:
+        download_link:
+          type: string
+          format: uri
     AgreementLists:
       type: object
       properties:
@@ -7363,9 +7397,13 @@ components:
           items:
             $ref: "#/components/schemas/DoubleCountingDocFile"
           readOnly: true
+        download_link:
+          type: string
+          readOnly: true
       required:
         - created_at
         - documents
+        - download_link
         - id
         - period_end
         - period_start
@@ -7440,8 +7478,11 @@ components:
           maxLength: 128
         file_type:
           $ref: "#/components/schemas/FileTypeEnum"
+        url:
+          type: string
       required:
         - id
+        - url
     DoubleCountingProduction:
       type: object
       properties:

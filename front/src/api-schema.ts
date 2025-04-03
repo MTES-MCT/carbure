@@ -175,6 +175,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/agreements/{id}/download-link/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_download_link_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/agreements/agreement-admin/": {
     parameters: {
       query?: never
@@ -1817,6 +1833,10 @@ export interface components {
       blending_is_outsourced: boolean
       blending_entity_id?: number
     }
+    AgreementDownloadLink: {
+      /** Format: uri */
+      download_link?: string
+    }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
       incoming: components["schemas"]["DoubleCountingRegistration"][]
@@ -2246,6 +2266,7 @@ export interface components {
       readonly sourcing: components["schemas"]["DoubleCountingSourcing"][]
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
+      readonly download_link: string
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
@@ -2272,6 +2293,7 @@ export interface components {
       readonly id: number
       file_name?: string
       file_type?: components["schemas"]["FileTypeEnum"]
+      url: string
     }
     DoubleCountingProduction: {
       readonly id: number
@@ -3957,6 +3979,31 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["DoubleCountingRegistrationDetails"]
+        }
+      }
+    }
+  }
+  double_counting_agreements_download_link_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AgreementDownloadLink"]
         }
       }
     }

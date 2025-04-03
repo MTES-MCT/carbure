@@ -222,7 +222,7 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingDocFile
-        fields = ["id", "file_name", "file_type"]
+        fields = ["id", "file_name", "file_type", "url"]
 
 
 class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
@@ -232,6 +232,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
     producer = EntitySerializer(read_only=True)
     documents = DoubleCountingDocFileSerializer(many=True, read_only=True)
+    download_link = serializers.SerializerMethodField()
 
     class Meta:
         model = DoubleCountingApplication
@@ -247,7 +248,12 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
             "sourcing",
             "production",
             "documents",
+            "download_link",
         ]
+
+    @extend_schema_field(str)
+    def get_download_link(self, obj):
+        return ""
 
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
