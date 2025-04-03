@@ -260,6 +260,9 @@ if env("TEST"):
         "default": {
             "BACKEND": "django.core.files.storage.InMemoryStorage",
         },
+        "private": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
