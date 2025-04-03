@@ -13,6 +13,7 @@ import TicketTag from "./tag"
 import { Order, Table, Cell } from "common/components/table2"
 import { Pagination } from "common/components/pagination2/pagination"
 import { NoResult } from "common/components/no-result2"
+import { formatConsumptionType } from "saf/utils/formatters"
 
 export interface TicketsTableProps {
   loading: boolean
@@ -57,6 +58,7 @@ export const TicketsTable = memo(
                 columns.availableVolume,
                 columns.period,
                 columns.feedstock,
+                columns.consumption,
                 columns.ghgReduction,
               ])}
             />
@@ -147,6 +149,20 @@ export function useColumns() {
       header: t("Réd. GES"),
       cell: (ticket: SafTicket) => (
         <Cell text={`${ticket.ghg_reduction?.toFixed(0)}%`} />
+      ),
+    },
+
+    consumption: {
+      key: "consumption_type",
+      header: t("Type de consommation"),
+      cell: (ticket: SafTicket) => (
+        <Cell
+          text={
+            ticket.consumption_type
+              ? formatConsumptionType(ticket.consumption_type)
+              : "-"
+          }
+        />
       ),
     },
   }

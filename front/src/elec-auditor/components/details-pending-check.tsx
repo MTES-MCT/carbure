@@ -51,6 +51,13 @@ const CheckReportSection = ({
       ) {
         const checkedData = response!.data.data
         onReportChecked(value.file!, checkedData)
+      } else if (
+        response?.status === 400 &&
+        response.data.error === "NO_CHARGE_POINT_DETECTED"
+      ) {
+        notify(t("Aucune donnée n'a été détectée dans ce fichier."), {
+          variant: "danger",
+        })
       } else if (response?.status === 413) {
         notify(
           t(
@@ -63,7 +70,7 @@ const CheckReportSection = ({
       } else {
         notify(
           t(
-            "L'envoi de vos relevés trimestriel a échoué. Merci de contacter l'équipe Carbure"
+            "L'envoi de vos résultats d'audit a échoué. Merci de contacter l'équipe Carbure."
           ),
           {
             variant: "danger",

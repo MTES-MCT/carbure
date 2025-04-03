@@ -1,6 +1,5 @@
 import traceback
 
-from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import (
@@ -15,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
+from core import private_storage
 from core.carburetypes import CarbureError
 from core.models import Entity
 from doublecount.helpers import (
@@ -180,7 +180,7 @@ class AddActionMixin:
             agreement.save()
 
         s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
-        dca.download_link = default_storage.url(s3_path)
+        dca.download_link = s3_path
         dca.save()
 
         # 2 - save all production_data DoubleCountingProduction in db
@@ -209,7 +209,7 @@ class AddActionMixin:
 
         # 3 - Upload file to S3
         try:
-            default_storage.save(s3_path, file)
+            private_storage.save(s3_path, file)
         except Exception:
             traceback.print_exc()
 

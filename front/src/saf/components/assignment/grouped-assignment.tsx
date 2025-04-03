@@ -19,8 +19,9 @@ import * as api from "../../pages/operator/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
+import { ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
+import { ConsumptionType } from "saf/types"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSource[]
@@ -214,11 +215,11 @@ const TicketsGroupedAssignment = ({
                 {...bind("consumption_type")}
                 options={[
                   {
-                    value: ConsumptionTypeEnum.MAC,
+                    value: ConsumptionType.MAC,
                     label: t("Mise à consommation mandat FR/EU"),
                   },
                   {
-                    value: ConsumptionTypeEnum.MAC_DECLASSEMENT,
+                    value: ConsumptionType.MAC_DECLASSEMENT,
                     label: t("Mise à consommation hors mandat (déclassement)"),
                   },
                 ]}
@@ -247,7 +248,7 @@ const defaultAssignment = {
   agreement_reference: "" as string | undefined, //TODO for transfer only
   reception_airport: undefined as Airport | undefined,
   shipping_method: undefined as ShippingMethodEnum | undefined,
-  consumption_type: undefined as ConsumptionTypeEnum | undefined,
+  consumption_type: undefined as ConsumptionType | undefined,
 }
 
 export type GroupedAssignmentForm = typeof defaultAssignment

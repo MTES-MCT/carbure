@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     "elec",
     "simple_history",
     "tiruert",
+    "user",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -236,6 +237,14 @@ STORAGES = {
             "querystring_auth": False,
         },
     },
+    "private": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "default_acl": "private",
+            "file_overwrite": True,
+            "querystring_auth": True,
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -250,6 +259,9 @@ if env("TEST") is False:
 if env("TEST"):
     STORAGES = {
         "default": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
+        "private": {
             "BACKEND": "django.core.files.storage.InMemoryStorage",
         },
         "staticfiles": {

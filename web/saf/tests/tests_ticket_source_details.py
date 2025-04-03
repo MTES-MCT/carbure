@@ -140,6 +140,7 @@ class SafTicketSourceDetailsTest(TestCase):
             "assigned_tickets": [
                 {
                     "agreement_date": "2022-06-20",
+                    "assignment_period": 202201,
                     "carbure_id": "carbure-id-t-001",
                     "client": self.ticket_client.name,
                     "id": 4321,

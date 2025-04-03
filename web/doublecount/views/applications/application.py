@@ -4,12 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity, UserRights
+from core.permissions import HasAdminRights, HasUserRights
 from doublecount.filters import ApplicationFilter
 from doublecount.models import DoubleCountingApplication
-from doublecount.permissions import HasAdminRights
 from doublecount.serializers import DoubleCountingApplicationSerializer
 from doublecount.views.applications.mixins import ActionMixin
-from saf.permissions import HasUserRights
 
 
 class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):

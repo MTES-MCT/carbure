@@ -1,11 +1,12 @@
 import { Button } from "common/components/button2"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketPreview } from "saf/types"
 import TicketTag from "saf/components/tickets/tag"
 import { SafTicketSource } from "saf/pages/operator/types"
 import { Collapse } from "common/components/collapse2"
+import { Ellipsis } from "common/components/scaffold"
 
 const AssignedTickets = ({
   ticketSource,
@@ -42,8 +43,13 @@ const AssignedTickets = ({
           return (
             <li key={ticket.id}>
               <Button customPriority="link" onClick={() => showTicket(ticket)}>
-                {ticket.client} - {formatNumber(ticket.volume)} L -{" "}
-                {t("Affecté le")} {formatDate(ticket.created_at)}{" "}
+                <Ellipsis>{ticket.client}</Ellipsis> -{" "}
+                {formatNumber(ticket.volume)} L -{" "}
+                {formatDate(
+                  `${formatPeriod(ticket.assignment_period)}-01`,
+                  "MM/yyyy"
+                )}{" "}
+                {`(${t("créé le")} ${formatDate(ticket.created_at)})`}{" "}
               </Button>{" "}
               <TicketTag status={ticket.status} small />
             </li>
