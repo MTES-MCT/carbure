@@ -48,6 +48,7 @@ class SafTicketsTest(TestCase):
             ghg_reference=60,
             ghg_reduction=65,
             parent_ticket_source_id=None,
+            consumption_type=SafTicket.MAC,
         )
 
         self.second_ticket = self.ticket
@@ -98,6 +99,7 @@ class SafTicketsTest(TestCase):
                 "is_in_europe": True,
             },
             "ghg_reduction": 65.0,
+            "consumption_type": SafTicket.MAC,
         }
         assert response.json()["results"][0] == expected_ticket
         assert response.json()["count"] == 2

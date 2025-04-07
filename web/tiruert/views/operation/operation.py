@@ -7,9 +7,9 @@ from rest_framework.viewsets import ModelViewSet
 
 from core.models import Entity, UserRights
 from core.pagination import MetadataPageNumberPagination
+from core.permissions import HasUserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
-from tiruert.permissions import HasUserRights
 from tiruert.serializers import (
     OperationInputSerializer,
     OperationListSerializer,

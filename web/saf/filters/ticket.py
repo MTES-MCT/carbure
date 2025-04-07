@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema_field
-from rest_framework.serializers import CharField, IntegerField, ListField
+from rest_framework.serializers import CharField, ChoiceField, IntegerField, ListField
 
 from core.models import Entity
 from saf.models import SafTicket
@@ -18,6 +18,7 @@ class TicketFilter(django_filters.FilterSet):
     suppliers = django_filters.CharFilter(method="filter_suppliers")
     countries_of_origin = django_filters.CharFilter(method="filter_countries_of_origin")
     production_sites = django_filters.CharFilter(method="filter_production_sites")
+    consumption_types = django_filters.CharFilter(method="filter_consumption_types")
 
     order = django_filters.OrderingFilter(
         fields=(
@@ -43,6 +44,7 @@ class TicketFilter(django_filters.FilterSet):
             "suppliers",
             "countries_of_origin",
             "production_sites",
+            "consumption_types",
         ]
 
     def filter_multiple_values(self, queryset, field_name, param_name):
@@ -122,3 +124,13 @@ class TicketFilter(django_filters.FilterSet):
     )
     def filter_production_sites(self, queryset, name, value):
         return self.filter_multiple_values(queryset, "carbure_production_site__name", "production_sites")
+
+    @extend_schema_field(
+        ListField(
+            child=ChoiceField(choices=SafTicket.CONSUMPTION_TYPES),
+            help_text="List of consumption types provided via ?consumption_types=value1&consumption_types=value2",
+            required=False,
+        )
+    )
+    def filter_consumption_types(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "consumption_type", "consumption_types")

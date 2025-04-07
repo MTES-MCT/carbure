@@ -125,6 +125,7 @@ export const safTicketPreview1: SafTicketPreview = {
   volume: 1000,
   created_at: "2022-01-10",
   status: SafTicketStatus.REJECTED,
+  assignment_period: 202401,
 }
 
 export const safTicketPreview2: SafTicketPreview = {
@@ -134,6 +135,7 @@ export const safTicketPreview2: SafTicketPreview = {
   volume: 2000,
   created_at: "2022-02-10",
   status: SafTicketStatus.PENDING,
+  assignment_period: 202401,
 }
 
 export const safTicketSourceDetails: SafTicketSourceDetails = {

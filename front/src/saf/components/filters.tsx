@@ -3,6 +3,7 @@ import { Normalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
 import { SafFilter, SafFilterSelection } from "../types"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
+import { normalizeConsumptionType } from "saf/utils/normalizers"
 
 export interface FiltersProps {
   filters: SafFilter[]
@@ -26,6 +27,7 @@ export function SafFilters({
     [SafFilter.CountriesOfOrigin]: t("Pays d'origine"),
     [SafFilter.ProductionSites]: t("Sites de production"),
     [SafFilter.DeliverySites]: t("Sites de livraison"),
+    [SafFilter.ConsumptionTypes]: t("Types de consommation"),
   }
 
   const computedFilters = filters.reduce(
@@ -56,6 +58,7 @@ const filterNormalizers: FilterNormalizers = {
   [SafFilter.CountriesOfOrigin]: norm.normalizeCountryFilter,
   [SafFilter.ProductionSites]: norm.normalizeUnknownFilter,
   [SafFilter.DeliverySites]: norm.normalizeUnknownFilter,
+  [SafFilter.ConsumptionTypes]: normalizeConsumptionType,
 }
 
 export default SafFilters

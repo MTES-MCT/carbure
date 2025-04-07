@@ -1,0 +1,1 @@
+from .inactive_user import UserAnonymizationService

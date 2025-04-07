@@ -59,6 +59,7 @@ class FilterActionMixin:
             "suppliers": "supplier__name",
             "periods": "assignment_period",
             "feedstocks": "feedstock__code",
+            "consumption_types": "consumption_type",
         }
         entity = Entity.objects.get(id=entity_id)
         if entity.entity_type != Entity.AIRLINE:

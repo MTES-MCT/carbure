@@ -1,6 +1,7 @@
 import cl from "clsx"
 import { Loader } from "./icons"
 import css from "./scaffold.module.css"
+import { ElementType } from "react"
 
 // top bar for the whole website, horizontal flow
 export const Header = (props: JSX.IntrinsicElements["header"]) => (
@@ -138,4 +139,16 @@ export function layout(props: Layout) {
     "data-asidey": props.asideY ? true : undefined,
     "data-spread": props.spread ? true : undefined,
   }
+}
+
+export const Ellipsis = ({
+  is = "span",
+  maxWidth = "200px",
+  ...props
+}: JSX.IntrinsicElements["span"] & {
+  is?: ElementType
+  maxWidth?: string
+}) => {
+  const Tag = is
+  return <Tag {...props} className={css.ellipsis} style={{ maxWidth }} />
 }

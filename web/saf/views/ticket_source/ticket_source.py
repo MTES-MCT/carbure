@@ -6,9 +6,9 @@ from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity, UserRights
 from core.pagination import MetadataPageNumberPagination
+from core.permissions import HasUserRights
 from saf.filters import TicketSourceFilter
 from saf.models import SafTicketSource
-from saf.permissions import HasUserRights
 from saf.serializers import SafTicketSourceDetailsSerializer, SafTicketSourceSerializer
 
 from .mixins import ActionMixin

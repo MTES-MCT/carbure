@@ -136,6 +136,10 @@ export const AirlineTickets = ({ year }: AirlineTicketsProps) => {
   )
 }
 
-const CLIENT_FILTERS = [SafFilter.Periods, SafFilter.Feedstocks]
+const CLIENT_FILTERS = [
+  SafFilter.Periods,
+  SafFilter.Feedstocks,
+  SafFilter.ConsumptionTypes,
+]
 
 export default AirlineTickets

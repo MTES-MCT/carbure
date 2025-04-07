@@ -175,6 +175,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/agreements/{id}/download-link/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_agreements_download_link_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/agreements/agreement-admin/": {
     parameters: {
       query?: never
@@ -1817,6 +1833,10 @@ export interface components {
       blending_is_outsourced: boolean
       blending_entity_id?: number
     }
+    AgreementDownloadLink: {
+      /** Format: uri */
+      download_link?: string
+    }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
       incoming: components["schemas"]["DoubleCountingRegistration"][]
@@ -2069,7 +2089,7 @@ export interface components {
      *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
      * @enum {string}
      */
-    ConsumptionTypeEnum: ConsumptionTypeEnum
+    ConsumptionTypeEnum: PathsApiSafTicketsGetParametersQueryConsumption_types
     /**
      * @description * `NO_PROBLEMO` - NO_PROBLEMO
      *     * `IN_CORRECTION` - IN_CORRECTION
@@ -2246,6 +2266,7 @@ export interface components {
       readonly sourcing: components["schemas"]["DoubleCountingSourcing"][]
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
+      readonly download_link: string
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
@@ -2272,6 +2293,7 @@ export interface components {
       readonly id: number
       file_name?: string
       file_type?: components["schemas"]["FileTypeEnum"]
+      url: string
     }
     DoubleCountingProduction: {
       readonly id: number
@@ -3108,6 +3130,7 @@ export interface components {
       readonly country_of_origin: components["schemas"]["Country"]
       /** Format: double */
       ghg_reduction?: number
+      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
       ets_status?: components["schemas"]["EtsStatusEnum"] | null
     }
     SafTicketBase: {
@@ -3127,6 +3150,7 @@ export interface components {
       readonly country_of_origin: components["schemas"]["Country"]
       /** Format: double */
       ghg_reduction?: number
+      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
     }
     SafTicketDetails:
       | components["schemas"]["SafTicketDetailsBase"]
@@ -3249,6 +3273,7 @@ export interface components {
       status?: components["schemas"]["saf.filters.TicketFilter.status"]
       /** Format: date-time */
       readonly created_at: string | null
+      assignment_period: number
     }
     SafTicketSource: {
       readonly id: number
@@ -3960,6 +3985,31 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["DoubleCountingRegistrationDetails"]
+        }
+      }
+    }
+  }
+  double_counting_agreements_download_link_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AgreementDownloadLink"]
         }
       }
     }
@@ -6587,6 +6637,8 @@ export interface operations {
       query: {
         /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
+        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
+        consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
         /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
         entity_id: number
@@ -6817,6 +6869,8 @@ export interface operations {
       query: {
         /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
+        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
+        consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
         /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
         entity_id: number
@@ -6876,6 +6930,8 @@ export interface operations {
       query: {
         /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
         clients?: string[]
+        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
+        consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
         /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
         countries_of_origin?: string[]
         entity_id: number
@@ -7619,6 +7675,10 @@ export enum PathsApiSafTicketSourcesGetParametersQueryStatus {
   AVAILABLE = "AVAILABLE",
   HISTORY = "HISTORY",
 }
+export enum PathsApiSafTicketsGetParametersQueryConsumption_types {
+  MAC = "MAC",
+  MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
+}
 export enum PathsApiSafTicketsGetParametersQueryOrder {
   ValueMinusclient = "-client",
   ValueMinuscreated_at = "-created_at",
@@ -7732,10 +7792,6 @@ export enum CertificateTypeEnum {
   ISCC = "ISCC",
   REDCERT = "REDCERT",
   Value2BS = "2BS",
-}
-export enum ConsumptionTypeEnum {
-  MAC = "MAC",
-  MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
 }
 export enum CorrectionStatusEnum {
   NO_PROBLEMO = "NO_PROBLEMO",

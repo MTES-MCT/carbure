@@ -176,7 +176,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         audited_charge_points = charge_point_audit_sample.audited_charge_points.all()
         charge_point_audits, errors = import_elec_audit_report_excel(file, audited_charge_points)
 
-        assert len(charge_point_audits) == 3
+        assert len(charge_point_audits) == 2
         assert len(errors) == 0
 
         assert charge_point_audits[0] == {
@@ -199,17 +199,6 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             "audit_date": datetime.date(2024, 6, 2),
             "observed_energy_reading": 1002,
             "comment": "",
-        }
-
-        assert charge_point_audits[2] == {
-            "charge_point_id": "ABCD03",
-            "observed_mid_or_prm_id": "",
-            "is_auditable": False,
-            "has_dedicated_pdl": False,
-            "current_type": "",
-            "audit_date": None,
-            "observed_energy_reading": 0,
-            "comment": "Charge point was not found",
         }
 
     def test_check_report(self):
@@ -250,6 +239,8 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         assert response.status_code == 200
 
+        assert len(charge_points_audited) == 3
+
         assert charge_points_audited[0].is_auditable is True
         assert charge_points_audited[0].current_type == "AC"
         assert charge_points_audited[0].observed_mid_or_prm_id == "[MID] 123-456"
@@ -266,10 +257,10 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         assert charge_points_audited[1].audit_date == datetime.date(2024, 6, 2)
         assert charge_points_audited[1].comment == ""
 
-        assert charge_points_audited[2].is_auditable is False
-        assert charge_points_audited[2].current_type == ""
-        assert charge_points_audited[2].observed_mid_or_prm_id == ""
-        assert charge_points_audited[2].observed_energy_reading == 0
-        assert charge_points_audited[2].has_dedicated_pdl is False
+        assert charge_points_audited[2].is_auditable is None
+        assert charge_points_audited[2].current_type is None
+        assert charge_points_audited[2].observed_mid_or_prm_id is None
+        assert charge_points_audited[2].observed_energy_reading is None
+        assert charge_points_audited[2].has_dedicated_pdl is None
         assert charge_points_audited[2].audit_date is None
-        assert charge_points_audited[2].comment == "Charge point was not found"
+        assert charge_points_audited[2].comment == ""

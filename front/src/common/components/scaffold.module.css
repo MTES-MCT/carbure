@@ -232,3 +232,9 @@ hr {
 .box--gap-lg {
   gap: var(--spacing-4w);
 }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

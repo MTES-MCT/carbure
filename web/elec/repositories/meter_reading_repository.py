@@ -1,4 +1,8 @@
-from django.db.models import Count, F, Q, Sum
+from datetime import date
+
+from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
+from django.db.models.fields import DateField, FloatField
+from django.db.models.functions import Cast, Coalesce
 
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
@@ -89,3 +93,45 @@ class MeterReadingRepository:
                 distinct=True,
             ),
         ).filter(app_count=0, meter_readings_charge_points_count__gt=0, entity_type=Entity.CPO)
+
+    @staticmethod
+    def annotate_charge_points_with_latest_readings(charge_points: QuerySet[ElecChargePoint], reference_date: date):
+        latest_readings = ElecMeterReading.objects.filter(
+            meter=OuterRef("current_meter"),
+            reading_date__lte=reference_date,
+        ).order_by("-reading_date", "-id")
+
+        return charge_points.select_related("current_meter").annotate(
+            latest_reading_index=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("extracted_energy")[:1]),
+                    F("current_meter__initial_index"),
+                    Value(0.0),
+                ),
+                output_field=FloatField(),
+            ),
+            latest_reading_date=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("reading_date")[:1]),
+                    F("current_meter__initial_index_date"),
+                    Value(date.min),
+                ),
+                output_field=DateField(),
+            ),
+            second_latest_reading_index=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("extracted_energy")[1:2]),
+                    F("current_meter__initial_index"),
+                    Value(0.0),
+                ),
+                output_field=FloatField(),
+            ),
+            second_latest_reading_date=Cast(
+                Coalesce(
+                    Subquery(latest_readings.values("reading_date")[1:2]),
+                    F("current_meter__initial_index_date"),
+                    Value(date.min),
+                ),
+                output_field=DateField(),
+            ),
+        )

@@ -2,6 +2,7 @@ import os
 import unicodedata
 from os import environ as env
 
+import pandas as pd
 import xlsxwriter
 from django import forms
 from django.conf import settings
@@ -251,3 +252,13 @@ class CarbureEnv:
 def is_true(df, column):
     values = df[column].astype(str).str.lower()
     return (values == "true") | (values == "1") | (values == "oui") | (values == "yes") | (values == "x")
+
+
+def is_bool_or_none(column):
+    values = column.astype(str).str.lower()
+    result = pd.Series([None] * len(column), index=column.index)
+    true_mask = (values == "true") | (values == "1") | (values == "oui") | (values == "yes") | (values == "x")
+    result[true_mask] = True
+    false_mask = (values == "false") | (values == "0") | (values == "non") | (values == "no")
+    result[false_mask] = False
+    return result

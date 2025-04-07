@@ -4,9 +4,8 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
 from core.models import Entity, UserRights
+from core.permissions import HasAdminRights, HasUserRights, OrPermission
 from entity.serializers import EntitySiteSerializer
-from saf.permissions import HasAdminRights, HasUserRights
-from saf.permissions.user_rights import OrPermission
 from transactions.models import Depot, EntitySite
 
 from .mixins import DepotActionMixin
