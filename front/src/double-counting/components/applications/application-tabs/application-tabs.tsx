@@ -8,11 +8,10 @@ import {
 } from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ProductionSiteForm } from "settings/components/production-site-dialog"
-import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
-import { ProductionTable } from "../../../double-counting/components/production-table"
-import { FilesTable } from "../../../double-counting/components/files-table"
-import { Box } from "common/components/scaffold"
+import { SourcingFullTable } from "../../sourcing-table"
+import { ProductionTable } from "../../production-table"
+import { ProductionSiteRecap } from "./production-site-recap"
+import { FilesTable } from "../../files-table"
 import {
   BuildingFill,
   BuildingLine,
@@ -21,6 +20,7 @@ import {
   UserFill,
   UserLine,
 } from "common/components/icon"
+import { Box } from "common/components/scaffold"
 
 interface ApplicationDetailsProps {
   production?: DoubleCountingProduction[]
@@ -78,7 +78,7 @@ const ApplicationTabs = ({
       />
       {focus === "production_site" && productionSite && (
         <Box>
-          <ProductionSiteForm readOnly productionSite={productionSite} />
+          <ProductionSiteRecap productionSite={productionSite} />
         </Box>
       )}
 
