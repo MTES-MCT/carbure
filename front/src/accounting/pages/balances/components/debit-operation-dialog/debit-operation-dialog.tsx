@@ -64,19 +64,18 @@ export const DebitOperationDialog = ({
             options={[
               {
                 label: formatOperationType(OperationType.CESSION),
-                hintText: "Additional information",
                 value: OperationType.CESSION,
               },
-              {
-                label: formatOperationType(OperationType.DEVALUATION),
-                hintText: "Additional information",
-                value: OperationType.DEVALUATION,
-              },
-              {
-                label: formatOperationType(OperationType.EXPORTATION),
-                hintText: "Additional information",
-                value: OperationType.EXPORTATION,
-              },
+              // {
+              //   label: formatOperationType(OperationType.DEVALUATION),
+              //   hintText: "Additional information",
+              //   value: OperationType.DEVALUATION,
+              // },
+              // {
+              //   label: formatOperationType(OperationType.EXPORTATION),
+              //   hintText: "Additional information",
+              //   value: OperationType.EXPORTATION,
+              // },
             ]}
             onChange={setCurrentOperation}
             value={currentOperation}

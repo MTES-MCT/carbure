@@ -12,6 +12,7 @@ class QuantitySerializer(serializers.Serializer):
 class ObjectiveSerializer(serializers.Serializer):
     target_mj = serializers.FloatField()
     target_type = serializers.CharField()
+    penalty = serializers.IntegerField()
 
 
 class ObjectiveSectorSerializer(serializers.Serializer):
@@ -38,6 +39,7 @@ class MainObjectiveSerializer(serializers.Serializer):
     pending_teneur = serializers.FloatField()
     declared_teneur = serializers.FloatField()
     unit = serializers.CharField()
+    penalty = serializers.IntegerField()
 
 
 class ObjectiveOutputSerializer(serializers.Serializer):

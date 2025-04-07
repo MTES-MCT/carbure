@@ -7,10 +7,13 @@ import { addQueryParams } from "common/utils/routes"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { DebitOperationDialog } from "./components/debit-operation-dialog"
-import { BalancesFilter, BalancesQuery } from "./types"
-import * as api from "./api"
+import {
+  BalancesFilter,
+  BalancesQuery,
+  OperationsStatus,
+} from "accounting/types"
+import * as api from "accounting/api/balances"
 import { formatSector } from "accounting/utils/formatters"
-import { OperationsStatus } from "accounting/types"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
@@ -43,7 +46,8 @@ export const useBalancesColumns = () => {
     },
     {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
-      cell: (item) => formatNumber(item.available_balance, 0),
+      cell: (item) =>
+        formatNumber(item.available_balance, { fractionDigits: 0 }),
     },
     {
       header: t("Opérations en attente"),
@@ -54,15 +58,12 @@ export const useBalancesColumns = () => {
           <Button
             customPriority="link"
             onClick={() => {
-              const url = addQueryParams(
-                routes.MATERIAL_ACCOUNTING.OPERATIONS,
-                {
-                  sector: item.sector,
-                  biofuel: item.biofuel?.code,
-                  customs_category: item.customs_category,
-                  status: OperationsStatus.PENDING,
-                }
-              )
+              const url = addQueryParams(routes.ACCOUNTING.OPERATIONS, {
+                sector: item.sector,
+                biofuel: item.biofuel?.code,
+                customs_category: item.customs_category,
+                status: OperationsStatus.PENDING,
+              })
               navigate(url)
             }}
           >

@@ -4,7 +4,7 @@ import useEntity from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
-import { createOperation, simulate } from "accounting/api"
+import { createOperation, simulate } from "accounting/api/operations"
 import { useMutation } from "common/hooks/async"
 
 type ExportationDialogProps = {
@@ -61,7 +61,9 @@ export const useExportationDialog = ({
         t(
           "L'exportation d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatUnit(values.quantity!, 0),
+            quantity: formatUnit(values.quantity!, {
+              fractionDigits: 0,
+            }),
           }
         ),
         { variant: "success" }

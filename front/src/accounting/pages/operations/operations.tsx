@@ -6,7 +6,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import useEntity from "common/hooks/entity"
-import * as api from "accounting/api"
+import * as api from "accounting/api/operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import { useGetFilterOptions, useOperationsColumns } from "./operations.hooks"
@@ -15,16 +15,15 @@ import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { NoResult } from "common/components/no-result2"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { useUnit } from "common/hooks/unit"
 const currentYear = new Date().getFullYear()
 
-export const Operations = ({
-  setOperationCount,
-}: {
-  setOperationCount: (count: number) => void
-}) => {
+const Operations = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   usePrivateNavigation(t("Comptabilité"))
+  const { formatUnit } = useUnit()
   const filterLabels = {
     [OperationsFilter.depot]: t("Dépôts"),
     [OperationsFilter.status]: t("Statut"),
@@ -47,9 +46,6 @@ export const Operations = ({
   const { result, loading } = useQuery(api.getOperations, {
     key: "operations",
     params: [query],
-    onSuccess: (data) => {
-      setOperationCount(data?.data?.count ?? 0)
-    },
   })
 
   const columns = useOperationsColumns({
@@ -77,6 +73,14 @@ export const Operations = ({
         <NoResult />
       ) : (
         <>
+          <RecapQuantity
+            text={t("{{count}} opérations pour un total de {{total}}", {
+              count: result?.data?.count ?? 0,
+              total: formatUnit(result?.data?.total_quantity ?? 0, {
+                fractionDigits: 0,
+              }),
+            })}
+          />
           <Table
             columns={columns}
             rows={result?.data?.results ?? []}
@@ -101,3 +105,5 @@ export const Operations = ({
     </>
   )
 }
+
+export default Operations

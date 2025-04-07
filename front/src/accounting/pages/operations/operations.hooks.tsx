@@ -8,7 +8,7 @@ import {
   getOperationEntity,
   isOperationDebit,
 } from "./operations.utils"
-import * as api from "accounting/api"
+import * as api from "accounting/api/operations"
 import {
   Operation,
   OperationDebitOrCredit,
@@ -50,7 +50,7 @@ export const useOperationsColumns = ({
         <Text
           size="sm"
           fontWeight="bold"
-          style={{ color: "var(--info-425-625)" }}
+          className={styles["operation-table__sector"]}
           is="button"
           componentProps={{
             onClick: () => onClickSector(item.sector),
@@ -113,7 +113,10 @@ export const useOperationsColumns = ({
                 styles["operation--rejected"]
             )}
           >
-            -{formatNumber(item.quantity)}
+            -
+            {formatNumber(item.quantity, {
+              fractionDigits: 0,
+            })}
           </Text>
         ) : (
           <Text
@@ -125,7 +128,10 @@ export const useOperationsColumns = ({
                 styles["operation--rejected"]
             )}
           >
-            +{formatNumber(item.quantity)}
+            +
+            {formatNumber(item.quantity, {
+              fractionDigits: 0,
+            })}
           </Text>
         ),
     },

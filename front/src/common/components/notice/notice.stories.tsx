@@ -55,16 +55,16 @@ export const Closable: Story = {
   },
 }
 
-export const NoColor: Story = {
-  args: {
-    variant: "info",
-    noColor: true,
-  },
-}
-
 export const WithIcon: Story = {
   args: {
     variant: "info",
     icon: SurveyFill,
+  },
+}
+
+export const NoColor: Story = {
+  args: {
+    variant: "info",
+    noColor: true,
   },
 }

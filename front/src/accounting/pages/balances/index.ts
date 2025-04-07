@@ -1,1 +1,1 @@
-export * from "./balances"
+export { default } from "./balances"

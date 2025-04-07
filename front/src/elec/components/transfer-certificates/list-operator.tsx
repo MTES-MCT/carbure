@@ -76,7 +76,9 @@ const OperatorTransferCertificateList = ({
         <Alert variant="info" icon={Bolt}>
           {t("{{acquired_energy}} MWh acquis", {
             count: snapshot.acquired_energy,
-            acquired_energy: formatNumber(snapshot.acquired_energy, 3),
+            acquired_energy: formatNumber(snapshot.acquired_energy, {
+              fractionDigits: 3,
+            }),
           })}
         </Alert>
       </Bar>

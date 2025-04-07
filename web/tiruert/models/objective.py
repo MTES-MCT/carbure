@@ -24,14 +24,16 @@ class Objective(models.Model):
     )
     customs_category = models.CharField(max_length=20, choices=MatierePremiere.MP_CATEGORIES, blank=True)
     year = models.IntegerField()
-    consideration_rate = models.FloatField(blank=True, null=True)
-    target = models.FloatField()
+    consideration_rate = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%")
+    target = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%")
     target_type = models.CharField(max_length=255, choices=TARGET_TYPES, default="REACH")
+    penalty = models.IntegerField(blank=True, null=True, help_text="en centimes d'euros")
 
     objects = ObjectiveManager()
 
     def __str__(self):
-        return f"{self.type} - {self.year} - {self.target}"
+        name = self.customs_category if self.type == self.BIOFUEL_CATEGORY else self.fuel_category
+        return f"{self.type} - {name} - {self.year} - {self.target}"
 
     class Meta:
         db_table = "tiruert_objectives"

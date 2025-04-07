@@ -92,7 +92,9 @@ export const ExportationQuantityForm = ({
             components={{ strong: <strong /> }}
             t={t}
             values={{
-              quantity: formatUnit(value.quantity!, 0),
+              quantity: formatUnit(value.quantity!, {
+                fractionDigits: 0,
+              }),
               avoided_emissions: formatEmissionMax(value.avoided_emissions),
             }}
             defaults="{{quantity}} : <strong>{{avoided_emissions}} tonnes de CO2 équivalent évitées</strong>"

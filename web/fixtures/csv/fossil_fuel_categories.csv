@@ -1,6 +1,6 @@
-name,pci_litre
-Essence,1
-Gazole,1
-Carburéacteur,1
-Fioul lourd,1
-GPL,1
+id,name,pci_litre
+1,Essence,32
+2,Gazole,36
+3,Carburéacteur,34
+4,Fioul lourd,33.2
+5,Gaz,24

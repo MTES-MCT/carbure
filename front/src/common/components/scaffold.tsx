@@ -71,6 +71,7 @@ export const Grid = (props: JSX.IntrinsicElements["div"]) => (
 export const Col = ({
   asideX,
   asideY,
+  spread,
   className,
   grow,
   gap,
@@ -78,7 +79,7 @@ export const Col = ({
 }: JSX.IntrinsicElements["div"] & Layout & { grow?: boolean; gap?: "md" }) => (
   <div
     {...props}
-    {...layout({ asideX, asideY })}
+    {...layout({ asideX, asideY, spread })}
     className={cl(
       css.column,
       grow && css["column--grow"],
@@ -112,8 +113,14 @@ export const LoaderOverlay = () => (
   </Overlay>
 )
 
-export const Box = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.box, props.className)} />
+export const Box = ({
+  gap = "md",
+  ...props
+}: JSX.IntrinsicElements["div"] & { gap?: "lg" | "md" | "sm" | "xs" }) => (
+  <div
+    {...props}
+    className={cl(css.box, props.className, gap && css[`box--gap-${gap}`])}
+  />
 )
 
 export const Divider = (props: JSX.IntrinsicElements["div"]) => (

@@ -1750,7 +1750,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** @description Set teneur operations to ACCEPTED */
+    /** @description Set teneur operations to DECLARED */
     post: operations["declare_teneur"]
     delete?: never
     options?: never
@@ -2707,7 +2707,6 @@ export interface components {
      *     * `TALLOL` - Tallol
      *     * `OTHER` - Autre
      *     * `EP2AM` - EP2AM
-     *     * `AM` - AM
      * @enum {string}
      */
     MPCategoriesEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category
@@ -2721,6 +2720,7 @@ export interface components {
       /** Format: double */
       declared_teneur: number
       unit: string
+      penalty: number
     }
     NavStats: {
       total_pending_action_for_admin?: number
@@ -2740,6 +2740,7 @@ export interface components {
       /** Format: double */
       target_mj: number
       target_type: string
+      penalty: number
     }
     ObjectiveCategory: {
       code: components["schemas"]["MPCategoriesEnum"]
@@ -2901,6 +2902,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["BalanceResponse"][]
+      total_quantity?: number
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -2931,6 +2933,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["OperationList"][]
+      total_quantity?: number
     }
     PaginatedSafTicketList: {
       /** @example 123 */
@@ -3421,6 +3424,7 @@ export interface components {
       max_n_batches?: number
       enforced_volumes?: number[]
       unit?: string
+      from_depot?: number | null
     }
     SimulationLotOutput: {
       lot_id: number
@@ -3436,6 +3440,7 @@ export interface components {
       /** Format: double */
       target_volume: number
       unit?: string
+      from_depot?: number | null
     }
     SimulationMinMaxOutput: {
       /** Format: double */
@@ -3599,6 +3604,8 @@ export interface components {
       readonly website: string
       readonly vat_number: string
       readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
+      readonly is_tiruert_liable: boolean
+      readonly accise_number: string
     }
     UserLoginRequest: {
       username: string
@@ -7036,7 +7043,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["ObjectiveOutput"][]
+          "application/json": components["schemas"]["ObjectiveOutput"]
         }
       }
     }
@@ -7055,8 +7062,15 @@ export interface operations {
         entity_id: number
         from_to?: string
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7362,8 +7376,15 @@ export interface operations {
         /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7401,6 +7422,11 @@ export interface operations {
         filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
         from_to?: string
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7438,6 +7464,11 @@ export interface operations {
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -7535,15 +7566,6 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Success message */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": unknown
-        }
-      }
       /** @description Error message */
       404: {
         headers: {
@@ -7677,7 +7699,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   TALLOL = "TALLOL",
   OTHER = "OTHER",
   EP2AM = "EP2AM",
-  AM = "AM",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   INCORPORATION = "INCORPORATION",
@@ -7689,6 +7710,10 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   DEVALUATION = "DEVALUATION",
   CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
   ACQUISITION = "ACQUISITION",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
+  ValueMinuscreated_at = "-created_at",
+  created_at = "created_at",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",

@@ -4998,9 +4998,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ObjectiveOutput"
+                $ref: "#/components/schemas/ObjectiveOutput"
           description: All objectives.
   /api/tiruert/operations/:
     get:
@@ -5026,7 +5024,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5035,7 +5032,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5095,10 +5091,32 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
           description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
           schema:
             type: integer
         - in: query
@@ -5565,7 +5583,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5574,7 +5591,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5639,10 +5655,32 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
           description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
           schema:
             type: integer
         - in: query
@@ -5745,7 +5783,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5754,7 +5791,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5818,6 +5854,22 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - in: query
           name: period
           schema:
@@ -5929,7 +5981,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5938,7 +5989,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -6008,6 +6058,22 @@ paths:
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - in: query
           name: period
           schema:
@@ -6186,7 +6252,7 @@ paths:
   /api/tiruert/operations/teneur/declare/:
     post:
       operationId: declare_teneur
-      description: Set teneur operations to ACCEPTED
+      description: Set teneur operations to DECLARED
       parameters:
         - in: query
           name: entity_id
@@ -6209,12 +6275,6 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: validated
-          description: Success message
         "404":
           content:
             application/json:
@@ -8607,7 +8667,6 @@ components:
         - TALLOL
         - OTHER
         - EP2AM
-        - AM
       type: string
       description: |-
         * `CONV` - Conventionnel
@@ -8616,7 +8675,6 @@ components:
         * `TALLOL` - Tallol
         * `OTHER` - Autre
         * `EP2AM` - EP2AM
-        * `AM` - AM
     MainObjective:
       type: object
       properties:
@@ -8634,9 +8692,12 @@ components:
           format: double
         unit:
           type: string
+        penalty:
+          type: integer
       required:
         - available_balance
         - declared_teneur
+        - penalty
         - pending_teneur
         - target
         - unit
@@ -8678,7 +8739,10 @@ components:
           format: double
         target_type:
           type: string
+        penalty:
+          type: integer
       required:
+        - penalty
         - target_mj
         - target_type
     ObjectiveCategory:
@@ -9050,6 +9114,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BalanceResponse"
+        total_quantity:
+          type: number
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -9096,6 +9162,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationList"
+        total_quantity:
+          type: number
     PaginatedSafTicketList:
       type: object
       required:
@@ -10398,6 +10466,9 @@ components:
         unit:
           type: string
           minLength: 1
+        from_depot:
+          type: integer
+          nullable: true
       required:
         - biofuel
         - customs_category
@@ -10436,6 +10507,9 @@ components:
         unit:
           type: string
           minLength: 1
+        from_depot:
+          type: integer
+          nullable: true
       required:
         - biofuel
         - customs_category
@@ -10817,7 +10891,14 @@ components:
           items:
             $ref: "#/components/schemas/ExtAdminPagesEnum"
           readOnly: true
+        is_tiruert_liable:
+          type: boolean
+          readOnly: true
+        accise_number:
+          type: string
+          readOnly: true
       required:
+        - accise_number
         - activity_description
         - default_certificate
         - entity_type
@@ -10830,6 +10911,7 @@ components:
         - has_trading
         - id
         - is_enabled
+        - is_tiruert_liable
         - legal_name
         - name
         - preferred_unit

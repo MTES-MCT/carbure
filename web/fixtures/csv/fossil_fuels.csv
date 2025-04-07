@@ -54,4 +54,7 @@ nomenclature,fuel_category,label,pci_litre,masse_volumique
 2711129700,5,Propane,1,1
 2711139100,5,Butane,1,1
 2711139700,5,Butane,1,1
-2711190000,5,GPL,1,1
+2711190000,5,GPL,1,1,
+2207200011,2,ED95,1,1
+3826001089,2,B100,1,1
+3826001089,2,B100,1,1

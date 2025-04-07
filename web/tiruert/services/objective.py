@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import make_aware
 
-from tiruert.models import Objective
+from tiruert.models import MacFossilFuel, Objective
 from tiruert.services.balance import BalanceService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
@@ -46,7 +47,7 @@ class ObjectiveService:
         return dict(consideration_rates)
 
     @staticmethod
-    def calculate_objective(balance, objective_queryset, energy_basis, objective_type):
+    def calculate_objectives_and_penalties(balance, objective_queryset, energy_basis, objective_type):
         """
         Calculate the objective per category or sector
         """
@@ -55,6 +56,7 @@ class ObjectiveService:
             balance[key]["objective"] = {
                 "target_mj": None,
                 "target_type": None,
+                "penalty": None,
             }
 
         objectives = objective_queryset.filter(type=objective_type)
@@ -72,21 +74,30 @@ class ObjectiveService:
             if key not in balance:
                 continue
             else:
+                target = ObjectiveService._calculate_target_for_objective(objective.target, energy_basis)
+                penalty_amout = ObjectiveService._calcule_penalty(
+                    objective.penalty,
+                    balance[key]["pending_teneur"] + balance[key]["declared_teneur"],
+                    target,
+                )
+
                 balance[key]["objective"] = {
-                    "target_mj": energy_basis * objective.target,
+                    "target_mj": target,
                     "target_type": objective.target_type,
+                    "penalty": penalty_amout,
                 }
 
         return list(balance.values())
 
     @staticmethod
-    def calculate_global_objective(objective_queryset, energy_basis):
+    def get_global_objective_and_penalty(objective_queryset, energy_basis):
         """
         Calculate the global objective of CO2 emissions reduction
         """
-        objective = objective_queryset.filter(type=Objective.MAIN).values("target").first()
-
-        return objective["target"] * energy_basis if objective else 0
+        objective = objective_queryset.filter(type=Objective.MAIN).values("target", "penalty").first()
+        target = ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis) if objective else 0
+        penalty = objective["penalty"] if objective else 0
+        return target, penalty
 
     @staticmethod
     def apply_ghg_conversion(value):
@@ -94,24 +105,15 @@ class ObjectiveService:
 
     @staticmethod
     def get_balances_for_objectives_calculation(operations, entity_id, date_from):
-        # First get the whole balance (from forever), so with no date_from filter
-        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj")
-        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj")
-
-        # Then update the balance with quantity and teneur details for requested dates
         date_from = make_aware(datetime.strptime(date_from, "%Y-%m-%d"))
-        operations_with_date_from = operations.filter(created_at__gte=date_from)
-        balance_per_category = BalanceService.calculate_balance(
-            operations_with_date_from, entity_id, "customs_category", "mj", balance_per_category, update_balance=True
-        )
-        balance_per_sector = BalanceService.calculate_balance(
-            operations_with_date_from, entity_id, "sector", "mj", balance_per_sector, update_balance=True
-        )
+
+        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from)
+        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj", date_from)
 
         return balance_per_category, balance_per_sector
 
     @staticmethod
-    def get_capped_objectives(year):
+    def _get_capped_objectives(year):
         """
         Get capped objectives for the given year
         Only for 'customs_category' objectives ('sector' and 'main' not handled for now)
@@ -119,8 +121,51 @@ class ObjectiveService:
         return Objective.objects.filter(year=year, target_type=Objective.CAP, type=Objective.BIOFUEL_CATEGORY)
 
     @staticmethod
-    def calculate_target_for_objective(objective, energy_basis):
+    def _calculate_target_for_objective(target, energy_basis):
         """
         Calculate the target for the given objective
         """
-        return energy_basis * objective.target
+        return energy_basis * target  # MJ
+
+    @staticmethod
+    def calculate_target_for_specific_category(customs_category, entity_id):
+        """
+        Calculate the objective target for a specific customs category
+        """
+        # 1. Get the capped objective for the given year and customs category
+        year = timezone.now().year
+        capped_objectives = ObjectiveService._get_capped_objectives(year)
+        objective = capped_objectives.filter(customs_category=customs_category).first()
+        if not objective:
+            return None
+
+        # 2. Calculate "assiette" used for objectives calculations
+        macs = MacFossilFuel.objects.filter(operator_id=entity_id, year=year)
+        objectives = Objective.objects.filter(year=year)
+        energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
+
+        # 3. Calculate the target objective for the customs category
+        target = ObjectiveService._calculate_target_for_objective(objective.target, energy_basis)  # MJ
+        return target
+
+    @staticmethod
+    def _calcule_penalty(penalty, teneur, target, tCO2=False):
+        """
+        Calculate the penalty for the given objective
+        If tCO2 is True, the penalty is in c€/tCO2
+        - teneur is in tCO2
+        - target is in tCO2
+        If tCO2 is False, the penalty is in c€/GJ
+        - teneur is in MJ (need to convert to GJ)
+        - target is in MJ (need to convert to GJ)
+        """
+        if not penalty or not target:
+            return 0
+
+        if teneur < target:
+            diff = target - teneur
+            diff = diff / 1000 if not tCO2 else diff
+            penalty_amount = diff * penalty
+            return penalty_amount
+        else:
+            return 0

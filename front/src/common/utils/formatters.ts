@@ -3,7 +3,7 @@ import formatTime from "date-fns/format"
 import formatDistanceToNow from "date-fns/formatDistanceToNow"
 import fr from "date-fns/locale/fr"
 import en from "date-fns/locale/en-GB"
-import { Unit } from "common/types"
+import { ExtendedUnit, Unit } from "common/types"
 import i18next from "i18next"
 
 export function formatPeriod(period: number | string) {
@@ -15,8 +15,21 @@ export function formatPeriodFromDate(date: Date) {
   return date.getFullYear() * 100 + date.getMonth() + 1
 }
 
-export function formatNumber(num: number, fractionDigits = 2) {
-  const integer = Math.floor(num).toFixed(0)
+export type FormatNumberOptions = {
+  fractionDigits?: number
+  mode?: "round" | "ceil" | "floor"
+}
+
+export function formatNumber(
+  num: number,
+  customOptions: FormatNumberOptions = {}
+) {
+  const defaultOptions: FormatNumberOptions = {
+    fractionDigits: 2,
+    mode: "floor",
+  }
+  const { fractionDigits, mode } = { ...defaultOptions, ...customOptions }
+  const integer = Math[mode ?? "floor"](num).toFixed(0)
   let decimal = num % 1
 
   // add space to separate thousands
@@ -37,6 +50,16 @@ export function roundNumber(num: number, fractionDigits = 2) {
   return Math.round(num * factor) / factor
 }
 
+export function ceilNumber(num: number, fractionDigits = 2) {
+  const factor = Math.pow(10, fractionDigits)
+  return Math.ceil(num * factor) / factor
+}
+
+export const floorNumber = (num: number, fractionDigits = 2) => {
+  const factor = Math.pow(10, fractionDigits)
+  return Math.floor(num * factor) / factor
+}
+
 export function formatPercentage(num: number) {
   return formatNumber(num) + "%"
 }
@@ -45,21 +68,31 @@ export function formatCelsiusDegree(num: number) {
   return formatNumber(num) + " °C"
 }
 
-export function formatUnit(num: number, unit: Unit, fractionDigits = 2) {
+export function formatUnit(
+  num: number,
+  unit: Unit | ExtendedUnit,
+  customOptions: FormatNumberOptions = {}
+) {
+  const defaultOptions: FormatNumberOptions = {
+    fractionDigits: 2,
+  }
+  const options = { ...defaultOptions, ...customOptions }
   const unitLabel = {
     [Unit.l]: i18next.t("litres", { count: num }),
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
+    [ExtendedUnit.GJ]: i18next.t("GJ"),
   }
 
-  return `${formatNumber(num, fractionDigits)} ${unitLabel[unit]}`
+  return `${formatNumber(num, options)} ${unitLabel[unit]}`
 }
 
-export function formatUnitOnly(unit: Unit, count = 2) {
+export function formatUnitOnly(unit: Unit | ExtendedUnit, count = 2) {
   const unitLabel = {
     [Unit.l]: i18next.t("litres", { count }),
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
+    [ExtendedUnit.GJ]: i18next.t("GJ"),
   }
 
   return unitLabel[unit]
@@ -147,4 +180,11 @@ export function chunk(str: string, size: number): string[] {
   }
 
   return chunks.reverse()
+}
+
+export const CONVERSIONS = {
+  energy: {
+    MJ_TO_GJ: (value: number) => value / 1000,
+    GJ_TO_MJ: (value: number) => value * 1000,
+  },
 }

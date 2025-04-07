@@ -129,6 +129,8 @@ class Entity(models.Model):
             "website": self.website,
             "vat_number": self.vat_number,
             "is_enabled": self.is_enabled,
+            "is_tiruert_liable": self.is_tiruert_liable,
+            "accise_number": self.accise_number,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]
@@ -291,7 +293,6 @@ class MatierePremiere(models.Model):
     TALLOL = "TALLOL"  # Tall
     OTHER = "OTHER"
     EP2AM = "EP2AM"  # EP2 résiduel
-    AM = "AM"  # AM résiduel
 
     MP_CATEGORIES = (
         (CONV, "Conventionnel"),
@@ -300,7 +301,6 @@ class MatierePremiere(models.Model):
         (TALLOL, "Tallol"),
         (OTHER, "Autre"),
         (EP2AM, "EP2AM"),
-        (AM, "AM"),
     )
 
     name = models.CharField(max_length=128)

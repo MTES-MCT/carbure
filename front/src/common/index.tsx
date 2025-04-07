@@ -3,7 +3,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity, { EntityContext, useEntityManager } from "common/hooks/entity"
-import useUserManager, { UserContext } from "common/hooks/user"
+import useUserManager, { UserContext, useUser } from "common/hooks/user"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { YearsProvider } from "common/providers/years-provider"
 import { NewNavigationDialog } from "carbure/components/new-navigation-dialog"
@@ -112,6 +112,7 @@ const currentYear = new Date().getFullYear()
 
 const Org = () => {
   const entity = useEntity()
+  const user = useUser()
   useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO
 
   const {
@@ -126,20 +127,25 @@ const Org = () => {
     isPowerOrHeatProducer,
     has_saf,
     has_elec,
+    accise_number,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
   const isTransferredElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
-
+  const userIsMTEDGEC = user?.rights.find(
+    (right) => right.entity.name === "MTE - DGEC"
+  )
   return (
     <Routes>
       <Route path="settings" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
       {(isIndustry || isPowerOrHeatProducer) && (
         <>
-          <Route path="accounting/*" element={<MaterialAccounting />} />
+          {(userIsMTEDGEC || accise_number !== "") && (
+            <Route path="accounting/*" element={<MaterialAccounting />} />
+          )}
           <Route path="transactions/:year/*" element={<Transactions />} />
 
           <Route

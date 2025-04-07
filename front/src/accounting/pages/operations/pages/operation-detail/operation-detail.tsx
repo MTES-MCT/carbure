@@ -2,14 +2,14 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
-import * as api from "accounting/api"
-import * as apiAccounting from "accounting/api"
+import * as api from "accounting/api/operations"
 import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import {
   getOperationEntity,
   getOperationQuantity,
+  isOperationDebit,
 } from "accounting/pages/operations/operations.utils"
 import { OperationBadge } from "accounting/pages/operations/components/operation-badge"
 import css from "./operation-detail.module.css"
@@ -80,7 +80,7 @@ export const OperationDetail = () => {
     })
 
   const { execute: patchOperation, loading: patchOperationLoading } =
-    useMutation(apiAccounting.patchOperation, {
+    useMutation(api.patchOperation, {
       onError: () => {
         notify(
           t(
@@ -123,12 +123,16 @@ export const OperationDetail = () => {
           label: t("Quantité"),
           value: getOperationQuantity(
             operation,
-            formatUnit(operation.quantity, 0)
+            formatUnit(operation.quantity, {
+              fractionDigits: 0,
+            })
           ),
         },
         {
           label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(operation.avoided_emissions),
+          value: formatNumber(operation.avoided_emissions, {
+            fractionDigits: 0,
+          }),
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
@@ -138,7 +142,7 @@ export const OperationDetail = () => {
           label: t("Destinataire"),
           value: getOperationEntity(operation)?.name ?? "-",
         },
-        {
+        operation.type !== OperationType.TENEUR && {
           label: t("Dépôt expéditeur"),
           value: operation.from_depot?.name ?? "-",
         },
@@ -192,7 +196,7 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {operation?.type === OperationType.CESSION &&
+            {isOperationDebit(operation?.type ?? "") &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button
@@ -201,7 +205,10 @@ export const OperationDetail = () => {
                   onClick={() => deleteOperation(entity.id, operation.id)}
                   loading={deleteOperationLoading}
                 >
-                  {t("Annuler le certificat de cession")}
+                  {operation?.type === OperationType.CESSION &&
+                    t("Annuler le certificat de cession")}
+                  {operation?.type === OperationType.TENEUR &&
+                    t("Annuler le certificat de teneur")}
                 </Button>
               )}
           </>

@@ -28,7 +28,7 @@ class MetadataPageNumberPagination(CustomPageNumberPagination):
         def get_extra_metadata(self):
             metadata = {'total': 0}
             for item in self.queryset:
-                metadata.total += item.volume
+                metadata["total"] += item.volume
             return metadata
     """
 
