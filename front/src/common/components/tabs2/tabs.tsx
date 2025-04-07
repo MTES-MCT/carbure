@@ -45,6 +45,7 @@ export const Tabs = <T extends string>({
   useEffect(() => {
     setFocus(controlledFocus ?? match?.key)
   }, [controlledFocus, match?.key])
+
   return (
     <nav {...layout(props)} className={cl(css.tabs, className)} style={style}>
       {tabs.map(({ icon: Icon, iconActive: IconActive, ...tab }) => {
@@ -82,7 +83,10 @@ export const Tabs = <T extends string>({
               {...props}
               key={tab.key}
             >
-              {Icon && <Icon size="sm" />}
+              {((Icon && tab.key !== focus) || (!IconActive && Icon)) && (
+                <Icon size="sm" />
+              )}
+              {IconActive && tab.key === focus && <IconActive size="sm" />}
               {tab.label}
             </Text>
           )
@@ -98,7 +102,10 @@ export const Tabs = <T extends string>({
             {...props}
             key={tab.key}
           >
-            {Icon && <Icon size="sm" />}
+            {((Icon && tab.key !== focus) || (!IconActive && Icon)) && (
+              <Icon size="sm" />
+            )}
+            {IconActive && tab.key === focus && <IconActive size="sm" />}
             {tab.label}
           </Text>
         )
