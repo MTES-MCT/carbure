@@ -35,7 +35,9 @@ class AgreementRetrieveActionMixin(RetrieveModelMixin):
             if entity.entity_type in [Entity.ADMIN, Entity.PRODUCER] or entity.has_external_admin_right(
                 ExternalAdminRights.DOUBLE_COUNTING
             ):
-                result["application"]["download_link"] = private_storage.url(agreement.application.download_link)
+                result["application"]["download_link"] = (
+                    private_storage.url(agreement.application.download_link) if agreement.application.download_link else None
+                )
             else:
                 result["application"]["download_link"] = None
 
