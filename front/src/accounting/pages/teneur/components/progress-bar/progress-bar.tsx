@@ -46,7 +46,7 @@ export const ProgressBar = ({
     setBaseValueWidth(`-${baseValueWidth / 2}px`)
 
     if (declaredPercent - basePercent < 10) {
-      setDeclaredValueWidth(`-${baseValueWidth + 10}px`)
+      setDeclaredValueWidth(`-${baseValueWidth * 1.5}px`)
     } else {
       setDeclaredValueWidth(`-${declaredValueWidth / 2}px`)
     }
@@ -73,7 +73,7 @@ export const ProgressBar = ({
           </span>
         ) : null}
         {/* Only show available percentage if available quantity is greater than declared quantity */}
-        {declaredQuantity ? (
+        {declaredQuantity && declaredPercent > 0 ? (
           <span
             className={css["progress-bar--quantity-available"]}
             style={{ width: `${declaredPercent}%` }}

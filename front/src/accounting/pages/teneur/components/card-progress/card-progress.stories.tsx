@@ -4,7 +4,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge"
 
 const meta: Meta<typeof CardProgress> = {
   component: CardProgress,
-  title: "pages/teneur/components/CardProgress",
+  title: "modules/accounting/pages/teneur/components/CardProgress",
   args: {
     title: "Essence",
     description: "Objectif en tonnes de CO2 évitées : 14",
