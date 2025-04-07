@@ -15,9 +15,9 @@ import * as api from "../../../api"
 import { DoubleCountingStatus as DCStatus } from "../../../../double-counting/types"
 import { ApplicationInfo } from "../application-info"
 import ApplicationStatus from "../../../../double-counting/components/application-status"
-import ApplicationTabs from "../application-tabs"
 import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
 import GenerateDecisionDialog from "double-counting-admin/components/generate-decision-dialog/generate-decision-dialog"
+import ApplicationTabs from "double-counting/components/applications/application-tabs"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -166,7 +166,7 @@ export const ApplicationDetailsDialog = () => {
     <Portal onClose={closeDialog}>
       <Dialog fullscreen onClose={closeDialog}>
         <header>
-          <ApplicationStatus big status={dcaStatus} />
+          <ApplicationStatus status={dcaStatus} />
           <h1>{t("Demande d'agrément double comptage")} </h1>
         </header>
 

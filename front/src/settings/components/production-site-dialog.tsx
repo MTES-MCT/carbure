@@ -17,13 +17,14 @@ import {
   normalizeCountry,
   normalizeFeedstock,
 } from "common/utils/normalizers"
-import { Autocomplete } from "common/components/autocomplete2"
+import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import Dialog from "common/components/dialog"
 import { Return, Save } from "common/components/icons"
-import { TextInput, RadioGroup } from "common/components/inputs2"
+import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
+import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
 import TagAutocomplete from "common/components/tag-autocomplete"
 import { useMutation } from "common/hooks/async"
@@ -298,7 +299,7 @@ export const ProductionSiteForm = ({
             <hr />
 
             <TagAutocomplete
-              label={t("Matières premières")}
+              label={t("Matieres premieres")}
               readOnly={readOnly}
               placeholder={t("Ajouter matières premières...")}
               defaultOptions={value.matieres_premieres}

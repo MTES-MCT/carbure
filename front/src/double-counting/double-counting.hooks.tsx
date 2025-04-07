@@ -15,7 +15,8 @@ import { formatDate, formatDateYear } from "common/utils/formatters"
 export enum DoubleCountingTab {
   ACTIVE = "active",
   PENDING = "pending",
-  REJECTED_OR_EXPIRED = "rejected_or_expired",
+  REJECTED = "rejected",
+  EXPIRED = "expired",
 }
 
 export const useDoubleCounting = () => {
@@ -29,13 +30,12 @@ export const useDoubleCounting = () => {
   const applicationsByStatus = useMemo(() => {
     const data = result?.data ?? []
     return Object.groupBy(data, ({ status, period_end }) => {
-      if (
-        isAgreementExpired(period_end) ||
-        status === DoubleCountingStatus.REJECTED
-      ) {
-        return DoubleCountingTab.REJECTED_OR_EXPIRED
+      if (isAgreementExpired(period_end)) {
+        return DoubleCountingTab.EXPIRED
       } else if (status === DoubleCountingStatus.PENDING) {
         return DoubleCountingTab.PENDING
+      } else if (status === DoubleCountingStatus.REJECTED) {
+        return DoubleCountingTab.REJECTED
       }
       return DoubleCountingTab.ACTIVE
     })
@@ -73,15 +73,19 @@ export const useDoubleCountingColumns = () => {
     {
       header: t("N° d'agrément"),
       cell: (dc) => (
-        <span>
-          {dc.status === DoubleCountingStatus.REJECTED && <>-</>}
-          {dc.status === DoubleCountingStatus.PENDING &&
-            t("En cours de traitement...")}
+        <Cell
+          text={
+            <>
+              {dc.status === DoubleCountingStatus.REJECTED && <>-</>}
+              {dc.status === DoubleCountingStatus.PENDING &&
+                t("En cours de traitement...")}
 
-          {dc.status === DoubleCountingStatus.ACCEPTED && (
-            <>{dc.certificate_id}</>
-          )}
-        </span>
+              {dc.status === DoubleCountingStatus.ACCEPTED && (
+                <>{dc.certificate_id}</>
+              )}
+            </>
+          }
+        ></Cell>
       ),
     },
     {

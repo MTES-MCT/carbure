@@ -94,12 +94,13 @@ export const Row = ({
   asideX,
   asideY,
   className,
+  gap,
   ...props
-}: JSX.IntrinsicElements["div"] & Layout) => (
+}: JSX.IntrinsicElements["div"] & Layout & { gap?: "md" }) => (
   <div
     {...props}
     {...layout({ asideX, asideY })}
-    className={cl(css.row, className)}
+    className={cl(css.row, className, gap && css[`row--gap-${gap}`])}
   />
 )
 
