@@ -1,12 +1,12 @@
 import createClient, { Middleware } from "openapi-fetch"
 import { getI18n } from "react-i18next"
-import { toFormData } from "./api"
 import {
   PathsWithGetMethod,
   QueryParams,
   type newPaths,
 } from "./api-fetch.types"
 import { getCookie } from "common/utils/cookies"
+import { toFormData } from "./api"
 
 export class HttpError extends Error {
   public status: number // Propriété pour stocker le statut HTTP
@@ -41,7 +41,11 @@ const middleware: Middleware = {
     if (!response.ok) {
       const message = await response.json()
 
-      throw new HttpError(JSON.stringify(message), response.status, message)
+      throw new HttpError(
+        JSON.stringify(message),
+        response.status,
+        JSON.stringify(message)
+      )
     }
     return response
   },

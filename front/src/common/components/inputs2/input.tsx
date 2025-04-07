@@ -2,15 +2,18 @@ import { InputProps as InputPropsDSFR } from "@codegouvfr/react-dsfr/Input"
 import { RefObject } from "react"
 import { BaseInput, ExtendedInputProps } from "./base-input"
 
+type CommonInputProps = {
+  inputRef?: React.RefObject<HTMLInputElement>
+  label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+}
 // Props to be exposed to all inputs (text/number/date etc...)
 export type InputProps = Omit<
   InputPropsDSFR,
   "nativeInputProps" | "textArea" | "nativeTextAreaProps" | "label"
 > &
-  ExtendedInputProps & {
-    inputRef?: React.RefObject<HTMLInputElement>
-    label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
-  }
+  ExtendedInputProps &
+  CommonInputProps
 
 /**
  * Base component for creating TextInput/NumberInput/DateInput etc...
@@ -23,16 +26,13 @@ export const Input = ({
   placeholder,
   type,
   nativeInputProps,
-  readOnly,
   inputRef,
-  required,
   label,
+  onKeyDown,
   ...props
 }: Omit<InputPropsDSFR.RegularInput, "label"> &
-  ExtendedInputProps & {
-    inputRef?: React.RefObject<HTMLInputElement>
-    label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
-  }) => {
+  ExtendedInputProps &
+  CommonInputProps) => {
   return (
     <BaseInput
       {...props}
@@ -43,9 +43,10 @@ export const Input = ({
         pattern,
         placeholder,
         type,
-        readOnly,
-        required,
+        readOnly: props.readOnly,
+        required: props.required,
         ref: inputRef as RefObject<HTMLInputElement>,
+        onKeyDown,
       }}
       textArea={false}
       label={label ?? ""}

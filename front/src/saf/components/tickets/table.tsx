@@ -1,5 +1,3 @@
-import Pagination from "common/components/pagination"
-import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
@@ -12,7 +10,10 @@ import {
   SafTicketStatus,
 } from "saf/types"
 import TicketTag from "./tag"
-import NoResult from "common/components/no-result"
+import { Order, Table, Cell } from "common/components/table2"
+import { Pagination } from "common/components/pagination2/pagination"
+import { NoResult } from "common/components/no-result2"
+import { formatConsumptionType } from "saf/utils/formatters"
 
 export interface TicketsTableProps {
   loading: boolean
@@ -57,21 +58,17 @@ export const TicketsTable = memo(
                 columns.availableVolume,
                 columns.period,
                 columns.feedstock,
+                columns.consumption,
                 columns.ghgReduction,
               ])}
             />
 
-            {(state.limit || 0) < total && (
-              <Pagination
-                page={state.page}
-                startPage={1}
-                limit={state.limit}
-                total={total}
-                onPage={actions.setPage}
-                onLimit={actions.setLimit}
-                keepSearch
-              />
-            )}
+            <Pagination
+              defaultPage={state.page}
+              limit={state.limit}
+              total={total}
+              onLimit={actions.setLimit}
+            />
           </>
         ) : (
           <NoResult
@@ -152,6 +149,20 @@ export function useColumns() {
       header: t("Réd. GES"),
       cell: (ticket: SafTicket) => (
         <Cell text={`${ticket.ghg_reduction?.toFixed(0)}%`} />
+      ),
+    },
+
+    consumption: {
+      key: "consumption_type",
+      header: t("Type de consommation"),
+      cell: (ticket: SafTicket) => (
+        <Cell
+          text={
+            ticket.consumption_type
+              ? formatConsumptionType(ticket.consumption_type)
+              : "-"
+          }
+        />
       ),
     },
   }

@@ -7,8 +7,7 @@ import { Button, ButtonProps } from "common/components/button2"
 import styles from "./select.module.css"
 import { Text } from "common/components/text"
 import cl from "clsx"
-
-export interface SelectProps<T, V = T> extends Trigger {
+export type SelectProps<T, V = T> = Trigger & {
   search?: boolean
   value?: V | undefined
   options?: T[]
@@ -28,7 +27,6 @@ export interface SelectProps<T, V = T> extends Trigger {
   className?: string
   children?: ListProps<T, V>["children"]
   loading?: boolean
-  readOnly?: boolean
   disabled?: boolean
 }
 
@@ -50,8 +48,8 @@ export function Select<T, V>({
   size = "medium",
   full,
   className,
+  disabled,
   children,
-  ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
@@ -81,6 +79,8 @@ export function Select<T, V>({
           className
         )}
         size={size}
+        type="button"
+        disabled={disabled}
       >
         <Text
           fontWeight="semibold"
@@ -92,36 +92,35 @@ export function Select<T, V>({
             : asyncOptions.label || placeholder}
         </Text>
       </Button>
-      {!props.disabled && !props.readOnly && (
-        <Dropdown
-          open={open && asyncOptions.items.length > 0}
-          triggerRef={triggerRef}
-          anchor={anchor}
-          onClose={onClose}
-          onToggle={setOpen}
-          onOpen={() => {
-            onOpen?.()
-            asyncOptions.execute()
+
+      <Dropdown
+        open={open && asyncOptions.items.length > 0}
+        triggerRef={triggerRef}
+        anchor={anchor}
+        onClose={onClose}
+        onToggle={setOpen}
+        onOpen={() => {
+          onOpen?.()
+          asyncOptions.execute()
+        }}
+        className={cl(search && styles["select-dropdown"])}
+      >
+        <List
+          controlRef={triggerRef}
+          search={search}
+          items={asyncOptions.items}
+          selectedValue={value}
+          sort={sort}
+          normalize={normalize}
+          onFocus={onChange}
+          onSelectValue={(value) => {
+            onChange?.(value)
+            setOpen(false)
           }}
-          className={cl(search && styles["select-dropdown"])}
         >
-          <List
-            controlRef={triggerRef}
-            search={search}
-            items={asyncOptions.items}
-            selectedValue={value}
-            sort={sort}
-            normalize={normalize}
-            onFocus={onChange}
-            onSelectValue={(value) => {
-              onChange?.(value)
-              setOpen(false)
-            }}
-          >
-            {children}
-          </List>
-        </Dropdown>
-      )}
+          {children}
+        </List>
+      </Dropdown>
     </>
   )
 }

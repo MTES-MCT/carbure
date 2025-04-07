@@ -2,13 +2,14 @@ import cl from "clsx"
 import { Link, To } from "react-router-dom"
 import useControlledState from "../../hooks/controlled-state"
 import { multipleSelection } from "../../utils/selection"
-import Checkbox from "../checkbox"
 import { ChevronRight } from "../icons"
 import { Col, LoaderOverlay } from "../scaffold"
 import css from "./table.module.css"
 import Tooltip from "../tooltip"
 import { Text } from "../text"
 import { useTranslation } from "react-i18next"
+import { Checkbox } from "../inputs2"
+import { ReactNode } from "react"
 
 export type TableVariant = "spaced" | "compact"
 
@@ -23,6 +24,9 @@ export interface TableProps<T> {
   columns: Column<T>[]
   rows: T[]
   order?: Order
+
+  // If hasSelectionColumn is true, this text will be displayed in the top actions section
+  selectionText?: string
 
   // List of selected rows
   selected?: number[]
@@ -49,6 +53,7 @@ export function Table<T>({
   loading,
   headless,
   hasSelectionColumn,
+  selectionText,
   selected = [],
   topActions,
   identify,
@@ -92,11 +97,15 @@ export function Table<T>({
                   captive
                   value={selected.length > 0}
                   onChange={() => onSelect?.([])}
-                >
-                  {t("{{count}} lignes sélectionnées", {
-                    count: selected.length,
-                  })}
-                </Checkbox>
+                  small
+                  style={{ marginRight: "8px" }}
+                />
+                <Text size="sm" is="span">
+                  {selectionText ??
+                    t("{{count}} lignes sélectionnées", {
+                      count: selected.length,
+                    })}
+                </Text>
               </span>
               {topActions?.map((action, i) => (
                 <div
@@ -191,7 +200,7 @@ function isVisible(column: Column<any>) {
   return !column.hidden
 }
 
-function selectionColumn<T, V>(
+export function selectionColumn<T, V>(
   rows: T[],
   selected: V[],
   onSelect: (selected: V[]) => void,
@@ -207,13 +216,17 @@ function selectionColumn<T, V>(
         captive
         value={selection.isAllSelected(values)}
         onChange={() => selection.onSelectAll(values)}
+        small
       />
     ),
     cell: (item) => (
       <Checkbox
         captive
         value={selection.isSelected(identify(item))}
-        onChange={() => selection.onSelect(identify(item))}
+        onChange={() => {
+          selection.onSelect(identify(item))
+        }}
+        small
       />
     ),
   }
@@ -316,8 +329,9 @@ export interface CellProps {
   style?: React.CSSProperties
   variant?: CellVariant
   icon?: React.FunctionComponent | React.ReactNode
-  text?: any
-  sub?: any
+  text?: ReactNode
+  sub?: ReactNode
+  tooltipText?: string // Text to be displayed in the tooltip
 }
 
 export const Cell = ({
@@ -327,18 +341,35 @@ export const Cell = ({
   icon: Icon,
   text,
   sub,
+  tooltipText,
 }: CellProps) => {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
 
+  const tooltipTitle =
+    tooltipText ??
+    (typeof text === "string" ? text : typeof sub === "string" ? sub : "")
+
   return (
     <Col
-      className={cl(css.multiline, variant && css[variant], className)}
+      className={cl(
+        css.overflow,
+        text && sub && css.multiline,
+        variant && css[variant],
+        className
+      )}
       style={style}
     >
-      <Tooltip title={`${text || sub}`}>
-        {text || sub} {icon}
+      <Tooltip title={tooltipTitle}>
+        <Text is="span" size="sm" className={css["cell__wrapper-text"]}>
+          {text || sub}
+          {icon}
+        </Text>
       </Tooltip>
-      {text && sub !== undefined && <small title={`${sub}`}>{sub}</small>}
+      {text && sub !== undefined && (
+        <Text is="span" size="sm" className={css["cell__sub-text"]}>
+          {sub}
+        </Text>
+      )}
     </Col>
   )
 }

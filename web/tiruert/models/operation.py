@@ -5,16 +5,58 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation_detail import OperationDetail
 
 
+class OperationManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
+            .prefetch_related("details")
+            .only(
+                # Champs de l'opération
+                "id",
+                "type",
+                "status",
+                "customs_category",
+                "validation_date",
+                "created_at",
+                # Relations nécessaires
+                "biofuel_id",
+                "credited_entity_id",
+                "debited_entity_id",
+                "from_depot_id",
+                "to_depot_id",
+                "export_country_id",
+                # Champs des modèles liés utilisés
+                "biofuel__code",
+                "biofuel__pci_litre",
+                "biofuel__compatible_essence",
+                "biofuel__compatible_diesel",
+                "biofuel__masse_volumique",
+                "credited_entity__name",
+                "debited_entity__name",
+                "from_depot__name",
+                "to_depot__name",
+            )
+        )
+
+
 class Operation(models.Model):
     PENDING = "PENDING"
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
+    ACCEPTED = "ACCEPTED"  # Acquisition
+    REJECTED = "REJECTED"  # Acquisition
     CANCELED = "CANCELED"
+    DECLARED = "DECLARED"  # Teneur validation
+    CORRECTED = "CORRECTED"  # By customs
+    VALIDATED = "VALIDATED"  # By customs
     OPERATION_STATUSES = (
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
         (REJECTED, REJECTED),
         (CANCELED, CANCELED),
+        (DECLARED, DECLARED),
+        (CORRECTED, CORRECTED),
+        (VALIDATED, VALIDATED),
     )
 
     INCORPORATION = "INCORPORATION"
@@ -25,6 +67,7 @@ class Operation(models.Model):
     ACQUISITION = "ACQUISITION"  # Only for display purposes
     EXPORTATION = "EXPORTATION"
     DEVALUATION = "DEVALUATION"
+    CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -33,7 +76,13 @@ class Operation(models.Model):
         (MAC_BIO, MAC_BIO),
         (EXPORTATION, EXPORTATION),
         (DEVALUATION, DEVALUATION),
+        (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
     )
+
+    ESSENCE = "ESSENCE"
+    GAZOLE = "GAZOLE"
+    CARBUREACTEUR = "CARBURÉACTEUR"
+    SECTOR_CODE_CHOICES = (ESSENCE, GAZOLE, CARBUREACTEUR)
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)
@@ -57,14 +106,20 @@ class Operation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
 
+    objects = OperationManager()
+
     @property
     def sector(self):
         if self.biofuel.compatible_essence:
-            return "ESSENCE"
+            return Operation.ESSENCE
         elif self.biofuel.compatible_diesel:
-            return "DIESEL"
+            return Operation.GAZOLE
         elif self.biofuel.code in SAF_BIOFUEL_TYPES:
-            return "SAF"
+            return Operation.CARBUREACTEUR
+
+    @property
+    def volume(self):
+        return sum([detail.volume for detail in self.details.all()])
 
     class Meta:
         db_table = "tiruert_operations"

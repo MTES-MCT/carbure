@@ -6,9 +6,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Entity, UserRights
+from core.pagination import MetadataPageNumberPagination
+from core.permissions import HasUserRights
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
-from tiruert.permissions import HasUserRights
 from tiruert.serializers import (
     OperationInputSerializer,
     OperationListSerializer,
@@ -17,6 +18,17 @@ from tiruert.serializers import (
 )
 
 from .mixins import ActionMixin
+
+
+class OperationPagination(MetadataPageNumberPagination):
+    aggregate_fields = {"total_quantity": 0}
+
+    def get_extra_metadata(self):
+        metadata = {"total_quantity": 0}
+        for operation in self.queryset:
+            quantity = operation.volume_to_quantity(operation.volume, self.request.unit)
+            metadata["total_quantity"] += quantity
+        return metadata
 
 
 @extend_schema(
@@ -31,7 +43,7 @@ from .mixins import ActionMixin
         OpenApiParameter(
             name="unit",
             type=str,
-            enum=["l", "mj", "kg"],
+            enum=[choice[0] for choice in Entity.UNIT_CHOICE],
             location=OpenApiParameter.QUERY,
             description="Specify the volume unit.",
         ),
@@ -47,6 +59,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     filterset_class = OperationFilter
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get", "post", "patch", "delete"]
+    pagination_class = OperationPagination
 
     def get_permissions(self):
         if self.action in ["reject", "accept", "simulate", "create", "partial_update", "destroy"]:
@@ -59,8 +72,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         request = super().initialize_request(request, *args, **kwargs)
         # Get unit from request params or entity preference or default to liters
         entity = getattr(request, "entity", None)
-        unit = request.GET.get("unit") or (entity.preferred_unit.lower() if entity else None) or "l"
-        setattr(request, "unit", unit)
+        unit = (
+            request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
+        )
+        setattr(request, "unit", unit.lower())
         return request
 
     def get_serializer_context(self):
@@ -191,7 +206,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.type == Operation.CESSION and instance.status in [Operation.PENDING, Operation.REJECTED]:
+        if instance.type in [Operation.CESSION, Operation.TENEUR] and instance.status in [
+            Operation.PENDING,
+            Operation.REJECTED,
+        ]:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_403_FORBIDDEN)

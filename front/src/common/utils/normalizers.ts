@@ -90,6 +90,7 @@ export const normalizeEntity: Normalizer<Entity> = (entity) => ({
     sustainability_officer_email: entity.sustainability_officer,
     vat_number: entity.vat_number,
     website: entity.website,
+    is_tiruert_liable: entity.is_tiruert_liable,
   },
 })
 

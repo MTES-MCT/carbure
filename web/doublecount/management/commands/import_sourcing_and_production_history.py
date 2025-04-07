@@ -3,9 +3,9 @@ import time
 import traceback
 import warnings
 
-from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 
+from core import private_storage
 from doublecount.helpers import load_dc_production_history_data, load_dc_sourcing_history_data
 from doublecount.models import DoubleCountingApplication
 from doublecount.parser.dc_parser import parse_dc_excel
@@ -25,6 +25,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start_time = time.time()
 
+        self.create_tmp_folder()
+
         if options["id"]:
             self.process_dc_application(f"{TMP_FOLDER}{options["id"]}.xlsx", f"{options["id"]}.xlsx")
             return
@@ -37,9 +39,9 @@ class Command(BaseCommand):
 
     def download_files_from_S3(self, folder):
         # Get all files in the folder and download them in TMP_FOLDER
-        for file in default_storage.listdir(folder)[1]:
+        for file in private_storage.listdir(folder)[1]:
             s3_path = f"{folder}{file}"
-            with default_storage.open(f"{s3_path}", "rb") as f:
+            with private_storage.open(f"{s3_path}", "rb") as f:
                 tmp_path = f"{TMP_FOLDER}{file}"
                 with open(f"{tmp_path}", "wb") as f2:
                     f2.write(f.read())
@@ -135,12 +137,16 @@ class Command(BaseCommand):
         if dca.download_link:
             return
 
-        dca.download_link = default_storage.url(s3_path)
+        dca.download_link = s3_path
         dca.save()
 
     def upload_dca_to_s3(self, s3_path, file):
         try:
-            default_storage.save(s3_path, file)
+            private_storage.save(s3_path, file)
         except Exception:
             traceback.print_exc()
             self.stdout.write(self.style.ERROR(f"Error uploading file to S3: {s3_path}"))
+
+    def create_tmp_folder(self):
+        if not os.path.exists(TMP_FOLDER):
+            os.makedirs(TMP_FOLDER)

@@ -9,12 +9,11 @@ import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 
 type ProductionTableProps = {
-  hasAgreement?: boolean
-
   quotas?: Record<string, number>
   production: DoubleCountingProduction[]
   sourcing: DoubleCountingSourcing[]
   setQuotas?: (quotas: Record<string, number>) => void
+  hasAgreement?: boolean
 }
 
 export const ProductionTable = ({

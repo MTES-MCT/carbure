@@ -1,13 +1,11 @@
 import useEntity from "common/hooks/entity"
 import { EntityPreview, EntityType, Airport } from "common/types"
 import * as norm from "common/utils/normalizers"
-import Autocomplete from "common/components/autocomplete"
-import Button from "common/components/button"
-import Collapse from "common/components/collapse"
-import Dialog from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Collapse } from "common/components/collapse2"
+import { Dialog } from "common/components/dialog2"
 import Form, { useForm } from "common/components/form"
-import { Return, Send, Split } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { TextInput } from "common/components/inputs2"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import {
@@ -21,8 +19,9 @@ import * as api from "../../pages/operator/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import Select from "common/components/select"
-import { ConsumptionTypeEnum, ShippingMethodEnum } from "api-schema"
+import { ShippingMethodEnum } from "api-schema"
+import { Autocomplete } from "common/components/autocomplete2"
+import { ConsumptionType } from "saf/types"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSource[]
@@ -98,143 +97,142 @@ const TicketsGroupedAssignment = ({
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <h1>{t("Affecter les volumes sélectionnés")}</h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
-              {t(
-                "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume des lots :"
-              )}
-            </p>
-
-            <Collapse
-              variant="info"
-              icon={Split}
-              label={t(
-                "{{volumeCount}} volumes sélectionnés pour un total de {{remainingVolume}} L",
-                {
-                  volumeCount: ticketSources.length,
-                  remainingVolume: formatNumber(remainingVolume),
-                }
-              )}
-            >
-              <section>
-                <ul>
-                  {ticketSources.map((ticketSource) => {
-                    return (
-                      <li key={ticketSource.id}>
-                        {" "}
-                        {t("{{volume}} L - {{period}} - {{feedstock}}", {
-                          volume: formatNumber(
-                            ticketSource.total_volume -
-                              ticketSource.assigned_volume
-                          ),
-                          period: formatPeriod(ticketSource.delivery_period),
-                          feedstock: t(ticketSource.feedstock?.code ?? "", {
-                            ns: "feedstocks",
-                          }),
-                        })}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </section>
-              <footer></footer>
-            </Collapse>
-
-            <Form id="assign-ticket" onSubmit={groupedAssignTicket}>
-              <VolumeInput
-                remainingVolume={remainingVolume}
-                onSetMaximumVolume={setMaximumVolume}
-                {...bind("volume")}
-              />
-              {lastDeliveryPeriod && (
-                <PeriodSelect
-                  deliveryPeriod={lastDeliveryPeriod}
-                  {...bind("assignment_period")}
-                />
-              )}
-
-              <Autocomplete
-                required
-                label={t("Client")}
-                getOptions={findSafClient}
-                normalize={norm.normalizeEntityPreview}
-                {...bind("client")}
-              />
-
-              {value.client?.entity_type === EntityType.Operator && (
-                <TextInput //TODO for transfer only
-                  required
-                  label={t("N° du certificat d'acquisition")}
-                  {...bind("agreement_reference")}
-                />
-              )}
-
-              {value.client?.entity_type === EntityType.Airline && (
-                <>
-                  <Autocomplete
-                    required
-                    label={t("Aéroport de réception")}
-                    getOptions={findAirports}
-                    normalize={norm.normalizeAirport}
-                    {...bind("reception_airport")}
-                  />
-
-                  <Select
-                    label={t("Mode d'expédition")}
-                    placeholder={t("Choisissez un mode")}
-                    {...bind("shipping_method")}
-                    options={[
-                      {
-                        value: ShippingMethodEnum.PIPELINE,
-                        label: t("Oléoduc"),
-                      },
-                      { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
-                      { value: ShippingMethodEnum.TRAIN, label: t("Train") },
-                      { value: ShippingMethodEnum.BARGE, label: t("Barge") },
-                    ]}
-                  />
-
-                  <Select
-                    label={t("Type de consommation")}
-                    placeholder={t("Choisissez un type")}
-                    {...bind("consumption_type")}
-                    options={[
-                      {
-                        value: ConsumptionTypeEnum.MAC,
-                        label: t("Mise à consommation mandat FR/EU"),
-                      },
-                      {
-                        value: ConsumptionTypeEnum.MAC_DECLASSEMENT,
-                        label: t(
-                          "Mise à consommation hors mandat (déclassement)"
-                        ),
-                      },
-                    ]}
-                  />
-                </>
-              )}
-
-              <TextInput label={t("Champ libre")} {...bind("free_field")} />
-            </Form>
-          </section>
-        </main>
-
-        <footer>
+      <Dialog
+        onClose={onClose}
+        header={
+          <Dialog.Title>{t("Affecter les volumes sélectionnés")}</Dialog.Title>
+        }
+        footer={
           <Button
-            icon={Send}
-            label={t("Affecter")}
-            variant="primary"
-            submit="assign-ticket"
+            iconId="ri-send-plane-line"
+            priority="primary"
+            nativeButtonProps={{
+              form: "assign-ticket",
+            }}
+            type="submit"
+          >
+            {t("Affecter")}
+          </Button>
+        }
+        fitContent
+      >
+        <p>
+          {t(
+            "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume des lots :"
+          )}
+        </p>
+
+        <Collapse
+          defaultExpanded
+          label={t(
+            "{{count}} volumes sélectionnés pour un total de {{remainingVolume}} L",
+            {
+              count: ticketSources.length,
+              remainingVolume: formatNumber(remainingVolume),
+            }
+          )}
+        >
+          <ul>
+            {ticketSources.map((ticketSource) => {
+              return (
+                <li key={ticketSource.id}>
+                  {" "}
+                  {t("{{volume}} L - {{period}} - {{feedstock}}", {
+                    volume: formatNumber(
+                      ticketSource.total_volume - ticketSource.assigned_volume
+                    ),
+                    period: formatPeriod(ticketSource.delivery_period),
+                    feedstock: t(ticketSource.feedstock?.code ?? "", {
+                      ns: "feedstocks",
+                    }),
+                  })}
+                </li>
+              )
+            })}
+          </ul>
+        </Collapse>
+
+        <Form id="assign-ticket" onSubmit={groupedAssignTicket}>
+          <VolumeInput
+            remainingVolume={remainingVolume}
+            onSetMaximumVolume={setMaximumVolume}
+            {...bind("volume")}
+          />
+          {lastDeliveryPeriod && (
+            <PeriodSelect
+              deliveryPeriod={lastDeliveryPeriod}
+              {...bind("assignment_period")}
+            />
+          )}
+
+          <Autocomplete
+            required
+            label={t("Client")}
+            placeholder={t("Sélectionnez un client")}
+            getOptions={findSafClient}
+            normalize={norm.normalizeEntityPreview}
+            {...bind("client")}
           />
 
-          <Button icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
+          {value.client?.entity_type === EntityType.Operator && (
+            <TextInput //TODO for transfer only
+              required
+              label={t("N° du certificat d'acquisition")}
+              placeholder={t("Ex: 1234567890")}
+              {...bind("agreement_reference")}
+            />
+          )}
+
+          {value.client?.entity_type === EntityType.Airline && (
+            <>
+              <Autocomplete
+                required
+                label={t("Aéroport de réception")}
+                placeholder={t("Sélectionnez un aéroport")}
+                getOptions={findAirports}
+                normalize={norm.normalizeAirport}
+                {...bind("reception_airport")}
+              />
+
+              <Autocomplete
+                label={t("Mode d'expédition")}
+                placeholder={t("Sélectionnez un mode")}
+                {...bind("shipping_method")}
+                options={[
+                  {
+                    value: ShippingMethodEnum.PIPELINE,
+                    label: t("Oléoduc"),
+                  },
+                  { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
+                  { value: ShippingMethodEnum.TRAIN, label: t("Train") },
+                  { value: ShippingMethodEnum.BARGE, label: t("Barge") },
+                ]}
+              />
+
+              <Autocomplete
+                label={t("Type de consommation")}
+                placeholder={t("Sélectionnez un type")}
+                {...bind("consumption_type")}
+                options={[
+                  {
+                    value: ConsumptionType.MAC,
+                    label: t("Mise à consommation mandat FR/EU"),
+                  },
+                  {
+                    value: ConsumptionType.MAC_DECLASSEMENT,
+                    label: t("Mise à consommation hors mandat (déclassement)"),
+                  },
+                ]}
+              />
+            </>
+          )}
+
+          <TextInput
+            label={t("Champ libre")}
+            {...bind("free_field")}
+            placeholder={t("Ex: commentaire")}
+          />
+        </Form>
       </Dialog>
     </Portal>
   )
@@ -250,7 +248,7 @@ const defaultAssignment = {
   agreement_reference: "" as string | undefined, //TODO for transfer only
   reception_airport: undefined as Airport | undefined,
   shipping_method: undefined as ShippingMethodEnum | undefined,
-  consumption_type: undefined as ConsumptionTypeEnum | undefined,
+  consumption_type: undefined as ConsumptionType | undefined,
 }
 
 export type GroupedAssignmentForm = typeof defaultAssignment

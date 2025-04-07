@@ -1,7 +1,8 @@
 import { fr, FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr"
 import cl from "clsx"
 import styles from "./icon.module.css"
-interface BaseIconProps {
+import { Layout, layout } from "../scaffold"
+interface BaseIconProps extends Layout {
   passthrough?: boolean
   size?: "xs" | "sm" | "md" | "lg"
   className?: string
@@ -12,10 +13,18 @@ interface BaseIconProps {
 export type IconName = FrIconClassName | RiIconClassName
 export type IconProps = Omit<BaseIconProps, "name">
 
-const Icon = ({ size = "md", name, ...props }: BaseIconProps) => {
+export const Icon = ({
+  size = "md",
+  name,
+  asideX,
+  asideY,
+  spread,
+  ...props
+}: BaseIconProps) => {
   return (
     <span
       {...props}
+      {...layout({ asideX, asideY, spread })}
       className={cl(props.className, styles[`fr-icon--${size}`], fr.cx(name))}
     />
   )
@@ -227,4 +236,24 @@ export const FileListLine = ({ ...props }: IconProps) => {
 
 export const FileListFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-file-list-fill" />
+}
+
+export const ChatDeleteLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-chat-delete-line" />
+}
+
+export const LoaderLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-loader-line" />
+}
+
+export const InfoFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="fr-icon-info-fill" />
+}
+
+export const WarningFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="fr-icon-warning-fill" />
+}
+
+export const AlertFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="fr-icon-error-fill" />
 }
