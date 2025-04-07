@@ -223,6 +223,10 @@ export const DraftFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-draft-fill" />
 }
 
+export const DraftLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-draft-line" />
+}
+
 export const ArrowRightLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-arrow-right-line" />
 }
@@ -289,4 +293,28 @@ export const UserLine = ({ ...props }: IconProps) => {
 
 export const UserFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="ri-user-fill" />
+}
+
+export const PauseCircleLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-pause-circle-line" />
+}
+
+export const PauseCircleFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-pause-circle-fill" />
+}
+
+export const ChatHistoryLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-chat-history-line" />
+}
+
+export const ChatHistoryFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-chat-history-fill" />
+}
+
+export const CloseLine = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-close-line" />
+}
+
+export const CloseFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-close-fill" />
 }
