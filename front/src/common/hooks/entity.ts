@@ -80,6 +80,7 @@ export function useEntityManager(
     canTrade: canTrade,
     website: entity?.website ?? "",
     vat_number: entity?.vat_number ?? "",
+    accise_number: entity?.accise_number ?? "",
 
     hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) =>
       entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false,

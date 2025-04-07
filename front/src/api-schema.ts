@@ -3605,6 +3605,7 @@ export interface components {
       readonly vat_number: string
       readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][]
       readonly is_tiruert_liable: boolean
+      readonly accise_number: string
     }
     UserLoginRequest: {
       username: string
@@ -7565,15 +7566,6 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Success message */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": unknown
-        }
-      }
       /** @description Error message */
       404: {
         headers: {

@@ -6275,12 +6275,6 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: validated
-          description: Success message
         "404":
           content:
             application/json:
@@ -10900,7 +10894,11 @@ components:
         is_tiruert_liable:
           type: boolean
           readOnly: true
+        accise_number:
+          type: string
+          readOnly: true
       required:
+        - accise_number
         - activity_description
         - default_certificate
         - entity_type

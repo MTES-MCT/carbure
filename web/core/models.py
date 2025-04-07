@@ -130,6 +130,7 @@ class Entity(models.Model):
             "vat_number": self.vat_number,
             "is_enabled": self.is_enabled,
             "is_tiruert_liable": self.is_tiruert_liable,
+            "accise_number": self.accise_number,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]

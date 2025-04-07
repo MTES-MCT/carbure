@@ -14,8 +14,7 @@ export const useAccounting = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const user = useUser()
-  const { isProducer, isOperator, isPowerOrHeatProducer, is_tiruert_liable } =
-    useEntity()
+  const { is_tiruert_liable, accise_number } = useEntity()
 
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
@@ -23,8 +22,7 @@ export const useAccounting = () => {
 
   const section: MenuSection = {
     title: t("Comptabilité"),
-    condition:
-      !!userIsMTEDGEC && (isProducer || isOperator || isPowerOrHeatProducer),
+    condition: Boolean(userIsMTEDGEC) || accise_number !== "",
     children: [
       {
         path: routes.ACCOUNTING.OPERATIONS,

@@ -708,6 +708,7 @@ class UserEntitySerializer(serializers.ModelSerializer):
             "vat_number",
             "ext_admin_pages",
             "is_tiruert_liable",
+            "accise_number",
         ]
         read_only_fields = fields
 
