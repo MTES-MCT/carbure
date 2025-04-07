@@ -1,5 +1,14 @@
 import { Button } from "common/components/button2"
-import { DraftFill, SendPlaneFill } from "common/components/icon"
+import {
+  ChatHistoryFill,
+  ChatHistoryLine,
+  CloseFill,
+  CloseLine,
+  DraftFill,
+  DraftLine,
+  PauseCircleFill,
+  PauseCircleLine,
+} from "common/components/icon"
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRights } from "common/hooks/entity"
@@ -69,19 +78,29 @@ const DoubleCounting = () => {
             key: DoubleCountingTab.ACTIVE,
             path: DoubleCountingTab.ACTIVE,
             label: t("Actifs"),
-            icon: DraftFill,
+            icon: DraftLine,
+            iconActive: DraftFill,
           },
           {
             key: DoubleCountingTab.PENDING,
             path: DoubleCountingTab.PENDING,
             label: t("En attente"),
-            icon: DraftFill,
+            icon: PauseCircleLine,
+            iconActive: PauseCircleFill,
           },
           {
-            key: DoubleCountingTab.REJECTED_OR_EXPIRED,
-            path: DoubleCountingTab.REJECTED_OR_EXPIRED,
-            label: t("Expirés / Rejetés"),
-            icon: SendPlaneFill,
+            key: DoubleCountingTab.EXPIRED,
+            path: DoubleCountingTab.EXPIRED,
+            label: t("Expirés"),
+            icon: ChatHistoryLine,
+            iconActive: ChatHistoryFill,
+          },
+          {
+            key: DoubleCountingTab.REJECTED,
+            path: DoubleCountingTab.REJECTED,
+            label: t("Rejetés"),
+            icon: CloseLine,
+            iconActive: CloseFill,
           },
         ]}
       />

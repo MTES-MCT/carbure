@@ -2,7 +2,7 @@ import {
   RadioButtons,
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons"
-import { ChangeEvent, ReactNode } from "react"
+import { ChangeEvent } from "react"
 import { Label, LabelProps } from "../base-input"
 import styles from "./radio.module.css"
 import cl from "clsx"
@@ -24,21 +24,21 @@ export type RadioGroupProps<V extends RadioValueType> = Omit<
 > & {
   options: OptionsProps<V>[]
   value?: V
-  onChange: (value: V) => void
-  required?: boolean
-  label?: ReactNode
-}
+  onChange?: (value: V) => void
+} & LabelProps
 
 export const RadioGroup = <V extends RadioValueType>({
   options,
   onChange,
   required,
   label,
+  readOnly,
+  hasTooltip,
+  title,
   ...props
 }: RadioGroupProps<V>) => {
   const optionsWithNativeInputProps = options.map((option) => ({
     ...option,
-    label: <Label {...option} />,
     nativeInputProps: {
       value: option.value,
       onChange: (e: ChangeEvent<HTMLInputElement>) =>
@@ -54,8 +54,21 @@ export const RadioGroup = <V extends RadioValueType>({
     <RadioButtons
       {...props}
       options={optionsWithNativeInputProps}
-      className={cl(props.className, styles["radio-group"])}
-      legend={label}
+      className={cl(
+        props.className,
+        styles["radio-group"],
+        readOnly && styles["radio-group--read-only"]
+      )}
+      legend={
+        <Label
+          label={label}
+          readOnly={readOnly}
+          hasTooltip={hasTooltip}
+          required={required}
+          title={title}
+        />
+      }
+      disabled={readOnly ?? props.disabled}
     />
   )
 }
