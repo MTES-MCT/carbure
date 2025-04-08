@@ -24,7 +24,7 @@ class ElecTransferCertificate(models.Model):
     )
     transfer_date = models.DateField()
     accepted_date = models.DateField(null=True, blank=True)
-    energy_amount = models.FloatField()
+    energy_amount = models.FloatField()  # unit = MWh
     comment = models.CharField(max_length=256, null=True, blank=True)
 
     used_in_tiruert = models.BooleanField(default=False)
