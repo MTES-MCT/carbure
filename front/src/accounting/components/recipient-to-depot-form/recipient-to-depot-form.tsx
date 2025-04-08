@@ -27,6 +27,7 @@ export const RecipientToDepotForm = () => {
     <>
       <Autocomplete
         label={t("Sélectionnez un destinataire")}
+        placeholder={t("Rechercher un destinataire")}
         getOptions={(query) => findEligibleTiruertEntities(entity.id, query)}
         normalize={normalizeEntityPreview}
         {...bind("credited_entity")}
@@ -34,6 +35,7 @@ export const RecipientToDepotForm = () => {
       />
       <Autocomplete
         label={t("Sélectionnez un dépôt destinataire")}
+        placeholder={t("Rechercher un dépôt")}
         getOptions={findDepots}
         normalize={normalizeDepot}
         {...bind("to_depot")}
