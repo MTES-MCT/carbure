@@ -7,7 +7,7 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from tiruert.models.elec_operation import ElecOperation
-from tiruert.services.elec import update_operator_cpo_acquisition_operations
+from tiruert.services.elec_operation import ElecOperationService
 
 
 class ElecOperationTest(TestCase):
@@ -49,19 +49,19 @@ class ElecOperationTest(TestCase):
         operations = ElecOperation.objects.all()
         assert operations.count() == 0
 
-        operation = update_operator_cpo_acquisition_operations(self.entity)
+        operation = ElecOperationService.update_operator_cpo_acquisition_operations(self.entity)
 
         assert operation is not None
-        assert operation.quantity == 10000
+        assert operation.quantity == 3600 * 10000
         assert operations.count() == 1
 
-        operation = update_operator_cpo_acquisition_operations(self.entity)
+        operation = ElecOperationService.update_operator_cpo_acquisition_operations(self.entity)
 
         assert operations.count() == 1
         assert operation is None
 
     def test_view_operations(self):
-        update_operator_cpo_acquisition_operations(self.entity)
+        ElecOperationService.update_operator_cpo_acquisition_operations(self.entity)
 
         query = {
             "entity_id": self.entity.id,
