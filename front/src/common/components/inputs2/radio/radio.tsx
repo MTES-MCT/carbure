@@ -7,8 +7,11 @@ import { Label, LabelProps } from "../base-input"
 import styles from "./radio.module.css"
 import cl from "clsx"
 
+// The DSFR does not support boolean values for the radio buttons
 type RadioValueType =
-  RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
+  | RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
+  | boolean
+
 // Simplify the usage of the RadioButtons component
 type OptionsProps<V extends RadioValueType> = Omit<
   RadioButtonsProps["options"][number],
@@ -48,7 +51,7 @@ export const RadioGroup = <V extends RadioValueType>({
         : {}),
       required,
     },
-  }))
+  })) as RadioButtonsProps["options"]
 
   return (
     <RadioButtons

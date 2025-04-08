@@ -355,3 +355,10 @@ export function identity<T>(value: T) {
 export function isString(value: any): value is string {
   return typeof value === "string"
 }
+
+export function getYesNoOptions() {
+  return [
+    { value: true, label: i18next.t("Oui") },
+    { value: false, label: i18next.t("Non") },
+  ]
+}
