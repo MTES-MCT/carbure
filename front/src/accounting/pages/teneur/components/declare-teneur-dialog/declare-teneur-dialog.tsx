@@ -165,17 +165,36 @@ const DeclareTeneurDialogContent = ({
                 </>
               )}
               {/* Setup progress bar related to the sector objective for unconstrained categories */}
-              {!targetType ? (
-                <DeclareTeneurProgressBar
-                  teneurDeclared={currentSectorObjective?.teneur_declared ?? 0}
-                  teneurDeclaredMonth={
-                    currentSectorObjective?.teneur_declared_month ?? 0
-                  }
-                  target={currentSectorObjective?.target ?? 0}
-                  quantity={form.value.quantity ?? 0}
-                  sector={currentSectorObjective?.code}
-                  targetType={targetType}
-                />
+              {!targetType && currentSectorObjective ? (
+                <>
+                  <DeclareTeneurProgressBar
+                    teneurDeclared={
+                      currentSectorObjective?.teneur_declared ?? 0
+                    }
+                    teneurDeclaredMonth={
+                      currentSectorObjective?.teneur_declared_month ?? 0
+                    }
+                    target={currentSectorObjective?.target ?? 0}
+                    quantity={form.value.quantity ?? 0}
+                    sector={currentSectorObjective?.code}
+                    targetType={targetType}
+                  />
+                  <RecapData.RemainingQuantityBeforeObjective
+                    value={formatUnit(
+                      Math.max(
+                        0,
+                        computeObjectiveEnergy(currentSectorObjective) -
+                          (form.value.quantity ?? 0)
+                      ),
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                    bold
+                    size="md"
+                  />
+                </>
               ) : null}
             </Box>
 

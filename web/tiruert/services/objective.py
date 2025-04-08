@@ -57,6 +57,7 @@ class ObjectiveService:
                 "target_mj": None,
                 "target_type": None,
                 "penalty": None,
+                "target_percent": None,
             }
 
         objectives = objective_queryset.filter(type=objective_type)
@@ -85,6 +86,7 @@ class ObjectiveService:
                     "target_mj": target,
                     "target_type": objective.target_type,
                     "penalty": penalty_amout,
+                    "target_percent": objective.target,
                 }
 
         return list(balance.values())
@@ -97,7 +99,8 @@ class ObjectiveService:
         objective = objective_queryset.filter(type=Objective.MAIN).values("target", "penalty").first()
         target = ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis) if objective else 0
         penalty = objective["penalty"] if objective else 0
-        return target, penalty
+        target_percent = objective["target"] if objective else 0
+        return target, penalty, target_percent
 
     @staticmethod
     def apply_ghg_conversion(value):

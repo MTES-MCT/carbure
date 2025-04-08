@@ -16,7 +16,7 @@ import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { CONVERSIONS, formatDate, formatNumber } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
 import {
@@ -27,7 +27,7 @@ import {
 import { Form, useForm } from "common/components/form2"
 import { useNotify } from "common/components/notifications"
 import { Autocomplete } from "common/components/autocomplete2"
-import { Depot, UserRole } from "common/types"
+import { Depot, ExtendedUnit, UserRole } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { formatOperationType, formatSector } from "accounting/utils/formatters"
 import { OperationsStatus, OperationType } from "accounting/types"
@@ -121,12 +121,20 @@ export const OperationDetail = () => {
         { label: t("Biocarburant"), value: operation.biofuel },
         {
           label: t("Quantité"),
-          value: getOperationQuantity(
+          value: `${getOperationQuantity(
             operation,
             formatUnit(operation.quantity, {
-              fractionDigits: 0,
+              fractionDigits: 2,
+              appendZeros: false,
             })
-          ),
+          )} / ${getOperationQuantity(
+            operation,
+            formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
+              fractionDigits: 2,
+              unit: ExtendedUnit.GJ,
+              appendZeros: false,
+            })
+          )}`,
         },
         {
           label: t("Tonnes CO2 eq evitées"),

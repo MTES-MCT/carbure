@@ -11,6 +11,7 @@ import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
 import { useQuantityForm } from "./quantity-form.hooks"
 import { ExtendedUnit, Unit } from "common/types"
+import { formatNumber } from "common/utils/formatters"
 
 type QuantityFormComponentProps = {
   balance: Balance
@@ -121,7 +122,7 @@ export const QuantityForm = ({
                     value.quantity > depot_quantity_max)
                 }
               >
-                {t("Déclarer la quantité")}
+                {t("Valider la quantité")}
               </Button>
             )}
             {quantityDeclared && (
@@ -151,7 +152,8 @@ export const QuantityForm = ({
                 t={t}
                 values={{
                   quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 0,
+                    fractionDigits: 10,
+                    appendZeros: false,
                   }),
                   value: value.avoided_emissions_min,
                 }}
@@ -163,7 +165,8 @@ export const QuantityForm = ({
                 t={t}
                 values={{
                   quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 0,
+                    fractionDigits: 10,
+                    appendZeros: false,
                   }),
                   min: value.avoided_emissions_min,
                   max: value.avoided_emissions_max,
@@ -210,12 +213,16 @@ export const QuantitySummary = ({
       <OperationText
         title={t("Quantité")}
         description={formatUnit(values.quantity, {
-          fractionDigits: 0,
+          fractionDigits: 10,
+          appendZeros: false,
         })}
       />
       <OperationText
         title={t("TCO2 évitées équivalentes")}
-        description={values.avoided_emissions}
+        description={formatNumber(values.avoided_emissions, {
+          fractionDigits: 10,
+          appendZeros: false,
+        })}
       />
     </>
   )

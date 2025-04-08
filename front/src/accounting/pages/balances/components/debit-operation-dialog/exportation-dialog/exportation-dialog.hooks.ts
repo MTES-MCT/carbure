@@ -1,10 +1,10 @@
-import { Balance, CreateOperationType } from "accounting/types"
+import { Balance } from "accounting/types"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import useEntity from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
-import { createOperation, simulate } from "accounting/api/operations"
+import { simulate } from "accounting/api/operations"
 import { useMutation } from "common/hooks/async"
 
 type ExportationDialogProps = {
@@ -31,24 +31,24 @@ export const useExportationDialog = ({
       debited_entity: entity.id,
       target_volume: values.quantity!,
       target_emission: values.avoided_emissions!,
-    }).then((response) => {
-      const lots = response.data?.selected_lots
-      if (lots) {
-        return createOperation(entity.id, {
-          lots: lots.map(({ lot_id, ...rest }) => ({
-            id: lot_id,
-            ...rest,
-          })),
-          biofuel: balance.biofuel?.id ?? null,
-          customs_category: balance.customs_category,
-          debited_entity: entity.id,
-          type: CreateOperationType.EXPORTATION,
-          from_depot: values.from_depot?.id,
-          to_depot: values.to_depot?.id,
-          credited_entity: values.credited_entity?.id,
-          export_country: 0, // TODO: when the exportation flow will be implemented, we will need to add the export country
-        })
-      }
+    }).then(() => {
+      // const lots = response.data?.selected_lots
+      // if (lots) {
+      //   return createOperation(entity.id, {
+      //     lots: lots.map(({ lot_id, ...rest }) => ({
+      //       id: lot_id,
+      //       ...rest,
+      //     })),
+      //     biofuel: balance.biofuel?.id ?? null,
+      //     customs_category: balance.customs_category,
+      //     debited_entity: entity.id,
+      //     type: CreateOperationType.EXPORTATION,
+      //     from_depot: values.from_depot?.id,
+      //     to_depot: values.to_depot?.id,
+      //     credited_entity: values.credited_entity?.id,
+      //     export_country: 0, // TODO: when the exportation flow will be implemented, we will need to add the export country
+      //   })
+      // }
     })
   }
 
