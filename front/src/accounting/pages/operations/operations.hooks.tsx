@@ -56,17 +56,17 @@ export const useOperationsColumns = ({
             onClick: () => onClickSector(item.sector),
           }}
         >
-          {t(formatSector(item.sector))}
+          {formatSector(item.sector)}
         </Text>
       ),
     },
     {
       header: t("Biocarburant"),
-      cell: (item) => item.biofuel,
+      cell: (item) => <Cell text={item.biofuel} />,
     },
     {
       header: t("Catégorie"),
-      cell: (item) => item.customs_category,
+      cell: (item) => <Cell text={item.customs_category} />,
     },
     {
       header: t("Date"),
@@ -82,7 +82,7 @@ export const useOperationsColumns = ({
     },
     {
       header: t("Opération"),
-      cell: (item) => <Cell text={t(formatOperationType(item.type))} />,
+      cell: (item) => <Cell text={formatOperationType(item.type)} />,
     },
     {
       header: t("De/à"),
@@ -153,7 +153,7 @@ export const useGetFilterOptions = (query: OperationsQuery) => {
 
     if (filter === OperationsFilter.status) {
       return data?.map((item) => ({
-        label: t(formatOperationStatus(item as OperationsStatus)),
+        label: formatOperationStatus(item as OperationsStatus),
         value: item,
       }))
     }
