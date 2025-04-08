@@ -8878,6 +8878,10 @@ components:
           type: number
           format: double
           readOnly: true
+        quantity_mj:
+          type: number
+          format: double
+          readOnly: true
         avoided_emissions:
           type: number
           format: double
@@ -8898,6 +8902,7 @@ components:
         - from_depot
         - id
         - quantity
+        - quantity_mj
         - sector
         - to_depot
         - type

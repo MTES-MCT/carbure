@@ -41,9 +41,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
         return instance.sector
 
     def get_volume_l(self, instance) -> float:
-        if not hasattr(self, "_cached_volume"):
-            self._cached_volume = instance.volume
-        return self._cached_volume
+        return instance.volume
 
     def get_quantity(self, instance) -> float:
         volume = self.get_volume_l(instance)

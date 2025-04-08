@@ -2799,6 +2799,8 @@ export interface components {
       /** Format: double */
       readonly quantity: number
       /** Format: double */
+      readonly quantity_mj: number
+      /** Format: double */
       readonly avoided_emissions: number
       readonly unit: string
       details?: components["schemas"]["OperationDetail"][]
