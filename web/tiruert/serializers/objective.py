@@ -13,6 +13,7 @@ class ObjectiveSerializer(serializers.Serializer):
     target_mj = serializers.FloatField()
     target_type = serializers.CharField()
     penalty = serializers.IntegerField()
+    target_percent = serializers.FloatField()
 
 
 class ObjectiveSectorSerializer(serializers.Serializer):
@@ -40,6 +41,7 @@ class MainObjectiveSerializer(serializers.Serializer):
     declared_teneur = serializers.FloatField()
     unit = serializers.CharField()
     penalty = serializers.IntegerField()
+    target_percent = serializers.FloatField()
 
 
 class ObjectiveOutputSerializer(serializers.Serializer):

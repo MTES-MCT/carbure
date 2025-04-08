@@ -18,6 +18,8 @@ export function formatPeriodFromDate(date: Date) {
 export type FormatNumberOptions = {
   fractionDigits?: number
   mode?: "round" | "ceil" | "floor"
+  // Add zeros to the number if it is less than the fractionDigits
+  appendZeros?: boolean
 }
 
 export function formatNumber(
@@ -27,8 +29,12 @@ export function formatNumber(
   const defaultOptions: FormatNumberOptions = {
     fractionDigits: 2,
     mode: "floor",
+    appendZeros: true,
   }
-  const { fractionDigits, mode } = { ...defaultOptions, ...customOptions }
+  const { fractionDigits, mode, appendZeros } = {
+    ...defaultOptions,
+    ...customOptions,
+  }
   const integer = Math[mode ?? "floor"](num).toFixed(0)
   let decimal = num % 1
 
@@ -39,7 +45,8 @@ export function formatNumber(
   if (decimal !== 0) {
     if (decimal < 0) decimal = -decimal
     const decimalStr = decimal.toFixed(fractionDigits).slice(2)
-    numStr += "," + decimalStr
+    numStr +=
+      "," + (appendZeros ? decimalStr : decimalStr.replace(/\.?0+$/, ""))
   }
 
   return numStr

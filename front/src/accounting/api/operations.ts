@@ -2,7 +2,6 @@ import { apiTypes } from "common/services/api-fetch.types"
 import { api } from "common/services/api-fetch"
 import { OperationsFilter, OperationsQuery } from "../types"
 import { PathsApiTiruertOperationsGetParametersQueryOrder_by } from "api-schema"
-import { floorNumber } from "common/utils/formatters"
 
 export const getOperationsFilters = (
   filter: string,
@@ -133,7 +132,7 @@ export const createOperationWithSimulation = (
   }).then((response) => {
     const lots = response.data?.selected_lots.map(({ volume, ...lot }) => ({
       ...lot,
-      volume: floorNumber(volume, 2),
+      volume: parseFloat(volume),
     }))
     if (lots) {
       return createOperation(entityId, {

@@ -6275,6 +6275,12 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: validated
+          description: Success message
         "404":
           content:
             application/json:
@@ -8694,12 +8700,16 @@ components:
           type: string
         penalty:
           type: integer
+        target_percent:
+          type: number
+          format: double
       required:
         - available_balance
         - declared_teneur
         - penalty
         - pending_teneur
         - target
+        - target_percent
         - unit
     NavStats:
       type: object
@@ -8741,9 +8751,13 @@ components:
           type: string
         penalty:
           type: integer
+        target_percent:
+          type: number
+          format: double
       required:
         - penalty
         - target_mj
+        - target_percent
         - target_type
     ObjectiveCategory:
       type: object
@@ -10481,8 +10495,8 @@ components:
         lot_id:
           type: integer
         volume:
-          type: number
-          format: double
+          type: string
+          format: decimal
         emission_rate_per_mj:
           type: number
           format: double

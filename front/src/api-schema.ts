@@ -2721,6 +2721,8 @@ export interface components {
       declared_teneur: number
       unit: string
       penalty: number
+      /** Format: double */
+      target_percent: number
     }
     NavStats: {
       total_pending_action_for_admin?: number
@@ -2741,6 +2743,8 @@ export interface components {
       target_mj: number
       target_type: string
       penalty: number
+      /** Format: double */
+      target_percent: number
     }
     ObjectiveCategory: {
       code: components["schemas"]["MPCategoriesEnum"]
@@ -3428,8 +3432,8 @@ export interface components {
     }
     SimulationLotOutput: {
       lot_id: number
-      /** Format: double */
-      volume: number
+      /** Format: decimal */
+      volume: string
       /** Format: double */
       emission_rate_per_mj: number
     }
@@ -7566,6 +7570,15 @@ export interface operations {
     }
     requestBody?: never
     responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
       /** @description Error message */
       404: {
         headers: {
