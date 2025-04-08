@@ -51,3 +51,10 @@ export const WithLabel: Story = {
     label: "Label",
   },
 }
+
+export const ReadOnly: Story = {
+  args: {
+    label: "Label",
+    readOnly: true,
+  },
+}
