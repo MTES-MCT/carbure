@@ -11,7 +11,14 @@
   padding: 0 0 1rem 0;
   margin: 0;
 }
+.radio-group :global(.fr-fieldset__content .fr-radio-group label) {
+  padding-bottom: 0;
+}
 
 .radio-group--read-only:disabled :global(.fr-label) {
   color: var(--text-default-grey);
+}
+
+.radio-group--read-only:disabled :global(.fr-fieldset__legend) {
+  padding: 0;
 }
