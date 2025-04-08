@@ -57,7 +57,7 @@ class ElecOperation(models.Model):
         "core.Entity", null=True, on_delete=models.deletion.CASCADE, related_name="debited_elec_operations"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    quantity = models.FloatField(default=0)
+    quantity = models.FloatField(default=0)  # unit = MWh
 
     objects = ElecOperationManager()
 
@@ -65,3 +65,8 @@ class ElecOperation(models.Model):
         db_table = "tiruert_elec_operations"
         verbose_name = "Opération électricité"
         verbose_name_plural = "Opérations électricité"
+
+    def is_acquisition(self, entity_id):
+        if self.credited_entity is None:
+            return False
+        return self.credited_entity.id == int(entity_id) and self.type == ElecOperation.CESSION
