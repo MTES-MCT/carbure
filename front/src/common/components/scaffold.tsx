@@ -63,8 +63,22 @@ export const Panel = ({
 )
 
 // a container that automatically arranges its content into a grid
-export const Grid = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.grid, props.className)} />
+export const Grid = ({
+  cols,
+  ...props
+}: JSX.IntrinsicElements["div"] & { cols?: number }) => (
+  <div
+    {...props}
+    className={cl(css.grid, props.className)}
+    style={{
+      ...props.style,
+      ...(cols
+        ? {
+            gridTemplateColumns: `repeat(${cols}, minmax(var(--grid-cell-width), 1fr))`,
+          }
+        : {}),
+    }}
+  />
 )
 
 // a div with vertical flow
