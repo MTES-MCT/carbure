@@ -3,12 +3,14 @@
 import traceback
 
 from django import forms
+from django.db import transaction
 from django.views.decorators.http import require_POST
 
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights
 from elec.models import ElecTransferCertificate
+from tiruert.services.elec import update_operator_cpo_acquisition_operations
 
 
 class ElecRejectError:
@@ -37,15 +39,19 @@ def accept_transfer_certificate(request, *args, **kwargs):
     used_in_tiruert = transfer_form.cleaned_data["used_in_tiruert"]
     consumption_date = transfer_form.cleaned_data["consumption_date"]
 
-    try:
-        transfer_certificate.status = ElecTransferCertificate.ACCEPTED
-        transfer_certificate.used_in_tiruert = used_in_tiruert == "true"
-        if consumption_date:
-            transfer_certificate.consumption_date = consumption_date
-        transfer_certificate.save()
-        return SuccessResponse()
-    except Exception:
-        traceback.print_exc()
-        return ErrorResponse(400, ElecRejectError.ACCEPT_FAILED)
+    with transaction.atomic():
+        try:
+            transfer_certificate.status = ElecTransferCertificate.ACCEPTED
+            transfer_certificate.used_in_tiruert = used_in_tiruert == "true"
+            if consumption_date:
+                transfer_certificate.consumption_date = consumption_date
+            transfer_certificate.save()
+
+            update_operator_cpo_acquisition_operations(transfer_certificate.client)
+
+            return SuccessResponse()
+        except Exception:
+            traceback.print_exc()
+            return ErrorResponse(400, ElecRejectError.ACCEPT_FAILED)
 
     # TODO: Create verification function to preserve integrity of the certificates
