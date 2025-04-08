@@ -1,9 +1,7 @@
-import { findCountries } from "common/api"
-import { Autocomplete } from "common/components/autocomplete2"
 import { RadioGroup, TextInput } from "common/components/inputs2"
-import { Col, Grid } from "common/components/scaffold"
+import { Grid } from "common/components/scaffold"
 import { GESOption, ProductionSiteDetails } from "common/types"
-import { normalizeCountry, normalizeFeedstock } from "common/utils/normalizers"
+import { getYesNoOptions, normalizeFeedstock } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
 export const ProductionSiteRecap = ({
   productionSite,
@@ -18,7 +16,7 @@ export const ProductionSiteRecap = ({
   ]
   return (
     <>
-      <Grid>
+      <Grid cols={2}>
         <TextInput
           autoFocus
           label={t("Nom du site")}
@@ -36,32 +34,11 @@ export const ProductionSiteRecap = ({
           label={t("Date de mise en service")}
           value={productionSite.date_mise_en_service ?? ""}
         />
-      </Grid>
-
-      <Col>
         <TextInput
           readOnly
-          label={t("Adresse postale")}
-          value={productionSite.address}
+          label={t("Adresse postale, CP, Pays")}
+          value={`${productionSite.address}, ${productionSite.postal_code}, ${productionSite.country.name}`}
         />
-        <Grid>
-          <TextInput readOnly label={t("Ville")} value={productionSite.city} />
-          <TextInput
-            readOnly
-            label={t("Code postal")}
-            value={productionSite.postal_code}
-          />
-          <Autocomplete
-            readOnly
-            label={t("Pays")}
-            placeholder={t("Rechercher un pays...")}
-            getOptions={findCountries}
-            normalize={normalizeCountry}
-            value={productionSite.country}
-          />
-        </Grid>
-      </Col>
-      <Grid>
         <TextInput
           readOnly
           label={t("Nom du gérant")}
@@ -78,12 +55,15 @@ export const ProductionSiteRecap = ({
           value={productionSite.manager_email}
         />
       </Grid>
+      <RadioGroup
+        label={t("Éligible double-comptage ?")}
+        options={getYesNoOptions()}
+        value={productionSite.eligible_dc}
+        readOnly
+        orientation="horizontal"
+        small
+      />
       <Grid>
-        <TextInput
-          readOnly
-          label={t("Éligible double-comptage ?")}
-          value={productionSite.eligible_dc ? t("Oui") : t("Non")}
-        />
         {productionSite.eligible_dc && (
           <TextInput
             readOnly
