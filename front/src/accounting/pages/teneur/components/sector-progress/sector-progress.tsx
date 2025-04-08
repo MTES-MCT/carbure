@@ -24,7 +24,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
         {sectors?.map((sector) => (
           <CardProgress
             key={sector.code}
-            title={t(formatSector(sector.code))}
+            title={formatSector(sector.code)}
             description={t("Objectif en GJ en {{date}}: {{objective}}", {
               date: "2025",
               objective: formatUnit(sector.target, ExtendedUnit.GJ, {

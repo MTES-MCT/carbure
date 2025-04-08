@@ -34,7 +34,7 @@ export const useBalancesColumns = () => {
   const columns: Column<apiTypes["Balance"]>[] = compact([
     {
       header: t("Filière"),
-      cell: (item) => t(formatSector(item.sector)),
+      cell: (item) => formatSector(item.sector),
     },
     {
       header: t("Biocarburant"),

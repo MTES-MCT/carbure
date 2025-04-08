@@ -3,6 +3,7 @@ import {
   OperationsStatus,
   OperationType,
 } from "accounting/types"
+import i18next from "i18next"
 
 /**
  * Return the i18n key for the sector
@@ -12,13 +13,13 @@ import {
 export const formatSector = (sector: string) => {
   switch (sector) {
     case OperationSector.ESSENCE:
-      return "Essence"
+      return i18next.t("Essence")
     case OperationSector.GAZOLE:
-      return "Gazole"
+      return i18next.t("Gazole")
     case OperationSector.CARBUR_ACTEUR:
-      return "Carburéacteur"
+      return i18next.t("Carburéacteur")
     default:
-      return "Inconnu"
+      return i18next.t("Inconnu")
   }
 }
 
@@ -30,43 +31,43 @@ export const formatSector = (sector: string) => {
 export const formatOperationType = (type: string) => {
   switch (type) {
     case OperationType.INCORPORATION:
-      return "Incorporation"
+      return i18next.t("Incorporation")
     case OperationType.CESSION:
-      return "Cession"
+      return i18next.t("Cession")
     case OperationType.MAC_BIO:
-      return "Mise à consommation"
+      return i18next.t("Mise à consommation")
     case OperationType.TENEUR:
-      return "Teneur"
+      return i18next.t("Teneur")
     case OperationType.EXPORTATION:
-      return "Exportation"
+      return i18next.t("Exportation")
     case OperationType.DEVALUATION:
-      return "Dévaluation"
+      return i18next.t("Dévaluation")
     case OperationType.LIVRAISON_DIRECTE:
-      return "Livraison directe"
+      return i18next.t("Livraison directe")
     case OperationType.ACQUISITION:
-      return "Acquisition"
+      return i18next.t("Acquisition")
     default:
-      return "Inconnu"
+      return i18next.t("Inconnu")
   }
 }
 
 export const formatOperationStatus = (status: OperationsStatus) => {
   switch (status) {
     case OperationsStatus.ACCEPTED:
-      return "Validé"
+      return i18next.t("Accepté")
     case OperationsStatus.CANCELED:
-      return "Annulé"
+      return i18next.t("Annulé")
     case OperationsStatus.PENDING:
-      return "En attente"
+      return i18next.t("En attente")
     case OperationsStatus.REJECTED:
-      return "Rejeté"
+      return i18next.t("Rejeté")
     case OperationsStatus.DECLARED:
-      return "Déclaré"
+      return i18next.t("Déclaré")
     case OperationsStatus.CORRECTED:
-      return "Corrigé"
+      return i18next.t("Corrigé")
     case OperationsStatus.VALIDATED:
-      return "Validé"
+      return i18next.t("Validé")
     default:
-      return "Inconnu"
+      return i18next.t("Inconnu")
   }
 }

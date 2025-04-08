@@ -25,7 +25,7 @@ export const useValidatePendingTeneurDialog = () => {
   const columns: Column<apiTypes["BalanceBySector"]>[] = [
     {
       header: t("Filière"),
-      cell: (item) => <Cell text={t(formatSector(item.sector))} />,
+      cell: (item) => <Cell text={formatSector(item.sector)} />,
     },
     {
       header: <HeaderWithSup>{t("Solde disponible")}</HeaderWithSup>,
