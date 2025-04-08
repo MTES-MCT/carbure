@@ -16,7 +16,7 @@ export const ProductionSiteRecap = ({
   ]
   return (
     <>
-      <Grid cols={2}>
+      <Grid cols={2} gap="lg">
         <TextInput
           autoFocus
           label={t("Nom du site")}

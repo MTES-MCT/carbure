@@ -72,6 +72,7 @@ export const RadioGroup = <V extends RadioValueType>({
         />
       }
       disabled={readOnly ?? props.disabled}
+      small={readOnly ?? props.small}
     />
   )
 }
