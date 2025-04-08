@@ -41,7 +41,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
         return instance.sector
 
     def get_volume_l(self, instance) -> float:
-        return instance.volume
+        if not hasattr(self, "_cached_volume"):
+            self._cached_volume = instance.volume
+        return self._cached_volume
 
     def get_quantity(self, instance) -> float:
         volume = self.get_volume_l(instance)
@@ -97,15 +99,21 @@ class OperationSerializer(BaseOperationSerializer):
             "created_at",
             "validation_date",
             "quantity",
+            "quantity_mj",
             "avoided_emissions",
             "unit",
             "details",
         ]
 
     avoided_emissions = serializers.SerializerMethodField()
+    quantity_mj = serializers.SerializerMethodField()
 
     def get_avoided_emissions(self, instance) -> float:
         return sum(detail.avoided_emissions for detail in instance.details.all())
+
+    def get_quantity_mj(self, instance) -> float:
+        volume = self.get_volume_l(instance)
+        return instance.volume_to_quantity(volume, "mj")
 
 
 class OperationLotSerializer(serializers.Serializer):
