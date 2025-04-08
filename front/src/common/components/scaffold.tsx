@@ -64,10 +64,10 @@ export const Panel = ({
 
 // a container that automatically arranges its content into a grid
 export const Grid = ({
-  gap,
   cols,
+  gap,
   ...props
-}: JSX.IntrinsicElements["div"] & { gap?: "xl"; cols?: number }) => (
+}: JSX.IntrinsicElements["div"] & { gap?: "xl" | "lg"; cols?: number }) => (
   <div
     {...props}
     className={cl(css.grid, props.className, gap && css[`grid--gap-${gap}`])}
