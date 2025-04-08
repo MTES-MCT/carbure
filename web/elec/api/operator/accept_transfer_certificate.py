@@ -10,7 +10,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights
 from elec.models import ElecTransferCertificate
-from tiruert.services.elec import update_operator_cpo_acquisition_operations
+from tiruert.services.elec_operation import ElecOperationService
 
 
 class ElecRejectError:
@@ -35,9 +35,13 @@ def accept_transfer_certificate(request, *args, **kwargs):
     if not transfer_form.is_valid():
         return ErrorResponse(400, ElecRejectError.MALFORMED_PARAMS, transfer_form.errors)
 
+    entity_id = transfer_form.cleaned_data["entity_id"]
     transfer_certificate = transfer_form.cleaned_data["transfer_certificate_id"]
     used_in_tiruert = transfer_form.cleaned_data["used_in_tiruert"]
     consumption_date = transfer_form.cleaned_data["consumption_date"]
+
+    if transfer_certificate.client_id != entity_id:
+        return ErrorResponse(400, ElecRejectError.ACCEPT_FAILED)
 
     with transaction.atomic():
         try:
@@ -47,7 +51,7 @@ def accept_transfer_certificate(request, *args, **kwargs):
                 transfer_certificate.consumption_date = consumption_date
             transfer_certificate.save()
 
-            update_operator_cpo_acquisition_operations(transfer_certificate.client)
+            ElecOperationService.update_operator_cpo_acquisition_operations(transfer_certificate.client)
 
             return SuccessResponse()
         except Exception:

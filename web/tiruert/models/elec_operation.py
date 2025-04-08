@@ -57,7 +57,7 @@ class ElecOperation(models.Model):
         "core.Entity", null=True, on_delete=models.deletion.CASCADE, related_name="debited_elec_operations"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    quantity = models.FloatField(default=0)  # unit = MWh
+    quantity = models.FloatField(default=0)  # unit = MJ
 
     objects = ElecOperationManager()
 
