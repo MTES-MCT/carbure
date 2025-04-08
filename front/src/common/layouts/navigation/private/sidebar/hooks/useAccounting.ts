@@ -22,7 +22,7 @@ export const useAccounting = () => {
 
   const section: MenuSection = {
     title: t("Comptabilité"),
-    condition: Boolean(userIsMTEDGEC) || accise_number !== "",
+    condition: Boolean(userIsMTEDGEC) && accise_number !== "",
     children: [
       {
         path: routes.ACCOUNTING.OPERATIONS,

@@ -1,5 +1,5 @@
 from django.db.models import Case, CharField, Value, When
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Cast, Coalesce, Concat, ExtractMonth, ExtractYear
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -111,6 +111,17 @@ class FilterActionMixin:
                 When(type="DEVALUATION", then=Value("DEVALUATION")),
                 default=Value(None),
                 output_field=CharField(),
+            ),
+            periods=Concat(
+                ExtractYear("created_at", output_field=CharField()),
+                Case(
+                    When(
+                        created_at__month__lt=10,
+                        then=Concat(Value("0"), Cast("created_at__month", output_field=CharField())),
+                    ),
+                    default=ExtractMonth("created_at", output_field=CharField()),
+                    output_field=CharField(),
+                ),
             ),
         )
 
