@@ -5,12 +5,12 @@ import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
-import ApplicationTabs from "../../../double-counting-admin/components/applications/application-tabs"
 import FileApplicationInfo from "../../../double-counting-admin/components/files-checker/file-application-info"
 import { DoubleCountingFileInfo } from "../../types"
 import { SendApplicationAdminDialog } from "../../../double-counting-admin/components/files-checker/send-application-dialog"
 import { SendApplicationProducerDialog } from "../send-application-dialog"
 import { DechetIndustrielAlert } from "./industrial-waste-alert"
+import ApplicationTabs from "../applications/application-tabs"
 
 export type ValidDetailsDialogProps = {
   file: File

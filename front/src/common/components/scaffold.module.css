@@ -164,6 +164,10 @@ section.actionbar {
   grid-gap: var(--spacing-s);
 }
 
+.grid--gap-lg {
+  grid-gap: var(--spacing-3w);
+}
+
 .grid > * {
   counter-increment: grid-item;
 }
