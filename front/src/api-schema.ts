@@ -1551,6 +1551,43 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/elec-operations/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve a list of operations with optional filtering and pagination. */
+    get: operations["list_elec_operations"]
+    put?: never
+    /** @description Create a new operation. */
+    post: operations["create_elec_operation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/elec-operations/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve one specific operation. */
+    get: operations["get_elec_operation"]
+    put?: never
+    post?: never
+    /** @description Delete an operation. Only allowed for certain types and statuses. */
+    delete: operations["delete_elec_operation"]
+    options?: never
+    head?: never
+    /** @description Update a part of operation. */
+    patch: operations["update_elec_operation"]
+    trace?: never
+  }
   "/api/tiruert/objectives/": {
     parameters: {
       query?: never
@@ -2410,6 +2447,61 @@ export interface components {
      * @enum {string}
      */
     DoubleCountingStatus: DoubleCountingStatus
+    ElecOperation: {
+      readonly id: number
+      readonly type: string
+      status?: components["schemas"]["ElecOperationStatusEnum"]
+      credited_entity: components["schemas"]["ElecOperationEntity"]
+      debited_entity: components["schemas"]["ElecOperationEntity"]
+      /** Format: double */
+      quantity?: number
+      /** Format: date-time */
+      readonly created_at: string
+      /** Format: double */
+      readonly avoided_emissions: number
+    }
+    ElecOperationEntity: {
+      id: number
+      name: string
+    }
+    ElecOperationEntityRequest: {
+      id: number
+      name: string
+    }
+    ElecOperationInputRequest: {
+      type: components["schemas"]["ElecOperationTypeEnum"]
+      credited_entity?: number | null
+      debited_entity?: number | null
+      /** Format: double */
+      quantity?: number
+    }
+    ElecOperationList: {
+      readonly id: number
+      readonly type: string
+      status?: components["schemas"]["ElecOperationStatusEnum"]
+      credited_entity: components["schemas"]["ElecOperationEntity"]
+      debited_entity: components["schemas"]["ElecOperationEntity"]
+      /** Format: double */
+      quantity?: number
+      /** Format: date-time */
+      readonly created_at: string
+    }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     *     * `CANCELED` - CANCELED
+     *     * `DECLARED` - DECLARED
+     * @enum {string}
+     */
+    ElecOperationStatusEnum: PathsApiTiruertElecOperationsGetParametersQueryStatus
+    /**
+     * @description * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+     *     * `CESSION` - CESSION
+     *     * `TENEUR` - TENEUR
+     * @enum {string}
+     */
+    ElecOperationTypeEnum: ElecOperationTypeEnum
     EmptyResponse: {
       empty?: string
     }
@@ -2910,6 +3002,22 @@ export interface components {
       results: components["schemas"]["BalanceResponse"][]
       total_quantity?: number
     }
+    PaginatedElecOperationListList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecOperationList"][]
+      total_quantity?: number
+    }
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -2972,6 +3080,12 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["SafTicketSource"][]
       total_available_volume?: number
+    }
+    PatchedElecOperationUpdateRequest: {
+      credited_entity?: components["schemas"]["ElecOperationEntityRequest"]
+      debited_entity?: components["schemas"]["ElecOperationEntityRequest"]
+      /** Format: double */
+      quantity?: number
     }
     PatchedOperationUpdateRequest: {
       type?: components["schemas"]["OperationTypeEnum"]
@@ -7025,6 +7139,179 @@ export interface operations {
       }
     }
   }
+  list_elec_operations: {
+    parameters: {
+      query: {
+        date_from?: string
+        date_to?: string
+        /** @description Include detailed information if set to `1`. */
+        details?: boolean
+        /** @description Authorised entity ID. */
+        entity_id: number
+        from_to?: string
+        operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        period?: string[]
+        status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description A list of operations. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecOperationListList"]
+        }
+      }
+    }
+  }
+  create_elec_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecOperationInputRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecOperationInputRequest"]
+        "multipart/form-data": components["schemas"]["ElecOperationInputRequest"]
+      }
+    }
+    responses: {
+      /** @description The newly created operation. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecOperationList"]
+        }
+      }
+      /** @description Invalid input data. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  get_elec_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération électricité. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Details of specific operation. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecOperation"]
+        }
+      }
+    }
+  }
+  delete_elec_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération électricité. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Operation deleted successfully. */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden. The operation type or status does not allow deletion. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  update_elec_operation: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Opération électricité. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedElecOperationUpdateRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedElecOperationUpdateRequest"]
+        "multipart/form-data": components["schemas"]["PatchedElecOperationUpdateRequest"]
+      }
+    }
+    responses: {
+      /** @description The updated operation. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecOperation"]
+        }
+      }
+      /** @description Invalid input data. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   objectives: {
     parameters: {
       query: {
@@ -7072,7 +7359,7 @@ export interface operations {
          *
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
@@ -7080,7 +7367,7 @@ export interface operations {
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
@@ -7386,7 +7673,7 @@ export interface operations {
          *
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
@@ -7394,7 +7681,7 @@ export interface operations {
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
@@ -7432,11 +7719,11 @@ export interface operations {
          *
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
@@ -7474,11 +7761,11 @@ export interface operations {
          *
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
-        type?: PathsApiTiruertOperationsGetParametersQueryType[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
       }
@@ -7707,6 +7994,27 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
   PENDING = "PENDING",
   REJECTED = "REJECTED",
 }
+export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
+  ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
+  ACQUISITION = "ACQUISITION",
+}
+export enum PathsApiTiruertElecOperationsGetParametersQueryOrder_by {
+  ValueMinuscreated_at = "-created_at",
+  created_at = "created_at",
+}
+export enum PathsApiTiruertElecOperationsGetParametersQueryStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+  CANCELED = "CANCELED",
+  DECLARED = "DECLARED",
+}
+export enum PathsApiTiruertElecOperationsGetParametersQueryType {
+  CREDIT = "CREDIT",
+  DEBIT = "DEBIT",
+}
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   CONV = "CONV",
   ANN_IX_A = "ANN-IX-A",
@@ -7726,10 +8034,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
   ACQUISITION = "ACQUISITION",
 }
-export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
-  ValueMinuscreated_at = "-created_at",
-  created_at = "created_at",
-}
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
   GAZOLE = "GAZOLE",
@@ -7743,10 +8047,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
   DECLARED = "DECLARED",
   CORRECTED = "CORRECTED",
   VALIDATED = "VALIDATED",
-}
-export enum PathsApiTiruertOperationsGetParametersQueryType {
-  CREDIT = "CREDIT",
-  DEBIT = "DEBIT",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
   MJ = "MJ",
@@ -7828,6 +8128,11 @@ export enum DoubleCountingStatus {
   INPROGRESS = "INPROGRESS",
   REJECTED = "REJECTED",
   ACCEPTED = "ACCEPTED",
+}
+export enum ElecOperationTypeEnum {
+  ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
+  CESSION = "CESSION",
+  TENEUR = "TENEUR",
 }
 export enum EntityTypeEnum {
   Producer = "Producteur",

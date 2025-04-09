@@ -1,19 +1,4 @@
-import {
-  Operation,
-  OperationDebitOrCredit,
-  OperationType,
-} from "accounting/types"
-
-export const formatOperationCreditOrDebit = (type: string) => {
-  switch (type) {
-    case OperationDebitOrCredit.CREDIT:
-      return "Crédit"
-    case OperationDebitOrCredit.DEBIT:
-      return "Débit"
-    default:
-      return "Inconnu"
-  }
-}
+import { Operation, OperationType } from "accounting/types"
 
 export const isOperationDebit = (operation: string) =>
   [
