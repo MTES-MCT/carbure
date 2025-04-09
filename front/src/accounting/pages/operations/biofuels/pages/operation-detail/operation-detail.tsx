@@ -10,8 +10,8 @@ import {
   getOperationEntity,
   getOperationQuantity,
   isOperationDebit,
-} from "accounting/pages/operations/operations.utils"
-import { OperationBadge } from "accounting/pages/operations/components/operation-badge"
+} from "../../operations.utils"
+import { OperationBadge } from "../../components/operation-badge"
 import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"

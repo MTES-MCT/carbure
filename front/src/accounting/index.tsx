@@ -22,22 +22,17 @@ const MaterialAccounting = () => {
     <Main>
       <Routes>
         <Route element={<OperationsBalancesLayout />}>
+          <Route path={`operations/:status`} element={<Operations />} />
           <Route
-            path={`operations/${SectorTabs.BIOFUELS}`}
-            element={<Operations />}
-          />
-          <Route
-            path="operations/*"
+            path="operations"
             element={<Navigate replace to={`${SectorTabs.BIOFUELS}`} />}
           />
+
           {canTransfer && (
             <>
+              <Route path="balances/:status" element={<Balances />} />
               <Route
-                path={`balances/${SectorTabs.BIOFUELS}`}
-                element={<Balances />}
-              />
-              <Route
-                path="balances/*"
+                path="balances"
                 element={<Navigate replace to={`${SectorTabs.BIOFUELS}`} />}
               />
             </>
