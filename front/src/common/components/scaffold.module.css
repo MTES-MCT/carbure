@@ -215,7 +215,22 @@ hr {
   padding: var(--spacing-4w);
   display: flex;
   flex-direction: column;
+}
+
+.box--gap-xs {
+  gap: var(--spacing-3v);
+}
+
+.box--gap-sm {
+  gap: var(--spacing-2w);
+}
+
+.box--gap-md {
   gap: var(--spacing-3w);
+}
+
+.box--gap-lg {
+  gap: var(--spacing-4w);
 }
 
 .ellipsis {

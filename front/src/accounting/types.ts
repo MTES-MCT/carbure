@@ -12,6 +12,7 @@ import {
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
   OperationTypeEnum as CreateOperationType,
   PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
+  PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter,
 } from "api-schema"
 
 // Type definitions
@@ -38,4 +39,20 @@ export {
   OperationDebitOrCredit,
   OperationBiofuelCategory,
   BalancesGroupBy,
+}
+
+/** BALANCES */
+
+export { BalancesFilter }
+export interface BalancesQuery
+  extends Omit<CBQueryParams<[], OperationsStatus[], string[]>, "type"> {
+  [BalancesFilter.sector]?: OperationSector[]
+  [BalancesFilter.customs_category]?: OperationBiofuelCategory[]
+  [BalancesFilter.biofuel]?: string[]
+}
+
+// For operations and balances, we want to display specific views for each sector
+export enum SectorTabs {
+  BIOFUELS = "biofuels",
+  ELEC = "elec",
 }

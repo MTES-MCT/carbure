@@ -24,7 +24,9 @@ export const EnergyTransferSummary = ({
   const onEnergyTransferred = (energy: number, clientName: string) => {
     notify(
       t("{{energy}} MWh ont bien été transférés au redevable {{clientName}}", {
-        energy: formatNumber(energy, 3),
+        energy: formatNumber(energy, {
+          fractionDigits: 3,
+        }),
         clientName,
       }),
       { variant: "success" }
@@ -45,7 +47,9 @@ export const EnergyTransferSummary = ({
     <Alert icon={Bolt} variant="info">
       <p>
         {t("{{remainingEnergy}} MWh restants", {
-          remainingEnergy: formatNumber(remainingEnergy, 3),
+          remainingEnergy: formatNumber(remainingEnergy, {
+            fractionDigits: 3,
+          }),
         })}
       </p>
 

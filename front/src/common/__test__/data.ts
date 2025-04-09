@@ -53,6 +53,8 @@ export const company: Entity = {
   activity_description: "",
   has_saf: false,
   ext_admin_pages: [],
+  is_tiruert_liable: false,
+  accise_number: "",
 }
 
 export const producer: Entity = {

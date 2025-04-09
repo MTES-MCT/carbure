@@ -19,12 +19,14 @@ export const quantityFormStepKey = "quantity-form"
 type QuantityFormStepKey = typeof quantityFormStepKey
 
 export const quantityFormStep: (
-  values: QuantityFormProps
-) => Step<QuantityFormStepKey> = (values) => {
+  values: QuantityFormProps,
+  overrides?: Partial<Step<QuantityFormStepKey>>
+) => Step<QuantityFormStepKey> = (values, overrides) => {
   return {
     key: quantityFormStepKey,
     title: i18next.t("Quantité"),
     allowNextStep: showNextStepQuantityForm(values),
+    ...overrides,
   }
 }
 

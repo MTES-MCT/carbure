@@ -119,8 +119,8 @@ class ObjectiveViewSet(GenericViewSet):
         )
 
         # 4. Calculate the global objective
-        global_objective_target, global_objective_penalty = ObjectiveService.get_global_objective_and_penalty(
-            objectives, energy_basis
+        global_objective_target, global_objective_penalty, global_objective_target_percent = (
+            ObjectiveService.get_global_objective_and_penalty(objectives, energy_basis)
         )
 
         available_balance_sum = sum([sector["available_balance"] for sector in objective_per_sector])
@@ -133,6 +133,7 @@ class ObjectiveViewSet(GenericViewSet):
             "pending_teneur": ObjectiveService.apply_ghg_conversion(pending_teneur_sum),
             "declared_teneur": ObjectiveService.apply_ghg_conversion(declared_teneur_sum),
             "unit": "tCO2",
+            "target_percent": global_objective_target_percent,
         }
         penalty = ObjectiveService._calcule_penalty(
             global_objective_penalty,
