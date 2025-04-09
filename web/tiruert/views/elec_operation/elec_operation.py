@@ -18,6 +18,8 @@ from tiruert.serializers import (
     ElecOperationUpdateSerializer,
 )
 
+from .mixins import ActionMixin
+
 
 class ElecOperationPagination(MetadataPageNumberPagination):
     aggregate_fields = {"total_quantity": Sum("quantity")}
@@ -34,7 +36,7 @@ class ElecOperationPagination(MetadataPageNumberPagination):
         ),
     ]
 )
-class ElecOperationViewSet(ModelViewSet):
+class ElecOperationViewSet(ModelViewSet, ActionMixin):
     queryset = ElecOperation.objects.all()
     serializer_class = ElecOperationListSerializer
     permission_classes = (

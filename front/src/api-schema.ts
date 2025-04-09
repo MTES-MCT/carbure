@@ -1588,6 +1588,23 @@ export interface paths {
     patch: operations["update_elec_operation"]
     trace?: never
   }
+  "/api/tiruert/elec-operations/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve content of a specific filter */
+    get: operations["filter_elec_operations"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/objectives/": {
     parameters: {
       query?: never
@@ -7312,6 +7329,42 @@ export interface operations {
       }
     }
   }
+  filter_elec_operations: {
+    parameters: {
+      query: {
+        date_from?: string
+        date_to?: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter: PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter
+        from_to?: string
+        operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+        period?: string[]
+        status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+    }
+  }
   objectives: {
     parameters: {
       query: {
@@ -8014,6 +8067,13 @@ export enum PathsApiTiruertElecOperationsGetParametersQueryStatus {
 export enum PathsApiTiruertElecOperationsGetParametersQueryType {
   CREDIT = "CREDIT",
   DEBIT = "DEBIT",
+}
+export enum PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter {
+  from_to = "from_to",
+  operation = "operation",
+  period = "period",
+  status = "status",
+  type = "type",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
   CONV = "CONV",

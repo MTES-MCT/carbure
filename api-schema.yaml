@@ -5237,6 +5237,135 @@ paths:
           description: Operation deleted successfully.
         "403":
           description: Forbidden. The operation type or status does not allow deletion.
+  /api/tiruert/elec-operations/filters/:
+    get:
+      operationId: filter_elec_operations
+      description: Retrieve content of a specific filter
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - from_to
+              - operation
+              - period
+              - status
+              - type
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
   /api/tiruert/objectives/:
     get:
       operationId: objectives
