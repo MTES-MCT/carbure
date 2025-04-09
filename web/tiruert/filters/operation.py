@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime  # noqa: I001
+from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db.models import Q
 from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
-from zoneinfo import ZoneInfo
 
 from core.models import MatierePremiere
 from saf.models.constants import SAF_BIOFUEL_TYPES
