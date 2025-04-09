@@ -21,10 +21,11 @@ import {
 import styles from "../operations.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
+import { Unit } from "common/types"
 
 export const useOperationsElecColumns = () => {
   const { t } = useTranslation()
-  const { unit } = useUnit()
+  const { unit } = useUnit(Unit.MJ)
 
   const columns: Column<ElecOperation>[] = [
     {
