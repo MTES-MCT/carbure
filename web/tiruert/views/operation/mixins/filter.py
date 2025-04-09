@@ -71,7 +71,7 @@ class FilterActionMixin:
             "from_to": "entities",
             "depot": "depots",
             "type": "types",
-            "period": "periods",
+            "period": "created_at",
         }
 
         column = filters.get(filter)
@@ -124,9 +124,19 @@ class FilterActionMixin:
                 ),
             ),
         )
+
         values = queryset.values_list(column, flat=True).distinct()
-        results = [v for v in values if v]
+        results = []
+        for v in values:
+            if v and column == "created_at":
+                year = v.year
+                month = v.month
+                period = f"{year}{month:02d}"
+                results.append(period)
+            elif v:
+                results.append(v)
         data = set(results)
+
         return Response(list(data))
 
     @extend_schema(
