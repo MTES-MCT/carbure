@@ -1,7 +1,7 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import { api } from "common/services/api-fetch"
 import {
-  OperationsFilter,
+  ElecOperationsFilter,
   ElecOperationsQuery,
   OperationOrderBy,
 } from "../types"
@@ -10,16 +10,14 @@ export const getOperationsFilters = (
   filter: string,
   query: ElecOperationsQuery
 ) => {
-  console.log(filter as OperationsFilter, query)
-  return Promise.resolve<{ data: any[] }>({ data: [] })
-  // return api.GET("/tiruert/elec-operations/filters/", {
-  //   params: {
-  //     query: {
-  //       ...query,
-  //       filter: filter as OperationsFilter,
-  //     },
-  //   },
-  // })
+  return api.GET("/tiruert/elec-operations/filters/", {
+    params: {
+      query: {
+        ...query,
+        filter: filter as ElecOperationsFilter,
+      },
+    },
+  })
 }
 
 export const getOperations = (query: ElecOperationsQuery) => {

@@ -16,6 +16,7 @@ import {
   PathsApiTiruertElecOperationsGetParametersQueryStatus as ElecOperationsStatus,
   PathsApiTiruertElecOperationsGetParametersQueryOperation as ElecOperationType,
   PathsApiTiruertElecOperationsGetParametersQueryOrder_by as OperationOrderBy,
+  PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
 } from "api-schema"
 
 // Type definitions
@@ -70,4 +71,4 @@ export interface ElecOperationsQuery
   [OperationsFilter.operation]?: ElecOperationType[]
 }
 
-export { ElecOperationsStatus, ElecOperationType }
+export { ElecOperationsStatus, ElecOperationType, ElecOperationsFilter }
