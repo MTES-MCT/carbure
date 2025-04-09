@@ -63,15 +63,14 @@ export const ProductionSiteRecap = ({
         orientation="horizontal"
         small
       />
-      <Grid>
-        {productionSite.eligible_dc && (
-          <TextInput
-            readOnly
-            label={t("Référence double-comptage")}
-            value={productionSite.dc_reference}
-          />
-        )}
-      </Grid>
+
+      {productionSite.eligible_dc && (
+        <TextInput
+          readOnly
+          label={t("Référence double-comptage")}
+          value={productionSite.dc_reference}
+        />
+      )}
       <RadioGroup
         label={t("Options GES")}
         options={gesOptions}
@@ -84,6 +83,20 @@ export const ProductionSiteRecap = ({
         label={t("Matieres premieres")}
         value={productionSite.inputs
           .map((input) => normalizeFeedstock(input).label)
+          .join(", ")}
+      />
+      <TextInput
+        readOnly
+        label={t("Biocarburants")}
+        value={productionSite.outputs
+          .map((output) => normalizeFeedstock(output).label)
+          .join(", ")}
+      />
+      <TextInput
+        readOnly
+        label={t("Certificats (2BS, ISCC)")}
+        value={productionSite.certificates
+          .map((certificate) => certificate.certificate_id)
           .join(", ")}
       />
     </>
