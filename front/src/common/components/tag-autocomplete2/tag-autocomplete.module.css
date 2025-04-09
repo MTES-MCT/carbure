@@ -1,0 +1,12 @@
+.tags {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  height: 100%;
+  z-index: 1;
+  gap: var(--spacing-1w);
+  padding-left: var(--spacing-2w);
+}

@@ -25,6 +25,7 @@ export interface TabsProps<T extends string> extends Layout {
   tabs: Tab<T>[]
   focus?: T
   onFocus?: (tab: T) => void
+  sticky?: boolean
   // children?: (tab: string) => React.ReactNode
 }
 export const Tabs = <T extends string>({
@@ -34,6 +35,7 @@ export const Tabs = <T extends string>({
   tabs: tabsConfig,
   focus: controlledFocus,
   onFocus,
+  sticky,
   ...props
 }: TabsProps<T>) => {
   const matcher = useMatcher()
@@ -47,7 +49,11 @@ export const Tabs = <T extends string>({
   }, [controlledFocus, match?.key])
 
   return (
-    <nav {...layout(props)} className={cl(css.tabs, className)} style={style}>
+    <nav
+      {...layout(props)}
+      className={cl(css.tabs, className, sticky && css.sticky)}
+      style={style}
+    >
       {tabs.map(({ icon: Icon, iconActive: IconActive, ...tab }) => {
         const props = {
           className: cl(
