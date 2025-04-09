@@ -1,7 +1,11 @@
+from datetime import datetime
+
+from django.conf import settings
 from django.db.models import Q
 from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
+from zoneinfo import ZoneInfo
 
 from core.models import MatierePremiere
 from saf.models.constants import SAF_BIOFUEL_TYPES
@@ -84,9 +88,30 @@ class BaseFilter(FilterSet):
         if not periods:
             return queryset
 
+        # Use the timezone from settings
+        django_timezone = ZoneInfo(settings.TIME_ZONE)
+
         q_objects = Q()
+
         for period in periods:
-            q_objects |= Q(created_at__year=period[:4], created_at__month=period[4:])
+            # We have to do all this stuff because scalingo doesn't support mysql timezone
+            year = int(period[:4])
+            month = int(period[4:])
+
+            # Calculate the next month and year
+            if month == 12:
+                next_year = year + 1
+                next_month = 1
+            else:
+                next_year = year
+                next_month = month + 1
+
+            # Dates in UTC
+            start_date = datetime(year, month, 1, 0, 0, 0, tzinfo=django_timezone).astimezone(ZoneInfo("UTC"))
+            end_date = datetime(next_year, next_month, 1, 0, 0, 0, tzinfo=django_timezone).astimezone(ZoneInfo("UTC"))
+
+            q_objects |= Q(created_at__gte=start_date, created_at__lt=end_date)
+
         return queryset.filter(q_objects).distinct()
 
     @extend_schema_field(
