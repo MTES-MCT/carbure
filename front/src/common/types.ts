@@ -2,7 +2,7 @@ import {
   EntityTypeEnum as EntityType,
   SiteTypeEnum as SiteType,
   GesOptionEnum as GESOption,
-  PreferredUnitEnum as Unit,
+  PathsApiTiruertOperationsGetParametersQueryUnit as Unit,
   UserRightsRequestsStatusEnum as UserRightStatus,
   RoleEnum as UserRole,
   ExtAdminPagesEnum as ExternalAdminPages,
@@ -62,7 +62,7 @@ export { EntityType }
 
 export { SiteType }
 
-export { GESOption, Unit }
+export { GESOption }
 
 export { UserRightStatus }
 
@@ -74,6 +74,12 @@ export { OwnershipType }
 
 export { CategoryEnum }
 
+// Add units that are not defined in the schema
+export enum ExtendedUnit {
+  GJ = "GJ",
+}
+
+export { Unit }
 /**
  * Make a type partial recursively
  */

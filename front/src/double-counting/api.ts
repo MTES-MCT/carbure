@@ -59,3 +59,15 @@ export function producerAddDoubleCountingApplication(
     },
   })
 }
+
+export function getDoubleCountingAgreementDownloadLink(
+  entity_id: number,
+  agreement_id: number
+) {
+  return apiFetch.GET("/double-counting/agreements/{id}/download-link/", {
+    params: {
+      query: { entity_id },
+      path: { id: agreement_id },
+    },
+  })
+}

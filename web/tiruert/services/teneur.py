@@ -167,6 +167,11 @@ class TeneurService:
         thresh_min = (target_volume < batches_volumes[emissions_sorter].cumsum()).argmax()
         thresh_max = (target_volume < batches_volumes[emissions_inv_sorter].cumsum()).argmax()
 
+        # Handle case where the target volume is exactly the sum of the batches volumes
+        if target_volume == batches_volumes.sum():
+            thresh_min = len(batches_volumes) - 1
+            thresh_max = len(batches_volumes) - 1
+
         min_emissions_rate = (
             np.dot(
                 batches_volumes[emissions_sorter][:thresh_min],
@@ -190,8 +195,8 @@ class TeneurService:
         return min_emissions_rate, max_emissions_rate
 
     @staticmethod
-    def prepare_data_and_optimize(entity_id, data, unit):
-        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(entity_id, data, unit)
+    def prepare_data_and_optimize(data, unit):
+        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data, unit)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
@@ -216,7 +221,6 @@ class TeneurService:
         Return avoided emissions (tCO2)
         """
         volumes, emissions, _, _, target_volume = TeneurService.prepare_data(
-            entity_id,
             data,
             unit,
         )  # volumes in L, emissions in gCO2/MJ
@@ -236,7 +240,7 @@ class TeneurService:
         return min_avoided_emissions, max_avoided_emissions
 
     @staticmethod
-    def prepare_data(entity_id, data, unit):
+    def prepare_data(data, unit):
         """
         Prepare data for optimization and operation creation
         """
@@ -250,8 +254,11 @@ class TeneurService:
             .distinct()
         )
 
+        if data.get("from_depot") is not None:
+            operations = operations.filter(to_depot=data["from_depot"])
+
         # Calculate balance of debited entity, for each lot, always in liters
-        balance = BalanceService.calculate_balance(operations, entity_id, "lot", "l")
+        balance = BalanceService.calculate_balance(operations, data["debited_entity"].id, "lot", "l")
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
         # For each we have something like:
@@ -261,25 +268,22 @@ class TeneurService:
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
-            volumes = np.append(volumes, value["quantity"]["credit"] - value["quantity"]["debit"])
+            volumes = np.append(volumes, value["available_balance"])
             emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)
 
             if enforced_volumes is not None:
-                volume = (
-                    value["quantity"]["credit"] - value["quantity"]["debit"] if lot_id in data["enforced_volumes"] else 0
-                )
+                volume = value["available_balance"] if lot_id in data["enforced_volumes"] else 0
                 enforced_volumes = np.append(enforced_volumes, volume)
 
         # Convert target volume into L
         target_volume = None
         if data.get("target_volume", None) is not None:
-            target_volume = TeneurService.convert_in_liters(data["target_volume"], unit, data["biofuel"])
-
+            target_volume = TeneurService._convert_in_liters(data["target_volume"], unit, data["biofuel"])
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
 
     @staticmethod
-    def convert_in_liters(quantity, unit, biofuel):
+    def _convert_in_liters(quantity, unit, biofuel):
         if unit == "mj":
             return quantity / biofuel.pci_litre
         elif unit == "kg":

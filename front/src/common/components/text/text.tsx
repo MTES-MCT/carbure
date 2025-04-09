@@ -22,10 +22,9 @@ type TextOwnProps<T extends React.ElementType> = {
   className?: string
   style?: React.CSSProperties
 
-  // Add/remove the margin bottom defined in the DSFR
-  margin?: boolean
-
   fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"
+
+  domRef?: React.RefObject<HTMLElement | undefined>
 }
 
 // Make mandatory the componentProps property if there are mandatory props for the generic component
@@ -36,29 +35,30 @@ export type TextProps<T extends React.ElementType> = TextOwnProps<T> &
 
 const defaultElement = "p"
 
-export const Text: <T extends React.ElementType = typeof defaultElement>(
+export const Text: <T extends React.ElementType>(
   props: TextProps<T>
 ) => React.ReactElement | null = ({
   is: TextTag = defaultElement,
   children,
   size = "md",
   className,
-  margin = false,
   fontWeight = "regular",
   componentProps,
+  domRef,
   ...props
 }) => {
   return (
     <TextTag
+      ref={domRef}
       {...componentProps}
       className={cl(
+        styles.text,
         fr.cx(`fr-text--${size}`),
-        !margin && styles.noMargin,
         fontWeight === "semibold"
           ? styles.semibold
           : fr.cx(`fr-text--${fontWeight}`),
-        className,
-        componentProps?.className
+        componentProps?.className,
+        className
       )}
       {...props}
     >

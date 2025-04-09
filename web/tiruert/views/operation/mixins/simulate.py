@@ -34,7 +34,6 @@ class SimulateActionMixin:
 
             try:
                 selected_lots, lot_ids, emissions, fun = TeneurService.prepare_data_and_optimize(
-                    data["debited_entity"].id,
                     data,
                     request.unit,
                 )

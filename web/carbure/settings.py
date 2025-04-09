@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     "elec",
     "simple_history",
     "tiruert",
+    "user",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -236,6 +237,14 @@ STORAGES = {
             "querystring_auth": False,
         },
     },
+    "private": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "default_acl": "private",
+            "file_overwrite": True,
+            "querystring_auth": True,
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -252,10 +261,16 @@ if env("TEST"):
         "default": {
             "BACKEND": "django.core.files.storage.InMemoryStorage",
         },
+        "private": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
+
+log_dir_mac = os.path.join("/tmp/", "mac")
+os.makedirs(log_dir_mac, exist_ok=True)
 
 LOGGING = {
     "version": 1,
@@ -271,12 +286,23 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "file_mac_import": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join("/tmp/mac/", "import_mac.log"),
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "django.request": {
             "handlers": ["console"],
             "level": "ERROR",  # change debug level as appropiate
             "propagate": False,
+        },
+        "mac_import": {
+            "handlers": ["console", "file_mac_import"],
+            "level": "DEBUG",
+            "propagate": True,
         },
     },
 }
@@ -367,6 +393,10 @@ SPECTACULAR_SETTINGS = {
         "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
         "UserRightsRequestsStatusEnum": "core.models.UserRightsRequests.STATUS_TYPES",
         "PreferredUnitEnum": "core.models.Entity.UNIT_CHOICE",
+        "MPCategoriesEnum": "core.models.MatierePremiere.MP_CATEGORIES",
+        "OperationStatusEnum": "tiruert.models.Operation.OPERATION_STATUSES",
+        "OperationTypeEnum": "tiruert.models.Operation.OPERATION_TYPES",
+        "ObjectiveSectorCodeEnum": "tiruert.models.Operation.SECTOR_CODE_CHOICES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,

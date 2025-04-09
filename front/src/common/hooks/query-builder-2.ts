@@ -15,6 +15,11 @@ export type CBSnapshot = Record<string, number>
 
 export type CBFilterSelection = Record<string, string[]>
 
+export type CBQueryFilterManager = {
+  filters: CBFilterSelection
+  onFilter: (filters: CBFilterSelection) => void
+}
+
 export const CBQUERY_RESET: Partial<CBQueryParams<[], undefined, undefined>> = {
   limit: undefined,
   page: 1,
@@ -90,7 +95,7 @@ export function useCBQueryBuilder<Columns extends string[], Status, Type>(
 
 export function useCBQueryParamsStore<S, T>(
   entity: Entity,
-  year: number,
+  year?: number,
   status?: S,
   type?: T
 ) {
@@ -201,7 +206,7 @@ export function useCBQueryParamsStore<S, T>(
   }
 
   // sync store state with year set from above
-  if (state.year !== year) {
+  if (year && state.year !== year) {
     actions.setYear(year)
   }
 

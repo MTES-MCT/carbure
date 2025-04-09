@@ -19,12 +19,19 @@ export const ROUTE_URLS = {
       COMPANIES: `${baseUrl}/entities`,
     }
   },
-  MATERIAL_ACCOUNTING: (entity_id: number) => {
+  ACCOUNTING: (entity_id: number) => {
     const baseUrl = urlWithOrgId(entity_id, "/accounting")
 
     return {
-      OPERATIONS: `${baseUrl}/operations`,
-      BALANCE: `${baseUrl}/balance`,
+      OPERATIONS: {
+        ROOT: `${baseUrl}/operations`,
+        BIOFUELS: `${baseUrl}/operations/biofuels`,
+      },
+      BALANCES: {
+        ROOT: `${baseUrl}/balances`,
+        BIOFUELS: `${baseUrl}/balances/biofuels`,
+      },
+      TENEUR: `${baseUrl}/teneur`,
     }
   },
 
@@ -119,4 +126,36 @@ export const ROUTE_URLS = {
   HOME: "/",
   CONTACT: "/contact",
   PUBLIC_STATS: "/stats",
+}
+
+/**
+ * Ajoute des paramètres de requête à une URL
+ * @param url - L'URL de base
+ * @param params - Un objet contenant les paramètres de requête à ajouter
+ * @returns L'URL avec les paramètres de requête
+ */
+export const addQueryParams = (
+  url: string,
+  params: Record<string, string | number | boolean | undefined | null>,
+  excludeEmptyValues: boolean = true
+) => {
+  // Sépare l'URL de base des paramètres existants
+  const [baseUrl, existingQuery] = url.split("?")
+  const searchParams = new URLSearchParams(existingQuery)
+
+  // Ajoute les nouveaux paramètres
+  Object.entries(params).forEach(([key, value]) => {
+    if (
+      excludeEmptyValues &&
+      (value === null || value === undefined || value === "")
+    )
+      return
+
+    searchParams.append(key, value?.toString() ?? "")
+  })
+
+  const queryString = searchParams.toString()
+  return queryString
+    ? `${baseUrl as string}?${queryString}`
+    : (baseUrl as string)
 }

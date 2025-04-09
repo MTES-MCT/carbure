@@ -1,10 +1,11 @@
 from django.db.models import Case, CharField, Value, When
-from django.db.models.functions import Cast, Coalesce, Concat
+from django.db.models.functions import Cast, Coalesce, Concat, ExtractMonth, ExtractYear
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
+from tiruert.models.operation import Operation
 
 
 class FilterActionMixin:
@@ -70,7 +71,7 @@ class FilterActionMixin:
             "from_to": "entities",
             "depot": "depots",
             "type": "types",
-            "period": "periods",
+            "period": "created_at",
         }
 
         column = filters.get(filter)
@@ -87,9 +88,9 @@ class FilterActionMixin:
                 "to_depot__name",
             ),
             sector=Case(
-                When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                When(biofuel__compatible_diesel=True, then=Value("DIESEL")),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
+                When(biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
+                When(biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
                 default=Value(None),
                 output_field=CharField(),
             ),
@@ -112,20 +113,30 @@ class FilterActionMixin:
                 output_field=CharField(),
             ),
             periods=Concat(
-                Cast("created_at__year", output_field=CharField()),
+                ExtractYear("created_at", output_field=CharField()),
                 Case(
                     When(
                         created_at__month__lt=10,
                         then=Concat(Value("0"), Cast("created_at__month", output_field=CharField())),
                     ),
-                    default=Cast("created_at__month", output_field=CharField()),
+                    default=ExtractMonth("created_at", output_field=CharField()),
                     output_field=CharField(),
                 ),
             ),
         )
+
         values = queryset.values_list(column, flat=True).distinct()
-        results = [v for v in values if v]
+        results = []
+        for v in values:
+            if v and column == "created_at":
+                year = v.year
+                month = v.month
+                period = f"{year}{month:02d}"
+                results.append(period)
+            elif v:
+                results.append(v)
         data = set(results)
+
         return Response(list(data))
 
     @extend_schema(
@@ -192,9 +203,9 @@ class FilterActionMixin:
 
         queryset = queryset.annotate(
             sector=Case(
-                When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                When(biofuel__compatible_diesel=True, then=Value("DIESEL")),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("SAF")),
+                When(biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
+                When(biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
                 default=Value(None),
                 output_field=CharField(),
             ),

@@ -1,7 +1,10 @@
 .pagination {
   margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pagination :global(.fr-pagination__list) {
-  justify-content: center;
+.pagination :global(.fr-pagination__link) {
+  margin-bottom: 0;
 }

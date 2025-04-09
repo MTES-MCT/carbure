@@ -16,6 +16,7 @@ import {
   PathsApiSafTicketSourcesGetParametersQueryOrder,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
+  PathsApiSafTicketsGetParametersQueryConsumption_types as ConsumptionType,
 } from "api-schema"
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator
@@ -93,6 +94,7 @@ export interface SafQuery
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
+  [SafFilter.ConsumptionTypes]?: ConsumptionType[]
 }
 
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
@@ -101,10 +103,10 @@ export enum SafFilter {
   Feedstocks = "feedstocks",
   Periods = "periods",
   Clients = "clients",
-  Suppliers = "suppliers",
   CountriesOfOrigin = "countries_of_origin",
   ProductionSites = "production_sites",
   DeliverySites = "delivery_sites",
+  ConsumptionTypes = "consumption_types",
 }
 
 export type SafQueryType = "assigned" | "received"
@@ -127,4 +129,4 @@ export interface SafOperatorQuery
 }
 
 // Generated enum is EnumStatus and the name is not readable
-export { SafTicketStatus }
+export { SafTicketStatus, ConsumptionType }

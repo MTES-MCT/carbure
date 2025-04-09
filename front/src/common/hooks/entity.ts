@@ -1,8 +1,13 @@
 import { useMatch } from "react-router-dom"
 import { createContext, useContext } from "react"
-import { Entity, EntityType, ExternalAdminPages, UserRole } from "common/types"
+import {
+  Entity,
+  EntityType,
+  ExternalAdminPages,
+  Unit,
+  UserRole,
+} from "common/types"
 import { UserManager } from "./user"
-import { PreferredUnitEnum } from "api-schema"
 
 export interface EntityManager extends Entity {
   isBlank: boolean
@@ -55,11 +60,12 @@ export function useEntityManager(
     has_trading: entity?.has_trading ?? false,
     has_stocks: entity?.has_stocks ?? false,
     has_direct_deliveries: entity?.has_direct_deliveries ?? false,
-    preferred_unit: entity?.preferred_unit ?? PreferredUnitEnum.l,
+    preferred_unit: entity?.preferred_unit ?? Unit.l,
     default_certificate: entity?.default_certificate ?? "",
     has_saf: entity?.has_saf ?? false,
     has_elec: entity?.has_elec ?? false,
     ext_admin_pages: entity?.ext_admin_pages ?? [],
+    is_tiruert_liable: entity?.is_tiruert_liable ?? false,
     isBlank: entityID === -1,
     isAdmin: type === EntityType.Administration,
     isExternal: type === EntityType.ExternalAdmin,
@@ -74,6 +80,7 @@ export function useEntityManager(
     canTrade: canTrade,
     website: entity?.website ?? "",
     vat_number: entity?.vat_number ?? "",
+    accise_number: entity?.accise_number ?? "",
 
     hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) =>
       entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false,

@@ -393,6 +393,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
+  /api/double-counting/agreements/{id}/download-link/:
+    get:
+      operationId: double_counting_agreements_download_link_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementDownloadLink"
+          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -881,15 +909,47 @@ paths:
       operationId: double_counting_applications_check_admin_files_create
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -997,14 +1057,46 @@ paths:
       operationId: double_counting_applications_filters_retrieve
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: filter
           schema:
             type: string
           description: Filter string to apply
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -1056,15 +1148,47 @@ paths:
       operationId: double_counting_applications_list_admin_retrieve
       parameters:
         - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
           schema:
             type: string
         - name: search
@@ -3319,6 +3443,11 @@ paths:
             type: boolean
           description: Only show enabled entities
         - in: query
+          name: is_tiruert_liable
+          schema:
+            type: boolean
+          description: Only show liable entities
+        - in: query
           name: query
           schema:
             type: string
@@ -4109,6 +4238,20 @@ paths:
           description: List of clients provided via
             ?clients=client1&clients=client2&clients=client3
         - in: query
+          name: consumption_types
+          schema:
+            type: array
+            items:
+              enum:
+                - MAC
+                - MAC_DECLASSEMENT
+              type: string
+              description: |-
+                * `MAC` - MAC
+                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          description: List of consumption types provided via
+            ?consumption_types=value1&consumption_types=value2
+        - in: query
           name: countries_of_origin
           schema:
             type: array
@@ -4457,6 +4600,20 @@ paths:
           description: List of clients provided via
             ?clients=client1&clients=client2&clients=client3
         - in: query
+          name: consumption_types
+          schema:
+            type: array
+            items:
+              enum:
+                - MAC
+                - MAC_DECLASSEMENT
+              type: string
+              description: |-
+                * `MAC` - MAC
+                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          description: List of consumption types provided via
+            ?consumption_types=value1&consumption_types=value2
+        - in: query
           name: countries_of_origin
           schema:
             type: array
@@ -4602,6 +4759,20 @@ paths:
               minLength: 1
           description: List of clients provided via
             ?clients=client1&clients=client2&clients=client3
+        - in: query
+          name: consumption_types
+          schema:
+            type: array
+            items:
+              enum:
+                - MAC
+                - MAC_DECLASSEMENT
+              type: string
+              description: |-
+                * `MAC` - MAC
+                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          description: List of consumption types provided via
+            ?consumption_types=value1&consumption_types=value2
         - in: query
           name: countries_of_origin
           schema:
@@ -4786,6 +4957,49 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/tiruert/objectives/:
+    get:
+      operationId: objectives
+      description: Get all objectives
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from which to calculate balance for teneur
+          required: true
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Date to which to calculate balance for teneur
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Year of the objectives
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectiveOutput"
+          description: All objectives.
   /api/tiruert/operations/:
     get:
       operationId: list_operations
@@ -4810,7 +5024,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -4819,7 +5032,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -4866,6 +5078,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -4876,7 +5089,24 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
@@ -4903,13 +5133,13 @@ paths:
             items:
               enum:
                 - ESSENCE
-                - DIESEL
-                - SAF
+                - GAZOLE
+                - CARBURÉACTEUR
               type: string
               description: |-
                 * `ESSENCE` - ESSENCE
-                * `DIESEL` - DIESEL
-                * `SAF` - SAF
+                * `GAZOLE` - GAZOLE
+                * `CARBURÉACTEUR` - CARBURÉACTEUR
         - in: query
           name: status
           schema:
@@ -4920,12 +5150,18 @@ paths:
                 - ACCEPTED
                 - REJECTED
                 - CANCELED
+                - DECLARED
+                - CORRECTED
+                - VALIDATED
               type: string
               description: |-
                 * `PENDING` - PENDING
                 * `ACCEPTED` - ACCEPTED
                 * `REJECTED` - REJECTED
                 * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+                * `CORRECTED` - CORRECTED
+                * `VALIDATED` - VALIDATED
         - in: query
           name: type
           schema:
@@ -4943,9 +5179,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -4974,9 +5210,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5060,9 +5296,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5097,9 +5333,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5157,9 +5393,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5193,9 +5429,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5209,11 +5445,74 @@ paths:
               schema:
                 status: accepted
           description: Success message
+        "400":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_TYPE_NOT_ALLOWED
+          description: Error message
         "404":
           content:
             application/json:
               schema:
-                error: Operation not found
+                error: OPERATION_NOT_FOUND
+          description: Error message
+  /api/tiruert/operations/{id}/correct/:
+    post:
+      operationId: correct_operation
+      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+        remove
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationCorrectionRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/OperationCorrectionRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/OperationCorrectionRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: corected
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: NOT_ENOUGH_VOLUME
           description: Error message
   /api/tiruert/operations/{id}/reject/:
     post:
@@ -5237,9 +5536,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5257,7 +5556,7 @@ paths:
           content:
             application/json:
               schema:
-                error: Operation not found
+                error: OPERATION_NOT_FOUND
           description: Error message
   /api/tiruert/operations/balance/:
     get:
@@ -5284,7 +5583,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5293,12 +5591,12 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
             type: string
             format: date
+          description: Date from where to calculate teneur and quantity
         - in: query
           name: date_to
           schema:
@@ -5344,6 +5642,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -5354,11 +5653,34 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - name: page
           required: false
           in: query
           description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
           schema:
             type: integer
         - in: query
@@ -5375,13 +5697,13 @@ paths:
             items:
               enum:
                 - ESSENCE
-                - DIESEL
-                - SAF
+                - GAZOLE
+                - CARBURÉACTEUR
               type: string
               description: |-
                 * `ESSENCE` - ESSENCE
-                * `DIESEL` - DIESEL
-                * `SAF` - SAF
+                * `GAZOLE` - GAZOLE
+                * `CARBURÉACTEUR` - CARBURÉACTEUR
         - in: query
           name: status
           schema:
@@ -5392,12 +5714,18 @@ paths:
                 - ACCEPTED
                 - REJECTED
                 - CANCELED
+                - DECLARED
+                - CORRECTED
+                - VALIDATED
               type: string
               description: |-
                 * `PENDING` - PENDING
                 * `ACCEPTED` - ACCEPTED
                 * `REJECTED` - REJECTED
                 * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+                * `CORRECTED` - CORRECTED
+                * `VALIDATED` - VALIDATED
         - in: query
           name: type
           schema:
@@ -5415,9 +5743,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5455,7 +5783,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5464,7 +5791,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5515,6 +5841,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -5525,7 +5852,24 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - in: query
           name: period
           schema:
@@ -5540,13 +5884,13 @@ paths:
             items:
               enum:
                 - ESSENCE
-                - DIESEL
-                - SAF
+                - GAZOLE
+                - CARBURÉACTEUR
               type: string
               description: |-
                 * `ESSENCE` - ESSENCE
-                * `DIESEL` - DIESEL
-                * `SAF` - SAF
+                * `GAZOLE` - GAZOLE
+                * `CARBURÉACTEUR` - CARBURÉACTEUR
         - in: query
           name: status
           schema:
@@ -5557,12 +5901,18 @@ paths:
                 - ACCEPTED
                 - REJECTED
                 - CANCELED
+                - DECLARED
+                - CORRECTED
+                - VALIDATED
               type: string
               description: |-
                 * `PENDING` - PENDING
                 * `ACCEPTED` - ACCEPTED
                 * `REJECTED` - REJECTED
                 * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+                * `CORRECTED` - CORRECTED
+                * `VALIDATED` - VALIDATED
         - in: query
           name: type
           schema:
@@ -5580,9 +5930,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5631,7 +5981,6 @@ paths:
                 - TALLOL
                 - OTHER
                 - EP2AM
-                - AM
               type: string
               description: |-
                 * `CONV` - Conventionnel
@@ -5640,7 +5989,6 @@ paths:
                 * `TALLOL` - Tallol
                 * `OTHER` - Autre
                 * `EP2AM` - EP2AM
-                * `AM` - AM
         - in: query
           name: date_from
           schema:
@@ -5697,6 +6045,7 @@ paths:
                 - MAC_BIO
                 - EXPORTATION
                 - DEVALUATION
+                - CUSTOMS_CORRECTION
                 - ACQUISITION
               type: string
               description: |-
@@ -5707,7 +6056,24 @@ paths:
                 * `MAC_BIO` - MAC_BIO
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
+                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                 * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
         - in: query
           name: period
           schema:
@@ -5722,13 +6088,13 @@ paths:
             items:
               enum:
                 - ESSENCE
-                - DIESEL
-                - SAF
+                - GAZOLE
+                - CARBURÉACTEUR
               type: string
               description: |-
                 * `ESSENCE` - ESSENCE
-                * `DIESEL` - DIESEL
-                * `SAF` - SAF
+                * `GAZOLE` - GAZOLE
+                * `CARBURÉACTEUR` - CARBURÉACTEUR
         - in: query
           name: status
           schema:
@@ -5739,12 +6105,18 @@ paths:
                 - ACCEPTED
                 - REJECTED
                 - CANCELED
+                - DECLARED
+                - CORRECTED
+                - VALIDATED
               type: string
               description: |-
                 * `PENDING` - PENDING
                 * `ACCEPTED` - ACCEPTED
                 * `REJECTED` - REJECTED
                 * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+                * `CORRECTED` - CORRECTED
+                * `VALIDATED` - VALIDATED
         - in: query
           name: type
           schema:
@@ -5762,9 +6134,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5805,9 +6177,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5849,9 +6221,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5877,10 +6249,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/SimulationMinMaxOutput"
           description: ""
-  /api/tiruert/operations/teneur/validate/:
+  /api/tiruert/operations/teneur/declare/:
     post:
-      operationId: validate_teneur
-      description: Set teneur operations to ACCEPTED
+      operationId: declare_teneur
+      description: Set teneur operations to DECLARED
       parameters:
         - in: query
           name: entity_id
@@ -5893,9 +6265,9 @@ paths:
           schema:
             type: string
             enum:
+              - MJ
               - kg
               - l
-              - mj
           description: Specify the volume unit.
       tags:
         - tiruert
@@ -5913,7 +6285,7 @@ paths:
           content:
             application/json:
               schema:
-                error: NOTHING_TO_VALIDATE
+                error: NOTHING_TO_DECLARE
           description: Error message
   /api/user/:
     get:
@@ -6054,6 +6426,12 @@ components:
       required:
         - delivery_site_id
         - ownership_type
+    AgreementDownloadLink:
+      type: object
+      properties:
+        download_link:
+          type: string
+          format: uri
     AgreementLists:
       type: object
       properties:
@@ -6154,44 +6532,40 @@ components:
       type: object
       properties:
         sector:
-          $ref: "#/components/schemas/SectorEnum"
+          $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
         initial_balance:
           type: number
           format: double
+          readOnly: true
         available_balance:
           type: number
           format: double
-          readOnly: true
-        final_balance:
-          type: number
-          format: double
-          readOnly: true
         quantity:
           $ref: "#/components/schemas/BalanceQuantity"
-        teneur:
+        pending_teneur:
           type: number
           format: double
-        yearly_teneur:
+        declared_teneur:
           type: number
           format: double
-        pending:
+        pending_operations:
           type: integer
         unit:
           type: string
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           $ref: "#/components/schemas/BalanceBiofuel"
       required:
         - available_balance
         - biofuel
         - customs_category
-        - final_balance
+        - declared_teneur
         - initial_balance
-        - pending
+        - pending_operations
+        - pending_teneur
         - quantity
         - sector
-        - teneur
         - unit
     BalanceBiofuel:
       type: object
@@ -6222,38 +6596,34 @@ components:
       type: object
       properties:
         sector:
-          $ref: "#/components/schemas/SectorEnum"
+          $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
         initial_balance:
           type: number
           format: double
+          readOnly: true
         available_balance:
           type: number
           format: double
-          readOnly: true
-        final_balance:
-          type: number
-          format: double
-          readOnly: true
         quantity:
           $ref: "#/components/schemas/BalanceQuantity"
-        teneur:
+        pending_teneur:
           type: number
           format: double
-        yearly_teneur:
+        declared_teneur:
           type: number
           format: double
-        pending:
+        pending_operations:
           type: integer
         unit:
           type: string
       required:
         - available_balance
-        - final_balance
+        - declared_teneur
         - initial_balance
-        - pending
+        - pending_operations
+        - pending_teneur
         - quantity
         - sector
-        - teneur
         - unit
     BalanceDepot:
       type: object
@@ -6595,24 +6965,6 @@ components:
         * `LOTS_UPDATED_BY_ADMIN` - LOTS_UPDATED_BY_ADMIN
         * `LOTS_DELETED_BY_ADMIN` - LOTS_DELETED_BY_ADMIN
         * `ELEC_TRANSFER_CERTIFICATE` - ELEC_TRANSFER_CERTIFICATE
-    CategoryEnum:
-      enum:
-        - CONV
-        - ANN-IX-A
-        - ANN-IX-B
-        - TALLOL
-        - OTHER
-        - EP2AM
-        - AM
-      type: string
-      description: |-
-        * `CONV` - Conventionnel
-        * `ANN-IX-A` - ANNEXE IX-A
-        * `ANN-IX-B` - ANNEXE IX-B
-        * `TALLOL` - Tallol
-        * `OTHER` - Autre
-        * `EP2AM` - EP2AM
-        * `AM` - AM
     CertificateTypeEnum:
       enum:
         - SYSTEME_NATIONAL
@@ -6869,24 +7221,6 @@ components:
           type: boolean
       required:
         - name
-    CustomsCategoryEnum:
-      enum:
-        - CONV
-        - ANN-IX-A
-        - ANN-IX-B
-        - TALLOL
-        - OTHER
-        - EP2AM
-        - AM
-      type: string
-      description: |-
-        * `CONV` - Conventionnel
-        * `ANN-IX-A` - ANNEXE IX-A
-        * `ANN-IX-B` - ANNEXE IX-B
-        * `TALLOL` - Tallol
-        * `OTHER` - Autre
-        * `EP2AM` - EP2AM
-        * `AM` - AM
     DeleteCertificateRequest:
       type: object
       properties:
@@ -7129,9 +7463,13 @@ components:
           items:
             $ref: "#/components/schemas/DoubleCountingDocFile"
           readOnly: true
+        download_link:
+          type: string
+          readOnly: true
       required:
         - created_at
         - documents
+        - download_link
         - id
         - period_end
         - period_start
@@ -7206,8 +7544,11 @@ components:
           maxLength: 128
         file_type:
           $ref: "#/components/schemas/FileTypeEnum"
+        url:
+          type: string
       required:
         - id
+        - url
     DoubleCountingProduction:
       type: object
       properties:
@@ -7823,7 +8164,7 @@ components:
           type: string
           maxLength: 64
         category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
           type: boolean
       required:
@@ -8100,7 +8441,7 @@ components:
           type: string
           maxLength: 64
         category:
-          $ref: "#/components/schemas/CategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
           type: boolean
       required:
@@ -8324,6 +8665,52 @@ components:
         * `REJECTED` - REJECTED
         * `FROZEN` - FROZEN
         * `DELETED` - DELETED
+    MPCategoriesEnum:
+      enum:
+        - CONV
+        - ANN-IX-A
+        - ANN-IX-B
+        - TALLOL
+        - OTHER
+        - EP2AM
+      type: string
+      description: |-
+        * `CONV` - Conventionnel
+        * `ANN-IX-A` - ANNEXE IX-A
+        * `ANN-IX-B` - ANNEXE IX-B
+        * `TALLOL` - Tallol
+        * `OTHER` - Autre
+        * `EP2AM` - EP2AM
+    MainObjective:
+      type: object
+      properties:
+        available_balance:
+          type: number
+          format: double
+        target:
+          type: number
+          format: double
+        pending_teneur:
+          type: number
+          format: double
+        declared_teneur:
+          type: number
+          format: double
+        unit:
+          type: string
+        penalty:
+          type: integer
+        target_percent:
+          type: number
+          format: double
+      required:
+        - available_balance
+        - declared_teneur
+        - penalty
+        - pending_teneur
+        - target
+        - target_percent
+        - unit
     NavStats:
       type: object
       properties:
@@ -8354,6 +8741,101 @@ components:
             type: integer
       required:
         - notification_ids
+    Objective:
+      type: object
+      properties:
+        target_mj:
+          type: number
+          format: double
+        target_type:
+          type: string
+        penalty:
+          type: integer
+        target_percent:
+          type: number
+          format: double
+      required:
+        - penalty
+        - target_mj
+        - target_percent
+        - target_type
+    ObjectiveCategory:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        pending_teneur:
+          type: number
+          format: double
+        declared_teneur:
+          type: number
+          format: double
+        available_balance:
+          type: number
+          format: double
+        unit:
+          type: string
+        objective:
+          $ref: "#/components/schemas/Objective"
+      required:
+        - available_balance
+        - code
+        - declared_teneur
+        - objective
+        - pending_teneur
+        - unit
+    ObjectiveOutput:
+      type: object
+      properties:
+        main:
+          $ref: "#/components/schemas/MainObjective"
+        sectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ObjectiveSector"
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/ObjectiveCategory"
+      required:
+        - categories
+        - main
+        - sectors
+    ObjectiveSector:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+        pending_teneur:
+          type: number
+          format: double
+        declared_teneur:
+          type: number
+          format: double
+        available_balance:
+          type: number
+          format: double
+        unit:
+          type: string
+        objective:
+          $ref: "#/components/schemas/Objective"
+      required:
+        - available_balance
+        - code
+        - declared_teneur
+        - objective
+        - pending_teneur
+        - unit
+    ObjectiveSectorCodeEnum:
+      enum:
+        - ESSENCE
+        - GAZOLE
+        - CARBURÉACTEUR
+      type: string
+      description: |-
+        * `ESSENCE` - ESSENCE
+        * `GAZOLE` - GAZOLE
+        * `CARBURÉACTEUR` - CARBURÉACTEUR
     Operation:
       type: object
       properties:
@@ -8364,12 +8846,12 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/StatusD22Enum"
+          $ref: "#/components/schemas/OperationStatusEnum"
         sector:
           type: string
           readOnly: true
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: string
           readOnly: true
@@ -8396,6 +8878,10 @@ components:
           type: number
           format: double
           readOnly: true
+        quantity_mj:
+          type: number
+          format: double
+          readOnly: true
         avoided_emissions:
           type: number
           format: double
@@ -8416,10 +8902,19 @@ components:
         - from_depot
         - id
         - quantity
+        - quantity_mj
         - sector
         - to_depot
         - type
         - unit
+    OperationCorrectionRequest:
+      type: object
+      properties:
+        correction_volume:
+          type: number
+          format: double
+      required:
+        - correction_volume
     OperationDepot:
       type: object
       properties:
@@ -8457,9 +8952,9 @@ components:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/TypeDefEnum"
+          $ref: "#/components/schemas/OperationTypeEnum"
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
           nullable: true
@@ -8498,12 +8993,12 @@ components:
           type: string
           readOnly: true
         status:
-          $ref: "#/components/schemas/StatusD22Enum"
+          $ref: "#/components/schemas/OperationStatusEnum"
         sector:
           type: string
           readOnly: true
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: string
           readOnly: true
@@ -8560,6 +9055,44 @@ components:
         - emission_rate_per_mj
         - id
         - volume
+    OperationStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - CANCELED
+        - DECLARED
+        - CORRECTED
+        - VALIDATED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `CANCELED` - CANCELED
+        * `DECLARED` - DECLARED
+        * `CORRECTED` - CORRECTED
+        * `VALIDATED` - VALIDATED
+    OperationTypeEnum:
+      enum:
+        - INCORPORATION
+        - CESSION
+        - TENEUR
+        - LIVRAISON_DIRECTE
+        - MAC_BIO
+        - EXPORTATION
+        - DEVALUATION
+        - CUSTOMS_CORRECTION
+      type: string
+      description: |-
+        * `INCORPORATION` - INCORPORATION
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
+        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+        * `MAC_BIO` - MAC_BIO
+        * `EXPORTATION` - EXPORTATION
+        * `DEVALUATION` - DEVALUATION
+        * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
     OtpResponse:
       type: object
       properties:
@@ -8600,6 +9133,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BalanceResponse"
+        total_quantity:
+          type: number
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -8646,6 +9181,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationList"
+        total_quantity:
+          type: number
     PaginatedSafTicketList:
       type: object
       required:
@@ -8669,6 +9206,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicket"
+        total_volume:
+          type: number
     PaginatedSafTicketSourceList:
       type: object
       required:
@@ -8692,13 +9231,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SafTicketSource"
+        total_available_volume:
+          type: number
     PatchedOperationUpdateRequest:
       type: object
       properties:
         type:
-          $ref: "#/components/schemas/TypeDefEnum"
+          $ref: "#/components/schemas/OperationTypeEnum"
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9130,6 +9671,10 @@ components:
         ghg_reduction:
           type: number
           format: double
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
         ets_status:
           allOf:
             - $ref: "#/components/schemas/EtsStatusEnum"
@@ -9192,6 +9737,10 @@ components:
         ghg_reduction:
           type: number
           format: double
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
       required:
         - assignment_period
         - biofuel
@@ -9525,7 +10074,12 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
       required:
+        - assignment_period
         - client
         - created_at
         - id
@@ -9854,16 +10408,6 @@ components:
           maxLength: 9
       required:
         - registration_id
-    SectorEnum:
-      enum:
-        - ESSENCE
-        - DIESEL
-        - SAF
-      type: string
-      description: |-
-        * `ESSENCE` - ESSENCE
-        * `DIESEL` - DIESEL
-        * `SAF` - SAF
     SetBioFuelsRequest:
       type: object
       properties:
@@ -9919,7 +10463,7 @@ components:
       type: object
       properties:
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9941,6 +10485,9 @@ components:
         unit:
           type: string
           minLength: 1
+        from_depot:
+          type: integer
+          nullable: true
       required:
         - biofuel
         - customs_category
@@ -9953,8 +10500,8 @@ components:
         lot_id:
           type: integer
         volume:
-          type: number
-          format: double
+          type: string
+          format: decimal
         emission_rate_per_mj:
           type: number
           format: double
@@ -9966,7 +10513,7 @@ components:
       type: object
       properties:
         customs_category:
-          $ref: "#/components/schemas/CustomsCategoryEnum"
+          $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
           nullable: true
@@ -9979,6 +10526,9 @@ components:
         unit:
           type: string
           minLength: 1
+        from_depot:
+          type: integer
+          nullable: true
       required:
         - biofuel
         - customs_category
@@ -10042,18 +10592,6 @@ components:
           type: string
       required:
         - metabase_iframe_url
-    StatusD22Enum:
-      enum:
-        - PENDING
-        - ACCEPTED
-        - REJECTED
-        - CANCELED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `ACCEPTED` - ACCEPTED
-        * `REJECTED` - REJECTED
-        * `CANCELED` - CANCELED
     ToggleElecRequest:
       type: object
       properties:
@@ -10094,24 +10632,6 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
-    TypeDefEnum:
-      enum:
-        - INCORPORATION
-        - CESSION
-        - TENEUR
-        - LIVRAISON_DIRECTE
-        - MAC_BIO
-        - EXPORTATION
-        - DEVALUATION
-      type: string
-      description: |-
-        * `INCORPORATION` - INCORPORATION
-        * `CESSION` - CESSION
-        * `TENEUR` - TENEUR
-        * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-        * `MAC_BIO` - MAC_BIO
-        * `EXPORTATION` - EXPORTATION
-        * `DEVALUATION` - DEVALUATION
     UnitRequest:
       type: object
       properties:
@@ -10390,7 +10910,14 @@ components:
           items:
             $ref: "#/components/schemas/ExtAdminPagesEnum"
           readOnly: true
+        is_tiruert_liable:
+          type: boolean
+          readOnly: true
+        accise_number:
+          type: string
+          readOnly: true
       required:
+        - accise_number
         - activity_description
         - default_certificate
         - entity_type
@@ -10403,6 +10930,7 @@ components:
         - has_trading
         - id
         - is_enabled
+        - is_tiruert_liable
         - legal_name
         - name
         - preferred_unit

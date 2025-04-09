@@ -74,7 +74,9 @@ export const ElecProvisionDetailsDialog = () => {
               label={t("MWh")}
               value={
                 "+ " +
-                formatNumber(provisionCertificate?.energy_amount || 0, 3) +
+                formatNumber(provisionCertificate?.energy_amount || 0, {
+                  fractionDigits: 3,
+                }) +
                 " MWh"
               }
             />

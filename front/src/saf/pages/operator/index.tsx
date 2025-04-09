@@ -1,14 +1,14 @@
 import useEntity from "common/hooks/entity"
 import { Main } from "common/components/scaffold"
-import Select from "common/components/select"
+import { Select } from "common/components/selects2"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years-2"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-import * as api from "./api"
-import TicketSources from "./ticket-sources"
-import OperatorTickets from "./tickets"
-import { SafTicketSourceStatus } from "saf/pages/operator/types"
+import { getYears, getSnapshot } from "saf/api"
+import TicketSources from "./pages/ticket-sources"
+import OperatorTickets from "./pages/tickets"
+import { SafTicketSourceStatus } from "./types"
 import { SafOperatorSnapshot } from "saf/types"
 
 export const SafOperator = () => {
@@ -16,9 +16,9 @@ export const SafOperator = () => {
 
   const entity = useEntity()
 
-  const years = useYears("saf", api.getOperatorYears)
+  const years = useYears("saf", getYears)
 
-  const snapshot = useQuery(api.getOperatorSnapshot, {
+  const snapshot = useQuery(getSnapshot, {
     key: "operator-snapshot",
     params: [entity.id, years.selected],
   })
@@ -31,7 +31,6 @@ export const SafOperator = () => {
         <section>
           <Select
             loading={years.loading}
-            variant="inline"
             placeholder={t("Choisir une année")}
             value={years.selected}
             onChange={years.setYear}

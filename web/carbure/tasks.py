@@ -108,6 +108,11 @@ if env.get("IMAGE_TAG") == "prod":
     def populate_read_replica() -> None:
         subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", env.get("READ_REPLICA_DATABASE_URL")])
 
+    # Anonymization
+    @periodic_task(crontab(day=1, hour=1, minute=0))
+    def anonymize_inactive_users() -> None:
+        call_command("anonymize_inactive_users")
+
 
 if env.get("IMAGE_TAG") == "staging":
 
