@@ -75,6 +75,7 @@ const ApplicationTabs = ({
         ])}
         focus={focus}
         onFocus={setFocus}
+        sticky
       />
       {focus === "production_site" && productionSite && (
         <Box>
