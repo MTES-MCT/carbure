@@ -50,3 +50,9 @@ export interface BalancesQuery
   [BalancesFilter.customs_category]?: OperationBiofuelCategory[]
   [BalancesFilter.biofuel]?: string[]
 }
+
+// For operations and balances, we want to display specific views for each sector
+export enum SectorTabs {
+  BIOFUELS = "biofuels",
+  ELEC = "elec",
+}

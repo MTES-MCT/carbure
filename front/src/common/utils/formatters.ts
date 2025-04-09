@@ -44,9 +44,11 @@ export function formatNumber(
 
   if (decimal !== 0) {
     if (decimal < 0) decimal = -decimal
-    const decimalStr = decimal.toFixed(fractionDigits).slice(2)
-    numStr +=
-      "," + (appendZeros ? decimalStr : decimalStr.replace(/\.?0+$/, ""))
+    let decimalStr = decimal.toFixed(fractionDigits).slice(2)
+    if (!appendZeros) {
+      decimalStr = decimalStr.replace(/\.?0+$/, "")
+    }
+    numStr += decimalStr ? "," + decimalStr : decimalStr
   }
 
   return numStr
