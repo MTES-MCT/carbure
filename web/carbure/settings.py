@@ -397,6 +397,8 @@ SPECTACULAR_SETTINGS = {
         "OperationStatusEnum": "tiruert.models.Operation.OPERATION_STATUSES",
         "OperationTypeEnum": "tiruert.models.Operation.OPERATION_TYPES",
         "ObjectiveSectorCodeEnum": "tiruert.models.Operation.SECTOR_CODE_CHOICES",
+        "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
+        "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,

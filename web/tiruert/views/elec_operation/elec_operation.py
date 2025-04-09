@@ -32,13 +32,6 @@ class ElecOperationPagination(MetadataPageNumberPagination):
             description="Authorised entity ID.",
             required=True,
         ),
-        OpenApiParameter(
-            name="unit",
-            type=str,
-            enum=[choice[0] for choice in Entity.UNIT_CHOICE],
-            location=OpenApiParameter.QUERY,
-            description="Specify the volume unit.",
-        ),
     ]
 )
 class ElecOperationViewSet(ModelViewSet):
@@ -67,7 +60,7 @@ class ElecOperationViewSet(ModelViewSet):
         return context
 
     @extend_schema(
-        operation_id="list_operations",
+        operation_id="list_elec_operations",
         description="Retrieve a list of operations with optional filtering and pagination.",
         filters=True,
         parameters=[
@@ -87,7 +80,7 @@ class ElecOperationViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     @extend_schema(
-        operation_id="get_operation",
+        operation_id="get_elec_operation",
         description="Retrieve one specific operation.",
         responses={
             status.HTTP_200_OK: OpenApiResponse(
@@ -100,7 +93,7 @@ class ElecOperationViewSet(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
-        operation_id="create_operation",
+        operation_id="create_elec_operation",
         description="Create a new operation.",
         request=ElecOperationInputSerializer,
         responses={
@@ -131,7 +124,7 @@ class ElecOperationViewSet(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
-        operation_id="update_operation",
+        operation_id="update_elec_operation",
         description="Update a part of operation.",
         request=ElecOperationUpdateSerializer,
         responses={
@@ -165,7 +158,7 @@ class ElecOperationViewSet(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
-        operation_id="delete_operation",
+        operation_id="delete_elec_operation",
         description="Delete an operation. Only allowed for certain types and statuses.",
         responses={
             status.HTTP_204_NO_CONTENT: OpenApiResponse(description="Operation deleted successfully."),
