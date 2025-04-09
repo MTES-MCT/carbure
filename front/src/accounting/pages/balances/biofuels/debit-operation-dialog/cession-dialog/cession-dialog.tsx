@@ -4,12 +4,6 @@ import { Box, Main } from "common/components/scaffold"
 import { Balance, CreateOperationType } from "accounting/types"
 import { Trans, useTranslation } from "react-i18next"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
-import {
-  FromDepotForm,
-  FromDepotSummary,
-  fromDepotStep,
-  fromDepotStepKey,
-} from "accounting/components/from-depot-form"
 import { useForm, Form, FormManager } from "common/components/form2"
 import { SessionDialogForm } from "./cession-dialog.types"
 import { Button } from "common/components/button2"
@@ -20,17 +14,17 @@ import {
   quantityFormStepKey,
 } from "accounting/components/quantity-form"
 import {
-  RecipientToDepotForm,
-  recipientToDepotStep,
-  recipientToDepotStepKey,
-  RecipientToDepotSummary,
-} from "accounting/components/recipient-to-depot-form"
-import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
 
 import { useCessionDialog } from "./cession-dialog.hooks"
+import {
+  FromDepotRecipientToDepotForm,
+  fromDepotRecipientToDepotStep,
+  fromDepotRecipientToDepotStepKey,
+  FromDepotRecipientToDepotSummary,
+} from "./from-depot-recipient-to-depot-form/from-depot-recipient-to-depot-form"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -89,19 +83,18 @@ export const CessionDialogContent = ({
           <Box>
             <RecapOperationGrid>
               <RecapOperation balance={balance} />
-              {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
-              {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
-              {currentStepIndex > 3 && form.value.credited_entity && (
-                <RecipientToDepotSummary values={form.value} />
+              {currentStepIndex > 1 && (
+                <FromDepotRecipientToDepotSummary values={form.value} />
               )}
+              {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
             </RecapOperationGrid>
           </Box>
 
           {currentStep?.key !== "recap" && (
             <Box>
               <Form form={form}>
-                {currentStep?.key === fromDepotStepKey && (
-                  <FromDepotForm balance={balance} />
+                {currentStep?.key === fromDepotRecipientToDepotStepKey && (
+                  <FromDepotRecipientToDepotForm balance={balance} />
                 )}
                 {currentStep?.key === quantityFormStepKey && (
                   <QuantityForm
@@ -110,9 +103,6 @@ export const CessionDialogContent = ({
                     type={CreateOperationType.CESSION}
                     depotId={form.value.from_depot?.id}
                   />
-                )}
-                {currentStep?.key === recipientToDepotStepKey && (
-                  <RecipientToDepotForm />
                 )}
               </Form>
             </Box>
@@ -127,9 +117,8 @@ export const CessionDialog = (props: CessionDialogProps) => {
   const { t } = useTranslation()
   const form = useForm<SessionDialogForm>({})
   const steps = [
-    fromDepotStep(form.value),
+    fromDepotRecipientToDepotStep(form.value),
     quantityFormStep(form.value),
-    recipientToDepotStep(form.value),
     { key: "recap", title: t("Récapitulatif") },
   ]
   return (

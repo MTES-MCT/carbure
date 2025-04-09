@@ -34,6 +34,9 @@ export const getObjectives = async (
           teneur_declared: objectives?.main.declared_teneur ?? 0,
           teneur_declared_month: objectives?.main.pending_teneur ?? 0,
           quantity_available: objectives?.main.available_balance ?? 0,
+          target_percent: objectives?.main.target_percent
+            ? objectives?.main.target_percent * 100
+            : 0,
         },
         sectors:
           objectives?.sectors.map((sector) => ({
@@ -48,6 +51,7 @@ export const getObjectives = async (
             quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
               sector.available_balance
             ),
+            target_percent: sector.objective.target_percent * 100, // Percentage of the total target to consider
           })) ?? [],
       }
 
@@ -63,6 +67,13 @@ export const getObjectives = async (
 
       const categories =
         objectives?.categories.reduce((objCategories, category) => {
+          if (
+            category.objective.target_mj &&
+            category.objective.target_mj === 0
+          ) {
+            return objCategories
+          }
+
           const cat = {
             code: category.code,
             target: category.objective.target_mj

@@ -13,6 +13,11 @@ export interface CategoryObjective extends BaseObjective {
 
 export interface SectorObjective extends BaseObjective {
   code: OperationSector
+  target_percent: number
+}
+
+export interface MainObjective extends BaseObjective {
+  target_percent: number
 }
 
 export type UnconstrainedCategoryObjective = Omit<
@@ -23,7 +28,7 @@ export type UnconstrainedCategoryObjective = Omit<
 }
 
 export interface Objectives {
-  global: BaseObjective
+  global: MainObjective
   sectors: SectorObjective[]
   capped_categories: CategoryObjective[]
   objectivized_categories: CategoryObjective[]

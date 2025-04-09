@@ -30,6 +30,11 @@ export const Icon = ({
   )
 }
 
+export const createIcon =
+  (defaultProps: BaseIconProps) => (props: IconProps) => (
+    <Icon {...defaultProps} {...props} />
+  )
+
 export const SurveyLine = ({ ...props }: IconProps) => {
   return <Icon {...props} name="fr-icon-survey-line" />
 }

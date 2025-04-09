@@ -6,7 +6,7 @@ import { RecapData } from "../recap-data"
 import { SectorObjective } from "../../types"
 import { CardGrid } from "../card-grid"
 import { ExtendedUnit } from "common/types"
-import { floorNumber, formatUnit } from "common/utils/formatters"
+import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -24,13 +24,20 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
         {sectors?.map((sector) => (
           <CardProgress
             key={sector.code}
-            title={t(formatSector(sector.code))}
-            description={t("Objectif en GJ en {{date}}: {{objective}}", {
-              date: "2025",
-              objective: formatUnit(sector.target, ExtendedUnit.GJ, {
-                fractionDigits: 0,
-              }),
-            })}
+            title={formatSector(sector.code)}
+            description={t(
+              "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
+              {
+                date: "2025",
+                objective: formatUnit(sector.target, ExtendedUnit.GJ, {
+                  fractionDigits: 0,
+                }),
+                target_percent: formatNumber(sector.target_percent, {
+                  fractionDigits: 2,
+                  appendZeros: false,
+                }),
+              }
+            )}
             mainValue={floorNumber(
               sector.teneur_declared + sector.teneur_declared_month,
               0

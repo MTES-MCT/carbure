@@ -9,6 +9,7 @@ import Balances from "./pages/balances"
 import useEntity from "common/hooks/entity"
 import { UserRole } from "common/types"
 import { TeneurLayout } from "./layouts/teneur-layout"
+import { SectorTabs } from "./types"
 
 const currentYear = new Date().getFullYear()
 
@@ -21,8 +22,21 @@ const MaterialAccounting = () => {
     <Main>
       <Routes>
         <Route element={<OperationsBalancesLayout />}>
-          <Route path="operations" element={<Operations />} />
-          {canTransfer && <Route path="balances" element={<Balances />} />}
+          <Route path={`operations/:status`} element={<Operations />} />
+          <Route
+            path="operations"
+            element={<Navigate replace to={`${SectorTabs.BIOFUELS}`} />}
+          />
+
+          {canTransfer && (
+            <>
+              <Route path="balances/:status" element={<Balances />} />
+              <Route
+                path="balances"
+                element={<Navigate replace to={`${SectorTabs.BIOFUELS}`} />}
+              />
+            </>
+          )}
         </Route>
         {entity.is_tiruert_liable && (
           <Route element={<TeneurLayout />}>

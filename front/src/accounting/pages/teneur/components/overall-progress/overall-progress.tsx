@@ -1,4 +1,4 @@
-import { BaseObjective } from "../../types"
+import { MainObjective } from "../../types"
 import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { useTranslation } from "react-i18next"
@@ -6,7 +6,7 @@ import { RecapData } from "../recap-data"
 import { ceilNumber, floorNumber, formatNumber } from "common/utils/formatters"
 
 type OverallProgressProps = {
-  objective?: BaseObjective
+  objective?: MainObjective
 }
 
 export const OverallProgress = ({ objective }: OverallProgressProps) => {
@@ -24,12 +24,16 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             date: "15/03/2025",
           })}
           description={t(
-            "Objectif en tC02 évitées en {{date}}: {{objective}} tC02 évitées",
+            "Objectif en tC02 évitées en {{date}}: {{objective}} tC02 évitées ({{target_percent}}% du total)",
             {
               date: "2025",
               objective: formatNumber(objective.target, {
                 fractionDigits: 0,
                 mode: "ceil",
+              }),
+              target_percent: formatNumber(objective.target_percent, {
+                fractionDigits: 2,
+                appendZeros: false,
               }),
             }
           )}

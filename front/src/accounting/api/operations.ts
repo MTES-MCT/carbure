@@ -130,7 +130,10 @@ export const createOperationWithSimulation = (
     unit: simulation.unit,
     from_depot,
   }).then((response) => {
-    const lots = response.data?.selected_lots
+    const lots = response.data?.selected_lots.map(({ volume, ...lot }) => ({
+      ...lot,
+      volume: parseFloat(volume),
+    }))
     if (lots) {
       return createOperation(entityId, {
         ...operation,

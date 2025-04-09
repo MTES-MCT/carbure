@@ -1,10 +1,8 @@
-import { useTranslation } from "react-i18next"
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 import { formatOperationStatus } from "accounting/utils/formatters"
 import { OperationsStatus } from "accounting/types"
 
 export const OperationBadge = ({ status }: { status?: OperationsStatus }) => {
-  const { t } = useTranslation()
   const labelMapping: Record<OperationsStatus, BadgeProps["severity"]> = {
     [OperationsStatus.ACCEPTED]: "success",
     [OperationsStatus.CANCELED]: "error",
@@ -19,7 +17,7 @@ export const OperationBadge = ({ status }: { status?: OperationsStatus }) => {
 
   return (
     <Badge severity={labelMapping[status]} noIcon>
-      {t(formatOperationStatus(status))}
+      {formatOperationStatus(status)}
     </Badge>
   )
 }

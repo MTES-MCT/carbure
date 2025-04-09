@@ -73,7 +73,7 @@ export const ExportationQuantityForm = ({
                     value.quantity > depot_quantity_max)
                 }
               >
-                {t("Déclarer la quantité")}
+                {t("Valider la quantité")}
               </Button>
             )}
             {quantityDeclared && (

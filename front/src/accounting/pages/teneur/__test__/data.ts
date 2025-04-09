@@ -1,7 +1,7 @@
 import { CategoryEnum } from "common/types"
 import {
-  BaseObjective,
   CategoryObjective,
+  MainObjective,
   UnconstrainedCategoryObjective,
 } from "../types"
 
@@ -42,9 +42,10 @@ export const objectivizedCategories: CategoryObjective[] = [
   },
 ]
 
-export const overallObjective: BaseObjective = {
+export const overallObjective: MainObjective = {
   target: 38296.35321542,
   teneur_declared: 954.004872,
   teneur_declared_month: 45.7,
   quantity_available: 141631.71604577947,
+  target_percent: 0.67,
 }
