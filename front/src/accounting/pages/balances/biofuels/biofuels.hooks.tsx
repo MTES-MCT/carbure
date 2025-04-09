@@ -6,7 +6,7 @@ import { apiTypes } from "common/services/api-fetch.types"
 import { addQueryParams } from "common/utils/routes"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import { DebitOperationDialog } from "./components/debit-operation-dialog"
+import { DebitOperationDialog } from "./debit-operation-dialog"
 import {
   BalancesFilter,
   BalancesQuery,
@@ -21,13 +21,14 @@ import { UserRole } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { formatNumber } from "common/utils/formatters"
 
-export const useBalancesColumns = () => {
+export const useBalancesBiofuelsColumns = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const routes = useRoutes()
   const portal = usePortal()
   const entity = useEntity()
   const { unit } = useUnit()
+
   const canTransfer =
     entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
@@ -58,12 +59,15 @@ export const useBalancesColumns = () => {
           <Button
             customPriority="link"
             onClick={() => {
-              const url = addQueryParams(routes.ACCOUNTING.OPERATIONS, {
-                sector: item.sector,
-                biofuel: item.biofuel?.code,
-                customs_category: item.customs_category,
-                status: OperationsStatus.PENDING,
-              })
+              const url = addQueryParams(
+                routes.ACCOUNTING.OPERATIONS.BIOFUELS,
+                {
+                  sector: item.sector,
+                  biofuel: item.biofuel?.code,
+                  customs_category: item.customs_category,
+                  status: OperationsStatus.PENDING,
+                }
+              )
               navigate(url)
             }}
           >

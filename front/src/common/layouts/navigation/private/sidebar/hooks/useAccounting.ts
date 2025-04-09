@@ -20,13 +20,13 @@ export const useAccounting = () => {
     condition: Boolean(userIsMTEDGEC) && accise_number !== "",
     children: [
       {
-        path: routes.ACCOUNTING.BALANCES,
+        path: routes.ACCOUNTING.BALANCES.ROOT,
         title: t("Soldes"),
         icon: createIcon({ name: "ri-bank-line" }),
         iconActive: createIcon({ name: "ri-bank-fill" }),
       },
       {
-        path: routes.ACCOUNTING.OPERATIONS,
+        path: routes.ACCOUNTING.OPERATIONS.ROOT,
         title: t("Comptabilité"),
         icon: createIcon({ name: "ri-bar-chart-2-line" }),
         iconActive: createIcon({ name: "ri-bar-chart-2-fill" }),

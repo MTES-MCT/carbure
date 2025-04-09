@@ -30,7 +30,7 @@ import { useUnit } from "common/hooks/unit"
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
 }
-export const useOperationsColumns = ({
+export const useOperationsBiofuelsColumns = ({
   onClickSector,
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
