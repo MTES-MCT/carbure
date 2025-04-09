@@ -1,4 +1,7 @@
 import {
+  ElecOperationsStatus,
+  ElecOperationType,
+  OperationDebitOrCredit,
   OperationSector,
   OperationsStatus,
   OperationType,
@@ -45,13 +48,16 @@ export const formatOperationType = (type: string) => {
     case OperationType.LIVRAISON_DIRECTE:
       return i18next.t("Livraison directe")
     case OperationType.ACQUISITION:
+    case ElecOperationType.ACQUISITION_FROM_CPO:
       return i18next.t("Acquisition")
     default:
       return i18next.t("Inconnu")
   }
 }
 
-export const formatOperationStatus = (status: OperationsStatus) => {
+export const formatOperationStatus = (
+  status: OperationsStatus | ElecOperationsStatus
+) => {
   switch (status) {
     case OperationsStatus.ACCEPTED:
       return i18next.t("Accepté")
@@ -69,5 +75,16 @@ export const formatOperationStatus = (status: OperationsStatus) => {
       return i18next.t("Validé")
     default:
       return i18next.t("Inconnu")
+  }
+}
+
+export const formatOperationCreditOrDebit = (type: string) => {
+  switch (type) {
+    case OperationDebitOrCredit.CREDIT:
+      return "Crédit"
+    case OperationDebitOrCredit.DEBIT:
+      return "Débit"
+    default:
+      return "Inconnu"
   }
 }

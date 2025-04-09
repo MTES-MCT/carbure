@@ -11,8 +11,8 @@ import {
   getOperationQuantity,
   isOperationDebit,
 } from "../../operations.utils"
-import { OperationBadge } from "../../components/operation-badge"
-import css from "./operation-detail.module.css"
+import { OperationBadge } from "accounting/components/operation-badge/operation-badge"
+import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
