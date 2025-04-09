@@ -4957,6 +4957,286 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/tiruert/elec-operations/:
+    get:
+      operationId: list_elec_operations
+      description: Retrieve a list of operations with optional filtering and pagination.
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: details
+          schema:
+            type: boolean
+            default: "0"
+          description: Include detailed information if set to `1`.
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecOperationListList"
+          description: A list of operations.
+    post:
+      operationId: create_elec_operation
+      description: Create a new operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecOperationInputRequest"
+            examples:
+              CreateOperationExample:
+                value:
+                  type: TENEUR
+                  credited_entity: ""
+                  debited_entity: 2
+                summary: Create Operation Example
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecOperationInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecOperationInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecOperationList"
+              examples:
+                CreateOperationExample:
+                  value:
+                    type: TENEUR
+                    credited_entity: ""
+                    debited_entity: 2
+                  summary: Create Operation Example
+          description: The newly created operation.
+        "400":
+          description: Invalid input data.
+  /api/tiruert/elec-operations/{id}/:
+    get:
+      operationId: get_elec_operation
+      description: Retrieve one specific operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecOperation"
+          description: Details of specific operation.
+    patch:
+      operationId: update_elec_operation
+      description: Update a part of operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedElecOperationUpdateRequest"
+            examples:
+              UpdateOperationExample:
+                value:
+                  quantity: 10
+                summary: Update Operation Example
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedElecOperationUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedElecOperationUpdateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecOperation"
+              examples:
+                UpdateOperationExample:
+                  value:
+                    quantity: 10
+                  summary: Update Operation Example
+          description: The updated operation.
+        "400":
+          description: Invalid input data.
+    delete:
+      operationId: delete_elec_operation
+      description: Delete an operation. Only allowed for certain types and statuses.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: Operation deleted successfully.
+        "403":
+          description: Forbidden. The operation type or status does not allow deletion.
   /api/tiruert/objectives/:
     get:
       operationId: objectives
@@ -7924,6 +8204,128 @@ components:
         * `INPROGRESS` - INPROGRESS
         * `REJECTED` - REJECTED
         * `ACCEPTED` - ACCEPTED
+    ElecOperation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/ElecOperationStatusEnum"
+        credited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        debited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        quantity:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        avoided_emissions:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - avoided_emissions
+        - created_at
+        - credited_entity
+        - debited_entity
+        - id
+        - type
+    ElecOperationEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    ElecOperationEntityRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+      required:
+        - id
+        - name
+    ElecOperationInputRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/ElecOperationTypeEnum"
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        quantity:
+          type: number
+          format: double
+      required:
+        - type
+    ElecOperationList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/ElecOperationStatusEnum"
+        credited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        debited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        quantity:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - created_at
+        - credited_entity
+        - debited_entity
+        - id
+        - type
+    ElecOperationStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - CANCELED
+        - DECLARED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `CANCELED` - CANCELED
+        * `DECLARED` - DECLARED
+    ElecOperationTypeEnum:
+      enum:
+        - ACQUISITION_FROM_CPO
+        - CESSION
+        - TENEUR
+      type: string
+      description: |-
+        * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
     EmptyResponse:
       type: object
       properties:
@@ -9135,6 +9537,31 @@ components:
             $ref: "#/components/schemas/BalanceResponse"
         total_quantity:
           type: number
+    PaginatedElecOperationListList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecOperationList"
+        total_quantity:
+          type: number
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -9233,6 +9660,16 @@ components:
             $ref: "#/components/schemas/SafTicketSource"
         total_available_volume:
           type: number
+    PatchedElecOperationUpdateRequest:
+      type: object
+      properties:
+        credited_entity:
+          $ref: "#/components/schemas/ElecOperationEntityRequest"
+        debited_entity:
+          $ref: "#/components/schemas/ElecOperationEntityRequest"
+        quantity:
+          type: number
+          format: double
     PatchedOperationUpdateRequest:
       type: object
       properties:

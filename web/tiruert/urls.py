@@ -9,7 +9,7 @@ from .views import (
 
 router = SimpleRouter()
 router.register("operations", OperationViewSet, basename="operations")
-router.register("elec_operations", ElecOperationViewSet, basename="elec-operations")
+router.register("elec-operations", ElecOperationViewSet, basename="elec-operations")
 
 objectives = ObjectiveViewSet.as_view({"get": "get_objectives"})
 
