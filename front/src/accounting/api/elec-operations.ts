@@ -86,27 +86,23 @@ export const deleteOperation = (entity_id: number, operation_id: number) => {
 }
 
 export const acceptOperation = (entity_id: number, operation_id: number) => {
-  console.log(entity_id, operation_id)
-  return Promise.resolve({})
-  // return api.POST(`/tiruert/elec-operations/{id}/accept/`, {
-  //   params: {
-  //     query: {
-  //       entity_id,
-  //     },
-  //     path: { id: operation_id },
-  //   },
-  // })
+  return api.POST(`/tiruert/elec-operations/{id}/accept/`, {
+    params: {
+      query: {
+        entity_id,
+      },
+      path: { id: operation_id },
+    },
+  })
 }
 
 export const rejectOperation = (entity_id: number, operation_id: number) => {
-  console.log(entity_id, operation_id)
-  return Promise.resolve({})
-  // return api.POST(`/tiruert/elec-operations/{id}/reject/`, {
-  //   params: {
-  //     query: {
-  //       entity_id,
-  //     },
-  //     path: { id: operation_id },
-  //   },
-  // })
+  return api.POST(`/tiruert/elec-operations/{id}/reject/`, {
+    params: {
+      query: {
+        entity_id,
+      },
+      path: { id: operation_id },
+    },
+  })
 }

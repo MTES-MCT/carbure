@@ -5237,6 +5237,82 @@ paths:
           description: Operation deleted successfully.
         "403":
           description: Forbidden. The operation type or status does not allow deletion.
+  /api/tiruert/elec-operations/{id}/accept/:
+    post:
+      operationId: accept_elec_operation
+      description: Set status operation to ACCEPTED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: accepted
+          description: Success message
+        "400":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_TYPE_NOT_ALLOWED
+          description: Error message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_NOT_FOUND
+          description: Error message
+  /api/tiruert/elec-operations/{id}/reject/:
+    post:
+      operationId: reject_elec_operation
+      description: Set status operation to REJECTED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: rejected
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_NOT_FOUND
+          description: Error message
   /api/tiruert/elec-operations/filters/:
     get:
       operationId: filter_elec_operations
