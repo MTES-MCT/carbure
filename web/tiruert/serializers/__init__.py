@@ -15,3 +15,4 @@ from .elec_operation import ElecOperationSerializer
 from .elec_operation import ElecOperationListSerializer
 from .elec_operation import ElecOperationInputSerializer
 from .elec_operation import ElecOperationUpdateSerializer
+from .elec_balance import ElecBalanceSerializer
