@@ -26,6 +26,7 @@ class ElecOperationManager(models.Manager):
 
 class ElecOperation(models.Model):
     EMISSION_RATE_PER_MJ = 183
+    SECTOR = "ELEC"
 
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"  # Acquisition
