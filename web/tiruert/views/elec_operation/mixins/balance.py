@@ -5,7 +5,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.decorators import action
 
 from core.pagination import MetadataPageNumberPagination
-from tiruert.filters.elec_operation import ElecOperationFilter
+from tiruert.filters.elec_operation import ElecOperationFilterForBalance
 from tiruert.serializers import ElecBalanceSerializer
 from tiruert.services.elec_balance import ElecBalanceService
 
@@ -40,7 +40,7 @@ class BalanceActionMixin:
         detail=False,
         methods=["get"],
         serializer_class=ElecBalanceSerializer,
-        filterset_class=ElecOperationFilter,
+        filterset_class=ElecOperationFilterForBalance,
         pagination_class=ElecBalancePagination,
     )
     def balance(self, request, pk=None):
