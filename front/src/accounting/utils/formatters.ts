@@ -1,4 +1,5 @@
 import {
+  ElecOperationSector,
   ElecOperationsStatus,
   ElecOperationType,
   OperationDebitOrCredit,
@@ -21,6 +22,8 @@ export const formatSector = (sector: string) => {
       return i18next.t("Gazole")
     case OperationSector.CARBUR_ACTEUR:
       return i18next.t("Carburéacteur")
+    case ElecOperationSector.ELEC:
+      return i18next.t("Électricité")
     default:
       return i18next.t("Inconnu")
   }

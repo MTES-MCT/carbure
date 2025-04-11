@@ -17,6 +17,7 @@ import {
   PathsApiTiruertElecOperationsGetParametersQueryOperation as ElecOperationType,
   PathsApiTiruertElecOperationsGetParametersQueryOrder_by as OperationOrderBy,
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
+  ElecOperationTypeEnum as CreateElecOperationType,
 } from "api-schema"
 
 // Type definitions
@@ -63,6 +64,11 @@ export enum SectorTabs {
 }
 
 export type ElecOperation = apiTypes["ElecOperationList"]
+export type ElecBalance = apiTypes["ElecBalance"]
+
+export enum ElecOperationSector {
+  ELEC = "ELEC",
+}
 
 export interface ElecOperationsQuery
   extends CBQueryParams<[], ElecOperationsStatus[], string[]> {
@@ -71,4 +77,9 @@ export interface ElecOperationsQuery
   [OperationsFilter.operation]?: ElecOperationType[]
 }
 
-export { ElecOperationsStatus, ElecOperationType, ElecOperationsFilter }
+export {
+  ElecOperationsStatus,
+  ElecOperationType,
+  ElecOperationsFilter,
+  CreateElecOperationType,
+}
