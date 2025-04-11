@@ -2,12 +2,16 @@ import { DraftFill } from "common/components/icon"
 import { Content } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useTranslation } from "react-i18next"
-import { Outlet } from "react-router-dom"
+import { Outlet, useParams } from "react-router-dom"
 import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
 
 const OperationsBalancesLayout = () => {
   const { t } = useTranslation()
+
+  // extract current TIRUERT section: "balances" or "operations"
+  const params = useParams()
+  const [section] = (params["*"] ?? "").split("/")
 
   return (
     <>
@@ -16,13 +20,13 @@ const OperationsBalancesLayout = () => {
           {
             key: SectorTabs.BIOFUELS,
             label: t("Biocarburants"),
-            path: `operations/${SectorTabs.BIOFUELS}`,
+            path: `${section}/${SectorTabs.BIOFUELS}`,
             icon: DraftFill,
           },
           {
             key: SectorTabs.ELEC,
             label: t("Électricité"),
-            path: `operations/${SectorTabs.ELEC}`,
+            path: `${section}/${SectorTabs.ELEC}`,
             icon: DraftFill,
           },
         ])}

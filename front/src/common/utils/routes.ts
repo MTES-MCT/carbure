@@ -26,10 +26,12 @@ export const ROUTE_URLS = {
       OPERATIONS: {
         ROOT: `${baseUrl}/operations`,
         BIOFUELS: `${baseUrl}/operations/biofuels`,
+        ELEC: `${baseUrl}/operations/elec`,
       },
       BALANCES: {
         ROOT: `${baseUrl}/balances`,
         BIOFUELS: `${baseUrl}/balances/biofuels`,
+        ELEC: `${baseUrl}/balances/elec`,
       },
       TENEUR: `${baseUrl}/teneur`,
     }
