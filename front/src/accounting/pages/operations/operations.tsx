@@ -6,17 +6,17 @@ const OperationsBiofuels = lazy(() => import("./biofuels"))
 const OperationsElec = lazy(() => import("./elec"))
 
 const Operations = () => {
-  const { status } = useParams()
+  const { category } = useParams()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!status) navigate(`${SectorTabs.BIOFUELS}`)
-  }, [status, navigate])
+    if (!category) navigate(`${SectorTabs.BIOFUELS}`)
+  }, [category, navigate])
 
   return (
     <>
-      {status === "biofuels" && <OperationsBiofuels />}
-      {status === "elec" && <OperationsElec />}
+      {category === "biofuels" && <OperationsBiofuels />}
+      {category === "elec" && <OperationsElec />}
     </>
   )
 }
