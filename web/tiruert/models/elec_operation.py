@@ -25,6 +25,8 @@ class ElecOperationManager(models.Manager):
 
 
 class ElecOperation(models.Model):
+    EMISSION_RATE_PER_MJ = 183
+
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"  # Acquisition
     REJECTED = "REJECTED"  # Acquisition
@@ -59,6 +61,10 @@ class ElecOperation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     quantity = models.FloatField(default=0)  # unit = MJ
 
+    @property
+    def avoided_emissions(self):
+        return ElecOperation.EMISSION_RATE_PER_MJ * self.quantity / 1e6
+
     objects = ElecOperationManager()
 
     class Meta:
@@ -70,3 +76,8 @@ class ElecOperation(models.Model):
         if self.credited_entity is None:
             return False
         return self.credited_entity.id == int(entity_id) and self.type == ElecOperation.CESSION
+
+    def is_credit(self, entity):
+        if self.credited_entity is None:
+            return False
+        return self.credited_entity.id == int(entity)

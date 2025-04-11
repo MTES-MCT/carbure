@@ -49,12 +49,6 @@ class ElecOperationSerializer(BaseElecOperationSerializer):
             "avoided_emissions",
         ]
 
-    avoided_emissions = serializers.SerializerMethodField()
-
-    def get_avoided_emissions(self, instance) -> float:
-        # TODO compute avoided emission using global conversion factor
-        return 0
-
 
 class ElecOperationInputSerializer(serializers.ModelSerializer):
     class Meta:
