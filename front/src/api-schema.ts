@@ -1622,6 +1622,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/elec-operations/balance/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve electricity balance */
+    get: operations["list_elec_balance"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/elec-operations/filters/": {
     parameters: {
       query?: never
@@ -2498,6 +2515,18 @@ export interface components {
      * @enum {string}
      */
     DoubleCountingStatus: DoubleCountingStatus
+    ElecBalance: {
+      /** Format: double */
+      readonly initial_balance: number
+      /** Format: double */
+      available_balance: number
+      quantity: components["schemas"]["BalanceQuantity"]
+      /** Format: double */
+      pending_teneur: number
+      /** Format: double */
+      declared_teneur: number
+      pending_operations: number
+    }
     ElecOperation: {
       readonly id: number
       readonly type: string
@@ -2509,7 +2538,7 @@ export interface components {
       /** Format: date-time */
       readonly created_at: string
       /** Format: double */
-      readonly avoided_emissions: number
+      avoided_emissions: number
     }
     ElecOperationEntity: {
       id: number
@@ -7438,6 +7467,41 @@ export interface operations {
         }
         content: {
           "application/json": unknown
+        }
+      }
+    }
+  }
+  list_elec_balance: {
+    parameters: {
+      query: {
+        /** @description Date from when to calculate teneur and quantity */
+        date_from?: string
+        date_to?: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        from_to?: string
+        operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[]
+        /** @description Ordre
+         *
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant) */
+        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+        period?: string[]
+        status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[]
+        type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecBalance"]
         }
       }
     }

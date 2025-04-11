@@ -12,6 +12,7 @@ class BaseElecOperationSerializer(serializers.ModelSerializer):
     credited_entity = ElecOperationEntitySerializer()
     debited_entity = ElecOperationEntitySerializer()
     type = serializers.SerializerMethodField()
+    avoided_emissions = serializers.FloatField()
 
     def get_type(self, instance: ElecOperation) -> str:
         entity_id = self.context.get("entity_id")
