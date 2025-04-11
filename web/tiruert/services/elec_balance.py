@@ -21,6 +21,7 @@ class ElecBalanceService:
         Initializes a balance entry with default values
         """
         entry = {
+            "sector": ElecOperation.SECTOR,
             "quantity": {"credit": 0, "debit": 0},
             "emission_rate_per_mj": 0,
             "pending_teneur": 0,
