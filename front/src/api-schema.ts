@@ -2516,6 +2516,7 @@ export interface components {
      */
     DoubleCountingStatus: DoubleCountingStatus
     ElecBalance: {
+      sector: components["schemas"]["ElecBalanceSectorEnum"]
       /** Format: double */
       readonly initial_balance: number
       /** Format: double */
@@ -2527,6 +2528,11 @@ export interface components {
       declared_teneur: number
       pending_operations: number
     }
+    /**
+     * @description * `ELEC` - ELEC
+     * @enum {string}
+     */
+    ElecBalanceSectorEnum: ElecBalanceSectorEnum
     ElecOperation: {
       readonly id: number
       readonly type: string
@@ -3080,6 +3086,22 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["BalanceResponse"][]
+      total_quantity?: number
+    }
+    PaginatedElecBalanceList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecBalance"][]
       total_quantity?: number
     }
     PaginatedElecOperationListList: {
@@ -7486,6 +7508,10 @@ export interface operations {
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant) */
         order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
         period?: string[]
         status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[]
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
@@ -7501,7 +7527,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["ElecBalance"]
+          "application/json": components["schemas"]["PaginatedElecBalanceList"]
         }
       }
     }
@@ -8365,6 +8391,9 @@ export enum DoubleCountingStatus {
   INPROGRESS = "INPROGRESS",
   REJECTED = "REJECTED",
   ACCEPTED = "ACCEPTED",
+}
+export enum ElecBalanceSectorEnum {
+  ELEC = "ELEC",
 }
 export enum ElecOperationTypeEnum {
   ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
