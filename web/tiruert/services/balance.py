@@ -73,7 +73,7 @@ class BalanceService:
         """
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
-            balance[key][teneur_type] += detail.volume * conversion_factor
+            balance[key][teneur_type] += detail.volume * conversion_factor * operation.renewable_energy_share
 
         quantity_type = "credit" if operation.is_credit(entity_id) else "debit"
         balance[key]["quantity"][quantity_type] += detail.volume * conversion_factor
