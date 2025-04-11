@@ -5371,6 +5371,18 @@ paths:
             * `-created_at` - Created at (décroissant)
           explode: false
           style: form
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
         - in: query
           name: period
           schema:
@@ -5418,7 +5430,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ElecBalance"
+                $ref: "#/components/schemas/PaginatedElecBalanceList"
           description: ""
   /api/tiruert/elec-operations/filters/:
     get:
@@ -8519,6 +8531,8 @@ components:
     ElecBalance:
       type: object
       properties:
+        sector:
+          $ref: "#/components/schemas/ElecBalanceSectorEnum"
         initial_balance:
           type: number
           format: double
@@ -8543,6 +8557,12 @@ components:
         - pending_operations
         - pending_teneur
         - quantity
+        - sector
+    ElecBalanceSectorEnum:
+      enum:
+        - ELEC
+      type: string
+      description: "* `ELEC` - ELEC"
     ElecOperation:
       type: object
       properties:
@@ -9873,6 +9893,31 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BalanceResponse"
+        total_quantity:
+          type: number
+    PaginatedElecBalanceList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecBalance"
         total_quantity:
           type: number
     PaginatedElecOperationListList:

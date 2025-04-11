@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.utils.timezone import make_aware
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import status
 from rest_framework.decorators import action
 
 from core.pagination import MetadataPageNumberPagination
@@ -35,7 +34,7 @@ class BalanceActionMixin:
                 default=None,
             ),
         ],
-        responses={status.HTTP_200_OK: ElecBalanceSerializer},
+        responses=ElecBalanceSerializer(many=True),
     )
     @action(
         detail=False,
