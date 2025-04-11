@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 
 from core.pagination import MetadataPageNumberPagination
-from tiruert.filters import OperationFilterForBalance
+from tiruert.filters.elec_operation import ElecOperationFilter
 from tiruert.serializers import ElecBalanceSerializer
 from tiruert.services.elec_balance import ElecBalanceService
 
@@ -24,7 +24,7 @@ class ElecBalancePagination(MetadataPageNumberPagination):
 class BalanceActionMixin:
     @extend_schema(
         operation_id="list_elec_balance",
-        description="Retrieve elec balance",
+        description="Retrieve electricity balance",
         filters=True,
         parameters=[
             OpenApiParameter(
@@ -41,7 +41,7 @@ class BalanceActionMixin:
         detail=False,
         methods=["get"],
         serializer_class=ElecBalanceSerializer,
-        filterset_class=OperationFilterForBalance,
+        filterset_class=ElecOperationFilter,
         pagination_class=ElecBalancePagination,
     )
     def balance(self, request, pk=None):

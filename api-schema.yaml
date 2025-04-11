@@ -5313,6 +5313,113 @@ paths:
               schema:
                 error: OPERATION_NOT_FOUND
           description: Error message
+  /api/tiruert/elec-operations/balance/:
+    get:
+      operationId: list_elec_balance
+      description: Retrieve electricity balance
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from when to calculate teneur and quantity
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - created_at
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecBalance"
+          description: ""
   /api/tiruert/elec-operations/filters/:
     get:
       operationId: filter_elec_operations
@@ -8409,6 +8516,33 @@ components:
         * `INPROGRESS` - INPROGRESS
         * `REJECTED` - REJECTED
         * `ACCEPTED` - ACCEPTED
+    ElecBalance:
+      type: object
+      properties:
+        initial_balance:
+          type: number
+          format: double
+          readOnly: true
+        available_balance:
+          type: number
+          format: double
+        quantity:
+          $ref: "#/components/schemas/BalanceQuantity"
+        pending_teneur:
+          type: number
+          format: double
+        declared_teneur:
+          type: number
+          format: double
+        pending_operations:
+          type: integer
+      required:
+        - available_balance
+        - declared_teneur
+        - initial_balance
+        - pending_operations
+        - pending_teneur
+        - quantity
     ElecOperation:
       type: object
       properties:
@@ -8434,7 +8568,6 @@ components:
         avoided_emissions:
           type: number
           format: double
-          readOnly: true
       required:
         - avoided_emissions
         - created_at
