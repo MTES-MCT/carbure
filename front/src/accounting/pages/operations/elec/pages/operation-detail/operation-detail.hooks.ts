@@ -17,7 +17,7 @@ export const useDeleteOperation = ({
   const { t } = useTranslation()
 
   return useMutation(api.deleteOperation, {
-    invalidates: ["operations"],
+    invalidates: ["elec-operations"],
     onSuccess: () => {
       notify(t(`L'opération n°{{id}} a été annulée.`, { id: operation?.id }), {
         variant: "success",
@@ -49,7 +49,7 @@ export const useAcceptOperation = ({
   const { t } = useTranslation()
 
   return useMutation(api.acceptOperation, {
-    invalidates: ["operations"],
+    invalidates: ["elec-operations"],
     onSuccess: () => {
       notify(t(`L'opération n°{{id}} a été acceptée.`, { id: operation?.id }), {
         variant: "success",
@@ -82,7 +82,7 @@ export const useRejectOperation = ({
   const { t } = useTranslation()
 
   return useMutation(api.rejectOperation, {
-    invalidates: ["operations"],
+    invalidates: ["elec-operations"],
     onSuccess: () => {
       notify(t(`L'opération n°{{id}} a été rejetée.`, { id: operation?.id }), {
         variant: "success",

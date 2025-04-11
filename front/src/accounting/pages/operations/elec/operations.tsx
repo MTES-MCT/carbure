@@ -44,7 +44,7 @@ const OperationsElec = () => {
   const query = useCBQueryBuilder<[], ElecOperationsStatus[], undefined>(state)
 
   const { result, loading } = useQuery(api.getOperations, {
-    key: "operations",
+    key: "elec-operations",
     params: [query],
   })
 
