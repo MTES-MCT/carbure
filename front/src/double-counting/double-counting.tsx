@@ -1,14 +1,4 @@
 import { Button } from "common/components/button2"
-import {
-  ChatHistoryFill,
-  ChatHistoryLine,
-  CloseFill,
-  CloseLine,
-  DraftFill,
-  DraftLine,
-  PauseCircleFill,
-  PauseCircleLine,
-} from "common/components/icon"
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useRights } from "common/hooks/entity"
@@ -90,29 +80,29 @@ const DoubleCounting = () => {
             key: DoubleCountingTab.ACTIVE,
             path: DoubleCountingTab.ACTIVE,
             label: t("Actifs"),
-            icon: DraftLine,
-            iconActive: DraftFill,
+            icon: "ri-draft-line",
+            iconActive: "ri-draft-fill",
           },
           {
             key: DoubleCountingTab.PENDING,
             path: DoubleCountingTab.PENDING,
             label: t("En attente"),
-            icon: PauseCircleLine,
-            iconActive: PauseCircleFill,
+            icon: "ri-pause-circle-line",
+            iconActive: "ri-pause-circle-fill",
           },
           {
             key: DoubleCountingTab.EXPIRED,
             path: DoubleCountingTab.EXPIRED,
             label: t("Expirés"),
-            icon: ChatHistoryLine,
-            iconActive: ChatHistoryFill,
+            icon: "ri-chat-history-line",
+            iconActive: "ri-chat-history-fill",
           },
           {
             key: DoubleCountingTab.REJECTED,
             path: DoubleCountingTab.REJECTED,
             label: t("Rejetés"),
-            icon: CloseLine,
-            iconActive: CloseFill,
+            icon: "ri-close-line",
+            iconActive: "ri-close-fill",
           },
         ]}
         sticky

@@ -1,4 +1,3 @@
-import { ChatDeleteLine, CheckLine, DraftFill } from "common/components/icon"
 import { Tabs } from "common/components/tabs2"
 import { compact } from "common/utils/collection"
 import { useTranslation } from "react-i18next"
@@ -47,11 +46,11 @@ export const SafStatusSwitcher = ({
   const getStatusIcon = (status: SafTicketStatus) => {
     switch (status) {
       case SafTicketStatus.PENDING:
-        return DraftFill
+        return "ri-draft-fill"
       case SafTicketStatus.REJECTED:
-        return ChatDeleteLine
+        return "ri-chat-delete-line"
       case SafTicketStatus.ACCEPTED:
-        return CheckLine
+        return "ri-check-line"
     }
   }
 

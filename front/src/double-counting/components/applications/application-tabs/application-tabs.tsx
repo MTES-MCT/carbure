@@ -12,14 +12,6 @@ import { SourcingFullTable } from "../../sourcing-table"
 import { ProductionTable } from "../../production-table"
 import { ProductionSiteRecap } from "./production-site-recap"
 import { FilesTable } from "../../files-table"
-import {
-  BuildingFill,
-  BuildingLine,
-  ProfileFill,
-  ProfileLine,
-  UserFill,
-  UserLine,
-} from "common/components/icon"
 import { Box } from "common/components/scaffold"
 
 interface ApplicationDetailsProps {
@@ -53,20 +45,20 @@ const ApplicationTabs = ({
           productionSite && {
             key: "production_site",
             label: t("Site de production"),
-            icon: BuildingLine,
-            iconActive: BuildingFill,
+            icon: "ri-building-line",
+            iconActive: "ri-building-fill",
           },
           {
             key: "sourcing_forecast",
             label: t("Approvisionnement"),
-            icon: ProfileLine,
-            iconActive: ProfileFill,
+            icon: "ri-profile-line",
+            iconActive: "ri-profile-fill",
           },
           {
             key: "production",
             label: t("Production"),
-            icon: UserLine,
-            iconActive: UserFill,
+            icon: "ri-user-line",
+            iconActive: "ri-user-fill",
           },
           {
             key: "fichiers",
