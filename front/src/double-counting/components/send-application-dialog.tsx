@@ -110,9 +110,7 @@ export const SendApplicationProducerDialog = ({
           </p>
         </section>
         <section>
-          {fileData.has_dechets_industriels && (
-            <DechetIndustrielAlert mailToIsButton={true} />
-          )}
+          {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
         </section>
         <section>
           <TextInput label={t("Producteur")} value={entity.name} readOnly />
