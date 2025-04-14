@@ -59,7 +59,6 @@ const DoubleCountingFilesCheckerDialog = ({
     const checkedFile = resp.data?.file
 
     if (checkedFile) {
-      onClose()
       if (checkedFile.error_count) {
         portal((close) => (
           <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />
