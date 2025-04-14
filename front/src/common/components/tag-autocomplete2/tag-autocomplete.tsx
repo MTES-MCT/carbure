@@ -1,5 +1,4 @@
-import { TextInput } from "../inputs2"
-import { useEffect, useMemo, useRef } from "react"
+import { useMemo, useRef } from "react"
 import css from "./tag-autocomplete.module.css"
 import { Field } from "./field"
 import { Dropdown, Trigger } from "../dropdown2"
@@ -16,7 +15,8 @@ import { Text } from "../text"
 import { Trans } from "react-i18next"
 import { LoaderLine } from "../icon"
 import { multipleSelection } from "common/utils/selection"
-import { TagsGroup } from "../tag2"
+import Tag from "@codegouvfr/react-dsfr/Tag"
+import cl from "clsx"
 
 export type TagAutocompleteProps<T, V = T> = Trigger &
   InputProps & {
@@ -47,7 +47,6 @@ export const TagAutocomplete = <T, V = T>({
   ...props
 }: TagAutocompleteProps<T, V>) => {
   const ref = useRef<HTMLInputElement>(null)
-  const tagsRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLInputElement>(null)
 
   const autocomplete = useTagAutocomplete({
@@ -59,11 +58,6 @@ export const TagAutocomplete = <T, V = T>({
     onQuery,
     normalize,
   })
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.style.paddingLeft = `calc(var(--spacing-2w) + ${tagsRef.current?.offsetWidth ?? 0}px)`
-    }
-  }, [autocomplete.tags])
 
   const tags = useMemo(() => {
     const normItems = normalizeItems(autocomplete.tags, normalize)
@@ -84,21 +78,33 @@ export const TagAutocomplete = <T, V = T>({
     <>
       <Field {...props}>
         <div className={css.container}>
-          {tags.length > 0 ? (
-            <div ref={tagsRef} className={css.tags}>
-              <TagsGroup tags={tags} smallTags />
-            </div>
-          ) : null}
-
-          <TextInput
-            inputRef={ref}
-            value={autocomplete.query}
-            placeholder={props.readOnly ? undefined : placeholder}
-            onChange={(v) => autocomplete.onQuery(v)}
-            onKeyDown={autocomplete.onKeyDown}
-            domRef={triggerRef}
-            disabled={props.readOnly}
-          />
+          <div
+            ref={triggerRef}
+            className={cl(css.tags, "fr-input", props.readOnly && css.readOnly)}
+            tabIndex={0}
+            role="textbox"
+            aria-label="Champ de saisie avec tags"
+            aria-expanded={autocomplete.open}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                ref.current?.focus()
+              }
+            }}
+          >
+            {tags.map((tag) => (
+              <Tag {...tag} small key={tag.children} />
+            ))}
+            <input
+              type="text"
+              className={css.input}
+              value={autocomplete.query}
+              placeholder={props.readOnly ? undefined : placeholder}
+              onChange={(v) => autocomplete.onQuery(v.target.value)}
+              onKeyDown={autocomplete.onKeyDown}
+              ref={ref}
+              disabled={props.readOnly}
+            />
+          </div>
         </div>
       </Field>
       {!props.disabled && !props.readOnly && (
