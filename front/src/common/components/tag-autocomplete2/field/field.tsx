@@ -17,6 +17,7 @@ export const Field = ({
   stateRelatedMessage,
   className,
   disabled,
+  marginBottom = false,
 }: FieldProps) => {
   const generatedId = useId()
   const selectId = idProps ?? generatedId
@@ -32,7 +33,8 @@ export const Field = ({
         fr.cx("fr-select-group"),
         className,
         disabled && "fr-select-group--disabled",
-        state !== "default" && `fr-select-group--${state}`
+        state !== "default" && `fr-select-group--${state}`,
+        !marginBottom && css["no-margin-bottom"]
       )}
     >
       {Boolean(label || hintText) && (

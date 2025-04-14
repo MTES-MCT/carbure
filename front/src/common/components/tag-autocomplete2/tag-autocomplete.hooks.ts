@@ -14,7 +14,7 @@ interface AutocompleteConfig<T, V> {
   options?: T[]
   defaultOptions?: T[]
   getOptions?: (query: string) => Promise<T[]>
-  onChange: (value: V[] | undefined) => void
+  onChange?: (value: V[] | undefined) => void
   onQuery?: (query: string) => Promise<T[] | void> | T[] | void
   normalize?: Normalizer<T, V>
 }
@@ -38,7 +38,6 @@ export function useTagAutocomplete<T, V>({
     findItems: getOptions,
     normalize,
   })
-
   const [suggestions, setSuggestions] = useState(asyncOptions.items)
   useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])
 
@@ -66,12 +65,12 @@ export function useTagAutocomplete<T, V>({
 
   function onSelect(values: V[] | undefined) {
     onQueryChange("")
-    onChange(values)
+    onChange?.(values)
   }
 
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Backspace" && query === "") {
-      onChange(value.slice(0, -1))
+      onChange?.(value.slice(0, -1))
     }
   }
 

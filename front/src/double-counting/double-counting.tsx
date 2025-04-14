@@ -30,6 +30,8 @@ import {
 import HashRoute from "common/components/hash-route"
 import { ApplicationDetailsDialog } from "./components/application-details-dialog"
 import { AgreementDetailsDialog } from "./components/agreement-details-dialog"
+import { usePortal } from "common/components/portal"
+import DoubleCountingUploadDialog from "./components/upload-dialog"
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -38,6 +40,7 @@ const DoubleCounting = () => {
   const columns = useDoubleCountingColumns()
   const rights = useRights()
   const navigate = useNavigate()
+  const portal = usePortal()
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   function showApplicationDialog(
@@ -61,10 +64,19 @@ const DoubleCounting = () => {
       })
     }
   }
+
+  function showUploadDialog() {
+    portal((resolve) => <DoubleCountingUploadDialog onClose={resolve} />)
+  }
   return (
     <Main>
       <header>
-        <Button iconId="ri-add-line" asideX disabled={!canModify}>
+        <Button
+          iconId="ri-add-line"
+          asideX
+          disabled={!canModify}
+          onClick={showUploadDialog}
+        >
           {t("Envoyer une demande d'agrément")}
         </Button>
       </header>
@@ -103,6 +115,7 @@ const DoubleCounting = () => {
             iconActive: CloseFill,
           },
         ]}
+        sticky
       />
       <Content>
         <Routes>
