@@ -12,7 +12,6 @@ import { compact } from "common/utils/collection"
 import Certificates from "./components/certificates"
 import CompanyInfo from "./components/company-info"
 import CompanyOptions from "./components/company-options"
-import DoubleCountingSettings from "../double-counting/components/settings"
 import { EntityUserRights } from "./components/user-rights"
 import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
 import HashRoute from "common/components/hash-route"
@@ -63,11 +62,6 @@ const Settings = () => {
             key: "depot",
             label: t("Dépôts"),
           },
-          isProducer && {
-            path: "#double-counting",
-            key: "double-counting",
-            label: t("Double comptage"),
-          },
           entity.hasRights(UserRole.Admin) && {
             path: "#users",
             key: "users",
@@ -81,7 +75,6 @@ const Settings = () => {
         {hasCertificates && <Certificates />}
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
-        {isProducer && <DoubleCountingSettings entity={entity} />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>
       <HashRoute
