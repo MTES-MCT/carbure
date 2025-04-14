@@ -1,5 +1,4 @@
-import Button from "common/components/button"
-import { Upload } from "common/components/icons"
+import { Button } from "common/components/button2"
 import { usePortal } from "common/components/portal"
 import { useTranslation } from "react-i18next"
 import DoubleCountingFilesCheckerDialog from "./files-checker-dialog"
@@ -13,13 +12,9 @@ const FilesCheckerUploadButton = ({ label }: { label?: string }) => {
   }
 
   return (
-    <Button
-      asideX
-      variant="secondary"
-      icon={Upload}
-      label={label || t("Ajouter des demandes d'agrément")}
-      action={showApplicationsChecker}
-    />
+    <Button asideX iconId="ri-upload-line" onClick={showApplicationsChecker}>
+      {label || t("Ajouter des demandes d'agrément")}
+    </Button>
   )
 }
 
