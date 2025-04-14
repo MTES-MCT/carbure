@@ -2,7 +2,7 @@ import { BaseFileInput, BaseFileInputProps } from "../base-file-input"
 
 export type FileInputProps = Omit<
   BaseFileInputProps,
-  "nativeInputProps" | "multiple"
+  "nativeInputProps" | "multiple" | "onChange"
 > & {
   value?: File
   onChange?: (value: File | undefined) => void

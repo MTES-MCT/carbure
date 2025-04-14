@@ -1,16 +1,9 @@
-import { Alert } from "common/components/alert"
+import { Notice } from "common/components/notice"
 import { Button } from "common/components/button"
 import Collapse from "common/components/collapse"
-import { Dialog } from "common/components/dialog"
-import {
-  AlertCircle,
-  AlertTriangle,
-  Plus,
-  Return,
-  Send,
-} from "common/components/icons"
-import Tabs from "common/components/tabs"
-import Tag from "common/components/tag"
+import { Dialog } from "common/components/dialog2"
+import { AlertCircle, Plus, Send } from "common/components/icons"
+import { Tabs } from "common/components/tabs2"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -24,6 +17,7 @@ import { ProductionTable } from "../production-table"
 import { ProductionHistoryTable } from "../production-history-table"
 import { t } from "i18next"
 import { useMatch } from "react-router-dom"
+import Badge from "@codegouvfr/react-dsfr/Badge"
 
 export type ErrorsDetailsDialogProps = {
   fileData: DoubleCountingFileInfo
@@ -39,99 +33,19 @@ export const ErrorsDetailsDialog = ({
 
   const [focus, setFocus] = useState("sourcing_forecast")
 
-  const focusedErrors = fileData.errors?.[
-    focus as keyof typeof fileData.errors
-  ] as DoubleCountingUploadError[]
+  const focusedErrors = fileData.errors?.[focus as keyof typeof fileData.errors]
 
   return (
-    <Dialog fullscreen onClose={onClose}>
-      <header>
-        <Tag big variant="warning">
-          {t("À corriger")}
-        </Tag>
-        <h1>{t("Correction du dossier double comptage")}</h1>
-      </header>
-
-      <main>
-        <FileApplicationInfo fileData={fileData} />
-
-        <section>
-          <Alert variant="warning" icon={AlertTriangle}>
-            {t(
-              `{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,
-              { count: fileData.error_count }
-            )}
-          </Alert>
-        </section>
-        <section>
-          <Tabs
-            variant="switcher"
-            tabs={[
-              {
-                key: "sourcing_forecast",
-                label: `${t("Approvisionnement")} (${fileData.errors?.sourcing_forecast?.length || 0})`,
-              },
-              {
-                key: "production",
-                label: `${t("Production")} (${fileData.errors?.production?.length || 0})`,
-              },
-              {
-                key: "sourcing_history",
-                label: `${t("Historique d'approvisionnement")} (${fileData.errors?.sourcing_history?.length || 0})`,
-              },
-              {
-                key: "production_history",
-                label: `${t("Historique de production")} (${fileData.errors?.production_history?.length || 0})`,
-              },
-              {
-                key: "global",
-                label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
-              },
-            ]}
-            focus={focus}
-            onFocus={setFocus}
-          />
-
-          {focusedErrors.length === 0 && (
-            <Alert variant="success" icon={AlertCircle}>
-              <p>{t("Aucune erreur dans cet onglet")}</p>
-            </Alert>
-          )}
-
-          {focusedErrors.length > 0 && <ErrorsTable errors={focusedErrors} />}
-        </section>
-
-        {focusedErrors.length === 0 && focus === "sourcing_forecast" && (
-          <section>
-            <SourcingFullTable sourcing={fileData.sourcing ?? []} />
-          </section>
-        )}
-
-        {focusedErrors.length === 0 && focus === "production" && (
-          <section>
-            <ProductionTable
-              production={fileData.production ?? []}
-              sourcing={fileData.sourcing}
-            />
-          </section>
-        )}
-
-        {focusedErrors.length === 0 && focus === "sourcing_history" && (
-          <section>
-            <SourcingFullTable sourcing={fileData.sourcing_history ?? []} />
-          </section>
-        )}
-
-        {focusedErrors.length === 0 && focus === "production_history" && (
-          <section>
-            <ProductionHistoryTable
-              production={fileData.production_history ?? []}
-            />
-          </section>
-        )}
-      </main>
-
-      <footer>
+    <Dialog
+      fullscreen
+      onClose={onClose}
+      header={
+        <Dialog.Title>
+          <Badge severity="warning">{t("À corriger")}</Badge>
+          {t("Correction du dossier double comptage")}
+        </Dialog.Title>
+      }
+      footer={
         <Button
           icon={isProducerMatch ? Send : Plus}
           label={
@@ -140,9 +54,83 @@ export const ErrorsDetailsDialog = ({
           variant="primary"
           disabled={true}
         />
+      }
+    >
+      <FileApplicationInfo fileData={fileData} />
 
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-      </footer>
+      <section>
+        <Notice variant="warning">
+          {t(
+            `{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,
+            { count: fileData.error_count }
+          )}
+        </Notice>
+      </section>
+      <section>
+        <Tabs
+          tabs={[
+            {
+              key: "sourcing_forecast",
+              label: `${t("Approvisionnement")} (${fileData.errors?.sourcing_forecast?.length || 0})`,
+            },
+            {
+              key: "production",
+              label: `${t("Production")} (${fileData.errors?.production?.length || 0})`,
+            },
+            {
+              key: "sourcing_history",
+              label: `${t("Historique d'approvisionnement")} (${fileData.errors?.sourcing_history?.length || 0})`,
+            },
+            {
+              key: "production_history",
+              label: `${t("Historique de production")} (${fileData.errors?.production_history?.length || 0})`,
+            },
+            {
+              key: "global",
+              label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
+            },
+          ]}
+          focus={focus}
+          onFocus={setFocus}
+        />
+
+        {focusedErrors.length === 0 && (
+          <Notice variant="info">
+            <p>{t("Aucune erreur dans cet onglet")}</p>
+          </Notice>
+        )}
+
+        {focusedErrors.length > 0 && <ErrorsTable errors={focusedErrors} />}
+      </section>
+
+      {focusedErrors.length === 0 && focus === "sourcing_forecast" && (
+        <section>
+          <SourcingFullTable sourcing={fileData.sourcing ?? []} />
+        </section>
+      )}
+
+      {focusedErrors.length === 0 && focus === "production" && (
+        <section>
+          <ProductionTable
+            production={fileData.production ?? []}
+            sourcing={fileData.sourcing}
+          />
+        </section>
+      )}
+
+      {focusedErrors.length === 0 && focus === "sourcing_history" && (
+        <section>
+          <SourcingFullTable sourcing={fileData.sourcing_history ?? []} />
+        </section>
+      )}
+
+      {focusedErrors.length === 0 && focus === "production_history" && (
+        <section>
+          <ProductionHistoryTable
+            production={fileData.production_history ?? []}
+          />
+        </section>
+      )}
     </Dialog>
   )
 }
