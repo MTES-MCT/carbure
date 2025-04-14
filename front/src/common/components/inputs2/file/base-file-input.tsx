@@ -2,6 +2,8 @@ import { forwardRef, useRef } from "react"
 import { ExtendedInputProps, Label } from "../base-input"
 import { Upload, UploadProps } from "@codegouvfr/react-dsfr/Upload"
 import { useTranslation } from "react-i18next"
+import css from "./base-file-input.module.css"
+import cl from "clsx"
 
 export type BaseFileInputProps = UploadProps &
   ExtendedInputProps & {
@@ -23,6 +25,7 @@ export const BaseFileInput = forwardRef<HTMLDivElement, BaseFileInputProps>(
       readOnly,
       multiple,
       name,
+      hint,
       ...props
     },
     ref
@@ -74,6 +77,8 @@ export const BaseFileInput = forwardRef<HTMLDivElement, BaseFileInputProps>(
           name,
           ref: inputRef,
         }}
+        hint={hint ?? ""}
+        className={cl(props.className, css["base-file-input"])}
       />
     )
   }
