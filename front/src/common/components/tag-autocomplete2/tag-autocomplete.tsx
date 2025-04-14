@@ -1,16 +1,22 @@
 import { TextInput } from "../inputs2"
-import { useLayoutEffect, useRef } from "react"
-import { Tag } from "@codegouvfr/react-dsfr/Tag"
+import { useEffect, useMemo, useRef } from "react"
 import css from "./tag-autocomplete.module.css"
 import { Field } from "./field"
 import { Dropdown, Trigger } from "../dropdown2"
 import { InputProps } from "../inputs2/input"
-import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
+import {
+  defaultNormalizer,
+  normalizeItems,
+  Normalizer,
+  Sorter,
+} from "common/utils/normalize"
 import { defaultRenderer, List, Renderer } from "../list2"
 import { useTagAutocomplete } from "./tag-autocomplete.hooks"
 import { Text } from "../text"
 import { Trans } from "react-i18next"
 import { LoaderLine } from "../icon"
+import { multipleSelection } from "common/utils/selection"
+import { TagsGroup } from "../tag2"
 
 export type TagAutocompleteProps<T, V = T> = Trigger &
   InputProps & {
@@ -53,30 +59,37 @@ export const TagAutocomplete = <T, V = T>({
     onQuery,
     normalize,
   })
-  useLayoutEffect(() => {
-    if (tagsRef.current && ref.current) {
-      ref.current.style.paddingLeft = `calc(var(--spacing-2w) + ${tagsRef.current.offsetWidth}px)`
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.paddingLeft = `calc(var(--spacing-2w) + ${tagsRef.current?.offsetWidth ?? 0}px)`
     }
-  }, [tagsRef])
+  }, [autocomplete.tags])
+
+  const tags = useMemo(() => {
+    const normItems = normalizeItems(autocomplete.tags, normalize)
+    const values = normItems.map((item) => item.value)
+    const { onSelect } = multipleSelection(values, onChange)
+
+    return normItems.map((item) => ({
+      dismissible: true,
+      children: item.label,
+      nativeButtonProps: {
+        onClick: () => onSelect(item.value),
+        disabled: props.readOnly,
+      },
+    }))
+  }, [autocomplete.tags, normalize, onChange, props.readOnly])
 
   return (
     <>
       <Field {...props}>
-        <div style={{ position: "relative" }}>
-          <div className={css.tags} ref={tagsRef}>
-            <Tag
-              small
-              dismissible
-              nativeButtonProps={{
-                onClick: () => console.log("clicked"),
-              }}
-            >
-              element 1
-            </Tag>
-            <Tag small dismissible>
-              element 2
-            </Tag>
-          </div>
+        <div className={css.container}>
+          {tags.length > 0 ? (
+            <div ref={tagsRef} className={css.tags}>
+              <TagsGroup tags={tags} smallTags />
+            </div>
+          ) : null}
+
           <TextInput
             inputRef={ref}
             value={autocomplete.query}
@@ -84,6 +97,7 @@ export const TagAutocomplete = <T, V = T>({
             onChange={(v) => autocomplete.onQuery(v)}
             onKeyDown={autocomplete.onKeyDown}
             domRef={triggerRef}
+            disabled={props.readOnly}
           />
         </div>
       </Field>
@@ -96,7 +110,7 @@ export const TagAutocomplete = <T, V = T>({
           anchor={anchor}
         >
           {loading || autocomplete.loading ? (
-            <Text style={{ padding: "10px", textAlign: "center" }}>
+            <Text className={css.loading}>
               <Trans>Chargement des résultats...</Trans>
               <LoaderLine size="sm" style={{ marginLeft: "4px" }} />
             </Text>
@@ -106,7 +120,10 @@ export const TagAutocomplete = <T, V = T>({
               controlRef={triggerRef}
               items={autocomplete.suggestions}
               selectedValues={value}
-              onSelectValues={autocomplete.onSelect}
+              onSelectValues={(values) => {
+                ref.current?.focus()
+                autocomplete.onSelect(values)
+              }}
               normalize={normalize}
             >
               {children}

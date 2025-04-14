@@ -1,0 +1,13 @@
+.tags-group {
+  padding: 0;
+  margin: 0;
+  gap: var(--spacing-1w);
+}
+
+.tags-group li {
+  line-height: normal;
+}
+
+.tags-group li :global(.fr-tag) {
+  margin: 0;
+}
