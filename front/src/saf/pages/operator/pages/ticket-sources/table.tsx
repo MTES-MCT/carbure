@@ -4,7 +4,7 @@ import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { To, useLocation, useNavigate } from "react-router-dom"
+import { To, useLocation } from "react-router-dom"
 import {
   SafTicketSource,
   SafTicketSourceStatus,
@@ -233,18 +233,9 @@ export interface ParentLotButtonProps {
 
 export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const location = useLocation()
 
   if (!lot) return <Cell text={t("N/A")} />
-
-  const showLotDetails = () => {
-    navigate({
-      pathname: location.pathname,
-      search: location.search,
-      hash: `lot/${lot.id}`,
-    })
-  }
 
   return (
     <Cell
@@ -253,7 +244,13 @@ export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
           captive
           customPriority="link"
           title={t("Lot initial")}
-          onClick={showLotDetails}
+          linkProps={{
+            to: {
+              pathname: location.pathname,
+              search: location.search,
+              hash: `lot/${lot.id}`,
+            },
+          }}
         >
           <Text size="sm" is="span">
             #{lot.carbure_id}
