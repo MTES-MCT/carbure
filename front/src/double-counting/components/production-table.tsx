@@ -93,6 +93,7 @@ export const ProductionTable = ({
           setQuotas={setQuotas}
         />
       ),
+      style: { minWidth: "200px" },
     })
   }
 

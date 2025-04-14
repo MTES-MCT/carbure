@@ -63,6 +63,8 @@ const ApplicationTabs = ({
           {
             key: "fichiers",
             label: t("Fichiers"),
+            icon: "ri-file-line",
+            iconActive: "ri-file-fill",
           },
         ])}
         focus={focus}
