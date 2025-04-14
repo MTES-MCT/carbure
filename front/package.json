@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.14.1",
+    "@codegouvfr/react-dsfr": "^1.22.3",
     "@sentry/react": "^8.30.0",
     "@sentry/vite-plugin": "^3.3.1",
     "@testing-library/jest-dom": "^5.16.5",
