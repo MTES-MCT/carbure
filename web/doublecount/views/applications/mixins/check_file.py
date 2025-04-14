@@ -59,6 +59,7 @@ class CheckFileActionMixin:
                 + len(errors["production"])
                 + len(errors["global"])
                 + len(errors["production_history"])
+                + len(errors["sourcing_history"])
             )
 
             has_dechets_industriels = check_has_dechets_industriels(production_data)
