@@ -140,6 +140,7 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
         ])}
         focus={focus}
         onFocus={setFocus}
+        sticky
       />
       {focus === "quotas" && <QuotasTable quotas={agreement.quotas} />}
 

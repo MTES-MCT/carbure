@@ -1,0 +1,3 @@
+.base-file-input :global(.fr-label + .fr-upload) {
+  margin-top: 0;
+}
