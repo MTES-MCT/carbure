@@ -24,7 +24,7 @@ export type TagAutocompleteProps<T, V = T> = Trigger &
     options?: T[]
     defaultOptions?: T[]
     getOptions?: (query: string) => Promise<T[]>
-    onChange: (value: V[] | undefined) => void
+    onChange?: (value: V[] | undefined) => void
     onQuery?: (query: string) => Promise<T[] | void> | T[] | void
     normalize?: Normalizer<T, V>
     children?: Renderer<T, V>

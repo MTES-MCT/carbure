@@ -1,5 +1,6 @@
 import { RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
+import { TagAutocomplete } from "common/components/tag-autocomplete2"
 import { GESOption, ProductionSiteDetails } from "common/types"
 import { getYesNoOptions, normalizeFeedstock } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
@@ -78,26 +79,29 @@ export const ProductionSiteRecap = ({
         readOnly
         orientation="horizontal"
       />
-      <TextInput
+      <TagAutocomplete
         readOnly
         label={t("Matieres premieres")}
-        value={productionSite.inputs
-          .map((input) => normalizeFeedstock(input).label)
-          .join(", ")}
+        value={productionSite.inputs}
+        normalize={normalizeFeedstock}
+        options={productionSite.inputs}
       />
-      <TextInput
+      <TagAutocomplete
         readOnly
         label={t("Biocarburants")}
-        value={productionSite.outputs
-          .map((output) => normalizeFeedstock(output).label)
-          .join(", ")}
+        value={productionSite.outputs}
+        normalize={normalizeFeedstock}
+        options={productionSite.outputs}
       />
-      <TextInput
+      <TagAutocomplete
         readOnly
         label={t("Certificats (2BS, ISCC)")}
-        value={productionSite.certificates
-          .map((certificate) => certificate.certificate_id)
-          .join(", ")}
+        value={productionSite.certificates.map(
+          (certificate) => certificate.certificate_id
+        )}
+        options={productionSite.certificates.map(
+          (certificate) => certificate.certificate_id
+        )}
       />
     </>
   )
