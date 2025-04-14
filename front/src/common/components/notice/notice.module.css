@@ -61,3 +61,7 @@
 .notice--no-color {
   color: inherit;
 }
+
+.notice .notice__body-content a {
+  color: currentColor;
+}
