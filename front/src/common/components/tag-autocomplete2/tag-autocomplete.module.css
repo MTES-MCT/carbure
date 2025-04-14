@@ -1,14 +1,15 @@
 .tags {
-  position: absolute;
-  top: 0px;
-  left: 0px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  height: 100%;
   z-index: 1;
   gap: var(--spacing-1w);
-  padding-left: var(--spacing-2w);
+  padding: var(--spacing-1w);
+  cursor: text;
+}
+
+.tags:global(.fr-input) {
+  max-height: 100%;
 }
 
 .container {
@@ -18,4 +19,23 @@
 .loading {
   padding: var(--spacing-3v);
   text-align: center;
+}
+
+.input {
+  flex: 1;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.tags:focus-within {
+  outline-offset: 2px;
+  outline-width: 2px;
+  outline-color: #0a76f6;
+  outline-style: solid;
+}
+
+.readOnly {
+  cursor: not-allowed;
 }
