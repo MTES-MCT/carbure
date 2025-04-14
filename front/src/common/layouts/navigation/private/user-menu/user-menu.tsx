@@ -28,6 +28,7 @@ export const UserMenu = () => {
     isProducer,
     isAirline,
     isExternal,
+    isAdmin,
   } = useEntity()
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const routes = useRoutes()
@@ -48,7 +49,11 @@ export const UserMenu = () => {
         path: routes.PUBLIC_STATS,
         icon: BarChartLine,
       },
-      (isIndustry || isPowerOrHeatProducer || isAirline || hasAirline) && {
+      (isIndustry ||
+        isPowerOrHeatProducer ||
+        isAirline ||
+        hasAirline ||
+        isAdmin) && {
         label: t("Annuaire"),
         path: routes.REGISTRY,
         icon: BookLine,

@@ -14,54 +14,53 @@ import useEntity from "common/hooks/entity"
 
 const Registry = () => {
   const { t } = useTranslation()
-  const { isAirline, isOperator, isExternal } = useEntity()
+  const { isAirline, isOperator, isExternal, isAdmin } = useEntity()
   const entity = useEntity()
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
 
   useTitle(t("Annuaire"))
   usePrivateNavigation(t("Annuaire"))
 
-  const defaultTabs = [
-    {
-      path: "#companies",
-      key: "companies",
-      label: t("Sociétés"),
+  const tabs = compact([
+    ...(!isAirline && !hasAirline
+      ? [
+          {
+            path: "#companies",
+            key: "companies",
+            label: t("Sociétés"),
+          },
+          {
+            path: "#feedstocks",
+            key: "feedstocks",
+            label: t("Matières premières"),
+          },
+          {
+            path: "#biofuels",
+            key: "biofuels",
+            label: t("Biocarburants"),
+          },
+          {
+            path: "#depots",
+            key: "depots",
+            label: t("Dépôts"),
+          },
+          {
+            path: "#double-counting",
+            key: "double-counting",
+            label: t("Double comptage"),
+          },
+        ]
+      : []),
+    (isAirline || isOperator || hasAirline || isAdmin) && {
+      path: "#airports",
+      key: "airports",
+      label: t("Aéroports"),
     },
-    {
-      path: "#feedstocks",
-      key: "feedstocks",
-      label: t("Matières premières"),
-    },
-    {
-      path: "#biofuels",
-      key: "biofuels",
-      label: t("Biocarburants"),
-    },
-    {
-      path: "#depots",
-      key: "depots",
-      label: t("Dépôts"),
-    },
-    {
-      path: "#double-counting",
-      key: "double-counting",
-      label: t("Double comptage"),
-    },
-  ]
+  ])
 
   return (
     <Main>
-      <Tabs
-        variant="sticky"
-        tabs={compact([
-          ...(!isAirline && !hasAirline ? defaultTabs : []),
-          (isAirline || isOperator || hasAirline) && {
-            path: "#airports",
-            key: "airports",
-            label: t("Aéroports"),
-          },
-        ])}
-      >
+      <Tabs variant="sticky" tabs={tabs}>
         {(focus) => (
           <section>
             {focus === "companies" && <Companies />}
