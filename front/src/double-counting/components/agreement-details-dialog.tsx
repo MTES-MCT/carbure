@@ -16,14 +16,6 @@ import { ProductionTable } from "./production-table"
 import { QuotasTable } from "./quotas-table"
 import { SourcingFullTable } from "./sourcing-table"
 import { AgreementDetails, DoubleCountingStatus } from "../types"
-import {
-  BuildingFill,
-  BuildingLine,
-  ProfileFill,
-  ProfileLine,
-  UserFill,
-  UserLine,
-} from "common/components/icon"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -122,20 +114,20 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
           {
             key: "quotas",
             label: t("Quotas"),
-            icon: BuildingLine,
-            iconActive: BuildingFill,
+            icon: "ri-building-line",
+            iconActive: "ri-building-fill",
           },
           {
             key: "sourcing_forecast",
             label: t("Approvisionnement"),
-            icon: ProfileLine,
-            iconActive: ProfileFill,
+            icon: "ri-profile-line",
+            iconActive: "ri-profile-fill",
           },
           {
             key: "production",
             label: t("Production"),
-            icon: UserLine,
-            iconActive: UserFill,
+            icon: "ri-user-line",
+            iconActive: "ri-user-fill",
           },
         ])}
         focus={focus}

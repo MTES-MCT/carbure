@@ -5,15 +5,15 @@ import { useEffect, useState } from "react"
 import cl from "clsx"
 import css from "./tabs.module.css"
 import { Text } from "../text"
-import { IconProps } from "../icon"
+import { IconName, Icon } from "../icon"
 
 export type TabVariant = "header"
 
 export interface Tab<T extends string> {
   key: T
   label: React.ReactNode
-  icon?: React.ComponentType<IconProps>
-  iconActive?: React.ComponentType<IconProps>
+  icon?: IconName
+  iconActive?: IconName
   path?: string
 }
 
@@ -54,12 +54,12 @@ export const Tabs = <T extends string>({
       className={cl(css.tabs, className, sticky && css.sticky)}
       style={style}
     >
-      {tabs.map(({ icon: Icon, iconActive: IconActive, ...tab }) => {
+      {tabs.map(({ icon, iconActive, ...tab }) => {
         const props = {
           className: cl(
             css.tab,
             tab.key === focus && css.active,
-            Icon && css.icon
+            icon && css.icon
           ),
           onClick: () => {
             setFocus(tab.key)
@@ -71,10 +71,12 @@ export const Tabs = <T extends string>({
         if (!tab.path) {
           return (
             <Text is="button" fontWeight="bold" {...props} key={tab.key}>
-              {((Icon && tab.key !== focus) || (!IconActive && Icon)) && (
-                <Icon size="sm" />
+              {((icon && tab.key !== focus) || (!iconActive && icon)) && (
+                <Icon size="sm" name={icon} />
               )}
-              {IconActive && tab.key === focus && <IconActive size="sm" />}
+              {iconActive && tab.key === focus && (
+                <Icon size="sm" name={iconActive} />
+              )}
               {tab.label}
             </Text>
           )
@@ -89,10 +91,12 @@ export const Tabs = <T extends string>({
               {...props}
               key={tab.key}
             >
-              {((Icon && tab.key !== focus) || (!IconActive && Icon)) && (
-                <Icon size="sm" />
+              {((icon && tab.key !== focus) || (!iconActive && icon)) && (
+                <Icon size="sm" name={icon} />
               )}
-              {IconActive && tab.key === focus && <IconActive size="sm" />}
+              {iconActive && tab.key === focus && (
+                <Icon size="sm" name={iconActive} />
+              )}
               {tab.label}
             </Text>
           )
@@ -108,10 +112,12 @@ export const Tabs = <T extends string>({
             {...props}
             key={tab.key}
           >
-            {((Icon && tab.key !== focus) || (!IconActive && Icon)) && (
-              <Icon size="sm" />
+            {((icon && tab.key !== focus) || (!iconActive && icon)) && (
+              <Icon size="sm" name={icon} />
             )}
-            {IconActive && tab.key === focus && <IconActive size="sm" />}
+            {iconActive && tab.key === focus && (
+              <Icon size="sm" name={iconActive} />
+            )}
             {tab.label}
           </Text>
         )

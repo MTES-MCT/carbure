@@ -1,8 +1,7 @@
 import { Notice } from "common/components/notice"
-import { Button } from "common/components/button"
-import Collapse from "common/components/collapse"
+import { Button } from "common/components/button2"
+import { Collapse } from "common/components/collapse2"
 import { Dialog } from "common/components/dialog2"
-import { AlertCircle, Plus, Send } from "common/components/icons"
 import { Tabs } from "common/components/tabs2"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -37,7 +36,7 @@ export const ErrorsDetailsDialog = ({
 
   return (
     <Dialog
-      fullscreen
+      fitContent
       onClose={onClose}
       header={
         <Dialog.Title>
@@ -47,89 +46,86 @@ export const ErrorsDetailsDialog = ({
       }
       footer={
         <Button
-          icon={isProducerMatch ? Send : Plus}
-          label={
-            isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")
-          }
-          variant="primary"
-          disabled={true}
-        />
+          iconId={isProducerMatch ? "ri-send-plane-line" : "ri-add-line"}
+          disabled
+        >
+          {isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")}
+        </Button>
       }
     >
       <FileApplicationInfo fileData={fileData} />
 
-      <section>
-        <Notice variant="warning">
-          {t(
-            `{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,
-            { count: fileData.error_count }
-          )}
-        </Notice>
-      </section>
-      <section>
-        <Tabs
-          tabs={[
-            {
-              key: "sourcing_forecast",
-              label: `${t("Approvisionnement")} (${fileData.errors?.sourcing_forecast?.length || 0})`,
-            },
-            {
-              key: "production",
-              label: `${t("Production")} (${fileData.errors?.production?.length || 0})`,
-            },
-            {
-              key: "sourcing_history",
-              label: `${t("Historique d'approvisionnement")} (${fileData.errors?.sourcing_history?.length || 0})`,
-            },
-            {
-              key: "production_history",
-              label: `${t("Historique de production")} (${fileData.errors?.production_history?.length || 0})`,
-            },
-            {
-              key: "global",
-              label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
-            },
-          ]}
-          focus={focus}
-          onFocus={setFocus}
-        />
-
-        {focusedErrors.length === 0 && (
-          <Notice variant="info">
-            <p>{t("Aucune erreur dans cet onglet")}</p>
-          </Notice>
+      <Notice variant="warning" icon="ri-error-warning-line">
+        {t(
+          `{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,
+          { count: fileData.error_count }
         )}
+      </Notice>
 
-        {focusedErrors.length > 0 && <ErrorsTable errors={focusedErrors} />}
-      </section>
+      <Tabs
+        tabs={[
+          {
+            key: "sourcing_forecast",
+            label: `${t("Approvisionnement")} (${fileData.errors?.sourcing_forecast?.length || 0})`,
+            icon: "ri-profile-line",
+            iconActive: "ri-profile-fill",
+          },
+          {
+            key: "production",
+            label: `${t("Production")} (${fileData.errors?.production?.length || 0})`,
+            icon: "ri-user-line",
+            iconActive: "ri-user-fill",
+          },
+          {
+            key: "sourcing_history",
+            label: `${t("Historique d'approvisionnement")} (${fileData.errors?.sourcing_history?.length || 0})`,
+            icon: "ri-history-line",
+          },
+          {
+            key: "production_history",
+            label: `${t("Historique de production")} (${fileData.errors?.production_history?.length || 0})`,
+            icon: "ri-history-line",
+          },
+          {
+            key: "global",
+            label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
+            icon: "ri-global-line",
+          },
+        ]}
+        focus={focus}
+        onFocus={setFocus}
+        sticky
+      />
+
+      {focusedErrors.length === 0 && (
+        <Notice
+          variant="info"
+          icon="fr-icon-success-line"
+          title={t("Aucune erreur dans cet onglet")}
+        ></Notice>
+      )}
+
+      {focusedErrors.length > 0 && <ErrorsTable errors={focusedErrors} />}
 
       {focusedErrors.length === 0 && focus === "sourcing_forecast" && (
-        <section>
-          <SourcingFullTable sourcing={fileData.sourcing ?? []} />
-        </section>
+        <SourcingFullTable sourcing={fileData.sourcing ?? []} />
       )}
 
       {focusedErrors.length === 0 && focus === "production" && (
-        <section>
-          <ProductionTable
-            production={fileData.production ?? []}
-            sourcing={fileData.sourcing}
-          />
-        </section>
+        <ProductionTable
+          production={fileData.production ?? []}
+          sourcing={fileData.sourcing}
+        />
       )}
 
       {focusedErrors.length === 0 && focus === "sourcing_history" && (
-        <section>
-          <SourcingFullTable sourcing={fileData.sourcing_history ?? []} />
-        </section>
+        <SourcingFullTable sourcing={fileData.sourcing_history ?? []} />
       )}
 
       {focusedErrors.length === 0 && focus === "production_history" && (
-        <section>
-          <ProductionHistoryTable
-            production={fileData.production_history ?? []}
-          />
-        </section>
+        <ProductionHistoryTable
+          production={fileData.production_history ?? []}
+        />
       )}
     </Dialog>
   )
@@ -144,12 +140,11 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
 
   return (
     <Collapse
-      icon={AlertCircle}
-      variant="warning"
-      label={t("{{errorCount}} erreurs", {
-        errorCount: errors.length,
+      icon="ri-error-warning-line"
+      label={t("{{count}} erreurs", {
+        count: errors.length,
       })}
-      isOpen
+      defaultExpanded
     >
       <section>
         <ul>

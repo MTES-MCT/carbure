@@ -1,4 +1,3 @@
-import { DraftFill } from "common/components/icon"
 import { Content } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useTranslation } from "react-i18next"
@@ -18,7 +17,7 @@ const OperationsBalancesLayout = () => {
             key: "balances",
             label: t("Biocarburants"),
             path: SectorTabs.BIOFUELS,
-            icon: DraftFill,
+            icon: "ri-draft-fill",
           },
         ])}
       />
