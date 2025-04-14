@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { TagAutocomplete } from "./tag-autocomplete"
+import { useState } from "react"
 
 const meta: Meta<typeof TagAutocomplete> = {
   component: TagAutocomplete,
@@ -10,6 +11,10 @@ const meta: Meta<typeof TagAutocomplete> = {
       default: "white",
       values: [{ name: "white", value: "white" }],
     },
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+    return <TagAutocomplete {...args} value={value} onChange={setValue} />
   },
 }
 
@@ -23,5 +28,20 @@ export const Default: Story = {
     placeholder: "Rechercher des tags...",
     options: ["tag1", "tag2", "tag3", "tag4", "tag5"],
     value: [],
+  },
+}
+
+export const ReadOnly: Story = {
+  args: {
+    ...Default.args,
+    readOnly: true,
+    value: ["tag1", "tag2"],
+  },
+}
+
+export const WithDefaultValues: Story = {
+  args: {
+    ...Default.args,
+    value: ["tag1", "tag2"],
   },
 }
