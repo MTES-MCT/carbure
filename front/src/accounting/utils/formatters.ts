@@ -91,3 +91,12 @@ export const formatOperationCreditOrDebit = (type: string) => {
       return "Inconnu"
   }
 }
+
+export const formatObjectiveCategory = (category: string) => {
+  switch (category) {
+    case ElecOperationSector.ELEC:
+      return i18next.t("Électricité")
+    default:
+      return category
+  }
+}

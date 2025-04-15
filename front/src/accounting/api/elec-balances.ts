@@ -10,7 +10,3 @@ export const getBalances = (
     },
   })
 }
-
-export const getElecBalance = (entity_id: number) => {
-  return getBalances({ entity_id })
-}

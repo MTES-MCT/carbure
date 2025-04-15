@@ -3,6 +3,7 @@ import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
   getBalancesBySector,
+  getElecBalance,
   validateTeneurBiofuel,
   validateTeneurElec,
 } from "../../api"
@@ -15,7 +16,6 @@ import { useUnit } from "common/hooks/unit"
 import { ExtendedUnit } from "common/types"
 import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
-import { getElecBalance } from "accounting/api/elec-balances"
 
 export const ValidatePendingTeneurDialog = ({
   onClose,

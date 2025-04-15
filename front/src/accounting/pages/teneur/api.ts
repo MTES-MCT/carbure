@@ -138,6 +138,10 @@ export const getBalancesBySector = async (entity_id: number) => {
   })
 }
 
+export const getElecBalance = (entity_id: number) => {
+  return getBalances({ entity_id })
+}
+
 export const validateTeneurBiofuel = async (entity_id: number) => {
   return api.POST("/tiruert/operations/teneur/declare/", {
     params: {

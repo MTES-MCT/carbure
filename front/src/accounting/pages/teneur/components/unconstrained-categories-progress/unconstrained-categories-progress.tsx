@@ -6,6 +6,7 @@ import { UnconstrainedCategoryObjective } from "../../types"
 import { CardGrid } from "../card-grid"
 import { ExtendedUnit } from "common/types"
 import { formatUnit } from "common/utils/formatters"
+import { formatObjectiveCategory } from "accounting/utils/formatters"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
@@ -27,7 +28,7 @@ export const UnconstrainedCategoriesProgress = ({
         {categories?.map((category) => (
           <CardProgress
             key={category.code}
-            title={category.code}
+            title={formatObjectiveCategory(category.code)}
             onClick={() => onCategoryClick(category)}
           >
             <ul>
