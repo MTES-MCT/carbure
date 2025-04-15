@@ -17,7 +17,13 @@ import {
 
 // Type definitions
 export type Operation = apiTypes["OperationList"]
-export type Balance = apiTypes["Balance"]
+export type Balance = apiTypes["Balance"] & {
+  quantity_renewable: {
+    credit: number
+    debit: number
+  }
+  available_balance_renewable: number
+}
 export interface OperationsQuery
   extends CBQueryParams<[], OperationsStatus[], string[]> {
   [OperationsFilter.status]?: OperationsStatus[]

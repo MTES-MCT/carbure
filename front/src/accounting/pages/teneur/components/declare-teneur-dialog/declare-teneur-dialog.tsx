@@ -95,10 +95,10 @@ const DeclareTeneurDialogContent = ({
     form.value.balance
       ? objective.target
         ? Math.min(
-            form.value.balance!.available_balance,
+            form.value.balance!.available_balance_renewable,
             computeObjectiveEnergy(objective)
           )
-        : form.value.balance!.available_balance
+        : form.value.balance!.available_balance_renewable
       : 0,
     0
   )
@@ -201,7 +201,11 @@ const DeclareTeneurDialogContent = ({
             <Box>
               <RecapOperationGrid>
                 <RecapOperation
-                  balance={form.value.balance!}
+                  balance={{
+                    ...form.value.balance!,
+                    available_balance:
+                      form.value.balance!.available_balance_renewable,
+                  }}
                   unit={ExtendedUnit.GJ}
                 />
                 {currentStepIndex > 2 && (
@@ -224,6 +228,7 @@ const DeclareTeneurDialogContent = ({
                   depot_quantity_max={depotQuantityMax}
                   unit={ExtendedUnit.GJ}
                   backendUnit={Unit.MJ}
+                  // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
                   converter={CONVERSIONS.energy.GJ_TO_MJ}
                 />
               )}
