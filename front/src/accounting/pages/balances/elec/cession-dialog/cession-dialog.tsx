@@ -41,9 +41,10 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
         }
         footer={
           <Button
+            type="submit"
             priority="primary"
-            onClick={() => mutation.execute()}
             loading={mutation.loading}
+            nativeButtonProps={{ form: "elec-cession-form" }}
           >
             {t("Céder")}
           </Button>
@@ -51,7 +52,11 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
       >
         <Main>
           <Box>
-            <Form form={form}>
+            <Form
+              id="elec-cession-form"
+              form={form}
+              onSubmit={() => mutation.execute()}
+            >
               <Autocomplete
                 label={t("Sélectionnez un destinataire")}
                 placeholder={t("Rechercher un destinataire")}
@@ -64,13 +69,16 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
               />
 
               <NumberInput
-                label={t(
-                  `Quantité cédée (MJ) - Disponible: ${balance.available_balance}`
-                )}
-                min={0}
+                label={t("Quantité cédée (MJ)")}
+                min={0.001}
                 max={balance.available_balance}
                 {...form.bind("quantity")}
                 required
+              />
+              <NumberInput
+                label={t("Tonnes de CO2 évitées")}
+                value={((form.value.quantity ?? 0) * 183) / 1e6}
+                disabled
               />
             </Form>
           </Box>
