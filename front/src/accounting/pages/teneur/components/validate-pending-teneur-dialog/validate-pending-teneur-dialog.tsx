@@ -1,7 +1,11 @@
 import { Dialog } from "common/components/dialog2"
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
-import { getBalancesBySector, validateTeneur } from "../../api"
+import {
+  getBalancesBySector,
+  validateTeneurBiofuel,
+  validateTeneurElec,
+} from "../../api"
 import { useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useValidatePendingTeneurDialog } from "./validate-pending-teneur-dialog.hooks"
@@ -36,10 +40,20 @@ export const ValidatePendingTeneurDialog = ({
 
   const loading = biofuel.loading || elec.loading
 
-  const results = [
-    ...(biofuel.result?.data.results ?? []),
-    ...(elec.result?.data?.results ?? []),
-  ]
+  const biofuelResults = biofuel.result?.data.results ?? []
+  const elecResults = elec.result?.data?.results ?? []
+
+  const results = [...biofuelResults, ...elecResults]
+
+  const validateTeneur = (entity_id: number) => {
+    // only call an endpoint if there is some teneur linked to it
+    return Promise.all([
+      biofuelResults.some((b) => b.pending_teneur > 0) &&
+        validateTeneurBiofuel(entity_id),
+      elecResults.some((b) => b.pending_teneur > 0) &&
+        validateTeneurElec(entity_id),
+    ])
+  }
 
   const mutation = useMutation(validateTeneur, {
     onSuccess: () => {
