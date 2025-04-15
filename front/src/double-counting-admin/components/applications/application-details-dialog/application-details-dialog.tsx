@@ -180,6 +180,7 @@ export const ApplicationDetailsDialog = () => {
               production={application.production}
               quotas={quotas}
               setQuotas={onUpdateQuotas}
+              application={application}
             />
           )}
         </main>

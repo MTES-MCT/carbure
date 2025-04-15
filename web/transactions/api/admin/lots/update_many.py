@@ -101,7 +101,9 @@ def update_many(request):
         updated_lots.append(node.data)
 
         # recompute the GHG values in case something changed
-        node.data.update_ghg()
+        diff_ghg = update_data_diff_with_ghg(node)
+        # update node.diff to add new ghg values
+        node.diff.update(diff_ghg)
 
         # save a lot event with the current modification
         update_events.append(
@@ -211,3 +213,14 @@ def group_lots_by_entity(lots):
         lots_by_entity[client].append(lot)
 
     return lots_by_entity
+
+
+def update_data_diff_with_ghg(node):
+    ghg_values_before_update = node.data
+    node.data.update_ghg()
+
+    return {
+        "ghg_reduction": (node.data.ghg_reduction, ghg_values_before_update.ghg_reduction),
+        "ghg_reduction_red_ii": (node.data.ghg_reduction_red_ii, ghg_values_before_update.ghg_reduction_red_ii),
+        "ghg_total": (node.data.ghg_total, ghg_values_before_update.ghg_total),
+    }
