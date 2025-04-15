@@ -21,6 +21,7 @@ import {
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ElecOperationSector } from "accounting/types"
+import { DeclareElecTeneurDialog } from "./components/declare-elec-teneur-dialog"
 
 const Teneur = () => {
   const entity = useEntity()
@@ -41,7 +42,14 @@ const Teneur = () => {
     objective: CategoryObjective | UnconstrainedCategoryObjective,
     targetType?: TargetType
   ) => {
-    if (objective.code !== ElecOperationSector.ELEC) {
+    if (objective.code === ElecOperationSector.ELEC) {
+      portal((close) => (
+        <DeclareElecTeneurDialog //
+          onClose={close}
+          objective={objective}
+        />
+      ))
+    } else {
       portal((close) => (
         <DeclareTeneurDialog
           onClose={close}
