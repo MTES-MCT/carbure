@@ -20,12 +20,7 @@ export interface MainObjective extends BaseObjective {
   target_percent: number
 }
 
-export type UnconstrainedCategoryObjective = Omit<
-  CategoryObjective,
-  "target"
-> & {
-  target: null
-}
+export type UnconstrainedCategoryObjective = CategoryObjective
 
 export interface Objectives {
   global: MainObjective

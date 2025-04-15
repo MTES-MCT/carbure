@@ -18,14 +18,14 @@ export const cappedCategories: CategoryObjective[] = [
 export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
   {
     code: CategoryEnum.OTHER,
-    target: null,
+    target: 0,
     teneur_declared: 10000,
     teneur_declared_month: 0,
     quantity_available: 357637.20670999994,
   },
   {
     code: CategoryEnum.ANN_IX_B,
-    target: null,
+    target: 0,
     teneur_declared: 0,
     teneur_declared_month: 0,
     quantity_available: 135531.468,

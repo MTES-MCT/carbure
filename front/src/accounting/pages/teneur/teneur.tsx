@@ -13,11 +13,7 @@ import { SectorProgress } from "./components/sector-progress/sector-progress"
 import { CappedCategoriesProgress } from "./components/capped-categories-progress"
 import { ObjectivizedCategoriesProgress } from "./components/objectivized-categories-progress"
 import { UnconstrainedCategoriesProgress } from "./components/unconstrained-categories-progress"
-import {
-  CategoryObjective,
-  TargetType,
-  UnconstrainedCategoryObjective,
-} from "./types"
+import { CategoryObjective, TargetType } from "./types"
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 import { usePrivateNavigation } from "common/layouts/navigation"
 
@@ -37,7 +33,7 @@ const Teneur = () => {
   }
 
   const onCategoryClick = (
-    objective: CategoryObjective | UnconstrainedCategoryObjective,
+    objective: CategoryObjective,
     targetType?: TargetType
   ) => {
     portal((close) => (

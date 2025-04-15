@@ -90,18 +90,17 @@ export const getObjectives = async (
             ),
           }
           if (!category.objective.target_mj) {
-            objCategories.unconstrained_categories.push({
-              ...cat,
-              target: null,
-            })
+            objCategories.unconstrained_categories.push({ ...cat, target: 0 })
           } else {
             const categoryMapping = {
               REACH: "objectivized_categories",
               CAP: "capped_categories",
-            }
-            const categoryType = categoryMapping[
-              category.objective.target_type as keyof typeof categoryMapping
-            ] as "capped_categories" | "objectivized_categories"
+              OTHER: "unconstrained_categories",
+            } as const
+            const categoryType =
+              categoryMapping[
+                category.objective.target_type as keyof typeof categoryMapping
+              ]
 
             objCategories[categoryType].push(cat)
           }
