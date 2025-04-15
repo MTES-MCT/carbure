@@ -10,7 +10,7 @@ def create_new_elec_operations(apps, schema_editor):
     ElecTransferCertificate = apps.get_model("elec", "ElecTransferCertificate")
     ElecOperation = apps.get_model("tiruert", "ElecOperation")
 
-    operators = Entity.objects.filter(entity_type="Opérateur", has_elec=True)
+    operators = Entity.objects.filter(entity_type="Opérateur", has_elec=True, is_tiruert_liable=True)
 
     for operator in operators:
         all_cpo_elec_certs = ElecTransferCertificate.objects.filter(
@@ -31,7 +31,7 @@ def create_new_elec_operations(apps, schema_editor):
         diff = (total_cpo_elec_certs * 3600) - total_elec_operations
 
         if diff > 0:
-            return ElecOperation.objects.create(
+            ElecOperation.objects.create(
                 type="ACQUISITION_FROM_CPO",
                 status="ACCEPTED",
                 quantity=diff,
