@@ -76,16 +76,10 @@ export const QuantityForm = ({
     mutation.execute().then((response) => {
       const emissions = response.data
       const emissionsMin = emissions?.min_avoided_emissions
-        ? Math.trunc(
-            emissions.min_avoided_emissions *
-              balance.biofuel.renewable_energy_share
-          )
+        ? Math.trunc(emissions.min_avoided_emissions)
         : 0
       const emissionsMax = emissions?.max_avoided_emissions
-        ? Math.trunc(
-            emissions?.max_avoided_emissions *
-              balance.biofuel.renewable_energy_share
-          )
+        ? Math.trunc(emissions?.max_avoided_emissions)
         : 0
       setField("avoided_emissions_min", emissionsMin)
       setField("avoided_emissions_max", emissionsMax)

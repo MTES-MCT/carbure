@@ -95,10 +95,10 @@ const DeclareTeneurDialogContent = ({
     form.value.balance
       ? objective.target
         ? Math.min(
-            form.value.balance!.available_balance_renewable,
+            form.value.balance!.available_balance,
             computeObjectiveEnergy(objective)
           )
-        : form.value.balance!.available_balance_renewable
+        : form.value.balance!.available_balance
       : 0,
     0
   )
@@ -201,11 +201,7 @@ const DeclareTeneurDialogContent = ({
             <Box>
               <RecapOperationGrid>
                 <RecapOperation
-                  balance={{
-                    ...form.value.balance!,
-                    available_balance:
-                      form.value.balance!.available_balance_renewable,
-                  }}
+                  balance={form.value.balance!}
                   unit={ExtendedUnit.GJ}
                 />
                 {currentStepIndex > 2 && (

@@ -26,7 +26,7 @@ class OperationPagination(MetadataPageNumberPagination):
     def get_extra_metadata(self):
         metadata = {"total_quantity": 0}
         for operation in self.queryset:
-            quantity = operation.volume_to_quantity(operation.volume, self.request.unit)
+            quantity = operation.volume_to_quantity(operation.volume * operation.renewable_energy_share, self.request.unit)
             metadata["total_quantity"] += quantity
         return metadata
 

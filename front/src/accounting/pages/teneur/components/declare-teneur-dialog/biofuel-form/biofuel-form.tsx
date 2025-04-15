@@ -9,7 +9,6 @@ import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 import { CONVERSIONS } from "common/utils/formatters"
 import { Balance } from "accounting/types"
-import { formatBalance } from "accounting/utils/formatters"
 
 export type BiofuelFormProps = {
   balance?: Balance
@@ -36,7 +35,7 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
       options={result.result?.data?.results ?? []}
       normalize={(balance) => ({
         value: {
-          ...formatBalance(balance),
+          ...balance,
           available_balance: CONVERSIONS.energy.MJ_TO_GJ(
             balance.available_balance
           ),

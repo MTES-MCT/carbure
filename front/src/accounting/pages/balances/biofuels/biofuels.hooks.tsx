@@ -13,7 +13,7 @@ import {
   OperationsStatus,
 } from "accounting/types"
 import * as api from "accounting/api/balances"
-import { formatBalance, formatSector } from "accounting/utils/formatters"
+import { formatSector } from "accounting/utils/formatters"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
@@ -85,10 +85,7 @@ export const useBalancesBiofuelsColumns = () => {
           size="small"
           onClick={() =>
             portal((close) => (
-              <DebitOperationDialog
-                onClose={close}
-                balance={formatBalance(balance)}
-              />
+              <DebitOperationDialog onClose={close} balance={balance} />
             ))
           }
         />
