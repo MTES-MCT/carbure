@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -22,7 +21,14 @@ from .mixins import ActionMixin
 
 
 class ElecOperationPagination(MetadataPageNumberPagination):
-    aggregate_fields = {"total_quantity": Sum("quantity")}
+    aggregate_fields = {"total_quantity": 0}
+
+    def get_extra_metadata(self):
+        metadata = {"total_quantity": 0}
+        for operation in self.queryset:
+            sign = 1 if operation.is_credit(self.request.entity.id) else -1
+            metadata["total_quantity"] += operation.quantity * sign
+        return metadata
 
 
 @extend_schema(
@@ -116,13 +122,17 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
         ],
     )
     def create(self, request):
+        entity_id = self.request.POST.get("entity_id")
         serializer = ElecOperationInputSerializer(
             data=request.data,
             context={"request": request},
         )
         if serializer.is_valid():
             operation = serializer.save()
-            return Response(ElecOperationSerializer(operation).data, status=status.HTTP_201_CREATED)
+            return Response(
+                ElecOperationSerializer(operation, context={"entity_id": entity_id}).data,
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(

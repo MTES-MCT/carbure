@@ -52,3 +52,32 @@ class AcceptActionMixin:
         operation.validation_date = datetime.now()
         operation.save()
         return Response({"status": "accepted"}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        operation_id="declare_teneur",
+        description="Set teneur operations to DECLARED",
+        request=None,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response={"status": "validated"}, description="Success message"),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                response={"error": AcceptActionMixinErrors.NOTHING_TO_DECLARE}, description="Error message"
+            ),
+        },
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="teneur/declare",
+    )
+    def declare_teneur(self, request):
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            type=ElecOperation.TENEUR,
+            status=ElecOperation.PENDING,
+        )
+
+        if not queryset.exists():
+            return Response({"error": AcceptActionMixinErrors.NOTHING_TO_DECLARE}, status=status.HTTP_400_BAD_REQUEST)
+
+        queryset.update(status=ElecOperation.DECLARED)
+
+        return Response({"status": "declared"}, status=status.HTTP_200_OK)
