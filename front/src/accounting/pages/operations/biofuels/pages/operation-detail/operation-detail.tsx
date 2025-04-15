@@ -136,6 +136,28 @@ export const OperationDetail = () => {
             })
           )}`,
         },
+        operation.type === OperationType.TENEUR && {
+          label: t("Quantité renouvelable"),
+          value: `${getOperationQuantity(
+            operation,
+            formatUnit(operation.quantity * operation.renewable_energy_share, {
+              fractionDigits: 2,
+              appendZeros: false,
+            })
+          )} / ${getOperationQuantity(
+            operation,
+            formatUnit(
+              CONVERSIONS.energy.MJ_TO_GJ(
+                operation.quantity_mj * operation.renewable_energy_share
+              ),
+              {
+                fractionDigits: 2,
+                unit: ExtendedUnit.GJ,
+                appendZeros: false,
+              }
+            )
+          )}`,
+        },
         {
           label: t("Tonnes CO2 eq evitées"),
           value: formatNumber(operation.avoided_emissions, {

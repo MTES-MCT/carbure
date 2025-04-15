@@ -1,8 +1,11 @@
 import {
+  Balance,
   OperationSector,
   OperationsStatus,
   OperationType,
 } from "accounting/types"
+import { apiTypes } from "common/services/api-fetch.types"
+import { CONVERSIONS } from "common/utils/formatters"
 import i18next from "i18next"
 
 /**
@@ -71,3 +74,21 @@ export const formatOperationStatus = (status: OperationsStatus) => {
       return i18next.t("Inconnu")
   }
 }
+
+export const formatBalance: (balance: apiTypes["Balance"]) => Balance = (
+  balance
+) => ({
+  ...balance,
+  quantity_renewable: {
+    credit: CONVERSIONS.energy.MJ_TO_GJ(
+      balance.quantity.credit * balance.biofuel.renewable_energy_share
+    ),
+    debit: CONVERSIONS.energy.MJ_TO_GJ(
+      balance.quantity.debit * balance.biofuel.renewable_energy_share
+    ),
+  },
+  available_balance_renewable: CONVERSIONS.energy.MJ_TO_GJ(
+    balance.quantity.credit * balance.biofuel.renewable_energy_share -
+      balance.quantity.debit * balance.biofuel.renewable_energy_share
+  ),
+})

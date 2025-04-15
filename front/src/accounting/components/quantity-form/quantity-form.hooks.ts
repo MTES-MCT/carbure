@@ -35,7 +35,9 @@ export const useQuantityForm = ({
       biofuel: balance.biofuel?.id ?? null,
       customs_category: balance.customs_category,
       debited_entity: entity.id,
-      target_volume: converter(values.quantity!),
+      target_volume: converter(
+        values.quantity! * balance.biofuel.renewable_energy_share
+      ),
       target_emission: 0,
       unit: unit,
       from_depot: depotId,

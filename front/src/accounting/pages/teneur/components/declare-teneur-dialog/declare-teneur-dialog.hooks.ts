@@ -23,11 +23,16 @@ export const useDeclareTeneurDialog = ({
   const notify = useNotify()
   const { t } = useTranslation()
 
-  const onSubmit = () =>
-    createOperationWithSimulation(entity.id, {
+  const onSubmit = () => {
+    const renewableEnergyShare =
+      values.balance?.biofuel.renewable_energy_share ?? 1
+
+    return createOperationWithSimulation(entity.id, {
       simulation: {
-        target_volume: CONVERSIONS.energy.GJ_TO_MJ(values.quantity!),
-        target_emission: values.avoided_emissions!,
+        target_volume: CONVERSIONS.energy.GJ_TO_MJ(
+          values.quantity! / renewableEnergyShare
+        ),
+        target_emission: values.avoided_emissions! / renewableEnergyShare,
         unit: Unit.MJ,
       },
       operation: {
@@ -37,6 +42,7 @@ export const useDeclareTeneurDialog = ({
       biofuel: values.balance!.biofuel?.id ?? null,
       debited_entity: entity.id,
     })
+  }
 
   const mutation = useMutation(onSubmit, {
     invalidates: ["teneur-objectives"],

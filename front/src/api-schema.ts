@@ -1887,6 +1887,8 @@ export interface components {
     BalanceBiofuel: {
       id: number
       code: string
+      /** Format: double */
+      renewable_energy_share: number
     }
     BalanceByDepot: {
       customs_category: string
@@ -2787,6 +2789,8 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["MPCategoriesEnum"]
       readonly biofuel: string
+      /** Format: double */
+      renewable_energy_share: number
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
       from_depot: components["schemas"]["OperationDepot"]
@@ -2842,6 +2846,8 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["MPCategoriesEnum"]
       readonly biofuel: string
+      /** Format: double */
+      renewable_energy_share: number
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
       from_depot: components["schemas"]["OperationDepot"]
@@ -2974,14 +2980,7 @@ export interface components {
       total_available_volume?: number
     }
     PatchedOperationUpdateRequest: {
-      type?: components["schemas"]["OperationTypeEnum"]
-      customs_category?: components["schemas"]["MPCategoriesEnum"]
-      biofuel?: number | null
-      credited_entity?: number | null
-      debited_entity?: number | null
-      from_depot?: number | null
       to_depot?: number | null
-      export_country?: number | null
     }
     Pays: {
       code_pays: string
