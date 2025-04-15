@@ -5,7 +5,9 @@ from django.utils import timezone
 from django.utils.timezone import make_aware
 
 from tiruert.models import MacFossilFuel, Objective
+from tiruert.models.elec_operation import ElecOperation
 from tiruert.services.balance import BalanceService
+from tiruert.services.elec_balance import ElecBalanceService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 
@@ -92,6 +94,22 @@ class ObjectiveService:
         return list(balance.values())
 
     @staticmethod
+    def get_elec_category(elec_operations, entity_id, date_from):
+        elec_category = ElecBalanceService.calculate_balance(elec_operations, entity_id, date_from)
+
+        elec_category["code"] = ElecOperation.SECTOR
+        elec_category["unit"] = "mj"
+
+        elec_category["objective"] = {
+            "target_mj": None,
+            "target_type": None,
+            "penalty": None,
+            "target_percent": None,
+        }
+
+        return elec_category
+
+    @staticmethod
     def get_global_objective_and_penalty(objective_queryset, energy_basis):
         """
         Calculate the global objective of CO2 emissions reduction
@@ -105,6 +123,10 @@ class ObjectiveService:
     @staticmethod
     def apply_ghg_conversion(value):
         return value * GHG_REFERENCE_RED_II / 1000000  # tCO2
+
+    @staticmethod
+    def apply_elec_ghg_conversion(value):
+        return value * ElecOperation.EMISSION_RATE_PER_MJ / 1e6  # tCO2
 
     @staticmethod
     def get_balances_for_objectives_calculation(operations, entity_id, date_from):
