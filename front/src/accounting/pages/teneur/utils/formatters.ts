@@ -1,8 +1,16 @@
-import { CategoryObjective, SectorObjective } from "../types"
+import {
+  CategoryObjective,
+  SectorObjective,
+  UnconstrainedCategoryObjective,
+} from "../types"
 import { floorNumber } from "common/utils/formatters"
+
 // Calculate the amount of energy before reaching the objective or the limit
 export const computeObjectiveEnergy = (
-  objective: CategoryObjective | SectorObjective,
+  objective:
+    | CategoryObjective
+    | SectorObjective
+    | UnconstrainedCategoryObjective,
   formatter = floorNumber
 ) =>
   formatter(objective.target, 0) -

@@ -22,12 +22,7 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
-import {
-  CategoryObjective,
-  SectorObjective,
-  TargetType,
-  UnconstrainedCategoryObjective,
-} from "../../types"
+import { CategoryObjective, SectorObjective, TargetType } from "../../types"
 import {
   ceilNumber,
   CONVERSIONS,
@@ -42,7 +37,7 @@ import { DeclareTeneurProgressBar } from "./declare-teneur-progress-bar"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
-  objective: CategoryObjective | UnconstrainedCategoryObjective
+  objective: CategoryObjective
   // Only used for unconstrained categories
   sectorObjectives: SectorObjective[]
   targetType?: TargetType
