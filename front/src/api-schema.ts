@@ -1656,6 +1656,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/elec-operations/teneur/declare/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Set teneur operations to DECLARED */
+    post: operations["declare_teneur"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/objectives/": {
     parameters: {
       query?: never
@@ -1856,7 +1873,7 @@ export interface paths {
     get?: never
     put?: never
     /** @description Set teneur operations to DECLARED */
-    post: operations["declare_teneur"]
+    post: operations["declare_teneur_2"]
     delete?: never
     options?: never
     head?: never
@@ -7568,6 +7585,38 @@ export interface operations {
       }
     }
   }
+  declare_teneur: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+      /** @description Error message */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
   objectives: {
     parameters: {
       query: {
@@ -8101,7 +8150,7 @@ export interface operations {
       }
     }
   }
-  declare_teneur: {
+  declare_teneur_2: {
     parameters: {
       query: {
         /** @description Authorised entity ID. */

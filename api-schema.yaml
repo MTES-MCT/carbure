@@ -5561,6 +5561,35 @@ paths:
                     - TERF SAF
                   summary: Example of filters response.
           description: ""
+  /api/tiruert/elec-operations/teneur/declare/:
+    post:
+      operationId: declare_teneur
+      description: Set teneur operations to DECLARED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: validated
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: NOTHING_TO_DECLARE
+          description: Error message
   /api/tiruert/objectives/:
     get:
       operationId: objectives
@@ -6855,7 +6884,7 @@ paths:
           description: ""
   /api/tiruert/operations/teneur/declare/:
     post:
-      operationId: declare_teneur
+      operationId: declare_teneur_2
       description: Set teneur operations to DECLARED
       parameters:
         - in: query
