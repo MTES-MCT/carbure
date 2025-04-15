@@ -20,6 +20,7 @@ class OperationManager(models.Manager):
                 "customs_category",
                 "validation_date",
                 "created_at",
+                "renewable_energy_share",
                 # Relations nécessaires
                 "biofuel_id",
                 "credited_entity_id",
@@ -33,6 +34,7 @@ class OperationManager(models.Manager):
                 "biofuel__compatible_essence",
                 "biofuel__compatible_diesel",
                 "biofuel__masse_volumique",
+                "biofuel__renewable_energy_share",
                 "credited_entity__name",
                 "debited_entity__name",
                 "from_depot__name",
@@ -105,6 +107,7 @@ class Operation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
+    renewable_energy_share = models.FloatField(default=1)
 
     objects = OperationManager()
 

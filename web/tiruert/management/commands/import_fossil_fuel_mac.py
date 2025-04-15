@@ -2,9 +2,9 @@ import logging
 import os
 
 import pandas as pd
-from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand, CommandError
 
+from core import private_storage
 from core.models import Entity, Pays
 from entity.views.registration.search_company import search_company_gouv_fr
 from tiruert.models import FossilFuel, MacFossilFuel
@@ -206,7 +206,7 @@ class Command(BaseCommand):
         """
         Get the more recent file in the folder
         """
-        files = default_storage.listdir(folder)[1]
+        files = private_storage.listdir(folder)[1]
         if not files:
             raise CommandError(f"No files found in {folder}")
 
@@ -214,7 +214,7 @@ class Command(BaseCommand):
             latest_file = files[0]
         else:
             self.stdout.write("Multiple files found, getting the most recent one")
-            files_with_mtime = [(file, default_storage.modified(os.path.join(folder, file))) for file in files]
+            files_with_mtime = [(file, private_storage.modified(os.path.join(folder, file))) for file in files]
             latest_file = max(files_with_mtime, key=lambda x: x[1])[0]
 
         self.download_file_from_S3(folder, latest_file)
@@ -234,7 +234,7 @@ class Command(BaseCommand):
         s3_path = f"{folder}{filename}"
         create_tmp_folder(TMP_FOLDER)
 
-        with default_storage.open(f"{s3_path}", "rb") as f:
+        with private_storage.open(f"{s3_path}", "rb") as f:
             tmp_path = f"{TMP_FOLDER}{filename}"
             with open(f"{tmp_path}", "wb") as f2:
                 f2.write(f.read())
@@ -247,8 +247,8 @@ class Command(BaseCommand):
         """
         s3_path = f"{folder}{filename}"
         backup_path = f"{backup_folder}{filename}"
-        with default_storage.open(s3_path, "rb") as f:
-            default_storage.save(backup_path, f)
+        with private_storage.open(s3_path, "rb") as f:
+            private_storage.save(backup_path, f)
         logger.info("File backed up successfully")
 
     def parse_mac_excel(self, filepath):

@@ -29,6 +29,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
     quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
+    renewable_energy_share = serializers.FloatField()
 
     def get_type(self, instance) -> str:
         entity_id = self.context.get("entity_id")
@@ -67,6 +68,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "sector",
             "customs_category",
             "biofuel",
+            "renewable_energy_share",
             "credited_entity",
             "debited_entity",
             "from_depot",
@@ -89,6 +91,7 @@ class OperationSerializer(BaseOperationSerializer):
             "sector",
             "customs_category",
             "biofuel",
+            "renewable_energy_share",
             "credited_entity",
             "debited_entity",
             "from_depot",
@@ -161,6 +164,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
             else:
                 validated_data["status"] = Operation.PENDING
 
+            # Set renewable_energy_share based on the biofuel
+            validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
+
             # Create the operation
             operation = Operation.objects.create(**validated_data)
 
@@ -187,14 +193,7 @@ class OperationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
         fields = [
-            "type",
-            "customs_category",
-            "biofuel",
-            "credited_entity",
-            "debited_entity",
-            "from_depot",
             "to_depot",
-            "export_country",
         ]
 
 
