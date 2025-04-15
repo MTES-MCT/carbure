@@ -11,6 +11,7 @@ import { useUnit } from "common/hooks/unit"
 import { ExtendedUnit } from "common/types"
 import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
+import { getElecBalance } from "accounting/api/elec-balances"
 
 export const ValidatePendingTeneurDialog = ({
   onClose,
@@ -22,10 +23,24 @@ export const ValidatePendingTeneurDialog = ({
   const notify = useNotify()
   const columns = useValidatePendingTeneurDialog()
   const { unitLabel } = useUnit(ExtendedUnit.GJ)
-  const { result, loading } = useQuery(getBalancesBySector, {
+
+  const biofuel = useQuery(getBalancesBySector, {
     key: "balances-by-sector",
     params: [entity.id],
   })
+
+  const elec = useQuery(getElecBalance, {
+    key: "elec-balance",
+    params: [entity.id],
+  })
+
+  const loading = biofuel.loading || elec.loading
+
+  const results = [
+    ...(biofuel.result?.data.results ?? []),
+    ...(elec.result?.data?.results ?? []),
+  ]
+
   const mutation = useMutation(validateTeneur, {
     onSuccess: () => {
       onClose()
@@ -58,9 +73,7 @@ export const ValidatePendingTeneurDialog = ({
       }
       fullWidth
     >
-      {!loading &&
-      result?.data?.results &&
-      result?.data?.results?.length === 0 ? (
+      {!loading && results && results?.length === 0 ? (
         <NoResult />
       ) : (
         <>
@@ -68,11 +81,7 @@ export const ValidatePendingTeneurDialog = ({
             <sup>*</sup>
             {`${t("Toutes les quantités sont exprimées en")} ${unitLabel}`}
           </Text>
-          <Table
-            columns={columns}
-            rows={result?.data?.results ?? []}
-            loading={loading}
-          />
+          <Table columns={columns} rows={results} loading={loading} />
         </>
       )}
     </Dialog>

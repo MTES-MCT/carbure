@@ -1,3 +1,4 @@
+import { ElecBalance } from "accounting/types"
 import { formatSector } from "accounting/utils/formatters"
 import { Column, Cell } from "common/components/table2"
 import { apiTypes } from "common/services/api-fetch.types"
@@ -22,7 +23,7 @@ const floorValue = (value: number) =>
 
 export const useValidatePendingTeneurDialog = () => {
   const { t } = useTranslation()
-  const columns: Column<apiTypes["BalanceBySector"]>[] = [
+  const columns: Column<apiTypes["BalanceBySector"] | ElecBalance>[] = [
     {
       header: t("Filière"),
       cell: (item) => <Cell text={formatSector(item.sector)} />,
