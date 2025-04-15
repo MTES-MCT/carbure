@@ -11,7 +11,7 @@ const OperationsBalancesLayout = () => {
 
   // extract current TIRUERT section: "balances" or "operations"
   const params = useParams()
-  const [section] = (params["*"] ?? "").split("/")
+  const [sector] = (params["*"] ?? "").split("/")
 
   return (
     <>
@@ -20,13 +20,13 @@ const OperationsBalancesLayout = () => {
           {
             key: SectorTabs.BIOFUELS,
             label: t("Biocarburants"),
-            path: `${section}/${SectorTabs.BIOFUELS}`,
+            path: `${sector}/${SectorTabs.BIOFUELS}`,
             icon: DraftFill,
           },
           {
             key: SectorTabs.ELEC,
             label: t("Électricité"),
-            path: `${section}/${SectorTabs.ELEC}`,
+            path: `${sector}/${SectorTabs.ELEC}`,
             icon: DraftFill,
           },
         ])}

@@ -1,7 +1,5 @@
-import { Main } from "common/components/scaffold"
-
 import { Navigate, Route, Routes } from "react-router-dom"
-
+import { Main } from "common/components/scaffold"
 import Teneur from "./pages/teneur"
 import OperationsBalancesLayout from "./layouts/operations-balances-layout"
 import Operations from "./pages/operations"
@@ -9,7 +7,7 @@ import Balances from "./pages/balances"
 import useEntity from "common/hooks/entity"
 import { UserRole } from "common/types"
 import { TeneurLayout } from "./layouts/teneur-layout"
-import { SectorTabs } from "./types"
+import { useLastSectorVisited } from "./hooks/last-sector-visited"
 
 const currentYear = new Date().getFullYear()
 
@@ -18,6 +16,8 @@ const MaterialAccounting = () => {
   const canTransfer =
     entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
+  const lastSector = useLastSectorVisited()
+
   return (
     <Main>
       <Routes>
@@ -25,7 +25,7 @@ const MaterialAccounting = () => {
           <Route path={`operations/:category`} element={<Operations />} />
           <Route
             path="operations"
-            element={<Navigate replace to={`${SectorTabs.BIOFUELS}`} />}
+            element={<Navigate replace to={lastSector} />}
           />
 
           {canTransfer && (
@@ -33,7 +33,7 @@ const MaterialAccounting = () => {
               <Route path="balances/:category" element={<Balances />} />
               <Route
                 path="balances"
-                element={<Navigate replace to={`${SectorTabs.BIOFUELS}`} />}
+                element={<Navigate replace to={lastSector} />}
               />
             </>
           )}
