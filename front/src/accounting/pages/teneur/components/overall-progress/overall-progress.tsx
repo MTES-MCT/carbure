@@ -24,7 +24,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             date: "15/03/2025",
           })}
           description={t(
-            "Objectif en tC02 évitées en {{date}}: {{objective}} tC02 évitées ({{target_percent}}% du total)",
+            "Objectif en tCO2 évitées en {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
             {
               date: "2025",
               objective: formatNumber(objective.target, {
