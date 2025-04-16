@@ -8,6 +8,7 @@ import { Button } from "common/components/button2"
 import { CessionDialog } from "./cession-dialog"
 import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
+import { ExportationDialog } from "./exportation-dialog"
 interface DebitOperationDialogProps {
   onClose: () => void
   balance: Balance
@@ -29,6 +30,15 @@ export const DebitOperationDialog = ({
       case OperationType.CESSION:
         portal((close) => (
           <CessionDialog
+            onClose={close}
+            balance={balance}
+            onOperationCreated={onClose}
+          />
+        ))
+        break
+      case OperationType.EXPORTATION:
+        portal((close) => (
+          <ExportationDialog
             onClose={close}
             balance={balance}
             onOperationCreated={onClose}
@@ -71,11 +81,10 @@ export const DebitOperationDialog = ({
               //   hintText: "Additional information",
               //   value: OperationType.DEVALUATION,
               // },
-              // {
-              //   label: formatOperationType(OperationType.EXPORTATION),
-              //   hintText: "Additional information",
-              //   value: OperationType.EXPORTATION,
-              // },
+              {
+                label: formatOperationType(OperationType.EXPORTATION),
+                value: OperationType.EXPORTATION,
+              },
             ]}
             onChange={setCurrentOperation}
             value={currentOperation}
