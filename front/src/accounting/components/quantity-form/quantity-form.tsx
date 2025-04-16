@@ -99,7 +99,7 @@ export const QuantityForm = ({
   }
 
   const quantityBind = bind("quantity", { showError: true })
-  console.log(quantityBind)
+
   return (
     <>
       <NumberInput
