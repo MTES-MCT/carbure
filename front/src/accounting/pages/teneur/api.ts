@@ -88,11 +88,13 @@ export const getObjectives = async (
             quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
               category.available_balance
             ),
+            target_percent: category.objective.target_percent * 100,
           }
           if (!category.objective.target_mj) {
             objCategories.unconstrained_categories.push({
               ...cat,
               target: null,
+              target_percent: null,
             })
           } else {
             const categoryMapping = {

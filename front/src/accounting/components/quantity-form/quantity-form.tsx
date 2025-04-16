@@ -133,7 +133,7 @@ export const QuantityForm = ({
           </>
         }
         stateRelatedMessage={t(
-          "Nous pourrons ensuite vous indiquer les tC02 évitées équivalentes pour cette quantité."
+          "Nous pourrons ensuite vous indiquer les tCO2 évitées équivalentes pour cette quantité."
         )}
         state={quantityDeclared ? "default" : "info"}
         disabled={quantityDeclared || mutation.loading}
@@ -157,7 +157,7 @@ export const QuantityForm = ({
                   }),
                   value: value.avoided_emissions_min,
                 }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tC02 évitées</strong>."
+                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
               />
             ) : (
               <Trans
@@ -171,7 +171,7 @@ export const QuantityForm = ({
                   min: value.avoided_emissions_min,
                   max: value.avoided_emissions_max,
                 }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tC02 évitées</strong>."
+                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
               />
             )}
           </Notice>
