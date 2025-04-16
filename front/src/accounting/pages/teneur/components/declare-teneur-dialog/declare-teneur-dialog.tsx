@@ -141,7 +141,7 @@ const DeclareTeneurDialogContent = ({
         <Stepper />
         {currentStep?.key !== biofuelFormStepKey && (
           <>
-            <Box gap="xs">
+            <Box gap="xs" spacing="md">
               <DeclareTeneurProgressBars
                 mainObjective={mainObjective}
                 sectorObjective={currentSectorObjective}
@@ -187,7 +187,7 @@ const DeclareTeneurDialogContent = ({
               ) : null}
             </Box>
 
-            <Box>
+            <Box spacing="md">
               <RecapOperationGrid>
                 <RecapOperation
                   balance={form.value.balance!}
@@ -201,7 +201,7 @@ const DeclareTeneurDialogContent = ({
           </>
         )}
         {currentStep?.key !== "recap" && (
-          <Box>
+          <Box spacing="md">
             <Form form={form}>
               {currentStep?.key === biofuelFormStepKey && (
                 <BiofuelForm category={objective.code} />
@@ -230,9 +230,7 @@ export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const form = useForm<DeclareTeneurDialogForm>({})
   const steps = [
     biofuelFormStep(form.value),
-    quantityFormStep(form.value, {
-      title: t("Quantité de la teneur et tCO2 évitées"),
-    }),
+    quantityFormStep(form.value),
     { key: "recap", title: t("Récapitulatif") },
   ]
   return (

@@ -67,7 +67,8 @@ export const QuantityForm = ({
       setFieldError(
         "quantity",
         t(
-          "La quantité déclarée est supérieure à la quantité maximale autorisée. Merci de modifier la quantité."
+          "La quantité déclarée est supérieure à la quantité maximale autorisée ({{max}}). Merci de modifier la quantité.",
+          { max: formatUnit(depot_quantity_max, { fractionDigits: 0 }) }
         )
       )
       return
@@ -97,6 +98,8 @@ export const QuantityForm = ({
     setQuantityDeclared(false)
   }
 
+  const quantityBind = bind("quantity", { showError: true })
+  console.log(quantityBind)
   return (
     <>
       <NumberInput
@@ -108,19 +111,14 @@ export const QuantityForm = ({
             declareQuantity()
           }
         }}
-        {...bind("quantity")}
+        {...quantityBind}
         addon={
           <>
             {!quantityDeclared && (
               <Button
                 onClick={declareQuantity}
                 loading={mutation.loading}
-                disabled={
-                  !value.quantity ||
-                  value.quantity === 0 ||
-                  (depot_quantity_max !== undefined &&
-                    value.quantity > depot_quantity_max)
-                }
+                disabled={!value.quantity || value.quantity === 0}
               >
                 {t("Valider la quantité")}
               </Button>
@@ -132,10 +130,20 @@ export const QuantityForm = ({
             )}
           </>
         }
-        stateRelatedMessage={t(
-          "Nous pourrons ensuite vous indiquer les tCO2 évitées équivalentes pour cette quantité."
-        )}
-        state={quantityDeclared ? "default" : "info"}
+        stateRelatedMessage={
+          quantityBind.state === "error"
+            ? quantityBind.stateRelatedMessage
+            : t(
+                "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
+              )
+        }
+        state={
+          quantityBind.state === "error"
+            ? "error"
+            : quantityDeclared
+              ? "default"
+              : "info"
+        }
         disabled={quantityDeclared || mutation.loading}
         required
       />

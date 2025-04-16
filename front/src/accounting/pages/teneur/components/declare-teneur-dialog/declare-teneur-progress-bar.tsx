@@ -1,4 +1,3 @@
-import { Text } from "common/components/text"
 import { useTranslation } from "react-i18next"
 import { ProgressBar } from "../progress-bar"
 import {
@@ -11,6 +10,7 @@ import {
 import { ceilNumber, floorNumber } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
 import { ReactNode } from "react"
+import Badge from "@codegouvfr/react-dsfr/Badge"
 
 interface DeclareTeneurProgressBarProps {
   teneurDeclared: number
@@ -39,7 +39,12 @@ const DeclareTeneurProgressBar = ({
         gap: "var(--spacing-1v)",
       }}
     >
-      {label && <Text size="sm">{label}</Text>}
+      {/* {label && <Text size="sm">{label}</Text>} */}
+      {label && (
+        <Badge severity="info" small noIcon>
+          {label}
+        </Badge>
+      )}
       <ProgressBar
         baseQuantity={formatNumber(teneurDeclared, 0)}
         targetQuantity={formatNumber(target, 0)}
