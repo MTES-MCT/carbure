@@ -1,6 +1,5 @@
 import { useMemo, useRef } from "react"
 import css from "./tag-autocomplete.module.css"
-import { Field } from "./field"
 import { Dropdown, Trigger } from "../dropdown2"
 import { InputProps } from "../inputs2/input"
 import {
@@ -17,6 +16,7 @@ import { LoaderLine } from "../icon"
 import { multipleSelection } from "common/utils/selection"
 import Tag from "@codegouvfr/react-dsfr/Tag"
 import cl from "clsx"
+import { Field } from "../inputs2/field"
 
 export type TagAutocompleteProps<T, V = T> = Trigger &
   InputProps & {

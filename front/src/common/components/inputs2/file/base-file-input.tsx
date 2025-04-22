@@ -4,6 +4,7 @@ import { Upload, UploadProps } from "@codegouvfr/react-dsfr/Upload"
 import { useTranslation } from "react-i18next"
 import css from "./base-file-input.module.css"
 import cl from "clsx"
+import { Field } from "../field"
 
 export type BaseFileInputProps = UploadProps &
   ExtendedInputProps & {
@@ -55,31 +56,32 @@ export const BaseFileInput = forwardRef<HTMLDivElement, BaseFileInputProps>(
     }
 
     return (
-      <Upload
-        {...props}
-        label={
-          <Label
-            hasTooltip={hasTooltip}
-            required={required}
-            title={title}
-            label={label}
-          />
-        }
-        ref={ref}
-        nativeInputProps={{
-          ...props.nativeInputProps,
-          onChange: handleChange,
-          required,
-          autoFocus,
-          disabled,
-          readOnly,
-          multiple,
-          name,
-          ref: inputRef,
-        }}
-        hint={hint ?? ""}
-        className={cl(props.className, css["base-file-input"])}
-      />
+      // <Upload
+      //   {...props}
+      //   label={
+      //     <Label
+      //       hasTooltip={hasTooltip}
+      //       required={required}
+      //       title={title}
+      //       label={label}
+      //     />
+      //   }
+      //   ref={ref}
+      //   nativeInputProps={{
+      //     ...props.nativeInputProps,
+      //     onChange: handleChange,
+      //     required,
+      //     autoFocus,
+      //     disabled,
+      //     readOnly,
+      //     multiple,
+      //     name,
+      //     ref: inputRef,
+      //   }}
+      //   hint={hint ?? ""}
+      //   className={cl(props.className, css["base-file-input"])}
+      // /><
+      <Field>upload</Field>
     )
   }
 )
