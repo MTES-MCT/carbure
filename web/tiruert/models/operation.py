@@ -180,6 +180,7 @@ def create_tiruert_operations_from_lots(lots):
             debited_entity=None,
             from_depot=None,
             to_depot=lots[0].carbure_delivery_site,
+            renewable_energy_share=lots[0].biofuel.renewable_energy_share,
         )
 
         lots_bulk = []
