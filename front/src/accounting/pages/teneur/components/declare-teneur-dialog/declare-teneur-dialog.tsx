@@ -39,7 +39,10 @@ import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
 import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
-import { DeclareTeneurProgressBars } from "./declare-teneur-progress-bar"
+import {
+  DeclareTeneurProgressBar,
+  DeclareTeneurProgressBarList,
+} from "./declare-teneur-progress-bar"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
@@ -141,52 +144,6 @@ const DeclareTeneurDialogContent = ({
         <Stepper />
         {currentStep?.key !== biofuelFormStepKey && (
           <>
-            <Box gap="xs" spacing="md">
-              <DeclareTeneurProgressBars
-                mainObjective={mainObjective}
-                sectorObjective={currentSectorObjective}
-                categoryObjective={objective}
-                quantity={form.value.quantity ?? 0}
-                targetType={targetType}
-              />
-
-              {targetType && objective.target && (
-                <>
-                  {targetType === TargetType.CAP && objective.target ? (
-                    <RecapData.RemainingQuantityBeforeLimit
-                      value={remainingEnergyBeforeLimitOrObjective}
-                      bold
-                      size="md"
-                    />
-                  ) : null}
-                  {targetType === TargetType.REACH && objective.target ? (
-                    <RecapData.RemainingQuantityBeforeObjective
-                      value={remainingEnergyBeforeLimitOrObjective}
-                      bold
-                      size="md"
-                    />
-                  ) : null}
-                </>
-              )}
-              {!targetType && currentSectorObjective ? (
-                <RecapData.RemainingQuantityBeforeObjective
-                  value={formatUnit(
-                    Math.max(
-                      0,
-                      computeObjectiveEnergy(currentSectorObjective) -
-                        (form.value.quantity ?? 0)
-                    ),
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                  bold
-                  size="md"
-                />
-              ) : null}
-            </Box>
-
             <Box spacing="md">
               <RecapOperationGrid>
                 <RecapOperation
@@ -198,27 +155,90 @@ const DeclareTeneurDialogContent = ({
                 )}
               </RecapOperationGrid>
             </Box>
+            {currentStep?.key !== "recap" && (
+              <Box gap="xs" spacing="md">
+                <DeclareTeneurProgressBarList
+                  sectorObjective={currentSectorObjective}
+                  categoryObjective={objective}
+                  quantity={form.value.quantity ?? 0}
+                  targetType={targetType}
+                />
+
+                {targetType && objective.target && (
+                  <>
+                    {targetType === TargetType.CAP && objective.target ? (
+                      <RecapData.RemainingQuantityBeforeLimit
+                        value={remainingEnergyBeforeLimitOrObjective}
+                        bold
+                        size="md"
+                      />
+                    ) : null}
+                    {targetType === TargetType.REACH && objective.target ? (
+                      <RecapData.RemainingQuantityBeforeObjective
+                        value={remainingEnergyBeforeLimitOrObjective}
+                        bold
+                        size="md"
+                      />
+                    ) : null}
+                  </>
+                )}
+                {!targetType && currentSectorObjective ? (
+                  <RecapData.RemainingQuantityBeforeObjective
+                    value={formatUnit(
+                      Math.max(
+                        0,
+                        computeObjectiveEnergy(currentSectorObjective) -
+                          (form.value.quantity ?? 0)
+                      ),
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                    bold
+                    size="md"
+                  />
+                ) : null}
+              </Box>
+            )}
           </>
         )}
         {currentStep?.key !== "recap" && (
-          <Box spacing="md">
-            <Form form={form}>
-              {currentStep?.key === biofuelFormStepKey && (
+          <Form form={form}>
+            {currentStep?.key === biofuelFormStepKey && (
+              <Box spacing="md">
                 <BiofuelForm category={objective.code} />
-              )}
-              {currentStep?.key === quantityFormStepKey && (
-                <QuantityForm
-                  balance={form.value.balance!}
-                  type={CreateOperationType.TENEUR}
-                  depot_quantity_max={depotQuantityMax}
-                  unit={ExtendedUnit.GJ}
-                  backendUnit={Unit.MJ}
-                  // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
-                  converter={CONVERSIONS.energy.GJ_TO_MJ}
-                />
-              )}
-            </Form>
-          </Box>
+              </Box>
+            )}
+            {currentStep?.key === quantityFormStepKey && (
+              <>
+                <Box spacing="md">
+                  <QuantityForm.Quantity
+                    balance={form.value.balance!}
+                    type={CreateOperationType.TENEUR}
+                    depot_quantity_max={depotQuantityMax}
+                    unit={ExtendedUnit.GJ}
+                    backendUnit={Unit.MJ}
+                    // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
+                    converter={CONVERSIONS.energy.GJ_TO_MJ}
+                  />
+                </Box>
+                {form.value.avoided_emissions_min && (
+                  <Box spacing="md">
+                    <QuantityForm.AvoidedEmissions />
+                    <DeclareTeneurProgressBar
+                      teneurDeclared={mainObjective.teneur_declared}
+                      teneurDeclaredMonth={mainObjective.teneur_declared_month}
+                      target={mainObjective.target}
+                      quantity={form.value.avoided_emissions ?? 0}
+                      targetType={TargetType.REACH}
+                      label={t("Objectif global")}
+                    />
+                  </Box>
+                )}
+              </>
+            )}
+          </Form>
         )}
       </Main>
     </Dialog>

@@ -63,8 +63,15 @@ export const Panel = ({
 )
 
 // a container that automatically arranges its content into a grid
-export const Grid = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.grid, props.className)} />
+export const Grid = (props: JSX.IntrinsicElements["div"] & { gap?: "xl" }) => (
+  <div
+    {...props}
+    className={cl(
+      css.grid,
+      props.className,
+      props.gap && css[`grid--gap-${props.gap}`]
+    )}
+  />
 )
 
 // a div with vertical flow

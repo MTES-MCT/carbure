@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next"
 import { ProgressBar } from "../progress-bar"
 import {
   CategoryObjective,
-  MainObjective,
   SectorObjective,
   TargetType,
   UnconstrainedCategoryObjective,
@@ -11,6 +10,7 @@ import { ceilNumber, floorNumber } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
 import { ReactNode } from "react"
 import Badge from "@codegouvfr/react-dsfr/Badge"
+import { Grid } from "common/components/scaffold"
 
 interface DeclareTeneurProgressBarProps {
   teneurDeclared: number
@@ -20,7 +20,7 @@ interface DeclareTeneurProgressBarProps {
   targetType?: TargetType
   label?: ReactNode
 }
-const DeclareTeneurProgressBar = ({
+export const DeclareTeneurProgressBar = ({
   teneurDeclared,
   teneurDeclaredMonth,
   target,
@@ -39,7 +39,6 @@ const DeclareTeneurProgressBar = ({
         gap: "var(--spacing-1v)",
       }}
     >
-      {/* {label && <Text size="sm">{label}</Text>} */}
       {label && (
         <Badge severity="info" small noIcon>
           {label}
@@ -57,38 +56,28 @@ const DeclareTeneurProgressBar = ({
   )
 }
 
-type DeclareTeneurProgressBarProps2 = {
-  mainObjective: MainObjective
+type DeclareTeneurProgressBarListProps = {
   sectorObjective?: SectorObjective
   categoryObjective?: CategoryObjective | UnconstrainedCategoryObjective
   quantity: number
   targetType?: TargetType
 }
-export const DeclareTeneurProgressBars = ({
-  mainObjective,
+export const DeclareTeneurProgressBarList = ({
   sectorObjective,
   categoryObjective,
   quantity,
   targetType,
-}: DeclareTeneurProgressBarProps2) => {
+}: DeclareTeneurProgressBarListProps) => {
   const { t } = useTranslation()
   return (
-    <>
-      <DeclareTeneurProgressBar
-        teneurDeclared={mainObjective.teneur_declared}
-        teneurDeclaredMonth={mainObjective.teneur_declared_month}
-        target={mainObjective.target}
-        quantity={quantity ?? 0}
-        targetType={TargetType.REACH}
-        label={t("Objectif global")}
-      />
+    <Grid gap="xl">
       {sectorObjective && (
         <DeclareTeneurProgressBar
           teneurDeclared={sectorObjective?.teneur_declared ?? 0}
           teneurDeclaredMonth={sectorObjective?.teneur_declared_month ?? 0}
           target={sectorObjective?.target ?? 0}
           quantity={quantity ?? 0}
-          label={t("Objectif pour la filière {{sector}}", {
+          label={t("Filière {{sector}}", {
             sector: formatSector(sectorObjective?.code),
           })}
           targetType={targetType}
@@ -101,11 +90,11 @@ export const DeclareTeneurProgressBars = ({
           target={categoryObjective.target}
           quantity={quantity ?? 0}
           targetType={targetType}
-          label={t("Objectif pour la catégorie {{category}}", {
+          label={t("Catégorie {{category}}", {
             category: categoryObjective.code,
           })}
         />
       )}
-    </>
+    </Grid>
   )
 }
