@@ -10,8 +10,8 @@ import { Button } from "common/components/button2"
 import {
   QuantityForm,
   QuantitySummary,
-  quantityFormStep,
   quantityFormStepKey,
+  useQuantityFormStep,
 } from "accounting/components/quantity-form"
 import {
   RecapOperation,
@@ -116,9 +116,13 @@ export const CessionDialogContent = ({
 export const CessionDialog = (props: CessionDialogProps) => {
   const { t } = useTranslation()
   const form = useForm<SessionDialogForm>({})
+  const quantityFormStep = useQuantityFormStep({
+    balance: props.balance,
+    form,
+  })
   const steps = [
     fromDepotRecipientToDepotStep(form.value),
-    quantityFormStep(form.value),
+    quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]
   return (

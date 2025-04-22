@@ -1,4 +1,4 @@
-import { createOperationWithSimulation } from "accounting/api/operations"
+import { createOperation } from "accounting/api/operations"
 import useEntity from "common/hooks/entity"
 import { SessionDialogForm } from "./cession-dialog.types"
 import { Balance, CreateOperationType } from "accounting/types"
@@ -25,22 +25,15 @@ export const useCessionDialog = ({
   const { formatUnit } = useUnit()
 
   const onSubmit = () =>
-    createOperationWithSimulation(entity.id, {
-      simulation: {
-        target_volume: values.quantity!,
-        target_emission: values.avoided_emissions!,
-        unit: balance.unit,
-      },
-      operation: {
-        type: CreateOperationType.CESSION,
-        from_depot: values.from_depot?.id,
-        to_depot: values.to_depot?.id,
-        credited_entity: values.credited_entity?.id,
-      },
+    createOperation(entity.id, {
+      type: CreateOperationType.CESSION,
+      from_depot: values.from_depot?.id,
+      to_depot: values.to_depot?.id,
+      credited_entity: values.credited_entity?.id,
+      lots: values.selected_lots!,
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
-      from_depot: values.from_depot?.id,
     })
 
   return useMutation(onSubmit, {

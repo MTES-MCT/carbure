@@ -34,6 +34,10 @@ export const QuantitySummary = ({
           appendZeros: false,
         })}
       />
+      <OperationText
+        title={t("Nombre de lots prélevés")}
+        description={values.selected_lots?.length ?? 0}
+      />
     </>
   )
 }

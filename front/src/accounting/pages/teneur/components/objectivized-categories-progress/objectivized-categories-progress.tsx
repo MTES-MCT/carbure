@@ -6,12 +6,7 @@ import { CategoryObjective, TargetType } from "../../types"
 import { CardGrid } from "../card-grid"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
-import {
-  ceilNumber,
-  floorNumber,
-  formatNumber,
-  formatUnit,
-} from "common/utils/formatters"
+import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -55,14 +50,15 @@ export const ObjectivizedCategoriesProgress = ({
                 }),
               }
             )}
-            baseQuantity={ceilNumber(category.teneur_declared)}
-            targetQuantity={ceilNumber(category.target)}
-            declaredQuantity={ceilNumber(category.teneur_declared_month)}
+            baseQuantity={floorNumber(category.teneur_declared, 0)}
+            targetQuantity={floorNumber(category.target, 0)}
+            declaredQuantity={floorNumber(category.teneur_declared_month, 0)}
             badge={
               <CardProgress.DefaultBadge
-                targetQuantity={category.target}
+                targetQuantity={floorNumber(category.target, 0)}
                 declaredQuantity={
-                  category.teneur_declared + category.teneur_declared_month
+                  floorNumber(category.teneur_declared, 0) +
+                  floorNumber(category.teneur_declared_month, 0)
                 }
               />
             }
@@ -87,7 +83,6 @@ export const ObjectivizedCategoriesProgress = ({
                     ExtendedUnit.GJ,
                     {
                       fractionDigits: 0,
-                      mode: "ceil",
                     }
                   )}
                 />

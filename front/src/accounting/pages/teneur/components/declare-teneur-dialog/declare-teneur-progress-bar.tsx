@@ -6,7 +6,7 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import { ceilNumber, floorNumber } from "common/utils/formatters"
+import { floorNumber } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
 import { ReactNode } from "react"
 import Badge from "@codegouvfr/react-dsfr/Badge"
@@ -25,12 +25,8 @@ export const DeclareTeneurProgressBar = ({
   teneurDeclaredMonth,
   target,
   quantity,
-  targetType,
   label,
 }: DeclareTeneurProgressBarProps) => {
-  const formatNumber =
-    targetType && targetType === TargetType.REACH ? ceilNumber : floorNumber
-
   return (
     <div
       style={{
@@ -45,12 +41,9 @@ export const DeclareTeneurProgressBar = ({
         </Badge>
       )}
       <ProgressBar
-        baseQuantity={formatNumber(teneurDeclared, 0)}
-        targetQuantity={formatNumber(target, 0)}
-        declaredQuantity={formatNumber(
-          teneurDeclaredMonth + (quantity ?? 0),
-          0
-        )}
+        baseQuantity={floorNumber(teneurDeclared, 0)}
+        targetQuantity={floorNumber(target, 0)}
+        declaredQuantity={floorNumber(teneurDeclaredMonth + (quantity ?? 0), 0)}
       />
     </div>
   )
@@ -71,18 +64,6 @@ export const DeclareTeneurProgressBarList = ({
   const { t } = useTranslation()
   return (
     <Grid gap="xl">
-      {sectorObjective && (
-        <DeclareTeneurProgressBar
-          teneurDeclared={sectorObjective?.teneur_declared ?? 0}
-          teneurDeclaredMonth={sectorObjective?.teneur_declared_month ?? 0}
-          target={sectorObjective?.target ?? 0}
-          quantity={quantity ?? 0}
-          label={t("Filière {{sector}}", {
-            sector: formatSector(sectorObjective?.code),
-          })}
-          targetType={targetType}
-        />
-      )}
       {categoryObjective && categoryObjective.target && (
         <DeclareTeneurProgressBar
           teneurDeclared={categoryObjective.teneur_declared}
@@ -93,6 +74,18 @@ export const DeclareTeneurProgressBarList = ({
           label={t("Catégorie {{category}}", {
             category: categoryObjective.code,
           })}
+        />
+      )}
+      {sectorObjective && (
+        <DeclareTeneurProgressBar
+          teneurDeclared={sectorObjective?.teneur_declared ?? 0}
+          teneurDeclaredMonth={sectorObjective?.teneur_declared_month ?? 0}
+          target={sectorObjective?.target ?? 0}
+          quantity={quantity ?? 0}
+          label={t("Filière {{sector}}", {
+            sector: formatSector(sectorObjective?.code),
+          })}
+          targetType={targetType}
         />
       )}
     </Grid>

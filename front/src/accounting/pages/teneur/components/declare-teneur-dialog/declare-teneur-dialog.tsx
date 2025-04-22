@@ -5,9 +5,9 @@ import { FormManager, useForm, Form } from "common/components/form2"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
 import {
   QuantityForm,
-  quantityFormStep,
   quantityFormStepKey,
   QuantitySummary,
+  useQuantityFormStep,
 } from "accounting/components/quantity-form"
 import { Box, Main } from "common/components/scaffold"
 import {
@@ -29,12 +29,7 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import {
-  ceilNumber,
-  CONVERSIONS,
-  floorNumber,
-  formatUnit,
-} from "common/utils/formatters"
+import { CONVERSIONS, floorNumber, formatUnit } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
@@ -50,7 +45,7 @@ interface DeclareTeneurDialogProps {
   // Only used for unconstrained categories
   sectorObjectives: SectorObjective[]
   targetType?: TargetType
-  mainObjective: MainObjective
+  mainObjective?: MainObjective
 }
 
 interface DeclareTeneurDialogContentProps extends DeclareTeneurDialogProps {
@@ -73,9 +68,6 @@ const DeclareTeneurDialogContent = ({
     values: form.value,
   })
 
-  const formatNumber =
-    targetType && targetType === TargetType.REACH ? ceilNumber : floorNumber
-
   const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
     // Add quantity declared only if the "declare quantity" button has been clicked
     const quantity = form.value.quantity ?? 0
@@ -87,17 +79,13 @@ const DeclareTeneurDialogContent = ({
 
     return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
       fractionDigits: 0,
-      // If the target is a reach, we need to ceil the remaining energy
-      // Ex: if the remaining energy to declare is 145.88 GJ, we need to declare 146 GJ
-      // because the objective is to reach a certain quantity
-      mode: targetType === TargetType.REACH ? "ceil" : "floor",
     })
-  }, [form.value.quantity, objective, targetType])
+  }, [form.value.quantity, objective])
 
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
   // Otherwise, the maximum quantity is the available balance
-  const depotQuantityMax = formatNumber(
+  const depotQuantityMax = floorNumber(
     form.value.balance
       ? objective.target
         ? Math.min(
@@ -171,6 +159,7 @@ const DeclareTeneurDialogContent = ({
                         value={remainingEnergyBeforeLimitOrObjective}
                         bold
                         size="md"
+                        category={objective.code}
                       />
                     ) : null}
                     {targetType === TargetType.REACH && objective.target ? (
@@ -178,6 +167,7 @@ const DeclareTeneurDialogContent = ({
                         value={remainingEnergyBeforeLimitOrObjective}
                         bold
                         size="md"
+                        category={objective.code}
                       />
                     ) : null}
                   </>
@@ -223,19 +213,23 @@ const DeclareTeneurDialogContent = ({
                     converter={CONVERSIONS.energy.GJ_TO_MJ}
                   />
                 </Box>
-                {form.value.avoided_emissions_min && (
+                {form.value.avoided_emissions_min ? (
                   <Box spacing="md">
                     <QuantityForm.AvoidedEmissions />
-                    <DeclareTeneurProgressBar
-                      teneurDeclared={mainObjective.teneur_declared}
-                      teneurDeclaredMonth={mainObjective.teneur_declared_month}
-                      target={mainObjective.target}
-                      quantity={form.value.avoided_emissions ?? 0}
-                      targetType={TargetType.REACH}
-                      label={t("Objectif global")}
-                    />
+                    {mainObjective && (
+                      <DeclareTeneurProgressBar
+                        teneurDeclared={mainObjective.teneur_declared}
+                        teneurDeclaredMonth={
+                          mainObjective.teneur_declared_month
+                        }
+                        target={mainObjective.target}
+                        quantity={form.value.avoided_emissions ?? 0}
+                        targetType={TargetType.REACH}
+                        label={t("Objectif global")}
+                      />
+                    )}
                   </Box>
-                )}
+                ) : null}
               </>
             )}
           </Form>
@@ -248,9 +242,14 @@ const DeclareTeneurDialogContent = ({
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
   const form = useForm<DeclareTeneurDialogForm>({})
+  const quantityFormStep = useQuantityFormStep({
+    balance: form.value.balance!,
+    converter: CONVERSIONS.energy.GJ_TO_MJ,
+    form,
+  })
   const steps = [
     biofuelFormStep(form.value),
-    quantityFormStep(form.value),
+    quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]
   return (

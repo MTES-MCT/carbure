@@ -97,11 +97,20 @@ export const simulate = (
 
 export const createOperation = (
   entityId: number,
-  data: apiTypes["OperationInputRequest"]
+  data: Omit<apiTypes["OperationInputRequest"], "lots"> & {
+    lots: apiTypes["SimulationLotOutput"][]
+  }
 ) => {
   return api.POST("/tiruert/operations/", {
     params: { query: { entity_id: entityId } },
-    body: data,
+    body: {
+      ...data,
+      lots: data.lots.map(({ lot_id, ...rest }) => ({
+        ...rest,
+        volume: parseFloat(rest.volume),
+        id: lot_id,
+      })),
+    },
     bodySerializer: (data) => JSON.stringify(data), // Body contains array of objects, our backend could not handle it in a formData
   })
 }
@@ -142,17 +151,11 @@ export const createOperationWithSimulation = (
     unit: simulation.unit,
     from_depot,
   }).then((response) => {
-    const lots = response.data?.selected_lots.map(({ volume, ...lot }) => ({
-      ...lot,
-      volume: parseFloat(volume),
-    }))
+    const lots = response.data?.selected_lots
     if (lots) {
       return createOperation(entityId, {
         ...operation,
-        lots: lots.map(({ lot_id, ...rest }) => ({
-          id: lot_id,
-          ...rest,
-        })),
+        lots,
         biofuel,
         customs_category,
         debited_entity,
