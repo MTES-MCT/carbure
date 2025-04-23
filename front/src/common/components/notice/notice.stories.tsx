@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Notice } from "./notice"
-import { SurveyFill } from "../icon"
 
 const meta: Meta<typeof Notice> = {
   component: Notice,
@@ -58,7 +57,7 @@ export const Closable: Story = {
 export const WithIcon: Story = {
   args: {
     variant: "info",
-    icon: SurveyFill,
+    icon: "ri-survey-fill",
   },
 }
 
