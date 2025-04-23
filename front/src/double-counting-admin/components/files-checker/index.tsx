@@ -1,10 +1,8 @@
-import Alert from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
-import { Main } from "common/components/scaffold"
-import Table, { Cell, Column } from "common/components/table"
-import Tabs from "common/components/tabs"
-import Tag from "common/components/tag"
+import { Content, Main } from "common/components/scaffold"
+import { Table, Cell, Column } from "common/components/table2"
+import { Tabs } from "common/components/tabs2"
 import useTitle from "common/hooks/title"
 import {
   CheckDoubleCountingFilesResponse,
@@ -16,11 +14,14 @@ import { useLocation } from "react-router-dom"
 import ErrorsDetailsDialog from "../../../double-counting/components/application-checker/errors-details-dialog"
 import FilesCheckerUploadButton from "./upload-button"
 import ValidDetailsDialog from "../../../double-counting/components/application-checker/valid-details-dialog"
+import { usePrivateNavigation } from "common/layouts/navigation"
+import Badge from "@codegouvfr/react-dsfr/Badge"
 
 const DoubleCountingFilesChecker = () => {
   const { t } = useTranslation()
   const location = useLocation()
   useTitle(t("Vérification de fichiers de double comptage"))
+  usePrivateNavigation("Vérification de fichiers de double comptage")
   const portal = usePortal()
 
   const checkedFiles: CheckDoubleCountingFilesResponse =
@@ -57,9 +58,9 @@ const DoubleCountingFilesChecker = () => {
       header: t("Statut"),
       cell: (file) =>
         file.error_count ? (
-          <Tag variant="warning">{t("À corriger")}</Tag>
+          <Badge severity="warning">{t("À corriger")}</Badge>
         ) : (
-          <Tag variant="success">{t("Valide")}</Tag>
+          <Badge severity="success">{t("Valide")}</Badge>
         ),
     },
     {
@@ -95,43 +96,36 @@ const DoubleCountingFilesChecker = () => {
   return (
     <Main>
       <header>
-        <section>
-          <h1>{t("Vérification de fichiers de double comptage")}</h1>
-          <FilesCheckerUploadButton label={t("Vérifier d'autres demandes")} />
-        </section>
+        <FilesCheckerUploadButton label={t("Vérifier d'autres demandes")} />
+
         {checkedFiles && (
-          <section>
-            <Tabs
-              variant="switcher"
-              onFocus={setTab}
-              focus={tab}
-              tabs={[
-                {
-                  key: "to-fix",
-                  label: t("À corriger ({{toFixCount}})", {
-                    toFixCount: toFix.count,
-                  }),
-                },
-                {
-                  key: "valid",
-                  label: t("Valides ({{validCount}})", {
-                    validCount: valid.count,
-                  }),
-                },
-              ]}
-            />
-          </section>
+          <Tabs
+            onFocus={setTab}
+            focus={tab}
+            tabs={[
+              {
+                key: "to-fix",
+                label: t("À corriger ({{toFixCount}})", {
+                  toFixCount: toFix.count,
+                }),
+              },
+              {
+                key: "valid",
+                label: t("Valides ({{validCount}})", {
+                  validCount: valid.count,
+                }),
+              },
+            ]}
+          />
         )}
       </header>
-      <section>
+      <Content>
         {!checkedFiles && (
-          <Alert variant="warning" icon={AlertCircle}>
-            <p>
-              {t(
-                "Aucune données à vérifier. Merci d'envoyer de nouveaux fichiers à analyser."
-              )}
-            </p>
-          </Alert>
+          <Notice variant="warning" icon="ri-alert-line">
+            {t(
+              "Aucune données à vérifier. Merci d'envoyer de nouveaux fichiers à analyser."
+            )}
+          </Notice>
         )}
 
         {checkedFiles && (
@@ -139,9 +133,9 @@ const DoubleCountingFilesChecker = () => {
             {tab === "valid" && (
               <>
                 {valid.count === 0 && (
-                  <Alert variant="warning" icon={AlertCircle}>
+                  <Notice variant="warning" icon="ri-alert-line">
                     {t("Aucun dossier valide")}
-                  </Alert>
+                  </Notice>
                 )}
 
                 {valid.count > 0 && (
@@ -157,9 +151,9 @@ const DoubleCountingFilesChecker = () => {
             {tab === "to-fix" && (
               <>
                 {toFix.count === 0 && (
-                  <Alert variant="warning" icon={AlertCircle}>
+                  <Notice variant="warning" icon="ri-alert-line">
                     {t("Aucun dossier à corriger !")}
-                  </Alert>
+                  </Notice>
                 )}
 
                 {toFix.count > 0 && (
@@ -173,7 +167,7 @@ const DoubleCountingFilesChecker = () => {
             )}
           </>
         )}
-      </section>
+      </Content>
     </Main>
   )
 }
