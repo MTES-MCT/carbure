@@ -21,28 +21,26 @@ export const ApplicationInfo = ({
   const entity = useEntity()
   const { t } = useTranslation()
   return (
-    <p>
-      <Trans
-        values={{ producer, productionSite, creationDate, user }}
-        components={{
-          Link: application ? (
-            <Link
-              to={
-                ROUTE_URLS.ADMIN(entity.id).COMPANY_DETAIL(
-                  application?.producer.id
-                ) + "#double-counting"
-              }
-              target="_blank"
-            />
-          ) : (
-            <Fragment />
-          ),
-        }}
-        defaults={
-          "Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
-        }
-        t={t}
-      />
-    </p>
+    <Trans
+      values={{ producer, productionSite, creationDate, user }}
+      components={{
+        Link: application ? (
+          <Link
+            to={
+              ROUTE_URLS.ADMIN(entity.id).COMPANY_DETAIL(
+                application?.producer.id
+              ) + "#double-counting"
+            }
+            target="_blank"
+          />
+        ) : (
+          <Fragment />
+        ),
+      }}
+      defaults={
+        "Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
+      }
+      t={t}
+    />
   )
 }
