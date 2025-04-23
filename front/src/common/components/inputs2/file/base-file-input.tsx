@@ -9,7 +9,7 @@ import { fr } from "@codegouvfr/react-dsfr"
 import { Icon } from "common/components/icon"
 import { Ellipsis } from "common/components/scaffold"
 
-export type BaseFileInputProps = FieldProps & {
+export type BaseFileInputProps = Omit<FieldProps, "children"> & {
   value?: File | FileList
   onChange?: (e?: React.ChangeEvent<HTMLInputElement>) => void
   multiple?: boolean

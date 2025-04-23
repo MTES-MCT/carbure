@@ -26,14 +26,7 @@ export const DechetIndustrielAlert = () => {
           <Trans>disponible ici</Trans>
         </Button>
         .{" " + t("Merci de déposer ce fichier") + " "}
-        <Button
-          customPriority="link"
-          linkProps={{
-            to: "/",
-          }}
-        >
-          {t("dans l'onglet Fichiers")}
-        </Button>
+        {t("dans l'onglet Fichiers") + "."}
       </p>
     </Notice>
   )
