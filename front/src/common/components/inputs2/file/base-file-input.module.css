@@ -1,3 +1,10 @@
 .base-file-input :global(.fr-label + .fr-upload) {
   margin-top: 0;
 }
+
+.base-file-input__label {
+  cursor: pointer;
+  display: flex;
+  gap: var(--spacing-2w);
+  align-items: center;
+}
