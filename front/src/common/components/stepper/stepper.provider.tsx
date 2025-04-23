@@ -10,6 +10,7 @@ export type Step<Key extends string> = {
   key: Key
   title: ReactNode
   allowNextStep?: boolean
+  onClick?: () => Promise<any>
 }
 
 type StepperContextType<Steps extends Step<string>[]> = {

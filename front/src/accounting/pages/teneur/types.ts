@@ -6,6 +6,7 @@ export interface BaseObjective {
   teneur_declared: number // GJ
   quantity_available: number // GJ
   teneur_declared_month: number // GJ
+  target_percent: number
 }
 export interface CategoryObjective extends BaseObjective {
   code: CategoryEnum
@@ -13,18 +14,16 @@ export interface CategoryObjective extends BaseObjective {
 
 export interface SectorObjective extends BaseObjective {
   code: OperationSector
-  target_percent: number
 }
 
-export interface MainObjective extends BaseObjective {
-  target_percent: number
-}
+export type MainObjective = BaseObjective
 
 export type UnconstrainedCategoryObjective = Omit<
   CategoryObjective,
-  "target"
+  "target" | "target_percent"
 > & {
   target: null
+  target_percent: null
 }
 
 export interface Objectives {

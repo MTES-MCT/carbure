@@ -63,8 +63,15 @@ export const Panel = ({
 )
 
 // a container that automatically arranges its content into a grid
-export const Grid = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.grid, props.className)} />
+export const Grid = (props: JSX.IntrinsicElements["div"] & { gap?: "xl" }) => (
+  <div
+    {...props}
+    className={cl(
+      css.grid,
+      props.className,
+      props.gap && css[`grid--gap-${props.gap}`]
+    )}
+  />
 )
 
 // a div with vertical flow
@@ -115,11 +122,20 @@ export const LoaderOverlay = () => (
 
 export const Box = ({
   gap = "md",
+  spacing = "lg",
   ...props
-}: JSX.IntrinsicElements["div"] & { gap?: "lg" | "md" | "sm" | "xs" }) => (
+}: JSX.IntrinsicElements["div"] & {
+  gap?: "lg" | "md" | "sm" | "xs"
+  spacing?: "lg" | "md" | "sm" | "xs"
+}) => (
   <div
     {...props}
-    className={cl(css.box, props.className, gap && css[`box--gap-${gap}`])}
+    className={cl(
+      css.box,
+      props.className,
+      gap && css[`box--gap-${gap}`],
+      spacing && css[`box--spacing-${spacing}`]
+    )}
   />
 )
 

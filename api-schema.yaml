@@ -6574,9 +6574,13 @@ components:
           type: integer
         code:
           type: string
+        renewable_energy_share:
+          type: number
+          format: double
       required:
         - code
         - id
+        - renewable_energy_share
     BalanceByDepot:
       type: object
       properties:
@@ -8855,6 +8859,9 @@ components:
         biofuel:
           type: string
           readOnly: true
+        renewable_energy_share:
+          type: number
+          format: double
         credited_entity:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
@@ -8903,6 +8910,7 @@ components:
         - id
         - quantity
         - quantity_mj
+        - renewable_energy_share
         - sector
         - to_depot
         - type
@@ -9002,6 +9010,9 @@ components:
         biofuel:
           type: string
           readOnly: true
+        renewable_energy_share:
+          type: number
+          format: double
         credited_entity:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
@@ -9036,6 +9047,7 @@ components:
         - from_depot
         - id
         - quantity
+        - renewable_energy_share
         - sector
         - to_depot
         - type
@@ -9236,26 +9248,7 @@ components:
     PatchedOperationUpdateRequest:
       type: object
       properties:
-        type:
-          $ref: "#/components/schemas/OperationTypeEnum"
-        customs_category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        biofuel:
-          type: integer
-          nullable: true
-        credited_entity:
-          type: integer
-          nullable: true
-        debited_entity:
-          type: integer
-          nullable: true
-        from_depot:
-          type: integer
-          nullable: true
         to_depot:
-          type: integer
-          nullable: true
-        export_country:
           type: integer
           nullable: true
     Pays:
