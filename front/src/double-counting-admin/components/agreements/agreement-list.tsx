@@ -79,7 +79,7 @@ const AgreementList = ({
       header: t("Quotas") + " " + currentYear,
       cell: (a) => (
         <Cell
-          text={`${a.quotas_progression ? Math.round(a.quotas_progression * 100) : "-"} %`}
+          text={`${a.quotas_progression ? Math.round(a.quotas_progression * 100) + "%" : "-"}`}
         />
       ),
     },
