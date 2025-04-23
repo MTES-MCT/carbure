@@ -1,6 +1,5 @@
 import useEntity from "common/hooks/entity"
-import { Confirm } from "common/components/dialog"
-import { Check } from "common/components/icons"
+import { Confirm } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import { PortalInstance } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -50,7 +49,6 @@ const ApplicationDetailsDialogValidateQuotas = ({
         </>
       }
       confirm={t("Valider")}
-      icon={Check}
       onClose={onClose}
       onConfirm={async () => {
         if (application) {
