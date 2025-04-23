@@ -17,6 +17,7 @@ import { ProductionHistoryTable } from "../production-history-table"
 import { t } from "i18next"
 import { useMatch } from "react-router-dom"
 import Badge from "@codegouvfr/react-dsfr/Badge"
+import { DoubleCountPeriod } from "./double-count-period"
 
 export type ErrorsDetailsDialogProps = {
   fileData: DoubleCountingFileInfo
@@ -58,6 +59,7 @@ export const ErrorsDetailsDialog = ({
         </Button>
       }
     >
+      <DoubleCountPeriod startYear={fileData.start_year} />
       <Notice variant="warning" icon="ri-error-warning-line">
         {t(
           `{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,

@@ -1,9 +1,8 @@
 import { AxiosError } from "axios"
 import useEntity from "common/hooks/entity"
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
-import { Form, useForm } from "common/components/form"
-import { Check } from "common/components/icons"
+import { Form, useForm } from "common/components/form2"
 import { FileListInput } from "common/components/inputs2"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
@@ -75,17 +74,17 @@ const DoubleCountingFilesCheckerDialog = ({
       }
       footer={
         <Button
-          submit="dc-request"
+          nativeButtonProps={{ form: "dc-checker" }}
           loading={uploadFiles.loading}
           disabled={!value.doubleCountingFiles}
-          variant="primary"
-          icon={Check}
-          action={submitFiles}
-          label={t("Vérifier les demandes")}
-        />
+          type="submit"
+          iconId="ri-check-line"
+        >
+          {t("Vérifier les demandes")}
+        </Button>
       }
     >
-      <Form id="dc-checker">
+      <Form id="dc-checker" onSubmit={submitFiles}>
         <p>
           {t(
             "Cet outil vous permet de faire remonter les erreurs de fichiers double comptage reçus. "
