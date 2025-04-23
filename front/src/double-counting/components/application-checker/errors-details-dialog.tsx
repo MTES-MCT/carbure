@@ -28,7 +28,7 @@ export const ErrorsDetailsDialog = ({
   onClose,
 }: ErrorsDetailsDialogProps) => {
   const { t } = useTranslation()
-  const isProducerMatch = useMatch("/org/:entity/settings*")
+  const isProducerMatch = useMatch("/org/:entity/double-counting/agreements/*")
 
   const [focus, setFocus] = useState("sourcing_forecast")
 
@@ -36,13 +36,18 @@ export const ErrorsDetailsDialog = ({
 
   return (
     <Dialog
-      fitContent
+      fullWidth
       onClose={onClose}
       header={
-        <Dialog.Title>
-          <Badge severity="warning">{t("À corriger")}</Badge>
-          {t("Correction du dossier double comptage")}
-        </Dialog.Title>
+        <>
+          <Dialog.Title>
+            <Badge severity="warning">{t("À corriger")}</Badge>
+            {t("Correction du dossier double comptage")}
+          </Dialog.Title>
+          <Dialog.Description>
+            <FileApplicationInfo fileData={fileData} />
+          </Dialog.Description>
+        </>
       }
       footer={
         <Button
@@ -53,8 +58,6 @@ export const ErrorsDetailsDialog = ({
         </Button>
       }
     >
-      <FileApplicationInfo fileData={fileData} />
-
       <Notice variant="warning" icon="ri-error-warning-line">
         {t(
           `{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,

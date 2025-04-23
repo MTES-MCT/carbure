@@ -28,7 +28,9 @@ export type RadioGroupProps<V extends RadioValueType> = Omit<
   options: OptionsProps<V>[]
   value?: V
   onChange?: (value: V) => void
-} & LabelProps
+} & Omit<LabelProps, "label"> & {
+    label?: LabelProps["label"]
+  }
 
 export const RadioGroup = <V extends RadioValueType>({
   options,

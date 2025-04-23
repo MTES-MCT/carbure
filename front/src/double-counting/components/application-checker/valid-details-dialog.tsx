@@ -25,7 +25,7 @@ export const ValidDetailsDialog = ({
 }: ValidDetailsDialogProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const isProducerMatch = useMatch("/org/:entity/settings*")
+  const isProducerMatch = useMatch("/org/:entity/double-counting/agreements/*")
 
   function showProductionSiteDialog() {
     if (isProducerMatch) {
@@ -58,10 +58,15 @@ export const ValidDetailsDialog = ({
       fullscreen
       onClose={onClose}
       header={
-        <Dialog.Title>
-          <Badge severity="success">{t("Valide")}</Badge>
-          {t("Dossier double comptage")}
-        </Dialog.Title>
+        <>
+          <Dialog.Title>
+            <Badge severity="success">{t("Valide")}</Badge>
+            {t("Dossier double comptage")}
+          </Dialog.Title>
+          <Dialog.Description>
+            <FileApplicationInfo fileData={fileData} />
+          </Dialog.Description>
+        </>
       }
       footer={
         <Button
@@ -74,8 +79,6 @@ export const ValidDetailsDialog = ({
         />
       }
     >
-      <FileApplicationInfo fileData={fileData} />
-
       {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
 
       <ApplicationTabs
