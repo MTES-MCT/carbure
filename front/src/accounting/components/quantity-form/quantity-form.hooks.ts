@@ -8,6 +8,7 @@ import { ExtendedUnit, Unit } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { FormManager } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
+import { FromDepotFormProps } from "../from-depot-form"
 
 type UseQuantityFormProps = {
   balance: Balance
@@ -55,7 +56,7 @@ type UseQuantityFormStepProps = {
 
   // Custom conversion function for the backend (default is the value passed as parameter)
   converter?: (value: number) => number
-  form: FormManager<QuantityFormProps>
+  form: FormManager<QuantityFormProps & FromDepotFormProps>
 }
 
 export const useQuantityFormStep = ({
@@ -73,6 +74,7 @@ export const useQuantityFormStep = ({
         debited_entity: entity.id,
         target_volume: converter(form.value.quantity!),
         target_emission: form.value.avoided_emissions ?? 0,
+        from_depot: form.value.from_depot!.id,
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
       }),

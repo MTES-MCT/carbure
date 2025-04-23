@@ -38,7 +38,9 @@ export const RecapOperation = ({
         })}
         description={
           balance.available_balance
-            ? formatUnit(balance.available_balance, { fractionDigits: 0 })
+            ? formatUnit(balance.available_balance, {
+                fractionDigits: 0,
+              })
             : ""
         }
       />

@@ -131,7 +131,7 @@ export const OperationDetail = () => {
         },
         { label: t("Catégorie"), value: operation.customs_category },
         { label: t("Biocarburant"), value: operation.biofuel },
-        operation.type === OperationType.INCORPORATION && {
+        {
           label: t("Quantité"),
           value: `${getOperationQuantity(
             operation,
@@ -148,31 +148,29 @@ export const OperationDetail = () => {
             })
           )}`,
         },
-        {
-          label:
-            operation.type === OperationType.INCORPORATION
-              ? t("Quantité renouvelable")
-              : t("Quantité"),
-          value: `${getOperationQuantity(
-            operation,
-            formatUnit(roundNumber(formatValue(operation.quantity), 2), {
-              fractionDigits: 2,
-              appendZeros: false,
-            })
-          )} / ${getOperationQuantity(
-            operation,
-            formatUnit(
-              CONVERSIONS.energy.MJ_TO_GJ(
-                roundNumber(formatValue(operation.quantity_mj), 2)
-              ),
-              {
+        operation.type === OperationType.INCORPORATION &&
+          operation.renewable_energy_share !== 1 && {
+            label: t("Quantité renouvelable"),
+            value: `${getOperationQuantity(
+              operation,
+              formatUnit(roundNumber(formatValue(operation.quantity), 2), {
                 fractionDigits: 2,
-                unit: ExtendedUnit.GJ,
                 appendZeros: false,
-              }
-            )
-          )}`,
-        },
+              })
+            )} / ${getOperationQuantity(
+              operation,
+              formatUnit(
+                CONVERSIONS.energy.MJ_TO_GJ(
+                  roundNumber(formatValue(operation.quantity_mj), 2)
+                ),
+                {
+                  fractionDigits: 2,
+                  unit: ExtendedUnit.GJ,
+                  appendZeros: false,
+                }
+              )
+            )}`,
+          },
         {
           label: t("Tonnes CO2 eq evitées"),
           value: formatNumber(formatValue(operation.avoided_emissions), {
