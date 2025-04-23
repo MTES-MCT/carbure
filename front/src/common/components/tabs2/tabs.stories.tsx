@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Tabs } from "./tabs"
-import { InboxArchiveFill, InboxArchiveLine } from "../icon"
 
 const meta: Meta<typeof Tabs> = {
   component: Tabs,
@@ -25,8 +24,8 @@ export const Default: Story = {}
 export const WithIcon: Story = {
   args: {
     tabs: [
-      { key: "1", label: "Tab 1", icon: InboxArchiveFill },
-      { key: "2", label: "Tab 2", icon: InboxArchiveFill },
+      { key: "1", label: "Tab 1", icon: "ri-inbox-archive-fill" },
+      { key: "2", label: "Tab 2", icon: "ri-inbox-archive-fill" },
     ],
   },
 }
@@ -37,13 +36,13 @@ export const WithIconActive: Story = {
       {
         key: "1",
         label: "Tab 1",
-        icon: InboxArchiveLine,
-        iconActive: InboxArchiveFill,
+        icon: "ri-inbox-archive-line",
+        iconActive: "ri-inbox-archive-fill",
       },
       {
         key: "2",
         label: "Tab 2",
-        icon: InboxArchiveLine,
+        icon: "ri-inbox-archive-line",
       },
     ],
   },

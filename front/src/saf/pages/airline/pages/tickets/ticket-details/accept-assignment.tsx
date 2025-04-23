@@ -81,13 +81,10 @@ export const AcceptAssignment = ({
       >
         <section>
           <Form id="accept-ticket" onSubmit={acceptTicket}>
-            <p>
-              {t(
+            <RadioGroup
+              label={t(
                 "Est-ce que ce ticket est concerné par une déclaration (ETS ou volontaire) ?"
               )}
-            </p>
-
-            <RadioGroup
               {...form.bind("ets_status")}
               required
               options={[
