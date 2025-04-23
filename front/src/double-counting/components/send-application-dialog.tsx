@@ -3,13 +3,12 @@ import useEntity from "common/hooks/entity"
 import { ProductionSite } from "common/types"
 import * as norm from "common/utils/normalizers"
 import Alert from "common/components/alert"
-import Autocomplete from "common/components/autocomplete"
+import { Autocomplete } from "common/components/autocomplete2"
 import { Button, MailTo } from "common/components/button"
-import Checkbox from "common/components/checkbox"
-import { Dialog } from "common/components/dialog"
+import { Dialog } from "common/components/dialog2"
 import { useForm } from "common/components/form"
 import { AlertTriangle, Return, Send } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { Checkbox, TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -92,60 +91,14 @@ export const SendApplicationProducerDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>
+    <Dialog
+      onClose={onClose}
+      header={
+        <Dialog.Title>
           <Trans>Envoyer la demande d'agrément</Trans>
-        </h1>
-      </header>
-
-      <main>
-        <section>
-          <p>
-            <Trans>
-              Votre fichier est valide. Vous pouvez maintenant transmettre la
-              demande d'agrément double comptage à la DGEC pour une vérification
-              approfondie.
-            </Trans>
-          </p>
-        </section>
-        <section>
-          {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
-        </section>
-        <section>
-          <TextInput label={t("Producteur")} value={entity.name} readOnly />
-          <Autocomplete
-            required
-            label={t("Site de production")}
-            getOptions={(query) => findProductionSites(query, entity.id)}
-            normalize={norm.normalizeProductionSite}
-            {...bind("productionSite")}
-          />
-          {fileData.has_dechets_industriels && (
-            <Checkbox
-              label={t(
-                "Je confirme avoir envoyé par email le formulaire mentionné ci-dessus. "
-              )}
-              required={true}
-              {...bind("formSent")}
-            />
-          )}
-        </section>
-
-        {error && (
-          <section ref={refToScroll}>
-            <Alert
-              variant="warning"
-              icon={AlertTriangle}
-              style={{ display: "inline-block" }}
-            >
-              {error}
-            </Alert>
-          </section>
-        )}
-      </main>
-
-      <footer>
+        </Dialog.Title>
+      }
+      footer={
         <Button
           loading={addApplication.loading}
           icon={Send}
@@ -158,9 +111,46 @@ export const SendApplicationProducerDialog = ({
           }
           action={saveApplication}
         />
+      }
+      fullWidth
+    >
+      <p>
+        <Trans>
+          Votre fichier est valide. Vous pouvez maintenant transmettre la
+          demande d'agrément double comptage à la DGEC pour une vérification
+          approfondie.
+        </Trans>
+      </p>
+      {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
 
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-      </footer>
+      <TextInput label={t("Producteur")} value={entity.name} disabled />
+      <Autocomplete
+        required
+        label={t("Site de production")}
+        getOptions={(query) => findProductionSites(query, entity.id)}
+        normalize={norm.normalizeProductionSite}
+        {...bind("productionSite")}
+      />
+      {fileData.has_dechets_industriels && (
+        <Checkbox
+          label={t(
+            "Je confirme avoir envoyé par email le formulaire mentionné ci-dessus. "
+          )}
+          {...bind("formSent")}
+        />
+      )}
+
+      {error && (
+        <section ref={refToScroll}>
+          <Alert
+            variant="warning"
+            icon={AlertTriangle}
+            style={{ display: "inline-block" }}
+          >
+            {error}
+          </Alert>
+        </section>
+      )}
     </Dialog>
   )
 }

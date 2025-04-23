@@ -6,9 +6,9 @@ import * as norm from "common/utils/normalizers"
 import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
 import { Button, ExternalLink } from "common/components/button"
-import { Dialog } from "common/components/dialog"
+import { Dialog } from "common/components/dialog2"
 import { useForm } from "common/components/form"
-import { AlertTriangle, Plus, Return } from "common/components/icons"
+import { AlertTriangle, Plus } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -98,48 +98,19 @@ export const SendApplicationAdminDialog = ({
   const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Ajout du dossier double comptage")}</h1>
-      </header>
-
-      <main>
-        <FileApplicationInfo fileData={fileData} />
-        <section>
-          <Autocomplete
-            required
-            label={t("Producteur")}
-            getOptions={findProducers}
-            normalize={norm.normalizeEntityPreview}
-            {...bind("producer")}
-          />
-          <Autocomplete
-            required
-            label={t("Site de production")}
-            getOptions={(query) => findProductionSites(query, producer)}
-            normalize={norm.normalizeProductionSite}
-            {...bind("productionSite")}
-          />
-          <TextInput
-            label={t("N° d'agrément lié à ce dossier")}
-            placeholder={t("Laisser vide si nouvelle demande")}
-            {...bind("certificate_id")}
-          />
-        </section>
-        {error && (
-          <section>
-            <Alert
-              variant="warning"
-              icon={AlertTriangle}
-              style={{ display: "inline-block" }}
-            >
-              {error}
-            </Alert>
-          </section>
-        )}
-      </main>
-
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={
+        <>
+          <Dialog.Title>
+            <Trans>Ajout du dossier double comptage</Trans>
+          </Dialog.Title>
+          <Dialog.Description>
+            <FileApplicationInfo fileData={fileData} />
+          </Dialog.Description>
+        </>
+      }
+      footer={
         <Button
           loading={addApplication.loading}
           icon={Plus}
@@ -150,9 +121,40 @@ export const SendApplicationAdminDialog = ({
           }
           action={saveApplication}
         />
-
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-      </footer>
+      }
+    >
+      <section>
+        <Autocomplete
+          required
+          label={t("Producteur")}
+          getOptions={findProducers}
+          normalize={norm.normalizeEntityPreview}
+          {...bind("producer")}
+        />
+        <Autocomplete
+          required
+          label={t("Site de production")}
+          getOptions={(query) => findProductionSites(query, producer)}
+          normalize={norm.normalizeProductionSite}
+          {...bind("productionSite")}
+        />
+        <TextInput
+          label={t("N° d'agrément lié à ce dossier")}
+          placeholder={t("Laisser vide si nouvelle demande")}
+          {...bind("certificate_id")}
+        />
+      </section>
+      {error && (
+        <section>
+          <Alert
+            variant="warning"
+            icon={AlertTriangle}
+            style={{ display: "inline-block" }}
+          >
+            {error}
+          </Alert>
+        </section>
+      )}
     </Dialog>
   )
 }

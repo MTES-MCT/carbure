@@ -78,6 +78,7 @@
   gap: var(--spacing-2w);
   padding: 0 var(--spacing-2w);
   flex: 1;
+  background: white;
 }
 
 .dialog__content--gap-lg {
