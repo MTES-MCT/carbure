@@ -1,8 +1,7 @@
 import useEntity from "common/hooks/entity"
-import { Button } from "common/components/button"
+import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Download } from "common/components/icons"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -98,9 +97,8 @@ export const AgreementDetailsDialog = () => {
         footer={
           application && (
             <Button
-              variant="primary"
-              action={() => openGenerateDecisionDialog()}
-              icon={Download}
+              onClick={() => openGenerateDecisionDialog()}
+              iconId="ri-download-line"
             >
               <Trans>Générer la décision</Trans>
             </Button>
@@ -123,13 +121,11 @@ export const AgreementDetailsDialog = () => {
             <section>
               <p>La demande est en cours de traitement...</p>
               <Button
-                variant="link"
+                customPriority="link"
                 asideY
-                action={() =>
-                  navigate(
-                    `/org/${entity.id}/double-counting/applications#application/${application.id}`
-                  )
-                }
+                linkProps={{
+                  to: `/org/${entity.id}/double-counting/applications#application/${application.id}`,
+                }}
               >
                 {"Voir la demande d'agrément à valider"}
               </Button>
