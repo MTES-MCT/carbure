@@ -1,7 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { Notice } from "common/components/notice"
 import { Dialog } from "common/components/dialog2"
-import { Download } from "common/components/icons"
 import { TextInput } from "common/components/inputs2"
 import { useNotify } from "common/components/notifications"
 import { PortalInstance } from "common/components/portal"
@@ -10,8 +9,8 @@ import { DoubleCountingApplicationDetails } from "double-counting/types"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api"
 import { useState } from "react"
-import Form from "common/components/form"
-import Button from "common/components/button"
+import { Form } from "common/components/form2"
+import { Button } from "common/components/button2"
 
 type GenerateDecisionDialogProps = {
   application: DoubleCountingApplicationDetails
@@ -44,11 +43,12 @@ const GenerateDecisionDialog = ({
       }
       footer={
         <Button
-          variant="primary"
-          icon={Download}
-          label={t("Générer la décision")}
-          submit="generate-decision"
-        />
+          iconId="ri-download-line"
+          nativeButtonProps={{ form: "generate-decision" }}
+          type="submit"
+        >
+          {t("Générer la décision")}
+        </Button>
       }
     >
       <Form id="generate-decision" onSubmit={downloadDoubleCountingApplication}>

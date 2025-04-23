@@ -2,12 +2,11 @@ import { findProductionSites } from "common/api"
 import useEntity from "common/hooks/entity"
 import { ProductionSite } from "common/types"
 import * as norm from "common/utils/normalizers"
-import Alert from "common/components/alert"
+import { Notice } from "common/components/notice"
 import { Autocomplete } from "common/components/autocomplete2"
-import { Button, MailTo } from "common/components/button"
+import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { useForm } from "common/components/form"
-import { AlertTriangle, Return, Send } from "common/components/icons"
 import { Checkbox, TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -101,16 +100,16 @@ export const SendApplicationProducerDialog = ({
       footer={
         <Button
           loading={addApplication.loading}
-          icon={Send}
-          label={t("Envoyer la demande")}
-          variant="primary"
+          iconId="ri-send-plane-line"
           disabled={
             addApplication.loading ||
             !value.productionSite ||
             (fileData.has_dechets_industriels && !value.formSent)
           }
-          action={saveApplication}
-        />
+          onClick={() => saveApplication()}
+        >
+          {t("Envoyer la demande")}
+        </Button>
       }
       fullWidth
     >
@@ -142,13 +141,9 @@ export const SendApplicationProducerDialog = ({
 
       {error && (
         <section ref={refToScroll}>
-          <Alert
-            variant="warning"
-            icon={AlertTriangle}
-            style={{ display: "inline-block" }}
-          >
+          <Notice variant="warning" icon="ri-alert-line">
             {error}
-          </Alert>
+          </Notice>
         </section>
       )}
     </Dialog>
@@ -183,58 +178,12 @@ function MissingAddress({
       {t(
         "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations de votre site de production."
       )}
-      <Button variant="link" action={goToProductionSites}>
+      <Button customPriority="link" onClick={goToProductionSites}>
         {"→ "}
         {t(`Editer le site de production {{productionSiteName}}`, {
           productionSiteName,
         })}
       </Button>
     </>
-  )
-}
-
-export const MailToDialog = ({
-  onClose,
-  fileData,
-}: {
-  onClose: () => void
-  fileData: DoubleCountingFileInfo
-}) => {
-  const { t } = useTranslation()
-  const entity = useEntity()
-  const dechetsIndustrielMessage = fileData.has_dechets_industriels
-    ? "%0D%0A-%20le%20questionnaire%20de%20processus%20de%20validation%20des%20mati%C3%A8res%20premieres%20rempli%20pour%20les%20d%C3%A9chets%20industriels%20mentionn%C3%A9s"
-    : ""
-  const bodyMessage = `Mesdames%2C%20Messieurs%2C%0D%0A%0D%0AJe%20vous%20faire%20parvenir%20le%20dossier%20de%20demande%20de%20reconnaissance%20au%20Double%20Comptage%20pour%20notre%20soci%C3%A9t%C3%A9.%0D%0AJ'ai%20joint%20%20%3A%0D%0A-%20le%20fichier%20Excel%20apr%C3%A8s%20validation%20avec%20la%20plateforme%20CarbuRe${dechetsIndustrielMessage}%0D%0A%0D%0ABien%20cordialement`
-
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Envoi du dossier double comptage")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <p style={{ textAlign: "left" }}>
-            {t(
-              "Votre fichier est valide. Vous pouvez le transmettre par email à la DGEC pour une vérification approfondie à l'adresse carbure@beta.gouv.fr en cliquant ci-dessous : "
-            )}
-          </p>
-          {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
-          <MailTo
-            user="carbure"
-            host="beta.gouv.fr"
-            subject={`[CarbuRe - Double comptage] Demande de ${entity.name}`}
-            body={bodyMessage}
-          >
-            <Trans>Envoyer la demande par email</Trans>
-          </MailTo>
-        </section>
-      </main>
-
-      <footer>
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-      </footer>
-    </Dialog>
   )
 }
