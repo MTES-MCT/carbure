@@ -160,6 +160,10 @@ section.actionbar {
   grid-gap: var(--spacing-s);
 }
 
+.grid--gap-xl {
+  grid-gap: var(--spacing-4w);
+}
+
 .grid > * {
   counter-increment: grid-item;
 }
@@ -221,16 +225,32 @@ hr {
   gap: var(--spacing-3v);
 }
 
+.box--spacing-xs {
+  padding: var(--spacing-3v);
+}
+
 .box--gap-sm {
   gap: var(--spacing-2w);
+}
+
+.box--spacing-sm {
+  padding: var(--spacing-2w);
 }
 
 .box--gap-md {
   gap: var(--spacing-3w);
 }
 
+.box--spacing-md {
+  padding: var(--spacing-3w);
+}
+
 .box--gap-lg {
   gap: var(--spacing-4w);
+}
+
+.box--spacing-lg {
+  padding: var(--spacing-4w);
 }
 
 .ellipsis {

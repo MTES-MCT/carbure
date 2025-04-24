@@ -46,6 +46,7 @@ const Teneur = () => {
         objective={objective}
         targetType={targetType}
         sectorObjectives={result?.sectors ?? []}
+        mainObjective={result?.global}
       />
     ))
   }

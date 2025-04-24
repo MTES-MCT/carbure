@@ -26,6 +26,7 @@ with open(filename) as csvfile:
         is_displayed = row[7]
         compat_essence = row[8]
         compat_diesel = row[9]
+        renewable_energy_share = row[10]
         obj, created = Biocarburant.objects.update_or_create(
             code=code,
             defaults={
@@ -39,5 +40,6 @@ with open(filename) as csvfile:
                 "is_displayed": is_displayed,
                 "compatible_essence": compat_essence,
                 "compatible_diesel": compat_diesel,
+                "renewable_energy_share": renewable_energy_share,
             },
         )

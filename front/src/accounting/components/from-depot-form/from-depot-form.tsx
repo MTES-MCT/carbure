@@ -47,7 +47,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
               t={t}
               values={{
                 depot: depot.name,
-                quantity: formatUnit(depot.quantity.credit, {
+                quantity: formatUnit(depot.available_balance, {
                   fractionDigits: 0,
                 }),
               }}
@@ -58,15 +58,15 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
       </Autocomplete>
       {value.from_depot && (
         <>
-          {value.from_depot.quantity.credit &&
-          value.from_depot.quantity.credit > 0 ? (
+          {value.from_depot.available_balance &&
+          value.from_depot.available_balance > 0 ? (
             <Notice noColor variant="info">
               <Trans
                 components={{ strong: <strong /> }}
                 t={t}
                 values={{
                   depot: value.from_depot.name,
-                  quantity: formatUnit(value.from_depot.quantity.credit, {
+                  quantity: formatUnit(value.from_depot.available_balance, {
                     fractionDigits: 0,
                   }),
                 }}
@@ -74,7 +74,7 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
               />
             </Notice>
           ) : null}
-          {value.from_depot.quantity.credit === 0 ? (
+          {value.from_depot.available_balance === 0 ? (
             <Notice noColor variant="warning">
               <Trans
                 t={t}
@@ -98,8 +98,8 @@ export const FromDepotSummary = ({
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   if (
-    !values.from_depot?.quantity?.credit ||
-    values.from_depot.quantity.credit <= 0
+    !values.from_depot?.available_balance ||
+    values.from_depot.available_balance <= 0
   ) {
     return null
   }
@@ -112,7 +112,7 @@ export const FromDepotSummary = ({
       />
       <OperationText
         title={t("Solde disponible")}
-        description={formatUnit(values.from_depot.quantity.credit, {
+        description={formatUnit(values.from_depot.available_balance, {
           fractionDigits: 0,
         })}
       />
