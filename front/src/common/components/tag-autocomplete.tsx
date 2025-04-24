@@ -68,6 +68,7 @@ function TagAutocomplete<T, V = T>({
             onChange={(e) => autocomplete.onQuery(e.target.value)}
             onKeyDown={autocomplete.onKeyDown}
             style={{ padding: 0 }}
+            required={props.required && (value?.length ?? 0) === 0}
           />
         </TagGroup>
       </Field>

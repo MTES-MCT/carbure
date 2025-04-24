@@ -242,11 +242,13 @@ const DeclareTeneurDialogContent = ({
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
   const form = useForm<DeclareTeneurDialogForm>({})
+
   const quantityFormStep = useQuantityFormStep({
-    balance: form.value.balance!,
+    balance: form.value.balance,
     converter: CONVERSIONS.energy.GJ_TO_MJ,
     form,
   })
+
   const steps = [
     biofuelFormStep(form.value),
     quantityFormStep,
