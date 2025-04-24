@@ -50,7 +50,7 @@ export const useQuantityForm = ({
 }
 
 type UseQuantityFormStepProps = {
-  balance: Balance
+  balance?: Balance
   // Unit of the quantity used by the backend (default is the entity preferred unit)
   backendUnit?: Unit | ExtendedUnit
 
@@ -67,16 +67,19 @@ export const useQuantityFormStep = ({
   const entity = useEntity()
 
   return quantityFormStep(form.value, {
-    onClick: () =>
-      simulate(entity.id, {
+    onClick: () => {
+      if (!balance) return Promise.resolve()
+
+      return simulate(entity.id, {
         biofuel: balance.biofuel.id,
         customs_category: balance.customs_category,
         debited_entity: entity.id,
         target_volume: converter(form.value.quantity!),
         target_emission: form.value.avoided_emissions ?? 0,
-        from_depot: form.value.from_depot!.id,
+        from_depot: form.value.from_depot?.id,
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
-      }),
+      })
+    },
   })
 }
