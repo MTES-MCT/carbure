@@ -63,6 +63,7 @@ export const useQuantityFormStep = ({
   balance,
   converter = (value) => value,
   form,
+  backendUnit,
 }: UseQuantityFormStepProps) => {
   const entity = useEntity()
 
@@ -77,6 +78,7 @@ export const useQuantityFormStep = ({
         target_volume: converter(form.value.quantity!),
         target_emission: form.value.avoided_emissions ?? 0,
         from_depot: form.value.from_depot?.id,
+        unit: backendUnit,
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
       })

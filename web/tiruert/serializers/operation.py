@@ -164,9 +164,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
             else:
                 validated_data["status"] = Operation.PENDING
 
-            # Set renewable_energy_share based on the biofuel
-            validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
-
             # Create the operation
             operation = Operation.objects.create(**validated_data)
 
