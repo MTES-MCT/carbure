@@ -71,12 +71,14 @@ class BalanceService:
         """
         Updates the balance entry with the details of the operation
         """
+        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
-            balance[key][teneur_type] += detail.volume * conversion_factor * operation.renewable_energy_share
+            balance[key][teneur_type] += quantity
 
         quantity_type = "credit" if operation.is_credit(entity_id) else "debit"
-        balance[key]["quantity"][quantity_type] += detail.volume * conversion_factor * operation.renewable_energy_share
+        balance[key]["quantity"][quantity_type] += quantity
 
         return balance
 
@@ -85,9 +87,8 @@ class BalanceService:
         Updates the balance entry with the details of the operation
         """
         volume_sign = 1 if operation.is_credit(entity_id) else -1
-        balance[key]["available_balance"] += (
-            detail.volume * volume_sign * conversion_factor * operation.renewable_energy_share
-        )
+        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+        balance[key]["available_balance"] += quantity * volume_sign
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
         return
 
