@@ -1,12 +1,12 @@
-import { createOperationWithSimulation } from "accounting/api/operations"
+import { createOperation } from "accounting/api/operations"
 import { useMutation } from "common/hooks/async"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
 import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { CONVERSIONS, formatUnit } from "common/utils/formatters"
-import { ExtendedUnit, Unit } from "common/types"
+import { formatUnit } from "common/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -24,24 +24,17 @@ export const useDeclareTeneurDialog = ({
   const { t } = useTranslation()
 
   const onSubmit = () =>
-    createOperationWithSimulation(entity.id, {
-      simulation: {
-        target_volume: CONVERSIONS.energy.GJ_TO_MJ(values.quantity!),
-        target_emission: values.avoided_emissions!,
-        unit: Unit.MJ,
-      },
-      operation: {
-        type: CreateOperationType.TENEUR,
-      },
+    createOperation(entity.id, {
+      type: CreateOperationType.TENEUR,
       customs_category: values.balance!.customs_category,
       biofuel: values.balance!.biofuel?.id ?? null,
       debited_entity: entity.id,
+      lots: values.selected_lots!,
     })
 
   const mutation = useMutation(onSubmit, {
     invalidates: ["teneur-objectives"],
     onSuccess: () => {
-      onClose()
       onOperationCreated()
       notify(
         t(
@@ -54,6 +47,7 @@ export const useDeclareTeneurDialog = ({
         ),
         { variant: "success" }
       )
+      onClose()
     },
     onError: () => {
       notify(t("Une erreur est survenue lors de la mise en teneur."), {

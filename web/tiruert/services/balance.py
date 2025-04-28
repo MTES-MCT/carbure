@@ -76,7 +76,9 @@ class BalanceService:
             balance[key][teneur_type] += detail.volume * conversion_factor * operation.renewable_energy_share
 
         quantity_type = "credit" if operation.is_credit(entity_id) else "debit"
-        balance[key]["quantity"][quantity_type] += detail.volume * conversion_factor
+        # If the operation is an incorporation, we need to use the renewable energy share to calculate the quantity
+        renewable_energy_share = operation.renewable_energy_share if operation.type == Operation.INCORPORATION else 1
+        balance[key]["quantity"][quantity_type] += detail.volume * conversion_factor * renewable_energy_share
 
         return balance
 
@@ -85,7 +87,9 @@ class BalanceService:
         Updates the balance entry with the details of the operation
         """
         volume_sign = 1 if operation.is_credit(entity_id) else -1
-        balance[key]["available_balance"] += detail.volume * volume_sign * conversion_factor
+        # If the operation is an incorporation, we need to use the renewable energy share to calculate the quantity
+        renewable_energy_share = operation.renewable_energy_share if operation.type == Operation.INCORPORATION else 1
+        balance[key]["available_balance"] += detail.volume * volume_sign * conversion_factor * renewable_energy_share
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
         return
 

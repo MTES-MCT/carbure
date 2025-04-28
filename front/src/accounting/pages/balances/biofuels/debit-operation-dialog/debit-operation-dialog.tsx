@@ -8,6 +8,7 @@ import { Button } from "common/components/button2"
 import { CessionDialog } from "./cession-dialog"
 import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
+
 interface DebitOperationDialogProps {
   onClose: () => void
   balance: Balance
@@ -73,7 +74,6 @@ export const DebitOperationDialog = ({
               // },
               // {
               //   label: formatOperationType(OperationType.EXPORTATION),
-              //   hintText: "Additional information",
               //   value: OperationType.EXPORTATION,
               // },
             ]}

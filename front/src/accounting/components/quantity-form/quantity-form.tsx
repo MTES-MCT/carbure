@@ -5,13 +5,11 @@ import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
 import { useState } from "react"
-import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
 import { useQuantityForm } from "./quantity-form.hooks"
 import { ExtendedUnit, Unit } from "common/types"
-import { formatNumber } from "common/utils/formatters"
 
 type QuantityFormComponentProps = {
   balance: Balance
@@ -34,7 +32,26 @@ type QuantityFormComponentProps = {
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
 export const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
-export const QuantityForm = ({
+const AvoidedEmissionsSection = () => {
+  const { value, bind } = useFormContext<QuantityFormProps>()
+  const { t } = useTranslation()
+
+  if (!value.avoided_emissions_min || !value.avoided_emissions_max) {
+    return null
+  }
+
+  return (
+    <NumberInput
+      label={t("Saisir un montant en tCO2 évitées")}
+      min={formatEmissionMin(value.avoided_emissions_min)}
+      max={formatEmissionMax(value.avoided_emissions_max)}
+      {...bind("avoided_emissions")}
+      required
+    />
+  )
+}
+
+const QuantitySection = ({
   balance,
   depot_quantity_max,
   type,
@@ -67,7 +84,8 @@ export const QuantityForm = ({
       setFieldError(
         "quantity",
         t(
-          "La quantité déclarée est supérieure à la quantité maximale autorisée. Merci de modifier la quantité."
+          "La quantité déclarée est supérieure à la quantité maximale autorisée ({{max}}). Merci de modifier la quantité.",
+          { max: formatUnit(depot_quantity_max, { fractionDigits: 0 }) }
         )
       )
       return
@@ -97,6 +115,8 @@ export const QuantityForm = ({
     setQuantityDeclared(false)
   }
 
+  const quantityBind = bind("quantity", { showError: true })
+
   return (
     <>
       <NumberInput
@@ -108,19 +128,14 @@ export const QuantityForm = ({
             declareQuantity()
           }
         }}
-        {...bind("quantity")}
+        {...quantityBind}
         addon={
           <>
             {!quantityDeclared && (
               <Button
                 onClick={declareQuantity}
                 loading={mutation.loading}
-                disabled={
-                  !value.quantity ||
-                  value.quantity === 0 ||
-                  (depot_quantity_max !== undefined &&
-                    value.quantity > depot_quantity_max)
-                }
+                disabled={!value.quantity || value.quantity === 0}
               >
                 {t("Valider la quantité")}
               </Button>
@@ -132,10 +147,20 @@ export const QuantityForm = ({
             )}
           </>
         }
-        stateRelatedMessage={t(
-          "Nous pourrons ensuite vous indiquer les tC02 évitées équivalentes pour cette quantité."
-        )}
-        state={quantityDeclared ? "default" : "info"}
+        stateRelatedMessage={
+          quantityBind.state === "error"
+            ? quantityBind.stateRelatedMessage
+            : t(
+                "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
+              )
+        }
+        state={
+          quantityBind.state === "error"
+            ? "error"
+            : quantityDeclared
+              ? "default"
+              : "info"
+        }
         disabled={quantityDeclared || mutation.loading}
         required
       />
@@ -144,45 +169,36 @@ export const QuantityForm = ({
       value.avoided_emissions_max &&
       value.avoided_emissions_min > 0 &&
       value.avoided_emissions_max > 0 ? (
-        <>
-          <Notice noColor variant="info">
-            {value.avoided_emissions_min === value.avoided_emissions_max ? (
-              <Trans
-                components={{ strong: <strong /> }}
-                t={t}
-                values={{
-                  quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 10,
-                    appendZeros: false,
-                  }),
-                  value: value.avoided_emissions_min,
-                }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tC02 évitées</strong>."
-              />
-            ) : (
-              <Trans
-                components={{ strong: <strong /> }}
-                t={t}
-                values={{
-                  quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 10,
-                    appendZeros: false,
-                  }),
-                  min: value.avoided_emissions_min,
-                  max: value.avoided_emissions_max,
-                }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tC02 évitées</strong>."
-              />
-            )}
-          </Notice>
-          <NumberInput
-            label={t("Saisir un montant en tCO2 évitées")}
-            min={formatEmissionMin(value.avoided_emissions_min)}
-            max={formatEmissionMax(value.avoided_emissions_max)}
-            {...bind("avoided_emissions")}
-            required
-          />
-        </>
+        <Notice noColor variant="info">
+          {value.avoided_emissions_min === value.avoided_emissions_max ? (
+            <Trans
+              components={{ strong: <strong /> }}
+              t={t}
+              values={{
+                quantity: formatUnit(value.quantity!, {
+                  fractionDigits: 10,
+                  appendZeros: false,
+                }),
+                value: value.avoided_emissions_min,
+              }}
+              defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
+            />
+          ) : (
+            <Trans
+              components={{ strong: <strong /> }}
+              t={t}
+              values={{
+                quantity: formatUnit(value.quantity!, {
+                  fractionDigits: 10,
+                  appendZeros: false,
+                }),
+                min: value.avoided_emissions_min,
+                max: value.avoided_emissions_max,
+              }}
+              defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
+            />
+          )}
+        </Notice>
       ) : null}
       {quantityDeclared && value.avoided_emissions_min === 0 && (
         <Notice noColor variant="warning">
@@ -195,35 +211,30 @@ export const QuantityForm = ({
   )
 }
 
-export const QuantitySummary = ({
-  values,
-  unit,
-}: {
-  values: QuantityFormProps
-  unit?: Unit | ExtendedUnit
-}) => {
-  const { t } = useTranslation()
-  const { formatUnit } = useUnit(unit)
-  if (!values.quantity || !values.avoided_emissions) {
-    return null
-  }
-
+export const QuantityForm = ({
+  balance,
+  depot_quantity_max,
+  type,
+  unit: customUnit,
+  backendUnit: customBackendUnit,
+  depotId,
+  converter,
+}: QuantityFormComponentProps) => {
   return (
     <>
-      <OperationText
-        title={t("Quantité")}
-        description={formatUnit(values.quantity, {
-          fractionDigits: 10,
-          appendZeros: false,
-        })}
+      <QuantitySection
+        balance={balance}
+        depot_quantity_max={depot_quantity_max}
+        type={type}
+        unit={customUnit}
+        backendUnit={customBackendUnit}
+        depotId={depotId}
+        converter={converter}
       />
-      <OperationText
-        title={t("TCO2 évitées équivalentes")}
-        description={formatNumber(values.avoided_emissions, {
-          fractionDigits: 10,
-          appendZeros: false,
-        })}
-      />
+      <AvoidedEmissionsSection />
     </>
   )
 }
+
+QuantityForm.Quantity = QuantitySection
+QuantityForm.AvoidedEmissions = AvoidedEmissionsSection

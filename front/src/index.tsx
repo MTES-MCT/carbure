@@ -23,6 +23,11 @@ async function enableMocking() {
   // return worker.start()
 }
 
+// After adding lazy loading inside routes, we need to reload the page when a preload error occurs (files saved in the cache are outdated and need to be reloaded)
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload()
+})
+
 enableMocking().then(() =>
   createRoot(document.getElementById("root")!).render(
     <SentryProvider>
