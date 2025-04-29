@@ -32,6 +32,8 @@ class BaseBalanceSerializer(serializers.Serializer):
 class BalanceSerializer(BaseBalanceSerializer):
     customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
     biofuel = BalanceBiofuelSerializer()
+    ghg_reduction_min = serializers.FloatField()
+    ghg_reduction_max = serializers.FloatField()
 
 
 class BalanceBySectorSerializer(BaseBalanceSerializer):

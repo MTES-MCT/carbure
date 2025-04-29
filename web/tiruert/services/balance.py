@@ -9,6 +9,7 @@ class BalanceService:
     GROUP_BY_CATEGORY = "customs_category"
     GROUP_BY_LOT = "lot"
     GROUP_BY_DEPOT = "depot"
+    GROUP_BY_ALL = [GROUP_BY_SECTOR, GROUP_BY_CATEGORY, GROUP_BY_LOT, GROUP_BY_DEPOT]
 
     @staticmethod
     def _get_key(operation, group_by, detail=None, depot=None):
@@ -93,6 +94,19 @@ class BalanceService:
         balance[key]["ghg_reduction_red_ii"] = detail.lot.ghg_reduction_red_ii
         return
 
+    def _update_ghg_min_max(balance, key, detail):
+        """
+        Updates the GHG min and max values in the balance entry
+        """
+        balance[key]["ghg_reduction_min"] = min(
+            filter(None, [balance[key].get("ghg_reduction_min"), detail.lot.ghg_reduction_red_ii])
+        )
+
+        balance[key]["ghg_reduction_max"] = max(
+            filter(None, [balance[key].get("ghg_reduction_max"), detail.lot.ghg_reduction_red_ii])
+        )
+        return
+
     @staticmethod
     def calculate_balance(operations, entity_id, group_by, unit, date_from=None):
         """
@@ -135,6 +149,9 @@ class BalanceService:
                 # Update quantity and teneur only if the operation date is after the date_from
                 if date_from is None or operation.created_at >= date_from:
                     BalanceService._update_quantity_and_teneur(balance, key, operation, detail, entity_id, conversion_factor)
+
+                if group_by not in BalanceService.GROUP_BY_ALL:
+                    BalanceService._update_ghg_min_max(balance, key, detail)
 
             if operation.status == Operation.PENDING:
                 balance[key]["pending_operations"] += 1

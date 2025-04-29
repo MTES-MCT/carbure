@@ -72,7 +72,7 @@ class BalanceActionMixin:
     def balance(self, request, pk=None):
         entity_id = request.entity.id
         unit = request.unit
-        group_by = request.query_params.get("group_by", "")
+        group_by = request.query_params.get("group_by", None)
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
 
