@@ -90,6 +90,7 @@ class BalanceService:
         quantity = detail.volume * conversion_factor * operation.renewable_energy_share
         balance[key]["available_balance"] += quantity * volume_sign
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
+        balance[key]["ghg_reduction_red_ii"] = detail.lot.ghg_reduction_red_ii
         return
 
     @staticmethod

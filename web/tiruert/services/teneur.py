@@ -266,13 +266,13 @@ class TeneurService:
         volumes, emissions, lot_ids = np.array([]), np.array([]), np.array([])
         enforced_volumes = np.array([]) if "enforced_volumes" in data else None
 
-        ges_bound_min = data.get("ges_bound_min", 0)
-        ges_bound_max = data.get("ges_bound_max", 100)
+        ges_bound_min = data.get("ges_bound_min", 50)
+        ges_bound_max = data.get("ges_bound_max", 125)
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
 
-            if value["emission_rate_per_mj"] < ges_bound_min or value["emission_rate_per_mj"] > ges_bound_max:
+            if value["ghg_reduction_red_ii"] <= ges_bound_min or value["ghg_reduction_red_ii"] >= ges_bound_max:
                 continue
 
             volumes = np.append(volumes, value["available_balance"])
