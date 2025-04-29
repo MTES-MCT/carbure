@@ -16,6 +16,8 @@ class SimulationInputSerializer(serializers.ModelSerializer):
             "enforced_volumes",
             "unit",
             "from_depot",
+            "ges_bound_min",
+            "ges_bound_max",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -29,6 +31,8 @@ class SimulationInputSerializer(serializers.ModelSerializer):
     max_n_batches = serializers.IntegerField(required=False)
     enforced_volumes = serializers.ListField(child=serializers.IntegerField(), required=False)
     unit = serializers.CharField(required=False)
+    ges_bound_min = serializers.FloatField(required=False)
+    ges_bound_max = serializers.FloatField(required=False)
 
 
 class SimulationLotOutputSerializer(serializers.Serializer):
@@ -52,6 +56,8 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
             "target_volume",
             "unit",
             "from_depot",
+            "ges_bound_min",
+            "ges_bound_max",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -62,6 +68,8 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
 
     target_volume = serializers.FloatField(required=True)
     unit = serializers.CharField(required=False)
+    ges_bound_min = serializers.FloatField(required=False)
+    ges_bound_max = serializers.FloatField(required=False)
 
 
 class SimulationMinMaxOutputSerializer(serializers.Serializer):
