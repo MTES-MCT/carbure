@@ -7,6 +7,7 @@ import cl from "clsx"
 import { Button } from "../button2"
 import { useStepper } from "./stepper.provider"
 import { useTranslation } from "react-i18next"
+import { useMutation } from "common/hooks/async"
 
 type AdditionalStepperProps = {
   marginBottom?: boolean
@@ -32,13 +33,18 @@ export const BaseStepper = ({
 const StepperNextButton = () => {
   const { goToNextStep, currentStep, nextStep } = useStepper()
   const { t } = useTranslation()
-
+  const mutation = useMutation(async () => {
+    if (currentStep?.onClick) {
+      await currentStep.onClick()
+    }
+    goToNextStep()
+  })
   if (!nextStep) return null
 
   return (
     <Button
       priority="secondary"
-      onClick={goToNextStep}
+      onClick={mutation.execute}
       disabled={
         currentStep.allowNextStep !== undefined
           ? !currentStep.allowNextStep
@@ -46,6 +52,7 @@ const StepperNextButton = () => {
       }
       iconId="ri-arrow-right-s-line"
       iconPosition="right"
+      loading={mutation.loading}
     >
       {t("Suivant")}
     </Button>

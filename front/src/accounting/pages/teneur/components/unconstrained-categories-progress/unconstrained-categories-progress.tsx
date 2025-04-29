@@ -5,7 +5,8 @@ import { RecapData } from "../recap-data"
 import { UnconstrainedCategoryObjective } from "../../types"
 import { CardGrid } from "../card-grid"
 import { ExtendedUnit } from "common/types"
-import { formatUnit } from "common/utils/formatters"
+import { floorNumber, formatUnit } from "common/utils/formatters"
+import { useFormatters } from "accounting/hooks/formatters"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
@@ -17,27 +18,22 @@ export const UnconstrainedCategoriesProgress = ({
   onCategoryClick,
 }: UnconstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
-
+  const { formatCategory } = useFormatters()
   return (
-    <ObjectiveSection
-      title={t("Catégories ni objectivées ni plafonnées")}
-      size="small"
-    >
+    <ObjectiveSection title={t("Autres catégories")} size="small">
       <CardGrid>
         {categories?.map((category) => (
           <CardProgress
             key={category.code}
-            title={category.code}
+            title={formatCategory(category.code)}
             onClick={() => onCategoryClick(category)}
+            mainValue={floorNumber(
+              category.teneur_declared + category.teneur_declared_month,
+              0
+            )}
+            mainText={t("GJ")}
           >
             <ul>
-              <li>
-                <RecapData.TeneurDeclared
-                  value={formatUnit(category.teneur_declared, ExtendedUnit.GJ, {
-                    fractionDigits: 0,
-                  })}
-                />
-              </li>
               <li>
                 <RecapData.TeneurDeclaredMonth
                   value={formatUnit(

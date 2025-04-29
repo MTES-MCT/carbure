@@ -6,7 +6,7 @@ import { CategoryObjective, TargetType } from "../../types"
 import { CardGrid } from "../card-grid"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber, formatUnit } from "common/utils/formatters"
+import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -32,14 +32,33 @@ export const ObjectivizedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={category.code}
-            baseQuantity={ceilNumber(category.teneur_declared)}
-            targetQuantity={ceilNumber(category.target)}
-            declaredQuantity={ceilNumber(category.teneur_declared_month)}
+            mainValue={
+              floorNumber(category.teneur_declared, 0) +
+              floorNumber(category.teneur_declared_month, 0)
+            }
+            mainText={t("GJ")}
+            description={t(
+              "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
+              {
+                date: "2025",
+                objective: formatUnit(category.target, ExtendedUnit.GJ, {
+                  fractionDigits: 0,
+                }),
+                target_percent: formatNumber(category.target_percent, {
+                  fractionDigits: 2,
+                  appendZeros: false,
+                }),
+              }
+            )}
+            baseQuantity={floorNumber(category.teneur_declared, 0)}
+            targetQuantity={floorNumber(category.target, 0)}
+            declaredQuantity={floorNumber(category.teneur_declared_month, 0)}
             badge={
               <CardProgress.DefaultBadge
-                targetQuantity={category.target}
+                targetQuantity={floorNumber(category.target, 0)}
                 declaredQuantity={
-                  category.teneur_declared + category.teneur_declared_month
+                  floorNumber(category.teneur_declared, 0) +
+                  floorNumber(category.teneur_declared_month, 0)
                 }
               />
             }
@@ -64,7 +83,6 @@ export const ObjectivizedCategoriesProgress = ({
                     ExtendedUnit.GJ,
                     {
                       fractionDigits: 0,
-                      mode: "ceil",
                     }
                   )}
                 />

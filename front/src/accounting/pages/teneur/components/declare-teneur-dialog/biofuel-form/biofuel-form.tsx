@@ -7,11 +7,11 @@ import useEntity from "common/hooks/entity"
 import { CategoryEnum } from "common/types"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
-import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
+import { Balance } from "accounting/types"
 
 export type BiofuelFormProps = {
-  balance?: apiTypes["Balance"]
+  balance?: Balance
 }
 
 type BiofuelFormComponentProps = {
