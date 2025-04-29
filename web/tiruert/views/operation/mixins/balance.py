@@ -75,10 +75,20 @@ class BalanceActionMixin:
         group_by = request.query_params.get("group_by", None)
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
+        ges_bound_min = request.query_params.get("ges_bound_min", None)
+        ges_bound_max = request.query_params.get("ges_bound_max", None)
 
         operations = self.filter_queryset(self.get_queryset())
 
-        balance = BalanceService.calculate_balance(operations, entity_id, group_by, unit, date_from)
+        balance = BalanceService.calculate_balance(
+            operations,
+            entity_id,
+            group_by,
+            unit,
+            date_from,
+            ges_bound_min,
+            ges_bound_max,
+        )
 
         # Convert balance to a list of dictionaries for serialization
         serializer_class = {

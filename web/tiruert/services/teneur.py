@@ -257,17 +257,19 @@ class TeneurService:
         if data.get("from_depot") is not None:
             operations = operations.filter(to_depot=data["from_depot"])
 
+        ges_bound_min = data.get("ges_bound_min", None)
+        ges_bound_max = data.get("ges_bound_max", None)
+
         # Calculate balance of debited entity, for each lot, always in liters
-        balance = BalanceService.calculate_balance(operations, data["debited_entity"].id, "lot", "l")
+        balance = BalanceService.calculate_balance(
+            operations, data["debited_entity"].id, "lot", "l", None, ges_bound_min, ges_bound_max
+        )
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
         # For each we have something like:
         # array([30.52876597, 42.1162736 , 30.07384206, 25.05628985, 85.52717505])
         volumes, emissions, lot_ids = np.array([]), np.array([]), np.array([])
         enforced_volumes = np.array([]) if "enforced_volumes" in data else None
-
-        ges_bound_min = data.get("ges_bound_min", 50)
-        ges_bound_max = data.get("ges_bound_max", 125)
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key

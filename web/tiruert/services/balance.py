@@ -64,6 +64,8 @@ class BalanceService:
             "declared_teneur": 0,
             "available_balance": 0,
             "unit": unit,
+            "ghg_reduction_min": None,
+            "ghg_reduction_max": None,
         }
 
         return entry
@@ -108,7 +110,7 @@ class BalanceService:
         return
 
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit, date_from=None):
+    def calculate_balance(operations, entity_id, group_by, unit, date_from=None, ges_bound_min=None, ges_bound_max=None):
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
@@ -133,6 +135,12 @@ class BalanceService:
             conversion_factor = BalanceService._get_conversion_factor(operation, unit)
 
             for detail in operation.details.all():
+                if ges_bound_min is not None and ges_bound_max is not None:
+                    if detail.lot.ghg_reduction_red_ii <= float(ges_bound_min) or detail.lot.ghg_reduction_red_ii >= float(
+                        ges_bound_max
+                    ):
+                        continue
+
                 key = BalanceService._get_key(operation, group_by, detail, depot)
 
                 if group_by != BalanceService.GROUP_BY_CATEGORY:
@@ -150,6 +158,7 @@ class BalanceService:
                 if date_from is None or operation.created_at >= date_from:
                     BalanceService._update_quantity_and_teneur(balance, key, operation, detail, entity_id, conversion_factor)
 
+                # Update GHG reduction min and max values
                 if group_by not in BalanceService.GROUP_BY_ALL:
                     BalanceService._update_ghg_min_max(balance, key, detail)
 
