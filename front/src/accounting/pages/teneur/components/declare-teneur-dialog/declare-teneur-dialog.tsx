@@ -241,7 +241,12 @@ const DeclareTeneurDialogContent = ({
 
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
-  const form = useForm<DeclareTeneurDialogForm>({})
+
+  const form = useForm<DeclareTeneurDialogForm>({
+    gesBoundMin: 50,
+    gesBoundMax: 125,
+  })
+
   const backendUnit = Unit.MJ
 
   const quantityFormStep = useQuantityFormStep({

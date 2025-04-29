@@ -9,9 +9,12 @@ import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 import { CONVERSIONS } from "common/utils/formatters"
 import { Balance } from "accounting/types"
+import { DoubleRange } from "common/components/inputs2"
 
 export type BiofuelFormProps = {
   balance?: Balance
+  gesBoundMin?: number
+  gesBoundMax?: number
 }
 
 type BiofuelFormComponentProps = {
@@ -29,23 +32,34 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
   })
 
   return (
-    <Autocomplete
-      label={t("Sélectionnez un biocarburant")}
-      placeholder={t("Ex: EMHV")}
-      options={result.result?.data?.results ?? []}
-      normalize={(balance) => ({
-        value: {
-          ...balance,
-          available_balance: CONVERSIONS.energy.MJ_TO_GJ(
-            balance.available_balance
-          ),
-        },
-        label: balance.biofuel.code,
-      })}
-      loading={result.loading}
-      required
-      {...bind("balance")}
-    />
+    <>
+      <Autocomplete
+        label={t("Sélectionnez un biocarburant")}
+        placeholder={t("Ex: EMHV")}
+        options={result.result?.data?.results ?? []}
+        normalize={(balance) => ({
+          value: {
+            ...balance,
+            available_balance: CONVERSIONS.energy.MJ_TO_GJ(
+              balance.available_balance
+            ),
+          },
+          label: balance.biofuel.code,
+        })}
+        loading={result.loading}
+        required
+        {...bind("balance")}
+      />
+
+      <DoubleRange
+        min={50}
+        max={125}
+        suffix="%"
+        label={t("Définissez le taux de réduction GES des lots à prélever")}
+        minRange={bind("gesBoundMin")}
+        maxRange={bind("gesBoundMax")}
+      />
+    </>
   )
 }
 
