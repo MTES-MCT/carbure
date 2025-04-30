@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter
+from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter, NumberFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
@@ -24,6 +24,8 @@ class BaseFilter(FilterSet):
     depot = CharFilter(method="filter_depot")
     type = CharFilter(method="filter_type")
     period = CharFilter(method="filter_period")
+    ges_bound_min = NumberFilter(method="ignore")
+    ges_bound_max = NumberFilter(method="ignore")
 
     order_by = OrderingFilter(fields=(("created_at", "created_at"),))
 
@@ -136,6 +138,9 @@ class BaseFilter(FilterSet):
             operations.remove("CESSION")
         q_objects |= Q(type__in=operations)
         return queryset.filter(q_objects).distinct()
+
+    def ignore(self, queryset, name, value):
+        return queryset
 
 
 class OperationFilter(BaseFilter):
