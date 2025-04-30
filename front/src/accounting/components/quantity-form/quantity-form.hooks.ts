@@ -42,6 +42,8 @@ export const useQuantityForm = ({
       target_emission: 0,
       unit: unit,
       from_depot: depotId,
+      ges_bound_min: balance.ghg_reduction_min,
+      ges_bound_max: balance.ghg_reduction_max,
     })
 
   const mutation = useMutation(declareQuantity, mutationOptions)
@@ -79,6 +81,8 @@ export const useQuantityFormStep = ({
         target_emission: form.value.avoided_emissions ?? 0,
         from_depot: form.value.from_depot?.id,
         unit: backendUnit,
+        ges_bound_min: balance.ghg_reduction_min,
+        ges_bound_max: balance.ghg_reduction_max,
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
       })
