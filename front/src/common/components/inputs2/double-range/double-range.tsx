@@ -32,6 +32,7 @@ export const DoubleRange = ({
       nativeInputProps={[
         {
           ...minRange,
+          value: minRange?.value ?? min,
           onChange: (e) => {
             const value = parseFloat(e.target.value)
             minRange?.onChange?.(value)
@@ -42,6 +43,7 @@ export const DoubleRange = ({
         },
         {
           ...maxRange,
+          value: maxRange?.value ?? max,
           onChange: (e) => {
             const value = parseFloat(e.target.value)
             maxRange?.onChange?.(value)
