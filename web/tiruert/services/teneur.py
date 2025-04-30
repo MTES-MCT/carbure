@@ -274,9 +274,6 @@ class TeneurService:
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
 
-            if value["ghg_reduction_red_ii"] <= ges_bound_min or value["ghg_reduction_red_ii"] >= ges_bound_max:
-                continue
-
             volumes = np.append(volumes, value["available_balance"])
             emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)
@@ -289,6 +286,7 @@ class TeneurService:
         target_volume = None
         if data.get("target_volume", None) is not None:
             target_volume = TeneurService._convert_in_liters(data["target_volume"], unit, data["biofuel"])
+
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
 
     @staticmethod

@@ -93,7 +93,6 @@ class BalanceService:
         quantity = detail.volume * conversion_factor * operation.renewable_energy_share
         balance[key]["available_balance"] += quantity * volume_sign
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
-        balance[key]["ghg_reduction_red_ii"] = detail.lot.ghg_reduction_red_ii
         return
 
     def _update_ghg_min_max(balance, key, detail):
@@ -135,13 +134,14 @@ class BalanceService:
             conversion_factor = BalanceService._get_conversion_factor(operation, unit)
 
             for detail in operation.details.all():
+                key = BalanceService._get_key(operation, group_by, detail, depot)
+
+                # Keep only lots with requested GHG reduction
                 if ges_bound_min is not None and ges_bound_max is not None:
                     if detail.lot.ghg_reduction_red_ii <= float(ges_bound_min) or detail.lot.ghg_reduction_red_ii >= float(
                         ges_bound_max
                     ):
                         continue
-
-                key = BalanceService._get_key(operation, group_by, detail, depot)
 
                 if group_by != BalanceService.GROUP_BY_CATEGORY:
                     balance[key]["sector"] = operation.sector
