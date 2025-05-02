@@ -45,11 +45,11 @@ const RemainingQuantityBeforeLimit = ({
     <Text size={size} fontWeight={bold ? "bold" : "regular"}>
       {category
         ? t(
-          "Quantité restante jusqu'au plafond pour la catégorie {{category}} :",
-          {
-            category,
-          }
-        )
+            "Quantité restante jusqu'au plafond pour la catégorie {{category}} :",
+            {
+              category,
+            }
+          )
         : t("Quantité restante jusqu’au plafond :")}{" "}
       {value}
     </Text>
@@ -72,11 +72,11 @@ const RemainingQuantityBeforeObjective = ({
     <Text size={size} fontWeight={bold ? "bold" : "regular"}>
       {category
         ? t(
-          "Quantité restante jusqu'à l'objectif pour la catégorie {{category}} :",
-          {
-            category,
-          }
-        )
+            "Quantité restante jusqu'à l'objectif pour la catégorie {{category}} :",
+            {
+              category,
+            }
+          )
         : t("Quantité restante jusqu’à l’objectif :")}{" "}
       {value}
     </Text>
@@ -95,7 +95,8 @@ const RemainingQuantityBegoreCO2Objective = ({
   const { t } = useTranslation()
   return (
     <Text size={size} fontWeight={bold ? "bold" : "regular"}>
-      {t("Quantité restante jusqu'à l'objectif global CO2 :")} {value} tCO2 évitées
+      {t("Quantité restante jusqu'à l'objectif global CO2 :")} {value} tCO2
+      évitées
     </Text>
   )
 }

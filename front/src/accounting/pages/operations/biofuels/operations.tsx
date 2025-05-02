@@ -71,8 +71,8 @@ const OperationsBiofuels = () => {
         getFilterOptions={getFilterOptions}
       />
       {!loading &&
-        result?.data?.results &&
-        result?.data?.results?.length === 0 ? (
+      result?.data?.results &&
+      result?.data?.results?.length === 0 ? (
         <NoResult />
       ) : (
         <>

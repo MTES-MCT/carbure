@@ -29,7 +29,12 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import { CONVERSIONS, floorNumber, formatUnit, formatNumber } from "common/utils/formatters"
+import {
+  CONVERSIONS,
+  floorNumber,
+  formatUnit,
+  formatNumber,
+} from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo, useEffect, useState } from "react"
 import { Button } from "common/components/button2"
@@ -64,7 +69,7 @@ const DeclareTeneurDialogContent = ({
   const { currentStep, currentStepIndex } = useStepper()
   const mutation = useDeclareTeneurDialog({
     onClose,
-    onOperationCreated: () => { },
+    onOperationCreated: () => {},
     values: form.value,
   })
 
@@ -89,9 +94,9 @@ const DeclareTeneurDialogContent = ({
     const remainingCO2 = Math.max(
       0,
       mainObjective.target -
-      mainObjective.teneur_declared -
-      mainObjective.teneur_declared_month -
-      avoidedEmissions
+        mainObjective.teneur_declared -
+        mainObjective.teneur_declared_month -
+        avoidedEmissions
     )
     return formatNumber(remainingCO2, {
       fractionDigits: 0,
@@ -115,9 +120,9 @@ const DeclareTeneurDialogContent = ({
     form.value.balance
       ? objective.target
         ? Math.min(
-          form.value.balance!.available_balance,
-          computeObjectiveEnergy(objective)
-        )
+            form.value.balance!.available_balance,
+            computeObjectiveEnergy(objective)
+          )
         : form.value.balance!.available_balance
       : 0,
     0
@@ -204,7 +209,7 @@ const DeclareTeneurDialogContent = ({
                       Math.max(
                         0,
                         computeObjectiveEnergy(currentSectorObjective) -
-                        (form.value.quantity ?? 0)
+                          (form.value.quantity ?? 0)
                       ),
                       ExtendedUnit.GJ,
                       {
