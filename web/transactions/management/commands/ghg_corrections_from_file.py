@@ -42,6 +42,7 @@ class Command(BaseCommand):
         # sessionid : Used to authenticate the request and corresponding user email
         # will appear in history comments as "Modifié par"
         parser.add_argument("--sessionid", type=str, help="Authenticated user session", required=True)
+        parser.add_argument("--csrftoken", type=str, help="CRSF token", required=True)
 
     def handle(self, *args, **options):
         self.stdout.write("--- Starting ghg correction script ---")
@@ -54,7 +55,7 @@ class Command(BaseCommand):
             valid_rows = self.data_validation(correction_rows)
 
         if len(valid_rows) > 0:
-            self.update_lots(valid_rows, options["sessionid"])
+            self.update_lots(valid_rows, options["sessionid"], options["csrftoken"])
 
         self.stdout.write("--- Finished ghg correction script ---")
 
@@ -145,11 +146,11 @@ class Command(BaseCommand):
                         modification_counts[field] += 1
 
         # Display the analysis results
-        self.stdout.write("=== Analysis of Changes ===", self.style.SUCCESS)
+        self.stdout.write("=== Analysis of changes ===", self.style.SUCCESS)
         for field, count in modification_counts.items():
             self.stdout.write(f"{field}: {count} modifications")
 
-    def update_lots(self, rows, sessionid):
+    def update_lots(self, rows, sessionid, csrftoken):
         """
         Group lots by similar data, analyze changes, and call update_many() for each group.
         """
@@ -164,10 +165,10 @@ class Command(BaseCommand):
         self._analyze_changes(grouped_data)
 
         # Call update_many() for each group
-        self.stdout.write("=== Updates lots ===", self.style.SUCCESS)
+        self.stdout.write("=== Updating lots ===", self.style.SUCCESS)
         domain = settings.CSRF_TRUSTED_ORIGINS[0]
         url = reverse("transactions-admin-lots-update-many")
-        endpoint_url = f"{domain}{url}"
+        endpoint_url = f"{domain}{url[1:]}"
 
         for update_key, group in grouped_data.items():
             carbure_ids = [row[RECONCILIATION_KEY] for row in group]
@@ -177,9 +178,15 @@ class Command(BaseCommand):
             lot_ids = [lot.id for lot in existing_lots]
             update_data = dict(zip(FIELDS_TO_UPDATE, update_key))
 
-            # Configure the sessionid for authentication
+            # Configure the sessionid and crsftoken for authentication
             cookies = {
                 "sessionid": sessionid,
+                "csrftoken": csrftoken,
+            }
+
+            headers = {
+                "X-CSRFToken": csrftoken,
+                "Referer": endpoint_url,
             }
 
             # Convert the payload to form-data format
@@ -192,7 +199,7 @@ class Command(BaseCommand):
             payload.update({field: str(value) for field, value in update_data.items()})  # Add update fields
 
             # Call the endpoint to update the lots
-            response = requests.post(endpoint_url, data=payload, cookies=cookies)
+            response = requests.post(endpoint_url, data=payload, cookies=cookies, headers=headers)
 
             # Handle the response
             if response.status_code != 200:
