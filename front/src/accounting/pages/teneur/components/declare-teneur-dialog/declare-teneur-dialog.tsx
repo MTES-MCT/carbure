@@ -29,9 +29,9 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import { CONVERSIONS, floorNumber, formatUnit } from "common/utils/formatters"
+import { CONVERSIONS, floorNumber, formatUnit, formatNumber } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
-import { useMemo } from "react"
+import { useMemo, useEffect, useState } from "react"
 import { Button } from "common/components/button2"
 import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
 import {
@@ -64,7 +64,7 @@ const DeclareTeneurDialogContent = ({
   const { currentStep, currentStepIndex } = useStepper()
   const mutation = useDeclareTeneurDialog({
     onClose,
-    onOperationCreated: () => {},
+    onOperationCreated: () => { },
     values: form.value,
   })
 
@@ -82,6 +82,32 @@ const DeclareTeneurDialogContent = ({
     })
   }, [form.value.quantity, objective])
 
+  const remainingCO2EmissionsBeforeObjective = (
+    mainObjective: MainObjective
+  ) => {
+    const avoidedEmissions = form.value.avoided_emissions ?? 0
+    const remainingCO2 = Math.max(
+      0,
+      mainObjective.target -
+      mainObjective.teneur_declared -
+      mainObjective.teneur_declared_month -
+      avoidedEmissions
+    )
+    return formatNumber(remainingCO2, {
+      fractionDigits: 0,
+      mode: "ceil",
+    })
+  }
+
+  const [remainingCO2Objective, setRemainingCO2Objective] = useState("")
+
+  useEffect(() => {
+    if (mainObjective) {
+      const updatedValue = remainingCO2EmissionsBeforeObjective(mainObjective)
+      setRemainingCO2Objective(updatedValue)
+    }
+  }, [form.value.avoided_emissions, mainObjective])
+
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
   // Otherwise, the maximum quantity is the available balance
@@ -89,9 +115,9 @@ const DeclareTeneurDialogContent = ({
     form.value.balance
       ? objective.target
         ? Math.min(
-            form.value.balance!.available_balance,
-            computeObjectiveEnergy(objective)
-          )
+          form.value.balance!.available_balance,
+          computeObjectiveEnergy(objective)
+        )
         : form.value.balance!.available_balance
       : 0,
     0
@@ -178,7 +204,7 @@ const DeclareTeneurDialogContent = ({
                       Math.max(
                         0,
                         computeObjectiveEnergy(currentSectorObjective) -
-                          (form.value.quantity ?? 0)
+                        (form.value.quantity ?? 0)
                       ),
                       ExtendedUnit.GJ,
                       {
@@ -226,6 +252,13 @@ const DeclareTeneurDialogContent = ({
                         quantity={form.value.avoided_emissions ?? 0}
                         targetType={TargetType.REACH}
                         label={t("Objectif global")}
+                      />
+                    )}
+                    {mainObjective && (
+                      <RecapData.RemainingQuantityBegoreCO2Objective
+                        value={remainingCO2Objective}
+                        bold
+                        size="md"
                       />
                     )}
                   </Box>

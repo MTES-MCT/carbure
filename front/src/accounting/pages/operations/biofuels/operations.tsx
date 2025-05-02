@@ -34,7 +34,7 @@ const OperationsBiofuels = () => {
     [OperationsFilter.sector]: t("Filière"),
     [OperationsFilter.customs_category]: t("Catégorie"),
     [OperationsFilter.biofuel]: t("Biocarburants"),
-    [OperationsFilter.period]: t("Période"),
+    [OperationsFilter.period]: t("Date"),
     [OperationsFilter.type]: t("Débit / Crédit"),
     [OperationsFilter.from_to]: t("Destinataire"),
   }
@@ -71,8 +71,8 @@ const OperationsBiofuels = () => {
         getFilterOptions={getFilterOptions}
       />
       {!loading &&
-      result?.data?.results &&
-      result?.data?.results?.length === 0 ? (
+        result?.data?.results &&
+        result?.data?.results?.length === 0 ? (
         <NoResult />
       ) : (
         <>

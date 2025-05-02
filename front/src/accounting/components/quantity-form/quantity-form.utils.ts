@@ -6,12 +6,12 @@ import { CreateOperationType } from "accounting/types"
 const showNextStepQuantityForm = (values: QuantityFormProps) => {
   return Boolean(
     values.quantity &&
-      values.quantity > 0 &&
-      values.avoided_emissions &&
-      values.avoided_emissions_min &&
-      values.avoided_emissions_max &&
-      values.avoided_emissions >= values.avoided_emissions_min &&
-      values.avoided_emissions <= values.avoided_emissions_max
+    values.quantity > 0 &&
+    values.avoided_emissions &&
+    values.avoided_emissions_min &&
+    values.avoided_emissions_max &&
+    values.avoided_emissions >= values.avoided_emissions_min &&
+    values.avoided_emissions <= values.avoided_emissions_max
   )
 }
 
@@ -35,7 +35,7 @@ export const quantityFormStep: (
 export const getQuantityInputLabel = (type: CreateOperationType) => {
   switch (type) {
     case CreateOperationType.CESSION:
-      return i18next.t("Saisir une quantité d'énergie consommée")
+      return i18next.t("Saisir une quantité d'énergie à céder")
     case CreateOperationType.EXPORTATION:
       return i18next.t("Saisir une quantité pour l'exportation")
     case CreateOperationType.TENEUR:
