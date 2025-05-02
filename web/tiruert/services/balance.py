@@ -166,21 +166,24 @@ class BalanceService:
                 balance[key]["pending_operations"] += 1
 
         if group_by == BalanceService.GROUP_BY_DEPOT:
-            balance = BalanceService._update_depot_debit_with_teneur(entity_id, balance, operations)
+            balance = BalanceService._update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations)
 
         return balance
 
     @staticmethod
-    def _update_depot_debit_with_teneur(entity_id, balance, operations):
+    def _update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations):
         """
-        Updates the balance by distributing teneur volumes across depots as debits
+        Updates the balance by distributing teneur and transfert volumes across depots as debits
         """
-        # Fetch all teneur operations
+        # Fetch all teneur and transfert operations
         teneurs = operations.filter(
-            type=Operation.TENEUR,
+            type__in=[
+                Operation.TENEUR,
+                Operation.TRANSFERT,
+            ],
         ).prefetch_related("details__lot")
 
-        # Collect all lot_ids from the teneur operations
+        # Collect all lot_ids from the teneur and transfert operations
         lot_ids = []
         for teneur in teneurs:
             for detail in teneur.details.all():
@@ -211,7 +214,7 @@ class BalanceService:
                         }
                     )
 
-        # Process each teneur operation and distribute its volume across depots
+        # Process each teneur/transfert operation and distribute its volume across depots
         for teneur in teneurs:
             for detail in teneur.details.all():
                 remaining_volume = detail.volume  # Initialize volume to distribute between depots
