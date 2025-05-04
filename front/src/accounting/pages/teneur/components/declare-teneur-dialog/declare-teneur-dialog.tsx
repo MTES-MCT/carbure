@@ -43,6 +43,7 @@ import {
   DeclareTeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
+import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
@@ -169,6 +170,10 @@ const DeclareTeneurDialogContent = ({
                   balance={form.value.balance!}
                   unit={ExtendedUnit.GJ}
                 />
+                <RecapGHGRange
+                  min={form.value.gesBoundMin}
+                  max={form.value.gesBoundMax}
+                />
                 {currentStepIndex > 2 && (
                   <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
                 )}
@@ -242,6 +247,8 @@ const DeclareTeneurDialogContent = ({
                     backendUnit={Unit.MJ}
                     // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
                     converter={CONVERSIONS.energy.GJ_TO_MJ}
+                    gesBoundMin={form.value.gesBoundMin}
+                    gesBoundMax={form.value.gesBoundMax}
                   />
                 </Box>
                 {form.value.avoided_emissions_min ? (

@@ -84,7 +84,7 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
           value: balance,
           label: balance.biofuel.code,
         })}
-        loading={filteredBalances.loading}
+        loading={fullBalances.loading}
         required
         filter={() => true} // show all options
         value={fullBalance}
