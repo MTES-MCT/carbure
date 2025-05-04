@@ -17,8 +17,7 @@ import { Balance } from "accounting/types"
 import { DoubleRange } from "common/components/inputs2"
 import { debounce } from "common/utils/functions"
 import { useEffect, useState } from "react"
-import Alert from "common/components/alert"
-import { InfoCircle } from "common/components/icons"
+import { Notice } from "common/components/notice"
 
 export type BiofuelFormProps = {
   balance?: Balance
@@ -103,18 +102,15 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
         maxRange={bind("gesBoundMax")}
       />
 
-      <Alert
-        loading={filteredBalances.loading}
-        icon={InfoCircle}
-        variant="info"
-      >
-        <span>{t("Solde disponible pour ces taux de réduction:")}</span>
+      <Notice noColor variant="info">
+        {t("Solde disponible pour ces taux de réduction")}
+        {" : "}
         <b>
           {formatUnit(value.balance?.available_balance ?? 0, ExtendedUnit.GJ, {
             fractionDigits: 0,
           })}
         </b>
-      </Alert>
+      </Notice>
     </>
   )
 }
