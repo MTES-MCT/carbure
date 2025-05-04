@@ -11,7 +11,7 @@ import {
 import { Pagination } from "common/components/pagination2/pagination"
 import { ElecOperationsStatus } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
-import { getBalances } from "accounting/api/elec-balances"
+import { getElecBalances } from "accounting/api/elec-balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
@@ -29,7 +29,7 @@ const BalancesElec = () => {
 
   const query = useCBQueryBuilder<[], ElecOperationsStatus[], undefined>(state)
 
-  const { result, loading } = useQuery(getBalances, {
+  const { result, loading } = useQuery(getElecBalances, {
     key: "elec-balances",
     params: [query],
   })

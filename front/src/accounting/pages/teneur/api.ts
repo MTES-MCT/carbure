@@ -1,4 +1,5 @@
 import { getBalances } from "accounting/api/balances"
+import { getElecBalances } from "accounting/api/elec-balances"
 import { CategoryEnum, Unit } from "common/types"
 import {
   CategoryObjective,
@@ -147,7 +148,7 @@ export const getBalancesBySector = async (entity_id: number) => {
 }
 
 export const getElecBalance = (entity_id: number) => {
-  return getBalances({ entity_id })
+  return getElecBalances({ entity_id })
 }
 
 export const validateTeneurBiofuel = async (entity_id: number) => {
