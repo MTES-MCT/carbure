@@ -12,6 +12,10 @@ import { normalizeEntityPreview } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
 import { NumberInput } from "common/components/inputs2"
 import { ElecBalance } from "accounting/types"
+import Alert from "common/components/alert"
+import { formatUnit } from "common/utils/formatters"
+import { Unit } from "common/types"
+import { InfoCircle } from "common/components/icons"
 
 interface CessionDialogProps {
   balance: ElecBalance
@@ -76,6 +80,14 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
                 {...form.bind("quantity")}
                 required
               />
+
+              <Alert icon={InfoCircle} variant="info">
+                {t("Quantité disponible")}
+                {" : "}
+                {formatUnit(balance.available_balance, Unit.MJ, {
+                  fractionDigits: 0,
+                })}
+              </Alert>
 
               <NumberInput
                 label={t("Tonnes de CO2 évitées")}
