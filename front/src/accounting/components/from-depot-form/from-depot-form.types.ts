@@ -5,4 +5,6 @@ export type FromDepotFormProps = {
   from_depot?: apiTypes["BalanceDepot"] & {
     available_balance: number
   }
+  gesBoundMin?: number
+  gesBoundMax?: number
 }

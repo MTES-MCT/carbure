@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
 import { Grid } from "common/components/scaffold"
 import { ExtendedUnit, Unit } from "common/types"
-import { ceilNumber, floorNumber } from "common/utils/formatters"
 
 type RecapOperationProps = {
   balance: Balance
@@ -32,14 +31,6 @@ export const RecapOperation = ({
       <OperationText
         title={t("Biocarburant")}
         description={balance.biofuel ? balance.biofuel.code : ""}
-      />
-      <OperationText
-        title={t("Réd. GES")}
-        description={
-          balance.ghg_reduction_min && balance.ghg_reduction_max
-            ? `${floorNumber(balance.ghg_reduction_min, 0)} - ${ceilNumber(balance.ghg_reduction_max, 0)}%`
-            : ""
-        }
       />
       <OperationText
         title={t("Solde disponible {{biofuel}}", {

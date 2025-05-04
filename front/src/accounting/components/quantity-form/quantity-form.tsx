@@ -27,6 +27,10 @@ type QuantityFormComponentProps = {
 
   // Depot id can be used to known in which depot the quantity will be picked up
   depotId?: number
+
+  // Lot GHG min and max bounds
+  gesBoundMin?: number
+  gesBoundMax?: number
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
@@ -58,6 +62,8 @@ const QuantitySection = ({
   unit: customUnit,
   backendUnit: customBackendUnit,
   depotId,
+  gesBoundMin,
+  gesBoundMax,
   converter,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
@@ -71,6 +77,8 @@ const QuantitySection = ({
     unit: customBackendUnit,
     converter,
     depotId,
+    gesBoundMin,
+    gesBoundMax,
   })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
@@ -219,6 +227,8 @@ export const QuantityForm = ({
   backendUnit: customBackendUnit,
   depotId,
   converter,
+  gesBoundMin,
+  gesBoundMax,
 }: QuantityFormComponentProps) => {
   return (
     <>
@@ -230,6 +240,8 @@ export const QuantityForm = ({
         backendUnit={customBackendUnit}
         depotId={depotId}
         converter={converter}
+        gesBoundMin={gesBoundMin}
+        gesBoundMax={gesBoundMax}
       />
       <AvoidedEmissionsSection />
     </>
