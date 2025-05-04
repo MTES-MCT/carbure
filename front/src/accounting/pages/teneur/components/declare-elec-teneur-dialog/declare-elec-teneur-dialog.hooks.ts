@@ -6,7 +6,8 @@ import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
 import { ElecTeneurForm } from "./declare-elec-teneur-dialog.types"
-import { Unit } from "common/types"
+import { ExtendedUnit } from "common/types"
+import { CONVERSIONS } from "common/utils/formatters"
 
 type CessionDialogProps = {
   values: ElecTeneurForm
@@ -26,7 +27,7 @@ export const useElecTeneurDialog = ({
     createOperation(entity.id, {
       type: CreateElecOperationType.TENEUR,
       debited_entity: entity.id,
-      quantity: values.quantity,
+      quantity: CONVERSIONS.energy.GJ_TO_MJ(values.quantity!),
     })
 
   return useMutation(operation, {
@@ -39,7 +40,7 @@ export const useElecTeneurDialog = ({
           {
             quantity: formatUnit(values.quantity!, {
               fractionDigits: 0,
-              unit: Unit.MJ,
+              unit: ExtendedUnit.GJ,
             }),
           }
         ),
