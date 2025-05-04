@@ -31,7 +31,7 @@ export const useBalancesElecColumns = () => {
     {
       header: `${t("Solde disponible")} (GJ)`,
       cell: (item) =>
-        formatNumber(item.available_balance / 1000, { fractionDigits: 2 }),
+        formatNumber(item.available_balance / 1000, { fractionDigits: 0 }),
     },
     {
       header: t("Opérations en attente"),
