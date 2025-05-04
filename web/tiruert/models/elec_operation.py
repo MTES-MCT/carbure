@@ -78,7 +78,7 @@ class ElecOperation(models.Model):
             return False
         return self.credited_entity.id == int(entity_id) and self.type == ElecOperation.CESSION
 
-    def is_credit(self, entity):
+    def is_credit(self, entity_id):
         if self.credited_entity is None:
             return False
-        return self.credited_entity.id == int(entity)
+        return self.credited_entity.id == int(entity_id)

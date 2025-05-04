@@ -123,15 +123,15 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
         ],
     )
     def create(self, request):
-        entity_id = self.request.POST.get("entity_id")
         serializer = ElecOperationInputSerializer(
             data=request.data,
             context={"request": request},
         )
         if serializer.is_valid():
             operation = serializer.save()
+            context = {"entity_id": self.request.entity.id}
             return Response(
-                ElecOperationSerializer(operation, context={"entity_id": entity_id}).data,
+                ElecOperationSerializer(operation, context=context).data,
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -155,7 +155,6 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
     )
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
-        entity_id = self.request.GET.get("entity_id")
         serializer = ElecOperationUpdateSerializer(
             instance,
             data=request.data,
@@ -164,8 +163,9 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
         )
         if serializer.is_valid():
             operation = serializer.save()
+            context = {"entity_id": self.request.entity.id}
             return Response(
-                ElecOperationSerializer(operation, context={"entity_id": entity_id}).data,
+                ElecOperationSerializer(operation, context=context).data,
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
