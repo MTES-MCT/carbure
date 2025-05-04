@@ -165,10 +165,6 @@ export const ProductionSiteForm = ({
     { value: GESOption.Actual, label: t("Valeurs réelles") },
   ]
 
-  const canSave = Boolean(
-    value.country && value.date_mise_en_service && value.name
-  )
-
   async function submitProductionSite() {
     if (
       !value ||
@@ -205,6 +201,7 @@ export const ProductionSiteForm = ({
               readOnly={readOnly}
               label={t("Nom du site")}
               {...bind("name")}
+              required
             />
 
             <Row style={{ gap: "var(--spacing-m)" }}>
@@ -212,6 +209,7 @@ export const ProductionSiteForm = ({
                 readOnly={readOnly}
                 label={t("N° d'identification (SIRET)")}
                 {...bind("site_id")}
+                required
               />
               <TextInput
                 readOnly={readOnly}
@@ -219,6 +217,7 @@ export const ProductionSiteForm = ({
                 label={t("Date de mise en service")}
                 style={{ flex: 1 }}
                 {...bind("date_mise_en_service")}
+                required
               />
             </Row>
 
@@ -228,17 +227,20 @@ export const ProductionSiteForm = ({
               readOnly={readOnly}
               label={t("Adresse postale")}
               {...bind("address")}
+              required
             />
             <Row style={{ gap: "var(--spacing-m)" }}>
               <TextInput
                 readOnly={readOnly}
                 label={t("Ville")}
                 {...bind("city")}
+                required
               />
               <TextInput
                 readOnly={readOnly}
                 label={t("Code postal")}
                 {...bind("postal_code")}
+                required
               />
             </Row>
 
@@ -249,6 +251,7 @@ export const ProductionSiteForm = ({
               getOptions={common.findCountries}
               normalize={normalizeCountry}
               {...bind("country")}
+              required
             />
 
             <hr />
@@ -257,6 +260,7 @@ export const ProductionSiteForm = ({
               readOnly={readOnly}
               label={t("Nom du gérant")}
               {...bind("manager_name")}
+              required
             />
 
             <Row style={{ gap: "var(--spacing-m)" }}>
@@ -264,11 +268,13 @@ export const ProductionSiteForm = ({
                 readOnly={readOnly}
                 label={t("N° de téléphone du gérant")}
                 {...bind("manager_phone")}
+                required
               />
               <TextInput
                 readOnly={readOnly}
                 label={t("Addresse email du gérant")}
                 {...bind("manager_email")}
+                required
               />
             </Row>
 
@@ -284,6 +290,7 @@ export const ProductionSiteForm = ({
                 label={t("Référence double-comptage")}
                 {...bind("dc_reference")}
                 disabled
+                required
               />
             )}
 
@@ -294,6 +301,7 @@ export const ProductionSiteForm = ({
               options={gesOptions}
               {...bind("ges_option")}
               disabled={readOnly}
+              required
             />
 
             <hr />
@@ -306,6 +314,7 @@ export const ProductionSiteForm = ({
               getOptions={common.findFeedstocks}
               normalize={normalizeFeedstock}
               {...bind("matieres_premieres")}
+              required
             />
             <TagAutocomplete
               readOnly={readOnly}
@@ -315,6 +324,7 @@ export const ProductionSiteForm = ({
               getOptions={common.findBiofuels}
               normalize={normalizeBiofuel}
               {...bind("biocarburants")}
+              required
             />
 
             <hr />
@@ -326,6 +336,7 @@ export const ProductionSiteForm = ({
               defaultOptions={value.certificates}
               getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
               {...bind("certificates")}
+              required
             />
           </Form>
         </section>
@@ -339,7 +350,7 @@ export const ProductionSiteForm = ({
             variant="primary"
             submit="production-site"
             icon={Save}
-            disabled={!canSave || updateProdSite.loading}
+            disabled={updateProdSite.loading}
             label={t("Sauvegarder")}
           />
         )}

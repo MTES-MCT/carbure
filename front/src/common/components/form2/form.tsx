@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react"
+import React, { ReactNode, useCallback, useContext, useState } from "react"
 import cl from "clsx"
 import css from "./form.module.css"
 
@@ -201,6 +201,7 @@ export interface BindProps<T, N extends keyof T> {
   name: N
   value: T[N]
   state?: "success" | "error" | "default"
+  stateRelatedMessage?: ReactNode
   checked: boolean | undefined
   disabled: boolean | undefined
   onChange: (value: T[N]) => void

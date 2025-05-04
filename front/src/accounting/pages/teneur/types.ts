@@ -6,6 +6,7 @@ export interface BaseObjective {
   teneur_declared: number // GJ
   quantity_available: number // GJ
   teneur_declared_month: number // GJ
+  target_percent: number
 }
 export interface CategoryObjective extends BaseObjective {
   code: CategoryEnum
@@ -13,19 +14,27 @@ export interface CategoryObjective extends BaseObjective {
 
 export interface SectorObjective extends BaseObjective {
   code: OperationSector
-  target_percent: number
 }
 
-export interface MainObjective extends BaseObjective {
-  target_percent: number
-}
+export type MainObjective = BaseObjective
 
-export interface ElecCategoryObjective extends BaseObjective {
+export interface ElecCategoryObjective
+  extends Omit<BaseObjective, "target" | "target_percent"> {
   code: ElecOperationSector.ELEC
+  target: null
+  target_percent: null
+}
+
+export type BiofuelUnconstrainedCategoryObjective = Omit<
+  CategoryObjective,
+  "target" | "target_percent"
+> & {
+  target: null
+  target_percent: null
 }
 
 export type UnconstrainedCategoryObjective =
-  | CategoryObjective
+  | BiofuelUnconstrainedCategoryObjective
   | ElecCategoryObjective
 
 export interface Objectives {

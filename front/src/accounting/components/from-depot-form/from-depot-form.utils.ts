@@ -4,7 +4,8 @@ import i18next from "i18next"
 
 export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
   return Boolean(
-    values.from_depot?.quantity?.credit && values.from_depot.quantity.credit > 0
+    values.from_depot?.available_balance &&
+      values.from_depot.available_balance > 0
   )
 }
 

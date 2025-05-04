@@ -88,14 +88,18 @@ export const getObjectives = async (
             quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
               category.available_balance
             ),
+            target_percent: category.objective.target_percent * 100,
           }
           if (!category.objective.target_mj) {
-            objCategories.unconstrained_categories.push({ ...cat, target: 0 })
+            objCategories.unconstrained_categories.push({
+              ...cat,
+              target: null,
+              target_percent: null,
+            })
           } else {
             const categoryMapping = {
               REACH: "objectivized_categories",
               CAP: "capped_categories",
-              OTHER: "unconstrained_categories",
             } as const
             const categoryType =
               categoryMapping[
@@ -119,13 +123,17 @@ export const getObjectives = async (
  */
 export const getBalancesCategory = async (
   entity_id: number,
-  category: CategoryEnum
+  category: CategoryEnum,
+  gesBoundMin?: number,
+  gesBoundMax?: number
 ) => {
   return getBalances({
     entity_id,
     page: 1,
     customs_category: [category],
     unit: Unit.MJ,
+    ges_bound_min: gesBoundMin,
+    ges_bound_max: gesBoundMax,
   })
 }
 

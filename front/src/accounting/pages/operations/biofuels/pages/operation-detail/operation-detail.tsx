@@ -16,7 +16,12 @@ import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
-import { CONVERSIONS, formatDate, formatNumber } from "common/utils/formatters"
+import {
+  CONVERSIONS,
+  formatDate,
+  formatNumber,
+  roundNumber,
+} from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
 import {
@@ -110,6 +115,13 @@ export const OperationDetail = () => {
     })
   }
 
+  // Format the value only for the incorporation operation
+  const formatValue = (value: number) => {
+    return operation?.type === OperationType.INCORPORATION
+      ? value * operation.renewable_energy_share
+      : value
+  }
+
   const fields = operation
     ? compact([
         { label: t("Filière"), value: formatSector(operation.sector) },
@@ -136,9 +148,32 @@ export const OperationDetail = () => {
             })
           )}`,
         },
+        operation.type === OperationType.INCORPORATION &&
+          operation.renewable_energy_share !== 1 && {
+            label: t("Quantité renouvelable"),
+            value: `${getOperationQuantity(
+              operation,
+              formatUnit(roundNumber(formatValue(operation.quantity), 2), {
+                fractionDigits: 2,
+                appendZeros: false,
+              })
+            )} / ${getOperationQuantity(
+              operation,
+              formatUnit(
+                CONVERSIONS.energy.MJ_TO_GJ(
+                  roundNumber(formatValue(operation.quantity_mj), 2)
+                ),
+                {
+                  fractionDigits: 2,
+                  unit: ExtendedUnit.GJ,
+                  appendZeros: false,
+                }
+              )
+            )}`,
+          },
         {
           label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(operation.avoided_emissions, {
+          value: formatNumber(formatValue(operation.avoided_emissions), {
             fractionDigits: 0,
           }),
         },

@@ -37,7 +37,10 @@ export const getDepotsWithBalance = (
     .then((res) => {
       const results = res.data?.results as apiTypes["BalanceByDepot"][]
       if (results && results.length > 0) {
-        return results[0]!.depots
+        return results[0]!.depots.map((depot) => ({
+          ...depot,
+          available_balance: depot.quantity.credit - depot.quantity.debit,
+        }))
       }
 
       return []

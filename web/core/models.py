@@ -266,6 +266,7 @@ class Biocarburant(models.Model):
     compatible_essence = models.BooleanField(default=False)
     compatible_diesel = models.BooleanField(default=False)
     dgddi_category = models.CharField(max_length=8, blank=True, null=True, default=None)
+    renewable_energy_share = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%", default=1.0)
 
     def __str__(self):
         return self.name

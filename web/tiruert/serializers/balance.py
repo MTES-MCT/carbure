@@ -7,6 +7,7 @@ from tiruert.models.operation import Operation
 class BalanceBiofuelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     code = serializers.CharField()
+    renewable_energy_share = serializers.FloatField()
 
 
 class BalanceQuantitySerializer(serializers.Serializer):
@@ -31,6 +32,8 @@ class BaseBalanceSerializer(serializers.Serializer):
 class BalanceSerializer(BaseBalanceSerializer):
     customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
     biofuel = BalanceBiofuelSerializer()
+    ghg_reduction_min = serializers.FloatField()
+    ghg_reduction_max = serializers.FloatField()
 
 
 class BalanceBySectorSerializer(BaseBalanceSerializer):

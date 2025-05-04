@@ -87,6 +87,8 @@ export const EntitySelector = ({ className }: { className?: string }) => {
         }
       }}
       placeholder={t("Liste des entités")}
+      // Display search only if user has more than 10 entities
+      search={options.length > 10}
     >
       {({ label, value }) => {
         if (value === "add-entity") {

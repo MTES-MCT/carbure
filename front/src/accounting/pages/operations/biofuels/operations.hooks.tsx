@@ -111,9 +111,14 @@ export const useOperationsBiofuelsColumns = ({
             )}
           >
             -
-            {formatNumber(item.quantity, {
-              fractionDigits: 0,
-            })}
+            {formatNumber(
+              item.type === OperationType.INCORPORATION
+                ? item.quantity_renewable
+                : item.quantity,
+              {
+                fractionDigits: 0,
+              }
+            )}
           </Text>
         ) : (
           <Text
@@ -126,9 +131,14 @@ export const useOperationsBiofuelsColumns = ({
             )}
           >
             +
-            {formatNumber(item.quantity, {
-              fractionDigits: 0,
-            })}
+            {formatNumber(
+              item.type === OperationType.INCORPORATION
+                ? item.quantity_renewable
+                : item.quantity,
+              {
+                fractionDigits: 0,
+              }
+            )}
           </Text>
         ),
     },

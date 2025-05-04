@@ -9,6 +9,7 @@ class BalanceService:
     GROUP_BY_CATEGORY = "customs_category"
     GROUP_BY_LOT = "lot"
     GROUP_BY_DEPOT = "depot"
+    GROUP_BY_ALL = [GROUP_BY_SECTOR, GROUP_BY_CATEGORY, GROUP_BY_LOT, GROUP_BY_DEPOT]
 
     @staticmethod
     def _get_key(operation, group_by, detail=None, depot=None):
@@ -63,6 +64,8 @@ class BalanceService:
             "declared_teneur": 0,
             "available_balance": 0,
             "unit": unit,
+            "ghg_reduction_min": None,
+            "ghg_reduction_max": None,
         }
 
         return entry
@@ -71,12 +74,14 @@ class BalanceService:
         """
         Updates the balance entry with the details of the operation
         """
+        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
-            balance[key][teneur_type] += detail.volume * conversion_factor
+            balance[key][teneur_type] += quantity
 
         quantity_type = "credit" if operation.is_credit(entity_id) else "debit"
-        balance[key]["quantity"][quantity_type] += detail.volume * conversion_factor
+        balance[key]["quantity"][quantity_type] += quantity
 
         return balance
 
@@ -85,12 +90,26 @@ class BalanceService:
         Updates the balance entry with the details of the operation
         """
         volume_sign = 1 if operation.is_credit(entity_id) else -1
-        balance[key]["available_balance"] += detail.volume * volume_sign * conversion_factor
+        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+        balance[key]["available_balance"] += quantity * volume_sign
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
         return
 
+    def _update_ghg_min_max(balance, key, detail):
+        """
+        Updates the GHG min and max values in the balance entry
+        """
+        balance[key]["ghg_reduction_min"] = min(
+            filter(None, [balance[key].get("ghg_reduction_min"), detail.lot.ghg_reduction_red_ii])
+        )
+
+        balance[key]["ghg_reduction_max"] = max(
+            filter(None, [balance[key].get("ghg_reduction_max"), detail.lot.ghg_reduction_red_ii])
+        )
+        return
+
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit, date_from=None):
+    def calculate_balance(operations, entity_id, group_by, unit, date_from=None, ges_bound_min=None, ges_bound_max=None):
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
@@ -117,6 +136,13 @@ class BalanceService:
             for detail in operation.details.all():
                 key = BalanceService._get_key(operation, group_by, detail, depot)
 
+                # Keep only lots with requested GHG reduction
+                if ges_bound_min is not None and ges_bound_max is not None:
+                    if detail.lot.ghg_reduction_red_ii <= float(ges_bound_min) or detail.lot.ghg_reduction_red_ii >= float(
+                        ges_bound_max
+                    ):
+                        continue
+
                 if group_by != BalanceService.GROUP_BY_CATEGORY:
                     balance[key]["sector"] = operation.sector
 
@@ -132,25 +158,32 @@ class BalanceService:
                 if date_from is None or operation.created_at >= date_from:
                     BalanceService._update_quantity_and_teneur(balance, key, operation, detail, entity_id, conversion_factor)
 
+                # Update GHG reduction min and max values
+                if group_by not in BalanceService.GROUP_BY_ALL:
+                    BalanceService._update_ghg_min_max(balance, key, detail)
+
             if operation.status == Operation.PENDING:
                 balance[key]["pending_operations"] += 1
 
         if group_by == BalanceService.GROUP_BY_DEPOT:
-            balance = BalanceService._update_depot_debit_with_teneur(entity_id, balance, operations)
+            balance = BalanceService._update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations)
 
         return balance
 
     @staticmethod
-    def _update_depot_debit_with_teneur(entity_id, balance, operations):
+    def _update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations):
         """
-        Updates the balance by distributing teneur volumes across depots as debits
+        Updates the balance by distributing teneur and transfert volumes across depots as debits
         """
-        # Fetch all teneur operations
+        # Fetch all teneur and transfert operations
         teneurs = operations.filter(
-            type=Operation.TENEUR,
+            type__in=[
+                Operation.TENEUR,
+                Operation.TRANSFERT,
+            ],
         ).prefetch_related("details__lot")
 
-        # Collect all lot_ids from the teneur operations
+        # Collect all lot_ids from the teneur and transfert operations
         lot_ids = []
         for teneur in teneurs:
             for detail in teneur.details.all():
@@ -181,7 +214,7 @@ class BalanceService:
                         }
                     )
 
-        # Process each teneur operation and distribute its volume across depots
+        # Process each teneur/transfert operation and distribute its volume across depots
         for teneur in teneurs:
             for detail in teneur.details.all():
                 remaining_volume = detail.volume  # Initialize volume to distribute between depots

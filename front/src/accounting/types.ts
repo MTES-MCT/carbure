@@ -21,7 +21,10 @@ import {
 } from "api-schema"
 
 // Type definitions
-export type Operation = apiTypes["OperationList"]
+export type Operation = apiTypes["OperationList"] & {
+  quantity_renewable: number
+}
+
 export type Balance = apiTypes["Balance"]
 export interface OperationsQuery
   extends CBQueryParams<[], OperationsStatus[], string[]> {

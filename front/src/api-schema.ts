@@ -2005,10 +2005,16 @@ export interface components {
       unit: string
       customs_category: components["schemas"]["MPCategoriesEnum"]
       biofuel: components["schemas"]["BalanceBiofuel"]
+      /** Format: double */
+      ghg_reduction_min: number
+      /** Format: double */
+      ghg_reduction_max: number
     }
     BalanceBiofuel: {
       id: number
       code: string
+      /** Format: double */
+      renewable_energy_share: number
     }
     BalanceByDepot: {
       customs_category: string
@@ -2982,6 +2988,8 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["MPCategoriesEnum"]
       readonly biofuel: string
+      /** Format: double */
+      renewable_energy_share: number
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
       from_depot: components["schemas"]["OperationDepot"]
@@ -3037,6 +3045,8 @@ export interface components {
       readonly sector: string
       customs_category?: components["schemas"]["MPCategoriesEnum"]
       readonly biofuel: string
+      /** Format: double */
+      renewable_energy_share: number
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
       from_depot: components["schemas"]["OperationDepot"]
@@ -3207,14 +3217,7 @@ export interface components {
       quantity?: number
     }
     PatchedOperationUpdateRequest: {
-      type?: components["schemas"]["OperationTypeEnum"]
-      customs_category?: components["schemas"]["MPCategoriesEnum"]
-      biofuel?: number | null
-      credited_entity?: number | null
-      debited_entity?: number | null
-      from_depot?: number | null
       to_depot?: number | null
-      export_country?: number | null
     }
     Pays: {
       code_pays: string
@@ -3664,6 +3667,10 @@ export interface components {
       enforced_volumes?: number[]
       unit?: string
       from_depot?: number | null
+      /** Format: double */
+      ges_bound_min?: number
+      /** Format: double */
+      ges_bound_max?: number
     }
     SimulationLotOutput: {
       lot_id: number
@@ -3680,6 +3687,10 @@ export interface components {
       target_volume: number
       unit?: string
       from_depot?: number | null
+      /** Format: double */
+      ges_bound_min?: number
+      /** Format: double */
+      ges_bound_max?: number
     }
     SimulationMinMaxOutput: {
       /** Format: double */
@@ -7659,6 +7670,8 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
+        ges_bound_max?: number
+        ges_bound_min?: number
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
@@ -7971,6 +7984,8 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
+        ges_bound_max?: number
+        ges_bound_min?: number
         /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
@@ -8019,6 +8034,8 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
         from_to?: string
+        ges_bound_max?: number
+        ges_bound_min?: number
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
@@ -8061,6 +8078,8 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
+        ges_bound_max?: number
+        ges_bound_min?: number
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *

@@ -7,6 +7,7 @@ import {
   OperationsStatus,
   OperationType,
 } from "accounting/types"
+import { apiTypes } from "common/services/api-fetch.types"
 import i18next from "i18next"
 
 /**
@@ -95,9 +96,13 @@ export const formatOperationCreditOrDebit = (type: string) => {
 
 export const formatObjectiveCategory = (category: string) => {
   switch (category) {
-    case ElecOperationSector.ELEC:
-      return i18next.t("Électricité")
     default:
       return category
   }
 }
+
+export const formatOperation = (
+  operation: apiTypes["OperationList"] | apiTypes["Operation"]
+) => ({
+  quantity_renewable: operation.quantity * operation.renewable_energy_share,
+})

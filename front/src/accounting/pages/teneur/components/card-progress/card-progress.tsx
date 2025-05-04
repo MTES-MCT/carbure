@@ -62,7 +62,7 @@ export const CardProgress = ({
         </div>
         <div>
           {mainValue !== undefined ? (
-            <Title is="p" as="h1">
+            <Title is="p" as="h2">
               {mainValue}
               {mainText !== undefined ? (
                 <Title is="span" as="h5">

@@ -20,6 +20,7 @@ class OperationManager(models.Manager):
                 "customs_category",
                 "validation_date",
                 "created_at",
+                "renewable_energy_share",
                 # Relations nécessaires
                 "biofuel_id",
                 "credited_entity_id",
@@ -33,6 +34,7 @@ class OperationManager(models.Manager):
                 "biofuel__compatible_essence",
                 "biofuel__compatible_diesel",
                 "biofuel__masse_volumique",
+                "biofuel__renewable_energy_share",
                 "credited_entity__name",
                 "debited_entity__name",
                 "from_depot__name",
@@ -68,6 +70,7 @@ class Operation(models.Model):
     EXPORTATION = "EXPORTATION"
     DEVALUATION = "DEVALUATION"
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION"
+    TRANSFERT = "TRANSFERT"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -77,6 +80,7 @@ class Operation(models.Model):
         (EXPORTATION, EXPORTATION),
         (DEVALUATION, DEVALUATION),
         (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
+        (TRANSFERT, TRANSFERT),
     )
 
     ESSENCE = "ESSENCE"
@@ -105,6 +109,8 @@ class Operation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
+    renewable_energy_share = models.FloatField(default=1)
+    durability_period = models.CharField(max_length=6, blank=True, null=True)
 
     objects = OperationManager()
 
@@ -177,6 +183,8 @@ def create_tiruert_operations_from_lots(lots):
             debited_entity=None,
             from_depot=None,
             to_depot=lots[0].carbure_delivery_site,
+            renewable_energy_share=lots[0].biofuel.renewable_energy_share,
+            durability_period=lots[0].period,
         )
 
         lots_bulk = []

@@ -5699,6 +5699,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: operation
           schema:
             type: array
@@ -6253,6 +6261,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: group_by
           schema:
             type: string
@@ -6462,6 +6478,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: operation
           schema:
             type: array
@@ -6665,6 +6689,14 @@ paths:
           name: from_to
           schema:
             type: string
+        - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
         - in: query
           name: operation
           schema:
@@ -7189,11 +7221,19 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           $ref: "#/components/schemas/BalanceBiofuel"
+        ghg_reduction_min:
+          type: number
+          format: double
+        ghg_reduction_max:
+          type: number
+          format: double
       required:
         - available_balance
         - biofuel
         - customs_category
         - declared_teneur
+        - ghg_reduction_max
+        - ghg_reduction_min
         - initial_balance
         - pending_operations
         - pending_teneur
@@ -7207,9 +7247,13 @@ components:
           type: integer
         code:
           type: string
+        renewable_energy_share:
+          type: number
+          format: double
       required:
         - code
         - id
+        - renewable_energy_share
     BalanceByDepot:
       type: object
       properties:
@@ -9644,6 +9688,9 @@ components:
         biofuel:
           type: string
           readOnly: true
+        renewable_energy_share:
+          type: number
+          format: double
         credited_entity:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
@@ -9692,6 +9739,7 @@ components:
         - id
         - quantity
         - quantity_mj
+        - renewable_energy_share
         - sector
         - to_depot
         - type
@@ -9791,6 +9839,9 @@ components:
         biofuel:
           type: string
           readOnly: true
+        renewable_energy_share:
+          type: number
+          format: double
         credited_entity:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
@@ -9825,6 +9876,7 @@ components:
         - from_depot
         - id
         - quantity
+        - renewable_energy_share
         - sector
         - to_depot
         - type
@@ -10085,26 +10137,7 @@ components:
     PatchedOperationUpdateRequest:
       type: object
       properties:
-        type:
-          $ref: "#/components/schemas/OperationTypeEnum"
-        customs_category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        biofuel:
-          type: integer
-          nullable: true
-        credited_entity:
-          type: integer
-          nullable: true
-        debited_entity:
-          type: integer
-          nullable: true
-        from_depot:
-          type: integer
-          nullable: true
         to_depot:
-          type: integer
-          nullable: true
-        export_country:
           type: integer
           nullable: true
     Pays:
@@ -11337,6 +11370,12 @@ components:
         from_depot:
           type: integer
           nullable: true
+        ges_bound_min:
+          type: number
+          format: double
+        ges_bound_max:
+          type: number
+          format: double
       required:
         - biofuel
         - customs_category
@@ -11378,6 +11417,12 @@ components:
         from_depot:
           type: integer
           nullable: true
+        ges_bound_min:
+          type: number
+          format: double
+        ges_bound_max:
+          type: number
+          format: double
       required:
         - biofuel
         - customs_category

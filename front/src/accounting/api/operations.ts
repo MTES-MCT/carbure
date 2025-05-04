@@ -1,6 +1,7 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import { api } from "common/services/api-fetch"
 import { OperationsFilter, OperationsQuery, OperationOrderBy } from "../types"
+import { formatOperation } from "accounting/utils/formatters"
 
 export const getOperationsFilters = (
   filter: string,
@@ -17,14 +18,25 @@ export const getOperationsFilters = (
 }
 
 export const getOperations = (query: OperationsQuery) => {
-  return api.GET("/tiruert/operations/", {
-    params: {
-      query: {
-        ...query,
-        order_by: [OperationOrderBy.ValueMinuscreated_at],
+  return api
+    .GET("/tiruert/operations/", {
+      params: {
+        query: {
+          ...query,
+          order_by: [OperationOrderBy.ValueMinuscreated_at],
+        },
       },
-    },
-  })
+    })
+    .then((response) => ({
+      ...response,
+      data: {
+        ...response.data,
+        results: response.data?.results.map((operation) => ({
+          ...operation,
+          ...formatOperation(operation),
+        })),
+      },
+    }))
 }
 
 export const patchOperation = (
@@ -54,6 +66,8 @@ export const simulateMinMax = (
     target_volume,
     unit,
     from_depot,
+    ges_bound_min,
+    ges_bound_max,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -65,6 +79,8 @@ export const simulateMinMax = (
       target_volume,
       unit,
       from_depot,
+      ges_bound_min,
+      ges_bound_max,
     },
   })
 }
@@ -82,11 +98,20 @@ export const simulate = (
 
 export const createOperation = (
   entityId: number,
-  data: apiTypes["OperationInputRequest"]
+  data: Omit<apiTypes["OperationInputRequest"], "lots"> & {
+    lots: apiTypes["SimulationLotOutput"][]
+  }
 ) => {
   return api.POST("/tiruert/operations/", {
     params: { query: { entity_id: entityId } },
-    body: data,
+    body: {
+      ...data,
+      lots: data.lots.map(({ lot_id, ...rest }) => ({
+        ...rest,
+        volume: parseFloat(rest.volume),
+        id: lot_id,
+      })),
+    },
     bodySerializer: (data) => JSON.stringify(data), // Body contains array of objects, our backend could not handle it in a formData
   })
 }
@@ -127,17 +152,11 @@ export const createOperationWithSimulation = (
     unit: simulation.unit,
     from_depot,
   }).then((response) => {
-    const lots = response.data?.selected_lots.map(({ volume, ...lot }) => ({
-      ...lot,
-      volume: parseFloat(volume),
-    }))
+    const lots = response.data?.selected_lots
     if (lots) {
       return createOperation(entityId, {
         ...operation,
-        lots: lots.map(({ lot_id, ...rest }) => ({
-          id: lot_id,
-          ...rest,
-        })),
+        lots,
         biofuel,
         customs_category,
         debited_entity,
@@ -151,16 +170,26 @@ export const createOperationWithSimulation = (
 }
 
 export const getOperationDetail = (entity_id: number, id: number) => {
-  return api.GET(`/tiruert/operations/{id}/`, {
-    params: {
-      query: {
-        entity_id,
+  return api
+    .GET(`/tiruert/operations/{id}/`, {
+      params: {
+        query: {
+          entity_id,
+        },
+        path: {
+          id,
+        },
       },
-      path: {
-        id,
-      },
-    },
-  })
+    })
+    .then((response) => ({
+      ...response,
+      data: response.data
+        ? {
+            ...response.data,
+            ...formatOperation(response.data),
+          }
+        : undefined,
+    }))
 }
 
 export const deleteOperation = (entity_id: number, operation_id: number) => {

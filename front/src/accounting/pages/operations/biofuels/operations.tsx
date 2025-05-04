@@ -28,14 +28,14 @@ const OperationsBiofuels = () => {
   usePrivateNavigation(t("Comptabilité"))
   const { formatUnit } = useUnit()
   const filterLabels = {
-    [OperationsFilter.depot]: t("Dépôts"),
     [OperationsFilter.status]: t("Statut"),
+    [OperationsFilter.operation]: t("Opération"),
+    [OperationsFilter.depot]: t("Dépôts"),
     [OperationsFilter.sector]: t("Filière"),
     [OperationsFilter.customs_category]: t("Catégorie"),
     [OperationsFilter.biofuel]: t("Biocarburants"),
     [OperationsFilter.period]: t("Date"),
     [OperationsFilter.type]: t("Débit / Crédit"),
-    [OperationsFilter.operation]: t("Opération"),
     [OperationsFilter.from_to]: t("Destinataire"),
   }
 
