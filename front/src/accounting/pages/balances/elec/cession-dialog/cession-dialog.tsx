@@ -12,10 +12,9 @@ import { normalizeEntityPreview } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
 import { NumberInput } from "common/components/inputs2"
 import { ElecBalance } from "accounting/types"
-import Alert from "common/components/alert"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "common/types"
-import { InfoCircle } from "common/components/icons"
+import { Notice } from "common/components/notice"
 
 interface CessionDialogProps {
   balance: ElecBalance
@@ -55,12 +54,12 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
         }
       >
         <Main>
-          <Box>
-            <Form
-              id="elec-cession-form"
-              form={form}
-              onSubmit={() => mutation.execute()}
-            >
+          <Form
+            id="elec-cession-form"
+            form={form}
+            onSubmit={() => mutation.execute()}
+          >
+            <Box>
               <Autocomplete
                 label={t("Sélectionnez un destinataire")}
                 placeholder={t("Rechercher un destinataire")}
@@ -71,7 +70,8 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
                 {...form.bind("credited_entity")}
                 required
               />
-
+            </Box>
+            <Box>
               <NumberInput
                 label={t("Quantité cédée (MJ)")}
                 step={0.001}
@@ -81,21 +81,24 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
                 required
               />
 
-              <Alert icon={InfoCircle} variant="info">
+              <Notice noColor variant="info">
                 {t("Quantité disponible")}
                 {" : "}
-                {formatUnit(balance.available_balance, Unit.MJ, {
-                  fractionDigits: 0,
-                })}
-              </Alert>
-
+                <b>
+                  {formatUnit(balance.available_balance, Unit.MJ, {
+                    fractionDigits: 0,
+                  })}
+                </b>
+              </Notice>
+            </Box>
+            <Box>
               <NumberInput
                 label={t("Tonnes de CO2 évitées")}
                 value={((form.value.quantity ?? 0) * 183) / 1e6}
                 disabled
               />
-            </Form>
-          </Box>
+            </Box>
+          </Form>
         </Main>
       </Dialog>
     </Portal>

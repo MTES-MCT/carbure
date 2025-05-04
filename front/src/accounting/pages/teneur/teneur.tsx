@@ -47,6 +47,7 @@ const Teneur = () => {
         <DeclareElecTeneurDialog //
           onClose={close}
           objective={objective}
+          mainObjective={result?.global}
         />
       ))
     } else {
