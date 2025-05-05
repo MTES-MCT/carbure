@@ -32,17 +32,13 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     renewable_energy_share = serializers.FloatField()
 
     def get_type(self, instance) -> str:
-        entity_id = self.context.get("entity_id")
-        if instance.is_acquisition(entity_id):
-            return Operation.ACQUISITION
-        else:
-            return instance.type
+        return instance._type
 
     def get_sector(self, instance) -> str:
         return instance.sector
 
     def get_volume_l(self, instance) -> float:
-        return instance.volume
+        return instance._volume
 
     def get_quantity(self, instance) -> float:
         volume = self.get_volume_l(instance)

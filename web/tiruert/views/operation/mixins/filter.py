@@ -51,7 +51,6 @@ class FilterActionMixin:
         query_params = request.GET.copy()
 
         filter = request.query_params.get("filter")
-        entity_id = self.request.query_params.get("entity_id")
 
         if not filter:
             raise Exception("No filter was specified")
@@ -64,12 +63,12 @@ class FilterActionMixin:
 
         filters = {
             "status": "status",
-            "sector": "sector",
+            "sector": "_sector",
             "customs_category": "customs_category",
             "biofuel": "biofuel__code",
-            "operation": "operations",
-            "from_to": "entities",
-            "depot": "depots",
+            "operation": "_type",
+            "from_to": "_entity",
+            "depot": "_depot",
             "type": "types",
             "period": "created_at",
         }
@@ -79,36 +78,9 @@ class FilterActionMixin:
             raise Exception(f"Filter '{filter}' does not exist for operations")
 
         queryset = queryset.annotate(
-            entities=Coalesce(
-                "credited_entity__name",
-                "debited_entity__name",
-            ),
-            depots=Coalesce(
-                "from_depot__name",
-                "to_depot__name",
-            ),
-            sector=Case(
-                When(biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
-                When(biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
-                default=Value(None),
-                output_field=CharField(),
-            ),
             types=Case(
                 When(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"], then=Value("CREDIT")),
-                When(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"], then=Value("DEBIT")),
-                default=Value(None),
-                output_field=CharField(),
-            ),
-            operations=Case(
-                When(type="CESSION", credited_entity_id=entity_id, then=Value("ACQUISITION")),
-                When(type="CESSION", then=Value("CESSION")),
-                When(type="INCORPORATION", then=Value("INCORPORATION")),
-                When(type="TENEUR", then=Value("TENEUR")),
-                When(type="LIVRAISON_DIRECTE", then=Value("LIVRAISON_DIRECTE")),
-                When(type="MAC_BIO", then=Value("MAC_BIO")),
-                When(type="EXPORTATION", then=Value("EXPORTATION")),
-                When(type="DEVALUATION", then=Value("DEVALUATION")),
+                When(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION", "TRANSFERT"], then=Value("DEBIT")),
                 default=Value(None),
                 output_field=CharField(),
             ),
