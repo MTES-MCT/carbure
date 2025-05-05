@@ -33,11 +33,16 @@ import { CONVERSIONS, floorNumber, formatUnit } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
-import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
+import {
+  useDeclareTeneurDialog,
+  useRemainingCO2Objective,
+  useRemainingEnergyBeforeLimitOrObjective,
+} from "./declare-teneur-dialog.hooks"
 import {
   DeclareTeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
+import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
@@ -68,19 +73,9 @@ const DeclareTeneurDialogContent = ({
     values: form.value,
   })
 
-  const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
-    // Add quantity declared only if the "declare quantity" button has been clicked
-    const quantity = form.value.quantity ?? 0
-
-    const remainingEnergy = Math.max(
-      0,
-      objective.target ? computeObjectiveEnergy(objective) - quantity : 0
-    )
-
-    return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
-      fractionDigits: 0,
-    })
-  }, [form.value.quantity, objective])
+  const remainingEnergyBeforeLimitOrObjective =
+    useRemainingEnergyBeforeLimitOrObjective(objective)
+  const remainingCO2Objective = useRemainingCO2Objective(mainObjective)
 
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
@@ -137,6 +132,10 @@ const DeclareTeneurDialogContent = ({
                 <RecapOperation
                   balance={form.value.balance!}
                   unit={ExtendedUnit.GJ}
+                />
+                <RecapGHGRange
+                  min={form.value.gesBoundMin}
+                  max={form.value.gesBoundMax}
                 />
                 {currentStepIndex > 2 && (
                   <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
@@ -211,6 +210,8 @@ const DeclareTeneurDialogContent = ({
                     backendUnit={Unit.MJ}
                     // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
                     converter={CONVERSIONS.energy.GJ_TO_MJ}
+                    gesBoundMin={form.value.gesBoundMin}
+                    gesBoundMax={form.value.gesBoundMax}
                   />
                 </Box>
                 {form.value.avoided_emissions_min ? (
@@ -228,6 +229,13 @@ const DeclareTeneurDialogContent = ({
                         label={t("Objectif global")}
                       />
                     )}
+                    {remainingCO2Objective && (
+                      <RecapData.RemainingQuantityBegoreCO2Objective
+                        value={remainingCO2Objective}
+                        bold
+                        size="md"
+                      />
+                    )}
                   </Box>
                 ) : null}
               </>
@@ -241,7 +249,12 @@ const DeclareTeneurDialogContent = ({
 
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
-  const form = useForm<DeclareTeneurDialogForm>({})
+
+  const form = useForm<DeclareTeneurDialogForm>({
+    gesBoundMin: undefined,
+    gesBoundMax: undefined,
+  })
+
   const backendUnit = Unit.MJ
 
   const quantityFormStep = useQuantityFormStep({

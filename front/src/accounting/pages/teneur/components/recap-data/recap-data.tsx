@@ -83,10 +83,29 @@ const RemainingQuantityBeforeObjective = ({
   )
 }
 
+const RemainingQuantityBegoreCO2Objective = ({
+  value,
+  bold,
+  size = "sm",
+}: {
+  value: string
+  bold?: boolean
+  size?: TextProps<"p">["size"]
+}) => {
+  const { t } = useTranslation()
+  return (
+    <Text size={size} fontWeight={bold ? "bold" : "regular"}>
+      {t("Quantité restante jusqu'à l'objectif global CO2 :")} {value} tCO2
+      évitées
+    </Text>
+  )
+}
+
 export const RecapData = {
   TeneurDeclared: RecapDataTeneurDeclared,
   TeneurDeclaredMonth: RecapDataTeneurDeclaredMonth,
   QuantityAvailable: RecapDataQuantityAvailable,
   RemainingQuantityBeforeLimit: RemainingQuantityBeforeLimit,
   RemainingQuantityBeforeObjective: RemainingQuantityBeforeObjective,
+  RemainingQuantityBegoreCO2Objective: RemainingQuantityBegoreCO2Objective,
 }

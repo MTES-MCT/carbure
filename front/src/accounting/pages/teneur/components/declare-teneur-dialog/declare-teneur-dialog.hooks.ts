@@ -5,8 +5,16 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { formatUnit } from "common/utils/formatters"
+import { formatNumber, formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
+import {
+  CategoryObjective,
+  MainObjective,
+  UnconstrainedCategoryObjective,
+} from "../../types"
+import { useFormContext } from "common/components/form2"
+import { useMemo } from "react"
+import { computeObjectiveEnergy } from "../../utils/formatters"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -57,4 +65,47 @@ export const useDeclareTeneurDialog = ({
   })
 
   return mutation
+}
+
+// Compute the remaining CO2 objective after the avoided emissions have been declared
+export const useRemainingCO2Objective = (mainObjective?: MainObjective) => {
+  const { value } = useFormContext<DeclareTeneurDialogForm>()
+
+  return useMemo(() => {
+    if (!mainObjective) return null
+
+    const avoidedEmissions = value.avoided_emissions ?? 0
+    const remainingCO2 = Math.max(
+      0,
+      mainObjective.target -
+        mainObjective.teneur_declared -
+        mainObjective.teneur_declared_month -
+        avoidedEmissions
+    )
+    return formatNumber(remainingCO2, {
+      fractionDigits: 0,
+      mode: "ceil",
+    })
+  }, [mainObjective, value.avoided_emissions])
+}
+
+// Compute the remaining energy before the limit or the objective after the quantity has been declared
+export const useRemainingEnergyBeforeLimitOrObjective = (
+  objective: CategoryObjective | UnconstrainedCategoryObjective
+) => {
+  const { value } = useFormContext<DeclareTeneurDialogForm>()
+
+  return useMemo(() => {
+    // Add quantity declared only if the "declare quantity" button has been clicked
+    const quantity = value.quantity ?? 0
+
+    const remainingEnergy = Math.max(
+      0,
+      objective.target ? computeObjectiveEnergy(objective) - quantity : 0
+    )
+
+    return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
+      fractionDigits: 0,
+    })
+  }, [value.quantity, objective])
 }

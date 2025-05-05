@@ -35,7 +35,7 @@ export const quantityFormStep: (
 export const getQuantityInputLabel = (type: CreateOperationType) => {
   switch (type) {
     case CreateOperationType.CESSION:
-      return i18next.t("Saisir une quantité d'énergie consommée")
+      return i18next.t("Saisir une quantité d'énergie à céder")
     case CreateOperationType.EXPORTATION:
       return i18next.t("Saisir une quantité pour l'exportation")
     case CreateOperationType.TENEUR:

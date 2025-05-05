@@ -69,6 +69,8 @@ export const simulateMinMax = (
     target_volume,
     unit,
     from_depot,
+    ges_bound_min,
+    ges_bound_max,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -80,6 +82,8 @@ export const simulateMinMax = (
       target_volume,
       unit,
       from_depot,
+      ges_bound_min,
+      ges_bound_max,
     },
   })
 }
