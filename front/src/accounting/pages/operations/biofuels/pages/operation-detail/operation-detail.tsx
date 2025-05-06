@@ -101,7 +101,11 @@ export const OperationDetail = () => {
 
   const onAcceptOperation = () => {
     const patch = () => {
-      if (operation && value.to_depot?.id !== operation?.to_depot?.id) {
+      if (
+        operation &&
+        operation.type === OperationType.ACQUISITION &&
+        value.to_depot?.id !== operation?.to_depot?.id
+      ) {
         return patchOperation(entity.id, operation?.id, {
           to_depot: value.to_depot?.id,
         })
@@ -139,14 +143,16 @@ export const OperationDetail = () => {
             formatUnit(operation.quantity, {
               fractionDigits: 2,
               appendZeros: false,
-            })
+            }),
+            entity.id
           )} / ${getOperationQuantity(
             operation,
             formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
               fractionDigits: 2,
               unit: ExtendedUnit.GJ,
               appendZeros: false,
-            })
+            }),
+            entity.id
           )}`,
         },
         operation.type === OperationType.INCORPORATION &&
@@ -157,7 +163,8 @@ export const OperationDetail = () => {
               formatUnit(roundNumber(formatValue(operation.quantity), 2), {
                 fractionDigits: 2,
                 appendZeros: false,
-              })
+              }),
+              entity.id
             )} / ${getOperationQuantity(
               operation,
               formatUnit(
@@ -169,7 +176,8 @@ export const OperationDetail = () => {
                   unit: ExtendedUnit.GJ,
                   appendZeros: false,
                 }
-              )
+              ),
+              entity.id
             )}`,
           },
         {
@@ -180,11 +188,13 @@ export const OperationDetail = () => {
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
-          value: getOperationEntity(operation)?.name ?? "-",
+          value: getOperationEntity(operation, entity.id)?.name ?? "-",
         },
-        operation.type === OperationType.CESSION && {
+        [OperationType.CESSION, OperationType.TRANSFERT].includes(
+          operation.type as OperationType
+        ) && {
           label: t("Destinataire"),
-          value: getOperationEntity(operation)?.name ?? "-",
+          value: getOperationEntity(operation, entity.id)?.name ?? "-",
         },
         operation.type !== OperationType.TENEUR && {
           label: t("Dépôt expéditeur"),
@@ -220,7 +230,13 @@ export const OperationDetail = () => {
         }
         footer={
           <>
-            {operation?.type === OperationType.ACQUISITION &&
+            {/* Display reject/accept button in two cases :
+             - Acquisition operation
+             - Transfert operation only if it's a credit operation
+            */}
+            {(operation?.type === OperationType.ACQUISITION ||
+              (operation?.type === OperationType.TRANSFERT &&
+                !isOperationDebit(operation, entity.id))) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <>
@@ -245,7 +261,8 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {isOperationDebit(operation?.type ?? "") &&
+            {operation &&
+              isOperationDebit(operation, entity.id) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button
@@ -254,10 +271,7 @@ export const OperationDetail = () => {
                   onClick={() => deleteOperation(entity.id, operation.id)}
                   loading={deleteOperationLoading}
                 >
-                  {operation?.type === OperationType.CESSION &&
-                    t("Annuler le certificat de cession")}
-                  {operation?.type === OperationType.TENEUR &&
-                    t("Annuler le certificat de teneur")}
+                  {t("Annuler le certificat")}
                 </Button>
               )}
           </>
@@ -275,11 +289,11 @@ export const OperationDetail = () => {
                     <Text className={css["field-value"]}>{value}</Text>
                   </div>
                 ))}
-                {operation?.type === OperationType.ACQUISITION &&
-                  operation?.status === OperationsStatus.PENDING &&
-                  canUpdateOperation && (
-                    <div className={css["operation-detail-fields-depot"]}>
-                      <Form id="patch-operation" onSubmit={onAcceptOperation}>
+                <Form id="patch-operation" onSubmit={onAcceptOperation}>
+                  {operation?.type === OperationType.ACQUISITION &&
+                    operation?.status === OperationsStatus.PENDING &&
+                    canUpdateOperation && (
+                      <div className={css["operation-detail-fields-depot"]}>
                         <Autocomplete
                           autoFocus
                           label={t("Dépot de livraison")}
@@ -298,9 +312,9 @@ export const OperationDetail = () => {
                           })}
                           {...bind("to_depot")}
                         />
-                      </Form>
-                    </div>
-                  )}
+                      </div>
+                    )}
+                </Form>
               </Grid>
               {operation?.type === OperationType.ACQUISITION &&
                 operation?.status === OperationsStatus.PENDING &&

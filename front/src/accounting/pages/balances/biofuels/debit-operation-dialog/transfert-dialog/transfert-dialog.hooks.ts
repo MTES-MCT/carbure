@@ -42,7 +42,7 @@ export const useTransfertDialog = ({
       onOperationCreated()
       notify(
         t(
-          "La mise en teneur d'une quantité de {{quantity}} a été réalisée avec succès",
+          "Le transfert de droits d'une quantité de {{quantity}} a été réalisé avec succès",
           {
             quantity: formatUnit(values.quantity!, {
               fractionDigits: 0,
@@ -54,7 +54,7 @@ export const useTransfertDialog = ({
       onClose()
     },
     onError: () => {
-      notify(t("Une erreur est survenue lors de la mise en teneur."), {
+      notify(t("Une erreur est survenue lors du transfert de droits."), {
         variant: "danger",
       })
     },

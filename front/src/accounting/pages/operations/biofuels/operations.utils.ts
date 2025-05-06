@@ -1,8 +1,4 @@
-import {
-  Operation,
-  OperationDebitOrCredit,
-  OperationType,
-} from "accounting/types"
+import { Operation, OperationDebitOrCredit } from "accounting/types"
 
 export const formatOperationCreditOrDebit = (type: string) => {
   switch (type) {
@@ -15,28 +11,22 @@ export const formatOperationCreditOrDebit = (type: string) => {
   }
 }
 
-export const isOperationDebit = (operation: string) =>
-  [
-    OperationType.CESSION,
-    OperationType.TENEUR,
-    OperationType.EXPORTATION,
-    OperationType.DEVALUATION,
-  ].includes(operation as OperationType)
+export const isOperationDebit = (operation: Operation, entityId: number) => {
+  return operation.debited_entity && operation.debited_entity.id === entityId
+}
 
-export const getOperationEntity = (operation: Operation) =>
-  [
-    OperationType.TENEUR,
-    OperationType.EXPORTATION,
-    OperationType.DEVALUATION,
-    OperationType.ACQUISITION,
-  ].includes(operation.type as OperationType)
-    ? operation.debited_entity
-    : operation.credited_entity
+export const getOperationEntity = (operation: Operation, entityId: number) => {
+  if (operation.credited_entity && operation.credited_entity.id === entityId) {
+    return operation.debited_entity
+  }
+  return operation.credited_entity
+}
 
 export const getOperationQuantity = (
   operation: Operation,
-  formattedQuantity: string
+  formattedQuantity: string,
+  entityId: number
 ) =>
-  isOperationDebit(operation.type)
+  isOperationDebit(operation, entityId)
     ? `-${formattedQuantity}`
     : `+${formattedQuantity}`

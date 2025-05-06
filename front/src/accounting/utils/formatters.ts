@@ -48,7 +48,7 @@ export const formatOperationType = (type: string) => {
     case OperationType.ACQUISITION:
       return i18next.t("Acquisition")
     case OperationType.TRANSFERT:
-      return i18next.t("Transfert de droit")
+      return i18next.t("Transfert de droits")
     default:
       return i18next.t("Inconnu")
   }

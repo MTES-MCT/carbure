@@ -45,7 +45,7 @@ export const TransfertGHGRangeForm = ({
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit()
   const entity = useEntity()
-  const { value } = useFormContext<TransfertGHGRangeFormProps>()
+  const { value, setField } = useFormContext<TransfertGHGRangeFormProps>()
 
   const { result } = useQuery(debouncedGetBalance, {
     key: "balance-ghg-min-max",
@@ -59,6 +59,11 @@ export const TransfertGHGRangeForm = ({
       unit,
     ],
     executeOnMount: false,
+    onSuccess: (data) => {
+      if (data) {
+        setField("availableBalance", data.available_balance)
+      }
+    },
   })
 
   return (

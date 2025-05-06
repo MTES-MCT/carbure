@@ -84,6 +84,19 @@ class FilterActionMixin:
                 default=Value(None),
                 output_field=CharField(),
             ),
+            operations=Case(
+                When(type="CESSION", credited_entity_id=entity_id, then=Value("ACQUISITION")),
+                When(type="CESSION", then=Value("CESSION")),
+                When(type="INCORPORATION", then=Value("INCORPORATION")),
+                When(type="TENEUR", then=Value("TENEUR")),
+                When(type="TRANSFERT", then=Value("TRANSFERT")),
+                When(type="LIVRAISON_DIRECTE", then=Value("LIVRAISON_DIRECTE")),
+                When(type="MAC_BIO", then=Value("MAC_BIO")),
+                When(type="EXPORTATION", then=Value("EXPORTATION")),
+                When(type="DEVALUATION", then=Value("DEVALUATION")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
             periods=Concat(
                 ExtractYear("created_at", output_field=CharField()),
                 Case(

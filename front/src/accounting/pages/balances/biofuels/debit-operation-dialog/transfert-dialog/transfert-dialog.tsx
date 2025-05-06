@@ -24,7 +24,6 @@ import {
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
-import { GHGRangeForm } from "accounting/components/ghg-range-form"
 import { TransfertGHGRangeForm } from "./ghg-range-form"
 
 interface TransfertDialogProps {
@@ -59,7 +58,7 @@ export const TransfertDialogContent = ({
       fullWidth
       onClose={onClose}
       header={
-        <Dialog.Title>{t("Réaliser un transfert de droit")}</Dialog.Title>
+        <Dialog.Title>{t("Réaliser un transfert de droits")}</Dialog.Title>
       }
       footer={
         <>
@@ -81,7 +80,19 @@ export const TransfertDialogContent = ({
         <Stepper />
         <Box>
           <RecapOperationGrid>
-            <RecapOperation balance={balance} />
+            <RecapOperation
+              balance={
+                // Change the available balance value only if the step is completed
+                currentStepIndex > 1
+                  ? {
+                      ...balance,
+                      available_balance:
+                        form.value.availableBalance ??
+                        balance.available_balance,
+                    }
+                  : balance
+              }
+            />
             {currentStepIndex > 1 && (
               <>
                 <RecipientToDepotSummary values={form.value} />
@@ -111,7 +122,9 @@ export const TransfertDialogContent = ({
               <Box>
                 <QuantityForm
                   balance={balance}
-                  depot_quantity_max={balance.available_balance}
+                  depot_quantity_max={
+                    form.value.availableBalance ?? balance.available_balance
+                  }
                   type={CreateOperationType.TRANSFERT}
                   gesBoundMin={form.value.gesBoundMin}
                   gesBoundMax={form.value.gesBoundMax}
@@ -130,6 +143,7 @@ export const TransfertDialog = (props: TransfertDialogProps) => {
   const form = useForm<TransfertDialogForm>({
     gesBoundMin: Math.floor(props.balance.ghg_reduction_min),
     gesBoundMax: Math.ceil(props.balance.ghg_reduction_max),
+    availableBalance: props.balance.available_balance,
   })
   const quantityFormStep = useQuantityFormStep({
     balance: props.balance,

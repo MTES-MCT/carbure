@@ -26,6 +26,7 @@ import {
 import styles from "./operations.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
+import useEntity from "common/hooks/entity"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -35,7 +36,7 @@ export const useOperationsBiofuelsColumns = ({
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
   const { unit } = useUnit()
-
+  const currentEntity = useEntity()
   const columns: Column<Operation>[] = [
     {
       header: t("Statut"),
@@ -87,12 +88,13 @@ export const useOperationsBiofuelsColumns = ({
     {
       header: t("De/à"),
       cell: (item) => {
-        const entity = getOperationEntity(item)
+        const entity = getOperationEntity(item, currentEntity.id)
         return (
           <Cell
             text={
               item.type === OperationType.CESSION ||
-              item.type === OperationType.ACQUISITION
+              item.type === OperationType.ACQUISITION ||
+              item.type === OperationType.TRANSFERT
                 ? entity.name
                 : "-"
             }
@@ -103,7 +105,7 @@ export const useOperationsBiofuelsColumns = ({
     {
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       cell: (item) =>
-        isOperationDebit(item.type) ? (
+        isOperationDebit(item, currentEntity.id) ? (
           <Text
             size="sm"
             fontWeight="semibold"
