@@ -1,8 +1,11 @@
-from django.db.models import Sum
+from django.db.models import Q, Sum
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from core.models import Entity
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from tiruert.models.elec_operation import ElecOperation
+from tiruert.services.elec_balance import ElecBalanceService
 
 
 class ElecOperationService:
@@ -45,3 +48,21 @@ class ElecOperationService:
                 quantity=diff,
                 credited_entity=operator,
             )
+
+    @staticmethod
+    def perform_checks_before_create(request, validated_data: dict, updated: ElecOperation = None):
+        debited = validated_data.get("debited_entity")
+        quantity = validated_data.get("quantity")
+
+        if debited is None:
+            return
+
+        operations = ElecOperation.objects.filter(Q(credited_entity=debited) | Q(debited_entity=debited)).distinct()
+        balance = ElecBalanceService.calculate_balance(operations, debited.id)
+
+        available_balance = balance["available_balance"]
+        if updated is not None:
+            available_balance += updated.quantity
+
+        if quantity > available_balance:
+            raise serializers.ValidationError({"quantity": _("Quantity is greater than the available balance")})

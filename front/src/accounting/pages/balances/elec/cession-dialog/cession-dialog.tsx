@@ -74,8 +74,7 @@ export const CessionDialog = ({ balance, onClose }: CessionDialogProps) => {
             <Box>
               <NumberInput
                 label={t("Quantité cédée (MJ)")}
-                step={0.001}
-                min={0.001}
+                min={1}
                 max={balance.available_balance}
                 {...form.bind("quantity")}
                 required
