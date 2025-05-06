@@ -74,8 +74,11 @@ const DeclareTeneurDialogContent = ({
   })
 
   const remainingEnergyBeforeLimitOrObjective =
-    useRemainingEnergyBeforeLimitOrObjective(objective)
-  const remainingCO2Objective = useRemainingCO2Objective(mainObjective)
+    useRemainingEnergyBeforeLimitOrObjective(objective, form.value)
+  const remainingCO2Objective = useRemainingCO2Objective(
+    form.value,
+    mainObjective
+  )
 
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
