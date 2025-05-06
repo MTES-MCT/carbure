@@ -37,10 +37,11 @@ class BaseFilter(FilterSet):
     @extend_schema_field(ListField(child=ChoiceField(choices=["CREDIT", "DEBIT"])))
     def filter_type(self, queryset, name, value):
         value = value.upper()
+        entity_id = self.request.query_params.get("entity_id")
         if value == "CREDIT":
-            return queryset.filter(type__in=["ACQUISITION_FROM_CPO", "ACQUISITION"]).distinct()
+            return queryset.filter(type__in=["CESSION", "ACQUISITION_FROM_CPO"], credited_entity_id=entity_id).distinct()
         elif value == "DEBIT":
-            return queryset.filter(type__in=["CESSION", "TENEUR"]).distinct()
+            return queryset.filter(type__in=["CESSION", "TENEUR"], debited_entity_id=entity_id).distinct()
         else:
             return queryset
 
