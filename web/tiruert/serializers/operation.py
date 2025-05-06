@@ -95,6 +95,7 @@ class OperationSerializer(BaseOperationSerializer):
             "export_country",
             "created_at",
             "validation_date",
+            "durability_period",
             "quantity",
             "quantity_mj",
             "avoided_emissions",

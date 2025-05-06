@@ -2804,6 +2804,7 @@ export interface components {
       readonly created_at: string
       /** Format: date */
       validation_date?: string | null
+      durability_period?: string | null
       /** Format: double */
       readonly quantity: number
       /** Format: double */
@@ -2891,6 +2892,7 @@ export interface components {
      *     * `EXPORTATION` - EXPORTATION
      *     * `DEVALUATION` - DEVALUATION
      *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+     *     * `TRANSFERT` - TRANSFERT
      * @enum {string}
      */
     OperationTypeEnum: OperationTypeEnum
@@ -7083,8 +7085,26 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7399,8 +7419,26 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7447,8 +7485,26 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -7491,8 +7547,26 @@ export interface operations {
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -7743,11 +7817,30 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   EXPORTATION = "EXPORTATION",
   DEVALUATION = "DEVALUATION",
   CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+  TRANSFERT = "TRANSFERT",
   ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
+  ValueMinusbiofuel = "-biofuel",
   ValueMinuscreated_at = "-created_at",
+  ValueMinuscustoms_category = "-customs_category",
+  ValueMinusdepot = "-depot",
+  ValueMinusfrom_to = "-from_to",
+  ValueMinuspending_operations = "-pending_operations",
+  ValueMinusquantity = "-quantity",
+  ValueMinussector = "-sector",
+  ValueMinusstatus = "-status",
+  ValueMinustype = "-type",
+  biofuel = "biofuel",
   created_at = "created_at",
+  customs_category = "customs_category",
+  depot = "depot",
+  from_to = "from_to",
+  pending_operations = "pending_operations",
+  quantity = "quantity",
+  sector = "sector",
+  status = "status",
+  type = "type",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
@@ -7899,6 +7992,7 @@ export enum OperationTypeEnum {
   EXPORTATION = "EXPORTATION",
   DEVALUATION = "DEVALUATION",
   CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+  TRANSFERT = "TRANSFERT",
 }
 export enum OwnershipTypeEnum {
   OWN = "OWN",

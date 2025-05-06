@@ -5087,6 +5087,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5098,6 +5099,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5106,13 +5108,49 @@ paths:
             items:
               type: string
               enum:
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - name: page
@@ -5659,6 +5697,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5670,6 +5709,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5678,13 +5718,49 @@ paths:
             items:
               type: string
               enum:
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - name: page
@@ -5866,6 +5942,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5877,6 +5954,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5885,13 +5963,49 @@ paths:
             items:
               type: string
               enum:
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - in: query
@@ -6078,6 +6192,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -6089,6 +6204,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -6097,13 +6213,49 @@ paths:
             items:
               type: string
               enum:
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - in: query
@@ -8921,6 +9073,10 @@ components:
           type: string
           format: date
           nullable: true
+        durability_period:
+          type: string
+          nullable: true
+          maxLength: 6
         quantity:
           type: number
           format: double
@@ -9135,6 +9291,7 @@ components:
         - EXPORTATION
         - DEVALUATION
         - CUSTOMS_CORRECTION
+        - TRANSFERT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -9145,6 +9302,7 @@ components:
         * `EXPORTATION` - EXPORTATION
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+        * `TRANSFERT` - TRANSFERT
     OtpResponse:
       type: object
       properties:
