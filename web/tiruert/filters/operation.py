@@ -37,6 +37,8 @@ class BaseFilter(FilterSet):
             ("_depot", "depot"),
             ("_entity", "from_to"),
             ("_volume", "quantity"),
+            ("id", "available_balance"),  # fake ordering for balance
+            ("id", "pending_operations"),  # fake ordering for balance
         )
     )
 
