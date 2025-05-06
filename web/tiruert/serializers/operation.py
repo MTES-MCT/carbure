@@ -24,8 +24,8 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     credited_entity = OperationEntitySerializer()
     debited_entity = OperationEntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
-    sector = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
+    sector = serializers.CharField(source="_sector", read_only=True)
+    type = serializers.CharField(source="_type", read_only=True)
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
     quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
@@ -33,13 +33,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
 
-    def get_type(self, instance) -> str:
-        return instance._type
-
-    def get_sector(self, instance) -> str:
-        return instance.sector
-
     def get_volume_l(self, instance) -> float:
+        if getattr(instance, "volume", None) is not None:
+            return instance.volume
         return instance._volume
 
     def get_quantity(self, instance) -> float:
