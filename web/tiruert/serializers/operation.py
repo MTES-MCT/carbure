@@ -24,20 +24,18 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     credited_entity = OperationEntitySerializer()
     debited_entity = OperationEntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
-    sector = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
+    sector = serializers.CharField(source="_sector", read_only=True)
+    type = serializers.CharField(source="_type", read_only=True)
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
     quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
     renewable_energy_share = serializers.FloatField()
-
-    def get_type(self, instance) -> str:
-        return instance._type
-
-    def get_sector(self, instance) -> str:
-        return instance.sector
+    _entity = serializers.CharField(read_only=True)
+    _depot = serializers.CharField(read_only=True)
 
     def get_volume_l(self, instance) -> float:
+        if getattr(instance, "volume", None) is not None:
+            return instance.volume
         return instance._volume
 
     def get_quantity(self, instance) -> float:
@@ -67,8 +65,10 @@ class OperationListSerializer(BaseOperationSerializer):
             "renewable_energy_share",
             "credited_entity",
             "debited_entity",
+            "_entity",
             "from_depot",
             "to_depot",
+            "_depot",
             "export_country",
             "created_at",
             "quantity",
@@ -90,8 +90,10 @@ class OperationSerializer(BaseOperationSerializer):
             "renewable_energy_share",
             "credited_entity",
             "debited_entity",
+            "_entity",
             "from_depot",
             "to_depot",
+            "_depot",
             "export_country",
             "created_at",
             "validation_date",
