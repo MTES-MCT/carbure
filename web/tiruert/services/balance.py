@@ -134,14 +134,14 @@ class BalanceService:
             conversion_factor = BalanceService._get_conversion_factor(operation, unit)
 
             for detail in operation.details.all():
-                key = BalanceService._get_key(operation, group_by, detail, depot)
-
                 # Keep only lots with requested GHG reduction
                 if ges_bound_min is not None and ges_bound_max is not None:
                     if detail.lot.ghg_reduction_red_ii <= float(ges_bound_min) or detail.lot.ghg_reduction_red_ii >= float(
                         ges_bound_max
                     ):
                         continue
+
+                key = BalanceService._get_key(operation, group_by, detail, depot)
 
                 if group_by != BalanceService.GROUP_BY_CATEGORY:
                     balance[key]["sector"] = operation.sector
@@ -162,7 +162,7 @@ class BalanceService:
                 if group_by not in BalanceService.GROUP_BY_ALL:
                     BalanceService._update_ghg_min_max(balance, key, detail)
 
-            if operation.status == Operation.PENDING:
+            if "key" in locals() is not None and operation.status == Operation.PENDING:
                 balance[key]["pending_operations"] += 1
 
         if group_by == BalanceService.GROUP_BY_DEPOT:
