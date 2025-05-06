@@ -284,11 +284,15 @@ export const OperationDetail = () => {
                     <Text className={css["field-value"]}>{value}</Text>
                   </div>
                 ))}
-                <Form id="patch-operation" onSubmit={onAcceptOperation}>
+                <Form
+                  id="patch-operation"
+                  onSubmit={onAcceptOperation}
+                  className={css["operation-detail-fields-depot"]}
+                >
                   {operation?.type === OperationType.ACQUISITION &&
                     operation?.status === OperationsStatus.PENDING &&
                     canUpdateOperation && (
-                      <div className={css["operation-detail-fields-depot"]}>
+                      <div>
                         <Autocomplete
                           autoFocus
                           label={t("Dépot de livraison")}

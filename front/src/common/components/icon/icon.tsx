@@ -262,3 +262,7 @@ export const WarningFill = ({ ...props }: IconProps) => {
 export const AlertFill = ({ ...props }: IconProps) => {
   return <Icon {...props} name="fr-icon-error-fill" />
 }
+
+export const GasStationFill = ({ ...props }: IconProps) => {
+  return <Icon {...props} name="ri-gas-station-fill" />
+}
