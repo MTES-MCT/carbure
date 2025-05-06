@@ -26,7 +26,7 @@ class Objective(models.Model):
     year = models.IntegerField()
     consideration_rate = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%")
     target = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%")
-    target_type = models.CharField(max_length=255, choices=TARGET_TYPES, default="REACH")
+    target_type = models.CharField(max_length=255, choices=TARGET_TYPES, blank=True)
     penalty = models.IntegerField(blank=True, null=True, help_text="en centimes d'euros")
 
     objects = ObjectiveManager()
