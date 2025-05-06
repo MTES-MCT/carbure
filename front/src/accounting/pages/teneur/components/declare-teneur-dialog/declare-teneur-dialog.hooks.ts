@@ -12,7 +12,6 @@ import {
   MainObjective,
   UnconstrainedCategoryObjective,
 } from "../../types"
-import { useFormContext } from "common/components/form2"
 import { useMemo } from "react"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 
@@ -68,13 +67,14 @@ export const useDeclareTeneurDialog = ({
 }
 
 // Compute the remaining CO2 objective after the avoided emissions have been declared
-export const useRemainingCO2Objective = (mainObjective?: MainObjective) => {
-  const { value } = useFormContext<DeclareTeneurDialogForm>()
-
+export const useRemainingCO2Objective = (
+  values: DeclareTeneurDialogForm,
+  mainObjective?: MainObjective
+) => {
   return useMemo(() => {
     if (!mainObjective) return null
 
-    const avoidedEmissions = value.avoided_emissions ?? 0
+    const avoidedEmissions = values.avoided_emissions ?? 0
     const remainingCO2 = Math.max(
       0,
       mainObjective.target -
@@ -86,18 +86,17 @@ export const useRemainingCO2Objective = (mainObjective?: MainObjective) => {
       fractionDigits: 0,
       mode: "ceil",
     })
-  }, [mainObjective, value.avoided_emissions])
+  }, [mainObjective, values.avoided_emissions])
 }
 
 // Compute the remaining energy before the limit or the objective after the quantity has been declared
 export const useRemainingEnergyBeforeLimitOrObjective = (
-  objective: CategoryObjective | UnconstrainedCategoryObjective
+  objective: CategoryObjective | UnconstrainedCategoryObjective,
+  values: DeclareTeneurDialogForm
 ) => {
-  const { value } = useFormContext<DeclareTeneurDialogForm>()
-
   return useMemo(() => {
     // Add quantity declared only if the "declare quantity" button has been clicked
-    const quantity = value.quantity ?? 0
+    const quantity = values.quantity ?? 0
 
     const remainingEnergy = Math.max(
       0,
@@ -107,5 +106,5 @@ export const useRemainingEnergyBeforeLimitOrObjective = (
     return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
       fractionDigits: 0,
     })
-  }, [value.quantity, objective])
+  }, [values.quantity, objective])
 }
