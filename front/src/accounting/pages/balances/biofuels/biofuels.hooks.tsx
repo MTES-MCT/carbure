@@ -10,6 +10,7 @@ import { DebitOperationDialog } from "./debit-operation-dialog"
 import {
   BalancesFilter,
   BalancesQuery,
+  OperationOrder,
   OperationsStatus,
 } from "accounting/types"
 import * as api from "accounting/api/balances"
@@ -36,14 +37,17 @@ export const useBalancesBiofuelsColumns = () => {
     {
       header: t("Filière"),
       cell: (item) => formatSector(item.sector),
+      key: OperationOrder.sector,
     },
     {
       header: t("Biocarburant"),
       cell: (item) => item.biofuel?.code,
+      key: OperationOrder.biofuel,
     },
     {
       header: t("Catégorie"),
       cell: (item) => item.customs_category,
+      key: OperationOrder.customs_category,
     },
     {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
@@ -51,6 +55,7 @@ export const useBalancesBiofuelsColumns = () => {
         formatNumber(item.available_balance, { fractionDigits: 0 }),
     },
     {
+      key: OperationOrder.pending_operations,
       header: t("Opérations en attente"),
       cell: (item) =>
         item.pending_operations === 0 ? (

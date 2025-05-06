@@ -9,12 +9,6 @@ import {
   QuantitySummary,
   useQuantityFormStep,
 } from "accounting/components/quantity-form"
-import {
-  RecipientToDepotForm,
-  recipientToDepotStep,
-  recipientToDepotStepKey,
-  RecipientToDepotSummary,
-} from "accounting/components/recipient-to-depot-form"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
 import { useTransfertDialog } from "./transfert-dialog.hooks"
 import { Button } from "common/components/button2"
@@ -25,6 +19,12 @@ import {
 } from "accounting/components/recap-operation"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 import { TransfertGHGRangeForm } from "./ghg-range-form"
+import {
+  RecipientForm,
+  recipientStep,
+  recipientStepKey,
+  RecipientSummary,
+} from "accounting/components/recipient-form"
 
 interface TransfertDialogProps {
   onClose: () => void
@@ -95,7 +95,7 @@ export const TransfertDialogContent = ({
             />
             {currentStepIndex > 1 && (
               <>
-                <RecipientToDepotSummary values={form.value} />
+                <RecipientSummary values={form.value} />
                 <RecapGHGRange
                   min={form.value.gesBoundMin}
                   max={form.value.gesBoundMax}
@@ -108,10 +108,10 @@ export const TransfertDialogContent = ({
 
         {currentStep?.key !== "recap" && (
           <Form form={form}>
-            {currentStep?.key === recipientToDepotStepKey && (
+            {currentStep?.key === recipientStepKey && (
               <>
                 <Box>
-                  <RecipientToDepotForm />
+                  <RecipientForm />
                 </Box>
                 <Box>
                   <TransfertGHGRangeForm balance={balance} />
@@ -156,7 +156,7 @@ export const TransfertDialog = (props: TransfertDialogProps) => {
   })
 
   const steps = [
-    recipientToDepotStep(form.value),
+    recipientStep(form.value),
     quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]

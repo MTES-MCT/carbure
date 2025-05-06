@@ -34,7 +34,6 @@ export const useExportationDialog = ({
       operation: {
         type: CreateOperationType.EXPORTATION,
         from_depot: values.from_depot?.id,
-        to_depot: values.to_depot?.id,
         credited_entity: values.credited_entity?.id,
       },
       customs_category: balance.customs_category,

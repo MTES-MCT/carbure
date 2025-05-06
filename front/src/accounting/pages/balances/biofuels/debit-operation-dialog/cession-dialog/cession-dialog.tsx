@@ -25,8 +25,9 @@ import {
   FromDepotRecipientToDepotSummary,
 } from "./from-depot-recipient-to-depot-form/from-depot-recipient-to-depot-form"
 import { FromDepotForm } from "accounting/components/from-depot-form"
-import { RecipientToDepotForm } from "accounting/components/recipient-to-depot-form"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
+import { RecipientForm } from "accounting/components/recipient-form"
+import { ToDepotForm } from "accounting/components/to-depot-form"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -103,7 +104,8 @@ export const CessionDialogContent = ({
               {currentStep?.key === fromDepotRecipientToDepotStepKey && (
                 <>
                   <Box>
-                    <RecipientToDepotForm />
+                    <RecipientForm />
+                    <ToDepotForm />
                   </Box>
                   <Box>
                     <FromDepotForm balance={balance} />

@@ -28,7 +28,6 @@ export const useTransfertDialog = ({
   const onSubmit = () =>
     createOperation(entity.id, {
       type: CreateOperationType.TRANSFERT,
-      to_depot: values.to_depot?.id,
       credited_entity: values.credited_entity?.id,
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
