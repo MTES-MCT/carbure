@@ -30,6 +30,8 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
     renewable_energy_share = serializers.FloatField()
+    _entity = serializers.CharField(read_only=True)
+    _depot = serializers.CharField(read_only=True)
 
     def get_type(self, instance) -> str:
         return instance._type
@@ -67,8 +69,10 @@ class OperationListSerializer(BaseOperationSerializer):
             "renewable_energy_share",
             "credited_entity",
             "debited_entity",
+            "_entity",
             "from_depot",
             "to_depot",
+            "_depot",
             "export_country",
             "created_at",
             "quantity",
@@ -90,8 +94,10 @@ class OperationSerializer(BaseOperationSerializer):
             "renewable_energy_share",
             "credited_entity",
             "debited_entity",
+            "_entity",
             "from_depot",
             "to_depot",
+            "_depot",
             "export_country",
             "created_at",
             "validation_date",

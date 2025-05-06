@@ -1,5 +1,4 @@
 from django.db.models import Case, CharField, F, Q, Sum, Value, When
-from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -109,14 +108,19 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     default=F("type"),
                     output_field=CharField(),
                 ),
-                _depot=Coalesce(
-                    "from_depot__name",
-                    "to_depot__name",
+                _depot=Case(
+                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("to_depot__name")),
+                    When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("from_depot__name")),
+                    When(Q(type="INCORPORATION") | Q(type="MAC_BIO"), then=F("to_depot__name")),
+                    default=Value(None),
+                    output_field=CharField(),
                 ),
                 _entity=Case(
                     When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
                     When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
-                    default=F("credited_entity__name"),
+                    When(Q(type="TRANSFERT", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
+                    When(Q(type="TRANSFERT", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
+                    default=Value(None),
                     output_field=CharField(),
                 ),
                 _volume=Sum("details__volume"),
