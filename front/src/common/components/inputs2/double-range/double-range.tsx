@@ -9,7 +9,7 @@ type BoundaryProps = Omit<ComponentProps<"input">, "value" | "onChange"> & {
   onChange?: (value: number) => void
 }
 
-export type DoubleRangeProps = BaseRangeProps & {
+export type DoubleRangeProps = Omit<BaseRangeProps, "double"> & {
   minRange?: BoundaryProps
   maxRange?: BoundaryProps
 }
@@ -31,7 +31,6 @@ export const DoubleRange = ({
       step={step}
       nativeInputProps={[
         {
-          ...minRange,
           value: minRange?.value ?? min,
           onChange: (e) => {
             const value = parseFloat(e.target.value)
@@ -42,7 +41,6 @@ export const DoubleRange = ({
           },
         },
         {
-          ...maxRange,
           value: maxRange?.value ?? max,
           onChange: (e) => {
             const value = parseFloat(e.target.value)

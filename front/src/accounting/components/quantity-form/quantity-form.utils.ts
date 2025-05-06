@@ -40,6 +40,8 @@ export const getQuantityInputLabel = (type: CreateOperationType) => {
       return i18next.t("Saisir une quantité pour l'exportation")
     case CreateOperationType.TENEUR:
       return i18next.t("Saisir une quantité d'énergie consommée")
+    case CreateOperationType.TRANSFERT:
+      return i18next.t("Saisir une quantité d'énergie à transférer")
     default:
       return i18next.t("Type inconnu")
   }
