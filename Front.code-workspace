@@ -6,15 +6,20 @@
   ],
   "settings": {
     "editor.formatOnSave": true,
-    "[javascript]": {
+    "[typescript]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[typescriptreact]": {
-      "editor.defaultFormatter": "vscode.typescript-language-features"
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "git.openRepositoryInParentFolders": "always",
-    "conventionalCommits.scopes": [
-      "front"
-    ]
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
   }
 }

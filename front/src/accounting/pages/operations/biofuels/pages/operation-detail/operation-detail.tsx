@@ -21,6 +21,7 @@ import {
   formatDate,
   formatNumber,
   roundNumber,
+  formatPeriod,
 } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
@@ -194,6 +195,11 @@ export const OperationDetail = () => {
           operation.status !== OperationsStatus.PENDING && {
             label: t("Dépôt destinataire"),
             value: operation.to_depot?.name ?? "-",
+          },
+        operation.durability_period &&
+          operation.durability_period !== null && {
+            label: t("Déclaration de durabilité"),
+            value: formatPeriod(operation.durability_period),
           },
       ])
     : []

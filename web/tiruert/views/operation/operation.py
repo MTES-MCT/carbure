@@ -1,3 +1,5 @@
+from django.db.models import Case, CharField, F, Q, Sum, Value, When
+from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -8,6 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 from core.models import Entity, UserRights
 from core.pagination import MetadataPageNumberPagination
 from core.permissions import HasUserRights
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.serializers import (
@@ -88,6 +91,37 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             context["unit"] = self.request.unit
         context["details"] = self.request.GET.get("details", "0") == "1"
         return context
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                _sector=Case(
+                    When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
+                    When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
+                    When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
+                _type=Case(
+                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=Value("ACQUISITION")),
+                    default=F("type"),
+                    output_field=CharField(),
+                ),
+                _depot=Coalesce(
+                    "from_depot__name",
+                    "to_depot__name",
+                ),
+                _entity=Case(
+                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
+                    When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
+                    default=F("credited_entity__name"),
+                    output_field=CharField(),
+                ),
+                _volume=Sum("details__volume"),
+            )
+        )
 
     @extend_schema(
         operation_id="list_operations",
