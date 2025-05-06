@@ -15,13 +15,6 @@ export const isOperationDebit = (operation: Operation, entityId: number) => {
   return operation.debited_entity && operation.debited_entity.id === entityId
 }
 
-export const getOperationEntity = (operation: Operation, entityId: number) => {
-  if (operation.credited_entity && operation.credited_entity.id === entityId) {
-    return operation.debited_entity
-  }
-  return operation.credited_entity
-}
-
 export const getOperationQuantity = (
   operation: Operation,
   formattedQuantity: string,

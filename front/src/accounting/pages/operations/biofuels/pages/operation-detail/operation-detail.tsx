@@ -6,11 +6,7 @@ import * as api from "accounting/api/operations"
 import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
-import {
-  getOperationEntity,
-  getOperationQuantity,
-  isOperationDebit,
-} from "../../operations.utils"
+import { getOperationQuantity, isOperationDebit } from "../../operations.utils"
 import { OperationBadge } from "../../components/operation-badge"
 import css from "./operation-detail.module.css"
 import { Text } from "common/components/text"
@@ -188,29 +184,28 @@ export const OperationDetail = () => {
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
-          value: getOperationEntity(operation, entity.id)?.name ?? "-",
+          value: operation._entity ?? "-",
         },
         [OperationType.CESSION, OperationType.TRANSFERT].includes(
           operation.type as OperationType
         ) && {
           label: t("Destinataire"),
-          value: getOperationEntity(operation, entity.id)?.name ?? "-",
+          value: operation._entity ?? "-",
         },
         operation.type !== OperationType.TENEUR && {
           label: t("Dépôt expéditeur"),
-          value: operation.from_depot?.name ?? "-",
+          value: operation._depot ?? "-",
         },
         operation.type !== OperationType.DEVALUATION &&
           operation.type === OperationType.ACQUISITION &&
           operation.status !== OperationsStatus.PENDING && {
             label: t("Dépôt destinataire"),
-            value: operation.to_depot?.name ?? "-",
+            value: operation._depot ?? "-",
           },
-        operation.durability_period &&
-          operation.durability_period !== null && {
-            label: t("Déclaration de durabilité"),
-            value: formatPeriod(operation.durability_period),
-          },
+        typeof operation.durability_period === "string" && {
+          label: t("Déclaration de durabilité"),
+          value: formatPeriod(operation.durability_period),
+        },
       ])
     : []
 

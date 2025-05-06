@@ -2797,8 +2797,12 @@ export interface components {
       renewable_energy_share: number
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
+      /**  entity */
+      readonly _entity: string
       from_depot: components["schemas"]["OperationDepot"]
       to_depot: components["schemas"]["OperationDepot"]
+      /**  depot */
+      readonly _depot: string
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
@@ -2855,8 +2859,12 @@ export interface components {
       renewable_energy_share: number
       credited_entity: components["schemas"]["OperationEntity"]
       debited_entity: components["schemas"]["OperationEntity"]
+      /**  entity */
+      readonly _entity: string
       from_depot: components["schemas"]["OperationDepot"]
       to_depot: components["schemas"]["OperationDepot"]
+      /**  depot */
+      readonly _depot: string
       export_country?: number | null
       /** Format: date-time */
       readonly created_at: string
