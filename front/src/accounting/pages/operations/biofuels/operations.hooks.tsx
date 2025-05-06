@@ -5,13 +5,13 @@ import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
 import {
   formatOperationCreditOrDebit,
-  getOperationEntity,
   isOperationDebit,
 } from "./operations.utils"
 import * as api from "accounting/api/operations"
 import {
   Operation,
   OperationDebitOrCredit,
+  OperationOrder,
   OperationsFilter,
   OperationsQuery,
   OperationsStatus,
@@ -43,6 +43,7 @@ export const useOperationsBiofuelsColumns = ({
       style: {
         flex: "0 0 137px",
       },
+      key: OperationOrder.status,
     },
     {
       header: t("Filière"),
@@ -59,48 +60,44 @@ export const useOperationsBiofuelsColumns = ({
           {formatSector(item.sector)}
         </Text>
       ),
+      key: OperationOrder.sector,
     },
     {
       header: t("Biocarburant"),
       cell: (item) => <Cell text={item.biofuel} />,
+      key: OperationOrder.biofuel,
     },
     {
       header: t("Catégorie"),
       cell: (item) => <Cell text={item.customs_category} />,
+      key: OperationOrder.customs_category,
     },
     {
       header: t("Date"),
       cell: (item) => <Cell text={formatDate(item.created_at)} />,
+      key: OperationOrder.created_at,
     },
     {
       header: t("Dépôt"),
       cell: (item) => {
-        const depot =
-          item.type === OperationType.CESSION ? item.from_depot : item.to_depot
-        return <Cell text={depot?.name ?? "-"} />
+        return <Cell text={item._depot ?? "-"} />
       },
+      key: OperationOrder.depot,
     },
     {
       header: t("Opération"),
       cell: (item) => <Cell text={formatOperationType(item.type)} />,
+      key: OperationOrder.type,
     },
     {
       header: t("De/à"),
       cell: (item) => {
-        const entity = getOperationEntity(item)
-        return (
-          <Cell
-            text={
-              item.type === OperationType.CESSION ||
-              item.type === OperationType.ACQUISITION
-                ? entity.name
-                : "-"
-            }
-          />
-        )
+        return <Cell text={item._entity ?? "-"} />
       },
+      key: OperationOrder.from_to,
     },
     {
+      key: OperationOrder.quantity,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       cell: (item) =>
         isOperationDebit(item.type) ? (

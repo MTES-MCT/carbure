@@ -9058,10 +9058,18 @@ components:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
           $ref: "#/components/schemas/OperationEntity"
+        _entity:
+          type: string
+          readOnly: true
+          title: " entity"
         from_depot:
           $ref: "#/components/schemas/OperationDepot"
         to_depot:
           $ref: "#/components/schemas/OperationDepot"
+        _depot:
+          type: string
+          readOnly: true
+          title: " depot"
         export_country:
           type: integer
           nullable: true
@@ -9097,6 +9105,8 @@ components:
           items:
             $ref: "#/components/schemas/OperationDetail"
       required:
+        - _depot
+        - _entity
         - avoided_emissions
         - biofuel
         - created_at
@@ -9213,10 +9223,18 @@ components:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
           $ref: "#/components/schemas/OperationEntity"
+        _entity:
+          type: string
+          readOnly: true
+          title: " entity"
         from_depot:
           $ref: "#/components/schemas/OperationDepot"
         to_depot:
           $ref: "#/components/schemas/OperationDepot"
+        _depot:
+          type: string
+          readOnly: true
+          title: " depot"
         export_country:
           type: integer
           nullable: true
@@ -9236,6 +9254,8 @@ components:
           items:
             $ref: "#/components/schemas/OperationDetail"
       required:
+        - _depot
+        - _entity
         - biofuel
         - created_at
         - credited_entity

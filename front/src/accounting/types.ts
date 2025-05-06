@@ -10,6 +10,7 @@ import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
   PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
+  PathsApiTiruertOperationsGetParametersQueryOrder_by as OperationOrder,
   OperationTypeEnum as CreateOperationType,
   PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
   PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter,
@@ -42,6 +43,7 @@ export {
   OperationDebitOrCredit,
   OperationBiofuelCategory,
   BalancesGroupBy,
+  OperationOrder,
 }
 
 /** BALANCES */
