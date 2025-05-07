@@ -13,6 +13,7 @@ import { ProductionTable } from "../../production-table"
 import { ProductionSiteRecap } from "./production-site-recap"
 import { FilesTable } from "../../files-table"
 import { Box } from "common/components/scaffold"
+import { AddIndustrialWastes } from "double-counting/components/add-industrial-wastes"
 
 interface ApplicationDetailsProps {
   production?: DoubleCountingProduction[]
@@ -22,6 +23,9 @@ interface ApplicationDetailsProps {
   hasAgreement?: boolean
   productionSite?: ProductionSiteDetails
   application?: DoubleCountingApplicationDetails
+  hasIndustrialWastes?: boolean
+  industrialWastesFile?: File
+  setIndustrialWastesFile?: (file?: File) => void
 }
 
 const ApplicationTabs = ({
@@ -32,6 +36,9 @@ const ApplicationTabs = ({
   setQuotas,
   hasAgreement,
   application,
+  hasIndustrialWastes,
+  industrialWastesFile,
+  setIndustrialWastesFile,
 }: ApplicationDetailsProps) => {
   const [focus, setFocus] = useState(
     productionSite ? "production_site" : "sourcing_forecast"
@@ -90,10 +97,16 @@ const ApplicationTabs = ({
           sourcing={sourcing ?? []}
         />
       )}
-      {focus === "fichiers" && application && (
-        <section>
-          <FilesTable application={application} />
-        </section>
+      {focus === "fichiers" && (
+        <>
+          {hasIndustrialWastes && setIndustrialWastesFile && (
+            <AddIndustrialWastes
+              industrialWastesFile={industrialWastesFile}
+              setIndustrialWastesFile={setIndustrialWastesFile}
+            />
+          )}
+          {application && <FilesTable application={application} />}
+        </>
       )}
     </>
   )

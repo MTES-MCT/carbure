@@ -18,6 +18,7 @@ from core import private_storage
 from core.carburetypes import CarbureError
 from core.models import Entity
 from doublecount.helpers import (
+    check_has_dechets_industriels,
     load_dc_filepath,
     load_dc_period,
     load_dc_production_data,
@@ -32,6 +33,7 @@ from doublecount.models import (
     DoubleCountingSourcing,
 )
 from doublecount.parser.dc_parser import parse_dc_excel
+from doublecount.serializers import DoubleCountingProductionSerializer
 from transactions.models import ProductionSite
 
 from .response_serializer import ResponseSerializer
@@ -44,6 +46,7 @@ class DoubleCountingAddError:
     APPLICATION_ALREADY_RECEIVED = "APPLICATION_ALREADY_RECEIVED"
     MISSING_FILE = "MISSING_FILE"
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
+    MISSING_INDUSTRIAL_WASTES_FILE = "MISSING_INDUSTRIAL_WASTES_FILE"
 
 
 class DoubleCountingAdminAddSerializer(serializers.Serializer):
@@ -53,6 +56,7 @@ class DoubleCountingAdminAddSerializer(serializers.Serializer):
     production_site_id = serializers.PrimaryKeyRelatedField(queryset=ProductionSite.objects.all())
     should_replace = serializers.BooleanField(required=False, default=False)
     file = serializers.FileField()
+    industrial_wastes_file = serializers.FileField(required=False)
 
 
 class AddActionMixin:
@@ -90,6 +94,7 @@ class AddActionMixin:
         production_site = serializer.validated_data["production_site_id"]
         certificate_id_to_link = serializer.validated_data.get("certificate_id")
         file = serializer.validated_data.get("file")
+        industrial_wastes_file = serializer.validated_data.get("industrial_wastes_file")
 
         if entity_type == Entity.PRODUCER:
             entity_id = serializer.validated_data["entity_id"]
@@ -119,6 +124,20 @@ class AddActionMixin:
         ) = parse_dc_excel(filepath)
 
         start, end, _ = load_dc_period(info["start_year"])
+        dca = DoubleCountingApplication(
+            period_start=start,
+            period_end=end,
+        )
+        production_data, _ = load_dc_production_data(
+            dca, production_max_rows, production_forecast_rows, requested_quota_rows
+        )
+        print(production_data)
+        has_dechets_industriels = check_has_dechets_industriels(
+            DoubleCountingProductionSerializer(production_data, many=True).data
+        )
+
+        if has_dechets_industriels and industrial_wastes_file is None:
+            raise ValidationError({"message": DoubleCountingAddError.MISSING_INDUSTRIAL_WASTES_FILE})
 
         # check if an application already exists for this producer, this period and is not accepted
         identical_replacable_application = DoubleCountingApplication.objects.filter(
@@ -181,6 +200,12 @@ class AddActionMixin:
 
         s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
         dca.download_link = s3_path
+
+        # save industrial wastes file
+        if has_dechets_industriels:
+            s3_path_industrial_wastes_file = f"doublecounting/{dca.id}_industrial_wastes_file.pdf"
+            dca.industrial_wastes_file_link = s3_path_industrial_wastes_file
+
         dca.save()
 
         # 2 - save all production_data DoubleCountingProduction in db
@@ -210,6 +235,8 @@ class AddActionMixin:
         # 3 - Upload file to S3
         try:
             private_storage.save(s3_path, file)
+            if has_dechets_industriels and industrial_wastes_file:
+                private_storage.save(s3_path_industrial_wastes_file, industrial_wastes_file)
         except Exception:
             traceback.print_exc()
 
