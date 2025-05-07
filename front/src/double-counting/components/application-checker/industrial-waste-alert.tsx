@@ -1,13 +1,18 @@
 import { Trans, useTranslation } from "react-i18next"
-import { Notice } from "common/components/notice"
+import { Notice, NoticeVariant } from "common/components/notice"
 import { Button } from "common/components/button2"
 
-export const DechetIndustrielAlert = () => {
+type DechetIndustrielAlertProps = {
+  variant?: NoticeVariant
+}
+export const DechetIndustrielAlert = ({
+  variant = "alert",
+}: DechetIndustrielAlertProps) => {
   const { t } = useTranslation()
 
   return (
     <Notice
-      variant="alert"
+      variant={variant}
       icon="ri-error-warning-line"
       title={t("Spécificité Déchets industriels")}
     >

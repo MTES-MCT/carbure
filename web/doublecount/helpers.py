@@ -747,3 +747,12 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
             sourcing_data.append(sourcing)
 
     return sourcing_data, sourcing_errors
+
+
+def check_has_dechets_industriels(production_data):
+    if production_data is None:
+        return False
+    for row in production_data:
+        if row["feedstock"]["code"] in ["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]:
+            return True
+    return False
