@@ -23,16 +23,6 @@ export const isOperationDebit = (operation: string) =>
     OperationType.DEVALUATION,
   ].includes(operation as OperationType)
 
-export const getOperationEntity = (operation: Operation) =>
-  [
-    OperationType.TENEUR,
-    OperationType.EXPORTATION,
-    OperationType.DEVALUATION,
-    OperationType.ACQUISITION,
-  ].includes(operation.type as OperationType)
-    ? operation.debited_entity
-    : operation.credited_entity
-
 export const getOperationQuantity = (
   operation: Operation,
   formattedQuantity: string
