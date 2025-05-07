@@ -6,6 +6,8 @@ import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Column, Table } from "common/components/table2"
 import { NoResult } from "common/components/no-result2"
+import { Button } from "common/components/button2"
+import { Text } from "common/components/text"
 type FilesTableProps = {
   application: DoubleCountingApplicationDetails
 }
@@ -39,7 +41,17 @@ export const FilesTable = ({ application }: FilesTableProps) => {
     },
     {
       header: t("Action"),
-      cell: (row) => row.url,
+      cell: (row) =>
+        row.url ? (
+          <Button
+            linkProps={{ href: row.url, target: "_blank" }}
+            customPriority="link"
+          >
+            {t("Télécharger")}
+          </Button>
+        ) : (
+          <Text>{t("Aucun fichier disponible")}</Text>
+        ),
     },
   ]
 

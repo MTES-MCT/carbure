@@ -104,7 +104,8 @@ export const SendApplicationProducerDialog = ({
           disabled={
             addApplication.loading ||
             !value.productionSite ||
-            (fileData.has_dechets_industriels && !value.formSent)
+            (fileData.has_dechets_industriels && !value.formSent) ||
+            Boolean(value.productionSite.dc_reference)
           }
           onClick={() => saveApplication()}
         >
@@ -129,6 +130,15 @@ export const SendApplicationProducerDialog = ({
         getOptions={(query) => findProductionSites(query, entity.id)}
         normalize={norm.normalizeProductionSite}
         {...bind("productionSite")}
+        state={value.productionSite?.dc_reference ? "error" : "default"}
+        stateRelatedMessage={
+          value.productionSite?.dc_reference ? (
+            <>
+              {t("Le site contient déjà un numéro d'agrément en cours")} (
+              {value.productionSite.dc_reference})
+            </>
+          ) : undefined
+        }
       />
       {fileData.has_dechets_industriels && (
         <Checkbox
