@@ -1,15 +1,13 @@
-import { AxiosError } from "axios"
 import { findProducers, findProductionSites } from "common/api"
 import useEntity from "common/hooks/entity"
 import { ProductionSite, EntityPreview } from "common/types"
 import * as norm from "common/utils/normalizers"
-import Alert from "common/components/alert"
-import Autocomplete from "common/components/autocomplete"
-import { Button, ExternalLink } from "common/components/button"
+import { Notice } from "common/components/notice"
+import { Autocomplete } from "common/components/autocomplete2"
+import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
-import { useForm } from "common/components/form"
-import { AlertTriangle, Plus } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -20,6 +18,7 @@ import { useNavigate } from "react-router-dom"
 import FileApplicationInfo from "./file-application-info"
 import { DoubleCountingFileInfo } from "../../../double-counting/types"
 import { ReplaceApplicationDialog } from "../../../double-counting/components/application-checker/replace-application-dialog"
+import { HttpError } from "common/services/api-fetch"
 
 export type SendApplicationAdminDialogProps = {
   file: File
@@ -51,8 +50,8 @@ export const SendApplicationAdminDialog = ({
       })
     },
     onError(err) {
-      const errorCode = (err as AxiosError<{ error: string }>).response?.data
-        .error
+      const errorCode = (err as HttpError)?.data?.message
+
       if (errorCode === "APPLICATION_ALREADY_EXISTS") {
         portal((close) => (
           <ReplaceApplicationDialog
@@ -113,46 +112,41 @@ export const SendApplicationAdminDialog = ({
       footer={
         <Button
           loading={addApplication.loading}
-          icon={Plus}
-          label={t("Ajouter le dossier")}
-          variant="primary"
+          iconId="ri-send-plane-line"
           disabled={
             addApplication.loading || !value.productionSite || !value.producer
           }
-          action={saveApplication}
-        />
+          onClick={() => saveApplication()}
+        >
+          {t("Ajouter le dossier")}
+        </Button>
       }
     >
-      <section>
-        <Autocomplete
-          required
-          label={t("Producteur")}
-          getOptions={findProducers}
-          normalize={norm.normalizeEntityPreview}
-          {...bind("producer")}
-        />
-        <Autocomplete
-          required
-          label={t("Site de production")}
-          getOptions={(query) => findProductionSites(query, producer)}
-          normalize={norm.normalizeProductionSite}
-          {...bind("productionSite")}
-        />
-        <TextInput
-          label={t("N° d'agrément lié à ce dossier")}
-          placeholder={t("Laisser vide si nouvelle demande")}
-          {...bind("certificate_id")}
-        />
-      </section>
+      <Autocomplete
+        required
+        label={t("Producteur")}
+        getOptions={findProducers}
+        normalize={norm.normalizeEntityPreview}
+        {...bind("producer")}
+      />
+      <Autocomplete
+        required
+        label={t("Site de production")}
+        getOptions={(query) => findProductionSites(query, producer)}
+        normalize={norm.normalizeProductionSite}
+        {...bind("productionSite")}
+      />
+      <TextInput
+        label={t("N° d'agrément lié à ce dossier")}
+        placeholder={t("Laisser vide si nouvelle demande")}
+        {...bind("certificate_id")}
+      />
+
       {error && (
         <section>
-          <Alert
-            variant="warning"
-            icon={AlertTriangle}
-            style={{ display: "inline-block" }}
-          >
+          <Notice variant="warning" icon="ri-alert-line">
             {error}
-          </Alert>
+          </Notice>
         </section>
       )}
     </Dialog>
@@ -178,11 +172,14 @@ function MissingAddress({
       {t(
         "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société."
       )}
-      <ExternalLink
-        href={`/admin/producers/productionsite/${productionSiteId}/change`}
+      <Button
+        customPriority="link"
+        linkProps={{
+          to: `/admin/producers/productionsite/${productionSiteId}/change`,
+        }}
       >
         <Trans>Editer le site de production</Trans>
-      </ExternalLink>
+      </Button>
     </>
   )
 }

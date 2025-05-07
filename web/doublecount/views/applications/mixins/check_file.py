@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from doublecount.helpers import check_dc_file
+from doublecount.helpers import check_dc_file, check_has_dechets_industriels
 
 from .response_serializer import CheckFileResponseSerializer
 
@@ -85,12 +85,3 @@ class CheckFileActionMixin:
                 {"message": CheckFilesError.FILE_CHECK_FAILED},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-
-def check_has_dechets_industriels(production_data):
-    if production_data is None:
-        return False
-    for row in production_data:
-        if row["feedstock"]["code"] in ["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]:
-            return True
-    return False

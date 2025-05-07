@@ -46,6 +46,7 @@ export function producerAddDoubleCountingApplication(
   producer_id: number,
   production_site_id: number,
   file: File,
+  industrialWastesFile?: File,
   should_replace = false
 ) {
   return apiFetch.POST("/double-counting/applications/add/", {
@@ -56,6 +57,7 @@ export function producerAddDoubleCountingApplication(
       production_site_id,
       should_replace,
       file,
+      industrial_wastes_file: industrialWastesFile,
     },
   })
 }

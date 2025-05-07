@@ -35,6 +35,7 @@ class DoubleCountingApplication(models.Model):
     certificate_id = models.CharField(max_length=16)  # FR_123456789_2020
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
     download_link = models.CharField(max_length=512, default=None, null=True)
+    industrial_wastes_file_link = models.CharField(max_length=512, default=None, null=True)
 
     def __str__(self):
         psite = self.production_site.name if self.production_site else ""
