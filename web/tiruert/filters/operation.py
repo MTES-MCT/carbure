@@ -79,12 +79,7 @@ class BaseFilter(FilterSet):
     @extend_schema_field(ListField(child=ChoiceField(choices=["CREDIT", "DEBIT"])))
     def filter_type(self, queryset, name, value):
         value = value.upper()
-        if value == "CREDIT":
-            return queryset.filter(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"]).distinct()
-        elif value == "DEBIT":
-            return queryset.filter(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"]).distinct()
-        else:
-            return queryset
+        return queryset.filter(_transaction=value).distinct()
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_period(self, queryset, name, value):
