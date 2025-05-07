@@ -7,17 +7,15 @@ import { Autocomplete } from "common/components/autocomplete2"
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { useForm } from "common/components/form"
-import { Checkbox, TextInput } from "common/components/inputs2"
+import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
-import { usePortal } from "common/components/portal"
+import { useCloseAllPortals, usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { producerAddDoubleCountingApplication } from "double-counting/api"
 import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { DoubleCountingFileInfo } from "../types"
-import { DechetIndustrielAlert } from "./application-checker/industrial-waste-alert"
 import { ReplaceApplicationDialog } from "./application-checker/replace-application-dialog"
-import { useNavigate } from "react-router-dom"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 import { HttpError } from "common/services/api-fetch"
 
@@ -25,12 +23,14 @@ export type SendApplicationProducerDialogProps = {
   file: File
   fileData: DoubleCountingFileInfo
   onClose: () => void
+  industrialWastesFile: File
 }
 
 export const SendApplicationProducerDialog = ({
   file,
   fileData,
   onClose,
+  industrialWastesFile,
 }: SendApplicationProducerDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -51,6 +51,7 @@ export const SendApplicationProducerDialog = ({
     },
     onError(err) {
       const errorCode = (err as HttpError)?.data?.message
+
       if (errorCode === "APPLICATION_ALREADY_EXISTS") {
         portal((close) => (
           <ReplaceApplicationDialog
@@ -66,10 +67,7 @@ export const SendApplicationProducerDialog = ({
         )
       } else if (errorCode === "PRODUCTION_SITE_ADDRESS_UNDEFINED") {
         setError(
-          <MissingAddress
-            onClose={onClose}
-            productionSiteName={fileData.production_site}
-          />
+          <MissingAddress productionSiteName={fileData.production_site} />
         )
       } else {
         notifyError(err, t("Impossible d'envoyer le dossier"))
@@ -85,6 +83,7 @@ export const SendApplicationProducerDialog = ({
       entity.id,
       value.productionSite.id,
       file,
+      industrialWastesFile,
       shouldReplace
     )
   }
@@ -104,7 +103,6 @@ export const SendApplicationProducerDialog = ({
           disabled={
             addApplication.loading ||
             !value.productionSite ||
-            (fileData.has_dechets_industriels && !value.formSent) ||
             Boolean(value.productionSite.dc_reference)
           }
           onClick={() => saveApplication()}
@@ -121,7 +119,6 @@ export const SendApplicationProducerDialog = ({
           approfondie.
         </Trans>
       </p>
-      {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
 
       <TextInput label={t("Producteur")} value={entity.name} disabled />
       <Autocomplete
@@ -140,15 +137,6 @@ export const SendApplicationProducerDialog = ({
           ) : undefined
         }
       />
-      {fileData.has_dechets_industriels && (
-        <Checkbox
-          label={t(
-            "Je confirme avoir envoyé par email le formulaire mentionné ci-dessus. "
-          )}
-          {...bind("formSent")}
-        />
-      )}
-
       {error && (
         <section ref={refToScroll}>
           <Notice variant="warning" icon="ri-alert-line">
@@ -162,33 +150,31 @@ export const SendApplicationProducerDialog = ({
 
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
-  formSent: false as boolean,
 }
 
 type ProductionForm = typeof defaultProductionForm
 
 function MissingAddress({
   productionSiteName,
-  onClose,
 }: {
   productionSiteName: string
-  onClose: () => void
 }) {
   const { t } = useTranslation()
   const entity = useEntity()
-  const navigate = useNavigate()
-
-  const goToProductionSites = () => {
-    onClose()
-    navigate(`/org/${entity.id}/settings#production`)
-  }
+  const closeAll = useCloseAllPortals()
 
   return (
     <>
       {t(
         "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations de votre site de production."
       )}
-      <Button customPriority="link" onClick={goToProductionSites}>
+      <Button
+        customPriority="link"
+        linkProps={{
+          to: `/org/${entity.id}/settings#production`,
+          onClick: closeAll,
+        }}
+      >
         {"→ "}
         {t(`Editer le site de production {{productionSiteName}}`, {
           productionSiteName,

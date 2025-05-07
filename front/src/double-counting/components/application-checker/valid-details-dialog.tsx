@@ -12,6 +12,7 @@ import ApplicationTabs from "../applications/application-tabs"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import useEntity from "common/hooks/entity"
 import { DoubleCountPeriod } from "./double-count-period"
+import { useState } from "react"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -27,6 +28,9 @@ export const ValidDetailsDialog = ({
   const { t } = useTranslation()
   const portal = usePortal()
   const { isProducer } = useEntity()
+  const [industrialWastesFile, setIndustrialWastesFile] = useState<
+    File | undefined
+  >(undefined)
 
   function showProductionSiteDialog() {
     if (isProducer) {
@@ -38,6 +42,7 @@ export const ValidDetailsDialog = ({
             onClose()
           }}
           file={file}
+          industrialWastesFile={industrialWastesFile!}
         />
       ))
     } else {
@@ -75,16 +80,24 @@ export const ValidDetailsDialog = ({
           label={isProducer ? t("Envoyer la demande") : t("Ajouter le dossier")}
           variant="primary"
           action={showProductionSiteDialog}
+          disabled={isProducer && !industrialWastesFile}
         />
       }
     >
       <DoubleCountPeriod startYear={fileData.start_year} />
 
-      {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
+      {fileData.has_dechets_industriels && (
+        <DechetIndustrielAlert
+          variant={industrialWastesFile ? "info" : "alert"}
+        />
+      )}
 
       <ApplicationTabs
         sourcing={fileData.sourcing}
         production={fileData.production}
+        industrialWastesFile={industrialWastesFile}
+        setIndustrialWastesFile={setIndustrialWastesFile}
+        hasIndustrialWastes={fileData.has_dechets_industriels}
       />
     </Dialog>
   )
