@@ -1,4 +1,4 @@
-from django.db.models import Case, CharField, F, Q, Sum, Value, When
+from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -92,6 +92,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         return context
 
     def get_queryset(self):
+        multiplicators = {
+            "mj": "biofuel__pci_litre",
+            "kg": "biofuel__masse_volumique",
+        }
+        multiplicator = multiplicators.get(self.request.unit, None)
+
         return (
             super()
             .get_queryset()
@@ -123,7 +129,18 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     default=Value(None),
                     output_field=CharField(),
                 ),
-                _volume=Sum("details__volume"),
+                _quantity=Case(
+                    When(
+                        credited_entity_id=self.request.entity.id,
+                        then=Sum("details__volume") * (F(multiplicator) if multiplicator else 1),
+                    ),
+                    When(
+                        debited_entity_id=self.request.entity.id,
+                        then=Sum("details__volume") * -1 * (F(multiplicator) if multiplicator else 1),
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
+                ),
                 _transaction=Case(
                     When(credited_entity_id=self.request.entity.id, then=Value("CREDIT")),
                     When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
