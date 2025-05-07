@@ -203,6 +203,10 @@ class BalanceService:
         # Create a mapping of lot_id to operations
         credited_operations = {}
         for operation in credit_operations_with_lots:
+            # Case of TRANSFERT for instance
+            if operation.to_depot is None:
+                continue
+
             for detail in operation.details.all():
                 if detail.lot_id in lot_ids:
                     if detail.lot_id not in credited_operations:
