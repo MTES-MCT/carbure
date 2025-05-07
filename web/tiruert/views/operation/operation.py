@@ -124,6 +124,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     output_field=CharField(),
                 ),
                 _volume=Sum("details__volume"),
+                _transaction=Case(
+                    When(credited_entity_id=self.request.entity.id, then=Value("CREDIT")),
+                    When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
             )
         )
 
