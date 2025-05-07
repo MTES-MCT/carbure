@@ -53,6 +53,7 @@ export const useBalancesBiofuelsColumns = () => {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
       cell: (item) =>
         formatNumber(item.available_balance, { fractionDigits: 0 }),
+      key: OperationOrder.available_balance,
     },
     {
       header: t("Opérations en attente"),
