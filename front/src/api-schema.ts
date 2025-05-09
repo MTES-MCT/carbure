@@ -1690,6 +1690,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/operations/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_operations_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/operations/filters/": {
     parameters: {
       query?: never
@@ -7111,8 +7127,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `pending_operations` - Pending operations
-         *     * `-pending_operations` - Pending operations (décroissant) */
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7445,8 +7463,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `pending_operations` - Pending operations
-         *     * `-pending_operations` - Pending operations (décroissant) */
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7511,8 +7531,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `pending_operations` - Pending operations
-         *     * `-pending_operations` - Pending operations (décroissant) */
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -7533,6 +7555,30 @@ export interface operations {
         }
         content: {
           "application/json": string[]
+        }
+      }
+    }
+  }
+  tiruert_operations_export_retrieve: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationList"]
         }
       }
     }
@@ -7573,8 +7619,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `pending_operations` - Pending operations
-         *     * `-pending_operations` - Pending operations (décroissant) */
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -7829,6 +7877,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
+  ValueMinusavailable_balance = "-available_balance",
   ValueMinusbiofuel = "-biofuel",
   ValueMinuscreated_at = "-created_at",
   ValueMinuscustoms_category = "-customs_category",
@@ -7839,6 +7888,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   ValueMinussector = "-sector",
   ValueMinusstatus = "-status",
   ValueMinustype = "-type",
+  available_balance = "available_balance",
   biofuel = "biofuel",
   created_at = "created_at",
   customs_category = "customs_category",

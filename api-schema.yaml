@@ -5108,6 +5108,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -5118,6 +5119,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -5149,8 +5151,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - name: page
@@ -5718,6 +5722,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -5728,6 +5733,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -5759,8 +5765,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - name: page
@@ -5963,6 +5971,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -5973,6 +5982,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -6004,8 +6014,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - in: query
@@ -6094,6 +6106,37 @@ paths:
                     - TMF
                     - TERF SAF
                   summary: Example of filters response.
+          description: ""
+  /api/tiruert/operations/export/:
+    get:
+      operationId: tiruert_operations_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/filters/:
     get:
@@ -6213,6 +6256,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -6223,6 +6267,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -6254,8 +6299,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - in: query
