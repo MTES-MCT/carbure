@@ -59,7 +59,6 @@ class ElecChargePoint(models.Model):
             "cpo_siren",
             "station_id",
             "station_name",
-            "nominal_power",
         ],
     )
 
