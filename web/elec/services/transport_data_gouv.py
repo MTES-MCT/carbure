@@ -72,6 +72,10 @@ class TransportDataGouv:
 
     @staticmethod
     def merge_charge_point_data(charge_point_data: pd.DataFrame, chunksize=1000):
+        transport_data = TransportDataGouv.get_transport_data(charge_point_data, chunksize)
+        return TransportDataGouv.enrich_charge_point_data(charge_point_data, transport_data)
+
+    def get_transport_data(charge_point_data: pd.DataFrame, chunksize=1000):
         file_path = TransportDataGouv.download_csv()
 
         # list the different charge point ids from the application
@@ -104,7 +108,7 @@ class TransportDataGouv:
         # mark the charge points as coming from TDG
         transport_data["is_in_tdg"] = True
 
-        return TransportDataGouv.enrich_charge_point_data(charge_point_data, transport_data)
+        return transport_data
 
     @staticmethod
     def download_csv():
