@@ -11,3 +11,5 @@ from .balance import BalanceByDepotSerializer
 from .balance import BalanceBySectorSerializer
 from .teneur import SimulationInputSerializer
 from .objective import ObjectiveOutputSerializer
+from .objective import ObjectiveInputSerializer
+from .objective import ObjectiveAdminInputSerializer
