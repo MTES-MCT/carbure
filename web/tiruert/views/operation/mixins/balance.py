@@ -100,7 +100,7 @@ class BalanceActionMixin:
 
         data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
 
-        # These sorting can't be done in operations filters because they are not in the queryset
+        # These sortings can't be done in operations filters because they are not in the queryset
         # Theses info are calculated in the balance service
         if order_by and order_by in ["available_balance", "pending_operations"]:
             data = sorted(data, key=lambda x: x[order_by])

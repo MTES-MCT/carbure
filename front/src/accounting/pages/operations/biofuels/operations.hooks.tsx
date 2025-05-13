@@ -100,7 +100,7 @@ export const useOperationsBiofuelsColumns = ({
       key: OperationOrder.quantity,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       cell: (item) =>
-        isOperationDebit(item.type) ? (
+        isOperationDebit(item.quantity) ? (
           <Text
             size="sm"
             fontWeight="semibold"
@@ -110,7 +110,6 @@ export const useOperationsBiofuelsColumns = ({
                 styles["operation--rejected"]
             )}
           >
-            -
             {formatNumber(
               item.type === OperationType.INCORPORATION
                 ? item.quantity_renewable

@@ -240,7 +240,7 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {isOperationDebit(operation?.type ?? "") &&
+            {isOperationDebit(operation?.quantity ?? 0) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button

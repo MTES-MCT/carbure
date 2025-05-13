@@ -34,11 +34,15 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _depot = serializers.CharField(read_only=True)
 
     def get_volume_l(self, instance) -> float:
-        if getattr(instance, "volume", None) is not None:
-            return instance.volume
-        return instance._volume
+        if getattr(instance, "_volume", None) is not None:
+            return instance._volume
+
+        return instance.volume
 
     def get_quantity(self, instance) -> float:
+        if getattr(instance, "_quantity", None) is not None:
+            return instance._quantity
+
         volume = self.get_volume_l(instance)
         return instance.volume_to_quantity(volume, self.context.get("unit"))
 
