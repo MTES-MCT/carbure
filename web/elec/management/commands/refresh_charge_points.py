@@ -1,6 +1,7 @@
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.forms import model_to_dict
+from simple_history.utils import bulk_update_with_history
 
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
@@ -42,10 +43,9 @@ class Command(BaseCommand):
         pdcs_df = pd.DataFrame([model_to_dict(cp) for cp in pdcs])
         tdg_df = TransportDataGouv.get_transport_data(pdcs_df)
 
-        diff_nps = 0
+        updated = []
+        power_changed = 0
         not_found = 0
-
-        changed_pdcs = set()
 
         for cp in pdcs:
             pdc_df = tdg_df[tdg_df["charge_point_id"] == cp.charge_point_id]
@@ -55,15 +55,15 @@ class Command(BaseCommand):
                 if nominal_power > 1000:
                     nominal_power /= 1000
                 if nominal_power != 0 and nominal_power != cp.nominal_power:
-                    diff_nps += 1
+                    power_changed += 1
                     cp.nominal_power = nominal_power
-                    changed_pdcs.add(cp)
+                    updated.append(cp)
             except Exception:
                 not_found += 1
 
         if apply:
-            ElecChargePoint.objects.bulk_update(list(changed_pdcs), ["nominal_power"], batch)
+            bulk_update_with_history(updated, ElecChargePoint, ["nominal_power"], batch)
 
-        print(f"> {diff_nps} nominal power changed")
+        print(f"> {power_changed} nominal power changed")
         print(f"> {not_found} charge point ids not found")
         print("> Done")
