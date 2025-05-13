@@ -24,8 +24,8 @@ export const getOperations = (query: OperationsQuery) => {
         query: {
           ...query,
           order_by:
-            query.order && query.order.length > 0
-              ? query.order
+            query.order_by && query.order_by.length > 0
+              ? query.order_by
               : [OperationOrder.ValueMinuscreated_at],
         },
       },

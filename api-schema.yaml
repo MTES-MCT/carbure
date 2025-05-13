@@ -5151,10 +5151,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `available_balance` - available_balance
-            * `-available_balance` - available_balance (descending)
-            * `pending_operations` - pending_operations
-            * `-pending_operations` - pending_operations (descending)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - name: page
@@ -5510,7 +5510,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -5611,7 +5612,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -5765,10 +5767,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `available_balance` - available_balance
-            * `-available_balance` - available_balance (descending)
-            * `pending_operations` - pending_operations
-            * `-pending_operations` - pending_operations (descending)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - name: page
@@ -6014,10 +6016,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `available_balance` - available_balance
-            * `-available_balance` - available_balance (descending)
-            * `pending_operations` - pending_operations
-            * `-pending_operations` - pending_operations (descending)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - in: query
@@ -6299,10 +6301,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `available_balance` - available_balance
-            * `-available_balance` - available_balance (descending)
-            * `pending_operations` - pending_operations
-            * `-pending_operations` - pending_operations (descending)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - in: query
@@ -11229,7 +11231,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:

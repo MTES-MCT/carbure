@@ -7127,10 +7127,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `available_balance` - available_balance
-         *     * `-available_balance` - available_balance (descending)
-         *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7463,10 +7463,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `available_balance` - available_balance
-         *     * `-available_balance` - available_balance (descending)
-         *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7531,10 +7531,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `available_balance` - available_balance
-         *     * `-available_balance` - available_balance (descending)
-         *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -7619,10 +7619,10 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
-         *     * `available_balance` - available_balance
-         *     * `-available_balance` - available_balance (descending)
-         *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
+         *     * `pending_operations` - Pending operations
+         *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]

@@ -110,6 +110,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             super()
             .get_queryset()
             .annotate(
+                total_volume=Sum("details__volume"),
                 _sector=Case(
                     When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                     When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
@@ -140,11 +141,11 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 _quantity=Case(
                     When(
                         credited_entity_id=self.request.entity.id,
-                        then=Sum("details__volume") * (F(multiplicator) if multiplicator else 1),
+                        then=F("total_volume") * (F(multiplicator) if multiplicator else 1),
                     ),
                     When(
                         debited_entity_id=self.request.entity.id,
-                        then=Sum("details__volume") * -1 * (F(multiplicator) if multiplicator else 1),
+                        then=F("total_volume") * -1 * (F(multiplicator) if multiplicator else 1),
                     ),
                     default=Value(None),
                     output_field=FloatField(),
@@ -154,6 +155,18 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
                     default=Value(None),
                     output_field=CharField(),
+                ),
+                _volume=Case(
+                    When(
+                        credited_entity_id=self.request.entity.id,
+                        then=F("total_volume"),
+                    ),
+                    When(
+                        debited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * -1,
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
                 ),
             )
         )
