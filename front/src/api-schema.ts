@@ -7111,6 +7111,8 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
          *     * `pending_operations` - Pending operations
          *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
@@ -7445,6 +7447,8 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
          *     * `pending_operations` - Pending operations
          *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
@@ -7511,6 +7515,8 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
          *     * `pending_operations` - Pending operations
          *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
@@ -7573,6 +7579,8 @@ export interface operations {
          *     * `-from_to` - From to (décroissant)
          *     * `quantity` - Quantity
          *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - Available balance
+         *     * `-available_balance` - Available balance (décroissant)
          *     * `pending_operations` - Pending operations
          *     * `-pending_operations` - Pending operations (décroissant) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
@@ -7829,6 +7837,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
+  ValueMinusavailable_balance = "-available_balance",
   ValueMinusbiofuel = "-biofuel",
   ValueMinuscreated_at = "-created_at",
   ValueMinuscustoms_category = "-customs_category",
@@ -7839,6 +7848,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   ValueMinussector = "-sector",
   ValueMinusstatus = "-status",
   ValueMinustype = "-type",
+  available_balance = "available_balance",
   biofuel = "biofuel",
   created_at = "created_at",
   customs_category = "customs_category",

@@ -69,6 +69,7 @@ const BalancesBiofuels = () => {
             columns={columns}
             rows={result?.data?.results ?? []}
             loading={loading}
+            onOrder={actions.setOrder}
           />
           <Pagination
             defaultPage={query.page}
