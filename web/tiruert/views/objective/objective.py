@@ -1,4 +1,3 @@
-from django.db.models import Case, CharField, Value, When
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
@@ -265,14 +264,7 @@ class ObjectiveViewSet(GenericViewSet):
         if not macs.exists():
             return
 
-        operations_qs = Operation.objects.all().annotate(
-            _transaction=Case(
-                When(credited_entity_id=request.entity.id, then=Value("CREDIT")),
-                When(debited_entity_id=request.entity.id, then=Value("DEBIT")),
-                default=Value(None),
-                output_field=CharField(),
-            ),
-        )
+        operations_qs = Operation.objects.all()
         operations = OperationFilterForBalance(query_params, queryset=operations_qs, request=request).qs
         if not operations.exists():
             return

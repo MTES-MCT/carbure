@@ -122,7 +122,7 @@ class BalanceService:
         )
 
         for operation in operations:
-            credit_operation = operation._transaction == "CREDIT"
+            credit_operation = operation.is_credit(entity_id)
             if credit_operation and operation.status == Operation.PENDING:
                 continue
 
