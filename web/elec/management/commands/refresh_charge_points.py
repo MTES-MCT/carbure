@@ -21,10 +21,17 @@ class Command(BaseCommand):
             default=1000,
             help="How many rows updated at once",
         )
+        parser.add_argument(
+            "--apply",
+            type=bool,
+            default=False,
+            help="Save the results in the database",
+        )
 
     def handle(self, *args, **options):
         cpo = options["cpo"]
         batch = options["batch"]
+        apply = options["apply"]
 
         print("> Refresh charge point data from TDG")
 
@@ -54,7 +61,8 @@ class Command(BaseCommand):
             except Exception:
                 not_found += 1
 
-        ElecChargePoint.objects.bulk_update(list(changed_pdcs), ["nominal_power"], batch)
+        if apply:
+            ElecChargePoint.objects.bulk_update(list(changed_pdcs), ["nominal_power"], batch)
 
         print(f"> {diff_nps} nominal power changed")
         print(f"> {not_found} charge point ids not found")

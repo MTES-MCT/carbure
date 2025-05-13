@@ -28,8 +28,8 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--apply",
-            type=str,
-            required=True,
+            type=bool,
+            default=False,
             help="Save the results in the database",
         )
 
