@@ -66,7 +66,15 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     pagination_class = OperationPagination
 
     def get_permissions(self):
-        if self.action in ["reject", "accept", "simulate", "create", "partial_update", "destroy"]:
+        if self.action in [
+            "reject",
+            "accept",
+            "simulate",
+            "create",
+            "partial_update",
+            "destroy",
+            "export_operations_to_excel",
+        ]:
             return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
         elif self.action in ["balance"]:
             return [HasUserRights([UserRights.ADMIN, UserRights.RO, UserRights.RW])]

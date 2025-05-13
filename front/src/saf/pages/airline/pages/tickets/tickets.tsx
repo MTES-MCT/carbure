@@ -22,7 +22,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { SearchInput } from "common/components/inputs2"
-import { ExportButton } from "saf/components/export"
+import { ExportButton } from "common/components/export"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "common/types"
