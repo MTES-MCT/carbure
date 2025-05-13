@@ -8,6 +8,7 @@ import { List, createQueryFilter, defaultRenderer, Renderer } from "../list2"
 import {
   defaultNormalizer,
   denormalizeItems,
+  Filter,
   normalizeItems,
   Normalizer,
   Sorter,
@@ -30,6 +31,7 @@ export type AutocompleteProps<T, V = T> = Trigger &
     normalize?: Normalizer<T, V>
     children?: Renderer<T, V>
     sort?: Sorter<T, V>
+    filter?: Filter<T, V>
     debounce?: number
   }
 
@@ -47,6 +49,7 @@ export function Autocomplete<T, V>({
   normalize = defaultNormalizer,
   children = defaultRenderer,
   sort,
+  filter,
   debounce = 300,
   ...props
 }: AutocompleteProps<T, V>) {
@@ -61,6 +64,7 @@ export function Autocomplete<T, V>({
     onQuery,
     create,
     normalize,
+    filter,
     debounce,
   })
 
@@ -121,6 +125,7 @@ interface AutocompleteConfig<T, V> {
   onQuery?: (query: string) => void
   create?: (value: string) => V
   normalize?: Normalizer<T, V>
+  filter?: Filter<T, V>
   debounce?: number
 }
 
@@ -133,6 +138,7 @@ export function useAutocomplete<T, V>({
   onQuery,
   create,
   normalize = defaultNormalizer,
+  filter,
   debounce = 300,
 }: AutocompleteConfig<T, V>) {
   const [open, setOpen] = useState(false)
@@ -168,7 +174,7 @@ export function useAutocomplete<T, V>({
 
   function filterOptions(query: string): T[] {
     const options = asyncOptions.items
-    const includesQuery = createQueryFilter(query)
+    const includesQuery = filter ?? createQueryFilter(query)
     return denormalizeItems(
       normalizeItems<T, V>(options, normalize, includesQuery)
     )

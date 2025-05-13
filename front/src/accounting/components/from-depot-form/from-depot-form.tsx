@@ -8,35 +8,68 @@ import { Balance } from "accounting/types"
 import { OperationText } from "accounting/components/operation-text"
 import { useUnit } from "common/hooks/unit"
 import { FromDepotFormProps } from "./from-depot-form.types"
+import { DoubleRange } from "common/components/inputs2"
+import { useQuery } from "common/hooks/async"
+import { debounce } from "common/utils/functions"
 
 // Type of the component
 type FromDepotProps = {
   balance: Balance
 }
 
+const debouncedGetDepotsWithBalance = debounce(getDepotsWithBalance, 200)
+
 export const FromDepotForm = ({ balance }: FromDepotProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { formatUnit } = useUnit()
-  const { value, bind } = useFormContext<FromDepotFormProps>()
+  const { value, bind, setField } = useFormContext<FromDepotFormProps>()
+
+  const depots = useQuery(
+    (sector, customs_category, biofuel, gesBoundMin, gesBoundMax) =>
+      debouncedGetDepotsWithBalance(entity.id, {
+        sector: sector,
+        category: customs_category,
+        biofuel: biofuel ?? "",
+        ges_bound_min: gesBoundMin,
+        ges_bound_max: gesBoundMax,
+      }),
+    {
+      key: "cession-depots",
+      params: [
+        balance.sector,
+        balance.customs_category,
+        balance.biofuel.code,
+        value.gesBoundMin ?? Math.floor(balance.ghg_reduction_min),
+        value.gesBoundMax ?? Math.ceil(balance.ghg_reduction_max),
+      ] as const,
+      onSuccess: (data) => {
+        const newDepot = data?.find((b) => b.id === value.from_depot?.id)
+        setField("from_depot", newDepot)
+      },
+    }
+  )
 
   return (
     <>
+      <DoubleRange
+        step={0.1}
+        min={Math.floor(balance.ghg_reduction_min)}
+        max={Math.ceil(balance.ghg_reduction_max)}
+        suffix="%"
+        label={t("Définissez le taux de réduction GES des lots à prélever")}
+        minRange={bind("gesBoundMin")}
+        maxRange={bind("gesBoundMax")}
+      />
       <Autocomplete
         label={t("Sélectionnez un dépôt d'expédition")}
         placeholder={t("Rechercher un dépôt")}
-        getOptions={(search) =>
-          getDepotsWithBalance(entity.id, {
-            sector: balance.sector,
-            category: balance.customs_category,
-            biofuel: balance.biofuel?.code ?? "",
-            query: search,
-          })
-        }
+        options={depots.result}
         normalize={(depot) => ({
           label: depot.name,
           value: depot,
         })}
+        filter={() => true}
         required
         {...bind("from_depot")}
       >
@@ -103,7 +136,6 @@ export const FromDepotSummary = ({
   ) {
     return null
   }
-
   return (
     <>
       <OperationText

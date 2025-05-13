@@ -5066,6 +5066,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: operation
           schema:
             type: array
@@ -5079,6 +5087,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5090,6 +5099,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5098,13 +5108,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - name: page
@@ -5460,7 +5510,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -5561,7 +5612,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -5620,6 +5672,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: group_by
           schema:
             type: string
@@ -5643,6 +5703,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5654,6 +5715,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5662,13 +5724,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - name: page
@@ -5829,6 +5931,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: operation
           schema:
             type: array
@@ -5842,6 +5952,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5853,6 +5964,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5861,13 +5973,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - in: query
@@ -5957,6 +6109,37 @@ paths:
                     - TERF SAF
                   summary: Example of filters response.
           description: ""
+  /api/tiruert/operations/export/:
+    get:
+      operationId: tiruert_operations_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationList"
+          description: ""
   /api/tiruert/operations/filters/:
     get:
       operationId: filter_operations
@@ -6033,6 +6216,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: ges_bound_max
+          schema:
+            type: number
+        - in: query
+          name: ges_bound_min
+          schema:
+            type: number
+        - in: query
           name: operation
           schema:
             type: array
@@ -6046,6 +6237,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -6057,6 +6249,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -6065,13 +6258,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - Available balance
+            * `-available_balance` - Available balance (décroissant)
+            * `pending_operations` - Pending operations
+            * `-pending_operations` - Pending operations (décroissant)
           explode: false
           style: form
         - in: query
@@ -6556,11 +6789,19 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           $ref: "#/components/schemas/BalanceBiofuel"
+        ghg_reduction_min:
+          type: number
+          format: double
+        ghg_reduction_max:
+          type: number
+          format: double
       required:
         - available_balance
         - biofuel
         - customs_category
         - declared_teneur
+        - ghg_reduction_max
+        - ghg_reduction_min
         - initial_balance
         - pending_operations
         - pending_teneur
@@ -8866,10 +9107,18 @@ components:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
           $ref: "#/components/schemas/OperationEntity"
+        _entity:
+          type: string
+          readOnly: true
+          title: " entity"
         from_depot:
           $ref: "#/components/schemas/OperationDepot"
         to_depot:
           $ref: "#/components/schemas/OperationDepot"
+        _depot:
+          type: string
+          readOnly: true
+          title: " depot"
         export_country:
           type: integer
           nullable: true
@@ -8881,6 +9130,10 @@ components:
           type: string
           format: date
           nullable: true
+        durability_period:
+          type: string
+          nullable: true
+          maxLength: 6
         quantity:
           type: number
           format: double
@@ -8901,6 +9154,8 @@ components:
           items:
             $ref: "#/components/schemas/OperationDetail"
       required:
+        - _depot
+        - _entity
         - avoided_emissions
         - biofuel
         - created_at
@@ -9017,10 +9272,18 @@ components:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
           $ref: "#/components/schemas/OperationEntity"
+        _entity:
+          type: string
+          readOnly: true
+          title: " entity"
         from_depot:
           $ref: "#/components/schemas/OperationDepot"
         to_depot:
           $ref: "#/components/schemas/OperationDepot"
+        _depot:
+          type: string
+          readOnly: true
+          title: " depot"
         export_country:
           type: integer
           nullable: true
@@ -9040,6 +9303,8 @@ components:
           items:
             $ref: "#/components/schemas/OperationDetail"
       required:
+        - _depot
+        - _entity
         - biofuel
         - created_at
         - credited_entity
@@ -9095,6 +9360,7 @@ components:
         - EXPORTATION
         - DEVALUATION
         - CUSTOMS_CORRECTION
+        - TRANSFERT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -9105,6 +9371,7 @@ components:
         * `EXPORTATION` - EXPORTATION
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+        * `TRANSFERT` - TRANSFERT
     OtpResponse:
       type: object
       properties:
@@ -10481,6 +10748,12 @@ components:
         from_depot:
           type: integer
           nullable: true
+        ges_bound_min:
+          type: number
+          format: double
+        ges_bound_max:
+          type: number
+          format: double
       required:
         - biofuel
         - customs_category
@@ -10522,6 +10795,12 @@ components:
         from_depot:
           type: integer
           nullable: true
+        ges_bound_min:
+          type: number
+          format: double
+        ges_bound_max:
+          type: number
+          format: double
       required:
         - biofuel
         - customs_category
@@ -10952,7 +11231,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:

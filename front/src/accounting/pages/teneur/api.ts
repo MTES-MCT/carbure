@@ -122,13 +122,17 @@ export const getObjectives = async (
  */
 export const getBalancesCategory = async (
   entity_id: number,
-  category: CategoryEnum
+  category: CategoryEnum,
+  gesBoundMin?: number,
+  gesBoundMax?: number
 ) => {
   return getBalances({
     entity_id,
     page: 1,
     customs_category: [category],
     unit: Unit.MJ,
+    ges_bound_min: gesBoundMin,
+    ges_bound_max: gesBoundMax,
   })
 }
 

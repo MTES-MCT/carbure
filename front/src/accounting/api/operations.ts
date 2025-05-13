@@ -1,7 +1,6 @@
 import { apiTypes } from "common/services/api-fetch.types"
-import { api } from "common/services/api-fetch"
-import { OperationsFilter, OperationsQuery } from "../types"
-import { PathsApiTiruertOperationsGetParametersQueryOrder_by } from "api-schema"
+import { api, download } from "common/services/api-fetch"
+import { OperationOrder, OperationsFilter, OperationsQuery } from "../types"
 import { formatOperation } from "accounting/utils/formatters"
 
 export const getOperationsFilters = (
@@ -24,9 +23,10 @@ export const getOperations = (query: OperationsQuery) => {
       params: {
         query: {
           ...query,
-          order_by: [
-            PathsApiTiruertOperationsGetParametersQueryOrder_by.ValueMinuscreated_at,
-          ],
+          order_by:
+            query.order_by && query.order_by.length > 0
+              ? query.order_by
+              : [OperationOrder.ValueMinuscreated_at],
         },
       },
     })
@@ -69,6 +69,8 @@ export const simulateMinMax = (
     target_volume,
     unit,
     from_depot,
+    ges_bound_min,
+    ges_bound_max,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -80,6 +82,8 @@ export const simulateMinMax = (
       target_volume,
       unit,
       from_depot,
+      ges_bound_min,
+      ges_bound_max,
     },
   })
 }
@@ -223,5 +227,11 @@ export const rejectOperation = (entity_id: number, operation_id: number) => {
       },
       path: { id: operation_id },
     },
+  })
+}
+
+export function downloadOperations(query: OperationsQuery) {
+  return download(`/tiruert/operations/export/`, {
+    ...query,
   })
 }
