@@ -1,3 +1,5 @@
+from django.db.models import Case, CharField, F, FloatField, Q, Value, When
+from django.db.models.functions import Cast, Concat, ExtractMonth, ExtractYear
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -67,6 +69,55 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
         entity = self.request.entity
         context["entity_id"] = entity.id
         return context
+
+    def get_queryset(self):
+        entity_id = self.request.entity.id
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                _operation=Case(
+                    When(Q(type="CESSION", credited_entity_id=entity_id), then=Value("ACQUISITION")),
+                    default=F("type"),
+                    output_field=CharField(),
+                ),
+                _type=Case(
+                    When(type__in=["ACQUISITION", "ACQUISITION_FROM_CPO"], then=Value("CREDIT")),
+                    When(type__in=["CESSION", "TENEUR"], then=Value("DEBIT")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
+                _entity=Case(
+                    When(Q(type="CESSION", credited_entity_id=entity_id), then=F("debited_entity__name")),
+                    When(Q(type="CESSION", debited_entity_id=entity_id), then=F("credited_entity__name")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
+                _quantity=Case(
+                    When(
+                        credited_entity_id=entity_id,
+                        then=F("quantity"),
+                    ),
+                    When(
+                        debited_entity_id=entity_id,
+                        then=F("quantity") * -1,
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
+                ),
+                _period=Concat(
+                    ExtractYear("created_at", output_field=CharField()),
+                    Case(
+                        When(
+                            created_at__month__lt=10,
+                            then=Concat(Value("0"), Cast("created_at__month", output_field=CharField())),
+                        ),
+                        default=ExtractMonth("created_at", output_field=CharField()),
+                        output_field=CharField(),
+                    ),
+                ),
+            )
+        )
 
     @extend_schema(
         operation_id="list_elec_operations",
