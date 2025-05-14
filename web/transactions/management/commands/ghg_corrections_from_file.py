@@ -168,7 +168,7 @@ class Command(BaseCommand):
         self.stdout.write("=== Updating lots ===", self.style.SUCCESS)
         domain = settings.CSRF_TRUSTED_ORIGINS[0]
         url = reverse("transactions-admin-lots-update-many")
-        endpoint_url = f"{domain}{url[1:]}"
+        endpoint_url = f"{domain}/{url[1:]}"
 
         for update_key, group in grouped_data.items():
             carbure_ids = [row[RECONCILIATION_KEY] for row in group]
