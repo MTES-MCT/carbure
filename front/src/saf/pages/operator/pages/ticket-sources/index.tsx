@@ -27,7 +27,7 @@ import {
 import { SafTicketSource, SafTicketSourceStatus } from "../../types"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import { ExportButton } from "saf/components/export"
+import { ExportButton } from "common/components/export"
 import { Pagination } from "common/components/pagination2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"

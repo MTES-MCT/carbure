@@ -5602,7 +5602,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -5703,7 +5704,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -6198,6 +6200,37 @@ paths:
                     - TMF
                     - TERF SAF
                   summary: Example of filters response.
+          description: ""
+  /api/tiruert/operations/export/:
+    get:
+      operationId: tiruert_operations_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/filters/:
     get:
@@ -11290,7 +11323,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:

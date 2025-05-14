@@ -1,5 +1,5 @@
 import { apiTypes } from "common/services/api-fetch.types"
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import { OperationOrder, OperationsFilter, OperationsQuery } from "../types"
 import { formatOperation } from "accounting/utils/formatters"
 
@@ -227,5 +227,11 @@ export const rejectOperation = (entity_id: number, operation_id: number) => {
       },
       path: { id: operation_id },
     },
+  })
+}
+
+export function downloadOperations(query: OperationsQuery) {
+  return download(`/tiruert/operations/export/`, {
+    ...query,
   })
 }

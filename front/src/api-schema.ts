@@ -1724,6 +1724,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/operations/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_operations_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/operations/filters/": {
     parameters: {
       query?: never
@@ -7633,6 +7649,30 @@ export interface operations {
         }
         content: {
           "application/json": string[]
+        }
+      }
+    }
+  }
+  tiruert_operations_export_retrieve: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Specify the volume unit. */
+        unit?: PathsApiTiruertOperationsGetParametersQueryUnit
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OperationList"]
         }
       }
     }

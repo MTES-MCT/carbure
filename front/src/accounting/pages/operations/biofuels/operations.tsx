@@ -20,6 +20,8 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
+import { ActionBar } from "common/components/scaffold"
+import { ExportButton } from "common/components/export"
 const currentYear = new Date().getFullYear()
 
 const OperationsBiofuels = () => {
@@ -64,6 +66,10 @@ const OperationsBiofuels = () => {
 
   return (
     <>
+      <ActionBar>
+        <ExportButton query={query} download={api.downloadOperations} />
+      </ActionBar>
+
       <FilterMultiSelect2
         filterLabels={filterLabels}
         selected={state.filters}
