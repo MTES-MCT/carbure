@@ -27,7 +27,7 @@ class OperationService:
         """
         Check if the debited entity is the same as entity_id passed in the request
         """
-        if data["debited_entity"] != entity_id:
+        if data["debited_entity"].id != entity_id:
             raise serializers.ValidationError({"debited_entity": OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID})
 
     @staticmethod
