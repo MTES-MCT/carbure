@@ -17,6 +17,8 @@ def create_new_elec_operations(apps, schema_editor):
             supplier__entity_type="Charge Point Operator",
             status="ACCEPTED",
             client_id=operator.pk,
+            transfer_date__year__gte=2025,
+            used_in_tiruert=False,
         )
 
         all_elec_operations = ElecOperation.objects.filter(

@@ -23,6 +23,8 @@ class ElecOperationService:
             supplier__entity_type=Entity.CPO,
             status=ElecTransferCertificate.ACCEPTED,
             client=operator,
+            transfer_date__year__gte=2025,
+            used_in_tiruert=False,
         )
 
         all_elec_operations = ElecOperation.objects.filter(
