@@ -158,11 +158,11 @@ export const getObjectives = async (
   }
 }
 
-export async function getAdminObjectivesEntity(
+export const getAdminObjectivesEntity = async (
   entity_id: number,
   year: number,
   selected_entity_id: number
-): Promise<Objectives> {
+): Promise<Objectives> => {
   const params = {
     entity_id,
     year: `${year}`,

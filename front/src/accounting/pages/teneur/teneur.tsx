@@ -4,7 +4,7 @@ import { Box, Col, LoaderOverlay, Row } from "common/components/scaffold"
 import { Trans, useTranslation } from "react-i18next"
 import { ObjectiveSection } from "./components/objective-section"
 import { useQuery } from "common/hooks/async"
-import { getObjectives } from "./api"
+import { getAdminObjectivesEntity, getObjectives } from "./api"
 import useEntity from "common/hooks/entity"
 import { usePortal } from "common/components/portal"
 import { DeclareTeneurDialog } from "./components/declare-teneur-dialog"
@@ -23,6 +23,17 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { useOutletContext } from "react-router-dom"
 import { TeneurOutletContext } from "accounting/layouts/teneur-layout"
 
+function getObjectivesForEntityOrAdmin(
+  entityId: number,
+  year: number,
+  isAdmin: boolean,
+  selectedEntityId?: number
+) {
+  if (isAdmin && selectedEntityId)
+    return getAdminObjectivesEntity(entityId, year, selectedEntityId)
+  else return getObjectives(entityId, year, isAdmin)
+}
+
 const Teneur = () => {
   const entity = useEntity()
   const { isAdmin } = entity
@@ -30,26 +41,20 @@ const Teneur = () => {
   const portal = usePortal()
   usePrivateNavigation(t("Objectifs annuels"))
 
-  // Récupération du contexte quand disponible (en admin avec entité sélectionnée)
-  const outletContext = useOutletContext<TeneurOutletContext>()
+  const { selectedEntityId } = useOutletContext<TeneurOutletContext>()
 
-  // Appel API normal pour les cas non-admin
-  const { result, loading } = useQuery(getObjectives, {
+  const { result, loading } = useQuery(getObjectivesForEntityOrAdmin, {
     key: "teneur-objectives",
-    params: [entity.id, 2025, isAdmin],
+    params: [entity.id, 2025, isAdmin, selectedEntityId],
   })
 
-  const isLoadingData = loading || outletContext?.loading
-  const objectivesData =
-    isAdmin && outletContext?.selectedEntityId
-      ? outletContext.objectives
-      : result
+  const objectivesData = result
 
-  if (isLoadingData) {
+  if (loading) {
     return <LoaderOverlay />
   }
 
-  if (isAdmin && !outletContext?.selectedEntityId && !objectivesData) {
+  if (isAdmin && !selectedEntityId && !objectivesData) {
     return (
       <Notice noColor variant="info">
         {t("Veuillez sélectionner un redevable pour voir ses objectifs.")}
@@ -78,7 +83,7 @@ const Teneur = () => {
 
   return (
     <>
-      {isAdmin && outletContext?.selectedEntityId ? (
+      {isAdmin && selectedEntityId ? (
         <Notice noColor variant="info">
           {t("Vous consultez les objectifs du redevable sélectionné.")}
         </Notice>
