@@ -25,7 +25,10 @@ export const getOperations = (query: ElecOperationsQuery) => {
     params: {
       query: {
         ...query,
-        order_by: [ElecOperationOrder.ValueMinuscreated_at],
+        order_by:
+          query.order_by && query.order_by.length > 0
+            ? query.order_by
+            : [ElecOperationOrder.ValueMinuscreated_at],
       },
     },
   })

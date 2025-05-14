@@ -99,6 +99,7 @@ const OperationsBiofuels = () => {
               hash: `operation/${row.id}`,
             })}
             loading={loading}
+            order={state.order}
             onOrder={actions.setOrder}
           />
           <Pagination

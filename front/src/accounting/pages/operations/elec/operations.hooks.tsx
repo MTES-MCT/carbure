@@ -12,6 +12,7 @@ import {
   ElecOperationsQuery,
   ElecOperationsStatus,
   ElecOperationType,
+  ElecOperationOrder,
 } from "accounting/types"
 import {
   formatOperationCreditOrDebit,
@@ -31,20 +32,24 @@ export const useOperationsElecColumns = () => {
     {
       header: t("Statut"),
       cell: (item) => <OperationBadge status={item.status} />,
+      key: ElecOperationOrder.status,
       style: {
         flex: "0 0 137px",
       },
     },
     {
       header: t("Date"),
+      key: ElecOperationOrder.created_at,
       cell: (item) => <Cell text={formatDate(item.created_at)} />,
     },
     {
       header: t("Opération"),
+      key: ElecOperationOrder.operation,
       cell: (item) => <Cell text={formatOperationType(item.type)} />,
     },
     {
       header: t("De/à"),
+      key: ElecOperationOrder.from_to,
       cell: (item) => {
         const entity = getOperationEntity(item)
         return (
@@ -61,6 +66,7 @@ export const useOperationsElecColumns = () => {
     },
     {
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
+      key: ElecOperationOrder.quantity,
       cell: (item) =>
         isOperationDebit(item.type) ? (
           <Text
