@@ -105,7 +105,7 @@ class ObjectiveViewSet(GenericViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        operation_id="objectives",
+        operation_id="admin_objectives_entity",
         description="Get objectives for a specific entity - admin view",
         parameters=[
             OpenApiParameter(
@@ -139,7 +139,7 @@ class ObjectiveViewSet(GenericViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        operation_id="objectives",
+        operation_id="admin_objectives",
         description="Get agregated objectives for all entities - admin view",
         responses={
             status.HTTP_200_OK: OpenApiResponse(
