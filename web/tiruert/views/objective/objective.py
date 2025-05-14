@@ -178,15 +178,12 @@ class ObjectiveViewSet(GenericViewSet):
             try:
                 # Get objectives for the current entity
                 entity_objectives = self._get_objectives(request, query_params)
-                print(f"Entity: {entity.name}, Objectives: {entity_objectives}")
                 if not entity_objectives:
                     continue
 
                 # Aggregate main objectives
                 for key in ["available_balance", "target", "pending_teneur", "declared_teneur", "penalty"]:
                     if key in entity_objectives["main"]:
-                        print(f"Aggregating {key}: {entity_objectives['main'][key]}")
-                        print(f"Current aggregated {key}: {aggregated_main[key]}")
                         aggregated_main[key] += entity_objectives["main"][key]
 
                 # Preserve target_percent (should be the same for all entities)
@@ -201,8 +198,6 @@ class ObjectiveViewSet(GenericViewSet):
                     else:
                         for key, value in sector.items():
                             if key in ["pending_teneur", "declared_teneur", "available_balance"]:
-                                print(f"Aggregating {key}: {value}")
-                                print(f"Current aggregated {key}: {aggregated_sectors[code][key]}")
                                 aggregated_sectors[code][key] += value
                             elif key == "objective":
                                 for objective_key, objective_value in value.items():
@@ -217,13 +212,12 @@ class ObjectiveViewSet(GenericViewSet):
                     else:
                         for key, value in category.items():
                             if key in ["pending_teneur", "declared_teneur", "available_balance"]:
-                                print(f"Aggregating {key}: {value}")
-                                print(f"Current aggregated {key}: {aggregated_categories[code][key]}")
                                 aggregated_categories[code][key] += value
                             elif key == "objective":
                                 for objective_key, objective_value in value.items():
                                     if objective_key in ["target_mj", "penalty"]:
-                                        aggregated_categories[code]["objective"][objective_key] += objective_value
+                                        if objective_key is not None and objective_value is not None:
+                                            aggregated_categories[code]["objective"][objective_key] += objective_value
 
             except Exception as e:
                 if isinstance(e, ValueError):
