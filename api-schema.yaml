@@ -5104,12 +5104,32 @@ paths:
               type: string
               enum:
                 - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
                 - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
           description: |-
             Ordre
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
           explode: false
           style: form
         - name: page
@@ -5455,12 +5475,32 @@ paths:
               type: string
               enum:
                 - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
                 - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
           description: |-
             Ordre
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
           explode: false
           style: form
         - name: page
@@ -5585,12 +5625,32 @@ paths:
               type: string
               enum:
                 - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
                 - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
           description: |-
             Ordre
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
           explode: false
           style: form
         - in: query

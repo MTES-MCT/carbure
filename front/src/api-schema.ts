@@ -7400,7 +7400,17 @@ export interface operations {
         /** @description Ordre
          *
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `operation` - Operation
+         *     * `-operation` - Operation (décroissant)
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `period` - Period
+         *     * `-period` - Period (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant) */
         order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7651,7 +7661,17 @@ export interface operations {
         /** @description Ordre
          *
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `operation` - Operation
+         *     * `-operation` - Operation (décroissant)
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `period` - Period
+         *     * `-period` - Period (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant) */
         order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -7691,7 +7711,17 @@ export interface operations {
         /** @description Ordre
          *
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
+         *     * `-created_at` - Created at (décroissant)
+         *     * `operation` - Operation
+         *     * `-operation` - Operation (décroissant)
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `period` - Period
+         *     * `-period` - Period (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant) */
         order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
         period?: string[]
         status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[]
@@ -8547,7 +8577,17 @@ export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryOrder_by {
   ValueMinuscreated_at = "-created_at",
+  ValueMinusfrom_to = "-from_to",
+  ValueMinusoperation = "-operation",
+  ValueMinusperiod = "-period",
+  ValueMinusquantity = "-quantity",
+  ValueMinusstatus = "-status",
   created_at = "created_at",
+  from_to = "from_to",
+  operation = "operation",
+  period = "period",
+  quantity = "quantity",
+  status = "status",
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryStatus {
   PENDING = "PENDING",
