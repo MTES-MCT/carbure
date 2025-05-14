@@ -70,14 +70,13 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "reject",
             "accept",
             "simulate",
+            "simulate_min_max",
             "create",
             "partial_update",
             "destroy",
             "export_operations_to_excel",
         ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
-        elif self.action in ["balance"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RO, UserRights.RW])]
+            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
         return super().get_permissions()
 
     def initialize_request(self, request, *args, **kwargs):
@@ -149,12 +148,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     ),
                     default=Value(None),
                     output_field=FloatField(),
-                ),
-                _transaction=Case(
-                    When(credited_entity_id=self.request.entity.id, then=Value("CREDIT")),
-                    When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
-                    default=Value(None),
-                    output_field=CharField(),
                 ),
                 _volume=Case(
                     When(
@@ -231,7 +224,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         ],
     )
     def create(self, request):
-        entity_id = self.request.GET.get("entity_id")
+        entity_id = request.entity.id
         serializer = OperationInputSerializer(
             data=request.data,
             context={"request": request},
