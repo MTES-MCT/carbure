@@ -1,6 +1,6 @@
 import { apiTypes } from "common/services/api-fetch.types"
-import { api } from "common/services/api-fetch"
 import { OperationsFilter, OperationsQuery, OperationOrderBy } from "../types"
+import { api, download } from "common/services/api-fetch"
 import { formatOperation } from "accounting/utils/formatters"
 
 export const getOperationsFilters = (
@@ -23,7 +23,10 @@ export const getOperations = (query: OperationsQuery) => {
       params: {
         query: {
           ...query,
-          order_by: [OperationOrderBy.ValueMinuscreated_at],
+          order_by:
+            query.order_by && query.order_by.length > 0
+              ? query.order_by
+              : [OperationOrderBy.ValueMinuscreated_at],
         },
       },
     })
@@ -224,5 +227,11 @@ export const rejectOperation = (entity_id: number, operation_id: number) => {
       },
       path: { id: operation_id },
     },
+  })
+}
+
+export function downloadOperations(query: OperationsQuery) {
+  return download(`/tiruert/operations/export/`, {
+    ...query,
   })
 }

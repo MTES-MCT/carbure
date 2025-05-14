@@ -1,3 +1,4 @@
+from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -8,6 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 from core.models import Entity, UserRights
 from core.pagination import MetadataPageNumberPagination
 from core.permissions import HasUserRights
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
 from tiruert.serializers import (
@@ -64,10 +66,17 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     pagination_class = OperationPagination
 
     def get_permissions(self):
-        if self.action in ["reject", "accept", "simulate", "create", "partial_update", "destroy"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
-        elif self.action in ["balance"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RO, UserRights.RW])]
+        if self.action in [
+            "reject",
+            "accept",
+            "simulate",
+            "simulate_min_max",
+            "create",
+            "partial_update",
+            "destroy",
+            "export_operations_to_excel",
+        ]:
+            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
         return super().get_permissions()
 
     def initialize_request(self, request, *args, **kwargs):
@@ -88,6 +97,72 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             context["unit"] = self.request.unit
         context["details"] = self.request.GET.get("details", "0") == "1"
         return context
+
+    def get_queryset(self):
+        multiplicators = {
+            "mj": "biofuel__pci_litre",
+            "kg": "biofuel__masse_volumique",
+        }
+        multiplicator = multiplicators.get(self.request.unit, None)
+
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                total_volume=Sum("details__volume"),
+                _sector=Case(
+                    When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
+                    When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
+                    When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
+                _type=Case(
+                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=Value("ACQUISITION")),
+                    default=F("type"),
+                    output_field=CharField(),
+                ),
+                _depot=Case(
+                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("to_depot__name")),
+                    When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("from_depot__name")),
+                    When(Q(type="INCORPORATION") | Q(type="MAC_BIO"), then=F("to_depot__name")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
+                _entity=Case(
+                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
+                    When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
+                    When(Q(type="TRANSFERT", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
+                    When(Q(type="TRANSFERT", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
+                _quantity=Case(
+                    When(
+                        credited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * (F(multiplicator) if multiplicator else 1),
+                    ),
+                    When(
+                        debited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * -1 * (F(multiplicator) if multiplicator else 1),
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
+                ),
+                _volume=Case(
+                    When(
+                        credited_entity_id=self.request.entity.id,
+                        then=F("total_volume"),
+                    ),
+                    When(
+                        debited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * -1,
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
+                ),
+            )
+        )
 
     @extend_schema(
         operation_id="list_operations",
@@ -149,7 +224,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         ],
     )
     def create(self, request):
-        entity_id = self.request.GET.get("entity_id")
+        entity_id = request.entity.id
         serializer = OperationInputSerializer(
             data=request.data,
             context={"request": request},

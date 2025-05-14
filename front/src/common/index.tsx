@@ -141,7 +141,7 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
-      {(isIndustry || isPowerOrHeatProducer) && (
+      {(isIndustry || isPowerOrHeatProducer || isAdmin) && (
         <>
           {(userIsMTEDGEC || accise_number !== "") && (
             <Route path="accounting/*" element={<MaterialAccounting />} />

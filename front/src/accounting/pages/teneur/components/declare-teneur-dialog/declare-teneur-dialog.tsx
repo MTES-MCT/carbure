@@ -29,16 +29,15 @@ import {
   SectorObjective,
   TargetType,
 } from "../../types"
-import {
-  CONVERSIONS,
-  floorNumber,
-  formatUnit,
-  formatNumber,
-} from "common/utils/formatters"
+import { CONVERSIONS, floorNumber, formatUnit } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
-import { useMemo, useEffect, useState } from "react"
+import { useMemo } from "react"
 import { Button } from "common/components/button2"
-import { useDeclareTeneurDialog } from "./declare-teneur-dialog.hooks"
+import {
+  useDeclareTeneurDialog,
+  useRemainingCO2Objective,
+  useRemainingEnergyBeforeLimitOrObjective,
+} from "./declare-teneur-dialog.hooks"
 import {
   DeclareTeneurProgressBar,
   DeclareTeneurProgressBarList,
@@ -74,45 +73,12 @@ const DeclareTeneurDialogContent = ({
     values: form.value,
   })
 
-  const remainingEnergyBeforeLimitOrObjective = useMemo(() => {
-    // Add quantity declared only if the "declare quantity" button has been clicked
-    const quantity = form.value.quantity ?? 0
-
-    const remainingEnergy = Math.max(
-      0,
-      objective.target ? computeObjectiveEnergy(objective) - quantity : 0
-    )
-
-    return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
-      fractionDigits: 0,
-    })
-  }, [form.value.quantity, objective])
-
-  const remainingCO2EmissionsBeforeObjective = (
-    mainObjective: MainObjective
-  ) => {
-    const avoidedEmissions = form.value.avoided_emissions ?? 0
-    const remainingCO2 = Math.max(
-      0,
-      mainObjective.target -
-        mainObjective.teneur_declared -
-        mainObjective.teneur_declared_month -
-        avoidedEmissions
-    )
-    return formatNumber(remainingCO2, {
-      fractionDigits: 0,
-      mode: "ceil",
-    })
-  }
-
-  const [remainingCO2Objective, setRemainingCO2Objective] = useState("")
-
-  useEffect(() => {
-    if (mainObjective) {
-      const updatedValue = remainingCO2EmissionsBeforeObjective(mainObjective)
-      setRemainingCO2Objective(updatedValue)
-    }
-  }, [form.value.avoided_emissions, mainObjective])
+  const remainingEnergyBeforeLimitOrObjective =
+    useRemainingEnergyBeforeLimitOrObjective(objective, form.value)
+  const remainingCO2Objective = useRemainingCO2Objective(
+    form.value,
+    mainObjective
+  )
 
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
@@ -266,7 +232,7 @@ const DeclareTeneurDialogContent = ({
                         label={t("Objectif global")}
                       />
                     )}
-                    {mainObjective && (
+                    {remainingCO2Objective && (
                       <RecapData.RemainingQuantityBegoreCO2Objective
                         value={remainingCO2Objective}
                         bold

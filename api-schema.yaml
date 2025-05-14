@@ -5720,6 +5720,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -5731,6 +5732,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -5739,13 +5741,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - name: page
@@ -6101,7 +6143,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -6202,7 +6245,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -6292,6 +6336,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -6303,6 +6348,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -6311,13 +6357,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - name: page
@@ -6499,6 +6585,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -6510,6 +6597,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -6518,13 +6606,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - in: query
@@ -6613,6 +6741,37 @@ paths:
                     - TMF
                     - TERF SAF
                   summary: Example of filters response.
+          description: ""
+  /api/tiruert/operations/export/:
+    get:
+      operationId: tiruert_operations_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/filters/:
     get:
@@ -6711,6 +6870,7 @@ paths:
                 - EXPORTATION
                 - DEVALUATION
                 - CUSTOMS_CORRECTION
+                - TRANSFERT
                 - ACQUISITION
               type: string
               description: |-
@@ -6722,6 +6882,7 @@ paths:
                 * `EXPORTATION` - EXPORTATION
                 * `DEVALUATION` - DEVALUATION
                 * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                * `TRANSFERT` - TRANSFERT
                 * `ACQUISITION` - ACQUISITION
         - in: query
           name: order_by
@@ -6730,13 +6891,53 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
+                - -biofuel
                 - -created_at
+                - -customs_category
+                - -depot
+                - -from_to
+                - -pending_operations
+                - -quantity
+                - -sector
+                - -status
+                - -type
+                - available_balance
+                - biofuel
                 - created_at
+                - customs_category
+                - depot
+                - from_to
+                - pending_operations
+                - quantity
+                - sector
+                - status
+                - type
           description: |-
             Ordre
 
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
+            * `sector` - Sector
+            * `-sector` - Sector (décroissant)
+            * `biofuel` - Biofuel
+            * `-biofuel` - Biofuel (décroissant)
+            * `customs_category` - Customs category
+            * `-customs_category` - Customs category (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
+            * `depot` - Depot
+            * `-depot` - Depot (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - in: query
@@ -9695,10 +9896,18 @@ components:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
           $ref: "#/components/schemas/OperationEntity"
+        _entity:
+          type: string
+          readOnly: true
+          title: " entity"
         from_depot:
           $ref: "#/components/schemas/OperationDepot"
         to_depot:
           $ref: "#/components/schemas/OperationDepot"
+        _depot:
+          type: string
+          readOnly: true
+          title: " depot"
         export_country:
           type: integer
           nullable: true
@@ -9710,6 +9919,10 @@ components:
           type: string
           format: date
           nullable: true
+        durability_period:
+          type: string
+          nullable: true
+          maxLength: 6
         quantity:
           type: number
           format: double
@@ -9730,6 +9943,8 @@ components:
           items:
             $ref: "#/components/schemas/OperationDetail"
       required:
+        - _depot
+        - _entity
         - avoided_emissions
         - biofuel
         - created_at
@@ -9846,10 +10061,18 @@ components:
           $ref: "#/components/schemas/OperationEntity"
         debited_entity:
           $ref: "#/components/schemas/OperationEntity"
+        _entity:
+          type: string
+          readOnly: true
+          title: " entity"
         from_depot:
           $ref: "#/components/schemas/OperationDepot"
         to_depot:
           $ref: "#/components/schemas/OperationDepot"
+        _depot:
+          type: string
+          readOnly: true
+          title: " depot"
         export_country:
           type: integer
           nullable: true
@@ -9869,6 +10092,8 @@ components:
           items:
             $ref: "#/components/schemas/OperationDetail"
       required:
+        - _depot
+        - _entity
         - biofuel
         - created_at
         - credited_entity
@@ -9924,6 +10149,7 @@ components:
         - EXPORTATION
         - DEVALUATION
         - CUSTOMS_CORRECTION
+        - TRANSFERT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -9934,6 +10160,7 @@ components:
         * `EXPORTATION` - EXPORTATION
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+        * `TRANSFERT` - TRANSFERT
     OtpResponse:
       type: object
       properties:
@@ -11853,7 +12080,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:

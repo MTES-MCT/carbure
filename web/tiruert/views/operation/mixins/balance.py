@@ -77,6 +77,7 @@ class BalanceActionMixin:
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
         ges_bound_min = request.query_params.get("ges_bound_min", None)
         ges_bound_max = request.query_params.get("ges_bound_max", None)
+        order_by = request.query_params.get("order_by", None)
 
         operations = self.filter_queryset(self.get_queryset())
 
@@ -98,6 +99,13 @@ class BalanceActionMixin:
         }.get(group_by, self.get_serializer_class())
 
         data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
+
+        # These sortings can't be done in operations filters because they are not in the queryset
+        # Theses info are calculated in the balance service
+        if order_by and order_by in ["available_balance", "pending_operations"]:
+            data = sorted(data, key=lambda x: x[order_by])
+        elif order_by and order_by in ["-available_balance", "-pending_operations"]:
+            data = sorted(data, key=lambda x: x[order_by[1:]], reverse=True)
 
         paginator = BalancePagination()
         paginated_data = paginator.paginate_queryset(data, request)

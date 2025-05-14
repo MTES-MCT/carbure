@@ -24,27 +24,25 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     credited_entity = OperationEntitySerializer()
     debited_entity = OperationEntitySerializer()
     details = OperationDetailSerializer(many=True, required=False)
-    sector = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
+    sector = serializers.CharField(source="_sector", read_only=True)
+    type = serializers.CharField(source="_type", read_only=True)
     biofuel = serializers.CharField(source="biofuel.code", read_only=True)
     quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
     renewable_energy_share = serializers.FloatField()
-
-    def get_type(self, instance) -> str:
-        entity_id = self.context.get("entity_id")
-        if instance.is_acquisition(entity_id):
-            return Operation.ACQUISITION
-        else:
-            return instance.type
-
-    def get_sector(self, instance) -> str:
-        return instance.sector
+    _entity = serializers.CharField(read_only=True)
+    _depot = serializers.CharField(read_only=True)
 
     def get_volume_l(self, instance) -> float:
+        if getattr(instance, "_volume", None) is not None:
+            return instance._volume
+
         return instance.volume
 
     def get_quantity(self, instance) -> float:
+        if getattr(instance, "_quantity", None) is not None:
+            return instance._quantity
+
         volume = self.get_volume_l(instance)
         return instance.volume_to_quantity(volume, self.context.get("unit"))
 
@@ -71,8 +69,10 @@ class OperationListSerializer(BaseOperationSerializer):
             "renewable_energy_share",
             "credited_entity",
             "debited_entity",
+            "_entity",
             "from_depot",
             "to_depot",
+            "_depot",
             "export_country",
             "created_at",
             "quantity",
@@ -94,11 +94,14 @@ class OperationSerializer(BaseOperationSerializer):
             "renewable_energy_share",
             "credited_entity",
             "debited_entity",
+            "_entity",
             "from_depot",
             "to_depot",
+            "_depot",
             "export_country",
             "created_at",
             "validation_date",
+            "durability_period",
             "quantity",
             "quantity_mj",
             "avoided_emissions",

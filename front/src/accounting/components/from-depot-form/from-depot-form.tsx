@@ -11,7 +11,6 @@ import { FromDepotFormProps } from "./from-depot-form.types"
 import { DoubleRange } from "common/components/inputs2"
 import { useQuery } from "common/hooks/async"
 import { debounce } from "common/utils/functions"
-import { useEffect } from "react"
 
 // Type of the component
 type FromDepotProps = {
@@ -41,16 +40,15 @@ export const FromDepotForm = ({ balance }: FromDepotProps) => {
         balance.sector,
         balance.customs_category,
         balance.biofuel.code,
-        value.gesBoundMin,
-        value.gesBoundMax,
+        value.gesBoundMin ?? Math.floor(balance.ghg_reduction_min),
+        value.gesBoundMax ?? Math.ceil(balance.ghg_reduction_max),
       ] as const,
+      onSuccess: (data) => {
+        const newDepot = data?.find((b) => b.id === value.from_depot?.id)
+        setField("from_depot", newDepot)
+      },
     }
   )
-
-  useEffect(() => {
-    const newDepot = depots.result?.find((b) => b.id === value.from_depot?.id)
-    setField("from_depot", newDepot)
-  }, [depots.result, setField, value.from_depot?.id])
 
   return (
     <>

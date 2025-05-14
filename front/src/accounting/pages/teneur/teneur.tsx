@@ -4,7 +4,7 @@ import { Box, Col, LoaderOverlay, Row } from "common/components/scaffold"
 import { Trans, useTranslation } from "react-i18next"
 import { ObjectiveSection } from "./components/objective-section"
 import { useQuery } from "common/hooks/async"
-import { getObjectives } from "./api"
+import { getAdminObjectivesEntity, getObjectives } from "./api"
 import useEntity from "common/hooks/entity"
 import { usePortal } from "common/components/portal"
 import { DeclareTeneurDialog } from "./components/declare-teneur-dialog"
@@ -22,20 +22,46 @@ import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneu
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ElecOperationSector } from "accounting/types"
 import { DeclareElecTeneurDialog } from "./components/declare-elec-teneur-dialog"
+import { useOutletContext } from "react-router-dom"
+import { TeneurOutletContext } from "accounting/layouts/teneur-layout"
+
+function getObjectivesForEntityOrAdmin(
+  entityId: number,
+  year: number,
+  isAdmin: boolean,
+  selectedEntityId?: number
+) {
+  if (isAdmin && selectedEntityId)
+    return getAdminObjectivesEntity(entityId, year, selectedEntityId)
+  else return getObjectives(entityId, year, isAdmin)
+}
 
 const Teneur = () => {
   const entity = useEntity()
+  const { isAdmin } = entity
   const { t } = useTranslation()
   const portal = usePortal()
   usePrivateNavigation(t("Objectifs annuels"))
 
-  const { result, loading } = useQuery(getObjectives, {
+  const { selectedEntityId } = useOutletContext<TeneurOutletContext>()
+
+  const { result, loading } = useQuery(getObjectivesForEntityOrAdmin, {
     key: "teneur-objectives",
-    params: [entity.id, 2025],
+    params: [entity.id, 2025, isAdmin, selectedEntityId],
   })
+
+  const objectivesData = result
 
   if (loading) {
     return <LoaderOverlay />
+  }
+
+  if (isAdmin && !selectedEntityId && !objectivesData) {
+    return (
+      <Notice noColor variant="info">
+        {t("Veuillez sélectionner un redevable pour voir ses objectifs.")}
+      </Notice>
+    )
   }
 
   const onCategoryClick = (
@@ -69,45 +95,61 @@ const Teneur = () => {
 
   return (
     <>
-      <Notice noColor variant="info">
-        {t(
-          "Bienvenue dans votre espace de teneur et objectifs annuels. Vous pouvez simuler des conversions quantités et tCO2 eq. évitées, ainsi qu'y rentrer vos quantités de teneur mensuelle afin de clôturer votre comptabilité mensuelle."
-        )}
-      </Notice>
-      <Box gap="lg">
+      {isAdmin && selectedEntityId ? (
         <Notice noColor variant="info">
-          <Row style={{ alignItems: "center", width: "100%" }}>
-            <Col spread>
-              <p>
-                <Trans
-                  t={t}
-                  components={{ strong: <strong /> }}
-                  defaults="Toutes vos déclarations enregistrées ne sont pas validées, <strong>pensez à valider votre teneur mensuelle</strong> pour que vos déclarations soient prises en comptes."
-                />
-              </p>
-            </Col>
-
-            <Button priority="primary" onClick={onValidatePendingTeneurClick}>
-              {t("Valider ma teneur mensuelle")}
-            </Button>
-          </Row>
+          {t("Vous consultez les objectifs du redevable sélectionné.")}
         </Notice>
+      ) : isAdmin ? (
+        <Notice noColor variant="info">
+          {t("Sur cette page, vous avez accès aux objectifs consolidés.")}
+          <br />
+          {t(
+            "Vous pouvez également sélectionner un redevable pour consulter ses objectifs."
+          )}
+        </Notice>
+      ) : (
+        <Notice noColor variant="info">
+          {t(
+            "Bienvenue dans votre espace de teneur et objectifs annuels. Vous pouvez simuler des conversions quantités et tCO2 eq. évitées, ainsi qu'y rentrer vos quantités de teneur mensuelle afin de clôturer votre comptabilité mensuelle."
+          )}
+        </Notice>
+      )}
+      <Box gap="lg">
+        {!isAdmin && (
+          <Notice noColor variant="info">
+            <Row style={{ alignItems: "center", width: "100%" }}>
+              <Col spread>
+                <p>
+                  <Trans
+                    t={t}
+                    components={{ strong: <strong /> }}
+                    defaults="Toutes vos déclarations enregistrées ne sont pas validées, <strong>pensez à valider votre teneur mensuelle</strong> pour que vos déclarations soient prises en comptes."
+                  />
+                </p>
+              </Col>
+
+              <Button priority="primary" onClick={onValidatePendingTeneurClick}>
+                {t("Valider ma teneur mensuelle")}
+              </Button>
+            </Row>
+          </Notice>
+        )}
         {/* Avancement global */}
-        <OverallProgress objective={result?.global} />
-        <SectorProgress sectors={result?.sectors} />
+        <OverallProgress objective={objectivesData?.global} />
+        <SectorProgress sectors={objectivesData?.sectors} />
         <ObjectiveSection
           title={t("Avancement par catégorie de carburants alternatifs")}
         >
           <CappedCategoriesProgress
-            categories={result?.capped_categories}
+            categories={objectivesData?.capped_categories}
             onCategoryClick={onCategoryClick}
           />
           <ObjectivizedCategoriesProgress
-            categories={result?.objectivized_categories}
+            categories={objectivesData?.objectivized_categories}
             onCategoryClick={onCategoryClick}
           />
           <UnconstrainedCategoriesProgress
-            categories={result?.unconstrained_categories}
+            categories={objectivesData?.unconstrained_categories}
             onCategoryClick={onCategoryClick}
           />
         </ObjectiveSection>

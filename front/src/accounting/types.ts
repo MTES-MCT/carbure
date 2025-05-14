@@ -10,12 +10,13 @@ import {
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
   PathsApiTiruertElecOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
+  PathsApiTiruertOperationsGetParametersQueryOrder_by as OperationOrder,
   OperationTypeEnum as CreateOperationType,
   PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
   PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter,
   PathsApiTiruertElecOperationsGetParametersQueryStatus as ElecOperationsStatus,
   PathsApiTiruertElecOperationsGetParametersQueryOperation as ElecOperationType,
-  PathsApiTiruertElecOperationsGetParametersQueryOrder_by as OperationOrderBy,
+  PathsApiTiruertElecOperationsGetParametersQueryOrder_by as ElecOperationOrder,
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
   ElecOperationTypeEnum as CreateElecOperationType,
 } from "api-schema"
@@ -47,7 +48,8 @@ export {
   OperationDebitOrCredit,
   OperationBiofuelCategory,
   BalancesGroupBy,
-  OperationOrderBy,
+  OperationOrder,
+  ElecOperationOrder,
 }
 
 /** BALANCES */

@@ -28,7 +28,7 @@ import {
 } from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import { ExportButton } from "saf/components/export"
+import { ExportButton } from "common/components/export"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "common/types"

@@ -6,11 +6,7 @@ import * as api from "accounting/api/operations"
 import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
-import {
-  getOperationEntity,
-  getOperationQuantity,
-  isOperationDebit,
-} from "../../operations.utils"
+import { getOperationQuantity, isOperationDebit } from "../../operations.utils"
 import { OperationBadge } from "accounting/components/operation-badge/operation-badge"
 import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
@@ -21,6 +17,7 @@ import {
   formatDate,
   formatNumber,
   roundNumber,
+  formatPeriod,
 } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
@@ -179,22 +176,26 @@ export const OperationDetail = () => {
         },
         operation.type === OperationType.ACQUISITION && {
           label: t("Expéditeur"),
-          value: getOperationEntity(operation)?.name ?? "-",
+          value: operation._entity ?? "-",
         },
         operation.type === OperationType.CESSION && {
           label: t("Destinataire"),
-          value: getOperationEntity(operation)?.name ?? "-",
+          value: operation._entity ?? "-",
         },
         operation.type !== OperationType.TENEUR && {
           label: t("Dépôt expéditeur"),
-          value: operation.from_depot?.name ?? "-",
+          value: operation._depot ?? "-",
         },
         operation.type !== OperationType.DEVALUATION &&
           operation.type === OperationType.ACQUISITION &&
           operation.status !== OperationsStatus.PENDING && {
             label: t("Dépôt destinataire"),
-            value: operation.to_depot?.name ?? "-",
+            value: operation._depot ?? "-",
           },
+        typeof operation.durability_period === "string" && {
+          label: t("Déclaration de durabilité"),
+          value: formatPeriod(operation.durability_period),
+        },
       ])
     : []
 
@@ -239,7 +240,7 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {isOperationDebit(operation?.type ?? "") &&
+            {isOperationDebit(operation?.quantity ?? 0) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button

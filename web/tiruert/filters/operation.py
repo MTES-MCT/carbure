@@ -3,12 +3,12 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter, NumberFilter
+from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
 from core.models import MatierePremiere
-from saf.models.constants import SAF_BIOFUEL_TYPES
+from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
 
 
@@ -27,7 +27,20 @@ class BaseFilter(FilterSet):
     ges_bound_min = NumberFilter(method="ignore")
     ges_bound_max = NumberFilter(method="ignore")
 
-    order_by = OrderingFilter(fields=(("created_at", "created_at"),))
+    order_by = CustomOrderingFilter(
+        fields=(
+            ("status", "status"),
+            ("created_at", "created_at"),
+            ("_sector", "sector"),
+            ("biofuel__code", "biofuel"),
+            ("customs_category", "customs_category"),
+            ("_type", "type"),
+            ("_depot", "depot"),
+            ("_entity", "from_to"),
+            ("_quantity", "quantity"),
+        ),
+        extra_valid_fields=["available_balance", "pending_operations"],
+    )
 
     def filter_multiple_values(self, queryset, field_name, param_name):
         values = self.data.getlist(param_name)
@@ -52,18 +65,7 @@ class BaseFilter(FilterSet):
 
     @extend_schema_field(ListField(child=ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)))
     def filter_sector(self, queryset, name, value):
-        sectors = [sector.upper() for sector in self.request.GET.getlist(name)]
-        if not sectors:
-            return queryset
-
-        q_objects = Q()
-        if Operation.ESSENCE in sectors:
-            q_objects |= Q(biofuel__compatible_essence=True)
-        if Operation.GAZOLE in sectors:
-            q_objects |= Q(biofuel__compatible_diesel=True)
-        if Operation.CARBUREACTEUR in sectors:
-            q_objects |= Q(biofuel__code__in=SAF_BIOFUEL_TYPES)
-        return queryset.filter(q_objects).distinct()
+        return self.filter_multiple_values(queryset, "_sector", "sector")
 
     def filter_from_to(self, queryset, name, value):
         entities = self.request.GET.getlist(name)
@@ -77,12 +79,7 @@ class BaseFilter(FilterSet):
     @extend_schema_field(ListField(child=ChoiceField(choices=["CREDIT", "DEBIT"])))
     def filter_type(self, queryset, name, value):
         value = value.upper()
-        if value == "CREDIT":
-            return queryset.filter(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"]).distinct()
-        elif value == "DEBIT":
-            return queryset.filter(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"]).distinct()
-        else:
-            return queryset
+        return queryset.filter(_transaction=value).distinct()
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_period(self, queryset, name, value):
@@ -124,20 +121,7 @@ class BaseFilter(FilterSet):
         )
     )
     def filter_operation(self, queryset, name, value):
-        entity_id = self.request.query_params.get("entity_id")
-        operations = [operation.upper() for operation in self.request.GET.getlist(name)]
-        if not operations:
-            return queryset
-
-        q_objects = Q()
-        if "ACQUISITION" in operations:
-            q_objects |= Q(type="CESSION", credited_entity_id=entity_id)
-            operations.remove("ACQUISITION")
-        if "CESSION" in operations:
-            q_objects |= Q(type="CESSION", debited_entity_id=entity_id)
-            operations.remove("CESSION")
-        q_objects |= Q(type__in=operations)
-        return queryset.filter(q_objects).distinct()
+        return self.filter_multiple_values(queryset, "_type", "operation")
 
     def ignore(self, queryset, name, value):
         return queryset
