@@ -4957,6 +4957,98 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/tiruert/admin-objectives/:
+    get:
+      operationId: admin_objectives
+      description: Get agregated objectives for all entities - admin view
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from which to calculate balance for teneur
+          required: true
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Date to which to calculate balance for teneur
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Year of the objectives
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectiveOutput"
+          description: All agregated objectives for all liable enttities.
+  /api/tiruert/admin-objectives-entity/:
+    get:
+      operationId: admin_objectives_entity
+      description: Get objectives for a specific entity - admin view
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from which to calculate balance for teneur
+          required: true
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Date to which to calculate balance for teneur
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Entity's objectives.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Year of the objectives
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectiveOutput"
+          description: All objectives.
   /api/tiruert/elec-operations/:
     get:
       operationId: list_elec_operations
@@ -5563,7 +5655,7 @@ paths:
           description: ""
   /api/tiruert/elec-operations/teneur/declare/:
     post:
-      operationId: declare_teneur
+      operationId: declare_elec_teneur
       description: Set teneur operations to DECLARED
       parameters:
         - in: query
@@ -6143,8 +6235,7 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description:
-        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -6245,8 +6336,7 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description:
-        Retrieve balances grouped by mp category / biofuel or by sector or
+      description: Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -7117,7 +7207,7 @@ paths:
           description: ""
   /api/tiruert/operations/teneur/declare/:
     post:
-      operationId: declare_teneur_2
+      operationId: declare_teneur
       description: Set teneur operations to DECLARED
       parameters:
         - in: query
@@ -8879,17 +8969,6 @@ components:
       required:
         - id
         - name
-    ElecOperationEntityRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-          minLength: 1
-      required:
-        - id
-        - name
     ElecOperationInputRequest:
       type: object
       properties:
@@ -10354,10 +10433,14 @@ components:
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
+        type:
+          $ref: "#/components/schemas/ElecOperationTypeEnum"
         credited_entity:
-          $ref: "#/components/schemas/ElecOperationEntityRequest"
+          type: integer
+          nullable: true
         debited_entity:
-          $ref: "#/components/schemas/ElecOperationEntityRequest"
+          type: integer
+          nullable: true
         quantity:
           type: number
           format: double
@@ -12080,8 +12163,7 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description:
-        A serializer for re-sending the user activation email. Includes
+      description: A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:

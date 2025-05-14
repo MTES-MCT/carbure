@@ -3,7 +3,7 @@ import { api } from "common/services/api-fetch"
 import {
   ElecOperationsFilter,
   ElecOperationsQuery,
-  OperationOrderBy,
+  ElecOperationOrder,
 } from "../types"
 
 export const getOperationsFilters = (
@@ -25,7 +25,7 @@ export const getOperations = (query: ElecOperationsQuery) => {
     params: {
       query: {
         ...query,
-        order_by: [OperationOrderBy.ValueMinuscreated_at],
+        order_by: [ElecOperationOrder.ValueMinuscreated_at],
       },
     },
   })

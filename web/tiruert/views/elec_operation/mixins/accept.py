@@ -54,7 +54,7 @@ class AcceptActionMixin:
         return Response({"status": "accepted"}, status=status.HTTP_200_OK)
 
     @extend_schema(
-        operation_id="declare_teneur",
+        operation_id="declare_elec_teneur",
         description="Set teneur operations to DECLARED",
         request=None,
         responses={

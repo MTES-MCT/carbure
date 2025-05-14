@@ -1,5 +1,5 @@
 import { apiTypes } from "common/services/api-fetch.types"
-import { OperationsFilter, OperationsQuery, OperationOrderBy } from "../types"
+import { OperationsFilter, OperationsQuery, OperationOrder } from "../types"
 import { api, download } from "common/services/api-fetch"
 import { formatOperation } from "accounting/utils/formatters"
 
@@ -26,7 +26,7 @@ export const getOperations = (query: OperationsQuery) => {
           order_by:
             query.order_by && query.order_by.length > 0
               ? query.order_by
-              : [OperationOrderBy.ValueMinuscreated_at],
+              : [OperationOrder.ValueMinuscreated_at],
         },
       },
     })

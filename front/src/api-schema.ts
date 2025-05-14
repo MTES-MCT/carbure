@@ -1551,6 +1551,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/admin-objectives/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Get agregated objectives for all entities - admin view */
+    get: operations["admin_objectives"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/tiruert/admin-objectives-entity/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Get objectives for a specific entity - admin view */
+    get: operations["admin_objectives_entity"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/elec-operations/": {
     parameters: {
       query?: never
@@ -1666,7 +1700,7 @@ export interface paths {
     get?: never
     put?: never
     /** @description Set teneur operations to DECLARED */
-    post: operations["declare_teneur"]
+    post: operations["declare_elec_teneur"]
     delete?: never
     options?: never
     head?: never
@@ -1889,7 +1923,7 @@ export interface paths {
     get?: never
     put?: never
     /** @description Set teneur operations to DECLARED */
-    post: operations["declare_teneur_2"]
+    post: operations["declare_teneur"]
     delete?: never
     options?: never
     head?: never
@@ -2589,10 +2623,6 @@ export interface components {
       id: number
       name: string
     }
-    ElecOperationEntityRequest: {
-      id: number
-      name: string
-    }
     ElecOperationInputRequest: {
       type: components["schemas"]["ElecOperationTypeEnum"]
       credited_entity?: number | null
@@ -3237,8 +3267,9 @@ export interface components {
       total_available_volume?: number
     }
     PatchedElecOperationUpdateRequest: {
-      credited_entity?: components["schemas"]["ElecOperationEntityRequest"]
-      debited_entity?: components["schemas"]["ElecOperationEntityRequest"]
+      type?: components["schemas"]["ElecOperationTypeEnum"]
+      credited_entity?: number | null
+      debited_entity?: number | null
       /** Format: double */
       quantity?: number
     }
@@ -7295,6 +7326,66 @@ export interface operations {
       }
     }
   }
+  admin_objectives: {
+    parameters: {
+      query: {
+        /** @description Date from which to calculate balance for teneur */
+        date_from: string
+        /** @description Date to which to calculate balance for teneur */
+        date_to: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Year of the objectives */
+        year: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description All agregated objectives for all liable enttities. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ObjectiveOutput"]
+        }
+      }
+    }
+  }
+  admin_objectives_entity: {
+    parameters: {
+      query: {
+        /** @description Date from which to calculate balance for teneur */
+        date_from: string
+        /** @description Date to which to calculate balance for teneur */
+        date_to: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Entity's objectives. */
+        selected_entity_id: number
+        /** @description Year of the objectives */
+        year: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description All objectives. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ObjectiveOutput"]
+        }
+      }
+    }
+  }
   list_elec_operations: {
     parameters: {
       query: {
@@ -7622,7 +7713,7 @@ export interface operations {
       }
     }
   }
-  declare_teneur: {
+  declare_elec_teneur: {
     parameters: {
       query: {
         /** @description Authorised entity ID. */
@@ -7704,8 +7795,26 @@ export interface operations {
          *     * `status` - Status
          *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
@@ -8022,8 +8131,26 @@ export interface operations {
          *     * `status` - Status
          *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
@@ -8072,8 +8199,26 @@ export interface operations {
          *     * `status` - Status
          *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -8142,8 +8287,26 @@ export interface operations {
          *     * `status` - Status
          *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant) */
-        order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[]
+         *     * `-created_at` - Created at (décroissant)
+         *     * `sector` - Sector
+         *     * `-sector` - Sector (décroissant)
+         *     * `biofuel` - Biofuel
+         *     * `-biofuel` - Biofuel (décroissant)
+         *     * `customs_category` - Customs category
+         *     * `-customs_category` - Customs category (décroissant)
+         *     * `type` - Type
+         *     * `-type` - Type (décroissant)
+         *     * `depot` - Depot
+         *     * `-depot` - Depot (décroissant)
+         *     * `from_to` - From to
+         *     * `-from_to` - From to (décroissant)
+         *     * `quantity` - Quantity
+         *     * `-quantity` - Quantity (décroissant)
+         *     * `available_balance` - available_balance
+         *     * `-available_balance` - available_balance (descending)
+         *     * `pending_operations` - pending_operations
+         *     * `-pending_operations` - pending_operations (descending) */
+        order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
@@ -8227,7 +8390,7 @@ export interface operations {
       }
     }
   }
-  declare_teneur_2: {
+  declare_teneur: {
     parameters: {
       query: {
         /** @description Authorised entity ID. */
@@ -8423,6 +8586,30 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
   CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
   TRANSFERT = "TRANSFERT",
   ACQUISITION = "ACQUISITION",
+}
+export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
+  ValueMinusavailable_balance = "-available_balance",
+  ValueMinusbiofuel = "-biofuel",
+  ValueMinuscreated_at = "-created_at",
+  ValueMinuscustoms_category = "-customs_category",
+  ValueMinusdepot = "-depot",
+  ValueMinusfrom_to = "-from_to",
+  ValueMinuspending_operations = "-pending_operations",
+  ValueMinusquantity = "-quantity",
+  ValueMinussector = "-sector",
+  ValueMinusstatus = "-status",
+  ValueMinustype = "-type",
+  available_balance = "available_balance",
+  biofuel = "biofuel",
+  created_at = "created_at",
+  customs_category = "customs_category",
+  depot = "depot",
+  from_to = "from_to",
+  pending_operations = "pending_operations",
+  quantity = "quantity",
+  sector = "sector",
+  status = "status",
+  type = "type",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
