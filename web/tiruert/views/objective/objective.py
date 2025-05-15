@@ -79,7 +79,7 @@ class ObjectiveViewSet(GenericViewSet):
             return [HasAdminRights(allow_external=[ExternalAdminRights.TIRIB_STATS])]
         else:
             return [
-                IsAuthenticated,
+                IsAuthenticated(),
                 HasUserRights([UserRights.ADMIN, UserRights.RW, UserRights.RO], [Entity.OPERATOR]),
             ]
 
