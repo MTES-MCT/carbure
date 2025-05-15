@@ -1,4 +1,4 @@
-import { DraftFill } from "common/components/icon"
+import { BiofuelFill, ElecFill } from "common/components/icon"
 import { Content } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useTranslation } from "react-i18next"
@@ -21,13 +21,13 @@ const OperationsBalancesLayout = () => {
             key: SectorTabs.BIOFUELS,
             label: t("Biocarburants"),
             path: `${sector}/${SectorTabs.BIOFUELS}`,
-            icon: DraftFill,
+            icon: BiofuelFill,
           },
           {
             key: SectorTabs.ELEC,
             label: t("Électricité"),
             path: `${sector}/${SectorTabs.ELEC}`,
-            icon: DraftFill,
+            icon: ElecFill,
           },
         ])}
       />
