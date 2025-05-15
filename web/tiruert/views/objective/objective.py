@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, UserRights
+from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import HasAdminRights, HasUserRights
 from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilterForBalance
 from tiruert.models import MacFossilFuel, Objective, Operation
@@ -76,9 +76,9 @@ class ObjectiveViewSet(GenericViewSet):
 
     def get_permissions(self):
         if self.action in ["get_objectives_admin_view", "get_agregated_objectives_admin_view"]:
-            self.permission_classes = [IsAuthenticated, HasAdminRights]
+            return [HasAdminRights(allow_external=[ExternalAdminRights.TIRIB_STATS])]
         else:
-            self.permission_classes = [
+            return [
                 IsAuthenticated,
                 HasUserRights([UserRights.ADMIN, UserRights.RW, UserRights.RO], [Entity.OPERATOR]),
             ]

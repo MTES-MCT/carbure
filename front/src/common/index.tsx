@@ -132,6 +132,7 @@ const Org = () => {
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
+  const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
   const isTransferredElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
   const userIsMTEDGEC = user?.rights.find(
@@ -141,9 +142,9 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
-      {(isIndustry || isPowerOrHeatProducer || isAdmin) && (
+      {(isIndustry || isPowerOrHeatProducer || isAdmin || allowAccounting) && (
         <>
-          {(userIsMTEDGEC || accise_number !== "") && (
+          {(userIsMTEDGEC || allowAccounting || accise_number !== "") && (
             <Route path="accounting/*" element={<MaterialAccounting />} />
           )}
           <Route path="transactions/:year/*" element={<Transactions />} />

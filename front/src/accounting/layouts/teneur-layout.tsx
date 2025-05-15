@@ -18,6 +18,7 @@ export const TeneurLayout = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { isAdmin } = entity
+  const isAdminOrExternal = isAdmin || entity.isExternal
   const [selectedEntity, setSelectedEntity] = useState<
     EntityPreview | undefined
   >(undefined)
@@ -37,7 +38,7 @@ export const TeneurLayout = () => {
           />
         </div>
 
-        {isAdmin && (
+        {isAdminOrExternal && (
           <div style={{ flex: 1 }}>
             <Autocomplete
               label={t("Sélectionnez un redevable")}
