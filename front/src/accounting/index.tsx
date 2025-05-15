@@ -15,9 +15,10 @@ const currentYear = new Date().getFullYear()
 
 const MaterialAccounting = () => {
   const entity = useEntity()
-  const { isAdmin } = entity
+  const { isAdmin, isExternal } = entity
   const canTransfer =
     entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
+  const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
 
   return (
     <Main>
@@ -39,7 +40,7 @@ const MaterialAccounting = () => {
             </>
           )}
         </Route>
-        {(entity.is_tiruert_liable || isAdmin) && (
+        {(entity.is_tiruert_liable || isAdmin || allowAccounting) && (
           <Route element={<TeneurLayout />}>
             <Route
               path="teneur"

@@ -37,6 +37,7 @@ function getObjectivesForEntityOrAdmin(
 const Teneur = () => {
   const entity = useEntity()
   const { isAdmin } = entity
+  const isAdminOrExternal = isAdmin || entity.isExternal
   const { t } = useTranslation()
   const portal = usePortal()
   usePrivateNavigation(t("Objectifs annuels"))
@@ -45,7 +46,7 @@ const Teneur = () => {
 
   const { result, loading } = useQuery(getObjectivesForEntityOrAdmin, {
     key: "teneur-objectives",
-    params: [entity.id, 2025, isAdmin, selectedEntityId],
+    params: [entity.id, 2025, isAdminOrExternal, selectedEntityId],
   })
 
   const objectivesData = result
@@ -54,7 +55,7 @@ const Teneur = () => {
     return <LoaderOverlay />
   }
 
-  if (isAdmin && !selectedEntityId && !objectivesData) {
+  if (isAdminOrExternal && !selectedEntityId && !objectivesData) {
     return (
       <Notice noColor variant="info">
         {t("Veuillez sélectionner un redevable pour voir ses objectifs.")}
@@ -83,11 +84,11 @@ const Teneur = () => {
 
   return (
     <>
-      {isAdmin && selectedEntityId ? (
+      {isAdminOrExternal && selectedEntityId ? (
         <Notice noColor variant="info">
           {t("Vous consultez les objectifs du redevable sélectionné.")}
         </Notice>
-      ) : isAdmin ? (
+      ) : isAdminOrExternal ? (
         <Notice noColor variant="info">
           {t("Sur cette page, vous avez accès aux objectifs consolidés.")}
           <br />
@@ -103,7 +104,7 @@ const Teneur = () => {
         </Notice>
       )}
       <Box gap="lg">
-        {!isAdmin && (
+        {!isAdminOrExternal && (
           <Notice noColor variant="info">
             <Row style={{ alignItems: "center", width: "100%" }}>
               <Col spread>
