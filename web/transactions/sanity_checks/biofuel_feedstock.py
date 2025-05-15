@@ -124,5 +124,6 @@ def get_feedstock_origin_incompatibilities(feedstock: MatierePremiere, country: 
     if feedstock.code == "MAIS" and not country.is_in_europe and country.code_pays not in mais_countries:
         yield f"{feedstock} de {country}"
 
-    if feedstock.code == "BETTERAVE" and not country.is_in_europe:
+    europe_feedstocks = ("BETTERAVE", "CIVE")
+    if feedstock.code in europe_feedstocks and not country.is_in_europe:
         yield f"{feedstock} de {country}"
