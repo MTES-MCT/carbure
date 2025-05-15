@@ -20,6 +20,8 @@ import {
 } from "./types"
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { ElecOperationSector } from "accounting/types"
+import { DeclareElecTeneurDialog } from "./components/declare-elec-teneur-dialog"
 import { useOutletContext } from "react-router-dom"
 import { TeneurOutletContext } from "accounting/layouts/teneur-layout"
 
@@ -67,15 +69,25 @@ const Teneur = () => {
     objective: CategoryObjective | UnconstrainedCategoryObjective,
     targetType?: TargetType
   ) => {
-    portal((close) => (
-      <DeclareTeneurDialog
-        onClose={close}
-        objective={objective}
-        targetType={targetType}
-        sectorObjectives={objectivesData?.sectors ?? []}
-        mainObjective={objectivesData?.global}
-      />
-    ))
+    if (objective.code === ElecOperationSector.ELEC) {
+      portal((close) => (
+        <DeclareElecTeneurDialog //
+          onClose={close}
+          objective={objective}
+          mainObjective={result?.global}
+        />
+      ))
+    } else {
+      portal((close) => (
+        <DeclareTeneurDialog
+          onClose={close}
+          objective={objective}
+          targetType={targetType}
+          sectorObjectives={result?.sectors ?? []}
+          mainObjective={result?.global}
+        />
+      ))
+    }
   }
 
   const onValidatePendingTeneurClick = () => {

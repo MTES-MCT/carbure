@@ -1,6 +1,6 @@
 import { apiTypes } from "common/services/api-fetch.types"
+import { OperationsFilter, OperationsQuery, OperationOrder } from "../types"
 import { api, download } from "common/services/api-fetch"
-import { OperationOrder, OperationsFilter, OperationsQuery } from "../types"
 import { formatOperation } from "accounting/utils/formatters"
 
 export const getOperationsFilters = (

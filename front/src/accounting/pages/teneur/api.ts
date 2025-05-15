@@ -1,4 +1,5 @@
 import { getBalances } from "accounting/api/balances"
+import { getElecBalances } from "accounting/api/elec-balances"
 import { CategoryEnum, Unit } from "common/types"
 import {
   CategoryObjective,
@@ -6,7 +7,6 @@ import {
   UnconstrainedCategoryObjective,
 } from "./types"
 import { api } from "common/services/api-fetch"
-import { BalancesGroupBy } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
 
@@ -193,17 +193,28 @@ export const getBalancesCategory = async (
   })
 }
 
-export const getBalancesBySector = async (entity_id: number) => {
-  return getBalances<apiTypes["BalanceBySector"]>({
+export const getBiofuelBalance = async (entity_id: number) => {
+  return getBalances<apiTypes["Balance"]>({
     entity_id,
-    page: 1,
-    group_by: BalancesGroupBy.sector,
     unit: Unit.MJ,
   })
 }
 
-export const validateTeneur = async (entity_id: number) => {
+export const getElecBalance = (entity_id: number) => {
+  return getElecBalances({ entity_id })
+}
+
+export const validateTeneurBiofuel = async (entity_id: number) => {
   return api.POST("/tiruert/operations/teneur/declare/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+  })
+}
+export const validateTeneurElec = async (entity_id: number) => {
+  return api.POST("/tiruert/elec-operations/teneur/declare/", {
     params: {
       query: {
         entity_id,
