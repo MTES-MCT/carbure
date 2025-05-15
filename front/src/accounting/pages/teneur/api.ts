@@ -7,7 +7,6 @@ import {
   UnconstrainedCategoryObjective,
 } from "./types"
 import { api } from "common/services/api-fetch"
-import { BalancesGroupBy } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
 
@@ -194,11 +193,9 @@ export const getBalancesCategory = async (
   })
 }
 
-export const getBalancesBySector = async (entity_id: number) => {
-  return getBalances<apiTypes["BalanceBySector"]>({
+export const getBiofuelBalance = async (entity_id: number) => {
+  return getBalances<apiTypes["Balance"]>({
     entity_id,
-    page: 1,
-    group_by: BalancesGroupBy.sector,
     unit: Unit.MJ,
   })
 }

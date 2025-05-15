@@ -2,20 +2,25 @@ import { Dialog } from "common/components/dialog2"
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
-  getBalancesBySector,
+  getBiofuelBalance,
   getElecBalance,
   validateTeneurBiofuel,
   validateTeneurElec,
 } from "../../api"
 import { useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { useValidatePendingTeneurDialog } from "./validate-pending-teneur-dialog.hooks"
+import {
+  useBiofuelTeneurColumns,
+  useElecTeneurColumns,
+} from "./validate-pending-teneur-dialog.hooks"
 import { NoResult } from "common/components/no-result2"
-import { Text } from "common/components/text"
-import { useUnit } from "common/hooks/unit"
-import { ExtendedUnit } from "common/types"
 import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
+import { Tabs } from "common/components/tabs2"
+import { compact } from "common/utils/collection"
+import { SectorTabs } from "accounting/types"
+import { BiofuelFill, ElecFill } from "common/components/icon"
+import { useState } from "react"
 
 export const ValidatePendingTeneurDialog = ({
   onClose,
@@ -25,10 +30,13 @@ export const ValidatePendingTeneurDialog = ({
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
-  const columns = useValidatePendingTeneurDialog()
-  const { unitLabel } = useUnit(ExtendedUnit.GJ)
 
-  const biofuel = useQuery(getBalancesBySector, {
+  const biofuelColumns = useBiofuelTeneurColumns()
+  const elecColumns = useElecTeneurColumns()
+
+  const [tab, setTab] = useState<string>(SectorTabs.BIOFUELS)
+
+  const biofuel = useQuery(getBiofuelBalance, {
     key: "balances-by-sector",
     params: [entity.id],
   })
@@ -45,14 +53,12 @@ export const ValidatePendingTeneurDialog = ({
 
   const results = [...biofuelResults, ...elecResults]
 
-  const validateTeneur = (entity_id: number) => {
-    // only call an endpoint if there is some teneur linked to it
-    return Promise.all([
-      biofuelResults.some((b) => b.pending_teneur > 0) &&
-        validateTeneurBiofuel(entity_id),
-      elecResults.some((b) => b.pending_teneur > 0) &&
-        validateTeneurElec(entity_id),
-    ])
+  const validateTeneur = async (entity_id: number) => {
+    if (tab === SectorTabs.BIOFUELS) {
+      await validateTeneurBiofuel(entity_id)
+    } else if (tab === SectorTabs.ELEC) {
+      await validateTeneurElec(entity_id)
+    }
   }
 
   const mutation = useMutation(validateTeneur, {
@@ -73,12 +79,20 @@ export const ValidatePendingTeneurDialog = ({
     },
   })
 
+  const hasPendingBiofuels = biofuelResults.some((r) => r.pending_teneur > 0)
+  const hasPendingElec = elecResults.some((r) => r.pending_teneur > 0)
+
+  const shouldDisable =
+    (tab === SectorTabs.BIOFUELS && !hasPendingBiofuels) ||
+    (tab === SectorTabs.ELEC && !hasPendingElec)
+
   return (
     <Dialog
       onClose={onClose}
       header={<Dialog.Title>{t("Valider ma teneur")}</Dialog.Title>}
       footer={
         <Button
+          disabled={shouldDisable}
           onClick={() => mutation.execute(entity.id)}
           loading={mutation.loading}
         >
@@ -87,15 +101,41 @@ export const ValidatePendingTeneurDialog = ({
       }
       fullWidth
     >
+      <Tabs
+        focus={tab}
+        onFocus={setTab}
+        tabs={compact([
+          {
+            key: SectorTabs.BIOFUELS,
+            label: t("Biocarburants"),
+            icon: BiofuelFill,
+          },
+          entity.has_elec && {
+            key: SectorTabs.ELEC,
+            label: t("Électricité"),
+            icon: ElecFill,
+          },
+        ])}
+      />
+
       {!loading && results && results?.length === 0 ? (
         <NoResult />
       ) : (
         <>
-          <Text fontWeight="bold" size="sm">
-            <sup>*</sup>
-            {`${t("Toutes les quantités sont exprimées en")} ${unitLabel}`}
-          </Text>
-          <Table columns={columns} rows={results} loading={loading} />
+          {tab === SectorTabs.BIOFUELS && (
+            <Table
+              loading={loading}
+              columns={biofuelColumns}
+              rows={biofuelResults}
+            />
+          )}
+          {tab === SectorTabs.ELEC && (
+            <Table //
+              loading={loading}
+              columns={elecColumns}
+              rows={elecResults}
+            />
+          )}
         </>
       )}
     </Dialog>
