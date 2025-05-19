@@ -11,11 +11,13 @@ import { useFormatters } from "accounting/hooks/formatters"
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
   onCategoryClick: (category: UnconstrainedCategoryObjective) => void
+  readOnly: boolean
 }
 
 export const UnconstrainedCategoriesProgress = ({
   categories,
   onCategoryClick,
+  readOnly,
 }: UnconstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
   const { formatCategory } = useFormatters()
@@ -26,7 +28,7 @@ export const UnconstrainedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={formatCategory(category.code)}
-            onClick={() => onCategoryClick(category)}
+            onClick={readOnly ? undefined : () => onCategoryClick(category)}
             mainValue={floorNumber(
               category.teneur_declared + category.teneur_declared_month,
               0

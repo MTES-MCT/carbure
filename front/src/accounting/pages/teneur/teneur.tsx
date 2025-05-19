@@ -38,6 +38,7 @@ const Teneur = () => {
   const entity = useEntity()
   const { isAdmin } = entity
   const isAdminOrExternal = isAdmin || entity.isExternal
+  const readOnly = isAdminOrExternal
   const { t } = useTranslation()
   const portal = usePortal()
   usePrivateNavigation(t("Objectifs annuels"))
@@ -132,14 +133,17 @@ const Teneur = () => {
           <CappedCategoriesProgress
             categories={objectivesData?.capped_categories}
             onCategoryClick={onCategoryClick}
+            readOnly={readOnly}
           />
           <ObjectivizedCategoriesProgress
             categories={objectivesData?.objectivized_categories}
             onCategoryClick={onCategoryClick}
+            readOnly={readOnly}
           />
           <UnconstrainedCategoriesProgress
             categories={objectivesData?.unconstrained_categories}
             onCategoryClick={onCategoryClick}
+            readOnly={readOnly}
           />
         </ObjectiveSection>
       </Box>

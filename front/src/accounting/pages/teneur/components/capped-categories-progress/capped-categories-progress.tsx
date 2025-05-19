@@ -12,11 +12,13 @@ import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 type CappedCategoriesProgressProps = {
   categories?: CategoryObjective[]
   onCategoryClick: (category: CategoryObjective, targetType: TargetType) => void
+  readOnly: boolean
 }
 
 export const CappedCategoriesProgress = ({
   categories,
   onCategoryClick,
+  readOnly,
 }: CappedCategoriesProgressProps) => {
   const { t } = useTranslation()
 
@@ -60,7 +62,11 @@ export const CappedCategoriesProgress = ({
                 </Badge>
               ) : null
             }
-            onClick={() => onCategoryClick(category, TargetType.CAP)}
+            onClick={
+              readOnly
+                ? undefined
+                : () => onCategoryClick(category, TargetType.CAP)
+            }
           >
             <ul>
               <li>
