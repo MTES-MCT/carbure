@@ -68,6 +68,7 @@ export const ApplicationDetailsDialog = () => {
             productionSite={application.production_site}
             sourcing={application.sourcing}
             production={application.production}
+            application={application}
           />
         )}
 
