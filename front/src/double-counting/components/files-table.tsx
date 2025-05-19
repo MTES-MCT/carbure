@@ -8,6 +8,7 @@ import { Column, Table } from "common/components/table2"
 import { NoResult } from "common/components/no-result2"
 import { Button } from "common/components/button2"
 import { Text } from "common/components/text"
+import { apiTypes } from "common/services/api-fetch.types"
 type FilesTableProps = {
   application: DoubleCountingApplicationDetails
 }
@@ -22,19 +23,9 @@ export const FilesTable = ({ application }: FilesTableProps) => {
       params: [],
     }
   )
-  const file = result?.data
+  const files = result?.data ?? []
 
-  const rows = [
-    {
-      name: "Demande d'agrément",
-      url: file?.download_link,
-    },
-  ]
-
-  const columns: Column<{
-    name: string
-    url?: string
-  }>[] = [
+  const columns: Column<apiTypes["AgreementDownloadLink"]>[] = [
     {
       header: t("Nom"),
       cell: (row) => row.name,
@@ -42,9 +33,9 @@ export const FilesTable = ({ application }: FilesTableProps) => {
     {
       header: t("Action"),
       cell: (row) =>
-        row.url ? (
+        row.link ? (
           <Button
-            linkProps={{ href: row.url, target: "_blank" }}
+            linkProps={{ href: row.link, target: "_blank" }}
             customPriority="link"
           >
             {t("Télécharger")}
@@ -55,9 +46,9 @@ export const FilesTable = ({ application }: FilesTableProps) => {
     },
   ]
 
-  return !loading && !file?.download_link ? (
+  return !loading && files?.length === 0 ? (
     <NoResult label={t("Aucun fichier disponible")} />
   ) : (
-    <Table columns={columns} rows={rows} loading={loading} />
+    <Table columns={columns} rows={files} loading={loading} />
   )
 }

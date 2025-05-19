@@ -395,8 +395,12 @@ paths:
           description: ""
   /api/double-counting/agreements/{id}/download-link/:
     get:
-      operationId: double_counting_agreements_download_link_retrieve
+      operationId: double_counting_agreements_download_link_list
       parameters:
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
         - in: query
           name: entity_id
           schema:
@@ -409,6 +413,46 @@ paths:
             type: integer
           description: A unique integer value identifying this Certificat Double Compte.
           required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
       tags:
         - double-counting
       security:
@@ -419,7 +463,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AgreementDownloadLink"
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgreementDownloadLink"
           description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
@@ -7384,9 +7430,13 @@ components:
     AgreementDownloadLink:
       type: object
       properties:
-        download_link:
+        name:
+          type: string
+        link:
           type: string
           format: uri
+      required:
+        - name
     AgreementLists:
       type: object
       properties:
@@ -8359,6 +8409,9 @@ components:
           type: boolean
           default: false
         file:
+          type: string
+          format: binary
+        industrial_wastes_file:
           type: string
           format: binary
       required:
