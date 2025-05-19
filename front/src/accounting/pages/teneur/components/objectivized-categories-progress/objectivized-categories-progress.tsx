@@ -11,11 +11,13 @@ import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
   onCategoryClick: (category: CategoryObjective, targetType: TargetType) => void
+  readOnly: boolean
 }
 
 export const ObjectivizedCategoriesProgress = ({
   categories,
   onCategoryClick,
+  readOnly,
 }: ObjectivizedCategoriesProgressProps) => {
   const { t } = useTranslation()
 
@@ -62,7 +64,11 @@ export const ObjectivizedCategoriesProgress = ({
                 }
               />
             }
-            onClick={() => onCategoryClick(category, TargetType.REACH)}
+            onClick={
+              readOnly
+                ? undefined
+                : () => onCategoryClick(category, TargetType.REACH)
+            }
           >
             <ul>
               <li>

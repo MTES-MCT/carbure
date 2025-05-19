@@ -29,7 +29,7 @@ export const TeneurLayout = () => {
 
   return (
     <>
-      <Row style={{ columnGap: "40px" }}>
+      <Row style={{ columnGap: "40px", alignItems: "flex-end" }}>
         <div>
           <Select
             options={[{ label: `${t("Année")} 2025`, value: 2025 }]}
@@ -39,9 +39,8 @@ export const TeneurLayout = () => {
         </div>
 
         {isAdminOrExternal && (
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 0.7 }}>
             <Autocomplete
-              label={t("Sélectionnez un redevable")}
               placeholder={t("Rechercher un redevable")}
               getOptions={(query) =>
                 findEligibleTiruertEntities(entity.id, query)

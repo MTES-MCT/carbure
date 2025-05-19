@@ -36,7 +36,7 @@ class SiteAdmin(admin.ModelAdmin):
         "is_enabled",
     )
     search_fields = ("name", "city", "country__name", "ges_option", "customs_id")
-    list_filter = ("country", "ges_option", "eligible_dc", "site_type")
+    list_filter = ("site_type", "country", "ges_option", "eligible_dc")
     actions = ["enable_site"]
     inlines = [EntitySiteInline]
 
