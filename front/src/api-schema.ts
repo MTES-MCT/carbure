@@ -182,7 +182,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["double_counting_agreements_download_link_retrieve"]
+    get: operations["double_counting_agreements_download_link_list"]
     put?: never
     post?: never
     delete?: never
@@ -2022,8 +2022,9 @@ export interface components {
       blending_entity_id?: number
     }
     AgreementDownloadLink: {
+      name: string
       /** Format: uri */
-      download_link?: string
+      link?: string
     }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
@@ -2432,6 +2433,8 @@ export interface components {
       should_replace: boolean
       /** Format: binary */
       file: File
+      /** Format: binary */
+      industrial_wastes_file?: File
     }
     /**
      * @description * `ACTIVE` - ACTIVE
@@ -4314,11 +4317,25 @@ export interface operations {
       }
     }
   }
-  double_counting_agreements_download_link_retrieve: {
+  double_counting_agreements_download_link_list: {
     parameters: {
       query: {
+        certificate_id?: string
         /** @description Entity ID */
         entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        producers?: string
+        production_sites?: string
+        /** @description A search term. */
+        search?: string
       }
       header?: never
       path: {
@@ -4334,7 +4351,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["AgreementDownloadLink"]
+          "application/json": components["schemas"]["AgreementDownloadLink"][]
         }
       }
     }

@@ -10,7 +10,8 @@ from doublecount.models import DoubleCountingApplication
 
 
 class AgreementDownloadLinkSerializer(serializers.Serializer):
-    download_link = serializers.URLField(required=False)
+    name = serializers.CharField(required=True)
+    link = serializers.URLField(required=False)
 
 
 class AgreementDownloadLinkMixin(RetrieveModelMixin):
@@ -24,7 +25,7 @@ class AgreementDownloadLinkMixin(RetrieveModelMixin):
                 required=True,
             )
         ],
-        responses=AgreementDownloadLinkSerializer,
+        responses=AgreementDownloadLinkSerializer(many=True),
     )
     @action(detail=True, methods=["GET"], url_path="download-link")
     def download_link(self, request, id=None):
@@ -32,12 +33,23 @@ class AgreementDownloadLinkMixin(RetrieveModelMixin):
         entity = Entity.objects.get(id=entity_id)
 
         application = DoubleCountingApplication.objects.get(id=id)
-
-        if entity.entity_type in [Entity.ADMIN, Entity.PRODUCER] or entity.has_external_admin_right(
+        links = []
+        can_download = entity.entity_type in [Entity.ADMIN, Entity.PRODUCER] or entity.has_external_admin_right(
             ExternalAdminRights.DOUBLE_COUNTING
-        ):
-            download_link = private_storage.url(application.download_link) if application.download_link else None
-        else:
-            download_link = None
+        )
 
-        return Response({"download_link": download_link})
+        if can_download:
+            links = [
+                {
+                    "name": "AGREEMENT",
+                    "link": private_storage.url(application.download_link) if application.download_link else None,
+                },
+                {
+                    "name": "INDUSTRIAL WASTATES",
+                    "link": private_storage.url(application.industrial_wastes_file_link)
+                    if application.industrial_wastes_file_link
+                    else None,
+                },
+            ]
+
+        return Response(AgreementDownloadLinkSerializer(links, many=True).data)
