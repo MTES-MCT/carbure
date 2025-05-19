@@ -70,7 +70,7 @@ class BalanceService:
 
         return entry
 
-    def _update_quantity_and_teneur(balance, key, operation, detail, entity_id, conversion_factor):
+    def _update_quantity_and_teneur(balance, key, operation, detail, credit_operation, conversion_factor):
         """
         Updates the balance entry with the details of the operation
         """
@@ -80,16 +80,16 @@ class BalanceService:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
             balance[key][teneur_type] += quantity
 
-        quantity_type = "credit" if operation.is_credit(entity_id) else "debit"
+        quantity_type = "credit" if credit_operation else "debit"
         balance[key]["quantity"][quantity_type] += quantity
 
         return balance
 
-    def _update_available_balance(balance, key, operation, detail, entity_id, conversion_factor):
+    def _update_available_balance(balance, key, operation, detail, credit_operation, conversion_factor):
         """
         Updates the balance entry with the details of the operation
         """
-        volume_sign = 1 if operation.is_credit(entity_id) else -1
+        volume_sign = 1 if credit_operation else -1
         quantity = detail.volume * conversion_factor * operation.renewable_energy_share
         balance[key]["available_balance"] += quantity * volume_sign
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
@@ -122,12 +122,13 @@ class BalanceService:
         )
 
         for operation in operations:
-            if operation.is_credit(entity_id) and operation.status == Operation.PENDING:
+            credit_operation = operation.is_credit(entity_id)
+            if credit_operation and operation.status == Operation.PENDING:
                 continue
 
             depot = None
             if group_by == BalanceService.GROUP_BY_DEPOT:
-                depot = operation.to_depot if operation.is_credit(entity_id) else operation.from_depot
+                depot = operation.to_depot if credit_operation else operation.from_depot
                 if depot is None:
                     continue
 
@@ -152,11 +153,15 @@ class BalanceService:
                         balance[key]["biofuel"] = operation.biofuel
 
                 # Update available balance
-                BalanceService._update_available_balance(balance, key, operation, detail, entity_id, conversion_factor)
+                BalanceService._update_available_balance(
+                    balance, key, operation, detail, credit_operation, conversion_factor
+                )
 
                 # Update quantity and teneur only if the operation date is after the date_from
                 if date_from is None or operation.created_at >= date_from:
-                    BalanceService._update_quantity_and_teneur(balance, key, operation, detail, entity_id, conversion_factor)
+                    BalanceService._update_quantity_and_teneur(
+                        balance, key, operation, detail, credit_operation, conversion_factor
+                    )
 
                 # Update GHG reduction min and max values
                 if group_by not in BalanceService.GROUP_BY_ALL:
@@ -203,6 +208,10 @@ class BalanceService:
         # Create a mapping of lot_id to operations
         credited_operations = {}
         for operation in credit_operations_with_lots:
+            # Case of TRANSFERT for instance
+            if operation.to_depot is None:
+                continue
+
             for detail in operation.details.all():
                 if detail.lot_id in lot_ids:
                     if detail.lot_id not in credited_operations:

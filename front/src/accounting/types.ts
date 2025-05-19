@@ -8,12 +8,17 @@ import {
   PathsApiTiruertOperationsGetParametersQuerySector as OperationSector,
   PathsApiTiruertOperationsGetParametersQueryOperation as OperationType,
   PathsApiTiruertOperationsFiltersGetParametersQueryFilter as OperationsFilter,
-  PathsApiTiruertOperationsGetParametersQueryType as OperationDebitOrCredit,
+  PathsApiTiruertElecOperationsGetParametersQueryType as OperationDebitOrCredit,
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
   PathsApiTiruertOperationsGetParametersQueryOrder_by as OperationOrder,
   OperationTypeEnum as CreateOperationType,
   PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
   PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter,
+  PathsApiTiruertElecOperationsGetParametersQueryStatus as ElecOperationsStatus,
+  PathsApiTiruertElecOperationsGetParametersQueryOperation as ElecOperationType,
+  PathsApiTiruertElecOperationsGetParametersQueryOrder_by as ElecOperationOrder,
+  PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
+  ElecOperationTypeEnum as CreateElecOperationType,
 } from "api-schema"
 
 // Type definitions
@@ -44,6 +49,7 @@ export {
   OperationBiofuelCategory,
   BalancesGroupBy,
   OperationOrder,
+  ElecOperationOrder,
 }
 
 /** BALANCES */
@@ -60,4 +66,25 @@ export interface BalancesQuery
 export enum SectorTabs {
   BIOFUELS = "biofuels",
   ELEC = "elec",
+}
+
+export type ElecOperation = apiTypes["ElecOperationList"]
+export type ElecBalance = apiTypes["ElecBalance"]
+
+export enum ElecOperationSector {
+  ELEC = "ELEC",
+}
+
+export interface ElecOperationsQuery
+  extends CBQueryParams<[], ElecOperationsStatus[], string[]> {
+  [OperationsFilter.status]?: ElecOperationsStatus[]
+  [OperationsFilter.type]?: OperationDebitOrCredit[]
+  [OperationsFilter.operation]?: ElecOperationType[]
+}
+
+export {
+  ElecOperationsStatus,
+  ElecOperationType,
+  ElecOperationsFilter,
+  CreateElecOperationType,
 }

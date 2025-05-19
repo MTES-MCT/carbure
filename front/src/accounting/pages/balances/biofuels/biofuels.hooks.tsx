@@ -10,8 +10,8 @@ import { DebitOperationDialog } from "./debit-operation-dialog"
 import {
   BalancesFilter,
   BalancesQuery,
-  OperationOrder,
   OperationsStatus,
+  OperationOrder,
 } from "accounting/types"
 import * as api from "accounting/api/balances"
 import { formatSector } from "accounting/utils/formatters"
@@ -53,6 +53,7 @@ export const useBalancesBiofuelsColumns = () => {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
       cell: (item) =>
         formatNumber(item.available_balance, { fractionDigits: 0 }),
+      key: OperationOrder.available_balance,
     },
     {
       key: OperationOrder.pending_operations,
@@ -79,6 +80,7 @@ export const useBalancesBiofuelsColumns = () => {
             {item.pending_operations}
           </Button>
         ),
+      key: OperationOrder.pending_operations,
     },
     canTransfer && {
       header: t("Céder"),

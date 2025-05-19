@@ -3,11 +3,12 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet, OrderingFilter, NumberFilter
+from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
 from core.models import MatierePremiere
+from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
 
 
@@ -26,7 +27,7 @@ class BaseFilter(FilterSet):
     ges_bound_min = NumberFilter(method="ignore")
     ges_bound_max = NumberFilter(method="ignore")
 
-    order_by = OrderingFilter(
+    order_by = CustomOrderingFilter(
         fields=(
             ("status", "status"),
             ("created_at", "created_at"),
@@ -36,10 +37,9 @@ class BaseFilter(FilterSet):
             ("_type", "type"),
             ("_depot", "depot"),
             ("_entity", "from_to"),
-            ("_volume", "quantity"),
-            ("id", "available_balance"),  # fake ordering for balance
-            ("id", "pending_operations"),  # fake ordering for balance
-        )
+            ("_quantity", "quantity"),
+        ),
+        extra_valid_fields=["available_balance", "pending_operations"],
     )
 
     def filter_multiple_values(self, queryset, field_name, param_name):
@@ -79,12 +79,7 @@ class BaseFilter(FilterSet):
     @extend_schema_field(ListField(child=ChoiceField(choices=["CREDIT", "DEBIT"])))
     def filter_type(self, queryset, name, value):
         value = value.upper()
-        if value == "CREDIT":
-            return queryset.filter(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"]).distinct()
-        elif value == "DEBIT":
-            return queryset.filter(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION"]).distinct()
-        else:
-            return queryset
+        return queryset.filter(_transaction=value).distinct()
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_period(self, queryset, name, value):

@@ -12,13 +12,23 @@ class OperationServiceErrors:
     INSUFFICIENT_INPUT_VOLUME = "INSUFFICIENT_INPUT_VOLUME"
     LOT_NOT_FOUND = "LOT_NOT_FOUND"
     TARGET_EXCEEDED = "TARGET_EXCEEDED"
+    ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
 
 
 class OperationService:
     @staticmethod
     def perform_checks_before_create(request, entity_id, selected_lots, data, unit):
+        OperationService.check_debited_entity(entity_id, data)
         OperationService.check_volumes(selected_lots, data, unit)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
+
+    @staticmethod
+    def check_debited_entity(entity_id, data):
+        """
+        Check if the debited entity is the same as entity_id passed in the request
+        """
+        if data["debited_entity"].id != entity_id:
+            raise serializers.ValidationError({"debited_entity": OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID})
 
     @staticmethod
     def check_volumes(selected_lots, data, unit):

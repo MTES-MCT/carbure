@@ -1,12 +1,9 @@
 import { Column, Cell } from "common/components/table2"
 import { useTranslation } from "react-i18next"
-import { OperationBadge } from "./components/operation-badge"
+import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import {
-  formatOperationCreditOrDebit,
-  isOperationDebit,
-} from "./operations.utils"
+import { isOperationDebit } from "./operations.utils"
 import * as api from "accounting/api/operations"
 import {
   Operation,
@@ -19,14 +16,14 @@ import {
 } from "accounting/types"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import {
+  formatOperationCreditOrDebit,
   formatOperationStatus,
   formatOperationType,
   formatSector,
 } from "accounting/utils/formatters"
-import styles from "./operations.module.css"
+import styles from "../operations.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
-import useEntity from "common/hooks/entity"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -36,7 +33,6 @@ export const useOperationsBiofuelsColumns = ({
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
   const { unit } = useUnit()
-  const currentEntity = useEntity()
   const columns: Column<Operation>[] = [
     {
       header: t("Statut"),
@@ -101,7 +97,7 @@ export const useOperationsBiofuelsColumns = ({
       key: OperationOrder.quantity,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       cell: (item) =>
-        isOperationDebit(item, currentEntity.id) ? (
+        isOperationDebit(item.quantity) ? (
           <Text
             size="sm"
             fontWeight="semibold"
@@ -111,7 +107,6 @@ export const useOperationsBiofuelsColumns = ({
                 styles["operation--rejected"]
             )}
           >
-            -
             {formatNumber(
               item.type === OperationType.INCORPORATION
                 ? item.quantity_renewable

@@ -1,4 +1,4 @@
-from django.db.models import Case, CharField, F, Q, Sum, Value, When
+from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -66,10 +66,17 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     pagination_class = OperationPagination
 
     def get_permissions(self):
-        if self.action in ["reject", "accept", "simulate", "create", "partial_update", "destroy"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
-        elif self.action in ["balance"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RO, UserRights.RW])]
+        if self.action in [
+            "reject",
+            "accept",
+            "simulate",
+            "simulate_min_max",
+            "create",
+            "partial_update",
+            "destroy",
+            "export_operations_to_excel",
+        ]:
+            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
         return super().get_permissions()
 
     def initialize_request(self, request, *args, **kwargs):
@@ -92,10 +99,17 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         return context
 
     def get_queryset(self):
+        multiplicators = {
+            "mj": "biofuel__pci_litre",
+            "kg": "biofuel__masse_volumique",
+        }
+        multiplicator = multiplicators.get(self.request.unit, None)
+
         return (
             super()
             .get_queryset()
             .annotate(
+                total_volume=Sum("details__volume"),
                 _sector=Case(
                     When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                     When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
@@ -123,7 +137,30 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     default=Value(None),
                     output_field=CharField(),
                 ),
-                _volume=Sum("details__volume"),
+                _quantity=Case(
+                    When(
+                        credited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * (F(multiplicator) if multiplicator else 1),
+                    ),
+                    When(
+                        debited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * -1 * (F(multiplicator) if multiplicator else 1),
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
+                ),
+                _volume=Case(
+                    When(
+                        credited_entity_id=self.request.entity.id,
+                        then=F("total_volume"),
+                    ),
+                    When(
+                        debited_entity_id=self.request.entity.id,
+                        then=F("total_volume") * -1,
+                    ),
+                    default=Value(None),
+                    output_field=FloatField(),
+                ),
             )
         )
 
@@ -187,7 +224,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         ],
     )
     def create(self, request):
-        entity_id = self.request.GET.get("entity_id")
+        entity_id = request.entity.id
         serializer = OperationInputSerializer(
             data=request.data,
             context={"request": request},

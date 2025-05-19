@@ -1,23 +1,33 @@
-import { DraftFill } from "common/components/icon"
+import { BiofuelFill, ElecFill } from "common/components/icon"
 import { Content } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useTranslation } from "react-i18next"
-import { Outlet } from "react-router-dom"
+import { Outlet, useParams } from "react-router-dom"
 import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
 
 const OperationsBalancesLayout = () => {
   const { t } = useTranslation()
 
+  // extract current TIRUERT section: "balances" or "operations"
+  const params = useParams()
+  const [sector] = (params["*"] ?? "").split("/")
+
   return (
     <>
       <Tabs
         tabs={compact([
           {
-            key: "balances",
+            key: SectorTabs.BIOFUELS,
             label: t("Biocarburants"),
-            path: SectorTabs.BIOFUELS,
-            icon: DraftFill,
+            path: `${sector}/${SectorTabs.BIOFUELS}`,
+            icon: BiofuelFill,
+          },
+          {
+            key: SectorTabs.ELEC,
+            label: t("Électricité"),
+            path: `${sector}/${SectorTabs.ELEC}`,
+            icon: ElecFill,
           },
         ])}
       />

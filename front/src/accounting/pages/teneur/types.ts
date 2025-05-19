@@ -1,4 +1,4 @@
-import { OperationSector } from "accounting/types"
+import { ElecOperationSector, OperationSector } from "accounting/types"
 import { CategoryEnum } from "common/types"
 
 export interface BaseObjective {
@@ -18,13 +18,24 @@ export interface SectorObjective extends BaseObjective {
 
 export type MainObjective = BaseObjective
 
-export type UnconstrainedCategoryObjective = Omit<
+export interface ElecCategoryObjective
+  extends Omit<BaseObjective, "target" | "target_percent"> {
+  code: ElecOperationSector.ELEC
+  target: null
+  target_percent: null
+}
+
+export type BiofuelUnconstrainedCategoryObjective = Omit<
   CategoryObjective,
   "target" | "target_percent"
 > & {
   target: null
   target_percent: null
 }
+
+export type UnconstrainedCategoryObjective =
+  | BiofuelUnconstrainedCategoryObjective
+  | ElecCategoryObjective
 
 export interface Objectives {
   global: MainObjective

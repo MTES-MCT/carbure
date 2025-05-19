@@ -4957,6 +4957,791 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/tiruert/admin-objectives/:
+    get:
+      operationId: admin_objectives
+      description: Get agregated objectives for all entities - admin view
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from which to calculate balance for teneur
+          required: true
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Date to which to calculate balance for teneur
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Year of the objectives
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectiveOutput"
+          description: All agregated objectives for all liable enttities.
+  /api/tiruert/admin-objectives-entity/:
+    get:
+      operationId: admin_objectives_entity
+      description: Get objectives for a specific entity - admin view
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from which to calculate balance for teneur
+          required: true
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Date to which to calculate balance for teneur
+          required: true
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Entity's objectives.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Year of the objectives
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectiveOutput"
+          description: All objectives.
+  /api/tiruert/elec-operations/:
+    get:
+      operationId: list_elec_operations
+      description: Retrieve a list of operations with optional filtering and pagination.
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: details
+          schema:
+            type: boolean
+            default: "0"
+          description: Include detailed information if set to `1`.
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
+                - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+          explode: false
+          style: form
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecOperationListList"
+          description: A list of operations.
+    post:
+      operationId: create_elec_operation
+      description: Create a new operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecOperationInputRequest"
+            examples:
+              CreateOperationExample:
+                value:
+                  type: TENEUR
+                  credited_entity: ""
+                  debited_entity: 2
+                summary: Create Operation Example
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecOperationInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecOperationInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecOperationList"
+              examples:
+                CreateOperationExample:
+                  value:
+                    type: TENEUR
+                    credited_entity: ""
+                    debited_entity: 2
+                  summary: Create Operation Example
+          description: The newly created operation.
+        "400":
+          description: Invalid input data.
+  /api/tiruert/elec-operations/{id}/:
+    get:
+      operationId: get_elec_operation
+      description: Retrieve one specific operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecOperation"
+          description: Details of specific operation.
+    patch:
+      operationId: update_elec_operation
+      description: Update a part of operation.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedElecOperationUpdateRequest"
+            examples:
+              UpdateOperationExample:
+                value:
+                  quantity: 10
+                summary: Update Operation Example
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedElecOperationUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedElecOperationUpdateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecOperation"
+              examples:
+                UpdateOperationExample:
+                  value:
+                    quantity: 10
+                  summary: Update Operation Example
+          description: The updated operation.
+        "400":
+          description: Invalid input data.
+    delete:
+      operationId: delete_elec_operation
+      description: Delete an operation. Only allowed for certain types and statuses.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: Operation deleted successfully.
+        "403":
+          description: Forbidden. The operation type or status does not allow deletion.
+  /api/tiruert/elec-operations/{id}/accept/:
+    post:
+      operationId: accept_elec_operation
+      description: Set status operation to ACCEPTED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: accepted
+          description: Success message
+        "400":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_TYPE_NOT_ALLOWED
+          description: Error message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_NOT_FOUND
+          description: Error message
+  /api/tiruert/elec-operations/{id}/reject/:
+    post:
+      operationId: reject_elec_operation
+      description: Set status operation to REJECTED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération électricité.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: rejected
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: OPERATION_NOT_FOUND
+          description: Error message
+  /api/tiruert/elec-operations/balance/:
+    get:
+      operationId: list_elec_balance
+      description: Retrieve electricity balance
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Date from when to calculate teneur and quantity
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
+                - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+          explode: false
+          style: form
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecBalanceList"
+          description: ""
+  /api/tiruert/elec-operations/filters/:
+    get:
+      operationId: filter_elec_operations
+      description: Retrieve content of a specific filter
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - from_to
+              - operation
+              - period
+              - status
+              - type
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
+                - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
+  /api/tiruert/elec-operations/teneur/declare/:
+    post:
+      operationId: declare_elec_teneur
+      description: Set teneur operations to DECLARED
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: validated
+          description: Success message
+        "404":
+          content:
+            application/json:
+              schema:
+                error: NOTHING_TO_DECLARE
+          description: Error message
   /api/tiruert/objectives/:
     get:
       operationId: objectives
@@ -5108,6 +5893,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -5118,6 +5904,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -5149,8 +5936,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - name: page
@@ -5718,6 +6507,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -5728,6 +6518,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -5759,8 +6550,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - name: page
@@ -5963,6 +6756,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -5973,6 +6767,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -6004,8 +6799,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - in: query
@@ -6094,6 +6891,37 @@ paths:
                     - TMF
                     - TERF SAF
                   summary: Example of filters response.
+          description: ""
+  /api/tiruert/operations/export/:
+    get:
+      operationId: tiruert_operations_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/filters/:
     get:
@@ -6213,6 +7041,7 @@ paths:
             items:
               type: string
               enum:
+                - -available_balance
                 - -biofuel
                 - -created_at
                 - -customs_category
@@ -6223,6 +7052,7 @@ paths:
                 - -sector
                 - -status
                 - -type
+                - available_balance
                 - biofuel
                 - created_at
                 - customs_category
@@ -6254,8 +7084,10 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
-            * `pending_operations` - Pending operations
-            * `-pending_operations` - Pending operations (décroissant)
+            * `available_balance` - available_balance
+            * `-available_balance` - available_balance (descending)
+            * `pending_operations` - pending_operations
+            * `-pending_operations` - pending_operations (descending)
           explode: false
           style: form
         - in: query
@@ -8120,6 +8952,151 @@ components:
         * `INPROGRESS` - INPROGRESS
         * `REJECTED` - REJECTED
         * `ACCEPTED` - ACCEPTED
+    ElecBalance:
+      type: object
+      properties:
+        sector:
+          $ref: "#/components/schemas/ElecBalanceSectorEnum"
+        initial_balance:
+          type: number
+          format: double
+          readOnly: true
+        available_balance:
+          type: number
+          format: double
+        quantity:
+          $ref: "#/components/schemas/BalanceQuantity"
+        pending_teneur:
+          type: number
+          format: double
+        declared_teneur:
+          type: number
+          format: double
+        pending_operations:
+          type: integer
+      required:
+        - available_balance
+        - declared_teneur
+        - initial_balance
+        - pending_operations
+        - pending_teneur
+        - quantity
+        - sector
+    ElecBalanceSectorEnum:
+      enum:
+        - ELEC
+      type: string
+      description: "* `ELEC` - ELEC"
+    ElecOperation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/ElecOperationStatusEnum"
+        credited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        debited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        quantity:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        avoided_emissions:
+          type: number
+          format: double
+      required:
+        - avoided_emissions
+        - created_at
+        - credited_entity
+        - debited_entity
+        - id
+        - type
+    ElecOperationEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    ElecOperationInputRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/ElecOperationTypeEnum"
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        quantity:
+          type: number
+          format: double
+      required:
+        - type
+    ElecOperationList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/ElecOperationStatusEnum"
+        credited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        debited_entity:
+          $ref: "#/components/schemas/ElecOperationEntity"
+        quantity:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - created_at
+        - credited_entity
+        - debited_entity
+        - id
+        - type
+    ElecOperationStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - CANCELED
+        - DECLARED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `CANCELED` - CANCELED
+        * `DECLARED` - DECLARED
+    ElecOperationTypeEnum:
+      enum:
+        - ACQUISITION_FROM_CPO
+        - CESSION
+        - TENEUR
+      type: string
+      description: |-
+        * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+        * `CESSION` - CESSION
+        * `TENEUR` - TENEUR
     EmptyResponse:
       type: object
       properties:
@@ -9365,6 +10342,56 @@ components:
             $ref: "#/components/schemas/BalanceResponse"
         total_quantity:
           type: number
+    PaginatedElecBalanceList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecBalance"
+        total_quantity:
+          type: number
+    PaginatedElecOperationListList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecOperationList"
+        total_quantity:
+          type: number
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -9463,6 +10490,20 @@ components:
             $ref: "#/components/schemas/SafTicketSource"
         total_available_volume:
           type: number
+    PatchedElecOperationUpdateRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/ElecOperationTypeEnum"
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        quantity:
+          type: number
+          format: double
     PatchedOperationUpdateRequest:
       type: object
       properties:

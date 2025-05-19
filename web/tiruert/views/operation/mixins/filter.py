@@ -69,7 +69,7 @@ class FilterActionMixin:
             "operation": "_type",
             "from_to": "_entity",
             "depot": "_depot",
-            "type": "types",
+            "type": "_transaction",
             "period": "created_at",
         }
 
@@ -78,12 +78,6 @@ class FilterActionMixin:
             raise Exception(f"Filter '{filter}' does not exist for operations")
 
         queryset = queryset.annotate(
-            types=Case(
-                When(type__in=["INCORPORATION", "MAC_BIO", "LIVRAISON_DIRECTE", "ACQUISITION"], then=Value("CREDIT")),
-                When(type__in=["CESSION", "TENEUR", "EXPORTATION", "DEVALUATION", "TRANSFERT"], then=Value("DEBIT")),
-                default=Value(None),
-                output_field=CharField(),
-            ),
             periods=Concat(
                 ExtractYear("created_at", output_field=CharField()),
                 Case(

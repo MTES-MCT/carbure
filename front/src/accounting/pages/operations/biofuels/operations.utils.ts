@@ -11,15 +11,14 @@ export const formatOperationCreditOrDebit = (type: string) => {
   }
 }
 
-export const isOperationDebit = (operation: Operation, entityId: number) => {
-  return operation.debited_entity && operation.debited_entity.id === entityId
-}
+export const isOperationDebit = (quantity: number) => quantity < 0
 
 export const getOperationQuantity = (
   operation: Operation,
-  formattedQuantity: string,
-  entityId: number
-) =>
-  isOperationDebit(operation, entityId)
-    ? `-${formattedQuantity}`
-    : `+${formattedQuantity}`
+  formattedQuantity: string
+) => {
+  if (formattedQuantity.trim().startsWith("-")) {
+    return formattedQuantity
+  }
+  return `+${formattedQuantity}`
+}

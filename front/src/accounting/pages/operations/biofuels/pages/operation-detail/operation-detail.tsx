@@ -7,8 +7,8 @@ import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import { getOperationQuantity, isOperationDebit } from "../../operations.utils"
-import { OperationBadge } from "../../components/operation-badge"
-import css from "./operation-detail.module.css"
+import { OperationBadge } from "accounting/components/operation-badge/operation-badge"
+import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
@@ -139,16 +139,14 @@ export const OperationDetail = () => {
             formatUnit(operation.quantity, {
               fractionDigits: 2,
               appendZeros: false,
-            }),
-            entity.id
+            })
           )} / ${getOperationQuantity(
             operation,
             formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
               fractionDigits: 2,
               unit: ExtendedUnit.GJ,
               appendZeros: false,
-            }),
-            entity.id
+            })
           )}`,
         },
         operation.type === OperationType.INCORPORATION &&
@@ -159,8 +157,7 @@ export const OperationDetail = () => {
               formatUnit(roundNumber(formatValue(operation.quantity), 2), {
                 fractionDigits: 2,
                 appendZeros: false,
-              }),
-              entity.id
+              })
             )} / ${getOperationQuantity(
               operation,
               formatUnit(
@@ -172,8 +169,7 @@ export const OperationDetail = () => {
                   unit: ExtendedUnit.GJ,
                   appendZeros: false,
                 }
-              ),
-              entity.id
+              )
             )}`,
           },
         {
@@ -231,7 +227,7 @@ export const OperationDetail = () => {
             */}
             {(operation?.type === OperationType.ACQUISITION ||
               (operation?.type === OperationType.TRANSFERT &&
-                !isOperationDebit(operation, entity.id))) &&
+                !isOperationDebit(operation?.quantity))) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <>
@@ -256,8 +252,7 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {operation &&
-              isOperationDebit(operation, entity.id) &&
+            {isOperationDebit(operation?.quantity ?? 0) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button

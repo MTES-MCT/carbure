@@ -174,7 +174,7 @@ class Validator(forms.Form):
     INVALID_DATA = "INVALID_DATA"
 
     # potential date formats inside the excel file
-    DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y"]
+    DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f", "%d/%m/%Y"]
 
     @classmethod
     def bulk_validate(SpecializedValidator, items, context=None) -> tuple[list, list]:
