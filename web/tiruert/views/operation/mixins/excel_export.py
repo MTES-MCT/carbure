@@ -1,5 +1,8 @@
+from datetime import datetime
+
 import openpyxl
 from django.http import HttpResponse
+from django.utils.timezone import make_aware
 from openpyxl.utils import get_column_letter
 from rest_framework.decorators import action
 
@@ -23,14 +26,15 @@ class ExcelExportActionMixin:
             "Filière",
             "Biocarburant",
             "Catégorie",
-            "Date",
-            "Période",
+            "Date de création",
+            "Période de durabilité",
             "Dépôt",
             "Type Opération",
             "Expéditeur",
             "Destinataire",
             "Quantité (L)",
             "Quantité (MJ)",
+            "Tonnes CO2 eq. évitées",
         ]
         for col_num, header in enumerate(headers, 1):
             sheet.cell(row=1, column=col_num, value=header)
@@ -47,8 +51,9 @@ class ExcelExportActionMixin:
             sheet.cell(row=row_num, column=8, value=operation._type)
             sheet.cell(row=row_num, column=9, value=operation.debited_entity.name if operation.debited_entity else "")
             sheet.cell(row=row_num, column=10, value=operation.credited_entity.name if operation.credited_entity else "")
-            sheet.cell(row=row_num, column=11, value=operation.volume)
-            sheet.cell(row=row_num, column=12, value=operation.volume_to_quantity(operation.volume, "mj"))
+            sheet.cell(row=row_num, column=11, value=operation._volume)
+            sheet.cell(row=row_num, column=12, value=operation.volume_to_quantity(operation._volume, "mj"))
+            sheet.cell(row=row_num, column=13, value=sum(detail.avoided_emissions for detail in operation.details.all()))
 
         # Adjust column widths
         for col_num in range(1, len(headers) + 1):
@@ -56,7 +61,8 @@ class ExcelExportActionMixin:
 
         # Prepare response
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        response["Content-Disposition"] = 'attachment; filename="operations_export.xlsx"'
+        filename = f"tiruert_operations_{request.entity}_{make_aware(datetime.now()).strftime('%Y-%m-%d_%H%M%S')}.xlsx"
+        response["Content-Disposition"] = f"attachment; filename={filename}"
         workbook.save(response)
 
         return response
