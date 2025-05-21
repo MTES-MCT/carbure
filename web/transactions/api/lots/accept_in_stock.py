@@ -52,6 +52,7 @@ def accept_in_stock(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = lot
         event.user = request.user
+        event.entity = entity
 
         if lot.carbure_delivery_site is None:
             lot.lot_status = CarbureLot.PENDING

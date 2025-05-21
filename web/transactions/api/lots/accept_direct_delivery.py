@@ -55,5 +55,6 @@ def accept_direct_delivery(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = lot
         event.user = request.user
+        event.entity = entity
         event.save()
     return JsonResponse({"status": "success"})

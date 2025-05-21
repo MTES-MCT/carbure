@@ -27,7 +27,7 @@ def approve_fix(request, context):
         if lot.carbure_client_id != entity_id:
             return ErrorResponse(400, ApproveFixError.UNAUTHORIZED_ENTITY)
 
-        event = CarbureLotEvent(event_type=CarbureLotEvent.FIX_ACCEPTED, lot=lot, user=request.user)
+        event = CarbureLotEvent(event_type=CarbureLotEvent.FIX_ACCEPTED, lot=lot, user=request.user, entity_id=entity_id)
         approve_fix_events.append(event)
 
     with transaction.atomic():

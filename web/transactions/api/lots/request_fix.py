@@ -35,9 +35,11 @@ def request_fix(request, context):
             return ErrorResponse(400, RequestFixError.FROZEN_LOT)
 
         if lot.carbure_supplier_id == entity_id:
-            event = CarbureLotEvent(event_type=CarbureLotEvent.RECALLED, lot=lot, user=request.user)
+            event = CarbureLotEvent(event_type=CarbureLotEvent.RECALLED, lot=lot, user=request.user, entity_id=entity_id)
         elif lot.carbure_client_id == entity_id:
-            event = CarbureLotEvent(event_type=CarbureLotEvent.FIX_REQUESTED, lot=lot, user=request.user)
+            event = CarbureLotEvent(
+                event_type=CarbureLotEvent.FIX_REQUESTED, lot=lot, user=request.user, entity_id=entity_id
+            )
         else:
             return ErrorResponse(400, RequestFixError.UNAUTHORIZED_ENTITY)
 

@@ -170,6 +170,7 @@ def stock_split(request, *args, **kwargs):
         event.event_type = CarbureStockEvent.SPLIT
         event.stock = stock
         event.user = request.user
+        event.entity = entity
         event.metadata = {"message": "Envoi lot.", "volume_to_deduct": lot.volume}
         event.save()
         # create events
@@ -177,6 +178,7 @@ def stock_split(request, *args, **kwargs):
         e.event_type = CarbureLotEvent.CREATED
         e.lot = lot
         e.user = request.user
+        e.entity = entity
         e.save()
     background_bulk_sanity_checks(new_lots, prefetched_data)
     background_bulk_scoring(new_lots, prefetched_data)
