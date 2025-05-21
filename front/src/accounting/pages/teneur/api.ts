@@ -119,18 +119,6 @@ type AdminObjectivesEntityParams = ObjectivesParams & {
 }
 
 async function fetchObjectives(
-  endpoint: "/tiruert/objectives/",
-  params: ObjectivesParams
-): Promise<Objectives>
-async function fetchObjectives(
-  endpoint: "/tiruert/admin-objectives/",
-  params: AdminObjectivesParams
-): Promise<Objectives>
-async function fetchObjectives(
-  endpoint: "/tiruert/admin-objectives-entity/",
-  params: AdminObjectivesEntityParams
-): Promise<Objectives>
-async function fetchObjectives(
   endpoint: ObjectivesEndpoint,
   params: ObjectivesParams | AdminObjectivesParams | AdminObjectivesEntityParams
 ): Promise<Objectives> {
