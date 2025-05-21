@@ -1,12 +1,9 @@
 import { Step } from "common/components/stepper"
-import { FromDepotFormProps } from "./from-depot-form.types"
+import { FromDepotFormProps } from "./from-depot-form"
 import i18next from "i18next"
 
 export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
-  return Boolean(
-    values.from_depot?.available_balance &&
-      values.from_depot.available_balance > 0
-  )
+  return values.from_depot !== undefined
 }
 
 export const fromDepotStepKey = "from-depot"

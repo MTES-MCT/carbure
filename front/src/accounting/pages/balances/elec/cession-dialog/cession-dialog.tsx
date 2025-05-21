@@ -6,7 +6,6 @@ import { useForm, Form } from "common/components/form2"
 import { Button } from "common/components/button2"
 import { useCessionDialog } from "./cession-dialog.hooks"
 import { ElecCessionForm } from "./cession-dialog.types"
-import { findEligibleTiruertEntities } from "accounting/components/recipient-to-depot-form/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { normalizeEntityPreview } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
@@ -15,6 +14,7 @@ import { ElecBalance } from "accounting/types"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "common/types"
 import { Notice } from "common/components/notice"
+import { findEligibleTiruertEntities } from "accounting/components/recipient-form/api"
 
 interface CessionDialogProps {
   balance: ElecBalance

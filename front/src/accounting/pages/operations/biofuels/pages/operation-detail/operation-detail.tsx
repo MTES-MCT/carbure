@@ -97,7 +97,11 @@ export const OperationDetail = () => {
 
   const onAcceptOperation = () => {
     const patch = () => {
-      if (operation && value.to_depot?.id !== operation?.to_depot?.id) {
+      if (
+        operation &&
+        operation.type === OperationType.ACQUISITION &&
+        value.to_depot?.id !== operation?.to_depot?.id
+      ) {
         return patchOperation(entity.id, operation?.id, {
           to_depot: value.to_depot?.id,
         })
@@ -178,7 +182,9 @@ export const OperationDetail = () => {
           label: t("Expéditeur"),
           value: operation._entity ?? "-",
         },
-        operation.type === OperationType.CESSION && {
+        [OperationType.CESSION, OperationType.TRANSFERT].includes(
+          operation.type as OperationType
+        ) && {
           label: t("Destinataire"),
           value: operation._entity ?? "-",
         },
@@ -215,7 +221,13 @@ export const OperationDetail = () => {
         }
         footer={
           <>
-            {operation?.type === OperationType.ACQUISITION &&
+            {/* Display reject/accept button in two cases :
+             - Acquisition operation
+             - Transfert operation only if it's a credit operation
+            */}
+            {(operation?.type === OperationType.ACQUISITION ||
+              (operation?.type === OperationType.TRANSFERT &&
+                !isOperationDebit(operation?.quantity))) &&
               operation?.status === OperationsStatus.PENDING &&
               canUpdateOperation && (
                 <>
@@ -249,10 +261,7 @@ export const OperationDetail = () => {
                   onClick={() => deleteOperation(entity.id, operation.id)}
                   loading={deleteOperationLoading}
                 >
-                  {operation?.type === OperationType.CESSION &&
-                    t("Annuler le certificat de cession")}
-                  {operation?.type === OperationType.TENEUR &&
-                    t("Annuler le certificat de teneur")}
+                  {t("Annuler le certificat")}
                 </Button>
               )}
           </>
@@ -270,11 +279,15 @@ export const OperationDetail = () => {
                     <Text className={css["field-value"]}>{value}</Text>
                   </div>
                 ))}
-                {operation?.type === OperationType.ACQUISITION &&
-                  operation?.status === OperationsStatus.PENDING &&
-                  canUpdateOperation && (
-                    <div className={css["operation-detail-fields-depot"]}>
-                      <Form id="patch-operation" onSubmit={onAcceptOperation}>
+                <Form
+                  id="patch-operation"
+                  onSubmit={onAcceptOperation}
+                  className={css["operation-detail-fields-depot"]}
+                >
+                  {operation?.type === OperationType.ACQUISITION &&
+                    operation?.status === OperationsStatus.PENDING &&
+                    canUpdateOperation && (
+                      <div>
                         <Autocomplete
                           autoFocus
                           label={t("Dépot de livraison")}
@@ -293,9 +306,9 @@ export const OperationDetail = () => {
                           })}
                           {...bind("to_depot")}
                         />
-                      </Form>
-                    </div>
-                  )}
+                      </div>
+                    )}
+                </Form>
               </Grid>
               {operation?.type === OperationType.ACQUISITION &&
                 operation?.status === OperationsStatus.PENDING &&

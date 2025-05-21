@@ -33,7 +33,6 @@ export const useOperationsBiofuelsColumns = ({
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
   const { unit } = useUnit()
-
   const columns: Column<Operation>[] = [
     {
       header: t("Statut"),

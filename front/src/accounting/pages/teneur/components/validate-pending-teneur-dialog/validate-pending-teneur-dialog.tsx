@@ -1,5 +1,4 @@
 import { Dialog } from "common/components/dialog2"
-import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
   getBiofuelBalance,
@@ -21,6 +20,7 @@ import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
 import { BiofuelFill, ElecFill } from "common/components/icon"
 import { useState } from "react"
+import { Table } from "common/components/table2"
 
 export const ValidatePendingTeneurDialog = ({
   onClose,
