@@ -9281,6 +9281,9 @@ components:
     EntityDepot:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         customs_id:
           type: string
           maxLength: 32
@@ -9323,6 +9326,7 @@ components:
           type: boolean
       required:
         - country
+        - id
         - name
     EntityFeedStock:
       type: object

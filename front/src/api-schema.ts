@@ -2727,6 +2727,7 @@ export interface components {
       is_in_europe?: boolean
     }
     EntityDepot: {
+      readonly id: number
       customs_id?: string
       name: string
       city?: string

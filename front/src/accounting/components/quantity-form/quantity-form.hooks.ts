@@ -9,6 +9,7 @@ import { useUnit } from "common/hooks/unit"
 import { FormManager } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
 import { FromDepotFormProps } from "../from-depot-form"
+import { GHGRangeFormProps } from "../ghg-range-form/ghg-range-form"
 
 type UseQuantityFormProps = {
   balance: Balance
@@ -62,7 +63,7 @@ type UseQuantityFormStepProps = {
 
   // Custom conversion function for the backend (default is the value passed as parameter)
   converter?: (value: number) => number
-  form: FormManager<QuantityFormProps & FromDepotFormProps>
+  form: FormManager<QuantityFormProps & FromDepotFormProps & GHGRangeFormProps>
   overrides?: Parameters<typeof quantityFormStep>[1]
 }
 

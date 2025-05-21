@@ -56,7 +56,6 @@ export const useBalancesBiofuelsColumns = () => {
       key: OperationOrder.available_balance,
     },
     {
-      key: OperationOrder.pending_operations,
       header: t("Opérations en attente"),
       cell: (item) =>
         item.pending_operations === 0 ? (

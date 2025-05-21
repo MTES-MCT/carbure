@@ -67,6 +67,7 @@ class EntityDepotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Depot
         fields = [
+            "id",
             "customs_id",
             "name",
             "city",

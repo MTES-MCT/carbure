@@ -28,6 +28,7 @@ import { FromDepotForm } from "accounting/components/from-depot-form"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 import { RecipientForm } from "accounting/components/recipient-form"
 import { ToDepotForm } from "accounting/components/to-depot-form"
+import { TransfertGHGRangeForm } from "accounting/pages/balances/biofuels/debit-operation-dialog/transfert-dialog/ghg-range-form/ghg-range-form"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -85,7 +86,19 @@ export const CessionDialogContent = ({
           <Stepper />
           <Box>
             <RecapOperationGrid>
-              <RecapOperation balance={balance} />
+              <RecapOperation
+                balance={
+                  // Change the available balance value only if the step is completed
+                  currentStepIndex > 1
+                    ? {
+                        ...balance,
+                        available_balance:
+                          form.value.availableBalance ??
+                          balance.available_balance,
+                      }
+                    : balance
+                }
+              />
               {currentStepIndex > 1 && (
                 <>
                   <FromDepotRecipientToDepotSummary values={form.value} />
@@ -106,9 +119,10 @@ export const CessionDialogContent = ({
                   <Box>
                     <RecipientForm />
                     <ToDepotForm />
+                    <FromDepotForm />
                   </Box>
                   <Box>
-                    <FromDepotForm balance={balance} />
+                    <TransfertGHGRangeForm balance={balance} />
                   </Box>
                 </>
               )}
@@ -117,7 +131,7 @@ export const CessionDialogContent = ({
                   <QuantityForm
                     balance={balance}
                     depot_quantity_max={
-                      form.value.from_depot?.available_balance
+                      form.value.availableBalance ?? balance.available_balance
                     }
                     type={CreateOperationType.CESSION}
                     depotId={form.value.from_depot?.id}
