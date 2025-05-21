@@ -1013,7 +1013,7 @@ def get_stocks_summary_data(stocks, entity_id=None, short=False):
     return data
 
 
-def handle_eth_to_etbe_transformation(user, stock, transformation):
+def handle_eth_to_etbe_transformation(user, stock, transformation, entity):
     required_fields = [
         "volume_ethanol",
         "volume_etbe",
@@ -1090,6 +1090,7 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
     e.event_type = CarbureStockEvent.TRANSFORMED
     e.stock = stock
     e.user = user
+    e.entity = entity
     e.save()
 
 

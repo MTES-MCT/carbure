@@ -38,7 +38,7 @@ def accept_consumption(request, entity, entity_id):
         lot.delivery_type = CarbureLot.CONSUMPTION
         updated_lots.append(lot)
 
-        event = CarbureLotEvent(event_type=CarbureLotEvent.ACCEPTED, lot=lot, user=request.user)
+        event = CarbureLotEvent(event_type=CarbureLotEvent.ACCEPTED, lot=lot, user=request.user, entity=entity)
         accepted_events.append(event)
 
     if len(errors) > 0:

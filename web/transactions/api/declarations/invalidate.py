@@ -69,7 +69,9 @@ def invalidate_declaration(request, *args, **kwargs):
         # Create cancel declaration events for all these lots
         bulk_events = []
         for lot in undeclared_lots:
-            bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
+            bulk_events.append(
+                CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user, entity_id=entity_id)
+            )
         CarbureLotEvent.objects.bulk_create(bulk_events)
 
         background_bulk_scoring(undeclared_lots)

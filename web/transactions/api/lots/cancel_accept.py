@@ -65,6 +65,7 @@ def cancel_accept_lots(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.CANCELLED
         event.lot = lot
         event.user = request.user
+        event.entity = entity
         event.save()
     return SuccessResponse()
 

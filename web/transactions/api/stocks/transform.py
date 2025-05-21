@@ -53,7 +53,7 @@ def stock_transform(request, *args, **kwargs):
 
         ttype = entry["transformation_type"]
         if ttype == CarbureStockTransformation.ETH_ETBE:
-            error = handle_eth_to_etbe_transformation(request.user, stock, entry)
+            error = handle_eth_to_etbe_transformation(request.user, stock, entry, entity)
             if error:
                 return error
     return JsonResponse({"status": "success"})

@@ -51,6 +51,12 @@ export const LotHistory = ({ changes }: HistoryProps) => {
             orderBy: (c) => c.user,
             cell: (c) => c.user,
           },
+          {
+            key: "entity",
+            header: t("Société"),
+            orderBy: (c) => c.entity ?? "",
+            cell: (c) => c.entity,
+          },
         ]}
       />
     </Collapse>
@@ -87,6 +93,7 @@ export interface LotChange {
   label: string
   valueBefore: string
   valueAfter: string
+  entity?: string
 }
 
 export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
@@ -106,6 +113,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
               valueAfter: u.metadata.value_after,
               user: u.user,
               date: u.event_dt,
+              entity: u.entity,
             }
           } else if ("changed" in u.metadata) {
             return (u.metadata as LotFieldUpdate).changed.map(
@@ -118,6 +126,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
                 label: i18next.t(field.replace(/_id$/, ""), { ns: "fields" }),
                 valueBefore: getFieldValue(valueBefore),
                 valueAfter: getFieldValue(valueAfter),
+                entity: u.entity,
               })
             )
           }
@@ -131,6 +140,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
             valueAfter: "",
             user: u.user,
             date: u.event_dt,
+            entity: u.entity,
           }
         }
 

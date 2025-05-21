@@ -1198,6 +1198,7 @@ class CarbureLotEvent(models.Model):
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
     user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
     metadata = models.JSONField(null=True, blank=True)
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         db_table = "carbure_lots_events"
@@ -1254,6 +1255,7 @@ class CarbureStockEvent(models.Model):
     stock = models.ForeignKey(CarbureStock, null=False, blank=False, on_delete=models.CASCADE)
     user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
     metadata = models.JSONField(null=True, blank=True)
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         db_table = "carbure_stock_events"

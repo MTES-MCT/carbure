@@ -43,6 +43,7 @@ def stock_cancel_transformation(request, entity):
                     stock=transform.source_stock,
                     event_type=CarbureStockEvent.UNTRANSFORMED,
                     user=request.user,
+                    entity=entity,
                 )
             )
 
