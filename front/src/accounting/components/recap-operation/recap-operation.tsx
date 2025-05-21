@@ -54,7 +54,7 @@ export const RecapOperationGrid = ({
   children: React.ReactNode
 }) => {
   return (
-    <Grid style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "24px" }}>
+    <Grid style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "24px" }}>
       {children}
     </Grid>
   )

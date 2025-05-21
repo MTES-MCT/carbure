@@ -14,11 +14,15 @@ export const getDepotsWithBalance = (
     category,
     biofuel,
     query,
+    ges_bound_min,
+    ges_bound_max,
   }: {
     sector: OperationSector
     category: OperationBiofuelCategory
     biofuel: string
     query?: string
+    ges_bound_min?: number
+    ges_bound_max?: number
   }
 ) => {
   return api
@@ -31,6 +35,8 @@ export const getDepotsWithBalance = (
           customs_category: [category],
           group_by: BalancesGroupBy.depot,
           search: query,
+          ges_bound_min,
+          ges_bound_max,
         },
       },
     })

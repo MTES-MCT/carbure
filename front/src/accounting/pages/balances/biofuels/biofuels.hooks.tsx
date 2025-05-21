@@ -11,6 +11,7 @@ import {
   BalancesFilter,
   BalancesQuery,
   OperationsStatus,
+  OperationOrder,
 } from "accounting/types"
 import * as api from "accounting/api/balances"
 import { formatSector } from "accounting/utils/formatters"
@@ -36,19 +37,23 @@ export const useBalancesBiofuelsColumns = () => {
     {
       header: t("Filière"),
       cell: (item) => formatSector(item.sector),
+      key: OperationOrder.sector,
     },
     {
       header: t("Biocarburant"),
       cell: (item) => item.biofuel?.code,
+      key: OperationOrder.biofuel,
     },
     {
       header: t("Catégorie"),
       cell: (item) => item.customs_category,
+      key: OperationOrder.customs_category,
     },
     {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
       cell: (item) =>
         formatNumber(item.available_balance, { fractionDigits: 0 }),
+      key: OperationOrder.available_balance,
     },
     {
       header: t("Opérations en attente"),
@@ -74,6 +79,7 @@ export const useBalancesBiofuelsColumns = () => {
             {item.pending_operations}
           </Button>
         ),
+      key: OperationOrder.pending_operations,
     },
     canTransfer && {
       header: t("Céder"),

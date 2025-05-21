@@ -21,6 +21,8 @@ type UseQuantityFormProps = {
   converter?: (value: number) => number
 
   depotId?: number
+  gesBoundMin?: number
+  gesBoundMax?: number
 }
 export const useQuantityForm = ({
   balance,
@@ -29,6 +31,8 @@ export const useQuantityForm = ({
   unit: customUnit,
   converter = (value) => value,
   depotId,
+  gesBoundMin,
+  gesBoundMax,
 }: UseQuantityFormProps) => {
   const entity = useEntity()
   const { unit } = useUnit(customUnit)
@@ -42,6 +46,8 @@ export const useQuantityForm = ({
       target_emission: 0,
       unit: unit,
       from_depot: depotId,
+      ges_bound_min: gesBoundMin,
+      ges_bound_max: gesBoundMax,
     })
 
   const mutation = useMutation(declareQuantity, mutationOptions)
@@ -79,6 +85,8 @@ export const useQuantityFormStep = ({
         target_emission: form.value.avoided_emissions ?? 0,
         from_depot: form.value.from_depot?.id,
         unit: backendUnit,
+        ges_bound_min: form.value.gesBoundMin,
+        ges_bound_max: form.value.gesBoundMax,
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
       })

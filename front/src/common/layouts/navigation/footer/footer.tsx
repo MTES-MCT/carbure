@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 
 import styles from "./footer.module.css"
-import logoMTES from "common/assets/images/MTE.svg"
+import logoMTES from "common/assets/images/MCE.svg"
 import logoFabNum from "common/assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "common/assets/images/betagouvfr.svg"
 import logoFranceRelance from "common/assets/images/france-relance.webp"
@@ -90,9 +90,8 @@ const CarbureFooter = ({ className }: { className?: string }) => {
           <p className={styles.footerDescription}>
             <Trans>
               CarbuRe est un service numérique de l'État incubé à la Fabrique
-              numérique du Ministère de la Transition Écologique, membre du
-              réseau d'incubateurs{" "}
-              <a href="http://beta.gouv.fr">beta.gouv.fr</a>
+              numérique du Ministère chargé de l'Énergie, membre du réseau
+              d'incubateurs <a href="http://beta.gouv.fr">beta.gouv.fr</a>
             </Trans>
           </p>
 

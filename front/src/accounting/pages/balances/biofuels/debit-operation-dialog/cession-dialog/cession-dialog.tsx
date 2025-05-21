@@ -20,11 +20,13 @@ import {
 
 import { useCessionDialog } from "./cession-dialog.hooks"
 import {
-  FromDepotRecipientToDepotForm,
   fromDepotRecipientToDepotStep,
   fromDepotRecipientToDepotStepKey,
   FromDepotRecipientToDepotSummary,
 } from "./from-depot-recipient-to-depot-form/from-depot-recipient-to-depot-form"
+import { FromDepotForm } from "accounting/components/from-depot-form"
+import { RecipientToDepotForm } from "accounting/components/recipient-to-depot-form"
+import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 
 interface CessionDialogProps {
   onClose: () => void
@@ -84,19 +86,32 @@ export const CessionDialogContent = ({
             <RecapOperationGrid>
               <RecapOperation balance={balance} />
               {currentStepIndex > 1 && (
-                <FromDepotRecipientToDepotSummary values={form.value} />
+                <>
+                  <FromDepotRecipientToDepotSummary values={form.value} />
+                  <RecapGHGRange
+                    min={form.value.gesBoundMin}
+                    max={form.value.gesBoundMax}
+                  />
+                </>
               )}
               {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
             </RecapOperationGrid>
           </Box>
 
           {currentStep?.key !== "recap" && (
-            <Box>
-              <Form form={form}>
-                {currentStep?.key === fromDepotRecipientToDepotStepKey && (
-                  <FromDepotRecipientToDepotForm balance={balance} />
-                )}
-                {currentStep?.key === quantityFormStepKey && (
+            <Form form={form}>
+              {currentStep?.key === fromDepotRecipientToDepotStepKey && (
+                <>
+                  <Box>
+                    <RecipientToDepotForm />
+                  </Box>
+                  <Box>
+                    <FromDepotForm balance={balance} />
+                  </Box>
+                </>
+              )}
+              {currentStep?.key === quantityFormStepKey && (
+                <Box>
                   <QuantityForm
                     balance={balance}
                     depot_quantity_max={
@@ -104,10 +119,12 @@ export const CessionDialogContent = ({
                     }
                     type={CreateOperationType.CESSION}
                     depotId={form.value.from_depot?.id}
+                    gesBoundMin={form.value.gesBoundMin}
+                    gesBoundMax={form.value.gesBoundMax}
                   />
-                )}
-              </Form>
-            </Box>
+                </Box>
+              )}
+            </Form>
           )}
         </Main>
       </Dialog>

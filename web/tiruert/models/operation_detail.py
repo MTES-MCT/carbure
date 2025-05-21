@@ -14,6 +14,7 @@ class OperationDetailsManager(models.Manager):
                 "lot__volume",
                 "operation__id",
                 "lot__biofuel__pci_litre",
+                "lot__ghg_reduction_red_ii",
             )
         )
 

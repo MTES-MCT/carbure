@@ -4,7 +4,7 @@ from .balance import BalanceActionMixin
 from .simulate import SimulateActionMixin
 from .filter import FilterActionMixin
 from .correct import CorrectActionMixin
-
+from .excel_export import ExcelExportActionMixin
 
 class ActionMixin(
     AcceptActionMixin,
@@ -13,5 +13,6 @@ class ActionMixin(
     SimulateActionMixin,
     FilterActionMixin,
     CorrectActionMixin,
+    ExcelExportActionMixin,
 ):
     pass

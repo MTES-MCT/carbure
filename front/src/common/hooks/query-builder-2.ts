@@ -23,7 +23,7 @@ export type CBQueryFilterManager = {
 export const CBQUERY_RESET: Partial<CBQueryParams<[], undefined, undefined>> = {
   limit: undefined,
   page: 1,
-  order: undefined,
+  order_by: undefined,
 }
 
 const formatOrder = <Columns extends string[]>(
@@ -58,7 +58,7 @@ export interface CBQueryParams<Columns extends string[], Status, Type> {
   search?: string
   page: number
   limit?: number
-  order?: OrderColumns<Columns>
+  order_by?: OrderColumns<Columns>
 }
 
 /* Hooks */
@@ -86,7 +86,8 @@ export function useCBQueryBuilder<Columns extends string[], Status, Type>(
       search,
       page: page > 0 ? page : 1,
       page_size: limit ?? undefined,
-      order: formatOrder<OrderColumns<Columns>>(order),
+      // With the backend refacto, order is not used anymore, we use order_by instead
+      order_by: formatOrder<OrderColumns<Columns>>(order),
       ...filters,
     }),
     [entity.id, status, type, search, limit, order, filters, page, year]
