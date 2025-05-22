@@ -111,8 +111,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
     sourcing_errors = []
 
     # preload data
-    feedstocks = MatierePremiere.objects.all()
-    countries = Pays.objects.all()
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
 
     for row in sourcing_rows:
         line = row["line"]
@@ -129,10 +128,8 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
         sourcing.metric_tonnes = row["metric_tonnes"]
 
         # Feedstock
-        try:
-            feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
-        except Exception:
-            feedstock = None
+        feedstock_code = row["feedstock"].strip() if row["feedstock"] else None
+        feedstock = feedstocks.get(feedstock_code)
 
         if feedstock and not feedstock.is_double_compte:
             continue
@@ -140,7 +137,9 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
             sourcing.feedstock = feedstock
 
         # Origin country
-        origin_country = get_country(row["origin_country"], countries)
+        origin_country_code = row["origin_country"]
+        origin_country = get_country(origin_country_code)
+
         if origin_country:
             sourcing.origin_country = origin_country
         else:
@@ -152,8 +151,8 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
                 )
             )
 
-        sourcing.supply_country = get_country(row["supply_country"], countries)
-        sourcing.transit_country = get_country(row["transit_country"], countries)
+        sourcing.supply_country = get_country(row["supply_country"])
+        sourcing.transit_country = get_country(row["transit_country"])
 
         sourcing_errors += errors
         if len(errors) == 0:
@@ -162,21 +161,21 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
     return sourcing_data, sourcing_errors
 
 
-def get_country(string, countries):
+def get_country(string):
     if not string:
         return None
 
     country_string = string.strip()
-    try:
-        country = countries.get(code_pays=country_string)
-    except Exception:
-        country = None
-        try:
-            country = countries.get(name=country_string)
-        except Exception:
-            country = None
 
-    return country
+    if not hasattr(get_country, "_cache"):
+        get_country._cache = {
+            "countries_by_code": {country.code_pays: country for country in Pays.objects.all()},
+            "countries_by_name": {country.name: country for country in Pays.objects.all()},
+        }
+    countries_by_code = get_country._cache["countries_by_code"]
+    countries_by_name = get_country._cache["countries_by_name"]
+
+    return countries_by_code.get(country_string, countries_by_name.get(country_string, None))
 
 
 def load_dc_production_data(
@@ -189,8 +188,8 @@ def load_dc_production_data(
     production_errors = []
 
     # preload data
-    feedstocks = MatierePremiere.objects.all()
-    biofuels = Biocarburant.objects.all()
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
+    biofuels = {biofuel.code: biofuel for biofuel in Biocarburant.objects.all()}
 
     # check rows integrity
     for index, production_base_rows in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
@@ -316,8 +315,8 @@ def load_dc_production_history_data(
     production_errors = []
 
     # preload data
-    feedstocks = MatierePremiere.objects.all()
-    biofuels = Biocarburant.objects.all()
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
+    biofuels = {biofuel.code: biofuel for biofuel in Biocarburant.objects.all()}
 
     # check rows integrity
     for index, production_base_rows in enumerate([production_max_history_rows, production_effective_history_rows]):
@@ -360,10 +359,7 @@ def load_dc_production_history_data(
 
 
 def get_material(code, list):
-    try:
-        return list.get(code=code)
-    except Exception:
-        return None
+    return list.get(code, None)
 
 
 def merge_rows(rows, key_to_merge):
@@ -711,8 +707,7 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
     sourcing_errors = []
 
     # preload data
-    feedstocks = MatierePremiere.objects.all()
-    countries = Pays.objects.all()
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
 
     for row in sourcing_history_rows:
         errors = check_sourcing_row(row)
@@ -726,10 +721,8 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
         sourcing.metric_tonnes = row["metric_tonnes"]
 
         # Feedstock
-        try:
-            feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
-        except Exception:
-            feedstock = None
+        feedstock_code = row["feedstock"].strip() if row["feedstock"] else None
+        feedstock = feedstocks.get(feedstock_code)
 
         if feedstock and not feedstock.is_double_compte:
             continue
@@ -737,14 +730,14 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
             sourcing.feedstock = feedstock
 
         # Origin country
-        origin_country = get_country(row["origin_country"], countries)
+        origin_country = get_country(row["origin_country"])
 
         if not origin_country:
-            origin_country = countries.get(code_pays="N/A")
+            origin_country = get_country("N/A")
 
         sourcing.origin_country = origin_country
-        sourcing.supply_country = get_country(row["supply_country"], countries)
-        sourcing.transit_country = get_country(row["transit_country"], countries)
+        sourcing.supply_country = get_country(row["supply_country"])
+        sourcing.transit_country = get_country(row["transit_country"])
         sourcing.raw_material_supplier = row.get("raw_material_supplier") or ""
         sourcing.supplier_certificate_name = row.get("supplier_certificate_name") or ""
         sourcing.supplier_certificate = row["supplier_certificate"]
