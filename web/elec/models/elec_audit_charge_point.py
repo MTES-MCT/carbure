@@ -18,7 +18,7 @@ class ElecAuditChargePoint(models.Model):
     is_auditable = models.BooleanField(null=True, blank=True)
     current_type = models.CharField(max_length=2, null=True, blank=True, choices=ElecChargePoint.CURRENT_TYPES)
     observed_mid_or_prm_id = models.CharField(max_length=128, null=True, blank=True)
-    observed_energy_reading = models.FloatField(null=True, blank=True)
+    observed_energy_reading = models.FloatField(null=True, blank=True)  # unit = kWh
     has_dedicated_pdl = models.BooleanField(null=True, blank=True)
     audit_date = models.DateField(null=True, blank=True)
     comment = models.CharField(max_length=512, default="")

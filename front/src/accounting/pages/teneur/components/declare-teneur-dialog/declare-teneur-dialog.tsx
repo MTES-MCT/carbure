@@ -23,11 +23,11 @@ import {
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
 import {
+  BiofuelUnconstrainedCategoryObjective,
   CategoryObjective,
   MainObjective,
   SectorObjective,
   TargetType,
-  UnconstrainedCategoryObjective,
 } from "../../types"
 import { CONVERSIONS, floorNumber, formatUnit } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
@@ -46,7 +46,7 @@ import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-r
 
 interface DeclareTeneurDialogProps {
   onClose: () => void
-  objective: CategoryObjective | UnconstrainedCategoryObjective
+  objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
   // Only used for unconstrained categories
   sectorObjectives: SectorObjective[]
   targetType?: TargetType

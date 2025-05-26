@@ -95,8 +95,12 @@ class TeneurService:
         A = np.vstack(
             (
                 c,
-                np.array([1 for _ in batches_volumes] + [0 for _ in batches_volumes] + [0]),
-                np.array([0 for _ in batches_volumes] + [1 for _ in batches_volumes] + [0]),
+                np.array(
+                    [1 for _ in batches_volumes] + [0 for _ in batches_volumes] + [0],
+                ),
+                np.array(
+                    [0 for _ in batches_volumes] + [1 for _ in batches_volumes] + [0],
+                ),
                 np.hstack(
                     (
                         np.diag(-1.0 * np.ones(len(batches_volumes))),
@@ -144,7 +148,9 @@ class TeneurService:
 
     @staticmethod
     def emission_bounds(
-        batches_volumes: npt.NDArray, batches_emissions: npt.NDArray, target_volume: float
+        batches_volumes: npt.NDArray,
+        batches_emissions: npt.NDArray,
+        target_volume: float,
     ) -> tuple[float, float]:
         """Computes emission rate bounds for a set of batches.
 
@@ -254,15 +260,22 @@ class TeneurService:
             .distinct()
         )
 
-        if data.get("from_depot") is not None:
-            operations = operations.filter(to_depot=data["from_depot"])
+        # Commented out because we don't want to filter by depot anymore (for now)
+        # if data.get("from_depot") is not None:
+        #     operations = operations.filter(to_depot=data["from_depot"])
 
         ges_bound_min = data.get("ges_bound_min", None)
         ges_bound_max = data.get("ges_bound_max", None)
 
         # Calculate balance of debited entity, for each lot, always in liters
         balance = BalanceService.calculate_balance(
-            operations, data["debited_entity"].id, "lot", "l", None, ges_bound_min, ges_bound_max
+            operations,
+            data["debited_entity"].id,
+            "lot",
+            "l",
+            None,
+            ges_bound_min,
+            ges_bound_max,
         )
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums

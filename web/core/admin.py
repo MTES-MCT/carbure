@@ -389,7 +389,10 @@ class CarbureLotAdmin(admin.ModelAdmin):
     @transaction.atomic
     def delete_lots(self, request, queryset):
         queryset.update(lot_status="DELETED")
-        events = [CarbureLotEvent(lot=lot, user=request.user, event_type=CarbureLotEvent.DELETED_ADMIN) for lot in queryset]
+
+        events = [
+            CarbureLotEvent(lot=lot, user=request.user, event_type=CarbureLotEvent.DELETED_BY_ADMIN) for lot in queryset
+        ]
         CarbureLotEvent.objects.bulk_create(events)
 
     delete_lots.short_description = "Changer le statut des lots en SUPRRIMÉ"

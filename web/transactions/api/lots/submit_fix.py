@@ -38,7 +38,7 @@ def submit_fix(request, context):
         if GenericError.objects.filter(lot=lot, is_blocking=True).count() > 0:
             return ErrorResponse(400, SubmitFixError.BLOCKING_SANITY_CHECK)
 
-        event = CarbureLotEvent(event_type=CarbureLotEvent.MARKED_AS_FIXED, lot=lot, user=request.user)
+        event = CarbureLotEvent(event_type=CarbureLotEvent.MARKED_AS_FIXED, lot=lot, user=request.user, entity_id=entity_id)
         submit_fix_events.append(event)
 
     rejected_lots = lots.filter(lot_status=CarbureLot.REJECTED)
@@ -67,6 +67,7 @@ def submit_fix(request, context):
                         lot=node.data,
                         user=request.user,
                         metadata=diff_to_metadata(node.diff),
+                        entity_id=entity_id,
                     )
                 )
 

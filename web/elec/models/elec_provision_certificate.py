@@ -28,6 +28,6 @@ class ElecProvisionCertificate(models.Model):
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)
     source = models.CharField(max_length=32, choices=SOURCES, null=True, default=None)
-    energy_amount = models.FloatField()
+    energy_amount = models.FloatField()  # unit = MWh
     remaining_energy_amount = models.FloatField()
     compensation = models.BooleanField(default=False)

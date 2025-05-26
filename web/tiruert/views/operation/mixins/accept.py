@@ -42,7 +42,7 @@ class AcceptActionMixin:
                 {"error": AcceptActionMixinErrors.OPERATION_ALREADY_ACCEPTED_VALIDATED}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        if operation.type == Operation.CESSION:
+        if operation.type == Operation.CESSION or operation.type == Operation.TRANSFERT:
             operation.status = Operation.ACCEPTED
         elif operation.type == Operation.INCORPORATION:
             operation.status = Operation.VALIDATED

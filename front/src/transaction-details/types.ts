@@ -32,6 +32,7 @@ export interface LotUpdate<T> {
   event_dt: string
   metadata?: T
   label?: string
+  entity?: string
 }
 
 export interface LotFieldUpdate {

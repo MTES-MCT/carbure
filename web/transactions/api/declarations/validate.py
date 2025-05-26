@@ -98,7 +98,9 @@ def validate_declaration(request, *args, **kwargs):
         # Create declaration events for all these lots
         bulk_events = []
         for lot in declared_lots:
-            bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
+            bulk_events.append(
+                CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user, entity_id=entity_id)
+            )
         CarbureLotEvent.objects.bulk_create(bulk_events)
 
         background_bulk_scoring(declared_lots)

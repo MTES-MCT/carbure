@@ -8,30 +8,33 @@ export const useAccounting = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
 
-  const { is_tiruert_liable, accise_number } = useEntity()
+  const { is_tiruert_liable, accise_number, isAdmin, hasAdminRight } =
+    useEntity()
 
   const section: MenuSection = {
     title: t("Comptabilité"),
-    condition: accise_number !== "",
+    condition: accise_number !== "" || isAdmin || hasAdminRight("TIRIB"),
     children: [
       {
         path: routes.ACCOUNTING.BALANCES.ROOT,
         title: t("Soldes"),
         icon: createIcon({ name: "ri-bank-line" }),
         iconActive: createIcon({ name: "ri-bank-fill" }),
+        condition: !isAdmin && !hasAdminRight("TIRIB"),
       },
       {
         path: routes.ACCOUNTING.OPERATIONS.ROOT,
         title: t("Comptabilité"),
         icon: createIcon({ name: "ri-bar-chart-2-line" }),
         iconActive: createIcon({ name: "ri-bar-chart-2-fill" }),
+        condition: !isAdmin && !hasAdminRight("TIRIB"),
       },
       {
         path: routes.ACCOUNTING.TENEUR,
         title: t("Objectifs annuels"),
         icon: createIcon({ name: "ri-flashlight-line" }),
         iconActive: createIcon({ name: "ri-flashlight-fill" }),
-        condition: is_tiruert_liable,
+        condition: is_tiruert_liable || isAdmin || hasAdminRight("TIRIB"),
       },
     ],
   }

@@ -46,6 +46,7 @@ def duplicate_lot(request, *args, **kwargs):
     e.lot_id = lot.pk
     e.user = request.user
     e.metadata = {"source": "MANUAL"}
+    e.entity_id = entity_id
     e.save()
     data = get_prefetched_data(Entity.objects.get(id=entity_id))
     bulk_sanity_checks([lot], data)

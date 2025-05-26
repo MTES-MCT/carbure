@@ -1,8 +1,12 @@
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 import { formatOperationStatus } from "accounting/utils/formatters"
-import { OperationsStatus } from "accounting/types"
+import { ElecOperationsStatus, OperationsStatus } from "accounting/types"
 
-export const OperationBadge = ({ status }: { status?: OperationsStatus }) => {
+export const OperationBadge = ({
+  status,
+}: {
+  status?: OperationsStatus | ElecOperationsStatus
+}) => {
   const labelMapping: Record<OperationsStatus, BadgeProps["severity"]> = {
     [OperationsStatus.ACCEPTED]: "success",
     [OperationsStatus.CANCELED]: "error",

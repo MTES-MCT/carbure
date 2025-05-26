@@ -59,6 +59,7 @@ def delete_many(request):
                 event_type=CarbureLotEvent.DELETED_BY_ADMIN,
                 lot=node.data,
                 user=request.user,
+                entity_id=entity_id,
             )
         )
 

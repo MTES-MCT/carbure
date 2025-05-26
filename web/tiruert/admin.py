@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from tiruert.models import FossilFuel, FossilFuelCategory, Objective, Operation
+from tiruert.models.elec_operation import ElecOperation
 
 from .admin_actions import perform_bulk_operations_validation
 
@@ -57,3 +58,16 @@ class OperationAdmin(admin.ModelAdmin):
     search_fields = ["credited_entity__name", "debited_entity__name", "credited_entity__id", "debited_entity__id"]
     list_filter = ["type", "status"]
     actions = [perform_bulk_operations_validation]
+
+
+@admin.register(ElecOperation)
+class ElecOperationAdmin(admin.ModelAdmin):
+    list_display = [
+        "type",
+        "status",
+        "credited_entity",
+        "debited_entity",
+        "created_at",
+    ]
+    search_fields = ["credited_entity__name", "debited_entity__name", "credited_entity__id", "debited_entity__id"]
+    list_filter = ["type", "status"]

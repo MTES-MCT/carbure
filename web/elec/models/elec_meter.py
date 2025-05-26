@@ -6,7 +6,7 @@ from elec.models.elec_charge_point import ElecChargePoint
 
 class ElecMeter(models.Model):
     mid_certificate = models.CharField(max_length=128, null=False, blank=False)
-    initial_index = models.FloatField(null=True, blank=False)
+    initial_index = models.FloatField(null=True, blank=False)  # unit = kWh
     initial_index_date = models.DateField(null=True, blank=False)
     charge_point = models.ForeignKey(
         ElecChargePoint, null=True, blank=False, on_delete=models.CASCADE, related_name="elec_meters"

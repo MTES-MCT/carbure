@@ -37,6 +37,7 @@ def add_lot(request, entity):
             lot_id=lots_created[0].id,
             user=request.user,
             metadata={"source": "MANUAL"},
+            entity=entity,
         )
 
     data = CarbureLotPublicSerializer(lots_created[0]).data

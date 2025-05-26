@@ -72,11 +72,13 @@ def stock_flush(request, *args, **kwargs):
         e.event_type = CarbureStockEvent.FLUSHED
         e.user = request.user
         e.stock = stock
+        e.entity_id = entity_id
         e.save()
         e = CarbureLotEvent()
         e.event_type = CarbureLotEvent.CREATED
         e.lot = lot
         e.user = request.user
+        e.entity_id = entity_id
         e.save()
         e.pk = None
         e.event_type = CarbureLotEvent.ACCEPTED

@@ -112,6 +112,7 @@ def update_many(request):
                 lot=node.data,
                 user=request.user,
                 metadata=diff_to_metadata(node.diff),
+                entity_id=entity_id,
             )
         )
 
