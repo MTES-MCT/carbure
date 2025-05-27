@@ -64,6 +64,7 @@ export const ObjectivizedCategoriesProgress = ({
                 }
               />
             }
+            penalty={category.penalty}
             onClick={
               readOnly
                 ? undefined

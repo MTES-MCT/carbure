@@ -7,6 +7,7 @@ export interface BaseObjective {
   quantity_available: number // GJ
   teneur_declared_month: number // GJ
   target_percent: number
+  penalty: number // euro cents
 }
 export interface CategoryObjective extends BaseObjective {
   code: CategoryEnum
