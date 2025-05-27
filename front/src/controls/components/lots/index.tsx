@@ -159,6 +159,8 @@ const ADMIN_FILTERS = [
   Filter.Conformity,
   Filter.Scores,
   Filter.ML,
+  Filter.Certificate_id,
+  Filter.SupplierCertificate,
 ]
 
 export default Lots
