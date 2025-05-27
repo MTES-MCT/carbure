@@ -24,7 +24,6 @@ class Objective(models.Model):
     )
     customs_category = models.CharField(max_length=20, choices=MatierePremiere.MP_CATEGORIES, blank=True)
     year = models.IntegerField()
-    consideration_rate = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%")
     target = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%")
     target_type = models.CharField(max_length=255, choices=TARGET_TYPES, blank=True)
     penalty = models.IntegerField(blank=True, null=True, help_text="en centimes d'euros")
