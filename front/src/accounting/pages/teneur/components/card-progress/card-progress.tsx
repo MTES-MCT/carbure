@@ -7,6 +7,7 @@ import { Title } from "common/components/title/title"
 import { ProgressBar } from "../progress-bar"
 import cl from "clsx"
 import { ArrowRightLine } from "common/components/icon"
+import { CONVERSIONS } from "common/utils/formatters"
 
 export type CardProgressProps = {
   title?: string
@@ -27,6 +28,8 @@ export type CardProgressProps = {
   // Allow to display custom badge
   badge?: ReactNode
 
+  penalty?: number
+
   onClick?: () => void
 
   className?: string
@@ -40,6 +43,7 @@ export const CardProgress = ({
   mainValue,
   description,
   badge,
+  penalty,
   children,
   onClick,
   className,
@@ -62,15 +66,22 @@ export const CardProgress = ({
         </div>
         <div>
           {mainValue !== undefined ? (
-            <Title is="p" as="h2">
-              {mainValue}
-              {mainText !== undefined ? (
-                <Title is="span" as="h5">
-                  {" "}
-                  {mainText}
-                </Title>
-              ) : null}
-            </Title>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Title is="p" as="h2">
+                {mainValue}
+                {mainText !== undefined ? (
+                  <Title is="span" as="h5">
+                    {" "}
+                    {mainText}
+                  </Title>
+                ) : null}
+              </Title>
+              {penalty !== undefined && (
+                <Text className={css["card-progress__penalty"]} size="sm">
+                  Sanction : {CONVERSIONS.euros.centsToKEuros(penalty)} k€
+                </Text>
+              )}
+            </div>
           ) : null}
           {description && (
             <div className={css["card-progress__description"]}>

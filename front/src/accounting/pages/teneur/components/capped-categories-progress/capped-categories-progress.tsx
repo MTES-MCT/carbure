@@ -62,6 +62,7 @@ export const CappedCategoriesProgress = ({
                 </Badge>
               ) : null
             }
+            penalty={category.penalty}
             onClick={
               readOnly
                 ? undefined

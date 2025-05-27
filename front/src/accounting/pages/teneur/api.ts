@@ -20,6 +20,7 @@ function parseObjectivesResponse(objectives: any) {
       target_percent: objectives?.main.target_percent
         ? objectives?.main.target_percent * 100
         : 0,
+      penalty: objectives?.main.penalty ?? 0,
     },
     sectors:
       objectives?.sectors.map((sector: any) => ({
@@ -33,6 +34,7 @@ function parseObjectivesResponse(objectives: any) {
           sector.available_balance
         ),
         target_percent: sector.objective.target_percent * 100,
+        penalty: sector.objective.penalty ?? 0,
       })) ?? [],
   }
 
@@ -71,6 +73,7 @@ function parseObjectivesResponse(objectives: any) {
             category.available_balance
           ),
           target_percent: category.objective.target_percent * 100,
+          penalty: category.objective.penalty ?? 0,
         }
         if (!category.objective.target_mj) {
           objCategories.unconstrained_categories.push({

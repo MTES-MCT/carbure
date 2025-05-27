@@ -54,6 +54,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 }
               />
             }
+            penalty={sector.penalty}
           >
             <ul>
               <li>

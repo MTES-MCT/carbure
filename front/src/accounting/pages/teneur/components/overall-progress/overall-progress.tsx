@@ -55,6 +55,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
               }
             />
           }
+          penalty={objective.penalty}
         >
           <ul>
             <li>
