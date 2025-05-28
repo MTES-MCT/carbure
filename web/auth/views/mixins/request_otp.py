@@ -44,7 +44,7 @@ class RequestOTPAction:
         self.send_new_token(request)
         device = EmailDevice.objects.get(user=request.user)
         dt = device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
-        return Response(data={"valid_until": dt.strftime("%m/%d/%Y, %H:%M")})
+        return Response({"valid_until": dt.strftime("%m/%d/%Y, %H:%M")})
 
     # static - not an endpoint
     def send_new_token(self, request):
