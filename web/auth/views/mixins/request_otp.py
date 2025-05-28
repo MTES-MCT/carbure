@@ -39,8 +39,8 @@ class RequestOTPAction:
             self.create_device(user)
         self.send_new_token(request)
         device = EmailDevice.objects.get(user=request.user)
-        dt = device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
-        return Response({"valid_until": dt.strftime("%m/%d/%Y, %H:%M")})
+        device_validity = self.device_validity_in_local_timezone(device)
+        return Response({"valid_until": device_validity.strftime("%m/%d/%Y, %H:%M")})
 
     def create_device(self, user):
         email_otp = EmailDevice()
@@ -50,6 +50,9 @@ class RequestOTPAction:
         email_otp.email = user.email
         email_otp.save()
 
+    def device_validity_in_local_timezone(self, device):
+        return device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
+
     # static - not an endpoint
     def send_new_token(self, request):
         device = EmailDevice.objects.get(user=request.user)
@@ -58,8 +61,8 @@ class RequestOTPAction:
         if now > device.valid_until:
             device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
         email_subject = "Carbure - Code de Sécurité"
-        dt = device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
-        expiry = "%s %s" % (dt.strftime("%H:%M"), dt.tzname())
+        device_validity = self.device_validity_in_local_timezone(device)
+        expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
         email_context = {
             "user": request.user,
             "domain": CarbureEnv.get_base_url(),
