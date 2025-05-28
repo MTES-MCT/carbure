@@ -35,8 +35,6 @@ class RequestOTPAction:
     def request_otp(self, request):
         user = request.user
         # send token by email and display form
-        if not user_has_device(user):
-            self.create_device(user)
         device = self.device_with_updated_validity(user)
         self.send_new_token(request, device)
         device_validity = self.device_validity_in_local_timezone(device)
@@ -54,6 +52,9 @@ class RequestOTPAction:
         return device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
 
     def device_with_updated_validity(self, user):
+        if not user_has_device(user):
+            self.create_device(user)
+
         device = EmailDevice.objects.get(user=user)
         now = timezone.now()
         if now > device.valid_until:
