@@ -36,8 +36,11 @@ class RequestOTPAction:
         # send token by email and display form
         if not user_has_device(user):
             self.create_device(user)
-        self.send_new_token(request)
-        device = EmailDevice.objects.get(user=request.user)
+        device = EmailDevice.objects.get(user=user)
+        now = timezone.now()
+        if now > device.valid_until:
+            device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
+        self.send_new_token(request, device)
         device_validity = self.device_validity_in_local_timezone(device)
         return Response({"valid_until": device_validity.strftime("%m/%d/%Y, %H:%M")})
 
@@ -53,12 +56,7 @@ class RequestOTPAction:
         return timezone.localtime(device.valid_until)
 
     # static - not an endpoint
-    def send_new_token(self, request):
-        device = EmailDevice.objects.get(user=request.user)
-        # if current token is expired, generate a new one
-        now = timezone.now()
-        if now > device.valid_until:
-            device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
+    def send_new_token(self, request, device):
         email_subject = "Carbure - Code de Sécurité"
         device_validity = self.device_validity_in_local_timezone(device)
         expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
