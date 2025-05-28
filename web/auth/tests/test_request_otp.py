@@ -70,11 +70,14 @@ class RequestOTPTest(TestCase):
         html_content = sent_mail.alternatives[0][0]
         assert not re.search("https://http://", html_content)
 
-    def test_request_otp_creates_email_device_and_sends_token_not_auth(self):
-        assert not EmailDevice.objects.filter(user=self.user).exists()
-
+    def test_returns_http_403_if_user_not_authenticated(self):
         response = self.client.get(self.request_otp_url)
-
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_does_not_create_email_device_if_user_not_authenticated(self):
+        self.client.get(self.request_otp_url)
         assert not EmailDevice.objects.filter(user=self.user).exists()
+
+    def test_does_not_send_email_if_user_not_authenticated(self):
+        self.client.get(self.request_otp_url)
+        assert len(mail.outbox) == 0
