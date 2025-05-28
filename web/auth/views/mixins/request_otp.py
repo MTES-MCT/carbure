@@ -33,18 +33,22 @@ class RequestOTPAction:
     )
     @action(detail=False, methods=["get"], url_path="request-otp")
     def request_otp(self, request):
+        user = request.user
         # send token by email and display form
-        if not user_has_device(request.user):
-            email_otp = EmailDevice()
-            email_otp.user = request.user
-            email_otp.name = "email"
-            email_otp.confirmed = True
-            email_otp.email = request.user.email
-            email_otp.save()
+        if not user_has_device(user):
+            self.create_device(user)
         self.send_new_token(request)
         device = EmailDevice.objects.get(user=request.user)
         dt = device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
         return Response({"valid_until": dt.strftime("%m/%d/%Y, %H:%M")})
+
+    def create_device(self, user):
+        email_otp = EmailDevice()
+        email_otp.user = user
+        email_otp.name = "email"
+        email_otp.confirmed = True
+        email_otp.email = user.email
+        email_otp.save()
 
     # static - not an endpoint
     def send_new_token(self, request):
