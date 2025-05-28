@@ -1,6 +1,5 @@
 import pytz
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils import timezone
 from django_otp import user_has_device
@@ -11,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
 from core.helpers import send_mail
+from core.utils import CarbureEnv
 
 
 class RequestOTPAction:
@@ -49,7 +49,6 @@ class RequestOTPAction:
     # static - not an endpoint
     def send_new_token(self, request):
         device = EmailDevice.objects.get(user=request.user)
-        current_site = get_current_site(request)
         # if current token is expired, generate a new one
         now = timezone.now()
         if now > device.valid_until:
@@ -59,7 +58,7 @@ class RequestOTPAction:
         expiry = "%s %s" % (dt.strftime("%H:%M"), dt.tzname())
         email_context = {
             "user": request.user,
-            "domain": current_site.domain,
+            "domain": CarbureEnv.get_base_url(),
             "token": device.token,
             "token_expiry": expiry,
         }
