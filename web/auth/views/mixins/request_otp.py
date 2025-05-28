@@ -34,7 +34,6 @@ class RequestOTPAction:
     @action(detail=False, methods=["get"], url_path="request-otp")
     def request_otp(self, request):
         user = request.user
-        # send token by email and display form
         device = self.device_with_updated_validity(user)
         self.send_new_token(request, device)
         device_validity = self.device_validity_in_local_timezone(device)
@@ -61,7 +60,6 @@ class RequestOTPAction:
             device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
         return device
 
-    # static - not an endpoint
     def send_new_token(self, request, device):
         email_subject = "Carbure - Code de Sécurité"
         device_validity = self.device_validity_in_local_timezone(device)
