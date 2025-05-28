@@ -19,16 +19,17 @@ class RequestOTPTest(TestCase):
         )
         self.request_otp_url = reverse("auth-request-otp")
 
-    def test_request_otp_creates_email_device_and_sends_token(self):
+    def test_creates_email_device(self):
         self.client.force_authenticate(user=self.user)
         assert not EmailDevice.objects.filter(user=self.user).exists()
 
-        response = self.client.get(self.request_otp_url)
-
-        assert response.status_code == status.HTTP_200_OK
-
+        self.client.get(self.request_otp_url)
         assert EmailDevice.objects.filter(user=self.user).exists()
 
+    def test_responds_with_token_validity(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.request_otp_url)
+        assert response.status_code == status.HTTP_200_OK
         assert "valid_until" in response.data
         assert response.data["valid_until"] is not None
 
