@@ -48,15 +48,20 @@ export const ValidatePendingTeneurDialog = ({
 
   const loading = biofuel.loading || elec.loading
 
-  const biofuelResults = biofuel.result?.data.results ?? []
-  const elecResults = elec.result?.data?.results ?? []
+  const biofuelsRes = biofuel.result?.data.results ?? []
+  const elecRes = elec.result?.data?.results ?? []
 
-  const results = [...biofuelResults, ...elecResults]
+  const results = [...biofuelsRes, ...elecRes]
+
+  const pendingBiofuels = biofuelsRes.filter((r) => r.pending_teneur > 0).length
+  const pendingElec = elecRes.filter((r) => r.pending_teneur > 0).length
 
   const validateTeneur = async (entity_id: number) => {
-    if (tab === SectorTabs.BIOFUELS) {
+    if (pendingBiofuels > 0) {
       await validateTeneurBiofuel(entity_id)
-    } else if (tab === SectorTabs.ELEC) {
+    }
+
+    if (pendingElec > 0) {
       await validateTeneurElec(entity_id)
     }
   }
@@ -79,12 +84,8 @@ export const ValidatePendingTeneurDialog = ({
     },
   })
 
-  const hasPendingBiofuels = biofuelResults.some((r) => r.pending_teneur > 0)
-  const hasPendingElec = elecResults.some((r) => r.pending_teneur > 0)
-
-  const shouldDisable =
-    (tab === SectorTabs.BIOFUELS && !hasPendingBiofuels) ||
-    (tab === SectorTabs.ELEC && !hasPendingElec)
+  const biofuelPendingMark = pendingBiofuels > 0 ? ` (${pendingBiofuels})` : ""
+  const elecPendingMark = pendingElec > 0 ? ` (${pendingElec})` : ""
 
   return (
     <Dialog
@@ -92,7 +93,7 @@ export const ValidatePendingTeneurDialog = ({
       header={<Dialog.Title>{t("Valider ma teneur")}</Dialog.Title>}
       footer={
         <Button
-          disabled={shouldDisable}
+          disabled={pendingBiofuels === 0 && pendingElec === 0}
           onClick={() => mutation.execute(entity.id)}
           loading={mutation.loading}
         >
@@ -107,12 +108,12 @@ export const ValidatePendingTeneurDialog = ({
         tabs={compact([
           {
             key: SectorTabs.BIOFUELS,
-            label: t("Biocarburants"),
+            label: t("Biocarburants") + biofuelPendingMark,
             icon: BiofuelFill,
           },
           entity.has_elec && {
             key: SectorTabs.ELEC,
-            label: t("Électricité"),
+            label: t("Électricité") + elecPendingMark,
             icon: ElecFill,
           },
         ])}
@@ -126,14 +127,14 @@ export const ValidatePendingTeneurDialog = ({
             <Table
               loading={loading}
               columns={biofuelColumns}
-              rows={biofuelResults}
+              rows={biofuelsRes}
             />
           )}
           {tab === SectorTabs.ELEC && (
             <Table //
               loading={loading}
               columns={elecColumns}
-              rows={elecResults}
+              rows={elecRes}
             />
           )}
         </>
