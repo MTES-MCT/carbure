@@ -32,24 +32,29 @@ class AgreementDownloadLinkMixin(RetrieveModelMixin):
         entity_id = self.request.query_params.get("entity_id")
         entity = Entity.objects.get(id=entity_id)
 
-        application = DoubleCountingApplication.objects.get(id=id)
+        application = DoubleCountingApplication.objects.prefetch_related("production").get(id=id)
         links = []
         can_download = entity.entity_type in [Entity.ADMIN, Entity.PRODUCER] or entity.has_external_admin_right(
             ExternalAdminRights.DOUBLE_COUNTING
         )
 
         if can_download:
-            links = [
+            excel_link = application.download_link
+            dechets_link = application.industrial_wastes_file_link
+
+            links.append(
                 {
                     "name": "APPLICATION_EXCEL",
-                    "link": private_storage.url(application.download_link) if application.download_link else None,
-                },
-                {
-                    "name": "INDUSTRIAL_WASTES",
-                    "link": private_storage.url(application.industrial_wastes_file_link)
-                    if application.industrial_wastes_file_link
-                    else None,
-                },
-            ]
+                    "link": private_storage.url(excel_link) if excel_link else None,
+                }
+            )
+
+            if application.has_industrial_waste():
+                links.append(
+                    {
+                        "name": "INDUSTRIAL_WASTES",
+                        "link": private_storage.url(dechets_link) if dechets_link else None,
+                    }
+                )
 
         return Response(AgreementDownloadLinkSerializer(links, many=True).data)

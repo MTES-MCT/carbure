@@ -52,6 +52,9 @@ class DoubleCountingApplication(models.Model):
             "status": self.status,
         }
 
+    def has_industrial_waste(self):
+        return self.production.filter(feedstock__code="DECHETS_INDUSTRIELS").count() > 0
+
     class Meta:
         db_table = "double_counting_applications"
         ordering = ["certificate_id"]
