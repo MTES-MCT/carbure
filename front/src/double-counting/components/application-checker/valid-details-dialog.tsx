@@ -7,7 +7,6 @@ import FileApplicationInfo from "../files-checker/file-application-info"
 import { DoubleCountingFileInfo } from "../../types"
 import { SendApplicationAdminDialog } from "../../../double-counting/components/files-checker/send-application-dialog"
 import { SendApplicationProducerDialog } from "../send-application-dialog"
-import { DechetIndustrielAlert } from "./industrial-waste-alert"
 import ApplicationTabs from "../applications/application-tabs"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import useEntity from "common/hooks/entity"
@@ -71,6 +70,7 @@ export const ValidDetailsDialog = ({
           </Dialog.Title>
           <Dialog.Description>
             <FileApplicationInfo fileData={fileData} />
+            <DoubleCountPeriod startYear={fileData.start_year} />
           </Dialog.Description>
         </>
       }
@@ -84,14 +84,6 @@ export const ValidDetailsDialog = ({
         />
       }
     >
-      <DoubleCountPeriod startYear={fileData.start_year} />
-
-      {fileData.has_dechets_industriels && (
-        <DechetIndustrielAlert
-          variant={industrialWastesFile ? "info" : "alert"}
-        />
-      )}
-
       <ApplicationTabs
         sourcing={fileData.sourcing}
         production={fileData.production}
