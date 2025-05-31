@@ -49,7 +49,7 @@ class AgreementDownloadLinkMixin(RetrieveModelMixin):
                 }
             )
 
-            if application.has_industrial_waste():
+            if application.has_dechets_industriels():
                 links.append(
                     {
                         "name": "INDUSTRIAL_WASTES",

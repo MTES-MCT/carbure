@@ -233,6 +233,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
     producer = EntitySerializer(read_only=True)
     documents = DoubleCountingDocFileSerializer(many=True, read_only=True)
     download_link = serializers.SerializerMethodField()
+    has_dechets_industriels = serializers.SerializerMethodField()
 
     class Meta:
         model = DoubleCountingApplication
@@ -249,11 +250,16 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
             "production",
             "documents",
             "download_link",
+            "has_dechets_industriels",
         ]
 
     @extend_schema_field(str)
     def get_download_link(self, obj):
         return ""
+
+    @extend_schema_field(bool)
+    def get_has_dechets_industriels(self, obj):
+        return obj.has_dechets_industriels()
 
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):

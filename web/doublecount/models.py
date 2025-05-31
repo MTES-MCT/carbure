@@ -52,8 +52,8 @@ class DoubleCountingApplication(models.Model):
             "status": self.status,
         }
 
-    def has_industrial_waste(self):
-        return self.production.filter(feedstock__code="DECHETS_INDUSTRIELS").count() > 0
+    def has_dechets_industriels(self):
+        return self.production.filter(feedstock__code__in=["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]).exists()
 
     class Meta:
         db_table = "double_counting_applications"
