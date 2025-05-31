@@ -54,11 +54,6 @@ class UpdateIndustrialWastesFileActionMixin:
 
         industrial_wastes_file = serializer.validated_data.get("industrial_wastes_file")
 
-        print("-----")
-        print(serializer.validated_data)
-        print(industrial_wastes_file)
-        print("-----")
-
         s3_path_industrial_wastes_file = f"doublecounting/{application.id}_industrial_wastes_file.pdf"
 
         try:
