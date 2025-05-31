@@ -12,6 +12,8 @@ import { DoubleCountingStatus as DCStatus } from "double-counting/types"
 import * as api from "double-counting/api"
 import { formatDateYear } from "common/utils/formatters"
 import ApplicationTabs from "./applications/application-tabs"
+import { useIndustrialWastesFile } from "double-counting/double-counting.hooks"
+import { Button } from "common/components/button2"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -35,6 +37,13 @@ export const ApplicationDetailsDialog = () => {
     ? `${formatDateYear(application.period_start)}-${formatDateYear(application.period_end)}`
     : "N/A"
 
+  const {
+    isMissingWasteFile,
+    industrialWastesFile,
+    setIndustrialWastesFile,
+    mutation,
+  } = useIndustrialWastesFile(application)
+
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#double-counting" })
   }
@@ -56,6 +65,24 @@ export const ApplicationDetailsDialog = () => {
             </Dialog.Description>
           </>
         }
+        footer={
+          isMissingWasteFile ? (
+            <Button
+              disabled={!industrialWastesFile || mutation.loading}
+              onClick={() => {
+                if (application && industrialWastesFile) {
+                  mutation.execute(
+                    entity.id,
+                    application.id,
+                    industrialWastesFile
+                  )
+                }
+              }}
+            >
+              {t("Sauvegarder")}
+            </Button>
+          ) : undefined
+        }
       >
         <p>
           <Trans
@@ -69,6 +96,9 @@ export const ApplicationDetailsDialog = () => {
             sourcing={application.sourcing}
             production={application.production}
             application={application}
+            hasIndustrialWastes={isMissingWasteFile}
+            industrialWastesFile={industrialWastesFile}
+            setIndustrialWastesFile={setIndustrialWastesFile}
           />
         )}
 
