@@ -1,3 +1,4 @@
+from doublecount.views.applications.mixins.update_industrial_waste_file import UpdateIndustrialWastesFileActionMixin
 from .add_application import AddActionMixin
 from .approve_application import ApproveActionMixin
 from .check_file import CheckFileActionMixin
@@ -19,5 +20,6 @@ class ActionMixin(
     RejectActionMixin,
     UpdateQuotaActionMixin,
     FilterActionMixin,
+    UpdateIndustrialWastesFileActionMixin
 ):
     pass
