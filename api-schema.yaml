@@ -872,6 +872,50 @@ paths:
                     status: success
                   summary: Example of response.
           description: ""
+  /api/double-counting/applications/{id}/update-industrial-wastes-file/:
+    post:
+      operationId: double_counting_applications_update_industrial_wastes_file_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIndustrialWastesFileRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateIndustrialWastesFileRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateIndustrialWastesFileRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                ExampleOfResponse.:
+                  value:
+                    status: success
+                  summary: Example of response.
+          description: ""
   /api/double-counting/applications/add/:
     post:
       operationId: double_counting_applications_add_create
@@ -8483,11 +8527,15 @@ components:
         has_dechets_industriels:
           type: boolean
           readOnly: true
+        has_dechets_industriels_file:
+          type: boolean
+          readOnly: true
       required:
         - created_at
         - documents
         - download_link
         - has_dechets_industriels
+        - has_dechets_industriels_file
         - id
         - period_end
         - period_start
@@ -11957,6 +12005,12 @@ components:
         website:
           type: string
           format: uri
+    UpdateIndustrialWastesFileRequest:
+      type: object
+      properties:
+        industrial_wastes_file:
+          type: string
+          format: binary
     UpdateProductionSiteModelRequest:
       type: object
       properties:
