@@ -8480,10 +8480,14 @@ components:
         download_link:
           type: string
           readOnly: true
+        has_dechets_industriels:
+          type: boolean
+          readOnly: true
       required:
         - created_at
         - documents
         - download_link
+        - has_dechets_industriels
         - id
         - period_end
         - period_start

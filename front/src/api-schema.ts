@@ -2447,6 +2447,7 @@ export interface components {
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
       readonly download_link: string
+      readonly has_dechets_industriels: boolean
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
