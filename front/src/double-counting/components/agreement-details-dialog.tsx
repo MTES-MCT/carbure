@@ -16,6 +16,7 @@ import { ProductionTable } from "./production-table"
 import { QuotasTable } from "./quotas-table"
 import { SourcingFullTable } from "./sourcing-table"
 import { AgreementDetails, DoubleCountingStatus } from "../types"
+import { FilesTable } from "./files-table"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -129,6 +130,12 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
             icon: "ri-user-line",
             iconActive: "ri-user-fill",
           },
+          {
+            key: "files",
+            label: t("Fichiers"),
+            icon: "ri-file-line",
+            iconActive: "ri-file-fill",
+          },
         ])}
         focus={focus}
         onFocus={setFocus}
@@ -147,6 +154,8 @@ const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
           hasAgreement={true}
         />
       )}
+
+      {focus === "files" && <FilesTable application={agreement.application} />}
     </>
   )
 }
