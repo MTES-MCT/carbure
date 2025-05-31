@@ -1,5 +1,5 @@
 import { Step } from "common/components/stepper"
-import { FromDepotFormProps } from "./from-depot-form"
+import { FromDepotFormProps } from "./from-depot-form.types"
 import i18next from "i18next"
 
 export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {

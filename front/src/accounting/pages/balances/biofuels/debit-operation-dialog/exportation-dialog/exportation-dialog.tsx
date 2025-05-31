@@ -98,9 +98,7 @@ export const ExportationDialogContent = ({
           {currentStep?.key !== "recap" && (
             <Box>
               <Form form={form}>
-                {currentStep?.key === fromDepotStepKey && (
-                  <FromDepotForm balance={balance} />
-                )}
+                {currentStep?.key === fromDepotStepKey && <FromDepotForm />}
                 {currentStep?.key === exportationQuantityFormStepKey && (
                   <ExportationQuantityForm
                     balance={balance}

@@ -18,7 +18,6 @@ import { useNotify } from "common/components/notifications"
 import { Tabs } from "common/components/tabs2"
 import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
-import { BiofuelFill, ElecFill } from "common/components/icon"
 import { useState } from "react"
 import { Table } from "common/components/table2"
 
@@ -108,13 +107,13 @@ export const ValidatePendingTeneurDialog = ({
         tabs={compact([
           {
             key: SectorTabs.BIOFUELS,
-            label: t("Biocarburants") + biofuelPendingMark,
-            icon: BiofuelFill,
+            label: t("Biocarburants"),
+            icon: "fr-icon-gas-station-fill",
           },
           entity.has_elec && {
             key: SectorTabs.ELEC,
-            label: t("Électricité") + elecPendingMark,
-            icon: ElecFill,
+            label: t("Électricité"),
+            icon: "fr-icon-charging-pile-2-fill",
           },
         ])}
       />

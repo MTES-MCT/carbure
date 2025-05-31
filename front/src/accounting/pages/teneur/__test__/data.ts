@@ -13,6 +13,7 @@ export const cappedCategories: CategoryObjective[] = [
     teneur_declared_month: 50,
     quantity_available: 4723.8037557404,
     target_percent: 0.67,
+    penalty: 0,
   },
 ]
 
@@ -24,6 +25,7 @@ export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
     teneur_declared_month: 0,
     quantity_available: 357637.20670999994,
     target_percent: null,
+    penalty: 0,
   },
   {
     code: CategoryEnum.ANN_IX_B,
@@ -32,6 +34,7 @@ export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
     teneur_declared_month: 0,
     quantity_available: 135531.468,
     target_percent: null,
+    penalty: 0,
   },
 ]
 
@@ -43,6 +46,7 @@ export const objectivizedCategories: CategoryObjective[] = [
     teneur_declared_month: 0,
     quantity_available: 541168.905,
     target_percent: 0.67,
+    penalty: 0,
   },
 ]
 
@@ -52,4 +56,5 @@ export const overallObjective: MainObjective = {
   teneur_declared_month: 45.7,
   quantity_available: 141631.71604577947,
   target_percent: 0.67,
+  penalty: 0,
 }
