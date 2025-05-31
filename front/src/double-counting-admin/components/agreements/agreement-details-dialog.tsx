@@ -24,6 +24,7 @@ import { ROUTE_URLS } from "common/utils/routes"
 import { ProductionSiteDetails } from "common/types"
 import GenerateDecisionDialog from "../generate-decision-dialog/generate-decision-dialog"
 import { ProductionSiteRecap } from "double-counting/components/applications/application-tabs/production-site-recap"
+import { Notice } from "common/components/notice"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -91,6 +92,17 @@ export const AgreementDetailsDialog = () => {
                 }}
                 defaults="Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>"
               />
+              {application?.has_dechets_industriels &&
+                !application.has_dechets_industriels_file && (
+                  <Notice
+                    variant="info"
+                    icon="ri-error-warning-line"
+                    title={t("Spécificité Déchets industriels")}
+                    style={{ marginTop: "var(--spacing-m)" }}
+                  >
+                    {t("Fichier en attente")}
+                  </Notice>
+                )}
             </Dialog.Description>
           </>
         }

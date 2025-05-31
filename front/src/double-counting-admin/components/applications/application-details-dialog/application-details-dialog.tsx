@@ -17,6 +17,7 @@ import ApplicationStatus from "../../../../double-counting/components/applicatio
 import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
 import GenerateDecisionDialog from "double-counting-admin/components/generate-decision-dialog/generate-decision-dialog"
 import ApplicationTabs from "double-counting/components/applications/application-tabs"
+import { Notice } from "common/components/notice"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -170,6 +171,18 @@ export const ApplicationDetailsDialog = () => {
             </Dialog.Title>
             <Dialog.Description>
               <ApplicationInfo application={application} />
+
+              {application?.has_dechets_industriels &&
+                !application.has_dechets_industriels_file && (
+                  <Notice
+                    variant="info"
+                    icon="ri-error-warning-line"
+                    title={t("Spécificité Déchets industriels")}
+                    style={{ marginTop: "var(--spacing-m)" }}
+                  >
+                    {t("Fichier en attente")}
+                  </Notice>
+                )}
             </Dialog.Description>
           </>
         }
