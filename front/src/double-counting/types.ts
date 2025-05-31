@@ -30,6 +30,8 @@ export interface DoubleCountingSourcingAggregation {
   feedstock: Feedstock
 }
 
+export type DoubleCountingApplication = apiTypes["DoubleCountingApplication"]
+
 export type DoubleCountingSourcing = apiTypes["DoubleCountingSourcing"]
 
 export type DoubleCountingProduction = apiTypes["DoubleCountingProduction"]

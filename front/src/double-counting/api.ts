@@ -73,3 +73,22 @@ export function getDoubleCountingAgreementDownloadLink(
     },
   })
 }
+
+export function updateDoubleCountingApplicationIndustrialWastesFile(
+  entity_id: number,
+  dca_id: number,
+  industrial_wastes_file: File
+) {
+  return apiFetch.POST(
+    "/double-counting/applications/{id}/update-industrial-wastes-file/",
+    {
+      params: {
+        query: { entity_id },
+        path: { id: dca_id },
+      },
+      body: {
+        industrial_wastes_file,
+      },
+    }
+  )
+}
