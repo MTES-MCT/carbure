@@ -234,6 +234,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
     documents = DoubleCountingDocFileSerializer(many=True, read_only=True)
     download_link = serializers.SerializerMethodField()
     has_dechets_industriels = serializers.SerializerMethodField()
+    has_dechets_industriels_file = serializers.SerializerMethodField()
 
     class Meta:
         model = DoubleCountingApplication
@@ -251,6 +252,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
             "documents",
             "download_link",
             "has_dechets_industriels",
+            "has_dechets_industriels_file",
         ]
 
     @extend_schema_field(str)
@@ -260,6 +262,10 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
     @extend_schema_field(bool)
     def get_has_dechets_industriels(self, obj):
         return obj.has_dechets_industriels()
+
+    @extend_schema_field(bool)
+    def get_has_dechets_industriels_file(self, obj):
+        return bool(obj.industrial_wastes_file_link)
 
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
