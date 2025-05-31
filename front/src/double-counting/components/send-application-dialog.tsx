@@ -101,9 +101,8 @@ export const SendApplicationProducerDialog = ({
           loading={addApplication.loading}
           iconId="ri-send-plane-line"
           disabled={
-            addApplication.loading ||
-            !value.productionSite ||
-            Boolean(value.productionSite.dc_reference)
+            addApplication.loading || !value.productionSite
+            // || Boolean(value.productionSite.dc_reference)
           }
           onClick={() => saveApplication()}
         >
@@ -127,15 +126,15 @@ export const SendApplicationProducerDialog = ({
         getOptions={(query) => findProductionSites(query, entity.id)}
         normalize={norm.normalizeProductionSite}
         {...bind("productionSite")}
-        state={value.productionSite?.dc_reference ? "error" : "default"}
-        stateRelatedMessage={
-          value.productionSite?.dc_reference ? (
-            <>
-              {t("Le site contient déjà un numéro d'agrément en cours")} (
-              {value.productionSite.dc_reference})
-            </>
-          ) : undefined
-        }
+        // state={value.productionSite?.dc_reference ? "error" : "default"}
+        // stateRelatedMessage={
+        //   value.productionSite?.dc_reference ? (
+        //     <>
+        //       {t("Le site contient déjà un numéro d'agrément en cours")} (
+        //       {value.productionSite.dc_reference})
+        //     </>
+        //   ) : undefined
+        // }
       />
       {error && (
         <section ref={refToScroll}>

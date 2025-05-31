@@ -70,7 +70,6 @@ export const ValidDetailsDialog = ({
           </Dialog.Title>
           <Dialog.Description>
             <FileApplicationInfo fileData={fileData} />
-            <DoubleCountPeriod startYear={fileData.start_year} />
           </Dialog.Description>
         </>
       }
@@ -84,6 +83,7 @@ export const ValidDetailsDialog = ({
         />
       }
     >
+      <DoubleCountPeriod startYear={fileData.start_year} />
       <ApplicationTabs
         sourcing={fileData.sourcing}
         production={fileData.production}
