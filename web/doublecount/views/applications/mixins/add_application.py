@@ -131,7 +131,7 @@ class AddActionMixin:
         production_data, _ = load_dc_production_data(
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
-        print(production_data)
+
         has_dechets_industriels = check_has_dechets_industriels(
             DoubleCountingProductionSerializer(production_data, many=True).data
         )
