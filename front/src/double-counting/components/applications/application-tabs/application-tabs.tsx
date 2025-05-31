@@ -14,6 +14,7 @@ import { ProductionSiteRecap } from "./production-site-recap"
 import { FilesTable } from "../../files-table"
 import { Box } from "common/components/scaffold"
 import { AddIndustrialWastes } from "double-counting/components/add-industrial-wastes"
+import { DechetIndustrielAlert } from "double-counting/components/application-checker/industrial-waste-alert"
 
 interface ApplicationDetailsProps {
   production?: DoubleCountingProduction[]
@@ -78,6 +79,11 @@ const ApplicationTabs = ({
         onFocus={setFocus}
         sticky
       />
+
+      {hasIndustrialWastes && (
+        <DechetIndustrielAlert valid={industrialWastesFile !== undefined} />
+      )}
+
       {focus === "production_site" && productionSite && (
         <Box>
           <ProductionSiteRecap productionSite={productionSite} />
