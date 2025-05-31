@@ -25,10 +25,15 @@ export const FilesTable = ({ application }: FilesTableProps) => {
   )
   const files = result?.data ?? []
 
+  const names: Record<string, string> = {
+    APPLICATION_EXCEL: t("Dossier excel"),
+    INDUSTRIAL_WASTES: t("Déchets industriels"),
+  }
+
   const columns: Column<apiTypes["AgreementDownloadLink"]>[] = [
     {
       header: t("Nom"),
-      cell: (row) => row.name,
+      cell: (row) => names[row.name] ?? row.name,
     },
     {
       header: t("Action"),

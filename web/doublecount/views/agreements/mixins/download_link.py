@@ -41,11 +41,11 @@ class AgreementDownloadLinkMixin(RetrieveModelMixin):
         if can_download:
             links = [
                 {
-                    "name": "AGREEMENT",
+                    "name": "APPLICATION_EXCEL",
                     "link": private_storage.url(application.download_link) if application.download_link else None,
                 },
                 {
-                    "name": "INDUSTRIAL WASTATES",
+                    "name": "INDUSTRIAL_WASTES",
                     "link": private_storage.url(application.industrial_wastes_file_link)
                     if application.industrial_wastes_file_link
                     else None,
