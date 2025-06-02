@@ -16,7 +16,6 @@ import {
 } from "../../../double-counting/types"
 import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "../../../double-counting/components/application-status"
-import FilesCheckerUploadButton from "../files-checker/upload-button"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import {
   useCBQueryBuilder,
@@ -119,8 +118,6 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
               },
             ]}
           />
-
-          <FilesCheckerUploadButton />
         </ActionBar>
 
         <AgreementFilters
