@@ -107,12 +107,12 @@ export const ValidatePendingTeneurDialog = ({
         tabs={compact([
           {
             key: SectorTabs.BIOFUELS,
-            label: t("Biocarburants"),
+            label: t("Biocarburants") + biofuelPendingMark,
             icon: "fr-icon-gas-station-fill",
           },
           entity.has_elec && {
             key: SectorTabs.ELEC,
-            label: t("Électricité"),
+            label: t("Électricité") + elecPendingMark,
             icon: "fr-icon-charging-pile-2-fill",
           },
         ])}
