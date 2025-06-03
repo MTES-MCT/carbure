@@ -1,4 +1,3 @@
-import pytz
 from django.conf import settings
 from django.template import loader
 from django.utils import timezone
@@ -51,7 +50,7 @@ class RequestOTPAction:
         email_otp.save()
 
     def device_validity_in_local_timezone(self, device):
-        return device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
+        return timezone.localtime(device.valid_until)
 
     # static - not an endpoint
     def send_new_token(self, request):
