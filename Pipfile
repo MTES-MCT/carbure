@@ -47,6 +47,7 @@ scipy = "*"
 django-simple-history = "*"
 scikit-learn = "*"
 sqlalchemy = "*"
+djangorestframework-api-key = "3.*"
 
 [dev-packages]
 django-stubs = "*"
