@@ -1,6 +1,4 @@
-import pytz
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils import timezone
 from django_otp import user_has_device
@@ -11,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
 from core.helpers import send_mail
+from core.utils import CarbureEnv
 
 
 class RequestOTPAction:
@@ -33,33 +32,40 @@ class RequestOTPAction:
     )
     @action(detail=False, methods=["get"], url_path="request-otp")
     def request_otp(self, request):
-        # send token by email and display form
-        if not user_has_device(request.user):
-            email_otp = EmailDevice()
-            email_otp.user = request.user
-            email_otp.name = "email"
-            email_otp.confirmed = True
-            email_otp.email = request.user.email
-            email_otp.save()
-        self.send_new_token(request)
-        device = EmailDevice.objects.get(user=request.user)
-        dt = device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
-        return Response(data={"valid_until": dt.strftime("%m/%d/%Y, %H:%M")})
+        user = request.user
+        device = self.device_with_updated_validity(user)
+        self.send_new_token(request, device)
+        device_validity = self.device_validity_in_local_timezone(device)
+        return Response({"valid_until": device_validity.strftime("%m/%d/%Y, %H:%M")})
 
-    # static - not an endpoint
-    def send_new_token(self, request):
-        device = EmailDevice.objects.get(user=request.user)
-        current_site = get_current_site(request)
-        # if current token is expired, generate a new one
+    def create_device(self, user):
+        email_otp = EmailDevice()
+        email_otp.user = user
+        email_otp.name = "email"
+        email_otp.confirmed = True
+        email_otp.email = user.email
+        email_otp.save()
+
+    def device_validity_in_local_timezone(self, device):
+        return timezone.localtime(device.valid_until)
+
+    def device_with_updated_validity(self, user):
+        if not user_has_device(user):
+            self.create_device(user)
+
+        device = EmailDevice.objects.get(user=user)
         now = timezone.now()
         if now > device.valid_until:
             device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
+        return device
+
+    def send_new_token(self, request, device):
         email_subject = "Carbure - Code de Sécurité"
-        dt = device.valid_until.astimezone(pytz.timezone("Europe/Paris"))
-        expiry = "%s %s" % (dt.strftime("%H:%M"), dt.tzname())
+        device_validity = self.device_validity_in_local_timezone(device)
+        expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
         email_context = {
             "user": request.user,
-            "domain": current_site.domain,
+            "domain": CarbureEnv.get_base_url(),
             "token": device.token,
             "token_expiry": expiry,
         }

@@ -2,7 +2,7 @@ Bonjour {{ user.name }},
 
 Vous pouvez maintenant vous connecter à CarbuRe en cliquant sur ce lien :
 
-https://{{ domain }}/app/auth/otp?token={{ token }}
+{{ domain }}/app/auth/otp?token={{ token }}
 
 Si le lien ne fonctionne pas, veuillez entrer manuellement le code suivant dans CarbuRe :
 
