@@ -13,7 +13,6 @@ class BulkCreateMixin:
         detail=False,
         methods=["post"],
         url_path="bulk-create",
-        permission_classes=[],
     )
     def bulk_create(self, request, *args, **kwargs):
         serializer = ProvisionCertificateBulkSerializer(data=request.data, many=True)
@@ -26,7 +25,7 @@ class BulkCreateMixin:
                 try:
                     cpo = Entity.objects.get(registration_id=siren)
                 except Entity.DoesNotExist:
-                    errors.append({"siren": siren, "error": "Entity with siren not found"})
+                    errors.append({"siren": siren, "error": "Entity not found"})
                     continue
                 certs_to_create = []
                 for unit in item["operational_units"]:
