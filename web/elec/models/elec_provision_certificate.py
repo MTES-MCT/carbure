@@ -31,3 +31,4 @@ class ElecProvisionCertificate(models.Model):
     energy_amount = models.FloatField()  # unit = MWh
     remaining_energy_amount = models.FloatField()
     compensation = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
