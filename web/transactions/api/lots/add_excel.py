@@ -66,12 +66,14 @@ def add_excel(request, *args, **kwargs):
             e.lot_id = lot.id
             e.user = request.user
             e.metadata = {"source": "EXCEL"}
+            e.entity = entity
             e.save()
             if lot.parent_stock:
                 event = CarbureStockEvent()
                 event.event_type = CarbureStockEvent.SPLIT
                 event.stock = lot.parent_stock
                 event.user = request.user
+                event.entity = entity
                 event.metadata = {
                     "message": "Envoi lot.",
                     "volume_to_deduct": lot.volume,

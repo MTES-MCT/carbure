@@ -2,12 +2,17 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal, { usePortal } from "common/components/portal"
 import { Trans } from "react-i18next"
 import { RadioGroup } from "common/components/inputs2"
+import { LoaderOverlay } from "common/components/scaffold"
 import { useState } from "react"
 import styles from "./debit-operation-dialog.module.css"
 import { Button } from "common/components/button2"
 import { CessionDialog } from "./cession-dialog"
 import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
+import { TransfertDialog } from "./transfert-dialog"
+import { getObjectives } from "accounting/pages/teneur/api"
+import { useQuery } from "common/hooks/async"
+import useEntity from "common/hooks/entity"
 
 interface DebitOperationDialogProps {
   onClose: () => void
@@ -18,18 +23,57 @@ export const DebitOperationDialog = ({
   onClose,
   balance,
 }: DebitOperationDialogProps) => {
+  const entity = useEntity()
   const portal = usePortal()
   const [currentOperation, setCurrentOperation] = useState<
     | OperationType.CESSION
     | OperationType.DEVALUATION
     | OperationType.EXPORTATION
+    | OperationType.TRANSFERT
   >(OperationType.CESSION)
+
+  const { result, loading } = useQuery(getObjectives, {
+    key: "teneur-objectives",
+    params: [entity.id, 2025, false],
+  })
+
+  const objectivesData = result
+
+  if (loading) {
+    return <LoaderOverlay />
+  }
+
+  const displayTransfert = () => {
+    if (objectivesData) {
+      const category = balance.customs_category
+      const categoryObjective =
+        objectivesData?.objectivized_categories.find(
+          (cat) => cat.code === category
+        ) ||
+        objectivesData?.capped_categories.find((cat) => cat.code === category)
+
+      return (
+        categoryObjective &&
+        categoryObjective.target <= categoryObjective.teneur_declared
+      )
+    }
+    return false
+  }
 
   const handleNext = () => {
     switch (currentOperation) {
       case OperationType.CESSION:
         portal((close) => (
           <CessionDialog
+            onClose={close}
+            balance={balance}
+            onOperationCreated={onClose}
+          />
+        ))
+        break
+      case OperationType.TRANSFERT:
+        portal((close) => (
+          <TransfertDialog
             onClose={close}
             balance={balance}
             onOperationCreated={onClose}
@@ -67,6 +111,14 @@ export const DebitOperationDialog = ({
                 label: formatOperationType(OperationType.CESSION),
                 value: OperationType.CESSION,
               },
+              ...(displayTransfert()
+                ? [
+                    {
+                      label: formatOperationType(OperationType.TRANSFERT),
+                      value: OperationType.TRANSFERT,
+                    },
+                  ]
+                : []),
               // {
               //   label: formatOperationType(OperationType.DEVALUATION),
               //   hintText: "Additional information",
@@ -77,7 +129,16 @@ export const DebitOperationDialog = ({
               //   value: OperationType.EXPORTATION,
               // },
             ]}
-            onChange={setCurrentOperation}
+            onChange={(value) => {
+              if (
+                value === OperationType.CESSION ||
+                value === OperationType.DEVALUATION ||
+                value === OperationType.EXPORTATION ||
+                value === OperationType.TRANSFERT
+              ) {
+                setCurrentOperation(value)
+              }
+            }}
             value={currentOperation}
             className={styles["debit-operation-dialog__radios"]}
           />

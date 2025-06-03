@@ -3,18 +3,22 @@ import { lazy, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 const BalancesBiofuels = lazy(() => import("./biofuels"))
+const BalancesElec = lazy(() => import("./elec"))
 
 const Balances = () => {
-  const { status } = useParams()
+  const { category } = useParams()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status !== SectorTabs.BIOFUELS) {
-      navigate(`${SectorTabs.BIOFUELS}`)
-    }
-  }, [status, navigate])
+    if (!category) navigate(`${SectorTabs.BIOFUELS}`)
+  }, [category, navigate])
 
-  return <>{status === "biofuels" && <BalancesBiofuels />}</>
+  return (
+    <>
+      {category === "biofuels" && <BalancesBiofuels />}
+      {category === "elec" && <BalancesElec />}
+    </>
+  )
 }
 
 export default Balances

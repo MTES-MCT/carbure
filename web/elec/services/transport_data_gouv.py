@@ -56,7 +56,6 @@ class TransportDataGouv:
         "measure_date",
         "measure_energy",
         "measure_reference_point_id",
-        "charge_point_id",
         "current_type",
         "is_article_2",
         "station_name",
@@ -72,6 +71,10 @@ class TransportDataGouv:
 
     @staticmethod
     def merge_charge_point_data(charge_point_data: pd.DataFrame, chunksize=1000):
+        transport_data = TransportDataGouv.get_transport_data(charge_point_data, chunksize)
+        return TransportDataGouv.enrich_charge_point_data(charge_point_data, transport_data)
+
+    def get_transport_data(charge_point_data: pd.DataFrame, chunksize=1000) -> pd.DataFrame:
         file_path = TransportDataGouv.download_csv()
 
         # list the different charge point ids from the application
@@ -84,10 +87,12 @@ class TransportDataGouv:
             wanted_stations.update(wanted_chunk["id_station_itinerance"].unique())
 
         # find all the charge points for all these stations
-        transport_data = pd.DataFrame(columns=TransportDataGouv.CSV_COLUMNS)
+        chunk_dfs = []
         for chunk in TransportDataGouv.read_transport_data_chunks(file_path, chunksize):
             station_charge_points = chunk[chunk["id_station_itinerance"].isin(wanted_stations)]
-            transport_data = pd.concat([transport_data, station_charge_points], ignore_index=True)
+            chunk_dfs.append(station_charge_points)
+
+        transport_data = pd.concat(chunk_dfs, ignore_index=True)
 
         # instead of droping duplicate rows, merge their values so we get as much data as possible
         transport_data = (
@@ -104,7 +109,7 @@ class TransportDataGouv:
         # mark the charge points as coming from TDG
         transport_data["is_in_tdg"] = True
 
-        return TransportDataGouv.enrich_charge_point_data(charge_point_data, transport_data)
+        return transport_data
 
     @staticmethod
     def download_csv():
@@ -235,7 +240,7 @@ class TransportDataGouv:
             ~merged_data["whole_station_has_readings"] & merged_data["guessed_is_article_2"]
         )
 
-        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", pd.NA)
+        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", pd.NA).astype("boolean")
         merged_data["is_article_2"] = merged_data["is_article_2"].fillna(merged_data["guessed_is_article_2"])
         merged_data["is_article_2"] = is_true(merged_data, "is_article_2")
 

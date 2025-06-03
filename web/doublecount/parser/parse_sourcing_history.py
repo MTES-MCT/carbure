@@ -14,6 +14,13 @@ def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[Sourci
 
     current_year = 2100
 
+    # Collect all certificate IDs from the sheet
+    certificate_ids = [row[7].value for row in sourcing_sheet.iter_rows() if row[7].value]
+
+    # Preload all certificates in one query
+    certificates = GenericCertificate.objects.filter(certificate_id__in=certificate_ids)
+    certificates_dict = {cert.certificate_id: cert for cert in certificates}
+
     for line, row in enumerate(sourcing_sheet.iter_rows()):
         current_year = extract_year(row[1].value, current_year)
         if current_year > start_year:
@@ -26,19 +33,19 @@ def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[Sourci
         raw_material_supplier = row[6].value
         supplier_certificate_id = row[7].value
 
-        # If not feedstock_name or feedstock_name == origin_country_cell:
         if not feedstock_name or feedstock_name == origin_country_cell:
             continue
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
-        # skip row if no feedstock is recognized
         if not feedstock:
             continue
 
         origin_country = extract_country_code(origin_country_cell)
         supply_country = extract_country_code(supply_country_cell)
         transit_country = extract_country_code(transit_country_cell)
-        supplier_certificate = GenericCertificate.objects.filter(certificate_id=supplier_certificate_id).first()
+
+        # Get the supplier certificate from the preloaded dictionary
+        supplier_certificate = certificates_dict.get(supplier_certificate_id)
 
         sourcing: SourcingHistoryRow = {
             "line": line + 1,

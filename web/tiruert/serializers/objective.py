@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import MatierePremiere
+from core.models import Entity, MatierePremiere
 from tiruert.models.operation import Operation
 
 
@@ -48,3 +48,14 @@ class ObjectiveOutputSerializer(serializers.Serializer):
     main = MainObjectiveSerializer()
     sectors = serializers.ListField(child=ObjectiveSectorSerializer())
     categories = serializers.ListField(child=ObjectiveCategorySerializer())
+
+
+class ObjectiveInputSerializer(serializers.Serializer):
+    entity_id = serializers.IntegerField(required=True)
+    year = serializers.IntegerField(required=True)
+    date_from = serializers.DateField(required=True)
+    date_to = serializers.DateField(required=False)
+
+
+class ObjectiveAdminInputSerializer(ObjectiveInputSerializer):
+    selected_entity_id = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all(), required=True)

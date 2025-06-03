@@ -1,10 +1,10 @@
 import { OperationText } from "accounting/components/operation-text"
 import {
-  RecipientToDepotForm,
-  RecipientToDepotFormProps,
-  RecipientToDepotSummary,
-  showNextStepRecipientToDepotForm,
-} from "accounting/components/recipient-to-depot-form"
+  RecipientForm,
+  RecipientFormProps,
+  RecipientSummary,
+  showNextStepRecipientForm,
+} from "accounting/components/recipient-form"
 import { findCountries } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
@@ -14,7 +14,7 @@ import { normalizeCountry } from "common/utils/normalizers"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 
-export type CountryFormProps = RecipientToDepotFormProps & {
+export type CountryFormProps = RecipientFormProps & {
   country?: Country
 }
 
@@ -34,7 +34,7 @@ export const CountryForm = () => {
         getOptions={findCountries}
         normalize={normalizeCountry}
       />
-      <RecipientToDepotForm />
+      <RecipientForm />
     </>
   )
 }
@@ -48,7 +48,7 @@ export const CountryFormSummary = ({
 
   return (
     <>
-      <RecipientToDepotSummary values={values} />
+      <RecipientSummary values={values} />
       <OperationText title={t("Pays")} description={values.country?.name} />
       <OperationText
         title={t("Etat membre")}
@@ -59,14 +59,14 @@ export const CountryFormSummary = ({
 }
 
 const showNextStepCountryForm = (values: CountryFormProps) => {
-  return showNextStepRecipientToDepotForm(values) && Boolean(values.country)
+  return showNextStepRecipientForm(values) && Boolean(values.country)
 }
 
 export const countryFormStepKey = "country-form"
 type CountryFormStepKey = typeof countryFormStepKey
 
 export const countryFormStep: (
-  values: RecipientToDepotFormProps
+  values: CountryFormProps
 ) => Step<CountryFormStepKey> = (values) => ({
   key: countryFormStepKey,
   title: i18next.t("Pays, client et dépôt destinataire"),

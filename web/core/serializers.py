@@ -144,6 +144,7 @@ class GenericErrorAdminSerializer(serializers.ModelSerializer):
 
 class CarbureLotEventSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    entity = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         visible_users = self.context.get("visible_users")
@@ -154,23 +155,35 @@ class CarbureLotEventSerializer(serializers.ModelSerializer):
         else:
             return obj.user.email
 
+    def get_entity(self, obj):
+        return obj.entity.name if obj.entity else None
+
     class Meta:
         model = CarbureLotEvent
-        fields = ["user", "event_type", "event_dt", "metadata"]
+        fields = ["user", "event_type", "event_dt", "metadata", "entity"]
 
 
 class CarbureLotAdminEventSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(read_only=True, slug_field="email")
+    entity = serializers.SerializerMethodField()
+
+    def get_entity(self, obj):
+        return obj.entity.name if obj.entity else None
 
     class Meta:
         model = CarbureLotEvent
-        fields = ["user", "event_type", "event_dt", "metadata"]
+        fields = ["user", "event_type", "event_dt", "metadata", "entity"]
 
 
 class CarbureStockEventSerializer(serializers.ModelSerializer):
+    entity = serializers.SerializerMethodField()
+
+    def get_entity(self, obj):
+        return obj.entity.name if obj.entity else None
+
     class Meta:
         model = CarbureLotEvent
-        fields = ["user", "event_type", "event_dt", "metadata"]
+        fields = ["user", "event_type", "event_dt", "metadata", "entity"]
 
 
 class CarbureLotCommentSerializer(serializers.ModelSerializer):

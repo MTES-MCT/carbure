@@ -61,6 +61,7 @@ def reject_lot(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.REJECTED
         event.lot = lot
         event.user = request.user
+        event.entity = entity
         event.save()
     notify_lots_rejected(lots)
     return JsonResponse({"status": "success"})

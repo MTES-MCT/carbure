@@ -64,6 +64,7 @@ def accept_processing(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = lot
         event.user = request.user
+        event.entity = entity
         event.save()
 
         # create child lot
@@ -88,6 +89,7 @@ def accept_processing(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.CREATED
         event.lot = child_lot
         event.user = request.user
+        event.entity = entity
         event.save()
 
     updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + processed_lot_ids)

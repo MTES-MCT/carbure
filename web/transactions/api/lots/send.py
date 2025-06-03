@@ -57,6 +57,7 @@ def lots_send(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.VALIDATED
         event.lot = lot
         event.user = request.user
+        event.entity = entity
         event.save()
 
         lot.lot_status = CarbureLot.PENDING
@@ -76,6 +77,7 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
+            event.entity = entity
             event.save()
             # SECOND TRANSACTION
             lot.pk = None
@@ -96,6 +98,7 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
+            event.entity = entity
             event.save()
         elif lot.carbure_client_id is None:
             # RFC or EXPORT
@@ -106,6 +109,7 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
+            event.entity = entity
             event.save()
         elif lot.carbure_client == entity and lot.delivery_type not in (
             CarbureLot.UNKNOWN,
@@ -117,6 +121,7 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
+            event.entity = entity
             event.save()
             if lot.delivery_type == CarbureLot.STOCK:
                 stock = CarbureStock()

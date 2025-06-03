@@ -59,6 +59,7 @@ def lots_delete(request, entity):
                 event_type=CarbureLotEvent.DELETED,
                 lot=node.data,
                 user=request.user,
+                entity=entity,
             )
         )
 

@@ -105,6 +105,7 @@ def update_lot(request, *args, **kwargs):
                 lot=lot_node.data,
                 user=request.user,
                 metadata=diff_to_metadata(lot_node.diff),
+                entity=entity,
             )
 
     return SuccessResponse()

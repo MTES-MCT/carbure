@@ -1,3 +1,5 @@
+from copy import copy
+
 from django.db import models, transaction
 
 from core.models import CarbureLot, MatierePremiere, Pays
@@ -159,6 +161,9 @@ def create_tiruert_operations_from_lots(lots):
     if not valid_lots:
         return []
 
+    valid_lots = list(valid_lots)
+    valid_lots = ep2_processing(valid_lots)
+
     # Group validated_lots by delivery_type, feedstock, biofuel and depot
     lots_by_delivery_type = {}
     for lot in valid_lots:
@@ -209,5 +214,31 @@ def keep_valid_lots(lots):
 
 
 def remove_existing_lots(lots):
+    # Remove lots that already have an operation to avoid duplicates
     existing_lots = OperationDetail.objects.filter(lot__in=lots).values_list("lot_id").distinct()
     return lots.exclude(id__in=existing_lots)
+
+
+def ep2_processing(lots):
+    # We split the EP2 lots into two new lots (but we don't save them in the database)
+    # 40% of the volume will be converted to CONV and 60% will be EP2AM
+    result_lots = []
+
+    for lot in lots:
+        if lot.feedstock.code == "EP2":
+            new_lot_conv = copy(lot)
+            new_lot_conv.feedstock = copy(lot.feedstock)
+            new_lot_conv.feedstock.category = MatierePremiere.CONV
+            new_lot_conv.volume = lot.volume * 0.4
+
+            new_lot_ep2 = copy(lot)
+            new_lot_ep2.feedstock = copy(lot.feedstock)
+            new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
+            new_lot_ep2.volume = lot.volume * 0.6
+
+            result_lots.append(new_lot_conv)
+            result_lots.append(new_lot_ep2)
+        else:
+            result_lots.append(lot)
+
+    return result_lots

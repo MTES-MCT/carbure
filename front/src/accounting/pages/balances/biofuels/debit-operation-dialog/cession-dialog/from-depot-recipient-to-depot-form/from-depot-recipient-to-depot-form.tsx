@@ -1,31 +1,19 @@
 import {
-  FromDepotForm,
   FromDepotFormProps,
   FromDepotSummary,
   showNextStepFromDepotForm,
 } from "accounting/components/from-depot-form"
 import {
-  RecipientToDepotForm,
-  RecipientToDepotFormProps,
-  RecipientToDepotSummary,
-  showNextStepRecipientToDepotForm,
-} from "accounting/components/recipient-to-depot-form"
-import { Balance } from "accounting/types"
+  RecipientFormProps,
+  RecipientSummary,
+  showNextStepRecipientForm,
+} from "accounting/components/recipient-form"
+import {
+  ToDepotFormProps,
+  ToDepotSummary,
+} from "accounting/components/to-depot-form"
 import { Step } from "common/components/stepper"
 import i18next from "i18next"
-
-export const FromDepotRecipientToDepotForm = ({
-  balance,
-}: {
-  balance: Balance
-}) => {
-  return (
-    <>
-      <RecipientToDepotForm />
-      <FromDepotForm balance={balance} />
-    </>
-  )
-}
 
 export const FromDepotRecipientToDepotSummary = ({
   values,
@@ -33,12 +21,14 @@ export const FromDepotRecipientToDepotSummary = ({
   values: FromDepotRecipientToDepotFormProps
 }) => (
   <>
-    <RecipientToDepotSummary values={values} />
+    <RecipientSummary values={values} />
+    <ToDepotSummary values={values} />
     <FromDepotSummary values={values} />
   </>
 )
 
-export type FromDepotRecipientToDepotFormProps = RecipientToDepotFormProps &
+export type FromDepotRecipientToDepotFormProps = RecipientFormProps &
+  ToDepotFormProps &
   FromDepotFormProps
 
 export const fromDepotRecipientToDepotStepKey = "from-depot-recipient-to-depot"
@@ -54,5 +44,4 @@ export const fromDepotRecipientToDepotStep: (
 
 export const showNextStepFromDepotRecipientToDepotForm = (
   values: FromDepotRecipientToDepotFormProps
-) =>
-  showNextStepRecipientToDepotForm(values) && showNextStepFromDepotForm(values)
+) => showNextStepRecipientForm(values) && showNextStepFromDepotForm(values)
