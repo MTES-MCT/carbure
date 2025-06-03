@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_email",
     "django_admin_listfilter_dropdown",
     "rest_framework",
+    "rest_framework_api_key",
     "django_filters",
     "drf_spectacular",
     "authtools",
