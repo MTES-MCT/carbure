@@ -34,6 +34,7 @@ COPY Pipfile Pipfile.lock /app/
 RUN pipenv install --dev --deploy
 
 # Copy the rest of your application code
+COPY pyproject.toml pyproject.toml
 COPY web web
 COPY scripts scripts
 COPY bin bin
