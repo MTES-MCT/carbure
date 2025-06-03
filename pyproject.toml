@@ -1,6 +1,6 @@
 [tool.ruff]
 src = ["web"]
-exclude = ["__init__.py", "scripts"]
+exclude = ["__init__.py", "scripts", ".venv"]
 line-length = 125
 
 [tool.ruff.lint]
