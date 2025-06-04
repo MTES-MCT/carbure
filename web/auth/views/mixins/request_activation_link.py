@@ -33,23 +33,7 @@ class UserResendActivationLinkAction:
             usermodel = get_user_model()
             email = self.email_from(request.data)
             user = usermodel.objects.get(email__iexact=email)
-            email_subject = "Carbure - Activation de compte"
-            email_context = {
-                "user": user,
-                "domain": CarbureEnv.get_base_url(),
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "token": account_activation_token.make_token(user),
-            }
-            html_message = loader.render_to_string("emails/account_activation_email.html", email_context)
-            text_message = loader.render_to_string("emails/account_activation_email.txt", email_context)
-            send_mail(
-                request=request,
-                subject=email_subject,
-                message=text_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                html_message=html_message,
-                recipient_list=[user.email],
-            )
+            self.send_notification_mail(user, request)
             return Response({"status": "success"})
         except Exception:
             return Response(
@@ -61,3 +45,22 @@ class UserResendActivationLinkAction:
         serializer = UserResendActivationLinkSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data.get("email", "")
+
+    def send_notification_mail(self, user, request):
+        email_subject = "Carbure - Activation de compte"
+        email_context = {
+            "user": user,
+            "domain": CarbureEnv.get_base_url(),
+            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+            "token": account_activation_token.make_token(user),
+        }
+        html_message = loader.render_to_string("emails/account_activation_email.html", email_context)
+        text_message = loader.render_to_string("emails/account_activation_email.txt", email_context)
+        send_mail(
+            request=request,
+            subject=email_subject,
+            message=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            html_message=html_message,
+            recipient_list=[user.email],
+        )
