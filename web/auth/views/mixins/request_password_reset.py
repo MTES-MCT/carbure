@@ -31,17 +31,17 @@ class RequestPasswordResetAction:
     )
     @action(detail=False, methods=["post"], url_path="request-password-reset")
     def request_password_reset(self, request):
-        email = self.retrieve_email(request.data)
-        user = get_user_model().objects.filter(email=email).first()
-        if not user:
+        try:
+            email = self.retrieve_email(request.data)
+            user = get_user_model().objects.get(email=email)
+            self.send_notification_mail(user, request)
+            return Response({"status": "success"})
+
+        except Exception:
             return Response(
                 {"message": CarbureError.PASSWORD_RESET_USER_NOT_FOUND},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        self.send_notification_mail(user, request)
-
-        return Response({"status": "success"})
 
     def retrieve_email(self, data):
         serializer = RequestPasswordResetSerializer(data=data)
