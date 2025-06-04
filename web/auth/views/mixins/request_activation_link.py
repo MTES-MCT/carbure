@@ -29,9 +29,9 @@ class UserResendActivationLinkAction:
     )
     @action(detail=False, methods=["post"], url_path="request-activation-link")
     def request_activation_link(self, request):
-        email = self.email_from(request.data)
-        usermodel = get_user_model()
         try:
+            usermodel = get_user_model()
+            email = self.email_from(request.data)
             user = usermodel.objects.get(email__iexact=email)
             email_subject = "Carbure - Activation de compte"
             email_context = {
