@@ -23,7 +23,7 @@ class RequestActivationLinkTest(TestCase):
             is_active=False,
         )
 
-    def test_request_activation_link_success(self):
+    def test_responds_with_success_status(self):
         response = self.client.post(self.request_activation_link_url, {"email": "testuser@example.com"})
 
         assert response.status_code == status.HTTP_200_OK
