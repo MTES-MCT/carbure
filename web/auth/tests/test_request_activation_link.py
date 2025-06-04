@@ -25,7 +25,6 @@ class RequestActivationLinkTest(TestCase):
 
     def test_responds_with_success_status(self):
         response = self.client.post(self.request_activation_link_url, {"email": "testuser@example.com"})
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
 
@@ -58,8 +57,8 @@ class RequestActivationLinkTest(TestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    def test_request_activation_link_invalid_email(self):
-        data = {"email": "invalid@example.com"}
+    def test_responds_with_http_400_error_on_request_with_unknown_email(self):
+        data = {"email": "unknown@example.com"}
         response = self.client.post(self.request_activation_link_url, data)
         data = response.json()
 
