@@ -62,4 +62,4 @@ class RequestActivationLinkTest(TestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         data = response.json()
-        assert "email" in data
+        assert data == {"status": "error", "message": "Could not send activation link"}

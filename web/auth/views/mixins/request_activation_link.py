@@ -34,7 +34,7 @@ class UserResendActivationLinkAction:
         email = serializer.validated_data.get("email", "")
         usermodel = get_user_model()
         try:
-            user = usermodel.objects.get(email=email)
+            user = usermodel.objects.get(email__iexact=email)
             email_subject = "Carbure - Activation de compte"
             email_context = {
                 "user": user,
