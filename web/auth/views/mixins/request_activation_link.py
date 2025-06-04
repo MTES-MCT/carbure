@@ -29,9 +29,7 @@ class UserResendActivationLinkAction:
     )
     @action(detail=False, methods=["post"], url_path="request-activation-link")
     def request_activation_link(self, request):
-        serializer = UserResendActivationLinkSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data.get("email", "")
+        email = self.email_from(request.data)
         usermodel = get_user_model()
         try:
             user = usermodel.objects.get(email__iexact=email)
@@ -58,3 +56,8 @@ class UserResendActivationLinkAction:
                 {"status": "error", "message": CarbureError.ACTIVATION_LINK_ERROR},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+    def email_from(self, data):
+        serializer = UserResendActivationLinkSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data.get("email", "")
