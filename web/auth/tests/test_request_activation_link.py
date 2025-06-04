@@ -15,13 +15,13 @@ User = get_user_model()
 class RequestActivationLinkTest(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.request_activation_link_url = reverse("auth-request-activation-link")
         self.user = User.objects.create_user(
             name="testuser",
             email="testuser@example.com",
             password="testpassword123",
             is_active=False,
         )
-        self.request_activation_link_url = reverse("auth-request-activation-link")
 
     def test_request_activation_link_success(self):
         response = self.client.post(self.request_activation_link_url, {"email": "testuser@example.com"})
