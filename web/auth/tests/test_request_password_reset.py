@@ -59,8 +59,8 @@ class RequestPasswordResetTests(TestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    def test_request_password_reset_user_not_found(self):
-        data = {"username": "nonexistent@example.com"}
+    def test_responds_with_http_400_error_when_user_unknown(self):
+        data = {"username": "unknown@example.com"}
         response = self.client.post(self.request_password_reset_url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
