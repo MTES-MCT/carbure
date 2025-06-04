@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -13,6 +12,7 @@ from auth.serializers import UserResendActivationLinkSerializer
 from auth.tokens import account_activation_token
 from core.carburetypes import CarbureError
 from core.helpers import send_mail
+from core.utils import CarbureEnv
 
 
 class UserResendActivationLinkAction:
@@ -35,11 +35,10 @@ class UserResendActivationLinkAction:
         usermodel = get_user_model()
         try:
             user = usermodel.objects.get(email=email)
-            current_site = get_current_site(request)
             email_subject = "Carbure - Activation de compte"
             email_context = {
                 "user": user,
-                "domain": current_site.domain,
+                "domain": CarbureEnv.get_base_url(),
                 "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                 "token": account_activation_token.make_token(user),
             }
