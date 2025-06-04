@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -12,6 +11,7 @@ from rest_framework.response import Response
 
 from core.carburetypes import CarbureError
 from core.helpers import send_mail
+from core.utils import CarbureEnv
 
 
 class RequestPasswordResetSerializer(serializers.Serializer):
@@ -43,12 +43,11 @@ class RequestPasswordResetAction:
             )
 
         prtg = PasswordResetTokenGenerator()
-        current_site = get_current_site(request)
         # send email
         email_subject = "Carbure - Réinitialisation du mot de passe"
         email_context = {
             "user": user,
-            "domain": current_site.domain,
+            "domain": CarbureEnv.get_base_url(),
             "uid": urlsafe_base64_encode(force_bytes(user.pk)),
             "token": prtg.make_token(user),
         }
