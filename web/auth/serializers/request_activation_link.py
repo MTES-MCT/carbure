@@ -10,5 +10,4 @@ class UserResendActivationLinkSerializer(serializers.Serializer):
     email = serializers.EmailField(label=_("Email"))
 
     def validate_email(self, value):
-        user_email = value.lower()
-        return user_email
+        return value.lower()
