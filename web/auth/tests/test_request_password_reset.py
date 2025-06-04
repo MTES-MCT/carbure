@@ -1,5 +1,4 @@
 import re
-from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -24,29 +23,18 @@ class RequestPasswordResetTests(TestCase):
         )
         self.request_password_reset_url = reverse("auth-request-password-reset")
 
-    @patch("auth.views.mixins.request_password_reset.send_mail")
-    def test_request_password_reset_success(self, mock_send_mail):
-        mock_send_mail.return_value = 1
-
+    def test_responds_with_success_status_when_user_known(self):
         data = {"username": self.user.email}
         response = self.client.post(self.request_password_reset_url, data)
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
 
-        assert mock_send_mail.called
-        assert mock_send_mail.call_count == 1
-
-        email_context = mock_send_mail.call_args[1]
-        assert "uid" in email_context["html_message"]
-        assert "token" in email_context["html_message"]
-        assert self.user.email in email_context["recipient_list"]
-
-    def test_sends_email(self):
+    def test_sends_email_to_user(self):
         assert len(mail.outbox) == 0
 
         self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
         assert len(mail.outbox) == 1
+        assert "testuser@example.com" in mail.outbox[0].recipients()
 
     def test_injects_server_base_url_in_sent_mail(self):
         self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
