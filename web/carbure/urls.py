@@ -22,6 +22,10 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 from carbure.api.redirect_app import redirect_app
 
@@ -43,6 +47,8 @@ urlpatterns = [
     ),
     path("api/", include("carbure.api")),
     path("core/", include("core.urls")),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
 if settings.DEBUG:

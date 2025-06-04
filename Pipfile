@@ -48,6 +48,7 @@ django-simple-history = "*"
 scikit-learn = "*"
 sqlalchemy = "*"
 djangorestframework-api-key = "3.*"
+djangorestframework-simplejwt = "5.*"
 
 [dev-packages]
 django-stubs = "*"
