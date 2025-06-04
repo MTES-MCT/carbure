@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "django_admin_listfilter_dropdown",
     "rest_framework",
     "rest_framework_api_key",
+    "rest_framework_simplejwt",
     "django_filters",
     "drf_spectacular",
     "authtools",
@@ -405,3 +406,5 @@ SPECTACULAR_SETTINGS = {
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
     # OTHER SETTINGS
 }
+
+API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
