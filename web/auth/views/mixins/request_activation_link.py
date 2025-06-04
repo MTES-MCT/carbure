@@ -30,9 +30,7 @@ class UserResendActivationLinkAction:
     @action(detail=False, methods=["post"], url_path="request-activation-link")
     def request_activation_link(self, request):
         try:
-            usermodel = get_user_model()
-            email = self.email_from(request.data)
-            user = usermodel.objects.get(email__iexact=email)
+            user = self.retrieve_user(request.data)
             self.send_notification_mail(user, request)
             return Response({"status": "success"})
         except Exception:
@@ -45,6 +43,11 @@ class UserResendActivationLinkAction:
         serializer = UserResendActivationLinkSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data.get("email", "")
+
+    def retrieve_user(self, data):
+        usermodel = get_user_model()
+        email = self.email_from(data)
+        return usermodel.objects.get(email__iexact=email)
 
     def send_notification_mail(self, user, request):
         email_subject = "Carbure - Activation de compte"
