@@ -24,8 +24,7 @@ class RequestActivationLinkTest(TestCase):
         self.request_activation_link_url = reverse("auth-request-activation-link")
 
     def test_request_activation_link_success(self):
-        data = {"email": self.user.email}
-        response = self.client.post(self.request_activation_link_url, data)
+        response = self.client.post(self.request_activation_link_url, {"email": "testuser@example.com"})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
