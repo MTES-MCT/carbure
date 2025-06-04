@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     "django_admin_listfilter_dropdown",
     "rest_framework",
     "rest_framework_api_key",
+    "rest_framework_simplejwt",
     "django_filters",
     "drf_spectacular",
     "authtools",
@@ -439,3 +440,5 @@ if env("TEST"):
     REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
     REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
+
+API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
