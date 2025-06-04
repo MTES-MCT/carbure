@@ -49,6 +49,7 @@ scikit-learn = "*"
 sqlalchemy = "*"
 urllib3 = "2.5.0"
 djangorestframework-api-key = "3.*"
+djangorestframework-simplejwt = "5.*"
 
 [dev-packages]
 django-stubs = "*"
