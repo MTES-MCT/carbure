@@ -31,11 +31,8 @@ class RequestPasswordResetAction:
     )
     @action(detail=False, methods=["post"], url_path="request-password-reset")
     def request_password_reset(self, request):
-        serializer = RequestPasswordResetSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get("username", "")
-
-        user = get_user_model().objects.filter(email=username).first()
+        email = self.retrieve_email(request.data)
+        user = get_user_model().objects.filter(email=email).first()
         if not user:
             return Response(
                 {"message": CarbureError.PASSWORD_RESET_USER_NOT_FOUND},
@@ -45,6 +42,11 @@ class RequestPasswordResetAction:
         self.send_notification_mail(user, request)
 
         return Response({"status": "success"})
+
+    def retrieve_email(self, data):
+        serializer = RequestPasswordResetSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data.get("username", "")
 
     def send_notification_mail(self, user, request):
         prtg = PasswordResetTokenGenerator()
