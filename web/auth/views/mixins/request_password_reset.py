@@ -42,8 +42,12 @@ class RequestPasswordResetAction:
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        self.send_notification_mail(user, request)
+
+        return Response({"status": "success"})
+
+    def send_notification_mail(self, user, request):
         prtg = PasswordResetTokenGenerator()
-        # send email
         email_subject = "Carbure - Réinitialisation du mot de passe"
         email_context = {
             "user": user,
@@ -61,5 +65,3 @@ class RequestPasswordResetAction:
             html_message=html_message,
             recipient_list=[user.email],
         )
-
-        return Response({"status": "success"})
