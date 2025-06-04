@@ -24,8 +24,7 @@ class RequestPasswordResetTests(TestCase):
         self.request_password_reset_url = reverse("auth-request-password-reset")
 
     def test_responds_with_success_status_when_user_known(self):
-        data = {"username": self.user.email}
-        response = self.client.post(self.request_password_reset_url, data)
+        response = self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
 
