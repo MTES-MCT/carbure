@@ -76,7 +76,7 @@ export const CardProgress = ({
                   </Title>
                 ) : null}
               </Title>
-              {penalty !== undefined && (
+              {!!penalty && (
                 <Text className={css["card-progress__penalty"]} size="sm">
                   Sanction : {CONVERSIONS.euros.centsToKEuros(penalty)} k€
                 </Text>
