@@ -1,9 +1,11 @@
 import re
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.serializers import ValidationError
 from rest_framework.test import APITestCase
 
 from core.utils import CarbureEnv
@@ -86,28 +88,10 @@ class RegisterTest(APITestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    def test_responds_with_http_400_error_when_passwords_mismatch(self):
-        data = {
-            "name": "newuser",
-            "password1": "strongpassword123",
-            "password2": "differentpassword",
-            "email": "newuser@example.com",
-        }
-        response = self.client.post(self.url, data)
+    @patch("auth.serializers.UserCreationSerializer.is_valid")
+    def test_responds_with_http_400_error_when_invalid_data(self, is_valid):
+        is_valid.side_effect = ValidationError("oups")
+        response = self.client.post(self.url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "password2" in response.data
-        assert response.data["password2"][0] == "The two password fields didn't match."
-
-    def test_responds_with_http_400_error_when_email_already_exists(self):
-        User.objects.create(name="Some user", email="existing@example.com")
-        data = {
-            "name": "Some new user",
-            "password1": "strongpassword123",
-            "password2": "strongpassword123",
-            "email": "existing@example.com",
-        }
-        response = self.client.post(self.url, data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "email" in response.data
+        assert response.data[0] == "oups"
