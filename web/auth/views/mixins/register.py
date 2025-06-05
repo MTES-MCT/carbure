@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -12,6 +11,7 @@ from rest_framework.response import Response
 from auth.serializers import UserCreationSerializer
 from auth.tokens import account_activation_token
 from core.helpers import send_mail
+from core.utils import CarbureEnv
 
 
 class UserCreationAction:
@@ -48,11 +48,10 @@ def send_email(
 ):
     if extra_context is None:
         extra_context = {}
-    current_site = get_current_site(request)
     email_subject = subject
     email_context = {
         "user": user,
-        "domain": current_site.domain,
+        "domain": CarbureEnv.get_base_url(),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": account_activation_token.make_token(user),
     } | extra_context
