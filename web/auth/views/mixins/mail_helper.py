@@ -47,3 +47,8 @@ def send_email(
 
 def send_account_activation_email(user, request):
     send_email(user, request, "Carbure - Activation de compte")
+
+
+def send_registration_email(user, entity, request, email_type):
+    email_context = {"invitation": True, "entity_name": entity.name}
+    send_email(user, request, "Carbure - Invitation à rejoindre une entité", email_type, email_context)

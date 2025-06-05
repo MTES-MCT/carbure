@@ -4,7 +4,7 @@ from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from auth.views.mixins.mail_helper import send_email as send_registration_email
+from auth.views.mixins.mail_helper import send_registration_email
 from core.models import Entity, UserRights, UserRightsRequests
 
 User = get_user_model()
@@ -78,8 +78,6 @@ class InviteUserActionMixin:
 
         try:
             user = User.objects.get(email=email)
-
-            email_subject = "Carbure - Invitation à rejoindre une entité"
             email_type = "invite_user_email"
 
         except Exception:
@@ -90,8 +88,6 @@ class InviteUserActionMixin:
                 is_active=False,
             )
             user.save()
-
-            email_subject = "Carbure - Invitation à rejoindre une entité"
             email_type = "account_activation_email"
 
         # Update rights and requests
@@ -115,7 +111,6 @@ class InviteUserActionMixin:
             )
 
         # Send email
-        email_context = {"invitation": True, "entity_name": entity.name}
-        send_registration_email(user, request, email_subject, email_type, email_context)
+        send_registration_email(user, entity, request, email_type)
 
         return Response({"status": "success"})
