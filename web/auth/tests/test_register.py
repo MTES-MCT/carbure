@@ -86,7 +86,7 @@ class RegisterTest(APITestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    def test_register_password_mismatch(self):
+    def test_responds_with_http_400_error_when_passwords_mismatch(self):
         data = {
             "name": "newuser",
             "password1": "strongpassword123",
@@ -99,7 +99,7 @@ class RegisterTest(APITestCase):
         assert "password2" in response.data
         assert response.data["password2"][0] == "The two password fields didn't match."
 
-    def test_register_email_exists(self):
+    def test_responds_with_http_400_error_when_email_already_exists(self):
         User.objects.create(name="Some user", email="existing@example.com")
         data = {
             "name": "Some new user",
