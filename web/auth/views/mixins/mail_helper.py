@@ -10,15 +10,7 @@ from core.helpers import send_mail
 from core.utils import CarbureEnv
 
 
-def send_email(
-    user,
-    request,
-    subject,
-    email_type="account_activation_email",
-    extra_context=None,
-):
-    if extra_context is None:
-        extra_context = {}
+def send_email(user, request, subject, email_type, extra_context):
     email_subject = subject
     email_context = {
         "user": user,
@@ -46,7 +38,7 @@ def send_email(
 
 
 def send_account_activation_email(user, request):
-    send_email(user, request, "Carbure - Activation de compte")
+    send_email(user, request, "Carbure - Activation de compte", "account_activation_email", {})
 
 
 def send_registration_email(user, entity, request, email_type):
