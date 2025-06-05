@@ -1,9 +1,11 @@
 import { MainObjective } from "../../types"
 import { CardProgress } from "../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { RecapData } from "../recap-data"
 import { floorNumber, formatNumber } from "common/utils/formatters"
+import useEntity from "common/hooks/entity"
+import { downloadMacFossilFuel } from "../../api"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -11,12 +13,31 @@ type OverallProgressProps = {
 
 export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   return (
     <ObjectiveSection
       title={t("Avancement global")}
-      description={t(
-        "Ces objectifs sont calculés sur la base de vos mises à la consommation décadaires. Ces mises à la consommation ne sont pas consolidées et sont calculées sur la base d’un PCI théorique."
-      )}
+      description={
+        <Trans
+          i18nKey="Ces objectifs sont calculés sur la base de vos <a><strong>{{mac}}</strong></a> et d’un PCI théorique."
+          values={{ mac: "mises à consommation 2023" }}
+          components={{
+            strong: <strong />,
+            a: (
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  downloadMacFossilFuel(entity.id)
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            ),
+            br: <br />,
+          }}
+        />
+      }
     >
       {objective && (
         <CardProgress

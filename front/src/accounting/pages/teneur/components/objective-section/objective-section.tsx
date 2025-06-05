@@ -4,7 +4,7 @@ import css from "./objective-section.module.css"
 
 type ObjectiveSectionProps = {
   title: string
-  description?: string
+  description?: React.ReactNode // Permettre un ReactNode pour <Trans>
   size?: "small"
   children?: React.ReactNode
 }

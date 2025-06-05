@@ -213,3 +213,11 @@ export const validateTeneurElec = async (entity_id: number) => {
     },
   })
 }
+
+export const downloadMacFossilFuel = (entity_id: number) => {
+  window.open(
+    `/api/tiruert/mac-fossil-fuel/export/?entity_id=${entity_id}`,
+    "_blank",
+    "noopener,noreferrer"
+  )
+}

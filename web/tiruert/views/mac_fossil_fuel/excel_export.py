@@ -1,8 +1,8 @@
-from datetime import datetime
+import time
 
 import openpyxl
 from django.http import HttpResponse
-from django.utils.timezone import make_aware
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from openpyxl.utils import get_column_letter
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
@@ -11,6 +11,17 @@ from tiruert.filters import MacFilter
 from tiruert.models import MacFossilFuel
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
 class MacFossilFuelExportViewSet(GenericViewSet):
     queryset = MacFossilFuel.objects.all()
     filterset_class = MacFilter
@@ -44,7 +55,7 @@ class MacFossilFuelExportViewSet(GenericViewSet):
             sheet.column_dimensions[get_column_letter(col_num)].width = 20
 
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        filename = f"mac_fossilfuel_{make_aware(datetime.now()).strftime('%Y-%m-%d_%H%M%S')}.xlsx"
+        filename = f"mac_{request.entity}_{time.strftime('%Y-%m-%d_%H%M%S')}.xlsx"
         response["Content-Disposition"] = f"attachment; filename={filename}"
         workbook.save(response)
         return response

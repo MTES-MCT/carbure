@@ -5742,6 +5742,25 @@ paths:
               schema:
                 error: NOTHING_TO_DECLARE
           description: Error message
+  /api/tiruert/mac-fossil-fuel/export/:
+    get:
+      operationId: tiruert_mac_fossil_fuel_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          description: No response body
   /api/tiruert/objectives/:
     get:
       operationId: objectives
