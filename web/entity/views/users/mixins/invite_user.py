@@ -111,6 +111,6 @@ class InviteUserActionMixin:
             )
 
         # Send email
-        send_registration_email(user, entity, request, email_type)
+        send_registration_email(user, entity.name, request, email_type)
 
         return Response({"status": "success"})
