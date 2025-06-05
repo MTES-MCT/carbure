@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.sites.shortcuts import get_current_site
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -12,6 +11,7 @@ from rest_framework.response import Response
 
 from core.carburetypes import CarbureError
 from core.helpers import send_mail
+from core.utils import CarbureEnv
 
 
 class RequestPasswordResetSerializer(serializers.Serializer):
@@ -31,24 +31,29 @@ class RequestPasswordResetAction:
     )
     @action(detail=False, methods=["post"], url_path="request-password-reset")
     def request_password_reset(self, request):
-        serializer = RequestPasswordResetSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get("username", "")
+        try:
+            email = self.retrieve_email(request.data)
+            user = get_user_model().objects.get(email=email)
+            self.send_notification_mail(user, request)
+            return Response({"status": "success"})
 
-        user = get_user_model().objects.filter(email=username).first()
-        if not user:
+        except Exception:
             return Response(
                 {"message": CarbureError.PASSWORD_RESET_USER_NOT_FOUND},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    def retrieve_email(self, data):
+        serializer = RequestPasswordResetSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data.get("username", "")
+
+    def send_notification_mail(self, user, request):
         prtg = PasswordResetTokenGenerator()
-        current_site = get_current_site(request)
-        # send email
         email_subject = "Carbure - Réinitialisation du mot de passe"
         email_context = {
             "user": user,
-            "domain": current_site.domain,
+            "domain": CarbureEnv.get_base_url(),
             "uid": urlsafe_base64_encode(force_bytes(user.pk)),
             "token": prtg.make_token(user),
         }
@@ -62,5 +67,3 @@ class RequestPasswordResetAction:
             html_message=html_message,
             recipient_list=[user.email],
         )
-
-        return Response({"status": "success"})
