@@ -77,8 +77,9 @@ class InviteUserActionMixin:
         email = User.objects.normalize_email(email)
 
         try:
+            user_already_exists = False
             user = User.objects.get(email=email)
-            email_type = "invite_user_email"
+            user_already_exists = True
 
         except Exception:
             # Create a new user (non active) with a random password
@@ -88,7 +89,6 @@ class InviteUserActionMixin:
                 is_active=False,
             )
             user.save()
-            email_type = "account_activation_email"
 
         # Update rights and requests
         check_user_rights = UserRights.objects.filter(user=user, entity=entity).first()
@@ -111,6 +111,6 @@ class InviteUserActionMixin:
             )
 
         # Send email
-        send_registration_email(user, entity.name, request, email_type)
+        send_registration_email(user, entity.name, request, user_already_exists)
 
         return Response({"status": "success"})

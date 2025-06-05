@@ -41,6 +41,7 @@ def send_account_activation_email(user, request):
     send_email(user, request, "Carbure - Activation de compte", "account_activation_email", {})
 
 
-def send_registration_email(user, entity_name, request, email_type):
+def send_registration_email(user, entity_name, request, user_already_exists):
     email_context = {"invitation": True, "entity_name": entity_name}
+    email_type = "invite_user_email" if user_already_exists else "account_activation_email"
     send_email(user, request, "Carbure - Invitation à rejoindre une entité", email_type, email_context)
