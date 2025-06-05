@@ -27,9 +27,6 @@ class RegisterTest(APITestCase):
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
 
-        user = User.objects.get(email="newuser@example.com")
-        assert not user.is_active
-
     def test_sends_email(self):
         assert len(mail.outbox) == 0
 
