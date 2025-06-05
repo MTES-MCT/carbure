@@ -7,7 +7,6 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import AgreementList from "./components/agreements/agreement-list"
 import ApplicationList from "./components/applications/application-list"
-import DoubleCountingFilesChecker from "./components/files-checker"
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -32,10 +31,6 @@ const DoubleCounting = () => {
         <Route
           path="agreements"
           element={<AgreementList snapshot={snapshot} />}
-        />
-        <Route
-          path="files-checker/*"
-          element={<DoubleCountingFilesChecker />}
         />
         <Route path="*" element={<Navigate to="applications" />} />
       </Routes>

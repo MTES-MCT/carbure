@@ -18,7 +18,7 @@ import {
   DoubleCountingUploadError,
   DoubleCountingUploadErrorType,
 } from "../../types"
-import FileApplicationInfo from "../../../double-counting-admin/components/files-checker/file-application-info"
+import FileApplicationInfo from "../files-checker/file-application-info"
 import { SourcingFullTable } from "../sourcing-table"
 import { ProductionTable } from "../production-table"
 import { ProductionHistoryTable } from "../production-history-table"
