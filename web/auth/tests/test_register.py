@@ -15,7 +15,7 @@ class RegisterTest(APITestCase):
     def setUp(self):
         self.url = reverse("auth-register")
 
-    def test_register_success(self):
+    def test_responds_with_success_status(self):
         data = {
             "name": "newuser",
             "password1": "strongpassword123",
@@ -23,7 +23,6 @@ class RegisterTest(APITestCase):
             "email": "newuser@example.com",
         }
         response = self.client.post(self.url, data)
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
 
