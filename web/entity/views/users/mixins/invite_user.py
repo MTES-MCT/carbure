@@ -4,7 +4,7 @@ from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from auth.views.mixins.register import send_email as send_registration_email
+from auth.views.mixins.mail_helper import send_email as send_registration_email
 from core.models import Entity, UserRights, UserRightsRequests
 
 User = get_user_model()
