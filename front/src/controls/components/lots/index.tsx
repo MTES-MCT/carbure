@@ -150,17 +150,17 @@ const ADMIN_FILTERS = [
   Filter.Feedstocks,
   Filter.CountriesOfOrigin,
   Filter.Suppliers,
+  Filter.SupplierCertificate,
   Filter.Clients,
   Filter.ClientTypes,
   Filter.ProductionSites,
+  Filter.Certificate_id,
   Filter.DeliverySites,
   Filter.AddedBy,
   Filter.Errors,
   Filter.Conformity,
   Filter.Scores,
   Filter.ML,
-  Filter.Certificate_id,
-  Filter.SupplierCertificate,
 ]
 
 export default Lots
