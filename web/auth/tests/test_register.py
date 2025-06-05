@@ -104,9 +104,9 @@ class RegisterTest(APITestCase):
         assert response.data["password2"][0] == "The two password fields didn't match."
 
     def test_register_email_exists(self):
-        User.objects.create(name="newuser", email="existing@example.com")
+        User.objects.create(name="Some user", email="existing@example.com")
         data = {
-            "name": "newuser",
+            "name": "Some new user",
             "password1": "strongpassword123",
             "password2": "strongpassword123",
             "email": "existing@example.com",
