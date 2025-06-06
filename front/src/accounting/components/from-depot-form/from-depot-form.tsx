@@ -2,14 +2,10 @@ import { useFormContext } from "common/components/form2"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
-import { Depot } from "common/types"
 import { OperationText } from "accounting/components/operation-text"
 import { useQuery } from "common/hooks/async"
 import { getDeliverySites } from "settings/api/delivery-sites"
-
-export type FromDepotFormProps = {
-  from_depot?: Depot
-}
+import { FromDepotFormProps } from "./from-depot-form.types"
 
 export const FromDepotForm = () => {
   const { t } = useTranslation()
