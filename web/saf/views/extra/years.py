@@ -51,7 +51,7 @@ class ExtraError:
     responses={200: {"type": "array", "items": {"type": "integer"}}, 400: ErrorResponseSerializer},
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.AIRLINE])])
+@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE])])
 def get_years(request, *args, **kwargs):
     try:
         entity_id = request.query_params.get("entity_id")

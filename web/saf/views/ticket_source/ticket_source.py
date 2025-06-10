@@ -24,7 +24,7 @@ class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet,
     lookup_field = "id"
     permission_classes = (
         IsAuthenticated,
-        HasUserRights(None, [Entity.OPERATOR]),
+        HasUserRights(None, [Entity.OPERATOR, Entity.SAF_TRADER]),
     )
     serializer_class = SafTicketSourceSerializer
     pagination_class = SafTicketSourcePagination
@@ -41,7 +41,7 @@ class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet,
 
     def get_permissions(self):
         if self.action in ["grouped_assign", "assign", "credit"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR, Entity.SAF_TRADER])]
         return super().get_permissions()
 
     def get_serializer_class(self):
