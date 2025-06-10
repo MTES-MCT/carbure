@@ -17,7 +17,9 @@ export interface SectorObjective extends BaseObjective {
   code: OperationSector
 }
 
-export type MainObjective = BaseObjective
+export interface MainObjective extends BaseObjective {
+  energy_basis: number // GJ
+}
 
 export interface ElecCategoryObjective
   extends Omit<BaseObjective, "target" | "target_percent"> {
