@@ -18,25 +18,45 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
     <ObjectiveSection
       title={t("Avancement global")}
       description={
-        <Trans
-          i18nKey="Ces objectifs sont calculés sur la base de vos <a><strong>{{mac}}</strong></a> et d’un PCI théorique."
-          values={{ mac: "mises à consommation 2023" }}
-          components={{
-            strong: <strong />,
-            a: (
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  downloadMacFossilFuel(entity.id)
-                }}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            ),
-            br: <br />,
-          }}
-        />
+        <>
+          <span>
+            <Trans
+              i18nKey="Ces objectifs sont calculés sur la base de vos <a>{{mac}}</a> et d’un PCI théorique."
+              values={{
+                mac: "mises à consommation 2023",
+              }}
+              components={{
+                strong: <strong />,
+                a: (
+                  <a
+                    className="fr-link--download fr-link"
+                    style={{
+                      backgroundImage:
+                        "var(--underline-img), var(--underline-img)",
+                    }}
+                    download="true"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      downloadMacFossilFuel(entity.id)
+                    }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                ),
+              }}
+            />
+          </span>
+          <br />
+          <span>
+            <Trans
+              i18nKey="Base calculée : {{energy_basis}} GJ"
+              values={{
+                energy_basis: objective?.energy_basis,
+              }}
+            />
+          </span>
+        </>
       }
     >
       {objective && (

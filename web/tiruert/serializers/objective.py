@@ -42,6 +42,7 @@ class MainObjectiveSerializer(serializers.Serializer):
     unit = serializers.CharField()
     penalty = serializers.IntegerField()
     target_percent = serializers.FloatField()
+    energy_basis = serializers.FloatField()
 
 
 class ObjectiveOutputSerializer(serializers.Serializer):

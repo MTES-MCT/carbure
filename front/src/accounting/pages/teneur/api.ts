@@ -21,6 +21,9 @@ function parseObjectivesResponse(objectives: any) {
         ? objectives?.main.target_percent * 100
         : 0,
       penalty: objectives?.main.penalty ?? 0,
+      energy_basis: CONVERSIONS.energy.MJ_TO_GJ(
+        objectives?.main.energy_basis ?? 0
+      ),
     },
     sectors:
       objectives?.sectors.map((sector: any) => ({

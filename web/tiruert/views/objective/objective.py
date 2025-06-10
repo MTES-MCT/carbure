@@ -323,6 +323,7 @@ class ObjectiveViewSet(GenericViewSet):
             "declared_teneur": biofuel_declared_teneur + elec_declared_teneur,
             "unit": "tCO2",
             "target_percent": global_objective_target_percent,
+            "energy_basis": energy_basis,
         }
         penalty = ObjectiveService._calcule_penalty(
             global_objective_penalty,
