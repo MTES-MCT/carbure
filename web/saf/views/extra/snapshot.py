@@ -89,7 +89,7 @@ class ExtraError:
     },
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.AIRLINE])])
+@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE])])
 def get_snapshot(request, *args, **kwargs):
     entity_id = request.query_params.get("entity_id")
     year = request.query_params.get("year")
