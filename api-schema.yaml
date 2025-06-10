@@ -904,86 +904,6 @@ paths:
                     status: success
                   summary: Example of response.
           description: ""
-  /api/double-counting/applications/check-admin-files/:
-    post:
-      operationId: double_counting_applications_check_admin_files_create
-      parameters:
-        - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: query
-          name: order_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - -production_site
-                - -valid_until
-                - production_site
-                - valid_until
-          description: |-
-            Ordre
-
-            * `production_site` - Production site
-            * `-production_site` - Production site (décroissant)
-            * `valid_until` - Valid until
-            * `-valid_until` - Valid until (décroissant)
-          explode: false
-          style: form
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: producers
-          schema:
-            type: string
-        - in: query
-          name: production_sites
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CheckFileResponse"
-          description: ""
   /api/double-counting/applications/check-file/:
     post:
       operationId: double_counting_applications_check_file_create
@@ -8037,16 +7957,6 @@ components:
       required:
         - email
         - role
-    CheckAdminFileRequest:
-      type: object
-      properties:
-        files:
-          type: array
-          items:
-            type: string
-            format: binary
-      required:
-        - files
     CheckCertificateRequest:
       type: object
       properties:
@@ -9550,6 +9460,7 @@ components:
         - Compagnie aérienne
         - Unknown
         - Power or Heat Producer
+        - SAF Trader
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -9562,6 +9473,7 @@ components:
         * `Compagnie aérienne` - Compagnie aérienne
         * `Unknown` - Unknown
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        * `SAF Trader` - Trader de SAF
       x-enum-varnames:
         - Producer
         - Operator
