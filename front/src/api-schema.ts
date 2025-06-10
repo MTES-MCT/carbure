@@ -2843,6 +2843,7 @@ export interface components {
      *     * `Compagnie aérienne` - Compagnie aérienne
      *     * `Unknown` - Unknown
      *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+     *     * `SAF Trader` - Trader de SAF
      * @enum {string}
      */
     EntityTypeEnum: EntityTypeEnum
@@ -8811,6 +8812,7 @@ export enum EntityTypeEnum {
   Airline = "Compagnie a\u00E9rienne",
   Unknown = "Unknown",
   PowerOrHeatProducer = "Power or Heat Producer",
+  SAF_Trader = "SAF Trader",
 }
 export enum EtsStatusEnum {
   ETS_VALUATION = "ETS_VALUATION",

@@ -9550,6 +9550,7 @@ components:
         - Compagnie aérienne
         - Unknown
         - Power or Heat Producer
+        - SAF Trader
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -9562,6 +9563,7 @@ components:
         * `Compagnie aérienne` - Compagnie aérienne
         * `Unknown` - Unknown
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        * `SAF Trader` - Trader de SAF
       x-enum-varnames:
         - Producer
         - Operator
