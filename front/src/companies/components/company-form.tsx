@@ -132,10 +132,14 @@ export const CompanyForm = ({
             value: EntityType.PowerOrHeatProducer,
             label: getEntityTypeLabel(EntityType.PowerOrHeatProducer),
           },
+          {
+            value: EntityType.SAF_Trader,
+            label: getEntityTypeLabel(EntityType.SAF_Trader),
+          },
         ]}
       />
       {companyForm.value?.entity_type &&
-        ![EntityType.Airline, EntityType.CPO].includes(
+        ![EntityType.Airline, EntityType.CPO, EntityType.SAF_Trader].includes(
           companyForm.value?.entity_type
         ) && (
           <Autocomplete

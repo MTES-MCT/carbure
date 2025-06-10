@@ -234,6 +234,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Administration Externe")
     case EntityType.Airline:
       return i18next.t("Compagnie aérienne")
+    case EntityType.SAF_Trader:
+      return i18next.t("Trader de SAF")
     case EntityType.CPO:
       return i18next.t("Aménageur de bornes électriques")
     case EntityType.PowerOrHeatProducer:
