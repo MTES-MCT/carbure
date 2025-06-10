@@ -35,6 +35,10 @@ class RequestPasswordResetTests(TestCase):
         assert len(mail.outbox) == 1
         assert "testuser@example.com" in mail.outbox[0].recipients()
 
+    def test_uses_proper_mail_template(self):
+        self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
+        assert "Réinitialisation du mot de passe" in mail.outbox[0].subject
+
     def test_injects_server_base_url_in_sent_mail(self):
         self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
         sent_mail = mail.outbox[0]
