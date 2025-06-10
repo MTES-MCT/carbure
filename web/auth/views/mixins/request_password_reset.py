@@ -18,6 +18,33 @@ class RequestPasswordResetSerializer(serializers.Serializer):
     username = serializers.CharField(required=True, max_length=150)
 
 
+def send_notification_mail(user, request):
+    prtg = PasswordResetTokenGenerator()
+    email_subject = "Carbure - Réinitialisation du mot de passe"
+    email_context = {
+        "user": user,
+        "domain": CarbureEnv.get_base_url(),
+        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+        "token": prtg.make_token(user),
+    }
+    html_message = loader.render_to_string("emails/password_reset_email.html", email_context)
+    text_message = loader.render_to_string("emails/password_reset_email.txt", email_context)
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        html_message=html_message,
+        recipient_list=[user.email],
+    )
+
+
+def retrieve_email(data):
+    serializer = RequestPasswordResetSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data.get("username", "")
+
+
 class RequestPasswordResetAction:
     @extend_schema(
         request=RequestPasswordResetSerializer,
@@ -32,9 +59,9 @@ class RequestPasswordResetAction:
     @action(detail=False, methods=["post"], url_path="request-password-reset")
     def request_password_reset(self, request):
         try:
-            email = self.retrieve_email(request.data)
+            email = retrieve_email(request.data)
             user = get_user_model().objects.get(email=email)
-            self.send_notification_mail(user, request)
+            send_notification_mail(user, request)
             return Response({"status": "success"})
 
         except Exception:
@@ -42,28 +69,3 @@ class RequestPasswordResetAction:
                 {"message": CarbureError.PASSWORD_RESET_USER_NOT_FOUND},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-    def retrieve_email(self, data):
-        serializer = RequestPasswordResetSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        return serializer.validated_data.get("username", "")
-
-    def send_notification_mail(self, user, request):
-        prtg = PasswordResetTokenGenerator()
-        email_subject = "Carbure - Réinitialisation du mot de passe"
-        email_context = {
-            "user": user,
-            "domain": CarbureEnv.get_base_url(),
-            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-            "token": prtg.make_token(user),
-        }
-        html_message = loader.render_to_string("emails/password_reset_email.html", email_context)
-        text_message = loader.render_to_string("emails/password_reset_email.txt", email_context)
-        send_mail(
-            request=request,
-            subject=email_subject,
-            message=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            html_message=html_message,
-            recipient_list=[user.email],
-        )
