@@ -2,7 +2,7 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal, { usePortal } from "common/components/portal"
 import { Trans } from "react-i18next"
 import { RadioGroup } from "common/components/inputs2"
-import { LoaderOverlay } from "common/components/scaffold"
+//import { LoaderOverlay } from "common/components/scaffold"
 import { useState } from "react"
 import styles from "./debit-operation-dialog.module.css"
 import { Button } from "common/components/button2"
@@ -10,9 +10,9 @@ import { CessionDialog } from "./cession-dialog"
 import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
 import { TransfertDialog } from "./transfert-dialog"
-import { getObjectives } from "accounting/pages/teneur/api"
-import { useQuery } from "common/hooks/async"
-import useEntity from "common/hooks/entity"
+//import { getObjectives } from "accounting/pages/teneur/api"
+//import { useQuery } from "common/hooks/async"
+//import useEntity from "common/hooks/entity"
 
 interface DebitOperationDialogProps {
   onClose: () => void
@@ -23,7 +23,7 @@ export const DebitOperationDialog = ({
   onClose,
   balance,
 }: DebitOperationDialogProps) => {
-  const entity = useEntity()
+  //const entity = useEntity()
   const portal = usePortal()
   const [currentOperation, setCurrentOperation] = useState<
     | OperationType.CESSION
@@ -32,18 +32,18 @@ export const DebitOperationDialog = ({
     | OperationType.TRANSFERT
   >(OperationType.CESSION)
 
-  const { result, loading } = useQuery(getObjectives, {
-    key: "teneur-objectives",
-    params: [entity.id, 2025, false],
-  })
+  //const { result, loading } = useQuery(getObjectives, {
+  //  key: "teneur-objectives",
+  //  params: [entity.id, 2025, false],
+  //})
 
-  const objectivesData = result
+  // const objectivesData = result
 
-  if (loading) {
-    return <LoaderOverlay />
-  }
+  //if (loading) {
+  //  return <LoaderOverlay />
+  //}
 
-  const displayTransfert = () => {
+  /*const displayTransfert = () => {
     if (objectivesData) {
       const category = balance.customs_category
       const categoryObjective =
@@ -58,7 +58,7 @@ export const DebitOperationDialog = ({
       )
     }
     return false
-  }
+  }*/
 
   const handleNext = () => {
     switch (currentOperation) {
@@ -107,18 +107,18 @@ export const DebitOperationDialog = ({
         <div className={styles["debit-operation-dialog__radios-container"]}>
           <RadioGroup
             options={[
+              //{
+              //  label: formatOperationType(OperationType.CESSION),
+              //  value: OperationType.CESSION,
+              //},
+              //...(displayTransfert()
+              //  ? [
               {
-                label: formatOperationType(OperationType.CESSION),
-                value: OperationType.CESSION,
+                label: formatOperationType(OperationType.TRANSFERT),
+                value: OperationType.TRANSFERT,
               },
-              ...(displayTransfert()
-                ? [
-                    {
-                      label: formatOperationType(OperationType.TRANSFERT),
-                      value: OperationType.TRANSFERT,
-                    },
-                  ]
-                : []),
+              //   ]
+              // : []),
               // {
               //   label: formatOperationType(OperationType.DEVALUATION),
               //   hintText: "Additional information",
