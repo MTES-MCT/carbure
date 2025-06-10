@@ -82,6 +82,10 @@ export const TicketAssignment = ({
     return apiResources.findAirports(query)
   }
 
+  const clientIsOperator = value.client?.entity_type === EntityType.Operator
+  const clientIsAirline = value.client?.entity_type === EntityType.Airline
+  const clientIsSafTrader = value.client?.entity_type === EntityType.SAF_Trader
+
   return (
     <Portal onClose={onClose}>
       <Dialog
@@ -132,7 +136,7 @@ export const TicketAssignment = ({
             {...bind("client")}
           />
 
-          {value.client?.entity_type === EntityType.Operator && (
+          {clientIsOperator && (
             <TextInput //TODO for transfer only
               required
               label={t("N° du certificat d'acquisition")}
@@ -141,7 +145,7 @@ export const TicketAssignment = ({
             />
           )}
 
-          {value.client?.entity_type === EntityType.Airline && (
+          {(clientIsAirline || clientIsSafTrader) && (
             <>
               <Autocomplete
                 required
