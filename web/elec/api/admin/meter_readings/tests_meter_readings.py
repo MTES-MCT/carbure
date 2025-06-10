@@ -200,7 +200,12 @@ class ElecMeterReadingsTest(TestCase):
                 {
                     "application_date": application_date,
                     "charge_point_count": 1,
-                    "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                    "cpo": {
+                        "entity_type": "Charge Point Operator",
+                        "id": self.cpo.id,
+                        "name": "CPO",
+                        "registration_id": self.cpo.registration_id,
+                    },
                     "energy_total": 24.92,
                     "id": application.id,
                     "quarter": 2,

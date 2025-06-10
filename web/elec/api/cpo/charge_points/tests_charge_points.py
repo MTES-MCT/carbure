@@ -428,6 +428,7 @@ class ElecCharginPointsTest(TestCase):
             "id": self.cpo.id,
             "entity_type": self.cpo.entity_type,
             "name": self.cpo.name,
+            "registration_id": self.cpo.registration_id,
         }
 
         expected = {
