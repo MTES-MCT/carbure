@@ -107,6 +107,7 @@ class SafTicketSourceDetailsTest(TestCase):
                 "id": self.entity.id,
                 "name": self.entity.name,
                 "entity_type": self.entity.entity_type,
+                "registration_id": self.entity.registration_id,
             },
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
