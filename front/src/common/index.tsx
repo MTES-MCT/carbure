@@ -126,6 +126,7 @@ const Org = () => {
     isAirline,
     isCPO,
     isPowerOrHeatProducer,
+    isSAFTrader,
     has_saf,
     has_elec,
     accise_number,
@@ -158,7 +159,7 @@ const Org = () => {
         </>
       )}
 
-      {has_saf && isOperator && (
+      {((has_saf && isOperator) || isSAFTrader) && (
         <>
           <Route path="saf/:year/*" element={<SafOperator />} />
           <Route
