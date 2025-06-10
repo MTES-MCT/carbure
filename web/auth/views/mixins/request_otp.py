@@ -12,6 +12,52 @@ from core.helpers import send_mail
 from core.utils import CarbureEnv
 
 
+def create_device(user):
+    email_otp = EmailDevice()
+    email_otp.user = user
+    email_otp.name = "email"
+    email_otp.confirmed = True
+    email_otp.email = user.email
+    email_otp.save()
+
+
+def device_validity_in_local_timezone(device):
+    return timezone.localtime(device.valid_until)
+
+
+def device_with_updated_validity(user):
+    if not user_has_device(user):
+        create_device(user)
+
+    device = EmailDevice.objects.get(user=user)
+    now = timezone.now()
+    if now > device.valid_until:
+        device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
+    return device
+
+
+def send_new_token(request, device):
+    email_subject = "Carbure - Code de Sécurité"
+    device_validity = device_validity_in_local_timezone(device)
+    expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
+    email_context = {
+        "user": request.user,
+        "domain": CarbureEnv.get_base_url(),
+        "token": device.token,
+        "token_expiry": expiry,
+    }
+    html_message = loader.render_to_string("emails/otp_token_email.html", email_context)
+    text_message = loader.render_to_string("emails/otp_token_email.txt", email_context)
+    send_mail(
+        request=request,
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        html_message=html_message,
+        recipient_list=[request.user.email],
+    )
+
+
 class RequestOTPAction:
     @extend_schema(
         request=None,
@@ -33,49 +79,7 @@ class RequestOTPAction:
     @action(detail=False, methods=["get"], url_path="request-otp")
     def request_otp(self, request):
         user = request.user
-        device = self.device_with_updated_validity(user)
-        self.send_new_token(request, device)
-        device_validity = self.device_validity_in_local_timezone(device)
+        device = device_with_updated_validity(user)
+        send_new_token(request, device)
+        device_validity = device_validity_in_local_timezone(device)
         return Response({"valid_until": device_validity.strftime("%m/%d/%Y, %H:%M")})
-
-    def create_device(self, user):
-        email_otp = EmailDevice()
-        email_otp.user = user
-        email_otp.name = "email"
-        email_otp.confirmed = True
-        email_otp.email = user.email
-        email_otp.save()
-
-    def device_validity_in_local_timezone(self, device):
-        return timezone.localtime(device.valid_until)
-
-    def device_with_updated_validity(self, user):
-        if not user_has_device(user):
-            self.create_device(user)
-
-        device = EmailDevice.objects.get(user=user)
-        now = timezone.now()
-        if now > device.valid_until:
-            device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
-        return device
-
-    def send_new_token(self, request, device):
-        email_subject = "Carbure - Code de Sécurité"
-        device_validity = self.device_validity_in_local_timezone(device)
-        expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
-        email_context = {
-            "user": request.user,
-            "domain": CarbureEnv.get_base_url(),
-            "token": device.token,
-            "token_expiry": expiry,
-        }
-        html_message = loader.render_to_string("emails/otp_token_email.html", email_context)
-        text_message = loader.render_to_string("emails/otp_token_email.txt", email_context)
-        send_mail(
-            request=request,
-            subject=email_subject,
-            message=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            html_message=html_message,
-            recipient_list=[request.user.email],
-        )
