@@ -17,9 +17,6 @@ import { QuotasTable } from "./quotas-table"
 import { SourcingFullTable } from "./sourcing-table"
 import { AgreementDetails, DoubleCountingStatus } from "../types"
 import { FilesTable } from "./files-table"
-import { AddIndustrialWastes } from "./add-industrial-wastes"
-import { DechetIndustrielAlert } from "./application-checker/industrial-waste-alert"
-import { useIndustrialWastesFile } from "double-counting/double-counting.hooks"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -36,13 +33,6 @@ export const AgreementDetailsDialog = () => {
   const agreement = applicationResponse.result?.data
 
   const application = agreement?.application
-
-  const {
-    isMissingWasteFile,
-    industrialWastesFile,
-    setIndustrialWastesFile,
-    mutation,
-  } = useIndustrialWastesFile(application)
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
@@ -72,24 +62,6 @@ export const AgreementDetailsDialog = () => {
               />
             </Dialog.Description>
           </>
-        }
-        footer={
-          isMissingWasteFile ? (
-            <Button
-              disabled={!industrialWastesFile || mutation.loading}
-              onClick={() => {
-                if (application && industrialWastesFile) {
-                  mutation.execute(
-                    entity.id,
-                    application.id,
-                    industrialWastesFile
-                  )
-                }
-              }}
-            >
-              {t("Sauvegarder")}
-            </Button>
-          ) : undefined
         }
       >
         {!application && !applicationResponse.loading && (
@@ -123,12 +95,7 @@ export const AgreementDetailsDialog = () => {
 
         {application &&
           application.status === DoubleCountingStatus.ACCEPTED && (
-            <AgreementTabs
-              agreement={agreement}
-              isMissingWasteFile={isMissingWasteFile}
-              industrialWastesFile={industrialWastesFile}
-              setIndustrialWastesFile={setIndustrialWastesFile}
-            />
+            <AgreementTabs agreement={agreement} />
           )}
 
         {applicationResponse.loading && <LoaderOverlay />}
@@ -139,17 +106,9 @@ export const AgreementDetailsDialog = () => {
 
 type AgreementTabsProps = {
   agreement: AgreementDetails
-  isMissingWasteFile?: boolean
-  industrialWastesFile?: File
-  setIndustrialWastesFile: (file?: File) => void
 }
 
-const AgreementTabs = ({
-  agreement,
-  isMissingWasteFile,
-  industrialWastesFile,
-  setIndustrialWastesFile,
-}: AgreementTabsProps) => {
+const AgreementTabs = ({ agreement }: AgreementTabsProps) => {
   const [focus, setFocus] = useState("quotas")
   const { t } = useTranslation()
 
@@ -187,10 +146,6 @@ const AgreementTabs = ({
         sticky
       />
 
-      {isMissingWasteFile && (
-        <DechetIndustrielAlert valid={industrialWastesFile !== undefined} />
-      )}
-
       {focus === "quotas" && <QuotasTable quotas={agreement.quotas} />}
 
       {focus === "sourcing_forecast" && (
@@ -205,17 +160,7 @@ const AgreementTabs = ({
         />
       )}
 
-      {focus === "files" && (
-        <>
-          {isMissingWasteFile && (
-            <AddIndustrialWastes
-              industrialWastesFile={industrialWastesFile}
-              setIndustrialWastesFile={setIndustrialWastesFile}
-            />
-          )}
-          <FilesTable application={agreement.application} />
-        </>
-      )}
+      {focus === "files" && <FilesTable application={agreement.application} />}
     </>
   )
 }
