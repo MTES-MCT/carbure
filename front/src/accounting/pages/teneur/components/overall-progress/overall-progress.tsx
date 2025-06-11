@@ -52,7 +52,9 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             <Trans
               i18nKey="Base calculée : {{energy_basis}} GJ"
               values={{
-                energy_basis: objective?.energy_basis,
+                energy_basis: formatNumber(objective?.energy_basis ?? 0, {
+                  fractionDigits: 0,
+                }),
               }}
             />
           </span>

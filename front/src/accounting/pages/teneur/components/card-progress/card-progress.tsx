@@ -7,7 +7,7 @@ import { Title } from "common/components/title/title"
 import { ProgressBar } from "../progress-bar"
 import cl from "clsx"
 import { ArrowRightLine } from "common/components/icon"
-import { CONVERSIONS } from "common/utils/formatters"
+import { CONVERSIONS, formatNumber } from "common/utils/formatters"
 
 export type CardProgressProps = {
   title?: string
@@ -78,7 +78,14 @@ export const CardProgress = ({
               </Title>
               {!!penalty && (
                 <Text className={css["card-progress__penalty"]} size="sm">
-                  Sanction : {CONVERSIONS.euros.centsToKEuros(penalty)} k€
+                  Sanction :{" "}
+                  {formatNumber(
+                    Number(CONVERSIONS.euros.centsToKEuros(penalty)),
+                    {
+                      fractionDigits: 0,
+                    }
+                  )}{" "}
+                  k€
                 </Text>
               )}
             </div>
