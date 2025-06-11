@@ -99,7 +99,7 @@ const DoubleCountingFilesCheckerDialog = ({
                 Le modèle Excel à remplir est disponible{" "}
                 <ExternalLink
                   href={
-                    "https://www.ecologie.gouv.fr/sites/default/files/documents/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202024_0.xlsx"
+                    "https://ecologie.gouv.fr/sites/default/files/documents/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202025_1.xlsx"
                   }
                 >
                   sur ce lien
