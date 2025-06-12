@@ -43,17 +43,17 @@ const AgreementPublicList = () => {
               {
                 header: t("Unité de production"),
                 small: true,
-                cell: (a) => a.production_site.name || "-",
+                cell: (a) => a.production_site?.name || "-",
               },
               {
                 header: t("Adresse"),
                 small: true,
-                cell: (a) => a.production_site.address,
+                cell: (a) => a.production_site?.address || "-",
               },
               {
                 header: t("Pays"),
                 small: true,
-                cell: (a) => a.production_site.country || "-",
+                cell: (a) => a.production_site?.country || "-",
               },
               {
                 header: t("N° d'agrément"),

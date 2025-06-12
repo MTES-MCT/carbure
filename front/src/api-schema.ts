@@ -1199,6 +1199,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/resources/dc-agreements": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["resources_dc_agreements_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/resources/depots": {
     parameters: {
       query?: never
@@ -2571,13 +2587,19 @@ export interface components {
       readonly quotas: components["schemas"]["DoubleCountingQuota"][]
     }
     DoubleCountingRegistrationPublic: {
-      readonly production_site: components["schemas"]["FieldData"]
+      production_site: components["schemas"]["ProductionSiteInfo"]
       certificate_id: string
       /** Format: date */
       valid_from: string
       /** Format: date */
       valid_until: string
       readonly biofuel_list: string
+    }
+    DoubleCountingRegistrationResource: {
+      readonly id: number
+      certificate_id: string
+      readonly producer: components["schemas"]["EntitySummary"]
+      production_site: components["schemas"]["ProductionSiteResource"]
     }
     DoubleCountingSourcing: {
       readonly id: number
@@ -2882,13 +2904,6 @@ export interface components {
       code: string
       category?: components["schemas"]["MPCategoriesEnum"]
       is_double_compte?: boolean
-    }
-    FieldData: {
-      name: string
-      city: string
-      address: string
-      postal_code: string
-      country: string
     }
     File: {
       file_name: string
@@ -3352,6 +3367,13 @@ export interface components {
       readonly type: string
       readonly certificate_id: string
     }
+    ProductionSiteInfo: {
+      name: string
+      city: string
+      address: string
+      postal_code: string
+      readonly country: string
+    }
     ProductionSiteModelRequest: {
       country_code: string
       country?: number | null
@@ -3369,6 +3391,15 @@ export interface components {
       eligible_dc: boolean
       dc_reference?: string
       created_by?: number | null
+    }
+    ProductionSiteResource: {
+      name: string
+      city: string
+      address: string
+      postal_code: string
+      country: components["schemas"]["Country"]
+      /** Format: date */
+      date_mise_en_service: string
     }
     RegistrationCountry: {
       name: string
@@ -6416,6 +6447,28 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["Country"][]
+        }
+      }
+    }
+  }
+  resources_dc_agreements_list: {
+    parameters: {
+      query?: {
+        /** @description Search within the fields `certificate_id` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DoubleCountingRegistrationResource"][]
         }
       }
     }

@@ -144,3 +144,10 @@ export async function findMyCertificates(
     ) ?? []
   )
 }
+
+export async function findDcAgreements(query: string) {
+  const res = await apiFetch.GET("/resources/dc-agreements", {
+    params: { query: { query } },
+  })
+  return res.data ?? []
+}
