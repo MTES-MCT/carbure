@@ -5,6 +5,7 @@ from resources.views import (
     get_biofuels,
     get_certificates,
     get_countries,
+    get_dc_agreements,
     get_depots,
     get_entities,
     get_feedstocks,
@@ -22,4 +23,5 @@ urlpatterns = [
     path("feedstocks", get_feedstocks, name="resources-feedstocks"),
     path("production-sites", get_production_sites, name="resources-production-sites"),
     path("airports", get_airports, name="resources-airports"),
+    path("dc-agreements", get_dc_agreements, name="resources-dc-agreements"),
 ]

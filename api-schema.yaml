@@ -904,86 +904,6 @@ paths:
                     status: success
                   summary: Example of response.
           description: ""
-  /api/double-counting/applications/check-admin-files/:
-    post:
-      operationId: double_counting_applications_check_admin_files_create
-      parameters:
-        - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: query
-          name: order_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - -production_site
-                - -valid_until
-                - production_site
-                - valid_until
-          description: |-
-            Ordre
-
-            * `production_site` - Production site
-            * `-production_site` - Production site (décroissant)
-            * `valid_until` - Valid until
-            * `-valid_until` - Valid until (décroissant)
-          explode: false
-          style: form
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: producers
-          schema:
-            type: string
-        - in: query
-          name: production_sites
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CheckFileResponse"
-          description: ""
   /api/double-counting/applications/check-file/:
     post:
       operationId: double_counting_applications_check_file_create
@@ -3397,6 +3317,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Country"
+          description: ""
+  /api/resources/dc-agreements:
+    get:
+      operationId: resources_dc_agreements_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `certificate_id`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DoubleCountingRegistrationResource"
           description: ""
   /api/resources/depots:
     get:
@@ -8037,16 +7980,6 @@ components:
       required:
         - email
         - role
-    CheckAdminFileRequest:
-      type: object
-      properties:
-        files:
-          type: array
-          items:
-            type: string
-            format: binary
-      required:
-        - files
     CheckCertificateRequest:
       type: object
       properties:
@@ -8855,9 +8788,7 @@ components:
       type: object
       properties:
         production_site:
-          allOf:
-            - $ref: "#/components/schemas/FieldData"
-          readOnly: true
+          $ref: "#/components/schemas/ProductionSiteInfo"
         certificate_id:
           type: string
           maxLength: 64
@@ -8876,6 +8807,26 @@ components:
         - production_site
         - valid_from
         - valid_until
+    DoubleCountingRegistrationResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        certificate_id:
+          type: string
+          maxLength: 64
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        production_site:
+          $ref: "#/components/schemas/ProductionSiteResource"
+      required:
+        - certificate_id
+        - id
+        - producer
+        - production_site
     DoubleCountingSourcing:
       type: object
       properties:
@@ -9644,25 +9595,6 @@ components:
         - code
         - name
         - name_en
-    FieldData:
-      type: object
-      properties:
-        name:
-          type: string
-        city:
-          type: string
-        address:
-          type: string
-        postal_code:
-          type: string
-        country:
-          type: string
-      required:
-        - address
-        - city
-        - country
-        - name
-        - postal_code
     File:
       type: object
       properties:
@@ -9899,9 +9831,13 @@ components:
         target_percent:
           type: number
           format: double
+        energy_basis:
+          type: number
+          format: double
       required:
         - available_balance
         - declared_teneur
+        - energy_basis
         - penalty
         - pending_teneur
         - target
@@ -10672,6 +10608,26 @@ components:
       required:
         - certificate_id
         - type
+    ProductionSiteInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+          readOnly: true
+      required:
+        - address
+        - city
+        - country
+        - name
+        - postal_code
     ProductionSiteModelRequest:
       type: object
       properties:
@@ -10733,6 +10689,29 @@ components:
         - name
         - postal_code
         - site_siret
+    ProductionSiteResource:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        postal_code:
+          type: string
+        country:
+          $ref: "#/components/schemas/Country"
+        date_mise_en_service:
+          type: string
+          format: date
+      required:
+        - address
+        - city
+        - country
+        - date_mise_en_service
+        - name
+        - postal_code
     RegistrationCountry:
       type: object
       properties:
