@@ -1,11 +1,28 @@
-from drf_spectacular.utils import extend_schema_field, inline_serializer
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.serializers import BiofuelSerializer, EntitySummarySerializer, FeedStockSerializer
 from doublecount.models import DoubleCountingProduction
-from doublecount.serializers import DoubleCountingApplicationSerializer
+from doublecount.serializers import (
+    BiofuelSerializer,
+    CountrySerializer,
+    DoubleCountingApplicationSerializer,
+    EntitySummarySerializer,
+    FeedStockSerializer,
+)
 
 from .models import DoubleCountingRegistration
+
+
+class ProductionSiteInfoSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    city = serializers.CharField()
+    address = serializers.CharField()
+    postal_code = serializers.CharField()
+    country = serializers.SerializerMethodField()
+
+    def get_country(self, obj):
+        return obj.country.name if obj.country else None
 
 
 class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
@@ -40,7 +57,7 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
 
 
 class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
-    production_site = serializers.SerializerMethodField()
+    production_site = ProductionSiteInfoSerializer()
     biofuel_list = serializers.SerializerMethodField()
 
     class Meta:
@@ -52,27 +69,6 @@ class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
             "valid_until",
             "biofuel_list",
         ]
-
-    @extend_schema_field(
-        inline_serializer(
-            name="FieldData",
-            fields={
-                "name": serializers.CharField(),
-                "city": serializers.CharField(),
-                "address": serializers.CharField(),
-                "postal_code": serializers.CharField(),
-                "country": serializers.CharField(),
-            },
-        )
-    )
-    def get_production_site(self, obj: DoubleCountingRegistration):
-        return {
-            "name": obj.production_site.name if obj.production_site else None,
-            "city": obj.production_site.city if obj.production_site else None,
-            "address": obj.production_site.address if obj.production_site else None,
-            "postal_code": obj.production_site.postal_code if obj.production_site else None,
-            "country": obj.production_site.country.name if obj.production_site else None,
-        }
 
     @extend_schema_field(str)
     def get_biofuel_list(self, obj: DoubleCountingRegistration):
@@ -131,3 +127,33 @@ class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.ListSerializer(child=DoubleCountingQuotaSerializer()))
     def get_quotas(self, obj):
         return []
+
+
+class ProductionSiteResourceSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    city = serializers.CharField()
+    address = serializers.CharField()
+    postal_code = serializers.CharField()
+    country = CountrySerializer()
+    date_mise_en_service = serializers.DateField()
+
+    def get_country(self, obj):
+        return obj.country.name if obj.country else None
+
+
+class DoubleCountingRegistrationResourceSerializer(serializers.ModelSerializer):
+    production_site = ProductionSiteResourceSerializer()
+    producer = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DoubleCountingRegistration
+        fields = [
+            "id",
+            "certificate_id",
+            "producer",
+            "production_site",
+        ]
+
+    @extend_schema_field(EntitySummarySerializer())
+    def get_producer(self, obj):
+        return EntitySummarySerializer(obj.production_site.producer).data if obj.production_site else None

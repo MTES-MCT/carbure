@@ -1,3 +1,4 @@
+import React from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
@@ -172,11 +173,13 @@ export const ProductionSiteCertificateField = (
 }
 
 export const ProductionSiteDoubleCountingCertificateField = (
-  props: TextInputProps
+  props: AutocompleteProps<string>
 ) => {
   const { t } = useTranslation()
-  const { value, bind } = useFormContext<LotFormValue>()
+  const { value, bind, setField, setDisabledFields } =
+    useFormContext<LotFormValue>()
   const entity = useEntity()
+  const lastResultsRef = React.useRef<any[]>([])
   const isAdminEditing = value.lot === undefined && entity.isAdmin
 
   // hide field for non-DC feedstocks
@@ -185,29 +188,86 @@ export const ProductionSiteDoubleCountingCertificateField = (
   }
 
   const bound = bind("production_site_double_counting_certificate")
-  // if the production site is known, use its DC data instead of expecting manual input
-  const dcProps =
-    value.production_site instanceof Object
-      ? {
-          ...props,
-          disabled: true,
-          error: bound.error,
-          value:
-            value.production_site_double_counting_certificate ||
-            value.production_site.dc_reference ||
-            t("détection..."),
-        }
-      : { ...props, ...bound }
+  const isKnown =
+    value.production_site && typeof value.production_site === "object"
+  const dcProps = isKnown
+    ? {
+        ...props,
+        error: bound.error,
+        value:
+          value.production_site_double_counting_certificate ||
+          (value.production_site &&
+          typeof value.production_site === "object" &&
+          "dc_reference" in value.production_site
+            ? value.production_site.dc_reference
+            : undefined) ||
+          t("détection..."),
+      }
+    : { ...props, ...bound }
 
   const certificate =
     value.certificates?.production_site_double_counting_certificate ?? undefined
 
+  if (isKnown) {
+    return (
+      <TextInput
+        icon={<CertificateIcon certificate={certificate} />}
+        label={t("Certificat double-comptage")}
+        {...dcProps}
+      />
+    )
+  }
+
+  const getOptionsWithStore = async (query: string) => {
+    const results = await api.findDcAgreements(query)
+    lastResultsRef.current = results
+    return results.map((item: any) => item.certificate_id)
+  }
+
+  const handleChange = (selectedId: string | undefined) => {
+    setField("production_site_double_counting_certificate", selectedId)
+
+    if (!selectedId) {
+      setDisabledFields([])
+      return
+    }
+
+    const selected = lastResultsRef.current.find(
+      (item) => item.certificate_id === selectedId
+    )
+    if (selected) {
+      setField("production_country", selected.production_site.country)
+
+      if (!entity.isProducer) {
+        setField("producer", selected.producer.name)
+        setField("production_site", selected.production_site.name)
+      } else {
+        setField("producer", selected.producer)
+        setField("production_site", selected.production_site)
+      }
+
+      setField(
+        "production_site_commissioning_date",
+        selected.production_site.date_mise_en_service
+      )
+      setDisabledFields([
+        "production_country",
+        "production_site_commissioning_date",
+      ])
+    }
+  }
+
   return (
-    <TextInput
+    <Autocomplete
       icon={<CertificateIcon certificate={certificate} />}
       label={t("Certificat double-comptage")}
       {...dcProps}
       required={!isSAF(value.biofuel)}
+      getOptions={getOptionsWithStore}
+      normalize={(id: string) => ({ label: id, value: id })}
+      {...bound}
+      {...props}
+      onChange={handleChange}
     />
   )
 }

@@ -6127,6 +6127,29 @@ paths:
                 items:
                   $ref: "#/components/schemas/Country"
           description: ""
+  /api/resources/dc-agreements:
+    get:
+      operationId: resources_dc_agreements_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `certificate_id`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DoubleCountingRegistrationResource"
+          description: ""
   /api/resources/depots:
     get:
       operationId: resources_depots_list
@@ -13180,9 +13203,7 @@ components:
       type: object
       properties:
         production_site:
-          allOf:
-            - $ref: "#/components/schemas/FieldData"
-          readOnly: true
+          $ref: "#/components/schemas/ProductionSiteInfo"
         certificate_id:
           type: string
           maxLength: 64
@@ -13201,6 +13222,26 @@ components:
         - production_site
         - valid_from
         - valid_until
+    DoubleCountingRegistrationResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        certificate_id:
+          type: string
+          maxLength: 64
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/EntitySummary"
+          readOnly: true
+        production_site:
+          $ref: "#/components/schemas/ProductionSiteResource"
+      required:
+        - certificate_id
+        - id
+        - producer
+        - production_site
     DoubleCountingSourcing:
       type: object
       properties:
@@ -14211,25 +14252,6 @@ components:
         - code
         - name
         - name_en
-    FieldData:
-      type: object
-      properties:
-        name:
-          type: string
-        city:
-          type: string
-        address:
-          type: string
-        postal_code:
-          type: string
-        country:
-          type: string
-      required:
-        - address
-        - city
-        - country
-        - name
-        - postal_code
     File:
       type: object
       properties:
