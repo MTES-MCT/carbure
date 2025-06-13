@@ -1,24 +1,38 @@
 import fs from "fs"
 
-async function translateMissing(filePath) {
-  const data = JSON.parse(fs.readFileSync(filePath, "utf8"))
-  let updateCount = 0
+async function translateMissing(translationPath, sourcePath) {
+  const translation = JSON.parse(fs.readFileSync(translationPath, "utf8"))
+  const source = JSON.parse(fs.readFileSync(sourcePath, "utf8"))
 
-  for (const [key, value] of Object.entries(data)) {
-    if (key === value) {
-      try {
-        data[key] = await translate(value, "FR", "EN")
-        console.log(`> Translated "${value}" to "${data[key]}"`)
-        fs.writeFileSync(filePath, JSON.stringify(data, null, "  "), "utf8")
-        await wait(1000)
-        updateCount++
-      } catch (error) {
-        console.log(`> Error translating "${value}": ${error.message}`)
-      }
+  const keys = Object.keys(translation)
+  const missingKeys = keys.filter(
+    (key) => key.includes(" ") && key.includes(translation[key])
+  )
+
+  console.log(
+    `> Found ${missingKeys.length}/${keys.length} missing translations`
+  )
+
+  for (let i = 0; i < missingKeys.length; i++) {
+    const key = missingKeys[i]
+    const value = source[key]
+    try {
+      translation[key] = await translate(value, "FR", "EN")
+      console.log(
+        `> (${i + 1}/${missingKeys.length}) Translated "${value}" to "${translation[key]}"`
+      )
+      fs.writeFileSync(
+        translationPath,
+        JSON.stringify(translation, null, "  "),
+        "utf8"
+      )
+      await wait(1000)
+    } catch (error) {
+      console.log(`> Error translating "${value}": ${error.message}`)
     }
   }
 
-  console.log(`> ${updateCount} bad translations updated`)
+  console.log(`> Translations updated successfully`)
 }
 
 async function translate(text, source_lang, target_lang) {
@@ -51,4 +65,7 @@ function wait(time) {
   return new Promise((resolve) => setTimeout(resolve, time))
 }
 
-translateMissing("public/locales/en/translation.json")
+translateMissing(
+  "public/locales/en/translation.json",
+  "public/locales/fr/translation.json"
+)
