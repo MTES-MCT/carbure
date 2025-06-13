@@ -41,7 +41,7 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
         elif entity.entity_type == Entity.PRODUCER:
             queryset = DoubleCountingApplication.objects.filter(producer=entity)
 
-        queryset = queryset.prefetch_related("production")
+        queryset = queryset.select_related("production_site").prefetch_related("production")
         self.applications = queryset
         return queryset
 
