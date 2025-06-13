@@ -231,7 +231,7 @@ class AddActionMixin:
         # 3 - Upload file to S3
         try:
             private_storage.save(s3_path, file)
-            DoubleCountingDocFile.objects.create(url=s3_path, file_name=file.name, dca=dca)
+            DoubleCountingDocFile.objects.create(url=s3_path, file_name=file.name, file_type="EXCEL", dca=dca)
             dc_files = []
             for extra_file in extra_files:
                 extra_s3_path = f"doublecounting/{dca.id}_file_{extra_file.name}"
