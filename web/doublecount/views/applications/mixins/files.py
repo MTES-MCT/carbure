@@ -1,5 +1,3 @@
-import os
-
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
@@ -9,7 +7,7 @@ from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
 
 from core import private_storage
-from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile
+from doublecount.models import DoubleCountingDocFile
 
 from .response_serializer import ResponseSerializer
 
@@ -25,44 +23,6 @@ class ApplicationFileUploadSerializer(serializers.Serializer):
 
 
 class ApplicationFilesMixin(RetrieveModelMixin):
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-        responses=ApplicationFileSerializer(many=True),
-    )
-    @action(detail=True, methods=["GET"], url_path="files")
-    def get_files(self, request, id=None):
-        application = DoubleCountingApplication.objects.prefetch_related("production").get(id=id)
-
-        excel_link = application.download_link
-        extra_files = DoubleCountingDocFile.objects.filter(dca=application)
-
-        links = [
-            {
-                "id": -1,
-                "name": os.path.basename(excel_link),
-                "link": private_storage.url(excel_link) if excel_link else None,
-            }
-        ]
-
-        for file in extra_files:
-            links.append(
-                {
-                    "id": file.pk,
-                    "name": file.file_name,
-                    "link": private_storage.url(file.url),
-                }
-            )
-
-        return Response(ApplicationFileSerializer(links, many=True).data)
-
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -107,7 +67,7 @@ class ApplicationFilesMixin(RetrieveModelMixin):
             OpenApiParameter(
                 "file_id",
                 OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
+                OpenApiParameter.PATH,
                 description="File ID to delete",
                 required=True,
             ),

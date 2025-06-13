@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from certificates.models import ProductionSiteCertificate
+from core import private_storage
 from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
@@ -85,6 +86,15 @@ class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Pays
         fields = ["name", "name_en", "code_pays", "is_in_europe"]
+
+
+class DoubleCountingProductionSitePreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductionSite
+        fields = [
+            "id",
+            "name",
+        ]
 
 
 class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
@@ -220,6 +230,12 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
 
 
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    @extend_schema_field(str)
+    def get_url(self, obj):
+        return private_storage.url(obj.url)
+
     class Meta:
         model = DoubleCountingDocFile
         fields = ["id", "file_name", "file_type", "url"]
@@ -263,7 +279,7 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
 
 
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
-    production_site = DoubleCountingProductionSiteSerializer(read_only=True)
+    production_site = DoubleCountingProductionSitePreviewSerializer(read_only=True)
     producer = EntitySummarySerializer(read_only=True)
     agreement_id = serializers.SerializerMethodField()
     quotas_progression = serializers.SerializerMethodField()

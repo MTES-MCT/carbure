@@ -231,12 +231,13 @@ class AddActionMixin:
         # 3 - Upload file to S3
         try:
             private_storage.save(s3_path, file)
+            DoubleCountingDocFile.objects.create(url=s3_path, file_name=file.name, dca=dca)
             dc_files = []
-            for file in extra_files:
-                extra_s3_path = f"doublecounting/{dca.id}_file_{file.name}"
-                dc_file = DoubleCountingDocFile(url=extra_s3_path, file_name=file.name, dca=dca)
+            for extra_file in extra_files:
+                extra_s3_path = f"doublecounting/{dca.id}_file_{extra_file.name}"
+                dc_file = DoubleCountingDocFile(url=extra_s3_path, file_name=extra_file.name, dca=dca)
                 dc_files.append(dc_file)
-                private_storage.save(extra_s3_path, file)
+                private_storage.save(extra_s3_path, extra_file)
             DoubleCountingDocFile.objects.bulk_create(dc_files)
         except Exception:
             traceback.print_exc()
