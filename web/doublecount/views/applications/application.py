@@ -24,11 +24,9 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
 
     def get_permissions(self):
         # TODO fix permissions if needed
-        if self.action == "add":
-            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.PRODUCER, Entity.ADMIN])]
-        # if self.action == "agreements_public_list":
-        #     return [AllowAny()]
-        if self.action in ["list_admin", "export", "approve", "update-approved-quotas"]:
+        if self.action in ["add", "upload_files", "delete_file"]:
+            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.PRODUCER])]
+        if self.action in ["list_admin", "export", "approve", "update_approved_quotas"]:
             return [HasAdminRights()]
 
         return super().get_permissions()

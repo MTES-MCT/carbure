@@ -29,6 +29,7 @@ from doublecount.helpers import (
 )
 from doublecount.models import (
     DoubleCountingApplication,
+    DoubleCountingDocFile,
     DoubleCountingProduction,
     DoubleCountingSourcing,
 )
@@ -56,7 +57,7 @@ class DoubleCountingAdminAddSerializer(serializers.Serializer):
     production_site_id = serializers.PrimaryKeyRelatedField(queryset=ProductionSite.objects.all())
     should_replace = serializers.BooleanField(required=False, default=False)
     file = serializers.FileField()
-    industrial_wastes_file = serializers.FileField(required=False)
+    extra_files = serializers.ListField(child=serializers.FileField(), required=False, allow_empty=True)
 
 
 class AddActionMixin:
@@ -94,7 +95,7 @@ class AddActionMixin:
         production_site = serializer.validated_data["production_site_id"]
         certificate_id_to_link = serializer.validated_data.get("certificate_id")
         file = serializer.validated_data.get("file")
-        industrial_wastes_file = serializer.validated_data.get("industrial_wastes_file")
+        extra_files = serializer.validated_data.get("extra_files")
 
         if entity_type == Entity.PRODUCER:
             entity_id = serializer.validated_data["entity_id"]
@@ -136,7 +137,7 @@ class AddActionMixin:
             DoubleCountingProductionSerializer(production_data, many=True).data
         )
 
-        if has_dechets_industriels and industrial_wastes_file is None:
+        if has_dechets_industriels and not extra_files:
             raise ValidationError({"message": DoubleCountingAddError.MISSING_INDUSTRIAL_WASTES_FILE})
 
         # check if an application already exists for this producer, this period and is not accepted
@@ -201,11 +202,6 @@ class AddActionMixin:
         s3_path = f"doublecounting/{dca.id}_application_{dca.certificate_id}.xlsx"
         dca.download_link = s3_path
 
-        # save industrial wastes file
-        if has_dechets_industriels:
-            s3_path_industrial_wastes_file = f"doublecounting/{dca.id}_industrial_wastes_file.pdf"
-            dca.industrial_wastes_file_link = s3_path_industrial_wastes_file
-
         dca.save()
 
         # 2 - save all production_data DoubleCountingProduction in db
@@ -235,8 +231,13 @@ class AddActionMixin:
         # 3 - Upload file to S3
         try:
             private_storage.save(s3_path, file)
-            if has_dechets_industriels and industrial_wastes_file:
-                private_storage.save(s3_path_industrial_wastes_file, industrial_wastes_file)
+            dc_files = []
+            for file in extra_files:
+                extra_s3_path = f"doublecounting/{dca.id}_file_{file.name}"
+                dc_file = DoubleCountingDocFile(url=extra_s3_path, file_name=file.name, dca=dca)
+                dc_files.append(dc_file)
+                private_storage.save(extra_s3_path, file)
+            DoubleCountingDocFile.objects.bulk_create(dc_files)
         except Exception:
             traceback.print_exc()
 
