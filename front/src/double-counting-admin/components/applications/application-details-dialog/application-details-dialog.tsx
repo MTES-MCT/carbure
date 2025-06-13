@@ -77,6 +77,9 @@ export const ApplicationDetailsDialog = () => {
     (p) => p.approved_quota === -1
   )
 
+  const isPendingFiles =
+    application?.has_dechets_industriels && application.documents.length <= 1
+
   const onUpdateQuotas = (quotas: Record<string, number>) => {
     setQuotasIsUpdated(true)
     setQuotas(quotas)
@@ -172,17 +175,16 @@ export const ApplicationDetailsDialog = () => {
             <Dialog.Description>
               <ApplicationInfo application={application} />
 
-              {application?.has_dechets_industriels &&
-                !application.has_dechets_industriels_file && (
-                  <Notice
-                    variant="info"
-                    icon="ri-error-warning-line"
-                    title={t("Spécificité Déchets industriels")}
-                    style={{ marginTop: "var(--spacing-m)" }}
-                  >
-                    {t("Fichier en attente")}
-                  </Notice>
-                )}
+              {isPendingFiles && (
+                <Notice
+                  variant="info"
+                  icon="ri-error-warning-line"
+                  title={t("Spécificité Déchets industriels et CIVE:")}
+                  style={{ marginTop: "var(--spacing-m)" }}
+                >
+                  {t("Fichier en attente")}
+                </Notice>
+              )}
             </Dialog.Description>
           </>
         }
@@ -232,12 +234,13 @@ export const ApplicationDetailsDialog = () => {
       >
         {application && (
           <ApplicationTabs
+            readOnly
             productionSite={application.production_site}
             sourcing={application.sourcing}
             production={application.production}
             quotas={quotas}
             setQuotas={onUpdateQuotas}
-            application={application}
+            files={application.documents}
           />
         )}
 

@@ -18,12 +18,12 @@ import { Fragment, useState } from "react"
 import { compact } from "common/utils/collection"
 import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
 import { ProductionTable } from "../../../double-counting/components/production-table"
-import { FilesTable } from "../../../double-counting/components/files-table"
 import { Tabs } from "common/components/tabs2"
 import { ROUTE_URLS } from "common/utils/routes"
 import { ProductionSiteDetails } from "common/types"
 import GenerateDecisionDialog from "../generate-decision-dialog/generate-decision-dialog"
 import { ProductionSiteRecap } from "double-counting/components/applications/application-tabs/production-site-recap"
+import { FilesManager } from "double-counting/components/files-manager"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -201,7 +201,7 @@ const AgreementTabs = ({
         />
       )}
       {focus === "fichiers" && (
-        <FilesTable application={agreement.application} />
+        <FilesManager readOnly files={agreement.application.documents} />
       )}
     </>
   )

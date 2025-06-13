@@ -117,3 +117,7 @@ export interface CheckDoubleCountingFilesResponse {
   files: DoubleCountingFileInfo[]
   checked_at: string
 }
+
+export type DoubleCountingFile = apiTypes["DoubleCountingDocFile"] & {
+  file?: File
+}

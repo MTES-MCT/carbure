@@ -1,13 +1,9 @@
-import { useMutation, useQuery } from "common/hooks/async"
-import {
-  getDoubleCountingAgreements,
-  updateDoubleCountingApplicationIndustrialWastesFile,
-} from "./api"
+import { useQuery } from "common/hooks/async"
+import { getDoubleCountingAgreements } from "./api"
 import useEntity from "common/hooks/entity"
 import { useMemo, useState } from "react"
 import { isAgreementExpired } from "./utils"
 import {
-  DoubleCountingApplication,
   DoubleCountingApplicationOverview,
   DoubleCountingStatus,
 } from "./types"
@@ -111,34 +107,4 @@ export const useDoubleCountingColumns = () => {
   ]
 
   return columns
-}
-
-export function useIndustrialWastesFile(
-  application?: DoubleCountingApplication
-) {
-  const [industrialWastesFile, setIndustrialWastesFile] = useState<
-    File | undefined
-  >(undefined)
-
-  const isMissingWasteFile =
-    application?.has_dechets_industriels &&
-    !application?.has_dechets_industriels_file
-
-  const mutation = useMutation(
-    updateDoubleCountingApplicationIndustrialWastesFile,
-    {
-      invalidates: [
-        "dc-agreement",
-        "dc-application",
-        "double-counting-agreement-download-link",
-      ],
-    }
-  )
-
-  return {
-    isMissingWasteFile,
-    industrialWastesFile,
-    setIndustrialWastesFile,
-    mutation,
-  }
 }
