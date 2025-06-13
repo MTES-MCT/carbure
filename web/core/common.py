@@ -201,6 +201,8 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
         lot["carbure_stock_id"] = lot_row.get("carbure_stock_id", "").strip()
         lot["free_field"] = lot_row.get("champ_libre", "")
+        lot["production_site_certificate"] = lot_row.get("production_site_reference", "").strip()
+        lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None).strip()
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
         if (
@@ -223,8 +225,20 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             else:
                 lot["unknown_supplier"] = supplier
 
-        lot["production_site_certificate"] = lot_row.get("production_site_reference", "")
-        lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None)
+            # Auto-complétion des certificats de double comptage (seulement si je ne suis PAS le producteur)
+            double_counting_cert = lot["production_site_double_counting_certificate"]
+            if double_counting_cert and double_counting_cert in prefetched_data["double_counting_certificates"]:
+                dc_cert_variations = prefetched_data["double_counting_certificates"][double_counting_cert]
+                if dc_cert_variations:
+                    dc_cert = dc_cert_variations[0]
+                    if dc_cert.production_site:
+                        lot["unknown_producer"] = dc_cert.production_site.producer.name
+                        lot["unknown_production_site"] = dc_cert.production_site.name
+                        if dc_cert.production_site.country:
+                            lot["production_country_code"] = dc_cert.production_site.country.code_pays
+                        if dc_cert.production_site.date_mise_en_service:
+                            lot["production_site_commissioning_date"] = dc_cert.production_site.date_mise_en_service
+
         lot["vendor_certificate"] = lot_row.get("vendor_certificate", "")
         lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
         lot["volume"] = lot_row.get("volume", 0)
