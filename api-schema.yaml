@@ -393,80 +393,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
-  /api/double-counting/agreements/{id}/download-link/:
-    get:
-      operationId: double_counting_agreements_download_link_list
-      parameters:
-        - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Certificat Double Compte.
-          required: true
-        - in: query
-          name: order_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - -production_site
-                - -valid_until
-                - production_site
-                - valid_until
-          description: |-
-            Ordre
-
-            * `production_site` - Production site
-            * `-production_site` - Production site (décroissant)
-            * `valid_until` - Valid until
-            * `-valid_until` - Valid until (décroissant)
-          explode: false
-          style: form
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: producers
-          schema:
-            type: string
-        - in: query
-          name: production_sites
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AgreementDownloadLink"
-          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -827,6 +753,153 @@ paths:
                   value: csv file.*
                   summary: Example of export response.
           description: ""
+  /api/double-counting/applications/{id}/files/:
+    get:
+      operationId: double_counting_applications_files_list
+      parameters:
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -production_site
+                - -valid_until
+                - production_site
+                - valid_until
+          description: |-
+            Ordre
+
+            * `production_site` - Production site
+            * `-production_site` - Production site (décroissant)
+            * `valid_until` - Valid until
+            * `-valid_until` - Valid until (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producers
+          schema:
+            type: string
+        - in: query
+          name: production_sites
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApplicationFile"
+          description: ""
+  /api/double-counting/applications/{id}/files/{file_id}/:
+    delete:
+      operationId: double_counting_applications_files_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: file_id
+          schema:
+            type: integer
+          description: File ID to delete
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
+  /api/double-counting/applications/{id}/files/upload/:
+    post:
+      operationId: double_counting_applications_files_upload_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
   /api/double-counting/applications/{id}/update-approved-quotas/:
     post:
       operationId: double_counting_applications_update_approved_quotas_create
@@ -857,50 +930,6 @@ paths:
             schema:
               $ref: "#/components/schemas/UpdatedQuotasRequest"
         required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-              examples:
-                ExampleOfResponse.:
-                  value:
-                    status: success
-                  summary: Example of response.
-          description: ""
-  /api/double-counting/applications/{id}/update-industrial-wastes-file/:
-    post:
-      operationId: double_counting_applications_update_industrial_wastes_file_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Dossier Double Compte.
-          required: true
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateIndustrialWastesFileRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/UpdateIndustrialWastesFileRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/UpdateIndustrialWastesFileRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -7471,16 +7500,6 @@ components:
       required:
         - delivery_site_id
         - ownership_type
-    AgreementDownloadLink:
-      type: object
-      properties:
-        name:
-          type: string
-        link:
-          type: string
-          format: uri
-      required:
-        - name
     AgreementLists:
       type: object
       properties:
@@ -7537,6 +7556,27 @@ components:
         - country
         - id
         - name
+    ApplicationFile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        link:
+          type: string
+          format: uri
+      required:
+        - id
+        - name
+    ApplicationFileUploadRequest:
+      type: object
+      properties:
+        extra_files:
+          type: array
+          items:
+            type: string
+            format: binary
     ApplicationListe:
       type: object
       properties:
@@ -8455,9 +8495,11 @@ components:
         file:
           type: string
           format: binary
-        industrial_wastes_file:
-          type: string
-          format: binary
+        extra_files:
+          type: array
+          items:
+            type: string
+            format: binary
       required:
         - entity_id
         - file
@@ -8527,15 +8569,11 @@ components:
         has_dechets_industriels:
           type: boolean
           readOnly: true
-        has_dechets_industriels_file:
-          type: boolean
-          readOnly: true
       required:
         - created_at
         - documents
         - download_link
         - has_dechets_industriels
-        - has_dechets_industriels_file
         - id
         - period_end
         - period_start
@@ -12005,12 +12043,6 @@ components:
         website:
           type: string
           format: uri
-    UpdateIndustrialWastesFileRequest:
-      type: object
-      properties:
-        industrial_wastes_file:
-          type: string
-          format: binary
     UpdateProductionSiteModelRequest:
       type: object
       properties:

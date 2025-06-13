@@ -175,22 +175,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/double-counting/agreements/{id}/download-link/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["double_counting_agreements_download_link_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/double-counting/agreements/agreement-admin/": {
     parameters: {
       query?: never
@@ -287,6 +271,54 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/applications/{id}/files/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["double_counting_applications_files_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/files/{file_id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: operations["double_counting_applications_files_destroy"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/files/upload/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_files_upload_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/applications/{id}/update-approved-quotas/": {
     parameters: {
       query?: never
@@ -297,22 +329,6 @@ export interface paths {
     get?: never
     put?: never
     post: operations["double_counting_applications_update_approved_quotas_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/double-counting/applications/{id}/update-industrial-wastes-file/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["double_counting_applications_update_industrial_wastes_file_create"]
     delete?: never
     options?: never
     head?: never
@@ -2021,11 +2037,6 @@ export interface components {
       blending_is_outsourced: boolean
       blending_entity_id?: number
     }
-    AgreementDownloadLink: {
-      name: string
-      /** Format: uri */
-      link?: string
-    }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
       incoming: components["schemas"]["DoubleCountingRegistration"][]
@@ -2042,6 +2053,15 @@ export interface components {
       postal_code?: string
       gps_coordinates?: string | null
       is_ue_airport?: boolean
+    }
+    ApplicationFile: {
+      id: number
+      name: string
+      /** Format: uri */
+      link?: string
+    }
+    ApplicationFileUploadRequest: {
+      extra_files?: File[]
     }
     ApplicationListe: {
       rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
@@ -2432,8 +2452,7 @@ export interface components {
       should_replace: boolean
       /** Format: binary */
       file: File
-      /** Format: binary */
-      industrial_wastes_file?: File
+      extra_files?: File[]
     }
     /**
      * @description * `ACTIVE` - ACTIVE
@@ -2464,7 +2483,6 @@ export interface components {
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
       readonly download_link: string
       readonly has_dechets_industriels: boolean
-      readonly has_dechets_industriels_file: boolean
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
@@ -3853,10 +3871,6 @@ export interface components {
       /** Format: uri */
       website?: string
     }
-    UpdateIndustrialWastesFileRequest: {
-      /** Format: binary */
-      industrial_wastes_file?: File
-    }
     UpdateProductionSiteModelRequest: {
       country_code: string
       name: string
@@ -4324,45 +4338,6 @@ export interface operations {
       }
     }
   }
-  double_counting_agreements_download_link_list: {
-    parameters: {
-      query: {
-        certificate_id?: string
-        /** @description Entity ID */
-        entity_id: number
-        /** @description Ordre
-         *
-         *     * `production_site` - Production site
-         *     * `-production_site` - Production site (décroissant)
-         *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        producers?: string
-        production_sites?: string
-        /** @description A search term. */
-        search?: string
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Certificat Double Compte. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AgreementDownloadLink"][]
-        }
-      }
-    }
-  }
   double_counting_agreements_agreement_admin_retrieve: {
     parameters: {
       query: {
@@ -4568,6 +4543,103 @@ export interface operations {
       }
     }
   }
+  double_counting_applications_files_list: {
+    parameters: {
+      query: {
+        certificate_id?: string
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Ordre
+         *
+         *     * `production_site` - Production site
+         *     * `-production_site` - Production site (décroissant)
+         *     * `valid_until` - Valid until
+         *     * `-valid_until` - Valid until (décroissant) */
+        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        producers?: string
+        production_sites?: string
+        /** @description A search term. */
+        search?: string
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApplicationFile"][]
+        }
+      }
+    }
+  }
+  double_counting_applications_files_destroy: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description File ID to delete */
+        file_id: number
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_applications_files_upload_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ApplicationFileUploadRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApplicationFileUploadRequest"]
+        "multipart/form-data": components["schemas"]["ApplicationFileUploadRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
   double_counting_applications_update_approved_quotas_create: {
     parameters: {
       query: {
@@ -4586,37 +4658,6 @@ export interface operations {
         "application/json": components["schemas"]["UpdatedQuotasRequest"]
         "application/x-www-form-urlencoded": components["schemas"]["UpdatedQuotasRequest"]
         "multipart/form-data": components["schemas"]["UpdatedQuotasRequest"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Response"]
-        }
-      }
-    }
-  }
-  double_counting_applications_update_industrial_wastes_file_create: {
-    parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Dossier Double Compte. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["UpdateIndustrialWastesFileRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["UpdateIndustrialWastesFileRequest"]
-        "multipart/form-data": components["schemas"]["UpdateIndustrialWastesFileRequest"]
       }
     }
     responses: {
