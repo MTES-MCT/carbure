@@ -14,23 +14,26 @@ import { useMutation } from "common/hooks/async"
 import { producerAddDoubleCountingApplication } from "double-counting/api"
 import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { DoubleCountingFileInfo } from "../types"
-import { ReplaceApplicationDialog } from "./application-checker/replace-application-dialog"
+import { DoubleCountingFile, DoubleCountingFileInfo } from "../../types"
+import { ReplaceApplicationDialog } from "./replace-application-dialog"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 import { HttpError } from "common/services/api-fetch"
+import { compact } from "common/utils/collection"
 
 export type SendApplicationProducerDialogProps = {
   file: File
   fileData: DoubleCountingFileInfo
+  extraFiles: DoubleCountingFile[]
+  onSuccess: () => void
   onClose: () => void
-  industrialWastesFile: File
 }
 
 export const SendApplicationProducerDialog = ({
   file,
   fileData,
+  extraFiles,
+  onSuccess,
   onClose,
-  industrialWastesFile,
 }: SendApplicationProducerDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -47,6 +50,7 @@ export const SendApplicationProducerDialog = ({
     invalidates: ["dc-agreements"],
     onSuccess() {
       onClose()
+      onSuccess()
       notify(t("La demande a été envoyée !"), { variant: "success" })
     },
     onError(err) {
@@ -69,6 +73,12 @@ export const SendApplicationProducerDialog = ({
         setError(
           <MissingAddress productionSiteName={fileData.production_site} />
         )
+      } else if (errorCode === "MISSING_INDUSTRIAL_WASTES_FILE") {
+        setError(
+          t(
+            "La demande concerne des déchets industriels, merci de renseigner le questionnaire associé dans l'onglet 'Fichiers'."
+          )
+        )
       } else {
         notifyError(err, t("Impossible d'envoyer le dossier"))
       }
@@ -77,13 +87,14 @@ export const SendApplicationProducerDialog = ({
 
   const saveApplication = async (shouldReplace = false) => {
     if (!value.productionSite) return
+    const files = compact(extraFiles.map((e) => e.file))
     setError(undefined)
     addApplication.execute(
       entity.id,
       entity.id,
       value.productionSite.id,
       file,
-      industrialWastesFile,
+      files,
       shouldReplace
     )
   }
@@ -126,15 +137,6 @@ export const SendApplicationProducerDialog = ({
         getOptions={(query) => findProductionSites(query, entity.id)}
         normalize={norm.normalizeProductionSite}
         {...bind("productionSite")}
-        // state={value.productionSite?.dc_reference ? "error" : "default"}
-        // stateRelatedMessage={
-        //   value.productionSite?.dc_reference ? (
-        //     <>
-        //       {t("Le site contient déjà un numéro d'agrément en cours")} (
-        //       {value.productionSite.dc_reference})
-        //     </>
-        //   ) : undefined
-        // }
       />
       {error && (
         <section ref={refToScroll}>

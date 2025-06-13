@@ -4,18 +4,15 @@ import { Box, Divider, Row } from "common/components/scaffold"
 import { Title } from "common/components/title"
 import { useTranslation } from "react-i18next"
 import { FileUploadDialog } from "./file-upload-dialog"
-import {
-  DoubleCountingApplicationDetails,
-  DoubleCountingFile,
-} from "double-counting/types"
+import { DoubleCountingFile } from "double-counting/types"
 import { NoResult } from "common/components/no-result2"
 import { Table, Column } from "common/components/table2"
 import { Confirm } from "common/components/dialog2"
 import { Text } from "common/components/text"
+import { FileTypeEnum } from "api-schema"
 
 type FilesManagerProps = {
   readOnly?: boolean
-  application?: DoubleCountingApplicationDetails
   files?: DoubleCountingFile[]
   onAddFiles?: (files: DoubleCountingFile[]) => void
   onDeleteFile?: (file: DoubleCountingFile) => void
@@ -34,8 +31,9 @@ export const FilesManager = ({
     const dcFiles = Array.from(files).map<DoubleCountingFile>((file) => ({
       id: 0,
       file,
-      name: file.name,
-      link: URL.createObjectURL(file),
+      file_name: file.name,
+      file_type: FileTypeEnum.EXTRA,
+      url: URL.createObjectURL(file),
     }))
 
     onAddFiles?.(dcFiles)
@@ -44,7 +42,7 @@ export const FilesManager = ({
   const columns: Column<DoubleCountingFile>[] = [
     {
       header: t("Nom"),
-      cell: (row) => row.name,
+      cell: (row) => row.file_name,
     },
     {
       header: t("Actions"),
@@ -96,7 +94,7 @@ export const FileActions = ({ file, readOnly, onDelete }: FileActionProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
-  if (!file.link) {
+  if (!file.url) {
     return <Text>{t("Aucun fichier disponible")}</Text>
   }
 
@@ -104,11 +102,11 @@ export const FileActions = ({ file, readOnly, onDelete }: FileActionProps) => {
     <Row style={{ gap: "var(--spacing-xs)" }}>
       <Button
         iconId="fr-icon-download-fill"
-        linkProps={{ href: file.link, target: "_blank" }}
+        linkProps={{ href: file.url, target: "_blank" }}
         priority="secondary"
         title={t("Télécharger")}
       />
-      {!readOnly && file.id !== -1 && (
+      {!readOnly && file.file_type !== "EXCEL" && (
         <Button
           iconId="fr-icon-delete-fill"
           priority="secondary"
@@ -118,7 +116,7 @@ export const FileActions = ({ file, readOnly, onDelete }: FileActionProps) => {
               <Confirm
                 title={t("Supprimer le fichier")}
                 description={t("Voulez-vous supprimer le fichier {{file}} ?", {
-                  file: file.name,
+                  file: file.file_name,
                 })}
                 confirm={t("Supprimer")}
                 customVariant="danger"

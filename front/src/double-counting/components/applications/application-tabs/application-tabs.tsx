@@ -4,42 +4,40 @@ import { compact } from "common/utils/collection"
 import {
   DoubleCountingProduction,
   DoubleCountingSourcing,
-  DoubleCountingApplicationDetails,
+  DoubleCountingFile,
 } from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SourcingFullTable } from "../../sourcing-table"
 import { ProductionTable } from "../../production-table"
 import { ProductionSiteRecap } from "./production-site-recap"
-import { FilesTable } from "../../files-table"
 import { Box } from "common/components/scaffold"
-import { AddIndustrialWastes } from "double-counting/components/add-industrial-wastes"
-import { DechetIndustrielAlert } from "double-counting/components/application-checker/industrial-waste-alert"
+import { FilesManager } from "double-counting/components/files-manager"
 
 interface ApplicationDetailsProps {
+  readOnly?: boolean
   production?: DoubleCountingProduction[]
   sourcing?: DoubleCountingSourcing[]
   quotas?: Record<string, number>
   setQuotas?: (quotas: Record<string, number>) => void
   hasAgreement?: boolean
   productionSite?: ProductionSiteDetails
-  application?: DoubleCountingApplicationDetails
-  hasIndustrialWastes?: boolean
-  industrialWastesFile?: File
-  setIndustrialWastesFile?: (file?: File) => void
+  files?: DoubleCountingFile[]
+  onAddFiles?: (files: DoubleCountingFile[]) => void
+  onDeleteFile?: (file: DoubleCountingFile) => void
 }
 
 const ApplicationTabs = ({
+  readOnly,
   productionSite,
   production,
   sourcing,
   quotas,
   setQuotas,
   hasAgreement,
-  application,
-  hasIndustrialWastes,
-  industrialWastesFile,
-  setIndustrialWastesFile,
+  files,
+  onAddFiles,
+  onDeleteFile,
 }: ApplicationDetailsProps) => {
   const [focus, setFocus] = useState(
     productionSite ? "production_site" : "sourcing_forecast"
@@ -80,10 +78,6 @@ const ApplicationTabs = ({
         sticky
       />
 
-      {hasIndustrialWastes && (
-        <DechetIndustrielAlert valid={industrialWastesFile !== undefined} />
-      )}
-
       {focus === "production_site" && productionSite && (
         <Box>
           <ProductionSiteRecap productionSite={productionSite} />
@@ -103,16 +97,14 @@ const ApplicationTabs = ({
           sourcing={sourcing ?? []}
         />
       )}
+
       {focus === "fichiers" && (
-        <>
-          {hasIndustrialWastes && setIndustrialWastesFile && (
-            <AddIndustrialWastes
-              industrialWastesFile={industrialWastesFile}
-              setIndustrialWastesFile={setIndustrialWastesFile}
-            />
-          )}
-          {application && <FilesTable application={application} />}
-        </>
+        <FilesManager
+          readOnly={readOnly}
+          files={files}
+          onAddFiles={onAddFiles}
+          onDeleteFile={onDeleteFile}
+        />
       )}
     </>
   )

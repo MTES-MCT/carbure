@@ -16,7 +16,7 @@ import { ProductionTable } from "./production-table"
 import { QuotasTable } from "./quotas-table"
 import { SourcingFullTable } from "./sourcing-table"
 import { AgreementDetails, DoubleCountingStatus } from "../types"
-import { FilesTable } from "./files-table"
+import { FilesManager } from "./files-manager"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -160,7 +160,9 @@ const AgreementTabs = ({ agreement }: AgreementTabsProps) => {
         />
       )}
 
-      {focus === "files" && <FilesTable application={agreement.application} />}
+      {focus === "files" && (
+        <FilesManager readOnly files={agreement.application.documents} />
+      )}
     </>
   )
 }
