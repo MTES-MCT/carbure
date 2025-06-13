@@ -271,22 +271,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/double-counting/applications/{id}/files/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["double_counting_applications_files_list"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/double-counting/applications/{id}/files/{file_id}/": {
     parameters: {
       query?: never
@@ -303,22 +287,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/double-counting/applications/{id}/files/upload/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["double_counting_applications_files_upload_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/double-counting/applications/{id}/update-approved-quotas/": {
     parameters: {
       query?: never
@@ -329,6 +297,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["double_counting_applications_update_approved_quotas_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/upload-files/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_upload_files_create"]
     delete?: never
     options?: never
     head?: never
@@ -2054,12 +2038,6 @@ export interface components {
       gps_coordinates?: string | null
       is_ue_airport?: boolean
     }
-    ApplicationFile: {
-      id: number
-      name: string
-      /** Format: uri */
-      link?: string
-    }
     ApplicationFileUploadRequest: {
       extra_files?: File[]
     }
@@ -2489,7 +2467,7 @@ export interface components {
       /** Format: date-time */
       readonly created_at: string
       readonly producer: components["schemas"]["EntitySummary"]
-      readonly production_site: components["schemas"]["DoubleCountingProductionSite"]
+      readonly production_site: components["schemas"]["DoubleCountingProductionSitePreview"]
       /** Format: date */
       period_start: string
       /** Format: date */
@@ -2509,7 +2487,7 @@ export interface components {
       readonly id: number
       file_name?: string
       file_type?: components["schemas"]["FileTypeEnum"]
-      url: string
+      readonly url: string
     }
     DoubleCountingProduction: {
       readonly id: number
@@ -2550,6 +2528,10 @@ export interface components {
       readonly inputs: components["schemas"]["FeedStock"][]
       readonly outputs: components["schemas"]["Biofuel"][]
       readonly certificates: components["schemas"]["ProductionSiteCertificate"][]
+    }
+    DoubleCountingProductionSitePreview: {
+      readonly id: number
+      name: string
     }
     DoubleCountingQuota: {
       approved_quota: number
@@ -4543,45 +4525,6 @@ export interface operations {
       }
     }
   }
-  double_counting_applications_files_list: {
-    parameters: {
-      query: {
-        certificate_id?: string
-        /** @description Entity ID */
-        entity_id: number
-        /** @description Ordre
-         *
-         *     * `production_site` - Production site
-         *     * `-production_site` - Production site (décroissant)
-         *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        producers?: string
-        production_sites?: string
-        /** @description A search term. */
-        search?: string
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Dossier Double Compte. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApplicationFile"][]
-        }
-      }
-    }
-  }
   double_counting_applications_files_destroy: {
     parameters: {
       query: {
@@ -4598,37 +4541,6 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Response"]
-        }
-      }
-    }
-  }
-  double_counting_applications_files_upload_create: {
-    parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Dossier Double Compte. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["ApplicationFileUploadRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["ApplicationFileUploadRequest"]
-        "multipart/form-data": components["schemas"]["ApplicationFileUploadRequest"]
-      }
-    }
     responses: {
       200: {
         headers: {
@@ -4658,6 +4570,37 @@ export interface operations {
         "application/json": components["schemas"]["UpdatedQuotasRequest"]
         "application/x-www-form-urlencoded": components["schemas"]["UpdatedQuotasRequest"]
         "multipart/form-data": components["schemas"]["UpdatedQuotasRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_applications_upload_files_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ApplicationFileUploadRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApplicationFileUploadRequest"]
+        "multipart/form-data": components["schemas"]["ApplicationFileUploadRequest"]
       }
     }
     responses: {

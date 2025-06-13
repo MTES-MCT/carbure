@@ -753,80 +753,6 @@ paths:
                   value: csv file.*
                   summary: Example of export response.
           description: ""
-  /api/double-counting/applications/{id}/files/:
-    get:
-      operationId: double_counting_applications_files_list
-      parameters:
-        - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Dossier Double Compte.
-          required: true
-        - in: query
-          name: order_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - -production_site
-                - -valid_until
-                - production_site
-                - valid_until
-          description: |-
-            Ordre
-
-            * `production_site` - Production site
-            * `-production_site` - Production site (décroissant)
-            * `valid_until` - Valid until
-            * `-valid_until` - Valid until (décroissant)
-          explode: false
-          style: form
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: producers
-          schema:
-            type: string
-        - in: query
-          name: production_sites
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ApplicationFile"
-          description: ""
   /api/double-counting/applications/{id}/files/{file_id}/:
     delete:
       operationId: double_counting_applications_files_destroy
@@ -851,45 +777,6 @@ paths:
           required: true
       tags:
         - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-          description: ""
-  /api/double-counting/applications/{id}/files/upload/:
-    post:
-      operationId: double_counting_applications_files_upload_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Dossier Double Compte.
-          required: true
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ApplicationFileUploadRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/ApplicationFileUploadRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/ApplicationFileUploadRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -944,6 +831,45 @@ paths:
                   value:
                     status: success
                   summary: Example of response.
+          description: ""
+  /api/double-counting/applications/{id}/upload-files/:
+    post:
+      operationId: double_counting_applications_upload_files_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
           description: ""
   /api/double-counting/applications/add/:
     post:
@@ -7556,19 +7482,6 @@ components:
         - country
         - id
         - name
-    ApplicationFile:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        link:
-          type: string
-          format: uri
-      required:
-        - id
-        - name
     ApplicationFileUploadRequest:
       type: object
       properties:
@@ -8598,7 +8511,7 @@ components:
           readOnly: true
         production_site:
           allOf:
-            - $ref: "#/components/schemas/DoubleCountingProductionSite"
+            - $ref: "#/components/schemas/DoubleCountingProductionSitePreview"
           readOnly: true
         period_start:
           type: string
@@ -8650,6 +8563,7 @@ components:
           $ref: "#/components/schemas/FileTypeEnum"
         url:
           type: string
+          readOnly: true
       required:
         - id
         - url
@@ -8797,6 +8711,18 @@ components:
         - name
         - outputs
         - producer
+    DoubleCountingProductionSitePreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+      required:
+        - id
+        - name
     DoubleCountingQuota:
       type: object
       properties:
