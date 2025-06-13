@@ -35,7 +35,6 @@ class DoubleCountingApplication(models.Model):
     certificate_id = models.CharField(max_length=16)  # FR_123456789_2020
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
     download_link = models.CharField(max_length=512, default=None, null=True)
-    industrial_wastes_file_link = models.CharField(max_length=512, default=None, null=True)
 
     def __str__(self):
         psite = self.production_site.name if self.production_site else ""
@@ -194,7 +193,7 @@ class DoubleCountingDocFile(models.Model):
     file_name = models.CharField(max_length=128, default="")
     file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
     dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="documents")
-    link_expiry_dt = models.DateTimeField()
+    link_expiry_dt = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
