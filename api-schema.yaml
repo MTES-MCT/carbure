@@ -9744,11 +9744,13 @@ components:
         - sourcing_history
     FileTypeEnum:
       enum:
-        - SOURCING
+        - EXCEL
+        - EXTRA
         - DECISION
       type: string
       description: |-
-        * `SOURCING` - SOURCING
+        * `EXCEL` - EXCEL
+        * `EXTRA` - EXTRA
         * `DECISION` - DECISION
     GenericCertificate:
       type: object

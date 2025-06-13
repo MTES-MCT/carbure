@@ -2920,7 +2920,8 @@ export interface components {
       global_errors: components["schemas"]["FileError"][]
     }
     /**
-     * @description * `SOURCING` - SOURCING
+     * @description * `EXCEL` - EXCEL
+     *     * `EXTRA` - EXTRA
      *     * `DECISION` - DECISION
      * @enum {string}
      */
@@ -8816,7 +8817,8 @@ export enum ExtAdminPagesEnum {
   TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
 }
 export enum FileTypeEnum {
-  SOURCING = "SOURCING",
+  EXCEL = "EXCEL",
+  EXTRA = "EXTRA",
   DECISION = "DECISION",
 }
 export enum GesOptionEnum {
