@@ -447,6 +447,54 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/provision-certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_provision_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/provision-certificates/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_provision_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/provision-certificates/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_provision_certificates_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/entities/": {
     parameters: {
       query?: never
@@ -2677,6 +2725,18 @@ export interface components {
      * @enum {string}
      */
     ElecOperationTypeEnum: ElecOperationTypeEnum
+    ElecProvisionCertificate: {
+      readonly id: number
+      readonly cpo: components["schemas"]["EntityPreview"]
+      source?: components["schemas"]["SourceEnum"] | null
+      quarter: components["schemas"]["QuarterEnum"]
+      year: number
+      operating_unit: string
+      /** Format: double */
+      energy_amount: number
+      /** Format: double */
+      remaining_energy_amount: number
+    }
     EmptyResponse: {
       empty?: string
     }
@@ -3228,6 +3288,21 @@ export interface components {
       results: components["schemas"]["ElecOperationList"][]
       total_quantity?: number
     }
+    PaginatedElecProvisionCertificateList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecProvisionCertificate"][]
+    }
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -3370,6 +3445,14 @@ export interface components {
       dc_reference?: string
       created_by?: number | null
     }
+    /**
+     * @description * `1` - T1
+     *     * `2` - T2
+     *     * `3` - T3
+     *     * `4` - T4
+     * @enum {integer}
+     */
+    QuarterEnum: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter
     RegistrationCountry: {
       name: string
       name_en: string
@@ -3800,6 +3883,13 @@ export interface components {
      * @enum {string}
      */
     SiteTypeEnum: SiteTypeEnum
+    /**
+     * @description * `MANUAL` - MANUAL
+     *     * `METER_READINGS` - METER_READINGS
+     *     * `QUALICHARGE` - QUALICHARGE
+     * @enum {string}
+     */
+    SourceEnum: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
     StatsResponse: {
       metabase_iframe_url: string
     }
@@ -4854,6 +4944,132 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ApplicationSnapshot"]
+        }
+      }
+    }
+  }
+  elec_v2_provision_certificates_list: {
+    parameters: {
+      query?: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Ordre
+         *
+         *     * `quarter` - Quarter
+         *     * `-quarter` - Quarter (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operating_unit` - Operating unit
+         *     * `-operating_unit` - Operating unit (décroissant)
+         *     * `source` - Source
+         *     * `-source` - Source (décroissant) */
+        order?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        quarter?: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter[]
+        /** @description A search term. */
+        search?: string
+        /** @description * `MANUAL` - MANUAL
+         *     * `METER_READINGS` - METER_READINGS
+         *     * `QUALICHARGE` - QUALICHARGE */
+        source?: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecProvisionCertificateList"]
+        }
+      }
+    }
+  }
+  elec_v2_provision_certificates_retrieve: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Fourniture (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecProvisionCertificate"]
+        }
+      }
+    }
+  }
+  elec_v2_provision_certificates_filters_retrieve: {
+    parameters: {
+      query?: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Filter string to apply */
+        filter?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Ordre
+         *
+         *     * `quarter` - Quarter
+         *     * `-quarter` - Quarter (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operating_unit` - Operating unit
+         *     * `-operating_unit` - Operating unit (décroissant)
+         *     * `source` - Source
+         *     * `-source` - Source (décroissant) */
+        order?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        quarter?: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter[]
+        /** @description A search term. */
+        search?: string
+        /** @description * `MANUAL` - MANUAL
+         *     * `METER_READINGS` - METER_READINGS
+         *     * `QUALICHARGE` - QUALICHARGE */
+        source?: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
         }
       }
     }
@@ -8574,6 +8790,29 @@ export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
   ValueMinusvalid_until = "-valid_until",
   production_site = "production_site",
   valid_until = "valid_until",
+}
+export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder {
+  ValueMinuscpo = "-cpo",
+  ValueMinusenergy_amount = "-energy_amount",
+  ValueMinusoperating_unit = "-operating_unit",
+  ValueMinusquarter = "-quarter",
+  ValueMinussource = "-source",
+  cpo = "cpo",
+  energy_amount = "energy_amount",
+  operating_unit = "operating_unit",
+  quarter = "quarter",
+  source = "source",
+}
+export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter {
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
+}
+export enum PathsApiElecV2ProvisionCertificatesGetParametersQuerySource {
+  MANUAL = "MANUAL",
+  METER_READINGS = "METER_READINGS",
+  QUALICHARGE = "QUALICHARGE",
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
   ValueMinusfeedstock = "-feedstock",

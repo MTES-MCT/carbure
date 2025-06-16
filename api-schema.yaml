@@ -1235,6 +1235,285 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
           description: ""
+  /api/elec-v2/provision-certificates/:
+    get:
+      operationId: elec_v2_provision_certificates_list
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -cpo
+                - -energy_amount
+                - -operating_unit
+                - -quarter
+                - -source
+                - cpo
+                - energy_amount
+                - operating_unit
+                - quarter
+                - source
+          description: |-
+            Ordre
+
+            * `quarter` - Quarter
+            * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operating_unit` - Operating unit
+            * `-operating_unit` - Operating unit (décroissant)
+            * `source` - Source
+            * `-source` - Source (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: quarter
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: string
+            nullable: true
+            enum:
+              - MANUAL
+              - METER_READINGS
+              - QUALICHARGE
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateList"
+          description: ""
+  /api/elec-v2/provision-certificates/{id}/:
+    get:
+      operationId: elec_v2_provision_certificates_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Fourniture
+            (elec).
+          required: true
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecProvisionCertificate"
+          description: ""
+  /api/elec-v2/provision-certificates/filters/:
+    get:
+      operationId: elec_v2_provision_certificates_filters_retrieve
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -cpo
+                - -energy_amount
+                - -operating_unit
+                - -quarter
+                - -source
+                - cpo
+                - energy_amount
+                - operating_unit
+                - quarter
+                - source
+          description: |-
+            Ordre
+
+            * `quarter` - Quarter
+            * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operating_unit` - Operating unit
+            * `-operating_unit` - Operating unit (décroissant)
+            * `source` - Source
+            * `-source` - Source (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: quarter
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: string
+            nullable: true
+            enum:
+              - MANUAL
+              - METER_READINGS
+              - QUALICHARGE
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - SHELL France
+                    - CIM SNC
+                    - ESSO SAF
+                    - TMF
+                    - TERF SAF
+                  summary: Example of filters response.
+          description: ""
   /api/entities/:
     get:
       operationId: entities_list
@@ -9116,6 +9395,46 @@ components:
         * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
         * `CESSION` - CESSION
         * `TENEUR` - TENEUR
+    ElecProvisionCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        source:
+          allOf:
+            - $ref: "#/components/schemas/SourceEnum"
+          nullable: true
+        quarter:
+          allOf:
+            - $ref: "#/components/schemas/QuarterEnum"
+          minimum: -2147483648
+          maximum: 2147483647
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        operating_unit:
+          type: string
+          maxLength: 64
+        energy_amount:
+          type: number
+          format: double
+        remaining_energy_amount:
+          type: number
+          format: double
+      required:
+        - cpo
+        - energy_amount
+        - id
+        - operating_unit
+        - quarter
+        - remaining_energy_amount
+        - year
     EmptyResponse:
       type: object
       properties:
@@ -10423,6 +10742,29 @@ components:
             $ref: "#/components/schemas/ElecOperationList"
         total_quantity:
           type: number
+    PaginatedElecProvisionCertificateList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecProvisionCertificate"
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -10741,6 +11083,18 @@ components:
         - name
         - postal_code
         - site_siret
+    QuarterEnum:
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      type: integer
+      description: |-
+        * `1` - T1
+        * `2` - T2
+        * `3` - T3
+        * `4` - T4
     RegistrationCountry:
       type: object
       properties:
@@ -11880,6 +12234,16 @@ components:
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
+    SourceEnum:
+      enum:
+        - MANUAL
+        - METER_READINGS
+        - QUALICHARGE
+      type: string
+      description: |-
+        * `MANUAL` - MANUAL
+        * `METER_READINGS` - METER_READINGS
+        * `QUALICHARGE` - QUALICHARGE
     StatsResponse:
       type: object
       properties:
