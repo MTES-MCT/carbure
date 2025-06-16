@@ -20,7 +20,7 @@ class TicketFilter(django_filters.FilterSet):
     production_sites = django_filters.CharFilter(method="filter_production_sites")
     consumption_types = django_filters.CharFilter(method="filter_consumption_types")
 
-    order = django_filters.OrderingFilter(
+    order_by = django_filters.OrderingFilter(
         fields=(
             ("client__name", "client"),
             ("volume", "volume"),
