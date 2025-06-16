@@ -39,7 +39,11 @@ class BaseFilter(FilterSet):
             ("_entity", "from_to"),
             ("_quantity", "quantity"),
         ),
-        extra_valid_fields=["available_balance", "pending_operations"],
+        extra_valid_fields=[
+            "available_balance",
+            "pending_operations",
+            "saved_emissions",
+        ],
     )
 
     def filter_multiple_values(self, queryset, field_name, param_name):

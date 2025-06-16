@@ -34,6 +34,7 @@ class BalanceSerializer(BaseBalanceSerializer):
     biofuel = BalanceBiofuelSerializer()
     ghg_reduction_min = serializers.FloatField()
     ghg_reduction_max = serializers.FloatField()
+    saved_emissions = serializers.FloatField()
 
 
 class BalanceBySectorSerializer(BaseBalanceSerializer):

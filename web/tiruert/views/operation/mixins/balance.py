@@ -102,9 +102,9 @@ class BalanceActionMixin:
 
         # These sortings can't be done in operations filters because they are not in the queryset
         # Theses info are calculated in the balance service
-        if order_by and order_by in ["available_balance", "pending_operations"]:
+        if order_by and order_by in ["available_balance", "pending_operations", "saved_emissions"]:
             data = sorted(data, key=lambda x: x[order_by])
-        elif order_by and order_by in ["-available_balance", "-pending_operations"]:
+        elif order_by and order_by in ["-available_balance", "-pending_operations", "-saved_emissions"]:
             data = sorted(data, key=lambda x: x[order_by[1:]], reverse=True)
 
         paginator = BalancePagination()
