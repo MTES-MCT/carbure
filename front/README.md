@@ -153,14 +153,17 @@ To use translations in frontend code, you have two methods:
 - using the react-i18next hook
 - using the `<Trans>` component
 
+You can find more details about their use in the [official documentation](https://react.i18next.com/guides/quick-start#translate-your-content).
+
 If no namespace is specified when using those tools, the translations will be located in the file `{locale}/translation.json`.
 
-You can prefill this file automatically by calling the command `npm run translate`: it will detect all the places where i18next is used, and generate key/value pairs for each translation described inside the frontend code.
+You can prefill this file automatically by calling the command `npm run translate`: it will detect all the places where i18next is used in frontend code, and generate key/value pairs for each translation found.
 
-Each new detected key will be added to the translation files of each locale, and then two operations must be done manually:
+Each new detected key will be added to the translation files of each locale, and then 3 operations must be done manually:
 
-- On the French translation file, find each key where `count` was used (this means the text has singular and plural variations), and adapt the value for each case (`{key}_one`, `{key}_many`, `{key}_other`)
-- Once the French side is done, run the following command `npm run translate-missing`: it will find all the untranslated keys inside the English translation file, and translate them automatically using the free DeepL API
+- On the french translation file, find each key where `count` was used ([https://www.i18next.com/translation-function/plurals]()), and adapt the value for each case (`{key}_one`, `{key}_many`, `{key}_other`)
+- Once the french side is done, run the following command `npm run translate-missing`: it will find all the untranslated keys inside the english translation file, and translate them automatically using the free DeepL API
+- Double-check that the new english translations are correct before committing.
 
 > [!NOTE]
 > For the automatic translation to work, you'll need to add a DEEPL_API_KEY in your local .env

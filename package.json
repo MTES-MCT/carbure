@@ -14,7 +14,8 @@
     "restart": "docker-compose down && docker-compose up -d",
     "deploy-preview": "git push origin $branch:preview --force",
     "check-types": "cd front; npm run check-types",
-    "translate": "cd front; npm run translate"
+    "translate": "cd front; npm run translate",
+    "translate-missing": "cd front; npm run translate-missing"
   },
   "engines": {
     "node": "16.16.0",
