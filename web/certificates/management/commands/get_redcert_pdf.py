@@ -26,6 +26,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--ids", type=str, help="Download specific certificates")
         parser.add_argument("--no-pdf", action="store_true", help="Download certificates without pdf")
+        parser.add_argument("--exclude-ids", type=str, help="Exclude specific certificates by ids")
+        parser.add_argument("--size", type=int, default=100, help="Number of certificates to search")
 
     def handle(self, *args, **options):
         start_time = time.time()
@@ -39,7 +41,7 @@ class Command(BaseCommand):
         if options["ids"]:
             certificates = self.certificates_with_ids(options["ids"])
         elif options["no_pdf"]:
-            certificates = self.certificates_without_pdf()
+            certificates = self.certificates_without_pdf(options["exclude_ids"], options["size"])
 
         if certificates:
             certificates_to_update = self.get_pdf_for_specific_certificates(driver, certificates)
@@ -79,12 +81,19 @@ class Command(BaseCommand):
             )
         )
 
-    def certificates_without_pdf(self):
-        return GenericCertificate.objects.filter(
-            certificate_type=GenericCertificate.REDCERT,
-            download_link__isnull=True,
-            valid_until__gte=time.strftime("%Y-%m-%d"),
-        ).order_by("-valid_until")
+    def certificates_without_pdf(self, exclude_ids=None, size=100):
+        if exclude_ids:
+            exclude_ids = exclude_ids.split(",")
+
+        return (
+            GenericCertificate.objects.filter(
+                certificate_type=GenericCertificate.REDCERT,
+                download_link__isnull=True,
+                valid_until__gte=time.strftime("%Y-%m-%d"),
+            )
+            .exclude(certificate_id__in=exclude_ids)
+            .order_by("-valid_until")[:size]
+        )
 
     def certificates_with_ids(self, certificate_ids):
         return GenericCertificate.objects.filter(certificate_id__in=certificate_ids.split(","))
