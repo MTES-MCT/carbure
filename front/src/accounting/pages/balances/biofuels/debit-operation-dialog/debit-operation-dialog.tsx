@@ -30,7 +30,7 @@ export const DebitOperationDialog = ({
     | OperationType.DEVALUATION
     | OperationType.EXPORTATION
     | OperationType.TRANSFERT
-  >(OperationType.CESSION)
+  >(OperationType.TRANSFERT)
 
   //const { result, loading } = useQuery(getObjectives, {
   //  key: "teneur-objectives",
