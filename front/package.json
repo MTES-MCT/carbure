@@ -77,6 +77,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "translate": "i18next",
+    "translate-missing": "node scripts/translate-missing.js",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
     "prestart": "react-dsfr update-icons",

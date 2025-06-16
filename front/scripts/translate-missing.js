@@ -65,7 +65,11 @@ function wait(time) {
   return new Promise((resolve) => setTimeout(resolve, time))
 }
 
-translateMissing(
-  "public/locales/en/translation.json",
-  "public/locales/fr/translation.json"
-)
+if (process.env.DEEPL_API_KEY) {
+  translateMissing(
+    "public/locales/en/translation.json",
+    "public/locales/fr/translation.json"
+  )
+} else {
+  throw new Error("DEEPL_API_KEY not found in env")
+}
