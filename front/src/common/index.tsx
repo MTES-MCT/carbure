@@ -39,6 +39,7 @@ const Pending = lazy(() => import("carbure/components/pending"))
 const PublicStats = lazy(() => import("carbure/components/public-stats"))
 const ElecAudit = lazy(() => import("elec-auditor"))
 const ContactPage = lazy(() => import("contact"))
+const ElecCertificatesV2 = lazy(() => import("elec-v2/pages/certificates"))
 
 const Carbure = () => {
   const user = useUserManager()
@@ -221,6 +222,16 @@ const Org = () => {
           />
         </>
       )}
+
+      {isCPO && (
+        <>
+          <Route
+            path="elec-v2/certificates/:year/*"
+            element={<ElecCertificatesV2 />}
+          />
+        </>
+      )}
+
       {isOperator && has_elec && (
         <>
           <Route path="elec/:year/*" element={<ElecOperator />} />

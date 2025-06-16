@@ -104,6 +104,16 @@ export const ROUTE_URLS = {
   ELEC_AUDITOR: (entity_id: number, year: number) =>
     urlWithOrgId(entity_id, `/elec-audit/${year}`),
 
+  ELEC_V2: (entity_id: number, year: number) => {
+    const certURL = urlWithOrgId(entity_id, `/elec-v2/certificates/${year}`)
+    return {
+      CERTIFICATES: {
+        PROVISION: `${certURL}/provision`,
+        TRANSFER: `${certURL}/transfer`,
+      },
+    }
+  },
+
   SAF: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/saf/${year}`)
 

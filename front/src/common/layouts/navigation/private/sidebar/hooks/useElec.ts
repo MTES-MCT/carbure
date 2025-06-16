@@ -74,5 +74,25 @@ export const useElec = (params?: ElecParams) => {
       },
     ],
   }
-  return [elec, elecAdmin]
+
+  const elecV2: MenuSection = {
+    title: t("Certificats d'élec (v2)"),
+    condition: isCPO,
+    children: [
+      {
+        path: routes.ELEC_V2().CERTIFICATES.PROVISION,
+        title: t("Énergie disponible"),
+        icon: ArrowGoBackLine,
+        condition: isCPO,
+      },
+      {
+        path: routes.ELEC_V2().CERTIFICATES.TRANSFER,
+        title: t("Énergie cédée"),
+        icon: ArrowGoForwardLine,
+        condition: isCPO,
+      },
+    ],
+  }
+
+  return [elec, elecAdmin, elecV2]
 }
