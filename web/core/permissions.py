@@ -1,3 +1,5 @@
+from typing import Literal, Optional
+
 from rest_framework.permissions import BasePermission
 
 from core.common import ErrorResponse
@@ -154,3 +156,51 @@ class OrPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         # Instantiate each permission class and check if any object-level permission is satisfied
         return any(permission().has_object_permission(request, view, obj) for permission in self.permission_classes)
+
+
+# static types
+
+EntityType = Literal[
+    "Producteur",
+    "Opérateur",
+    "Trader",
+    "Administration",
+    "Auditor",
+    "Administration Externe",
+    "Compagnie aérienne",
+    "Unknown",
+    "Charge Point Operator",
+    "Power or Heat Producer",
+]
+
+UserRole = Literal[
+    "RO",
+    "RW",
+    "ADMIN",
+    "AUDITOR",
+]
+
+ExternalAdmin = Literal[
+    "AIRLINE",
+    "DCA",
+    "AGRIMER",
+    "TIRIB",
+    "ELEC",
+    "TRANSFERRED_ELEC",
+]
+
+
+def AdminRightsFactory(allow_external: Optional[list[ExternalAdmin]] = None, allow_role: Optional[list[UserRole]] = None):
+    class _HasAdminRights(HasAdminRights):
+        def __init__(self):
+            super().__init__(allow_external, allow_role)
+
+    return _HasAdminRights
+
+
+def UserRightsFactory(role: Optional[list[UserRole]] = None, entity_type: Optional[list[EntityType]] = None):
+    class _HasUserRights(HasUserRights):
+        def __init__(self):
+            super().__init__(role, entity_type)
+
+    return _HasUserRights
