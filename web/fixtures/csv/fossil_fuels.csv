@@ -1,60 +1,17 @@
 nomenclature,fuel_category,label,pci_litre,masse_volumique
 2710123111,1,Essences d’aviation,1,1
-2710123119,1,Essences d’aviation,1,1
-2710123190,1,Essences d’aviation,1,1
-2710124111,1,Supercarburants sans plomb,1,1
-2710124119,1,Supercarburants sans plomb,1,1
-2710124190,1,Supercarburants sans plomb,1,1
-2710124511,1,Supercarburants sans plomb,1,1
-2710124519,1,Supercarburants sans plomb,1,1
-2710124590,1,Supercarburants sans plomb,1,1
-2710124911,1,Supercarburants sans plomb,1,1
-2710124919,1,Supercarburants sans plomb,1,1
-2710124990,1,Supercarburants sans plomb,1,1
-3824909266,1,Superéthanol E85,1,1
-2710192500,2,Pétrole lampant,1,1
-2710194321,2,Gazole autre,1,1
-2710194329,2,Gazole autre,1,1
-2710194330,2,Gazole autre,1,1
-2710194390,2,Gazole autre,1,1
-2710194621,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
-2710194629,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
-2710194630,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
-2710194690,2,Fioul domestique 10 ppm < S < 20 ppm,1,1
-2710194721,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
-2710194729,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
-2710194730,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
-2710194790,2,Fioul domestique 20 ppm < S < 1 000 ppm,1,1
-2710194810,2,Fioul domestique 1 000 ppm < S,1,1
-2710194890,2,Fioul domestique 1 000 ppm < S,1,1
-2710201121,2,Gazole S < 10 ppm,1,1
-2710201129,2,Gazole S < 10 ppm,1,1
-2710201130,2,Gazole S < 10 ppm,1,1
-2710201521,2,Gazole 10 ppm < S < 20 ppm,1,1
-2710201529,2,Gazole 10 ppm < S < 20 ppm,1,1
-2710201530,2,Gazole 10 ppm < S < 20 ppm,1,1
-2710201721,2,Gazole 20 ppm < S < 1 000 ppm,1,1
-2710201729,2,Gazole 20 ppm < S < 1 000 ppm,1,1
-2710201730,2,Gazole 20 ppm < S < 1 000 ppm,1,1
-2710201790,2,Gazole 20 ppm < S < 1 000 ppm,1,1
-2710201910,2,Gazole 1 000 ppm < S,1,1
-2710201990,2,Gazole 1 000 ppm < S,1,1
-2710192100,3,Carburéacteurs type kérosène (ou type pétrole lampant),1,1
-2710127011,3,Carburéacteurs type essence,1,1
-2710127019,3,Carburéacteurs type essence,1,1
-2710127090,3,Carburéacteurs type essence,1,1
-2710196200,4,Fiouls lourds,1,1
-2710196400,4,Fiouls lourds,1,1
-2710196800,4,Fiouls lourds,1,1
-2710203100,4,Fiouls lourds,1,1
-2710203500,4,Fiouls lourds,1,1
-2710203900,4,Fiouls lourds,1,1
-2711121100,5,Propane,1,1
-2711129400,5,Propane,1,1
-2711129700,5,Propane,1,1
-2711139100,5,Butane,1,1
-2711139700,5,Butane,1,1
-2711190000,5,GPL,1,1,
-2207200011,2,ED95,1,1
-3826001089,2,B100,1,1
-3826001089,2,B100,1,1
+SP95 - E5,1,SP95- E5,1,1
+SP98,1,SP98,1,1
+ARS,1,ARS,1,1
+SP95 – E10,1,SP95 – E10,1,1
+E85,1,E85,1,1
+ED95,1,ED95,1,1
+Gazole routier,2,Gazole routier,1,1
+B30,2,B30,1,1
+Gazole routier XTL,2,Gazole routier XTL,1,1
+B100,2,B100,1,1
+GNR,2,GNR,1,1
+GNR B30,2,GNR B30,1,1
+GNR XTL,2,GNR XTL,1,1
+Carbureacteur type essence,3,Carbureacteur type essence,1,1
+carbureacteur type petrole lampant,3,carbureacteur type petrole lampant,1,1

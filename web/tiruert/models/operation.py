@@ -181,7 +181,7 @@ def create_tiruert_operations_from_lots(lots):
     for key, lots in lots_by_delivery_type.items():
         operation = Operation.objects.create(
             type=matching_types[key[0]],
-            status=Operation.PENDING,
+            status=Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
             customs_category=key[1],
             biofuel=lots[0].biofuel,
             credited_entity=lots[0].carbure_client,
@@ -220,7 +220,7 @@ def remove_existing_lots(lots):
 
 
 def ep2_processing(lots):
-    # We split the EP2 lots into two new lots (but we don't save them in the database)
+    # We split the EP2 lots into two new lots (but we don't save them yet in the database)
     # 40% of the volume will be converted to CONV and 60% will be EP2AM
     result_lots = []
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from tiruert.models import FossilFuel, FossilFuelCategory, Objective, Operation
+from tiruert.models import FossilFuel, FossilFuelCategory, FossilFuelCategoryConsiderationRate, Objective, Operation
 from tiruert.models.elec_operation import ElecOperation
 
 from .admin_actions import perform_bulk_operations_validation
@@ -17,6 +17,18 @@ class FossilFuelCategoryAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(FossilFuelCategoryConsiderationRate)
+class FossilFuelCategoryConsiderationRateAdmin(admin.ModelAdmin):
+    list_display = ["category_fuel", "year", "consideration_rate_"]
+    search_fields = ["category_fuel__name"]
+    list_filter = ["year", "category_fuel"]
+    ordering = ["-year"]
+
+    def consideration_rate_(self, obj):
+        if obj.consideration_rate is not None:
+            return f"{obj.consideration_rate * 100:.2f} %"
+
+
 @admin.register(Objective)
 class ObjectiveAdmin(admin.ModelAdmin):
     list_display = [
@@ -26,17 +38,12 @@ class ObjectiveAdmin(admin.ModelAdmin):
         "year",
         "target_",
         "target_type",
-        "consideration_rate_",
         "penalty_",
     ]
 
     def target_(self, obj):
         if obj.target is not None:
             return f"{obj.target * 100:.2f} %"
-
-    def consideration_rate_(self, obj):
-        if obj.consideration_rate is not None:
-            return f"{obj.consideration_rate * 100:.2f} %"
 
     def penalty_(self, obj):
         if obj.penalty is not None:

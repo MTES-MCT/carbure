@@ -13,40 +13,24 @@ from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 class ObjectiveService:
     @staticmethod
-    def calculate_energy_basis(mac_queryset, objective_queryset):
+    def calculate_energy_basis(mac_queryset, year=datetime.now().year):
         """
         Calculate the energy basis (from fossil fuels mac), used for all objectives calculations
         """
-        consideration_rates = ObjectiveService._get_consideration_rate_per_sector(objective_queryset)
-
         total_energy = mac_queryset.annotate(
             energy=models.F("volume")
             * models.F("fuel__fuel_category__pci_litre")
             * models.Case(
-                *[
-                    models.When(fuel__fuel_category__name=key, then=models.Value(value))
-                    for key, value in consideration_rates.items()
-                ],
-                default=models.Value(1),
+                models.When(
+                    fuel__fuel_category__consideration_rates__year=year,
+                    then=models.F("fuel__fuel_category__consideration_rates__consideration_rate"),
+                ),
+                default=1,
                 output_field=models.FloatField(),
             )
         ).aggregate(total=models.Sum("energy"))["total"]
 
         return total_energy  # (MJ)
-
-    @staticmethod
-    def _get_consideration_rate_per_sector(objective_queryset, year=datetime.now().year):
-        """
-        Get consideration rate per sector
-        """
-        consideration_rates = objective_queryset.filter(
-            type=Objective.SECTOR,
-        ).values_list(
-            "fuel_category__name",
-            "consideration_rate",
-        )
-
-        return dict(consideration_rates)
 
     @staticmethod
     def calculate_objectives_and_penalties(balance, objective_queryset, energy_basis, objective_type):
@@ -166,8 +150,9 @@ class ObjectiveService:
 
         # 2. Calculate "assiette" used for objectives calculations
         macs = MacFossilFuel.objects.filter(operator_id=entity_id, year=year)
-        objectives = Objective.objects.filter(year=year)
-        energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
+        energy_basis = ObjectiveService.calculate_energy_basis(macs, year)
+        if not energy_basis:
+            return None
 
         # 3. Calculate the target objective for the customs category
         target = ObjectiveService._calculate_target_for_objective(objective.target, energy_basis)  # MJ

@@ -273,7 +273,7 @@ class ObjectiveViewSet(GenericViewSet):
             return
 
         # 1. Calculate "assiette" used for objectives calculation
-        energy_basis = ObjectiveService.calculate_energy_basis(macs, objectives)
+        energy_basis = ObjectiveService.calculate_energy_basis(macs, year=query_params.get("year"))
 
         # 2. Calculate the balances per category and sector
         balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
@@ -323,6 +323,7 @@ class ObjectiveViewSet(GenericViewSet):
             "declared_teneur": biofuel_declared_teneur + elec_declared_teneur,
             "unit": "tCO2",
             "target_percent": global_objective_target_percent,
+            "energy_basis": energy_basis,
         }
         penalty = ObjectiveService._calcule_penalty(
             global_objective_penalty,

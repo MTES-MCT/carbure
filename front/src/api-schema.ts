@@ -1707,6 +1707,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/mac-fossil-fuel/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_mac_fossil_fuel_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/objectives/": {
     parameters: {
       query?: never
@@ -7773,6 +7789,27 @@ export interface operations {
         content: {
           "application/json": unknown
         }
+      }
+    }
+  }
+  tiruert_mac_fossil_fuel_export_retrieve: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
