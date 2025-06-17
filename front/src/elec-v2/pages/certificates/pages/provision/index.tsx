@@ -1,28 +1,28 @@
-import { useLocation, useParams } from "react-router-dom"
-
-import useEntity from "common/hooks/entity"
+import { useLocation } from "react-router-dom"
 
 import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
-import { useQuery } from "common/hooks/async"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import { getProvisionCertificateFilters, getProvisionCertificates } from "./api"
-import {
-  ProvisionCertificate,
-  ProvisionCertificateFilter,
-  ProvisionCertificateOrder,
-  ProvisionCertificateStatus,
-} from "./types"
+import { getProvisionCertificateFilters } from "./api"
+import { ProvisionCertificate, ProvisionCertificateFilter } from "./types"
 import { Tabs } from "common/components/tabs2"
 import { Table } from "common/components/table2"
-import { useColumns, useFilters, useTabs } from "./hooks"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { NoResult } from "common/components/no-result2"
+import { Pagination } from "common/components/pagination2"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { formatUnit } from "common/utils/formatters"
+import { ExtendedUnit } from "common/types"
+import { useQuery } from "common/hooks/async"
+import { getProvisionCertificates } from "./api"
+import {
+  useColumns,
+  useController,
+  useFilters,
+  useStatus,
+  useTabs,
+} from "./hooks"
 
 export interface ProvisionCertificatesProps {
   year: number
@@ -33,34 +33,23 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
 
   usePrivateNavigation(t("Certificats de fourniture"))
 
-  const entity = useEntity()
-
   const location = useLocation()
-  const params = useParams<"status">()
-  const status = (params.status ?? "available") as ProvisionCertificateStatus
+  const status = useStatus()
+
+  const { state, actions, query } = useController(year, status)
 
   const tabs = useTabs()
   const filters = useFilters()
   const columns = useColumns()
 
-  const [state, actions] = useCBQueryParamsStore<
-    ProvisionCertificateStatus,
-    undefined
-  >(entity, year, status)
-
-  const query = useCBQueryBuilder<
-    ProvisionCertificateOrder[],
-    ProvisionCertificateStatus,
-    undefined
-  >(state)
-
-  const provisionResponse = useQuery(getProvisionCertificates, {
+  const provisionCerts = useQuery(getProvisionCertificates, {
     key: "tickets",
     params: [query],
   })
 
-  const provisionData = provisionResponse.result?.data
-  const isEmpty = !provisionData?.results.length
+  const loading = provisionCerts.loading
+  const data = provisionCerts.result?.data
+  const isEmpty = !data?.results.length
 
   const showTicketDetail = (p: ProvisionCertificate) => {
     return {
@@ -100,26 +89,39 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
 
         {isEmpty && (
           <NoResult
-            loading={provisionResponse.loading}
+            loading={loading}
             filters={state.filters}
             onFilter={actions.setFilters}
           />
         )}
 
         {!isEmpty && (
-          <Table
-            loading={provisionResponse.loading}
-            rowLink={showTicketDetail}
-            order={state.order}
-            onOrder={actions.setOrder}
-            rows={provisionData?.results ?? []}
-            columns={[
-              columns.period,
-              columns.operatingUnit,
-              columns.source,
-              columns.energy,
-            ]}
-          />
+          <>
+            <RecapQuantity
+              text={t("{{total}} d'énergie disponible pour cession", {
+                total: formatUnit(
+                  data!.available_energy ?? 0,
+                  ExtendedUnit.MWh
+                ),
+              })}
+            />
+
+            <Table
+              loading={loading}
+              rowLink={showTicketDetail}
+              order={state.order}
+              onOrder={actions.setOrder}
+              rows={data!.results}
+              columns={columns}
+            />
+
+            <Pagination
+              defaultPage={state.page}
+              limit={state.limit}
+              total={data!.count}
+              onLimit={actions.setLimit}
+            />
+          </>
         )}
       </Content>
     </>

@@ -13,6 +13,7 @@ export enum ProvisionCertificateFilter {
   Quarter = "quarter",
   OperatingUnit = "operating_unit",
   Source = "source",
+  Cpo = "cpo",
 }
 
 export type ProvisionCertificateOrder =

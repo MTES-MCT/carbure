@@ -223,7 +223,7 @@ const Org = () => {
         </>
       )}
 
-      {isCPO && (
+      {(isCPO || isAdmin || isElecAdmin) && (
         <>
           <Route
             path="elec-v2/certificates/:year/*"

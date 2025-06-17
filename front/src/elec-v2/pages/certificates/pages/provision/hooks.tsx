@@ -2,12 +2,45 @@ import { useTranslation } from "react-i18next"
 import {
   ProvisionCertificate,
   ProvisionCertificateFilter,
+  ProvisionCertificateOrder,
   ProvisionCertificateSource,
   ProvisionCertificateStatus,
 } from "./types"
 import { formatNumber } from "common/utils/formatters"
-import { Columns } from "common/components/table2"
+import { Column } from "common/components/table2"
 import { Tab } from "common/components/tabs2"
+import useEntity from "common/hooks/entity"
+import { compact } from "common/utils/collection"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder-2"
+import { useParams } from "react-router-dom"
+
+export function useStatus() {
+  const params = useParams<"status">()
+  return (params.status ?? "available") as ProvisionCertificateStatus
+}
+
+export function useController(
+  year: number,
+  status: ProvisionCertificateStatus
+) {
+  const entity = useEntity()
+
+  const [state, actions] = useCBQueryParamsStore<
+    ProvisionCertificateStatus,
+    undefined
+  >(entity, year, status)
+
+  const query = useCBQueryBuilder<
+    ProvisionCertificateOrder[],
+    ProvisionCertificateStatus,
+    undefined
+  >(state)
+
+  return { state, actions, query }
+}
 
 export function useTabs(): Tab<ProvisionCertificateStatus>[] {
   const { t } = useTranslation()
@@ -31,15 +64,25 @@ export function useTabs(): Tab<ProvisionCertificateStatus>[] {
 
 export function useFilters() {
   const { t } = useTranslation()
-  return {
-    [ProvisionCertificateFilter.Quarter]: t("Période"),
+  const entity = useEntity()
+
+  const filters: Record<string, string> = {
+    [ProvisionCertificateFilter.Cpo]: t("Aménageur"),
+    [ProvisionCertificateFilter.Quarter]: t("Trimestre"),
     [ProvisionCertificateFilter.OperatingUnit]: t("Unité d'exploitation"),
     [ProvisionCertificateFilter.Source]: t("Source"),
   }
+
+  if (entity.isCPO) {
+    delete filters[ProvisionCertificateFilter.Cpo]
+  }
+
+  return filters
 }
 
 export function useColumns() {
   const { t } = useTranslation()
+  const entity = useEntity()
 
   const sources = {
     [ProvisionCertificateSource.MANUAL]: t("DGEC"),
@@ -47,33 +90,32 @@ export function useColumns() {
     [ProvisionCertificateSource.QUALICHARGE]: t("Qualicharge"),
   }
 
-  return {
-    period: {
+  return compact([
+    {
       key: "quarter",
-      header: t("Période"),
+      header: t("Trimestre"),
       cell: (p) =>
         t("T{{quarter}} {{year}}", { quarter: p.quarter, year: p.year }),
     },
-
-    operatingUnit: {
+    (entity.isAdmin || entity.isExternal) && {
+      key: "cpo",
+      header: t("Aménageur"),
+      cell: (p) => p.cpo.name,
+    },
+    {
       key: "operating_unit",
       header: t("Unité d'exploitation"),
       cell: (p) => p.operating_unit,
     },
-
-    source: {
+    {
       key: "source",
       header: t("Source"),
       cell: (p) => (p.source ? sources[p.source] : t("N/A")),
     },
-
-    energy: {
+    {
       key: "remaining_energy_amount",
-      header: t("MWh"),
-      cell: (p) =>
-        p.remaining_energy_amount > 0.01 // not in history yet
-          ? `${formatNumber(p.remaining_energy_amount, { fractionDigits: 0 })}`
-          : `${formatNumber(p.energy_amount, { fractionDigits: 0 })}`,
+      header: t("Quantité disponible (MWh)"),
+      cell: (p) => `${formatNumber(p.remaining_energy_amount)}`,
     },
-  } satisfies Columns<ProvisionCertificate>
+  ]) satisfies Column<ProvisionCertificate>[]
 }
