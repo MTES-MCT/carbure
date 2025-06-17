@@ -1235,6 +1235,39 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
           description: ""
+  /api/elec-v2/certificates/years/:
+    get:
+      operationId: elec_v2_certificates_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
   /api/elec-v2/provision-certificates/:
     get:
       operationId: elec_v2_provision_certificates_list
@@ -1519,11 +1552,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - ETBE
+                    - Ethanol
+                    - EMHV
+                    - B100
+                    - HVOE
                   summary: Example of filters response.
           description: ""
   /api/entities/:
