@@ -91,6 +91,7 @@ export function formatUnit(
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
     [ExtendedUnit.GJ]: i18next.t("GJ"),
+    [ExtendedUnit.MWh]: i18next.t("MWh"),
   }
 
   return `${formatNumber(num, options)} ${unitLabel[unit]}`
@@ -102,6 +103,7 @@ export function formatUnitOnly(unit: Unit | ExtendedUnit, count = 2) {
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
     [ExtendedUnit.GJ]: i18next.t("GJ"),
+    [ExtendedUnit.MWh]: i18next.t("MWh"),
   }
 
   return unitLabel[unit]

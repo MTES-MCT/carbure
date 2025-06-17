@@ -13,6 +13,8 @@ import { ReactNode } from "react"
 
 export type TableVariant = "spaced" | "compact"
 
+export type Columns<T> = { [key: string]: NonNullable<Column<T>> }
+
 export interface TableProps<T> {
   className?: string
   style?: React.CSSProperties

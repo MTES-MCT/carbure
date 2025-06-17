@@ -1,4 +1,4 @@
-import { Content, Main } from "common/components/scaffold"
+import { Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
 import { FetchResponseType } from "common/services/api-fetch.types"
@@ -31,12 +31,13 @@ export const ElecCertificates = () => {
         </section>
       </header>
 
-      <Content marginTop>
-        <Routes>
-          <Route path="provision/*" element={<ProvisionCertificates />} />
-          <Route path="transfer/*" element={<TransferCertificates />} />
-        </Routes>
-      </Content>
+      <Routes>
+        <Route
+          path="provision/:status?"
+          element={<ProvisionCertificates year={years.selected} />}
+        />
+        <Route path="transfer/:status?" element={<TransferCertificates />} />
+      </Routes>
     </Main>
   )
 }

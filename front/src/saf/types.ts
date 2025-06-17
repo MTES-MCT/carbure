@@ -12,8 +12,8 @@ import {
 } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
-  PathsApiSafTicketsGetParametersQueryOrder,
-  PathsApiSafTicketSourcesGetParametersQueryOrder,
+  PathsApiSafTicketsGetParametersQueryOrder_by,
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
   PathsApiSafTicketsGetParametersQueryConsumption_types as ConsumptionType,
@@ -112,11 +112,11 @@ export enum SafFilter {
 export type SafQueryType = "assigned" | "received"
 
 // Airline
-export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
+export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder_by
 
 // Operator
 export type SafOperatorColumnsOrder =
-  PathsApiSafTicketSourcesGetParametersQueryOrder
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by
 export interface SafOperatorQuery
   extends CBQueryParams<
     SafOperatorColumnsOrder[],
