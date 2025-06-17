@@ -1565,6 +1565,322 @@ paths:
                     - HVOE
                   summary: Example of filters response.
           description: ""
+  /api/elec-v2/transfer-certificates/:
+    get:
+      operationId: elec_v2_transfer_certificates_list
+      parameters:
+        - in: query
+          name: accepted_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: client
+          schema:
+            type: integer
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: operator
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -accepted_date
+                - -certificate_id
+                - -cpo
+                - -energy_amount
+                - -operator
+                - -status
+                - -transfer_date
+                - accepted_date
+                - certificate_id
+                - cpo
+                - energy_amount
+                - operator
+                - status
+                - transfer_date
+          description: |-
+            Ordre
+
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operator` - Operator
+            * `-operator` - Operator (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
+            * `transfer_date` - Transfer date
+            * `-transfer_date` - Transfer date (décroissant)
+            * `accepted_date` - Accepted date
+            * `-accepted_date` - Accepted date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - PENDING
+                - REJECTED
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: supplier
+          schema:
+            type: integer
+        - in: query
+          name: transfer_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: year
+          schema:
+            type: number
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecTransferCertificateList"
+          description: ""
+  /api/elec-v2/transfer-certificates/{id}/:
+    get:
+      operationId: elec_v2_transfer_certificates_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferCertificate"
+          description: ""
+  /api/elec-v2/transfer-certificates/filters/:
+    get:
+      operationId: elec_v2_transfer_certificates_filters_retrieve
+      parameters:
+        - in: query
+          name: accepted_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: client
+          schema:
+            type: integer
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: operator
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -accepted_date
+                - -certificate_id
+                - -cpo
+                - -energy_amount
+                - -operator
+                - -status
+                - -transfer_date
+                - accepted_date
+                - certificate_id
+                - cpo
+                - energy_amount
+                - operator
+                - status
+                - transfer_date
+          description: |-
+            Ordre
+
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operator` - Operator
+            * `-operator` - Operator (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
+            * `transfer_date` - Transfer date
+            * `-transfer_date` - Transfer date (décroissant)
+            * `accepted_date` - Accepted date
+            * `-accepted_date` - Accepted date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - PENDING
+                - REJECTED
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: supplier
+          schema:
+            type: integer
+        - in: query
+          name: transfer_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: year
+          schema:
+            type: number
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - ETBE
+                    - Ethanol
+                    - EMHV
+                    - B100
+                    - HVOE
+                  summary: Example of filters response.
+          description: ""
   /api/entities/:
     get:
       operationId: entities_list
@@ -9486,6 +9802,54 @@ components:
         - quarter
         - remaining_energy_amount
         - year
+    ElecTransferCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        client:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        transfer_date:
+          type: string
+          format: date
+        energy_amount:
+          type: number
+          format: double
+        status:
+          $ref: "#/components/schemas/ElecTransferCertificateStatusEnum"
+        certificate_id:
+          type: string
+          maxLength: 32
+        used_in_tiruert:
+          type: boolean
+        consumption_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+        - certificate_id
+        - client
+        - energy_amount
+        - id
+        - supplier
+        - transfer_date
+    ElecTransferCertificateStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
     EmptyResponse:
       type: object
       properties:
@@ -10817,6 +11181,31 @@ components:
           items:
             $ref: "#/components/schemas/ElecProvisionCertificate"
         available_energy:
+          type: number
+    PaginatedElecTransferCertificateList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecTransferCertificate"
+        transferred_energy:
           type: number
     PaginatedEntityPreviewList:
       type: object

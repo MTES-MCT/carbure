@@ -511,6 +511,54 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/transfer-certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_transfer_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/transfer-certificates/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_transfer_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/transfer-certificates/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_transfer_certificates_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/entities/": {
     parameters: {
       query?: never
@@ -2753,6 +2801,27 @@ export interface components {
       /** Format: double */
       remaining_energy_amount: number
     }
+    ElecTransferCertificate: {
+      readonly id: number
+      readonly supplier: components["schemas"]["EntityPreview"]
+      readonly client: components["schemas"]["EntityPreview"]
+      /** Format: date */
+      transfer_date: string
+      /** Format: double */
+      energy_amount: number
+      status?: components["schemas"]["ElecTransferCertificateStatusEnum"]
+      certificate_id: string
+      used_in_tiruert?: boolean
+      /** Format: date */
+      consumption_date?: string | null
+    }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     * @enum {string}
+     */
+    ElecTransferCertificateStatusEnum: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
     EmptyResponse: {
       empty?: string
     }
@@ -3319,6 +3388,22 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["ElecProvisionCertificate"][]
       available_energy?: number
+    }
+    PaginatedElecTransferCertificateList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecTransferCertificate"][]
+      transferred_energy?: number
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -4123,7 +4208,7 @@ export interface components {
      *     * `REJECTED` - Refusé
      * @enum {string}
      */
-    "saf.filters.TicketFilter.status": PathsApiSafTicketsGetParametersQueryStatus
+    "saf.filters.TicketFilter.status": PathsApiElecV2TransferCertificatesGetParametersQueryStatus
   }
   responses: never
   parameters: never
@@ -5096,6 +5181,145 @@ export interface operations {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         source?: ("MANUAL" | "METER_READINGS" | null | "QUALICHARGE")[]
         status?: string
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+    }
+  }
+  elec_v2_transfer_certificates_list: {
+    parameters: {
+      query?: {
+        accepted_date?: string
+        certificate_id?: string
+        client?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operator?: string[]
+        /** @description Ordre
+         *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operator` - Operator
+         *     * `-operator` - Operator (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant)
+         *     * `transfer_date` - Transfer date
+         *     * `-transfer_date` - Transfer date (décroissant)
+         *     * `accepted_date` - Accepted date
+         *     * `-accepted_date` - Accepted date (décroissant) */
+        order_by?: PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus[]
+        supplier?: number
+        transfer_date?: string
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecTransferCertificateList"]
+        }
+      }
+    }
+  }
+  elec_v2_transfer_certificates_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificate"]
+        }
+      }
+    }
+  }
+  elec_v2_transfer_certificates_filters_retrieve: {
+    parameters: {
+      query?: {
+        accepted_date?: string
+        certificate_id?: string
+        client?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Filter string to apply */
+        filter?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operator?: string[]
+        /** @description Ordre
+         *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operator` - Operator
+         *     * `-operator` - Operator (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant)
+         *     * `transfer_date` - Transfer date
+         *     * `-transfer_date` - Transfer date (décroissant)
+         *     * `accepted_date` - Accepted date
+         *     * `-accepted_date` - Accepted date (décroissant) */
+        order_by?: PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus[]
+        supplier?: number
+        transfer_date?: string
         year?: number
       }
       header?: never
@@ -7256,7 +7480,7 @@ export interface operations {
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
-        status?: PathsApiSafTicketsGetParametersQueryStatus
+        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
@@ -7484,7 +7708,7 @@ export interface operations {
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
-        status?: PathsApiSafTicketsGetParametersQueryStatus
+        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
@@ -7547,7 +7771,7 @@ export interface operations {
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
-        status?: PathsApiSafTicketsGetParametersQueryStatus
+        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
@@ -8849,6 +9073,27 @@ export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter {
   Value3 = 3,
   Value4 = 4,
 }
+export enum PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by {
+  ValueMinusaccepted_date = "-accepted_date",
+  ValueMinuscertificate_id = "-certificate_id",
+  ValueMinuscpo = "-cpo",
+  ValueMinusenergy_amount = "-energy_amount",
+  ValueMinusoperator = "-operator",
+  ValueMinusstatus = "-status",
+  ValueMinustransfer_date = "-transfer_date",
+  accepted_date = "accepted_date",
+  certificate_id = "certificate_id",
+  cpo = "cpo",
+  energy_amount = "energy_amount",
+  operator = "operator",
+  status = "status",
+  transfer_date = "transfer_date",
+}
+export enum PathsApiElecV2TransferCertificatesGetParametersQueryStatus {
+  ACCEPTED = "ACCEPTED",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
+}
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
   ValueMinusfeedstock = "-feedstock",
   ValueMinusghg_reduction = "-ghg_reduction",
@@ -8882,11 +9127,6 @@ export enum PathsApiSafTicketsGetParametersQueryOrder_by {
   period = "period",
   suppliers = "suppliers",
   volume = "volume",
-}
-export enum PathsApiSafTicketsGetParametersQueryStatus {
-  ACCEPTED = "ACCEPTED",
-  PENDING = "PENDING",
-  REJECTED = "REJECTED",
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
   ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",

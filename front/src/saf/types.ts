@@ -15,7 +15,7 @@ import {
   PathsApiSafTicketsGetParametersQueryOrder_by,
   PathsApiSafTicketSourcesGetParametersQueryOrder_by,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
-  PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
+  PathsApiElecV2TransferCertificatesGetParametersQueryStatus as SafTicketStatus,
   PathsApiSafTicketsGetParametersQueryConsumption_types as ConsumptionType,
 } from "api-schema"
 
