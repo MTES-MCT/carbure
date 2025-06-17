@@ -1,20 +1,16 @@
 import { Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
-import { FetchResponseType } from "common/services/api-fetch.types"
 import { useTranslation } from "react-i18next"
 import { Route, Routes } from "react-router-dom"
 import TransferCertificates from "./pages/transfer"
 import ProvisionCertificates from "./pages/provision"
-
-async function getYears() {
-  return { data: [2025] } as FetchResponseType<number[]>
-}
+import { getYears } from "./api"
 
 export const ElecCertificates = () => {
   const { t } = useTranslation()
 
-  const years = useYears("elec-v2", getYears)
+  const years = useYears("elec-v2/certificates", getYears)
 
   return (
     <Main>
