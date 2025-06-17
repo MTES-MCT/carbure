@@ -9,11 +9,18 @@ import ProvisionCertificates from "./pages/provision"
 import ProvisionCertificateDetails from "./pages/provision-details"
 import TransferCertificateDetails from "./pages/transfer-details"
 import { getYears } from "./api"
+import useEntity from "common/hooks/entity"
+import { ImportProvisionCertificates } from "./components/import-provision-certificates"
+import { SendTransferCertificates } from "./components/send-transfer-certificates"
 
 export const ElecCertificates = () => {
   const { t } = useTranslation()
 
+  const entity = useEntity()
   const years = useYears("elec-v2/certificates", getYears)
+
+  const canWriteCPO = entity.isCPO && entity.canWrite()
+  const canWriteAdmin = (entity.isAdmin || entity.isExternal) && entity.canWrite() // prettier-ignore
 
   return (
     <Main>
@@ -27,6 +34,9 @@ export const ElecCertificates = () => {
             options={years.options}
             sort={(year) => -year.value}
           />
+
+          {canWriteCPO && <SendTransferCertificates />}
+          {canWriteAdmin && <ImportProvisionCertificates />}
         </section>
       </header>
 

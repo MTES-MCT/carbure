@@ -25,6 +25,7 @@ export interface EntityManager extends Entity {
   canTrade: boolean
   hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) => boolean
   hasRights: (...roles: UserRole[]) => boolean
+  canWrite: () => boolean
 }
 
 export function useEntityManager(
@@ -89,6 +90,11 @@ export function useEntityManager(
 
     hasRights: (...roles: UserRole[]) =>
       (entityRights && roles.includes(entityRights.role)) ?? false,
+
+    canWrite: () =>
+      entityRights
+        ? [UserRole.ReadWrite, UserRole.Admin].includes(entityRights.role)
+        : false,
   }
 }
 
