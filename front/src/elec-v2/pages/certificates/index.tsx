@@ -7,6 +7,7 @@ import useYears from "common/hooks/years-2"
 import TransferCertificates from "./pages/transfer"
 import ProvisionCertificates from "./pages/provision"
 import ProvisionCertificateDetails from "./pages/provision-details"
+import TransferCertificateDetails from "./pages/transfer-details"
 import { getYears } from "./api"
 
 export const ElecCertificates = () => {
@@ -43,6 +44,11 @@ export const ElecCertificates = () => {
       <HashRoute
         path="provision-certificate/:id"
         element={<ProvisionCertificateDetails />}
+      />
+
+      <HashRoute
+        path="transfer-certificate/:id"
+        element={<TransferCertificateDetails />}
       />
     </Main>
   )

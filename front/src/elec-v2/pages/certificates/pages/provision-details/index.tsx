@@ -2,13 +2,12 @@ import useEntity from "common/hooks/entity"
 import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
 import Portal from "common/components/portal"
-import { LoaderOverlay } from "common/components/scaffold"
+import { Box, LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getProvisionCertificateDetails } from "../../api"
 import { TextInput } from "common/components/inputs2"
-import { DialogSection } from "saf/components/dialog-section"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { getSourceLabel } from "../../utils/formatters"
@@ -45,7 +44,7 @@ export const ProvisionCertificateDetails = () => {
         }
         footer={<></>}
       >
-        <DialogSection label={t("Information")}>
+        <Box>
           <TextInput
             readOnly
             label={t("Aménageur")}
@@ -85,7 +84,7 @@ export const ProvisionCertificateDetails = () => {
               ExtendedUnit.MWh
             )}
           />
-        </DialogSection>
+        </Box>
 
         {provisionResponse.loading && <LoaderOverlay />}
       </Dialog>

@@ -88,7 +88,7 @@ export function useColumns() {
   return compact([
     {
       key: "transfer_date",
-      header: t("Date de cession"),
+      header: t("Date d'émission"),
       cell: (p) => formatDate(p.transfer_date),
     },
     (entity.isAdmin || entity.isExternal) && {
