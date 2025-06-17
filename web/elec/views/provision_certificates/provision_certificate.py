@@ -4,18 +4,15 @@ from django.db.models import Sum
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
-from web.core.pagination import MetadataPageNumberPagination
 
-from core.models import Entity, ExternalAdminRights
-from core.permissions import AdminRightsFactory, UserRightsFactory
+from core.models import Entity
+from core.pagination import MetadataPageNumberPagination
 from elec.filters.provision_certificates import ProvisionCertificateFilter
 from elec.models import ElecProvisionCertificate
+from elec.permissions import HasCpoUserRights, HasElecAdminRights
 from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
 
 from .mixins import ActionMixin
-
-HasCpoUserRights = UserRightsFactory(entity_type=[Entity.CPO])
-HasElecAdminRights = AdminRightsFactory(allow_external=[ExternalAdminRights.ELEC])
 
 
 class ProvisionCertificatePagination(MetadataPageNumberPagination):
