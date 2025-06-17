@@ -1,0 +1,1 @@
+from .transfer_certificate import TransferCertificateViewSet
