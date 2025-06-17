@@ -10,7 +10,7 @@ import { getProvisionCertificateDetails } from "../../api"
 import { TextInput } from "common/components/inputs2"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { getSourceLabel } from "../../utils/formatters"
+import { getSourceLabel } from "../../utils"
 
 export const ProvisionCertificateDetails = () => {
   const { t } = useTranslation()

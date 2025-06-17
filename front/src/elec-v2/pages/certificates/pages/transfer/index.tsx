@@ -25,7 +25,7 @@ import {
   useStatus,
   useTabs,
 } from "./hooks"
-import { normalizeSource } from "../../utils/normalizers"
+import { normalizeSource } from "../../utils"
 
 export interface TransferCertificatesProps {
   year: number
@@ -72,6 +72,7 @@ export const TransferCertificates = ({ year }: TransferCertificatesProps) => {
         tabs={tabs}
         keepSearch
       />
+
       <Content>
         <ActionBar>
           <ActionBar.Grow>

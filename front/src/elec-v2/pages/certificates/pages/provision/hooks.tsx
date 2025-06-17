@@ -15,7 +15,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { useParams } from "react-router-dom"
-import { getSourceLabel } from "../../utils/formatters"
+import { getSourceLabel } from "../../utils"
 
 export function useStatus() {
   const params = useParams<"status">()

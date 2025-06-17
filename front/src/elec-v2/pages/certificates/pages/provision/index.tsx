@@ -25,7 +25,7 @@ import {
   useStatus,
   useTabs,
 } from "./hooks"
-import { normalizeSource } from "../../utils/normalizers"
+import { normalizeSource } from "../../utils"
 
 export interface ProvisionCertificatesProps {
   year: number
@@ -72,6 +72,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
         tabs={tabs}
         keepSearch
       />
+
       <Content>
         <ActionBar>
           <ActionBar.Grow>
