@@ -26,9 +26,9 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
     serializer_class = ElecProvisionCertificateSerializer
     filterset_class = ProvisionCertificateFilter
     pagination_class = ProvisionCertificatePagination
-    lookup_field = "id"
-
     permission_classes = [IsAuthenticated & (HasCpoUserRights | HasElecAdminRights)]
+    lookup_field = "id"
+    search_fields = ["cpo__name", "operating_unit"]
 
     def get_queryset(self):
         queryset = ElecProvisionCertificate.objects.all()
