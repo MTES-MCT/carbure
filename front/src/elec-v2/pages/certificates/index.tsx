@@ -1,10 +1,12 @@
+import { useTranslation } from "react-i18next"
+import { Route, Routes } from "react-router-dom"
+import HashRoute from "common/components/hash-route"
 import { Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
-import { useTranslation } from "react-i18next"
-import { Route, Routes } from "react-router-dom"
 import TransferCertificates from "./pages/transfer"
 import ProvisionCertificates from "./pages/provision"
+import ProvisionCertificateDetails from "./pages/provision-details"
 import { getYears } from "./api"
 
 export const ElecCertificates = () => {
@@ -34,6 +36,11 @@ export const ElecCertificates = () => {
         />
         <Route path="transfer/:status?" element={<TransferCertificates />} />
       </Routes>
+
+      <HashRoute
+        path="provision-certificate/:id"
+        element={<ProvisionCertificateDetails />}
+      />
     </Main>
   )
 }

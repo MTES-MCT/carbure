@@ -4,7 +4,7 @@ import {
   ProvisionCertificateFilter,
   ProvisionCertificateOrder,
   ProvisionCertificateStatus,
-} from "./types"
+} from "../../types"
 import { formatNumber } from "common/utils/formatters"
 import { Column } from "common/components/table2"
 import { Tab } from "common/components/tabs2"
@@ -15,7 +15,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { useParams } from "react-router-dom"
-import { getSourceLabel } from "./utils"
+import { getSourceLabel } from "../../utils/formatters"
 
 export function useStatus() {
   const params = useParams<"status">()

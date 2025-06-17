@@ -1,5 +1,5 @@
 import i18next from "i18next"
-import { ProvisionCertificateSource } from "./types"
+import { ProvisionCertificateSource } from "../types"
 
 export function getSourceLabel(source: string | null | undefined) {
   switch (source) {
@@ -11,12 +11,5 @@ export function getSourceLabel(source: string | null | undefined) {
       return i18next.t("Qualicharge")
     default:
       return i18next.t("N/A")
-  }
-}
-
-export function normalizeSource(source: string) {
-  return {
-    value: source,
-    label: getSourceLabel(source),
   }
 }

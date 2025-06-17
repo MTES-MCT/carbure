@@ -4,8 +4,6 @@ import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import { getProvisionCertificateFilters } from "./api"
-import { ProvisionCertificate, ProvisionCertificateFilter } from "./types"
 import { Tabs } from "common/components/tabs2"
 import { Table } from "common/components/table2"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
@@ -15,10 +13,11 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { useQuery } from "common/hooks/async"
-import HashRoute from "common/components/hash-route"
-import ProvisionCertificateDetails from "./components/provision-certificate-details"
-import { normalizeSource } from "./utils"
-import { getProvisionCertificates } from "./api"
+import { ProvisionCertificate, ProvisionCertificateFilter } from "../../types"
+import {
+  getProvisionCertificates,
+  getProvisionCertificateFilters,
+} from "../../api"
 import {
   useColumns,
   useController,
@@ -26,6 +25,7 @@ import {
   useStatus,
   useTabs,
 } from "./hooks"
+import { normalizeSource } from "../../utils/normalizers"
 
 export interface ProvisionCertificatesProps {
   year: number
@@ -46,7 +46,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
   const columns = useColumns()
 
   const provisionCerts = useQuery(getProvisionCertificates, {
-    key: "tickets",
+    key: "elec-provision-certificates",
     params: [query],
   })
 
@@ -54,7 +54,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
   const data = provisionCerts.result?.data
   const isEmpty = !data?.results.length
 
-  const showTicketDetail = (p: ProvisionCertificate) => {
+  const showProvisionCertificateDetail = (p: ProvisionCertificate) => {
     return {
       pathname: location.pathname,
       search: location.search,
@@ -62,7 +62,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
     }
   }
 
-  const getTicketFilter = (filter: ProvisionCertificateFilter) =>
+  const getProvisionCertificateFilter = (filter: ProvisionCertificateFilter) =>
     getProvisionCertificateFilters(filter, query)
 
   return (
@@ -87,7 +87,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
           filterLabels={filters}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={getTicketFilter}
+          getFilterOptions={getProvisionCertificateFilter}
           normalizers={{ source: normalizeSource }}
         />
 
@@ -112,7 +112,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
 
             <Table
               loading={loading}
-              rowLink={showTicketDetail}
+              rowLink={showProvisionCertificateDetail}
               order={state.order}
               onOrder={actions.setOrder}
               rows={data!.results}
@@ -128,11 +128,6 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
           </>
         )}
       </Content>
-
-      <HashRoute
-        path="provision-certificate/:id"
-        element={<ProvisionCertificateDetails />}
-      />
     </>
   )
 }
