@@ -17,3 +17,15 @@ export function getProvisionCertificateFilters(
     })
     .then((res) => res.data ?? [])
 }
+
+export function getProvisionCertificateDetails(
+  entity_id: number,
+  provision_certificate_id: number
+) {
+  return api.GET("/elec-v2/provision-certificates/{id}/", {
+    params: {
+      path: { id: provision_certificate_id },
+      query: { entity_id },
+    },
+  })
+}

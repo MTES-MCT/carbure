@@ -15,6 +15,9 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { useQuery } from "common/hooks/async"
+import HashRoute from "common/components/hash-route"
+import ProvisionCertificateDetails from "./components/provision-certificate-details"
+import { normalizeSource } from "./utils"
 import { getProvisionCertificates } from "./api"
 import {
   useColumns,
@@ -85,6 +88,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTicketFilter}
+          normalizers={{ source: normalizeSource }}
         />
 
         {isEmpty && (
@@ -124,6 +128,11 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
           </>
         )}
       </Content>
+
+      <HashRoute
+        path="provision-certificate/:id"
+        element={<ProvisionCertificateDetails />}
+      />
     </>
   )
 }

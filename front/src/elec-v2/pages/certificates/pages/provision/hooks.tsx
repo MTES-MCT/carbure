@@ -3,7 +3,6 @@ import {
   ProvisionCertificate,
   ProvisionCertificateFilter,
   ProvisionCertificateOrder,
-  ProvisionCertificateSource,
   ProvisionCertificateStatus,
 } from "./types"
 import { formatNumber } from "common/utils/formatters"
@@ -16,6 +15,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { useParams } from "react-router-dom"
+import { getSourceLabel } from "./utils"
 
 export function useStatus() {
   const params = useParams<"status">()
@@ -84,12 +84,6 @@ export function useColumns() {
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const sources = {
-    [ProvisionCertificateSource.MANUAL]: t("DGEC"),
-    [ProvisionCertificateSource.METER_READINGS]: t("Relevés trimestriels"),
-    [ProvisionCertificateSource.QUALICHARGE]: t("Qualicharge"),
-  }
-
   return compact([
     {
       key: "quarter",
@@ -110,7 +104,7 @@ export function useColumns() {
     {
       key: "source",
       header: t("Source"),
-      cell: (p) => (p.source ? sources[p.source] : t("N/A")),
+      cell: (p) => getSourceLabel(p.source),
     },
     {
       key: "remaining_energy_amount",
