@@ -5,7 +5,7 @@ from elec.models import ElecTransferCertificate
 
 class TransferCertificateFilter(django_filters.FilterSet):
     year = django_filters.NumberFilter(field_name="transfer_date__year")
-    status = django_filters.BaseInFilter(field_name="status", lookup_expr="in")
+    status = django_filters.CharFilter(field_name="status")
     cpo = django_filters.BaseInFilter(field_name="supplier__name", lookup_expr="in")
     operator = django_filters.BaseInFilter(field_name="client__name", lookup_expr="in")
 

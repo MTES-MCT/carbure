@@ -1672,16 +1672,7 @@ paths:
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - ACCEPTED
-                - PENDING
-                - REJECTED
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+            type: string
         - in: query
           name: supplier
           schema:
@@ -1835,16 +1826,7 @@ paths:
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - ACCEPTED
-                - PENDING
-                - REJECTED
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
-          style: form
+            type: string
         - in: query
           name: supplier
           schema:

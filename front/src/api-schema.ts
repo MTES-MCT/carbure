@@ -2821,7 +2821,7 @@ export interface components {
      *     * `REJECTED` - REJECTED
      * @enum {string}
      */
-    ElecTransferCertificateStatusEnum: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
+    ElecTransferCertificateStatusEnum: PathsApiSafTicketsGetParametersQueryStatus
     EmptyResponse: {
       empty?: string
     }
@@ -4208,7 +4208,7 @@ export interface components {
      *     * `REJECTED` - Refusé
      * @enum {string}
      */
-    "saf.filters.TicketFilter.status": PathsApiElecV2TransferCertificatesGetParametersQueryStatus
+    "saf.filters.TicketFilter.status": PathsApiSafTicketsGetParametersQueryStatus
   }
   responses: never
   parameters: never
@@ -5235,8 +5235,7 @@ export interface operations {
         page_size?: number
         /** @description A search term. */
         search?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus[]
+        status?: string
         supplier?: number
         transfer_date?: string
         year?: number
@@ -5316,8 +5315,7 @@ export interface operations {
         ordering?: string
         /** @description A search term. */
         search?: string
-        /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus[]
+        status?: string
         supplier?: number
         transfer_date?: string
         year?: number
@@ -7480,7 +7478,7 @@ export interface operations {
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
-        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
+        status?: PathsApiSafTicketsGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
@@ -7708,7 +7706,7 @@ export interface operations {
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
-        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
+        status?: PathsApiSafTicketsGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
@@ -7771,7 +7769,7 @@ export interface operations {
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
-        status?: PathsApiElecV2TransferCertificatesGetParametersQueryStatus
+        status?: PathsApiSafTicketsGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
         suppliers?: string[]
         year?: number
@@ -9089,11 +9087,6 @@ export enum PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by {
   status = "status",
   transfer_date = "transfer_date",
 }
-export enum PathsApiElecV2TransferCertificatesGetParametersQueryStatus {
-  ACCEPTED = "ACCEPTED",
-  PENDING = "PENDING",
-  REJECTED = "REJECTED",
-}
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
   ValueMinusfeedstock = "-feedstock",
   ValueMinusghg_reduction = "-ghg_reduction",
@@ -9127,6 +9120,11 @@ export enum PathsApiSafTicketsGetParametersQueryOrder_by {
   period = "period",
   suppliers = "suppliers",
   volume = "volume",
+}
+export enum PathsApiSafTicketsGetParametersQueryStatus {
+  ACCEPTED = "ACCEPTED",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
   ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
