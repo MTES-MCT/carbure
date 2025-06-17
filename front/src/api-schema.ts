@@ -5041,7 +5041,10 @@ export interface operations {
   }
   elec_v2_provision_certificates_retrieve: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
       header?: never
       path: {
         /** @description A unique integer value identifying this Certificat de Fourniture (elec). */

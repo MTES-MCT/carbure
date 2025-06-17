@@ -1404,6 +1404,12 @@ paths:
     get:
       operationId: elec_v2_provision_certificates_retrieve
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
         - in: path
           name: id
           schema:
