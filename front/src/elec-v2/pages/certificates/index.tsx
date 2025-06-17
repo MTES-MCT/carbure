@@ -34,7 +34,10 @@ export const ElecCertificates = () => {
           path="provision/:status?"
           element={<ProvisionCertificates year={years.selected} />}
         />
-        <Route path="transfer/:status?" element={<TransferCertificates />} />
+        <Route
+          path="transfer/:status?"
+          element={<TransferCertificates year={years.selected} />}
+        />
       </Routes>
 
       <HashRoute

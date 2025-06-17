@@ -102,12 +102,16 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
         {!isEmpty && (
           <>
             <RecapQuantity
-              text={t("{{total}} d'énergie disponible pour cession", {
-                total: formatUnit(
-                  data!.available_energy ?? 0,
-                  ExtendedUnit.MWh
-                ),
-              })}
+              text={t(
+                "{{count}} certificats et {{total}} d'énergie disponible pour cession",
+                {
+                  count: data.count,
+                  total: formatUnit(
+                    data!.available_energy ?? 0,
+                    ExtendedUnit.MWh
+                  ),
+                }
+              )}
             />
 
             <Table
