@@ -1,8 +1,10 @@
 # pyright: strict
 
+from django.db.models import Sum
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
+from web.core.pagination import MetadataPageNumberPagination
 
 from core.models import Entity, ExternalAdminRights
 from core.permissions import AdminRightsFactory, UserRightsFactory
@@ -16,10 +18,17 @@ HasCpoUserRights = UserRightsFactory(entity_type=[Entity.CPO])
 HasElecAdminRights = AdminRightsFactory(allow_external=[ExternalAdminRights.ELEC])
 
 
+class ProvisionCertificatePagination(MetadataPageNumberPagination):
+    aggregate_fields = {
+        "available_energy": Sum("remaining_energy_amount"),
+    }
+
+
 class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin, GenericViewSet[ElecProvisionCertificate]):
     queryset = ElecProvisionCertificate.objects.none()
     serializer_class = ElecProvisionCertificateSerializer
     filterset_class = ProvisionCertificateFilter
+    pagination_class = ProvisionCertificatePagination
     lookup_field = "id"
 
     permission_classes = [IsAuthenticated & (HasCpoUserRights | HasElecAdminRights)]
