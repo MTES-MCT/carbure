@@ -3302,6 +3302,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["ElecProvisionCertificate"][]
+      available_energy?: number
     }
     PaginatedEntityPreviewList: {
       /** @example 123 */
@@ -3889,7 +3890,7 @@ export interface components {
      *     * `QUALICHARGE` - QUALICHARGE
      * @enum {string}
      */
-    SourceEnum: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
+    SourceEnum: SourceEnum
     StatsResponse: {
       metabase_iframe_url: string
     }
@@ -4960,15 +4961,15 @@ export interface operations {
          *
          *     * `quarter` - Quarter
          *     * `-quarter` - Quarter (décroissant)
-         *     * `energy_amount` - Energy amount
-         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `remaining_energy_amount` - Remaining energy amount
+         *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
          *     * `cpo` - Cpo
          *     * `-cpo` - Cpo (décroissant)
          *     * `operating_unit` - Operating unit
          *     * `-operating_unit` - Operating unit (décroissant)
          *     * `source` - Source
          *     * `-source` - Source (décroissant) */
-        order?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder[]
+        order_by?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -4979,10 +4980,9 @@ export interface operations {
         quarter?: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter[]
         /** @description A search term. */
         search?: string
-        /** @description * `MANUAL` - MANUAL
-         *     * `METER_READINGS` - METER_READINGS
-         *     * `QUALICHARGE` - QUALICHARGE */
-        source?: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        source?: ("MANUAL" | "METER_READINGS" | null | "QUALICHARGE")[]
+        status?: string
         year?: number
       }
       header?: never
@@ -5037,25 +5037,24 @@ export interface operations {
          *
          *     * `quarter` - Quarter
          *     * `-quarter` - Quarter (décroissant)
-         *     * `energy_amount` - Energy amount
-         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `remaining_energy_amount` - Remaining energy amount
+         *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
          *     * `cpo` - Cpo
          *     * `-cpo` - Cpo (décroissant)
          *     * `operating_unit` - Operating unit
          *     * `-operating_unit` - Operating unit (décroissant)
          *     * `source` - Source
          *     * `-source` - Source (décroissant) */
-        order?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder[]
+        order_by?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         quarter?: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter[]
         /** @description A search term. */
         search?: string
-        /** @description * `MANUAL` - MANUAL
-         *     * `METER_READINGS` - METER_READINGS
-         *     * `QUALICHARGE` - QUALICHARGE */
-        source?: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        source?: ("MANUAL" | "METER_READINGS" | null | "QUALICHARGE")[]
+        status?: string
         year?: number
       }
       header?: never
@@ -6934,7 +6933,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
+        order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -7048,7 +7047,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
+        order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
@@ -7104,7 +7103,7 @@ export interface operations {
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
          *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
+        order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
@@ -7200,7 +7199,7 @@ export interface operations {
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
          *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsGetParametersQueryOrder[]
+        order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -7432,7 +7431,7 @@ export interface operations {
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
          *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsGetParametersQueryOrder[]
+        order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
@@ -7495,7 +7494,7 @@ export interface operations {
          *     * `-created_at` - Created at (décroissant)
          *     * `suppliers` - Suppliers
          *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsGetParametersQueryOrder[]
+        order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
@@ -8791,16 +8790,16 @@ export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
   production_site = "production_site",
   valid_until = "valid_until",
 }
-export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder {
+export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by {
   ValueMinuscpo = "-cpo",
-  ValueMinusenergy_amount = "-energy_amount",
   ValueMinusoperating_unit = "-operating_unit",
   ValueMinusquarter = "-quarter",
+  ValueMinusremaining_energy_amount = "-remaining_energy_amount",
   ValueMinussource = "-source",
   cpo = "cpo",
-  energy_amount = "energy_amount",
   operating_unit = "operating_unit",
   quarter = "quarter",
+  remaining_energy_amount = "remaining_energy_amount",
   source = "source",
 }
 export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter {
@@ -8809,12 +8808,7 @@ export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter {
   Value3 = 3,
   Value4 = 4,
 }
-export enum PathsApiElecV2ProvisionCertificatesGetParametersQuerySource {
-  MANUAL = "MANUAL",
-  METER_READINGS = "METER_READINGS",
-  QUALICHARGE = "QUALICHARGE",
-}
-export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
+export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
   ValueMinusfeedstock = "-feedstock",
   ValueMinusghg_reduction = "-ghg_reduction",
   ValueMinusperiod = "-period",
@@ -8832,7 +8826,7 @@ export enum PathsApiSafTicketsGetParametersQueryConsumption_types {
   MAC = "MAC",
   MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
 }
-export enum PathsApiSafTicketsGetParametersQueryOrder {
+export enum PathsApiSafTicketsGetParametersQueryOrder_by {
   ValueMinusclient = "-client",
   ValueMinuscreated_at = "-created_at",
   ValueMinusfeedstock = "-feedstock",
@@ -9124,6 +9118,11 @@ export enum SiteTypeEnum {
   PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
   EFCA = "EFCA",
   AIRPORT = "AIRPORT",
+}
+export enum SourceEnum {
+  MANUAL = "MANUAL",
+  METER_READINGS = "METER_READINGS",
+  QUALICHARGE = "QUALICHARGE",
 }
 export enum TransportDocumentTypeEnum {
   DAU = "DAU",

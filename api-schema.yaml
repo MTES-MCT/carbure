@@ -1263,29 +1263,29 @@ paths:
           explode: false
           style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
                 - -cpo
-                - -energy_amount
                 - -operating_unit
                 - -quarter
+                - -remaining_energy_amount
                 - -source
                 - cpo
-                - energy_amount
                 - operating_unit
                 - quarter
+                - remaining_energy_amount
                 - source
           description: |-
             Ordre
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
-            * `energy_amount` - Energy amount
-            * `-energy_amount` - Energy amount (décroissant)
+            * `remaining_energy_amount` - Remaining energy amount
+            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
             * `-cpo` - Cpo (décroissant)
             * `operating_unit` - Operating unit
@@ -1335,16 +1335,22 @@ paths:
         - in: query
           name: source
           schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - MANUAL
+                - METER_READINGS
+                - null
+                - QUALICHARGE
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: status
+          schema:
             type: string
-            nullable: true
-            enum:
-              - MANUAL
-              - METER_READINGS
-              - QUALICHARGE
-          description: |-
-            * `MANUAL` - MANUAL
-            * `METER_READINGS` - METER_READINGS
-            * `QUALICHARGE` - QUALICHARGE
         - in: query
           name: year
           schema:
@@ -1417,29 +1423,29 @@ paths:
           explode: false
           style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
                 - -cpo
-                - -energy_amount
                 - -operating_unit
                 - -quarter
+                - -remaining_energy_amount
                 - -source
                 - cpo
-                - energy_amount
                 - operating_unit
                 - quarter
+                - remaining_energy_amount
                 - source
           description: |-
             Ordre
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
-            * `energy_amount` - Energy amount
-            * `-energy_amount` - Energy amount (décroissant)
+            * `remaining_energy_amount` - Remaining energy amount
+            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
             * `-cpo` - Cpo (décroissant)
             * `operating_unit` - Operating unit
@@ -1477,16 +1483,22 @@ paths:
         - in: query
           name: source
           schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - MANUAL
+                - METER_READINGS
+                - null
+                - QUALICHARGE
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: status
+          schema:
             type: string
-            nullable: true
-            enum:
-              - MANUAL
-              - METER_READINGS
-              - QUALICHARGE
-          description: |-
-            * `MANUAL` - MANUAL
-            * `METER_READINGS` - METER_READINGS
-            * `QUALICHARGE` - QUALICHARGE
         - in: query
           name: year
           schema:
@@ -3959,7 +3971,7 @@ paths:
           description: List of feedstocks provided via
             ?feedstocks=feedstock1&feedstocks=feedstock2
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
@@ -4180,7 +4192,7 @@ paths:
           description: List of feedstocks provided via
             ?feedstocks=feedstock1&feedstocks=feedstock2
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
@@ -4326,7 +4338,7 @@ paths:
             type: string
           description: Filter string to apply
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
@@ -4519,7 +4531,7 @@ paths:
           description: List of feedstocks provided via
             ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
@@ -4881,7 +4893,7 @@ paths:
           description: List of feedstocks provided via
             ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
@@ -5046,7 +5058,7 @@ paths:
             type: string
           description: Filter string to apply
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
@@ -10765,6 +10777,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ElecProvisionCertificate"
+        available_energy:
+          type: number
     PaginatedEntityPreviewList:
       type: object
       required:
