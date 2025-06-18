@@ -31,6 +31,12 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
     lookup_field = "id"
     search_fields = ["supplier__name", "client__name", "certificate_id"]
 
+    def get_permission(self):
+        if self.action in ("accept", "reject"):
+            return [IsAuthenticated(), HasElecOperatorUserRights()]
+
+        return super().get_permissions()
+
     def get_queryset(self):
         queryset = ElecTransferCertificate.objects.all()
 
