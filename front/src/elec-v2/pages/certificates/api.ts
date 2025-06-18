@@ -21,6 +21,13 @@ export function getClients(entity_id: number, query: string) {
     .then((res) => res.data ?? [])
 }
 
+export function importProvisionCertificates(entity_id: number, file: File) {
+  return api.POST("/elec-v2/provision-certificates/import/", {
+    params: { query: { entity_id } },
+    body: { file },
+  })
+}
+
 export function getProvisionCertificates(query: ProvisionCertificatesQuery) {
   return api.GET("/elec-v2/provision-certificates/", {
     params: { query },
