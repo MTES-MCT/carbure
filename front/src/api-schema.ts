@@ -447,6 +447,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/certificates/snapshot/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_certificates_snapshot_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/certificates/years/": {
     parameters: {
       query?: never
@@ -5046,6 +5062,36 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ApplicationSnapshot"]
+        }
+      }
+    }
+  }
+  elec_v2_certificates_snapshot_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Year */
+        year: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            provision_certificates_available: number
+            provision_certificates_history: number
+            transfer_certificates_pending: number
+            transfer_certificates_accepted: number
+            transfer_certificates_rejected: number
+          }
         }
       }
     }
