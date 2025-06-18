@@ -13,6 +13,14 @@ export function getSnapshot(entity_id: number, year: number) {
   })
 }
 
+export function getClients(entity_id: number, query: string) {
+  return api
+    .GET("/elec-v2/certificates/clients/", {
+      params: { query: { entity_id, query } },
+    })
+    .then((res) => res.data ?? [])
+}
+
 export function getProvisionCertificates(query: ProvisionCertificatesQuery) {
   return api.GET("/elec-v2/provision-certificates/", {
     params: { query },
@@ -39,6 +47,23 @@ export function getProvisionCertificateDetails(
       path: { id: provision_certificate_id },
       query: { entity_id },
     },
+  })
+}
+
+export function getProvisionCertificateBalance(entity_id: number) {
+  return api.GET("/elec-v2/provision-certificates/balance/", {
+    params: { query: { entity_id } },
+  })
+}
+
+export function createTransferCertificate(
+  entity_id: number,
+  energy_amount: number,
+  client: number
+) {
+  return api.POST("/elec-v2/provision-certificates/transfer/", {
+    params: { query: { entity_id } },
+    body: { energy_amount, client },
   })
 }
 

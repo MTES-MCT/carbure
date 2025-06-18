@@ -1,5 +1,13 @@
 import i18next from "i18next"
 import { ProvisionCertificateSource } from "./types"
+import { HttpError } from "common/services/api-fetch"
+
+export function normalizeSource(source: string) {
+  return {
+    value: source,
+    label: getSourceLabel(source),
+  }
+}
 
 export function getSourceLabel(source: string | null | undefined) {
   switch (source) {
@@ -14,9 +22,12 @@ export function getSourceLabel(source: string | null | undefined) {
   }
 }
 
-export function normalizeSource(source: string) {
-  return {
-    value: source,
-    label: getSourceLabel(source),
+export function getTransferErrorLabel(error: Error) {
+  const errorCode = (error as HttpError)?.data?.message
+  switch (errorCode) {
+    case "NOT_ENOUGH_ENERGY":
+      return i18next.t("Pas assez d'énergie disponible")
+    default:
+      return errorCode
   }
 }
