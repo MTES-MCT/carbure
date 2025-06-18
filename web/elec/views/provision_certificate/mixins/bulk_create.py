@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,6 +10,14 @@ from elec.serializers.elec_provision_certificate_bulk import ProvisionCertificat
 
 
 class BulkCreateMixin:
+    @extend_schema(
+        operation_id="bulk_create_provision_certificates",
+        description="Create multiple provision certificates in bulk (from Qualicharge)",
+        request=ProvisionCertificateBulkSerializer,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response={"status": "success", "errors": []}, description="Success message"),
+        },
+    )
     @action(
         detail=False,
         methods=["post"],
