@@ -607,6 +607,38 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/transfer-certificates/{id}/accept/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_v2_transfer_certificates_accept_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/transfer-certificates/{id}/reject/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_v2_transfer_certificates_reject_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/transfer-certificates/filters/": {
     parameters: {
       query?: never
@@ -2865,6 +2897,16 @@ export interface components {
       /** Format: double */
       remaining_energy_amount: number
     }
+    ElecTransferAccept: {
+      used_in_tiruert: string
+      /** Format: date */
+      consumption_date?: string
+    }
+    ElecTransferAcceptRequest: {
+      used_in_tiruert: string
+      /** Format: date */
+      consumption_date?: string
+    }
     ElecTransferCertificate: {
       readonly id: number
       readonly supplier: components["schemas"]["EntityPreview"]
@@ -2886,6 +2928,12 @@ export interface components {
      * @enum {string}
      */
     ElecTransferCertificateStatusEnum: PathsApiSafTicketsGetParametersQueryStatus
+    ElecTransferReject: {
+      comment: string
+    }
+    ElecTransferRejectRequest: {
+      comment: string
+    }
     ElecTransferRequest: {
       /** Format: double */
       energy_amount: number
@@ -5452,6 +5500,68 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ElecTransferCertificate"]
+        }
+      }
+    }
+  }
+  elec_v2_transfer_certificates_accept_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecTransferAcceptRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecTransferAcceptRequest"]
+        "multipart/form-data": components["schemas"]["ElecTransferAcceptRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferAccept"]
+        }
+      }
+    }
+  }
+  elec_v2_transfer_certificates_reject_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecTransferRejectRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecTransferRejectRequest"]
+        "multipart/form-data": components["schemas"]["ElecTransferRejectRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferReject"]
         }
       }
     }

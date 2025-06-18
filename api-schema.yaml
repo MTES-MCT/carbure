@@ -1873,6 +1873,94 @@ paths:
               schema:
                 $ref: "#/components/schemas/ElecTransferCertificate"
           description: ""
+  /api/elec-v2/transfer-certificates/{id}/accept/:
+    post:
+      operationId: elec_v2_transfer_certificates_accept_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec-v2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferAccept"
+              examples:
+                ExampleOfAssignResponse.:
+                  value: {}
+                  summary: Example of assign response.
+          description: ""
+  /api/elec-v2/transfer-certificates/{id}/reject/:
+    post:
+      operationId: elec_v2_transfer_certificates_reject_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec-v2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferReject"
+              examples:
+                ExampleOfAssignResponse.:
+                  value: {}
+                  summary: Example of assign response.
+          description: ""
   /api/elec-v2/transfer-certificates/filters/:
     get:
       operationId: elec_v2_transfer_certificates_filters_retrieve
@@ -9931,6 +10019,27 @@ components:
         - quarter
         - remaining_energy_amount
         - year
+    ElecTransferAccept:
+      type: object
+      properties:
+        used_in_tiruert:
+          type: string
+        consumption_date:
+          type: string
+          format: date
+      required:
+        - used_in_tiruert
+    ElecTransferAcceptRequest:
+      type: object
+      properties:
+        used_in_tiruert:
+          type: string
+          minLength: 1
+        consumption_date:
+          type: string
+          format: date
+      required:
+        - used_in_tiruert
     ElecTransferCertificate:
       type: object
       properties:
@@ -9979,6 +10088,21 @@ components:
         * `PENDING` - PENDING
         * `ACCEPTED` - ACCEPTED
         * `REJECTED` - REJECTED
+    ElecTransferReject:
+      type: object
+      properties:
+        comment:
+          type: string
+      required:
+        - comment
+    ElecTransferRejectRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+      required:
+        - comment
     ElecTransferRequest:
       type: object
       properties:
