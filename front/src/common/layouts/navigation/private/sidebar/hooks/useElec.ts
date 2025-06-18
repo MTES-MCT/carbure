@@ -81,7 +81,8 @@ export const useElec = (params?: ElecParams) => {
 
   const elecV2: MenuSection = {
     title: t("Certificats d'élec (v2)"),
-    condition: isCPO || isElecOperator || isAdmin || isElecAdmin,
+    condition:
+      isCPO || isElecOperator || isAdmin || isElecAdmin || isElecTransferAdmin,
     children: [
       {
         path: routes.ELEC_V2().CERTIFICATES.PROVISION,

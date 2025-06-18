@@ -137,7 +137,7 @@ const Org = () => {
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
   const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
   const isElecOperator = isOperator && entity.has_elec
-  const isTransferredElecAdmin =
+  const isTransferElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
@@ -224,13 +224,15 @@ const Org = () => {
         </>
       )}
 
-      {(isCPO || isElecOperator || isAdmin || isElecAdmin) && (
-        <>
-          <Route
-            path="elec-v2/certificates/:year/*"
-            element={<ElecCertificatesV2 />}
-          />
-        </>
+      {(isCPO ||
+        isElecOperator ||
+        isAdmin ||
+        isElecAdmin ||
+        isTransferElecAdmin) && (
+        <Route
+          path="elec-v2/certificates/:year/*"
+          element={<ElecCertificatesV2 />}
+        />
       )}
 
       {isOperator && has_elec && (
@@ -283,7 +285,7 @@ const Org = () => {
         </>
       )}
 
-      {(isAdmin || isElecAdmin || isTransferredElecAdmin) && (
+      {(isAdmin || isElecAdmin || isTransferElecAdmin) && (
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
           <Route

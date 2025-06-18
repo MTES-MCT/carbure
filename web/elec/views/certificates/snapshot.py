@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from core.models import Entity
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights
+from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights, HasElecTransferAdminRights
 
 
 @extend_schema(
@@ -54,7 +54,9 @@ from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperat
     },
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights)])
+@permission_classes(
+    [IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights | HasElecTransferAdminRights)]
+)
 def get_snapshot(request, *args, **kwargs):
     entity = request.entity
     year = request.query_params.get("year")

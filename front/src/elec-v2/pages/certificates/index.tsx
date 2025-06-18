@@ -26,7 +26,8 @@ export const ElecCertificates = () => {
   })
 
   const canWriteCPO = entity.isCPO && entity.canWrite()
-  const canWriteAdmin = (entity.isAdmin || entity.isExternal) && entity.canWrite() // prettier-ignore
+  const canWriteAdmin =
+    (entity.isAdmin || entity.hasAdminRight("ELEC")) && entity.canWrite()
 
   return (
     <Main>

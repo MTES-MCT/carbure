@@ -8,7 +8,7 @@ from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
 from elec.filters.transfer_certificates import TransferCertificateFilter
 from elec.models import ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights
+from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights, HasElecTransferAdminRights
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 from .mixins import ActionMixin
@@ -25,7 +25,9 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
     serializer_class = ElecTransferCertificateSerializer
     filterset_class = TransferCertificateFilter
     pagination_class = TransferCertificatePagination
-    permission_classes = [IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights)]
+    permission_classes = [
+        IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights | HasElecTransferAdminRights)
+    ]
     lookup_field = "id"
     search_fields = ["supplier__name", "client__name", "certificate_id"]
 
