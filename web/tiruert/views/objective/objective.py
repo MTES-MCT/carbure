@@ -156,7 +156,6 @@ class ObjectiveViewSet(GenericViewSet):
         if not tiruert_liable_entities.exists():
             return Response({"error": "No Tiruert liable entities found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Initialize aggregated results
         aggregated_main = {
             "available_balance": 0,
             "target": 0,
@@ -165,15 +164,15 @@ class ObjectiveViewSet(GenericViewSet):
             "unit": "tCO2",
             "target_percent": None,
             "penalty": 0,
+            "energy_basis": 0,
         }
 
         aggregated_sectors = {}
         aggregated_categories = {}
 
         original_entity = request.entity
-        # Process each entity
+
         for entity in tiruert_liable_entities:
-            # Temporarily set the request entity to the current entity
             setattr(request, "entity", entity)
             query_params = request.GET.copy()
             query_params["entity_id"] = entity.id
@@ -184,13 +183,15 @@ class ObjectiveViewSet(GenericViewSet):
                     continue
 
                 # Aggregate main objectives
-                for key in ["available_balance", "target", "pending_teneur", "declared_teneur", "penalty"]:
+                for key in ["available_balance", "target", "pending_teneur", "declared_teneur", "penalty", "energy_basis"]:
                     if key in entity_objectives["main"]:
                         aggregated_main[key] += entity_objectives["main"][key]
 
-                # Preserve target_percent (should be the same for all entities)
+                # target_percent and energy_basis
                 if aggregated_main["target_percent"] is None and "target_percent" in entity_objectives["main"]:
                     aggregated_main["target_percent"] = entity_objectives["main"]["target_percent"]
+                if aggregated_main["energy_basis"] == 0 and "energy_basis" in entity_objectives["main"]:
+                    aggregated_main["energy_basis"] = entity_objectives["main"]["energy_basis"]
 
                 # Aggregate sectors
                 for sector in entity_objectives["sectors"]:
@@ -234,11 +235,9 @@ class ObjectiveViewSet(GenericViewSet):
         # Restore the original entity
         setattr(request, "entity", original_entity)
 
-        # Convert aggregated dictionaries to lists
         aggregated_sectors_list = list(aggregated_sectors.values())
         aggregated_categories_list = list(aggregated_categories.values())
 
-        # Final result
         result = {
             "main": aggregated_main,
             "sectors": aggregated_sectors_list,
