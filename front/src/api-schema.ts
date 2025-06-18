@@ -559,6 +559,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/provision-certificates/transfer/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_v2_provision_certificates_transfer_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/transfer-certificates/": {
     parameters: {
       query?: never
@@ -2870,6 +2886,11 @@ export interface components {
      * @enum {string}
      */
     ElecTransferCertificateStatusEnum: PathsApiSafTicketsGetParametersQueryStatus
+    ElecTransferRequest: {
+      /** Format: double */
+      energy_amount: number
+      client: number
+    }
     EmptyResponse: {
       empty?: string
     }
@@ -5321,6 +5342,34 @@ export interface operations {
         }
         content: {
           "application/json": string[]
+        }
+      }
+    }
+  }
+  elec_v2_provision_certificates_transfer_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecTransferRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecTransferRequest"]
+        "multipart/form-data": components["schemas"]["ElecTransferRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificate"]
         }
       }
     }

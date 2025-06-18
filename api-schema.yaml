@@ -1674,6 +1674,44 @@ paths:
                     - HVOE
                   summary: Example of filters response.
           description: ""
+  /api/elec-v2/provision-certificates/transfer/:
+    post:
+      operationId: elec_v2_provision_certificates_transfer_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec-v2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferCertificate"
+              examples:
+                ExampleOfAssignResponse.:
+                  value: {}
+                  summary: Example of assign response.
+          description: ""
   /api/elec-v2/transfer-certificates/:
     get:
       operationId: elec_v2_transfer_certificates_list
@@ -9941,6 +9979,17 @@ components:
         * `PENDING` - PENDING
         * `ACCEPTED` - ACCEPTED
         * `REJECTED` - REJECTED
+    ElecTransferRequest:
+      type: object
+      properties:
+        energy_amount:
+          type: number
+          format: double
+        client:
+          type: integer
+      required:
+        - client
+        - energy_amount
     EmptyResponse:
       type: object
       properties:
