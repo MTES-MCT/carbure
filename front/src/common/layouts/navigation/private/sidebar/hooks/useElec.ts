@@ -81,41 +81,21 @@ export const useElec = (params?: ElecParams) => {
 
   const elecV2: MenuSection = {
     title: t("Certificats d'élec (v2)"),
-    condition: isCPO || isElecOperator,
+    condition: isCPO || isElecOperator || isAdmin || isElecAdmin,
     children: [
       {
         path: routes.ELEC_V2().CERTIFICATES.PROVISION,
-        title: t("Énergie disponible"),
-        icon: ArrowGoBackLine,
-        condition: isCPO,
+        title: t("Cert. de fourniture"),
+        icon: ArrowGoForwardLine,
+        condition: isCPO || isAdmin || isElecAdmin,
       },
       {
         path: routes.ELEC_V2().CERTIFICATES.TRANSFER,
-        title: t("Énergie cédée"),
-        icon: ArrowGoForwardLine,
-        condition: isCPO || isElecOperator,
+        title: t("Cert. de cession"),
+        icon: ArrowGoBackLine,
       },
     ],
   }
 
-  const elecAdminV2: MenuSection = {
-    title: t("Certificats d'élec (v2)"),
-    condition: isAdmin || isElecAdmin,
-    children: [
-      {
-        path: routes.ELEC_V2().CERTIFICATES.PROVISION,
-        title: t("Énergie fournie"),
-        icon: ArrowGoBackLine,
-        condition: isAdmin || isElecAdmin,
-      },
-      {
-        path: routes.ELEC_V2().CERTIFICATES.TRANSFER,
-        title: t("Énergie cédée"),
-        icon: ArrowGoForwardLine,
-        condition: isAdmin || isElecAdmin || isElecTransferAdmin,
-      },
-    ],
-  }
-
-  return [elec, elecAdmin, elecV2, elecAdminV2]
+  return [elec, elecAdmin, elecV2]
 }

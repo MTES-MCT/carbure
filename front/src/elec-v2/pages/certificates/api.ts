@@ -7,6 +7,12 @@ export function getYears(entity_id: number) {
   })
 }
 
+export function getSnapshot(entity_id: number, year: number) {
+  return api.GET("/elec-v2/certificates/snapshot/", {
+    params: { query: { entity_id, year } },
+  })
+}
+
 export function getProvisionCertificates(query: ProvisionCertificatesQuery) {
   return api.GET("/elec-v2/provision-certificates/", {
     params: { query },

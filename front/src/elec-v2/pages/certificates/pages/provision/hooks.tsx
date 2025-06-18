@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 import {
+  ElecCertificateSnapshot,
   ProvisionCertificate,
   ProvisionCertificateFilter,
   ProvisionCertificateOrder,
@@ -42,7 +43,9 @@ export function useController(
   return { state, actions, query }
 }
 
-export function useTabs(): Tab<ProvisionCertificateStatus>[] {
+export function useTabs(
+  snapshot?: ElecCertificateSnapshot
+): Tab<ProvisionCertificateStatus>[] {
   const { t } = useTranslation()
   return [
     {
@@ -51,6 +54,7 @@ export function useTabs(): Tab<ProvisionCertificateStatus>[] {
       icon: "fr-icon-time-line",
       iconActive: "fr-icon-time-fill",
       path: "../provision/available",
+      count: snapshot?.provision_certificates_available,
     },
     {
       key: "history",
@@ -58,6 +62,7 @@ export function useTabs(): Tab<ProvisionCertificateStatus>[] {
       icon: "fr-icon-booklet-line",
       iconActive: "fr-icon-booklet-fill",
       path: "../provision/history",
+      count: snapshot?.provision_certificates_history,
     },
   ]
 }

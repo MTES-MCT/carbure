@@ -10,6 +10,14 @@ import { apiTypes } from "common/services/api-fetch.types"
 export { SourceEnum as ProvisionCertificateSource }
 export { PathsApiSafTicketsGetParametersQueryStatus as TransferCertificateStatus }
 
+export type ElecCertificateSnapshot = {
+  provision_certificates_available: number
+  provision_certificates_history: number
+  transfer_certificates_pending: number
+  transfer_certificates_accepted: number
+  transfer_certificates_rejected: number
+}
+
 export type ProvisionCertificateStatus = "available" | "history"
 
 export enum ProvisionCertificateFilter {

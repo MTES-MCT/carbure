@@ -13,7 +13,11 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { useQuery } from "common/hooks/async"
-import { ProvisionCertificate, ProvisionCertificateFilter } from "../../types"
+import {
+  ElecCertificateSnapshot,
+  ProvisionCertificate,
+  ProvisionCertificateFilter,
+} from "../../types"
 import {
   getProvisionCertificates,
   getProvisionCertificateFilters,
@@ -29,9 +33,13 @@ import { normalizeSource } from "../../utils"
 
 export interface ProvisionCertificatesProps {
   year: number
+  snapshot?: ElecCertificateSnapshot
 }
 
-export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
+export const ProvisionCertificates = ({
+  year,
+  snapshot,
+}: ProvisionCertificatesProps) => {
   const { t } = useTranslation()
 
   usePrivateNavigation(t("Certificats de fourniture"))
@@ -41,7 +49,7 @@ export const ProvisionCertificates = ({ year }: ProvisionCertificatesProps) => {
 
   const { state, actions, query } = useController(year, status)
 
-  const tabs = useTabs()
+  const tabs = useTabs(snapshot)
   const filters = useFilters()
   const columns = useColumns()
 

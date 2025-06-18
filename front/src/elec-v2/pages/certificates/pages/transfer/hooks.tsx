@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 import {
+  ElecCertificateSnapshot,
   TransferCertificate,
   TransferCertificateFilter,
   TransferCertificateOrder,
@@ -38,7 +39,7 @@ export function useController(year: number, status: TransferCertificateStatus) {
   return { state, actions, query }
 }
 
-export function useTabs(): Tab<string>[] {
+export function useTabs(snapshot?: ElecCertificateSnapshot): Tab<string>[] {
   const { t } = useTranslation()
   return [
     {
@@ -47,6 +48,7 @@ export function useTabs(): Tab<string>[] {
       icon: "fr-icon-time-line",
       iconActive: "fr-icon-time-fill",
       path: "../transfer/pending",
+      count: snapshot?.transfer_certificates_pending,
     },
     {
       key: "accepted",
@@ -54,6 +56,7 @@ export function useTabs(): Tab<string>[] {
       icon: "fr-icon-success-line",
       iconActive: "fr-icon-success-fill",
       path: "../transfer/accepted",
+      count: snapshot?.transfer_certificates_accepted,
     },
     {
       key: "rejected",
@@ -61,6 +64,7 @@ export function useTabs(): Tab<string>[] {
       icon: "fr-icon-error-line",
       iconActive: "fr-icon-error-fill",
       path: "../transfer/rejected",
+      count: snapshot?.transfer_certificates_rejected,
     },
   ]
 }
