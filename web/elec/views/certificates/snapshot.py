@@ -72,8 +72,8 @@ def get_snapshot(request, *args, **kwargs):
         transfer_certificates = transfer_certificates.filter(client=entity)
 
     snapshot = {
-        "provision_certificates_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
-        "provision_certificates_history": provision_certificates.filter(remaining_energy_amount=0).count(),
+        "provision_certificates_available": provision_certificates.filter(remaining_energy_amount__gt=0.01).count(),
+        "provision_certificates_history": provision_certificates.filter(remaining_energy_amount__lte=0.01).count(),
         "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
         "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
         "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),

@@ -62,7 +62,6 @@ class HasAdminRights(BasePermission):
                 return False
         # If we're not on an admin-type entity, forbid access
         else:
-            print(f">>> Here's the shite {entity.name} {entity.entity_type}")
             return False
 
         # Store the entity and context for use in the view
