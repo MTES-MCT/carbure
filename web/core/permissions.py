@@ -50,13 +50,11 @@ class HasAdminRights(BasePermission):
         except UserRights.DoesNotExist:
             return False
 
-        # Check if the endpoint is admin-only
-        if len(self.allow_external) == 0:
-            if entity.entity_type != Entity.ADMIN:
-                return False
+        # Check if the user is staff to access admin entities
+        if entity.entity_type == Entity.ADMIN:
             if not request.user.is_staff:
                 return False
-        # Otherwise check if the external admin right is good
+        # Otherwise check if the external admin right is allowed
         elif entity.entity_type == Entity.EXTERNAL_ADMIN:
             try:
                 ExternalAdminRights.objects.get(entity=entity, right__in=self.allow_external)
@@ -64,6 +62,7 @@ class HasAdminRights(BasePermission):
                 return False
         # If we're not on an admin-type entity, forbid access
         else:
+            print(f">>> Here's the shite {entity.name} {entity.entity_type}")
             return False
 
         # Store the entity and context for use in the view

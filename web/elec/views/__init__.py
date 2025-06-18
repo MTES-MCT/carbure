@@ -1,3 +1,3 @@
-from .certificates.years import get_years
+from .certificates import get_years, get_snapshot
 from .provision_certificates import ProvisionCertificateViewSet
 from .transfer_certificates import TransferCertificateViewSet
