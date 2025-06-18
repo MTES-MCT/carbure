@@ -1,4 +1,5 @@
-from typing import Literal, Optional
+from types import FunctionType
+from typing import Callable, Literal, Optional
 
 from rest_framework.permissions import BasePermission
 
@@ -50,18 +51,20 @@ class HasAdminRights(BasePermission):
             return False
 
         # Check if the endpoint is admin-only
-        is_admin_only = len(self.allow_external) == 0
-
-        if is_admin_only:
+        if len(self.allow_external) == 0:
             if entity.entity_type != Entity.ADMIN:
                 return False
             if not request.user.is_staff:
                 return False
+        # Otherwise check if the external admin right is good
         elif entity.entity_type == Entity.EXTERNAL_ADMIN:
             try:
                 ExternalAdminRights.objects.get(entity=entity, right__in=self.allow_external)
             except ExternalAdminRights.DoesNotExist:
                 return False
+        # If we're not on an admin-type entity, forbid access
+        else:
+            return False
 
         # Store the entity and context for use in the view
         request.context = {"entity_id": entity.id, "entity": entity}
@@ -99,10 +102,11 @@ class HasUserRights(BaseEntityPermission):
     role = None
     entity_type = None
 
-    def __init__(self, role=None, entity_type=None):
+    def __init__(self, role=None, entity_type=None, check=None):
         super().__init__()
         self.role = role
         self.entity_type = entity_type
+        self.check = check
 
     def __call__(self):
         return self
@@ -119,6 +123,13 @@ class HasUserRights(BaseEntityPermission):
         if entity is None:
             return False
 
+        if isinstance(self.entity_type, list) and entity.entity_type not in self.entity_type:
+            return False
+
+        if isinstance(self.check, FunctionType):
+            if not self.check(entity):
+                return False
+
         rights = {str(ur.entity_id): ur.role for ur in UserRights.objects.filter(user=request.user)}
 
         request.session["rights"] = rights
@@ -132,9 +143,6 @@ class HasUserRights(BaseEntityPermission):
             request.session["entity_id"] = entity_id
 
         user_role = rights[entity_id]
-        if isinstance(self.entity_type, list) and entity.entity_type not in self.entity_type:
-            return False
-
         if isinstance(self.role, list) and user_role not in self.role:
             return False
         return True
@@ -198,9 +206,13 @@ def AdminRightsFactory(allow_external: Optional[list[ExternalAdmin]] = None, all
     return _HasAdminRights
 
 
-def UserRightsFactory(role: Optional[list[UserRole]] = None, entity_type: Optional[list[EntityType]] = None):
+def UserRightsFactory(
+    role: Optional[list[UserRole]] = None,
+    entity_type: Optional[list[EntityType]] = None,
+    check: Optional[Callable[[Entity], bool]] = None,
+):
     class _HasUserRights(HasUserRights):
         def __init__(self):
-            super().__init__(role, entity_type)
+            super().__init__(role, entity_type, check)
 
     return _HasUserRights

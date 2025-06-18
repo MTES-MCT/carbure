@@ -81,7 +81,7 @@ export const useElec = (params?: ElecParams) => {
 
   const elecV2: MenuSection = {
     title: t("Certificats d'élec (v2)"),
-    condition: isCPO,
+    condition: isCPO || isElecOperator,
     children: [
       {
         path: routes.ELEC_V2().CERTIFICATES.PROVISION,
@@ -93,7 +93,7 @@ export const useElec = (params?: ElecParams) => {
         path: routes.ELEC_V2().CERTIFICATES.TRANSFER,
         title: t("Énergie cédée"),
         icon: ArrowGoForwardLine,
-        condition: isCPO,
+        condition: isCPO || isElecOperator,
       },
     ],
   }

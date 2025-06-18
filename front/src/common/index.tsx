@@ -136,6 +136,7 @@ const Org = () => {
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
   const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
+  const isElecOperator = isOperator && entity.has_elec
   const isTransferredElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
   const userIsMTEDGEC = user?.rights.find(
@@ -223,7 +224,7 @@ const Org = () => {
         </>
       )}
 
-      {(isCPO || isAdmin || isElecAdmin) && (
+      {(isCPO || isElecOperator || isAdmin || isElecAdmin) && (
         <>
           <Route
             path="elec-v2/certificates/:year/*"
@@ -245,9 +246,7 @@ const Org = () => {
           />
         </>
       )}
-      {((isOperator && has_elec) || isCPO) && (
-        <Route path="charge-points/*" element={<ChargePoints />} />
-      )}
+      {isCPO && <Route path="charge-points/*" element={<ChargePoints />} />}
 
       {isAuditor && (
         <>

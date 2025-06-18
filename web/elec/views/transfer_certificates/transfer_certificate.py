@@ -8,7 +8,7 @@ from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
 from elec.filters.transfer_certificates import TransferCertificateFilter
 from elec.models import ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights
+from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 from .mixins import ActionMixin
@@ -25,7 +25,7 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
     serializer_class = ElecTransferCertificateSerializer
     filterset_class = TransferCertificateFilter
     pagination_class = TransferCertificatePagination
-    permission_classes = [IsAuthenticated & (HasCpoUserRights | HasElecAdminRights)]
+    permission_classes = [IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights)]
     lookup_field = "id"
     search_fields = ["supplier__name", "client__name", "certificate_id"]
 
@@ -35,6 +35,8 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
         entity = self.request.entity
         if entity.entity_type == Entity.CPO:
             queryset = ElecTransferCertificate.objects.filter(supplier=entity)
+        if entity.entity_type == Entity.OPERATOR:
+            queryset = ElecTransferCertificate.objects.filter(client=entity)
 
         return queryset.select_related("supplier", "client")
 

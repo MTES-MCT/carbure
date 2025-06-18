@@ -78,6 +78,10 @@ export function useFilters() {
     delete filters[TransferCertificateFilter.Cpo]
   }
 
+  if (entity.isOperator) {
+    delete filters[TransferCertificateFilter.Operator]
+  }
+
   return filters
 }
 
@@ -91,12 +95,12 @@ export function useColumns() {
       header: t("Date d'émission"),
       cell: (p) => formatDate(p.transfer_date),
     },
-    (entity.isAdmin || entity.isExternal) && {
+    !entity.isCPO && {
       key: "cpo",
       header: t("Aménageur"),
       cell: (p) => p.supplier.name,
     },
-    {
+    !entity.isOperator && {
       key: "operator",
       header: t("Redevable"),
       cell: (p) => p.client.name,

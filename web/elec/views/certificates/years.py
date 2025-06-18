@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from core.models import Entity
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights
+from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights
 
 
 @extend_schema(
@@ -40,7 +40,7 @@ from elec.permissions import HasCpoUserRights, HasElecAdminRights
     responses={200: {"type": "array", "items": {"type": "integer"}}},
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated & (HasCpoUserRights | HasElecAdminRights)])
+@permission_classes([IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights)])
 def get_years(request, *args, **kwargs):
     entity = request.entity
 
@@ -50,6 +50,9 @@ def get_years(request, *args, **kwargs):
     if entity.entity_type == Entity.CPO:
         provision_years = provision_years.filter(cpo=entity)
         transfer_years = transfer_years.filter(supplier=entity)
+    if entity.entity_type == Entity.OPERATOR:
+        provision_years = provision_years.none()
+        transfer_years = transfer_years.filter(client=entity)
 
     years = list(set(list(provision_years) + list(transfer_years)))
     return Response(years)
