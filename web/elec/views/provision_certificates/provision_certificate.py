@@ -29,6 +29,12 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
     lookup_field = "id"
     search_fields = ["cpo__name", "operating_unit"]
 
+    def get_permissions(self):
+        if self.action == "balance":
+            return [IsAuthenticated(), HasCpoUserRights()]
+
+        return super().get_permissions()
+
     def get_queryset(self):
         queryset = ElecProvisionCertificate.objects.all()
 
