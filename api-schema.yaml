@@ -1235,6 +1235,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
           description: ""
+  /api/elec-v2/certificates/clients/:
+    get:
+      operationId: elec_v2_certificates_clients_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity querying the endpoint
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityPreview"
+          description: ""
   /api/elec-v2/certificates/snapshot/:
     get:
       operationId: elec_v2_certificates_snapshot_retrieve
@@ -1480,6 +1508,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ElecProvisionCertificate"
+          description: ""
+  /api/elec-v2/provision-certificates/balance/:
+    get:
+      operationId: elec_v2_provision_certificates_balance_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: integer
+              examples:
+                ExampleOfAssignResponse.:
+                  value: {}
+                  summary: Example of assign response.
           description: ""
   /api/elec-v2/provision-certificates/filters/:
     get:

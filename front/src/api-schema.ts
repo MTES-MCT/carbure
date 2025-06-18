@@ -447,6 +447,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/certificates/clients/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_certificates_clients_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/certificates/snapshot/": {
     parameters: {
       query?: never
@@ -503,6 +519,22 @@ export interface paths {
       cookie?: never
     }
     get: operations["elec_v2_provision_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/provision-certificates/balance/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_v2_provision_certificates_balance_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -5066,6 +5098,30 @@ export interface operations {
       }
     }
   }
+  elec_v2_certificates_clients_list: {
+    parameters: {
+      query?: {
+        /** @description Entity querying the endpoint */
+        entity_id?: number
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityPreview"][]
+        }
+      }
+    }
+  }
   elec_v2_certificates_snapshot_retrieve: {
     parameters: {
       query: {
@@ -5191,6 +5247,30 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ElecProvisionCertificate"]
+        }
+      }
+    }
+  }
+  elec_v2_provision_certificates_balance_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            balance?: number
+          }
         }
       }
     }
