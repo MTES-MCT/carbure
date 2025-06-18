@@ -41,7 +41,7 @@ class TransferActionMixin:
     )
     @action(methods=["POST"], detail=False, serializer_class=ElecTransferSerializer)
     @transaction.atomic
-    def transfer(self, request, id=None):
+    def transfer(self, request):
         entity = request.entity
 
         transfer_form = ElecTransferSerializer(data=request.POST)

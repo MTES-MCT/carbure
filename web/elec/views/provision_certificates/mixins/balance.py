@@ -33,7 +33,7 @@ class BalanceActionMixin:
         },
     )
     @action(methods=["GET"], detail=False)
-    def balance(self, request, id=None):
+    def balance(self, request):
         entity = request.entity
         provisions = ElecProvisionCertificate.objects.filter(cpo=entity)
         transfers = ElecTransferCertificate.objects.filter(supplier=entity)
