@@ -1674,6 +1674,45 @@ paths:
                     - HVOE
                   summary: Example of filters response.
           description: ""
+  /api/elec-v2/provision-certificates/import/:
+    post:
+      operationId: elec_v2_provision_certificates_import_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec-v2
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+              required:
+                - file
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                ExampleOfAssignResponse.:
+                  value: {}
+                  summary: Example of assign response.
+          description: ""
   /api/elec-v2/provision-certificates/transfer/:
     post:
       operationId: elec_v2_provision_certificates_transfer_create

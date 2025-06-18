@@ -559,6 +559,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/provision-certificates/import/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_v2_provision_certificates_import_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/provision-certificates/transfer/": {
     parameters: {
       query?: never
@@ -5390,6 +5406,38 @@ export interface operations {
         }
         content: {
           "application/json": string[]
+        }
+      }
+    }
+  }
+  elec_v2_provision_certificates_import_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Format: binary
+           * @description CSV file to import
+           */
+          file: File
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": Record<string, never>
         }
       }
     }
