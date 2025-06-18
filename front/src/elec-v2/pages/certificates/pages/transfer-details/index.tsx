@@ -11,6 +11,9 @@ import { TextInput } from "common/components/inputs2"
 import { formatDate, formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import TicketTag from "saf/components/tickets/tag"
+import { AcceptTransferCertificate } from "../../components/accept-transfer-certificate"
+import { RejectTransferCertificate } from "../../components/reject-transfer-certificate"
+import { TransferCertificateStatus } from "../../types"
 
 export const TransferCertificateDetails = () => {
   const { t } = useTranslation()
@@ -18,17 +21,19 @@ export const TransferCertificateDetails = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("transfer-certificate/:id")
+  const transferID = parseInt(match?.params.id ?? "")
 
   const entity = useEntity()
 
   const transferResponse = useQuery(getTransferCertificateDetails, {
     key: "transfer-certificate-details",
-    params: [entity.id, parseInt(match?.params.id ?? "")],
+    params: [entity.id, transferID],
   })
 
   const transferCert = transferResponse.result?.data
+  const isPending = transferCert?.status === TransferCertificateStatus.PENDING
 
-  const closeDialog = () => {
+  function closeDialog() {
     navigate({ search: location.search, hash: "#" })
   }
 
@@ -43,7 +48,16 @@ export const TransferCertificateDetails = () => {
             {transferCert?.certificate_id ?? "..."}
           </Dialog.Title>
         }
-        footer={<></>}
+        footer={
+          <>
+            {entity.isOperator && isPending && (
+              <>
+                <RejectTransferCertificate id={transferID} />
+                <AcceptTransferCertificate id={transferID} />
+              </>
+            )}
+          </>
+        }
       >
         <Box>
           <TextInput
@@ -61,6 +75,13 @@ export const TransferCertificateDetails = () => {
             label={t("Date d'émission")}
             value={formatDate(transferCert?.transfer_date ?? null)}
           />
+          {!entity.isCPO && (
+            <TextInput
+              readOnly
+              label={t("Date de déclaration TIRUERT")}
+              value={formatDate(transferCert?.consumption_date ?? null)}
+            />
+          )}
           <TextInput
             readOnly
             label={t("Énergie transférée")}

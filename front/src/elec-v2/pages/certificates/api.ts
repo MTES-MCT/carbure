@@ -95,3 +95,35 @@ export function getTransferCertificateDetails(
     },
   })
 }
+
+export function acceptTransferCertificate(
+  entity_id: number,
+  transfer_certificate_id: number,
+  used_in_tiruert: string,
+  consumption_date?: string
+) {
+  return api.POST("/elec-v2/transfer-certificates/{id}/accept/", {
+    params: {
+      query: { entity_id },
+      path: { id: transfer_certificate_id },
+    },
+    body: {
+      consumption_date,
+      used_in_tiruert,
+    },
+  })
+}
+
+export function rejectTransferCertificate(
+  entity_id: number,
+  transfer_certificate_id: number,
+  comment: string
+) {
+  return api.POST("/elec-v2/transfer-certificates/{id}/reject/", {
+    params: {
+      query: { entity_id },
+      path: { id: transfer_certificate_id },
+    },
+    body: { comment },
+  })
+}
