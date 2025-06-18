@@ -1,8 +1,10 @@
-from .filters import FiltersActionMixin
 from .balance import BalanceActionMixin
+from .filters import FiltersActionMixin
+from .transfer import TransferActionMixin
 
 class ActionMixin(
+    BalanceActionMixin,
     FiltersActionMixin,
-    BalanceActionMixin
+    TransferActionMixin
 ):
     pass
