@@ -20,9 +20,10 @@ class ElecTransferSerializer(serializers.Serializer):
 
 class TransferActionMixin:
     @extend_schema(
+        request=ElecTransferSerializer,
         responses={200: ElecTransferCertificateSerializer},
     )
-    @action(methods=["POST"], detail=False, serializer_class=ElecTransferSerializer)
+    @action(methods=["POST"], detail=False)
     @transaction.atomic
     def transfer(self, request):
         entity = request.entity

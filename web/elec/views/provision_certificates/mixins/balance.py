@@ -8,6 +8,7 @@ from elec.models import ElecProvisionCertificate, ElecTransferCertificate
 
 class BalanceActionMixin:
     @extend_schema(
+        request=None,
         responses={
             200: {
                 "type": "object",

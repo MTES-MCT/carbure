@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,7 +12,11 @@ class ElecTransferRejectSerializer(serializers.Serializer):
 
 
 class RejectActionMixin:
-    @action(methods=["POST"], detail=True, serializer_class=ElecTransferRejectSerializer)
+    @extend_schema(
+        request=ElecTransferRejectSerializer,
+        responses=None,
+    )
+    @action(methods=["POST"], detail=True)
     @transaction.atomic
     def reject(self, request, id=None):
         transfer_certificate = self.get_object()
