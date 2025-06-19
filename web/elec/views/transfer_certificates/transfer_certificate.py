@@ -59,4 +59,4 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
         if entity.entity_type == Entity.OPERATOR:
             queryset = ElecTransferCertificate.objects.filter(client=entity)
 
-        return queryset.select_related("supplier", "client")
+        return queryset.select_related("supplier", "client").order_by("id")

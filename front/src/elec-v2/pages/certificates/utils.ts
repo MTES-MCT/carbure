@@ -23,7 +23,7 @@ export function getSourceLabel(source: string | null | undefined) {
 }
 
 export function getTransferErrorLabel(error: Error) {
-  const errorCode = (error as HttpError)?.data?.message
+  const errorCode = (error as HttpError)?.data?.detail
   switch (errorCode) {
     case "NOT_ENOUGH_ENERGY":
       return i18next.t("Pas assez d'énergie disponible")

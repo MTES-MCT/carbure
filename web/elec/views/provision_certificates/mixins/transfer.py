@@ -5,6 +5,7 @@ from django.db.models import Sum
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
 from core.models import Entity
@@ -45,7 +46,7 @@ class TransferActionMixin:
 
         available_energy = available_provision_certificates.aggregate(Sum("remaining_energy_amount"))
         if available_energy["remaining_energy_amount__sum"] < energy_required:
-            raise Exception("NOT_ENOUGH_ENERGY")
+            raise ParseError("NOT_ENOUGH_ENERGY")
 
         available_provision_certificates = list(available_provision_certificates)
 

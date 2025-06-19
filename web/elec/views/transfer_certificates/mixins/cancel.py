@@ -2,6 +2,7 @@ from django.db import transaction
 from django.db.models import F
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
 from core.models import CarbureNotification
@@ -16,7 +17,7 @@ class CancelActionMixin:
         transfer_certificate = self.get_object()
 
         if transfer_certificate.status == ElecTransferCertificate.ACCEPTED:
-            raise Exception("ALREADY_ACCEPTED")
+            raise ParseError("ALREADY_ACCEPTED")
 
         # Parcourir les certificat de provision et vider au fur et à mesure tant que on a pas atteint la somme
         energy_filled = 0

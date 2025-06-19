@@ -55,4 +55,4 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
         if entity.entity_type == Entity.CPO:
             queryset = ElecProvisionCertificate.objects.filter(cpo=entity)
 
-        return queryset.select_related("cpo")
+        return queryset.select_related("cpo").order_by("id")

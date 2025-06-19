@@ -1,6 +1,7 @@
 import pandas as pd
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
 from core.models import Entity
@@ -23,7 +24,7 @@ class ImportActionMixin:
     def import_certificates(self, request):
         file = request.FILES.get("file")
         if file is None:
-            raise Exception("MISSING_FILE")
+            raise ParseError("MISSING_FILE")
 
         certificate_df = pd.read_csv(file, sep=";", decimal=",")
 
@@ -38,7 +39,7 @@ class ImportActionMixin:
                 missing_cpos.append(certificate["cpo"])
 
         if len(missing_cpos) > 0:
-            raise Exception("MISSING_CPO")
+            raise ParseError("MISSING_CPO")
 
         certificate_model_instances = []
         for record in certificate_df.to_dict("records"):
