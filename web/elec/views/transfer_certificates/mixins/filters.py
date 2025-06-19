@@ -6,6 +6,7 @@ from core.models import Entity
 CPO_FILTERS = {
     "status": "status",
     "operator": "client__name",
+    "month": "transfer_date__month",
 }
 
 ADMIN_FILTERS = {

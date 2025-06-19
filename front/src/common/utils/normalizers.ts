@@ -22,7 +22,7 @@ import {
   EntityPreview,
 } from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
-import { formatPeriod } from "common/utils/formatters"
+import { formatMonth, formatPeriod } from "common/utils/formatters"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -216,6 +216,11 @@ export const normalizeConformityFilter: Normalizer<Conformity> = (conformity) =>
 export const normalizeMLFilter: Normalizer<ML> = (ml) => ({
   value: ml,
   label: ml,
+})
+
+export const normalizeMonth: Normalizer<string> = (m) => ({
+  value: m,
+  label: formatMonth(parseInt(m)),
 })
 
 export function getEntityTypeLabel(type: EntityType) {

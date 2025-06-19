@@ -193,6 +193,12 @@ export function chunk(str: string, size: number): string[] {
   return chunks.reverse()
 }
 
+export function formatMonth(month: number) {
+  const date = new Date(0, month - 1, 1)
+  const formatted = formatDate(date, "MMMM")
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+}
+
 export const CONVERSIONS = {
   energy: {
     MJ_TO_GJ: (value: number) => value / 1000,

@@ -5547,6 +5547,7 @@ export interface operations {
         energy_amount?: number
         /** @description Entity ID */
         entity_id: number
+        month?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operator?: string[]
         /** @description Ordre
@@ -5739,6 +5740,7 @@ export interface operations {
         entity_id: number
         /** @description Filter string to apply */
         filter?: string
+        month?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operator?: string[]
         /** @description Ordre

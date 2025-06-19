@@ -74,6 +74,7 @@ export function useFilters() {
   const entity = useEntity()
 
   const filters: Record<string, string> = {
+    [TransferCertificateFilter.Month]: t("Mois"),
     [TransferCertificateFilter.Cpo]: t("Aménageur"),
     [TransferCertificateFilter.Operator]: t("Redevable"),
   }

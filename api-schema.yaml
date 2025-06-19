@@ -1813,6 +1813,10 @@ paths:
           description: Entity ID
           required: true
         - in: query
+          name: month
+          schema:
+            type: number
+        - in: query
           name: operator
           schema:
             type: array
@@ -2104,6 +2108,10 @@ paths:
           schema:
             type: string
           description: Filter string to apply
+        - in: query
+          name: month
+          schema:
+            type: number
         - in: query
           name: operator
           schema:

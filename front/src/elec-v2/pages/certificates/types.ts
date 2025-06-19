@@ -39,6 +39,7 @@ export type ProvisionCertificatesQuery = CBQueryParams<
 export type ProvisionCertificate = apiTypes["ElecProvisionCertificate"]
 
 export enum TransferCertificateFilter {
+  Month = "month",
   Operator = "operator",
   Cpo = "cpo",
 }

@@ -13,11 +13,7 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { useQuery } from "common/hooks/async"
-import {
-  ElecCertificateSnapshot,
-  TransferCertificate,
-  TransferCertificateFilter,
-} from "../../types"
+import { ElecCertificateSnapshot, TransferCertificate } from "../../types"
 import {
   getTransferCertificates,
   getTransferCertificateFilters,
@@ -32,6 +28,7 @@ import {
 } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
+import { normalizeMonth } from "common/utils/normalizers"
 
 export interface TransferCertificatesProps {
   year: number
@@ -72,7 +69,7 @@ export const TransferCertificates = ({
     }
   }
 
-  const getTransferCertificateFilter = (filter: TransferCertificateFilter) =>
+  const getTransferCertificateFilter = (filter: string) =>
     getTransferCertificateFilters(filter, query)
 
   return (
@@ -101,7 +98,7 @@ export const TransferCertificates = ({
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTransferCertificateFilter}
-          normalizers={{ source: normalizeSource }}
+          normalizers={{ source: normalizeSource, month: normalizeMonth }}
         />
 
         {isEmpty && (
