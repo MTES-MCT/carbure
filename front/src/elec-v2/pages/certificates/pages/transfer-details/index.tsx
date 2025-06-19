@@ -33,6 +33,8 @@ export const TransferCertificateDetails = () => {
 
   const transferCert = transferResponse.result?.data
   const isPending = transferCert?.status === TransferCertificateStatus.PENDING
+  const isAccepted = transferCert?.status === TransferCertificateStatus.ACCEPTED
+  const isDeclared = transferCert?.used_in_tiruert ?? false
 
   function closeDialog() {
     navigate({ search: location.search, hash: "#" })
@@ -56,11 +58,16 @@ export const TransferCertificateDetails = () => {
             )}
 
             {entity.isOperator && isPending && (
-              <>
-                <RejectTransferCertificate id={transferID} />
-                <AcceptTransferCertificate id={transferID} />
-              </>
+              <RejectTransferCertificate id={transferID} />
             )}
+
+            {entity.isOperator &&
+              (isPending || (isAccepted && !isDeclared)) && (
+                <AcceptTransferCertificate
+                  id={transferID}
+                  alreadyAccepted={isAccepted}
+                />
+              )}
           </>
         }
       >

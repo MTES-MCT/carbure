@@ -12,17 +12,23 @@ import { Form } from "common/components/form2"
 
 type AcceptTransferCertificateProps = {
   id: number
+  alreadyAccepted: boolean
 }
 
 export const AcceptTransferCertificate = ({
   id,
+  alreadyAccepted,
 }: AcceptTransferCertificateProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
   function showDialog() {
     portal((close) => (
-      <AcceptTransferCertificateDialog id={id} onClose={close} />
+      <AcceptTransferCertificateDialog
+        id={id}
+        alreadyAccepted={alreadyAccepted}
+        onClose={close}
+      />
     ))
   }
 
@@ -32,18 +38,20 @@ export const AcceptTransferCertificate = ({
       customPriority="success"
       onClick={showDialog}
     >
-      {t("Accepter")}
+      {alreadyAccepted ? t("Déclarer") : t("Accepter")}
     </Button>
   )
 }
 
 type AcceptTransferCertificateDialogProps = {
   id: number
+  alreadyAccepted: boolean
   onClose: () => void
 }
 
 const AcceptTransferCertificateDialog = ({
   id,
+  alreadyAccepted,
   onClose,
 }: AcceptTransferCertificateDialogProps) => {
   const { t } = useTranslation()
@@ -53,7 +61,7 @@ const AcceptTransferCertificateDialog = ({
 
   const form = useForm({
     consumptionDate: undefined as string | undefined,
-    usedInTiruert: "false",
+    usedInTiruert: alreadyAccepted ? "true" : "false",
   })
 
   const acceptResponse = useMutation(acceptTransferCertificate, {
@@ -85,7 +93,13 @@ const AcceptTransferCertificateDialog = ({
   return (
     <Dialog
       onClose={onClose}
-      header={<Dialog.Title>{t("Accepter le certificat")}</Dialog.Title>}
+      header={
+        <Dialog.Title>
+          {alreadyAccepted
+            ? t("Déclarer le certificat")
+            : t("Accepter le certificat")}
+        </Dialog.Title>
+      }
       footer={
         <>
           <Button priority="secondary" onClick={onClose}>
@@ -103,28 +117,30 @@ const AcceptTransferCertificateDialog = ({
       }
     >
       <Form id="accept-elec-transfer-form" onSubmit={onAccept}>
-        <RadioGroup
-          {...form.bind("usedInTiruert")}
-          label={t(
-            "Ce certificat a-t-il été consommé dans le cadre d'une déclaration TIRUERT ?"
-          )}
-          options={[
-            {
-              value: "false",
-              label: t("Ne concerne pas encore une déclaration"),
-            },
-            {
-              value: "true",
-              label: t("Concerne une déclaration TIRUERT"),
-            },
-          ]}
-        />
+        {!alreadyAccepted && (
+          <RadioGroup
+            {...form.bind("usedInTiruert")}
+            label={t(
+              "Ce certificat a-t-il été consommé dans le cadre d'une déclaration TIRUERT ?"
+            )}
+            options={[
+              {
+                value: "false",
+                label: t("Ne concerne pas encore une déclaration"),
+              },
+              {
+                value: "true",
+                label: t("Concerne une déclaration TIRUERT"),
+              },
+            ]}
+          />
+        )}
 
         {form.value.usedInTiruert === "true" && (
           <DateInput
             required
             type="date"
-            label={t("J'indique la date de déclaration")}
+            label={t("J'indique la date de déclaration TIRUERT")}
             {...form.bind("consumptionDate")}
             style={{ marginTop: "var(--spacing-m)" }}
           />
