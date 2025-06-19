@@ -45,6 +45,8 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
     def get_permission(self):
         if self.action in ("accept", "reject"):
             return [IsAuthenticated(), HasElecOperatorUserRights()]
+        if self.action == "cancel":
+            return [IsAuthenticated(), HasCpoUserRights()]
 
         return super().get_permissions()
 

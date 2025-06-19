@@ -639,6 +639,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/transfer-certificates/{id}/cancel/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_v2_transfer_certificates_cancel_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/transfer-certificates/{id}/reject/": {
     parameters: {
       query?: never
@@ -2913,11 +2929,6 @@ export interface components {
       /** Format: double */
       remaining_energy_amount: number
     }
-    ElecTransferAccept: {
-      used_in_tiruert: string
-      /** Format: date */
-      consumption_date?: string
-    }
     ElecTransferAcceptRequest: {
       used_in_tiruert: string
       /** Format: date */
@@ -2944,9 +2955,6 @@ export interface components {
      * @enum {string}
      */
     ElecTransferCertificateStatusEnum: PathsApiSafTicketsGetParametersQueryStatus
-    ElecTransferReject: {
-      comment: string
-    }
     ElecTransferRejectRequest: {
       comment: string
     }
@@ -5579,13 +5587,36 @@ export interface operations {
       }
     }
     responses: {
+      /** @description No response body */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          "application/json": components["schemas"]["ElecTransferAccept"]
+        content?: never
+      }
+    }
+  }
+  elec_v2_transfer_certificates_cancel_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
         }
+        content?: never
       }
     }
   }
@@ -5610,13 +5641,12 @@ export interface operations {
       }
     }
     responses: {
+      /** @description No response body */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          "application/json": components["schemas"]["ElecTransferReject"]
-        }
+        content?: never
       }
     }
   }
