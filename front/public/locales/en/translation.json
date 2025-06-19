@@ -1145,6 +1145,8 @@
   "Ne concerne pas encore une déclaration": "Not yet in a declaration",
   "Concerne une déclaration TIRUERT": "Concerning a declaration TIRUERT",
   "J'indique la date de déclaration": "I indicate the declaration date",
+  "Le certificat a bien été annulé": "The certificate has been cancelled",
+  "Le certificat n'a pas pu être annulé": "Certificate could not be cancelled",
   "Émettre des certificats de fourniture": "Issue transfer certificates",
   "Les certificats ont bien été ajoutés": "Certificates have been added",
   "Le certificat n'ont pas pu être ajoutés": "Certificate could not be added",
