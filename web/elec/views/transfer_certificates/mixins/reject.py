@@ -1,5 +1,4 @@
 from django.db import transaction
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,25 +11,6 @@ class ElecTransferRejectSerializer(serializers.Serializer):
 
 
 class RejectActionMixin:
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-        examples=[
-            OpenApiExample(
-                "Example of assign response.",
-                value={},
-                request_only=False,
-                response_only=True,
-            ),
-        ],
-    )
     @action(methods=["POST"], detail=True, serializer_class=ElecTransferRejectSerializer)
     @transaction.atomic
     def reject(self, request, id=None):

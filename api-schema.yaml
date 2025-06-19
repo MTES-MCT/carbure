@@ -1367,6 +1367,12 @@ paths:
             type: number
             format: float
         - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
           name: operating_unit
           schema:
             type: array
@@ -1533,10 +1539,6 @@ paths:
                 properties:
                   balance:
                     type: integer
-              examples:
-                ExampleOfAssignResponse.:
-                  value: {}
-                  summary: Example of assign response.
           description: ""
   /api/elec-v2/provision-certificates/filters/:
     get:
@@ -1556,6 +1558,12 @@ paths:
           schema:
             type: number
             format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
         - in: query
           name: filter
           schema:
@@ -1708,10 +1716,6 @@ paths:
               schema:
                 type: object
                 properties: {}
-              examples:
-                ExampleOfAssignResponse.:
-                  value: {}
-                  summary: Example of assign response.
           description: ""
   /api/elec-v2/provision-certificates/transfer/:
     post:
@@ -1746,10 +1750,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ElecTransferCertificate"
-              examples:
-                ExampleOfAssignResponse.:
-                  value: {}
-                  summary: Example of assign response.
           description: ""
   /api/elec-v2/transfer-certificates/:
     get:
@@ -1782,6 +1782,12 @@ paths:
           schema:
             type: number
             format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
         - in: query
           name: operator
           schema:
@@ -1951,10 +1957,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ElecTransferAccept"
-              examples:
-                ExampleOfAssignResponse.:
-                  value: {}
-                  summary: Example of assign response.
           description: ""
   /api/elec-v2/transfer-certificates/{id}/reject/:
     post:
@@ -1995,10 +1997,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ElecTransferReject"
-              examples:
-                ExampleOfAssignResponse.:
-                  value: {}
-                  summary: Example of assign response.
           description: ""
   /api/elec-v2/transfer-certificates/filters/:
     get:
@@ -2031,6 +2029,12 @@ paths:
           schema:
             type: number
             format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
         - in: query
           name: filter
           schema:

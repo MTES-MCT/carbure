@@ -20,6 +20,17 @@ class ProvisionCertificatePagination(MetadataPageNumberPagination):
     }
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+)
 class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin, GenericViewSet[ElecProvisionCertificate]):
     queryset = ElecProvisionCertificate.objects.all()
     serializer_class = ElecProvisionCertificateSerializer
@@ -45,17 +56,3 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
             queryset = ElecProvisionCertificate.objects.filter(cpo=entity)
 
         return queryset.select_related("cpo")
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)

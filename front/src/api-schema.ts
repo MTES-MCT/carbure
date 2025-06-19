@@ -5261,10 +5261,12 @@ export interface operations {
   }
   elec_v2_provision_certificates_list: {
     parameters: {
-      query?: {
+      query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         cpo?: string[]
         energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operating_unit?: string[]
         /** @description Ordre
@@ -5362,10 +5364,12 @@ export interface operations {
   }
   elec_v2_provision_certificates_filters_retrieve: {
     parameters: {
-      query?: {
+      query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         cpo?: string[]
         energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
         /** @description Filter string to apply */
         filter?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -5472,13 +5476,15 @@ export interface operations {
   }
   elec_v2_transfer_certificates_list: {
     parameters: {
-      query?: {
+      query: {
         accepted_date?: string
         certificate_id?: string
         client?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         cpo?: string[]
         energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operator?: string[]
         /** @description Ordre
@@ -5616,13 +5622,15 @@ export interface operations {
   }
   elec_v2_transfer_certificates_filters_retrieve: {
     parameters: {
-      query?: {
+      query: {
         accepted_date?: string
         certificate_id?: string
         client?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         cpo?: string[]
         energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
         /** @description Filter string to apply */
         filter?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */

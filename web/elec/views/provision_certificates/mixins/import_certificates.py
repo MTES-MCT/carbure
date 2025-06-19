@@ -1,5 +1,5 @@
 import pandas as pd
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -10,15 +10,6 @@ from elec.models import ElecProvisionCertificate
 
 class ImportActionMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         request={
             "multipart/form-data": {
                 "type": "object",
@@ -26,14 +17,6 @@ class ImportActionMixin:
                 "required": ["file"],
             }
         },
-        examples=[
-            OpenApiExample(
-                "Example of assign response.",
-                value={},
-                request_only=False,
-                response_only=True,
-            ),
-        ],
         responses={200: {"type": "object", "properties": {}}},
     )
     @action(methods=["POST"], detail=False, url_path="import")

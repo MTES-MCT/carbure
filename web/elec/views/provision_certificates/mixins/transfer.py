@@ -2,7 +2,7 @@ import datetime
 
 from django.db import transaction
 from django.db.models import Sum
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,23 +20,6 @@ class ElecTransferSerializer(serializers.Serializer):
 
 class TransferActionMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-        examples=[
-            OpenApiExample(
-                "Example of assign response.",
-                value={},
-                request_only=False,
-                response_only=True,
-            ),
-        ],
         responses={200: ElecTransferCertificateSerializer},
     )
     @action(methods=["POST"], detail=False, serializer_class=ElecTransferSerializer)

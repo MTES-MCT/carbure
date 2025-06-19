@@ -20,6 +20,17 @@ class TransferCertificatePagination(MetadataPageNumberPagination):
     }
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+)
 class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin, GenericViewSet[ElecTransferCertificate]):
     queryset = ElecTransferCertificate.objects.all()
     serializer_class = ElecTransferCertificateSerializer
@@ -47,17 +58,3 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
             queryset = ElecTransferCertificate.objects.filter(client=entity)
 
         return queryset.select_related("supplier", "client")
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
