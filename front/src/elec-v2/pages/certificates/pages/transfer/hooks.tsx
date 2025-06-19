@@ -77,10 +77,12 @@ export function useFilters() {
     [TransferCertificateFilter.Month]: t("Mois"),
     [TransferCertificateFilter.Cpo]: t("Aménageur"),
     [TransferCertificateFilter.Operator]: t("Redevable"),
+    [TransferCertificateFilter.UsedInTiruert]: t("Décl. TIRUERT"),
   }
 
   if (entity.isCPO) {
     delete filters[TransferCertificateFilter.Cpo]
+    delete filters[TransferCertificateFilter.UsedInTiruert]
   }
 
   if (entity.isOperator) {
@@ -95,11 +97,6 @@ export function useColumns() {
   const entity = useEntity()
 
   return compact([
-    {
-      key: "transfer_date",
-      header: t("Date d'émission"),
-      cell: (p) => formatDate(p.transfer_date),
-    },
     !entity.isCPO && {
       key: "cpo",
       header: t("Aménageur"),
@@ -109,6 +106,16 @@ export function useColumns() {
       key: "operator",
       header: t("Redevable"),
       cell: (p) => p.client.name,
+    },
+    {
+      key: "transfer_date",
+      header: t("Date d'émission"),
+      cell: (p) => formatDate(p.transfer_date),
+    },
+    !entity.isCPO && {
+      key: "consumption_date",
+      header: t("Date de décl. TIRUERT"),
+      cell: (p) => formatDate(p.consumption_date ?? null),
     },
     {
       key: "energy_amount",

@@ -28,7 +28,7 @@ import {
 } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
-import { normalizeMonth } from "common/utils/normalizers"
+import { normalizeBoolean, normalizeMonth } from "common/utils/normalizers"
 
 export interface TransferCertificatesProps {
   year: number
@@ -98,7 +98,11 @@ export const TransferCertificates = ({
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTransferCertificateFilter}
-          normalizers={{ source: normalizeSource, month: normalizeMonth }}
+          normalizers={{
+            source: normalizeSource,
+            month: normalizeMonth,
+            used_in_tiruert: normalizeBoolean,
+          }}
         />
 
         {isEmpty && (

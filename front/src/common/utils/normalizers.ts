@@ -223,6 +223,11 @@ export const normalizeMonth: Normalizer<string> = (m) => ({
   label: formatMonth(parseInt(m)),
 })
 
+export const normalizeBoolean: Normalizer<string> = (b) => ({
+  value: b,
+  label: String(b) === "true" ? i18next.t("Oui") : i18next.t("Non"),
+})
+
 export function getEntityTypeLabel(type: EntityType) {
   switch (type) {
     case EntityType.Administration:

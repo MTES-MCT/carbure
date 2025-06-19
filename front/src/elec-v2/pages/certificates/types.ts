@@ -42,6 +42,7 @@ export enum TransferCertificateFilter {
   Month = "month",
   Operator = "operator",
   Cpo = "cpo",
+  UsedInTiruert = "used_in_tiruert",
 }
 
 export type TransferCertificateOrder =
