@@ -9,7 +9,6 @@ import {
   elecMeterReadingsApplicationsResponseMissing,
   elecMeterReadingsApplicationsResponsePending,
   elecMeterReadingsApplicationsWithoutChargePointsResponse,
-  elecSnapshot,
   meterReadingsApplicationCheckResponseFailed,
   meterReadingsApplicationCheckResponseSuccess,
 } from "elec/__test__/data"
@@ -33,11 +32,6 @@ export const okChargePointsApplications = http.get(
       data,
     })
   }
-)
-
-export const okCPOSnapshot = mockGetWithResponseData(
-  "/elec/cpo/certificate-snapshot",
-  elecSnapshot
 )
 
 export const okChargePointsApplicationsEmpty = mockGetWithResponseData(

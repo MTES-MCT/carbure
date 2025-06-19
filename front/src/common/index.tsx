@@ -18,11 +18,8 @@ const DoubleCountingAdmin = lazy(() => import("double-counting-admin"))
 const AgreementPublicList = lazy(
   () => import("double-counting/components/agreement-public-list")
 )
-const ElecAdmin = lazy(() => import("elec-admin"))
 const ElecAdminAudit = lazy(() => import("elec-audit-admin"))
-const ElecCPO = lazy(() => import("elec/cpo"))
 const ChargePoints = lazy(() => import("elec-charge-points/charge-points"))
-const ElecOperator = lazy(() => import("elec/operator"))
 const Registry = lazy(() => import("registry"))
 const SafAirline = lazy(() => import("saf/pages/airline"))
 const SafOperator = lazy(() => import("saf/pages/operator"))
@@ -129,7 +126,6 @@ const Org = () => {
     isPowerOrHeatProducer,
     isSAFTrader,
     has_saf,
-    has_elec,
     accise_number,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
@@ -208,22 +204,6 @@ const Org = () => {
 
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
-      {isCPO && (
-        <>
-          <Route path="elec/:year/*" element={<ElecCPO />} />
-          <Route
-            path="elec"
-            element={<Navigate replace to={`${currentYear}/provisioned`} />}
-          />
-          <Route
-            path="*"
-            element={
-              <Navigate replace to={`elec/${currentYear}/provisioned`} />
-            }
-          />
-        </>
-      )}
-
       {(isCPO ||
         isElecOperator ||
         isAdmin ||
@@ -235,19 +215,6 @@ const Org = () => {
         />
       )}
 
-      {isOperator && has_elec && (
-        <>
-          <Route path="elec/:year/*" element={<ElecOperator />} />
-          <Route
-            path="elec"
-            element={<Navigate replace to={`${currentYear}`} />}
-          />
-          <Route
-            path="*"
-            element={<Navigate replace to={`elec/${currentYear}/pending`} />}
-          />
-        </>
-      )}
       {isCPO && <Route path="charge-points/*" element={<ChargePoints />} />}
 
       {isAuditor && (
@@ -285,15 +252,6 @@ const Org = () => {
         </>
       )}
 
-      {(isAdmin || isElecAdmin || isTransferElecAdmin) && (
-        <>
-          <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
-          <Route
-            path="elec-admin"
-            element={<Navigate replace to={`${currentYear}`} />}
-          />
-        </>
-      )}
       {(isAdmin || isElecAdmin) && (
         <>
           <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />

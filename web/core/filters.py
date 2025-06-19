@@ -59,6 +59,6 @@ def FiltersActionFactory(filters: Callable[[Request], dict[str, str]]):
 
             # Use pre-filtered queryset for distinct values
             values = filterset.qs.values_list(filter_obj.field_name, flat=True).distinct()
-            return Response([v for v in values if v])
+            return Response({v for v in values if v})
 
     return FiltersActionMixin

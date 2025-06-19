@@ -1,59 +1,5 @@
 import { EntityPreview, UploadCheckReportInfo } from "common/types"
-import { ElecTransferCertificateStatus } from "./types-cpo"
 import { ElecApplicationSample } from "elec-audit-admin/types"
-
-export enum ElecProvisionCertificateSource {
-  MANUAL = "MANUAL",
-  METER_READINGS = "METER_READINGS",
-  QUALICHARGE = "QUALICHARGE",
-}
-export interface ElecProvisionCertificatePreview {
-  id: number
-  cpo: EntityPreview
-  energy_amount: number
-  operating_unit: string
-  quarter: number
-  remaining_energy_amount: number
-  source?: ElecProvisionCertificateSource
-  year: number
-}
-export interface ElecTransferCertificatePreview {
-  id: number
-  supplier: EntityPreview
-  client: EntityPreview
-  transfer_date: string
-  energy_amount: number
-  status: ElecTransferCertificateStatus
-  certificate_id: number
-  used_in_tiruert: boolean
-  consumption_date: string
-}
-
-export interface ElecTransferCertificate
-  extends ElecTransferCertificatePreview {
-  comment: string
-}
-
-export interface ElecTransferCertificatesData {
-  elec_transfer_certificates: ElecTransferCertificatePreview[]
-  from: number
-  ids: number[]
-  returned: number
-  total: number
-}
-
-export enum ElecTransferCertificateFilter {
-  TransferDate = "transfer_date",
-  Operator = "operator",
-  Cpo = "cpo",
-  CertificateId = "certificate_id",
-}
-
-export interface ElecTransferCertificatesDetails
-  extends ElecTransferCertificatePreview {
-  comment: string
-}
-export type ElecProvisionCertificatesDetails = ElecProvisionCertificatePreview
 
 export enum ElecAuditApplicationStatus {
   Pending = "PENDING",
