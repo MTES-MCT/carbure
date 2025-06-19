@@ -286,6 +286,8 @@ export const defaultLot = {
   emission_heat: 0 as number | undefined,
   total_reduction_electricity: 0 as number | undefined,
   total_reduction_heat: 0 as number | undefined,
+
+  entity_id: 0 as number | undefined, // the entity that created the lot
 }
 
 export type LotFormValue = typeof defaultLot
@@ -345,6 +347,8 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
   emission_heat: lot?.emission_heat ?? 0,
   total_reduction_electricity: lot?.total_reduction_electricity ?? 0,
   total_reduction_heat: lot?.total_reduction_heat ?? 0,
+
+  entity_id: entity.id,
 })
 
 export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
@@ -383,15 +387,27 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
 
     // production
     carbure_producer_id:
-      lot.producer instanceof Object ? lot.producer.id : undefined,
+      lot.producer instanceof Object && lot.producer.id == lot.entity_id
+        ? lot.producer.id
+        : undefined,
     unknown_producer:
-      typeof lot.producer === "string" ? lot.producer : undefined,
+      lot.producer instanceof Object
+        ? lot.producer.id === lot.entity_id
+          ? undefined
+          : lot.producer.name
+        : lot.producer,
     carbure_production_site:
-      lot.production_site instanceof Object
+      lot.production_site instanceof Object &&
+      lot.producer instanceof Object &&
+      lot.producer.id == lot.entity_id
         ? lot.production_site.name
         : undefined,
     unknown_production_site:
-      typeof lot.production_site === "string" ? lot.production_site : undefined,
+      lot.production_site instanceof Object
+        ? lot.producer instanceof Object && lot.producer.id === lot.entity_id
+          ? undefined
+          : lot.production_site.name
+        : lot.production_site,
     production_site_certificate: lot.production_site_certificate,
     production_site_certificate_type: undefined,
     production_country_code: lot.production_country?.code_pays,

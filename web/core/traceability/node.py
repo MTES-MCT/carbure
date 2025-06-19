@@ -200,6 +200,25 @@ class Node:
             if not is_similar(new_value, old_value):
                 diff[attr] = (new_value, old_value)
 
+        if self._parent is None and self._children is None:
+            fields_to_nullify = [
+                "unknown_producer",
+                "unknown_production_site",
+                "production_site_double_counting_certificate",
+                "carbure_producer",
+                "carbure_production_site",
+                "production_site_certificate",
+                "production_country",
+            ]
+
+            # for production fields, if they are not in 'data', we nullify them
+            # (because frontend application doesn't send them if user empty them)
+            for field in fields_to_nullify:
+                if field not in data and hasattr(self.data, field):
+                    old_value = getattr(self.data, field)
+                    if old_value is not None:
+                        diff[field] = (None, old_value)
+
         # if an entity_id is specified, check if it has the right to apply the diff
         if entity_id is not None:
             allowed_diff = self.get_allowed_diff(diff, entity_id)
