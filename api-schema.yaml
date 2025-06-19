@@ -1780,11 +1780,6 @@ paths:
       operationId: elec_v2_transfer_certificates_list
       parameters:
         - in: query
-          name: accepted_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: certificate_id
           schema:
             type: string
@@ -1792,6 +1787,11 @@ paths:
           name: client
           schema:
             type: integer
+        - in: query
+          name: consumption_date
+          schema:
+            type: string
+            format: date
         - in: query
           name: cpo
           schema:
@@ -1832,15 +1832,15 @@ paths:
             items:
               type: string
               enum:
-                - -accepted_date
                 - -certificate_id
+                - -consumption_date
                 - -cpo
                 - -energy_amount
                 - -operator
                 - -status
                 - -transfer_date
-                - accepted_date
                 - certificate_id
+                - consumption_date
                 - cpo
                 - energy_amount
                 - operator
@@ -1861,8 +1861,8 @@ paths:
             * `-certificate_id` - Certificate id (décroissant)
             * `transfer_date` - Transfer date
             * `-transfer_date` - Transfer date (décroissant)
-            * `accepted_date` - Accepted date
-            * `-accepted_date` - Accepted date (décroissant)
+            * `consumption_date` - Consumption date
+            * `-consumption_date` - Consumption date (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -1902,6 +1902,10 @@ paths:
           schema:
             type: string
             format: date
+        - in: query
+          name: used_in_tiruert
+          schema:
+            type: boolean
         - in: query
           name: year
           schema:
@@ -2071,11 +2075,6 @@ paths:
       operationId: elec_v2_transfer_certificates_filters_retrieve
       parameters:
         - in: query
-          name: accepted_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: certificate_id
           schema:
             type: string
@@ -2083,6 +2082,11 @@ paths:
           name: client
           schema:
             type: integer
+        - in: query
+          name: consumption_date
+          schema:
+            type: string
+            format: date
         - in: query
           name: cpo
           schema:
@@ -2128,15 +2132,15 @@ paths:
             items:
               type: string
               enum:
-                - -accepted_date
                 - -certificate_id
+                - -consumption_date
                 - -cpo
                 - -energy_amount
                 - -operator
                 - -status
                 - -transfer_date
-                - accepted_date
                 - certificate_id
+                - consumption_date
                 - cpo
                 - energy_amount
                 - operator
@@ -2157,8 +2161,8 @@ paths:
             * `-certificate_id` - Certificate id (décroissant)
             * `transfer_date` - Transfer date
             * `-transfer_date` - Transfer date (décroissant)
-            * `accepted_date` - Accepted date
-            * `-accepted_date` - Accepted date (décroissant)
+            * `consumption_date` - Consumption date
+            * `-consumption_date` - Consumption date (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -2186,6 +2190,10 @@ paths:
           schema:
             type: string
             format: date
+        - in: query
+          name: used_in_tiruert
+          schema:
+            type: boolean
         - in: query
           name: year
           schema:

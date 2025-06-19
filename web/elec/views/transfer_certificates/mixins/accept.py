@@ -38,6 +38,9 @@ class AcceptActionMixin:
             transfer_certificate.consumption_date = consumption_date
         transfer_certificate.save()
 
-        ElecOperationService.update_operator_cpo_acquisition_operations(transfer_certificate.client)
+        try:
+            ElecOperationService.update_operator_cpo_acquisition_operations(transfer_certificate.client)
+        except Exception:
+            pass
 
         return Response()

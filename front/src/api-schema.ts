@@ -5539,9 +5539,9 @@ export interface operations {
   elec_v2_transfer_certificates_list: {
     parameters: {
       query: {
-        accepted_date?: string
         certificate_id?: string
         client?: number
+        consumption_date?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         cpo?: string[]
         energy_amount?: number
@@ -5564,8 +5564,8 @@ export interface operations {
          *     * `-certificate_id` - Certificate id (décroissant)
          *     * `transfer_date` - Transfer date
          *     * `-transfer_date` - Transfer date (décroissant)
-         *     * `accepted_date` - Accepted date
-         *     * `-accepted_date` - Accepted date (décroissant) */
+         *     * `consumption_date` - Consumption date
+         *     * `-consumption_date` - Consumption date (décroissant) */
         order_by?: PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -5578,6 +5578,7 @@ export interface operations {
         status?: string
         supplier?: number
         transfer_date?: string
+        used_in_tiruert?: boolean
         year?: number
       }
       header?: never
@@ -5730,9 +5731,9 @@ export interface operations {
   elec_v2_transfer_certificates_filters_retrieve: {
     parameters: {
       query: {
-        accepted_date?: string
         certificate_id?: string
         client?: number
+        consumption_date?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         cpo?: string[]
         energy_amount?: number
@@ -5757,8 +5758,8 @@ export interface operations {
          *     * `-certificate_id` - Certificate id (décroissant)
          *     * `transfer_date` - Transfer date
          *     * `-transfer_date` - Transfer date (décroissant)
-         *     * `accepted_date` - Accepted date
-         *     * `-accepted_date` - Accepted date (décroissant) */
+         *     * `consumption_date` - Consumption date
+         *     * `-consumption_date` - Consumption date (décroissant) */
         order_by?: PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -5767,6 +5768,7 @@ export interface operations {
         status?: string
         supplier?: number
         transfer_date?: string
+        used_in_tiruert?: boolean
         year?: number
       }
       header?: never
@@ -9521,15 +9523,15 @@ export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter {
   Value4 = 4,
 }
 export enum PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by {
-  ValueMinusaccepted_date = "-accepted_date",
   ValueMinuscertificate_id = "-certificate_id",
+  ValueMinusconsumption_date = "-consumption_date",
   ValueMinuscpo = "-cpo",
   ValueMinusenergy_amount = "-energy_amount",
   ValueMinusoperator = "-operator",
   ValueMinusstatus = "-status",
   ValueMinustransfer_date = "-transfer_date",
-  accepted_date = "accepted_date",
   certificate_id = "certificate_id",
+  consumption_date = "consumption_date",
   cpo = "cpo",
   energy_amount = "energy_amount",
   operator = "operator",
