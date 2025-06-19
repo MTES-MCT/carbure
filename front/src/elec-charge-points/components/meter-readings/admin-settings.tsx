@@ -4,7 +4,7 @@ import { AlertCircle } from "common/components/icons"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import * as api from "elec-admin/api"
-import { ElecMeterReadingsApplication } from "elec/types"
+import { ElecMeterReadingsApplication } from "elec-charge-points/types"
 import { Trans, useTranslation } from "react-i18next"
 
 import MeterReadingsApplicationsTable from "./table"

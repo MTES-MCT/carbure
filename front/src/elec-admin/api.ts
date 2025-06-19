@@ -2,7 +2,7 @@ import { api, Api, download } from "common/services/api"
 import {
   ElecChargePointsApplication,
   ElecMeterReadingsApplication,
-} from "elec/types"
+} from "elec-charge-points/types"
 
 //TO MOVE WHEN  /elec-charge-points created by Benjamin
 export function downloadChargePointsApplicationDetails(

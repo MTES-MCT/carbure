@@ -6,7 +6,7 @@ import {
 import {
   elecChargePointsApplications,
   elecMeterReadingsApplications,
-} from "elec/__test__/data"
+} from "elec-charge-points/__test__/data"
 
 export const elecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   charge_points_applications: 2,

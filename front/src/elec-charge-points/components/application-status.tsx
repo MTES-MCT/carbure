@@ -1,5 +1,5 @@
 import Tag, { TagVariant } from "common/components/tag"
-import { ElecAuditApplicationStatus } from "elec/types"
+import { ElecAuditApplicationStatus } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
 
 const statusToVariant: Record<ElecAuditApplicationStatus, TagVariant> = {

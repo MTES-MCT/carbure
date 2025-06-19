@@ -4,7 +4,7 @@ import {
   ElecChargePointsApplication,
   ElecChargePointsApplicationDetails,
   ElecMeterReadingsApplicationDetails,
-} from "elec/types"
+} from "elec-charge-points/types"
 import {
   ElecAdminAuditQuery,
   ElecAdminAuditSnapshot,

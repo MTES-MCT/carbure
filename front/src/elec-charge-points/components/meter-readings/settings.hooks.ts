@@ -1,6 +1,6 @@
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import * as api from "../../api-cpo"
+import * as api from "elec-charge-points/api"
 
 type useElecMeterReadingsSettingsParams = {
   entityId: number

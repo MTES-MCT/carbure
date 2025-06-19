@@ -7,12 +7,12 @@ import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
+import ElecChargePointsFileUpload from "elec-charge-points/components/charge-points/upload-dialog"
 import {
   ElecChargePointsApplication,
   ElecAuditApplicationStatus,
   ElecChargePointsSnapshot,
-} from "elec/types"
+} from "elec-charge-points/types"
 import { Trans, useTranslation } from "react-i18next"
 import Metric from "common/components/metric"
 

@@ -5,8 +5,8 @@ import { Return, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
-import * as api from "elec/api-cpo"
-import { ElecMeterReadingsApplicationCheckInfo } from "elec/types"
+import * as api from "elec-charge-points/api"
+import { ElecMeterReadingsApplicationCheckInfo } from "elec-charge-points/types"
 import { Trans, useTranslation } from "react-i18next"
 
 export type MeterReadingsValidDetailsDialogProps = {

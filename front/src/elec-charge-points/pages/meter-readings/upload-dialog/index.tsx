@@ -15,12 +15,12 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 
-import * as api from "elec/api-cpo"
+import * as api from "elec-charge-points/api"
 import {
   ElecMeterReadingsApplicationCheckInfo,
   ElecMeterReadingsCurrentApplicationsPeriod,
   MeterReadingsApplicationUrgencyStatus,
-} from "elec/types"
+} from "elec-charge-points/types"
 import { Trans, useTranslation } from "react-i18next"
 import MeterReadingsErrorsDetailsDialog from "./errors-dialog"
 import MeterReadingsValidDetailsDialog from "./valid-dialog"

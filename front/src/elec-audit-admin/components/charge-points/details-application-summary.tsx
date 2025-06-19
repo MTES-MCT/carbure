@@ -1,7 +1,7 @@
 import Form from "common/components/form"
 import { TextInput } from "common/components/input"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import { ElecChargePointsApplication } from "elec/types"
+import { ElecChargePointsApplication } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
 
 const ApplicationSummary = ({

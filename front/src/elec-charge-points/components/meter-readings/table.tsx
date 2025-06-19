@@ -2,11 +2,11 @@ import Button from "common/components/button"
 import { Cross, Download } from "common/components/icons"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
-import ApplicationStatus from "elec/components/application-status"
+import ApplicationStatus from "elec-charge-points/components/application-status"
 import {
   ElecAuditApplicationStatus,
   ElecMeterReadingsApplication,
-} from "elec/types"
+} from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
 import { compact } from "common/utils/collection"
 
