@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
+from core.models import Entity
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 
@@ -20,22 +21,37 @@ class ExcelExportActionMixin:
         today = date.today()
         file = "carbure_elec_transfer_certificate_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
 
+        """
+        "id",
+        "supplier",
+        "client",
+        "transfer_date",
+        "energy_amount",
+        "status",
+        "certificate_id",
+        "used_in_tiruert",
+        "consumption_date",
+        """
+
+        columns = [
+            {"label": "certificate_id", "value": "certificate_id"},
+            {"label": "status", "value": "status"},
+            {"label": "supplier", "value": "supplier.name"},
+            {"label": "client", "value": "client.name"},
+            {"label": "transfer_date", "value": "transfer_date"},
+            {"label": "energy_amount", "value": "energy_amount"},
+        ]
+
+        if request.entity.entity_type != Entity.CPO:
+            columns.insert(5, {"label": "consumption_date", "value": "consumption_date"})
+
         excel_file = export_to_excel(
             file,
             [
                 {
                     "label": "tickets",
                     "rows": ElecTransferCertificateSerializer(transfers, many=True).data,
-                    "columns": [
-                        {"label": "id", "value": "id"},
-                        {"label": "quarter", "value": "quarter"},
-                        {"label": "year", "value": "year"},
-                        {"label": "cpo", "value": "cpo.name"},
-                        {"label": "operating_unit", "value": "operating_unit"},
-                        {"label": "source", "value": "source"},
-                        {"label": "energy_amount", "value": "energy_amount"},
-                        {"label": "remaining_energy_amount", "value": "remaining_energy_amount"},
-                    ],
+                    "columns": columns,
                 }
             ],
         )
