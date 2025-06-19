@@ -21,7 +21,7 @@ class ProvisionCertificatePagination(MetadataPageNumberPagination):
 
 
 class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin, GenericViewSet[ElecProvisionCertificate]):
-    queryset = ElecProvisionCertificate.objects.none()
+    queryset = ElecProvisionCertificate.objects.all()
     serializer_class = ElecProvisionCertificateSerializer
     filterset_class = ProvisionCertificateFilter
     pagination_class = ProvisionCertificatePagination
@@ -38,7 +38,7 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = ElecProvisionCertificate.objects.all()
+        queryset = super().get_queryset()
 
         entity = self.request.entity
         if entity.entity_type == Entity.CPO:

@@ -21,7 +21,7 @@ class TransferCertificatePagination(MetadataPageNumberPagination):
 
 
 class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin, GenericViewSet[ElecTransferCertificate]):
-    queryset = ElecTransferCertificate.objects.none()
+    queryset = ElecTransferCertificate.objects.all()
     serializer_class = ElecTransferCertificateSerializer
     filterset_class = TransferCertificateFilter
     pagination_class = TransferCertificatePagination
@@ -38,7 +38,7 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = ElecTransferCertificate.objects.all()
+        queryset = super().get_queryset()
 
         entity = self.request.entity
         if entity.entity_type == Entity.CPO:
