@@ -21,18 +21,6 @@ class ExcelExportActionMixin:
         today = date.today()
         file = "carbure_elec_transfer_certificate_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
 
-        """
-        "id",
-        "supplier",
-        "client",
-        "transfer_date",
-        "energy_amount",
-        "status",
-        "certificate_id",
-        "used_in_tiruert",
-        "consumption_date",
-        """
-
         columns = [
             {"label": "certificate_id", "value": "certificate_id"},
             {"label": "status", "value": "status"},
