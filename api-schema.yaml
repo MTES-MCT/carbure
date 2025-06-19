@@ -1540,6 +1540,30 @@ paths:
                   balance:
                     type: integer
           description: ""
+  /api/elec-v2/provision-certificates/export/:
+    get:
+      operationId: export_provision_certificates_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: Excel file download
+          description: ""
   /api/elec-v2/provision-certificates/filters/:
     get:
       operationId: elec_v2_provision_certificates_filters_retrieve
@@ -2014,6 +2038,30 @@ paths:
       responses:
         "200":
           description: No response body
+  /api/elec-v2/transfer-certificates/export/:
+    get:
+      operationId: export_transfer_certificates_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec-v2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: Excel file download
+          description: ""
   /api/elec-v2/transfer-certificates/filters/:
     get:
       operationId: elec_v2_transfer_certificates_filters_retrieve

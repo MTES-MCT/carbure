@@ -21,6 +21,7 @@ import {
 import {
   getTransferCertificates,
   getTransferCertificateFilters,
+  exportTransferCertificates,
 } from "../../api"
 import {
   useColumns,
@@ -30,6 +31,7 @@ import {
   useTabs,
 } from "./hooks"
 import { normalizeSource } from "../../utils"
+import { ExportButton } from "common/components/export"
 
 export interface TransferCertificatesProps {
   year: number
@@ -90,6 +92,8 @@ export const TransferCertificates = ({
               onChange={actions.setSearch}
             />
           </ActionBar.Grow>
+
+          <ExportButton query={query} download={exportTransferCertificates} />
         </ActionBar>
 
         <FilterMultiSelect2

@@ -543,6 +543,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec-v2/provision-certificates/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["export_provision_certificates_excel"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec-v2/provision-certificates/filters/": {
     parameters: {
       query?: never
@@ -665,6 +681,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["elec_v2_transfer_certificates_reject_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec-v2/transfer-certificates/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["export_transfer_certificates_excel"]
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -5370,6 +5402,28 @@ export interface operations {
       }
     }
   }
+  export_provision_certificates_excel: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": File
+        }
+      }
+    }
+  }
   elec_v2_provision_certificates_filters_retrieve: {
     parameters: {
       query: {
@@ -5647,6 +5701,28 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  export_transfer_certificates_excel: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": File
+        }
       }
     }
   }

@@ -1,4 +1,4 @@
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import { ProvisionCertificatesQuery, TransferCertificatesQuery } from "./types"
 
 export function getYears(entity_id: number) {
@@ -32,6 +32,10 @@ export function getProvisionCertificates(query: ProvisionCertificatesQuery) {
   return api.GET("/elec-v2/provision-certificates/", {
     params: { query },
   })
+}
+
+export function exportProvisionCertificates(query: ProvisionCertificatesQuery) {
+  return download("/elec-v2/provision-certificates/export/", query)
 }
 
 export function getProvisionCertificateFilters(
@@ -78,6 +82,10 @@ export function getTransferCertificates(query: TransferCertificatesQuery) {
   return api.GET("/elec-v2/transfer-certificates/", {
     params: { query },
   })
+}
+
+export function exportTransferCertificates(query: TransferCertificatesQuery) {
+  return download("/elec-v2/transfer-certificates/export/", query)
 }
 
 export function getTransferCertificateFilters(

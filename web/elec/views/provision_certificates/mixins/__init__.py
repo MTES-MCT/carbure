@@ -2,11 +2,14 @@ from .import_certificates import ImportActionMixin
 from .balance import BalanceActionMixin
 from .filters import FiltersActionMixin
 from .transfer import TransferActionMixin
+from .excel_export import ExcelExportActionMixin
 
 class ActionMixin(
     BalanceActionMixin,
     FiltersActionMixin,
     TransferActionMixin,
-    ImportActionMixin
+    ImportActionMixin,
+    ExcelExportActionMixin
+
 ):
     pass
