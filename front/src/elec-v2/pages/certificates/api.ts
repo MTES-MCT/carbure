@@ -134,3 +134,15 @@ export function rejectTransferCertificate(
     body: { comment },
   })
 }
+
+export function cancelTransferCertificate(
+  entity_id: number,
+  transfer_certificate_id: number
+) {
+  return api.POST("/elec-v2/transfer-certificates/{id}/cancel/", {
+    params: {
+      query: { entity_id },
+      path: { id: transfer_certificate_id },
+    },
+  })
+}

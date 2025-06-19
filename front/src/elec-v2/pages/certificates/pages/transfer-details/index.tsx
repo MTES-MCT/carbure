@@ -13,6 +13,7 @@ import { ExtendedUnit } from "common/types"
 import TicketTag from "saf/components/tickets/tag"
 import { AcceptTransferCertificate } from "../../components/accept-transfer-certificate"
 import { RejectTransferCertificate } from "../../components/reject-transfer-certificate"
+import { CancelTransferCertificate } from "../../components/cancel-transfer-certificate"
 import { TransferCertificateStatus } from "../../types"
 
 export const TransferCertificateDetails = () => {
@@ -50,6 +51,10 @@ export const TransferCertificateDetails = () => {
         }
         footer={
           <>
+            {entity.isCPO && isPending && (
+              <CancelTransferCertificate id={transferID} />
+            )}
+
             {entity.isOperator && isPending && (
               <>
                 <RejectTransferCertificate id={transferID} />
