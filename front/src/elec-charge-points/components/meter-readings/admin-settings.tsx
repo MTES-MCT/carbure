@@ -3,7 +3,7 @@ import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import * as api from "elec-admin/api"
+import * as api from "elec-charge-points/api-admin"
 import { ElecMeterReadingsApplication } from "elec-charge-points/types"
 import { Trans, useTranslation } from "react-i18next"
 

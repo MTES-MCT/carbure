@@ -6,7 +6,7 @@ import { usePortal } from "common/components/portal"
 import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
-import * as apiAdmin from "elec-admin/api"
+import * as apiAdmin from "elec-charge-points/api-admin"
 import ElecChargePointsFileUpload from "elec-charge-points/components/charge-points/upload-dialog"
 import {
   ElecChargePointsApplication,
