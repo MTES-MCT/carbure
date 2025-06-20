@@ -5,12 +5,12 @@ import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
 import {
   SafStates,
-  SafTicket,
+  SafTicketPreview,
   SafTicketsResponse,
   SafTicketStatus,
 } from "saf/types"
 import TicketTag from "./tag"
-import { Order, Table, Cell } from "common/components/table2"
+import { Order, Table, Cell, Column } from "common/components/table2"
 import { Pagination } from "common/components/pagination2/pagination"
 import { NoResult } from "common/components/no-result2"
 import { formatConsumptionType } from "saf/utils/formatters"
@@ -23,7 +23,7 @@ export interface TicketsTableProps {
   ticketsData?: SafTicketsResponse
   order: Order | undefined
   client?: boolean
-  rowLink: (ticketSource: SafTicket) => To
+  rowLink: (ticket: SafTicketPreview) => To
 }
 
 export const TicketsTable = memo(
@@ -88,7 +88,7 @@ export function useColumns() {
   return {
     status: {
       header: t("Statut"),
-      cell: (ticket: SafTicket) => (
+      cell: (ticket) => (
         <TicketTag
           status={ticket.status}
           ets={"ets_status" in ticket ? ticket.ets_status : undefined}
@@ -99,27 +99,25 @@ export function useColumns() {
     availableVolume: {
       key: "volume",
       header: t("Volume"),
-      cell: (ticket: SafTicket) => (
-        <Cell text={`${formatNumber(ticket.volume)} L`} />
-      ),
+      cell: (ticket) => <Cell text={`${formatNumber(ticket.volume)} L`} />,
     },
 
     client: {
       key: "client",
       header: t("Client"),
-      cell: (ticket: SafTicket) => <Cell text={ticket.client} />,
+      cell: (ticket) => <Cell text={ticket.client} />,
     },
 
     supplier: {
       key: "supplier",
       header: t("Fournisseur"),
-      cell: (ticket: SafTicket) => <Cell text={ticket.supplier} />,
+      cell: (ticket) => <Cell text={ticket.supplier} />,
     },
 
     period: {
       key: "period",
       header: t("Période"),
-      cell: (ticket: SafTicket) => (
+      cell: (ticket) => (
         <Cell
           text={
             ticket.assignment_period
@@ -133,7 +131,7 @@ export function useColumns() {
     feedstock: {
       key: "feedstock",
       header: t("Matière première"),
-      cell: (ticket: SafTicket) => (
+      cell: (ticket) => (
         <Cell
           text={t(ticket.feedstock?.code ?? "", { ns: "feedstocks" })}
           sub={t(ticket.country_of_origin?.code_pays ?? "", {
@@ -147,15 +145,13 @@ export function useColumns() {
       small: true,
       key: "ghg_reduction",
       header: t("Réd. GES"),
-      cell: (ticket: SafTicket) => (
-        <Cell text={`${ticket.ghg_reduction?.toFixed(0)}%`} />
-      ),
+      cell: (ticket) => <Cell text={`${ticket.ghg_reduction?.toFixed(0)}%`} />,
     },
 
     consumption: {
       key: "consumption_type",
       header: t("Type de consommation"),
-      cell: (ticket: SafTicket) => (
+      cell: (ticket) => (
         <Cell
           text={
             ticket.consumption_type
@@ -165,7 +161,7 @@ export function useColumns() {
         />
       ),
     },
-  }
+  } satisfies Record<string, Column<SafTicketPreview>>
 }
 
 export default TicketsTable
