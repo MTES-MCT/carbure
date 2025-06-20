@@ -54,21 +54,18 @@ class FilterActionMixin:
         filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
         queryset = filterset.qs
 
-        if filter == "clients":
-            column = "saf_tickets__client__name"
-        elif filter == "periods":
-            column = "delivery_period"
-        elif filter == "feedstocks":
-            column = "feedstock__code"
-        elif filter == "countries_of_origin":
-            column = "country_of_origin__code_pays"
-        elif filter == "production_sites":
-            column = "carbure_production_site__name"
-        elif filter == "delivery_sites":
-            column = "parent_lot__carbure_delivery_site__name"
-        elif filter == "suppliers":
-            column = "parent_supplier"
-        else:  # raise an error for unknown filters
+        filters = {
+            "client": "saf_tickets__client__name",
+            "period": "delivery_period",
+            "feedstock": "feedstock__code",
+            "country_of_origin": "country_of_origin__code_pays",
+            "production_site": "carbure_production_site__name",
+            "delivery_site": "parent_lot__carbure_delivery_site__name",
+            "supplier": "parent_supplier",
+        }
+
+        column = filters.get(filter)
+        if not column:  # raise an error for unknown filters
             raise ValidationError({"message": "Filter '%s' does not exist for ticket sources" % filter})
 
         queryset = queryset.annotate(
