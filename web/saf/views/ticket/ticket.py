@@ -1,22 +1,22 @@
 from django.db.models import Q, Sum
-from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, PolymorphicProxySerializer, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, UserRights
+from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
-from core.permissions import HasUserRights
 from saf.filters import TicketFilter
 from saf.models import SafTicket
-from saf.serializers import (
-    SafTicketAirlineSerializer,
-    SafTicketBaseSerializer,
-    SafTicketDetailsAirlineSerializer,
-    SafTicketDetailsBaseSerializer,
+from saf.permissions import (
+    HasAirlineRights,
+    HasAirlineWriteRights,
+    HasSafAdminRights,
+    HasSafOperatorRights,
+    HasSafOperatorWriteRights,
+    HasSafTraderRights,
+    HasSafTraderWriteRights,
 )
+from saf.serializers import SafTicketPreviewSerializer, SafTicketSerializer
 
 from .mixins import ActionMixin
 
@@ -27,13 +27,22 @@ class SafTicketPagination(MetadataPageNumberPagination):
     }
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+)
 class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, ActionMixin):
     lookup_field = "id"
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE]),
-    )
-    serializer_class = SafTicketBaseSerializer
+    queryset = SafTicket.objects.all()
+    permission_classes = [HasAirlineRights | HasSafOperatorRights | HasSafTraderRights | HasSafAdminRights]
+    serializer_class = SafTicketSerializer
     filterset_class = TicketFilter
     pagination_class = SafTicketPagination
     search_fields = [
@@ -50,78 +59,36 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
 
     def get_permissions(self):
         if self.action in ["reject", "accept"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE])]
+            return [(HasAirlineWriteRights | HasSafOperatorWriteRights | HasSafTraderWriteRights)()]
         if self.action == "cancel":
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR, Entity.SAF_TRADER])]
+            return [(HasSafOperatorWriteRights | HasSafTraderWriteRights)()]
         return super().get_permissions()
 
     def get_serializer_class(self):
-        entity_id = self.request.query_params.get("entity_id")
-        entity = Entity.objects.filter(pk=entity_id).first()
-        is_airline = entity and entity.entity_type == Entity.AIRLINE
-
         if self.action == "list":
-            return SafTicketAirlineSerializer if is_airline else SafTicketBaseSerializer
-        elif self.action == "retrieve":
-            return SafTicketDetailsAirlineSerializer if is_airline else SafTicketDetailsBaseSerializer
-
+            return SafTicketPreviewSerializer
         return super().get_serializer_class()
 
     def get_queryset(self):
-        queryset = SafTicket.objects.none()
-        if self.request and not self.request.user.is_anonymous:
-            queryset = SafTicket.objects.select_related(
-                "parent_ticket_source",
-                "feedstock",
-                "biofuel",
-                "country_of_origin",
-                "carbure_production_site",
-                "supplier",
-                "client",
-            )
-        return queryset
+        queryset = super().get_queryset()
+        entity = self.request.entity
 
-    @extend_schema(
-        responses={
-            200: PolymorphicProxySerializer(
-                many=True,
-                component_name="SafTicket",
-                serializers=[SafTicketBaseSerializer, SafTicketAirlineSerializer],
-                resource_type_field_name=None,
-            )
-        },
-    )
+        if entity.entity_type == Entity.AIRLINE:
+            queryset = queryset.filter(client=entity)
+
+        if entity.entity_type in (Entity.SAF_TRADER, Entity.OPERATOR):
+            queryset = queryset.filter(Q(client=entity) | Q(supplier=entity))
+
+        return queryset.select_related(
+            "parent_ticket_source",
+            "feedstock",
+            "biofuel",
+            "country_of_origin",
+            "carbure_production_site",
+            "supplier",
+            "client",
+        )
+
+    @extend_schema(responses={200: SafTicketPreviewSerializer})
     def list(self, request):
         return super().list(request)
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-        responses={
-            200: PolymorphicProxySerializer(
-                component_name="SafTicketDetails",
-                serializers=[SafTicketDetailsBaseSerializer, SafTicketDetailsAirlineSerializer],
-                resource_type_field_name=None,
-            )
-        },
-    )
-    def retrieve(self, request, id):
-        entity = request.entity
-        if entity.entity_type == Entity.AIRLINE:
-            ticket = SafTicket.objects.select_related("parent_ticket_source").get(id=id, client_id=entity.id)
-        else:
-            ticket_filter = Q(id=id) & (Q(supplier_id=entity.id) | Q(client_id=entity.id))
-            ticket = get_object_or_404(SafTicket.objects.select_related("parent_ticket_source"), ticket_filter)
-
-            if ticket.supplier_id != entity.id:
-                ticket.parent_ticket_source = None
-
-        serializer = self.get_serializer(ticket)
-        return Response(serializer.data)

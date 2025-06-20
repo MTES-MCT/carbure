@@ -2,8 +2,6 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schem
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from core.models import Entity
-
 
 class FilterActionMixin:
     @extend_schema(
@@ -55,26 +53,18 @@ class FilterActionMixin:
         queryset = filterset.qs
 
         filters = {
-            "suppliers": "supplier__name",
-            "periods": "assignment_period",
-            "feedstocks": "feedstock__code",
-            "consumption_types": "consumption_type",
+            "supplier": "supplier__name",
+            "period": "assignment_period",
+            "feedstock": "feedstock__code",
+            "consumption_type": "consumption_type",
+            "client": "client__name",
+            "country_of_origin": "country_of_origin__code_pays",
+            "production_site": "carbure_production_site__name",
         }
-        entity = request.entity
-        if entity.entity_type != Entity.AIRLINE:
-            filters.update(
-                {
-                    "clients": "client__name",
-                    "countries_of_origin": "country_of_origin__code_pays",
-                    "production_sites": "carbure_production_site__name",
-                }
-            )
 
         column = filters.get(filter)
         if not column:
             raise Exception(f"Filter '{filter}' does not exist for tickets")
 
         values = queryset.values_list(column, flat=True).distinct()
-        results = [v for v in values if v]
-        data = set(results)
-        return Response(list(data))
+        return Response({v for v in values if v is not None})
