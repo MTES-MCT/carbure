@@ -1,6 +1,6 @@
 import { Step } from "common/components/stepper"
-import { FromDepotFormProps } from "./from-depot-form"
 import i18next from "i18next"
+import { FromDepotFormProps } from "./from-depot-form.types"
 
 export const showNextStepFromDepotForm = (values: FromDepotFormProps) => {
   return values.from_depot !== undefined

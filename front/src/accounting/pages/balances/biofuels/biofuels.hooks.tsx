@@ -56,6 +56,11 @@ export const useBalancesBiofuelsColumns = () => {
       key: OperationOrder.available_balance,
     },
     {
+      header: `${t("Solde disponible max. (tCO2)")}`,
+      cell: (item) => formatNumber(item.saved_emissions, { fractionDigits: 0 }),
+      key: OperationOrder.saved_emissions,
+    },
+    {
       header: t("Opérations en attente"),
       cell: (item) =>
         item.pending_operations === 0 ? (

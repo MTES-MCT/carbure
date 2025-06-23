@@ -264,6 +264,8 @@ export enum Filter {
   Scores = "scores",
   Conformity = "conformity",
   ML = "ml_scoring",
+  Certificate_id = "certificate_id",
+  SupplierCertificate = "supplier_certificate",
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>

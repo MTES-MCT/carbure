@@ -22,6 +22,7 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
 import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
+import { Notice } from "common/components/notice"
 const currentYear = new Date().getFullYear()
 
 const OperationsBiofuels = () => {
@@ -82,6 +83,15 @@ const OperationsBiofuels = () => {
         <NoResult />
       ) : (
         <>
+          <Notice noColor variant="warning" isClosable={true}>
+            {t(
+              'Vos opérations d\'incorporation et de mise à consommation de biocarburants ont le statut "validé" par défaut dans le cadre de cette bêta.'
+            )}
+            <br />
+            {t(
+              "Ce comportement est temporaire, dans l’attente de l’implémentation du mécanisme officiel de validation par un tiers."
+            )}
+          </Notice>
           <RecapQuantity
             text={t("{{count}} opérations pour un total de {{total}}", {
               count: result?.data?.count ?? 0,

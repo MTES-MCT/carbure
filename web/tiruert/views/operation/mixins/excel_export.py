@@ -1,8 +1,7 @@
-from datetime import datetime
+import time
 
 import openpyxl
 from django.http import HttpResponse
-from django.utils.timezone import make_aware
 from openpyxl.utils import get_column_letter
 from rest_framework.decorators import action
 
@@ -61,7 +60,7 @@ class ExcelExportActionMixin:
 
         # Prepare response
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        filename = f"tiruert_operations_{request.entity}_{make_aware(datetime.now()).strftime('%Y-%m-%d_%H%M%S')}.xlsx"
+        filename = f"tiruert_operations_{request.entity}_{time.strftime('%Y-%m-%d_%H%M%S')}.xlsx"
         response["Content-Disposition"] = f"attachment; filename={filename}"
         workbook.save(response)
 

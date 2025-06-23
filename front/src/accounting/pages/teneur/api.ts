@@ -20,6 +20,10 @@ function parseObjectivesResponse(objectives: any) {
       target_percent: objectives?.main.target_percent
         ? objectives?.main.target_percent * 100
         : 0,
+      penalty: objectives?.main.penalty ?? 0,
+      energy_basis: CONVERSIONS.energy.MJ_TO_GJ(
+        objectives?.main.energy_basis ?? 0
+      ),
     },
     sectors:
       objectives?.sectors.map((sector: any) => ({
@@ -33,6 +37,7 @@ function parseObjectivesResponse(objectives: any) {
           sector.available_balance
         ),
         target_percent: sector.objective.target_percent * 100,
+        penalty: sector.objective.penalty ?? 0,
       })) ?? [],
   }
 
@@ -71,6 +76,7 @@ function parseObjectivesResponse(objectives: any) {
             category.available_balance
           ),
           target_percent: category.objective.target_percent * 100,
+          penalty: category.objective.penalty ?? 0,
         }
         if (!category.objective.target_mj) {
           objCategories.unconstrained_categories.push({
@@ -209,4 +215,12 @@ export const validateTeneurElec = async (entity_id: number) => {
       },
     },
   })
+}
+
+export const downloadMacFossilFuel = (entity_id: number) => {
+  window.open(
+    `/api/tiruert/mac-fossil-fuel/export/?entity_id=${entity_id}`,
+    "_blank",
+    "noopener,noreferrer"
+  )
 }

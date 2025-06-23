@@ -45,6 +45,8 @@ export function Filters<T>({
     [Filter.Scores]: t("Score"),
     [Filter.Conformity]: t("Conformité"),
     [Filter.ML]: t("ML"),
+    [Filter.Certificate_id]: t("N° d'agrément"),
+    [Filter.SupplierCertificate]: t("Certificats fournisseurs"),
   }
 
   return (

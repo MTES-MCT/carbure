@@ -904,86 +904,6 @@ paths:
                     status: success
                   summary: Example of response.
           description: ""
-  /api/double-counting/applications/check-admin-files/:
-    post:
-      operationId: double_counting_applications_check_admin_files_create
-      parameters:
-        - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: query
-          name: order_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - -production_site
-                - -valid_until
-                - production_site
-                - valid_until
-          description: |-
-            Ordre
-
-            * `production_site` - Production site
-            * `-production_site` - Production site (décroissant)
-            * `valid_until` - Valid until
-            * `-valid_until` - Valid until (décroissant)
-          explode: false
-          style: form
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: producers
-          schema:
-            type: string
-        - in: query
-          name: production_sites
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/CheckAdminFileRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CheckFileResponse"
-          description: ""
   /api/double-counting/applications/check-file/:
     post:
       operationId: double_counting_applications_check_file_create
@@ -5742,6 +5662,25 @@ paths:
               schema:
                 error: NOTHING_TO_DECLARE
           description: Error message
+  /api/tiruert/mac-fossil-fuel/export/:
+    get:
+      operationId: tiruert_mac_fossil_fuel_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          description: No response body
   /api/tiruert/objectives/:
     get:
       operationId: objectives
@@ -7578,6 +7517,9 @@ components:
         ghg_reduction_max:
           type: number
           format: double
+        saved_emissions:
+          type: number
+          format: double
       required:
         - available_balance
         - biofuel
@@ -7589,6 +7531,7 @@ components:
         - pending_operations
         - pending_teneur
         - quantity
+        - saved_emissions
         - sector
         - unit
     BalanceBiofuel:
@@ -8018,16 +7961,6 @@ components:
       required:
         - email
         - role
-    CheckAdminFileRequest:
-      type: object
-      properties:
-        files:
-          type: array
-          items:
-            type: string
-            format: binary
-      required:
-        - files
     CheckCertificateRequest:
       type: object
       properties:
@@ -9880,9 +9813,13 @@ components:
         target_percent:
           type: number
           format: double
+        energy_basis:
+          type: number
+          format: double
       required:
         - available_balance
         - declared_teneur
+        - energy_basis
         - penalty
         - pending_teneur
         - target

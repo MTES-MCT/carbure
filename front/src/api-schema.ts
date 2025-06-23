@@ -335,22 +335,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/double-counting/applications/check-admin-files/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post: operations["double_counting_applications_check_admin_files_create"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/double-counting/applications/check-file/": {
     parameters: {
       query?: never
@@ -1707,6 +1691,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/tiruert/mac-fossil-fuel/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["tiruert_mac_fossil_fuel_export_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/tiruert/objectives/": {
     parameters: {
       query?: never
@@ -2059,6 +2059,8 @@ export interface components {
       ghg_reduction_min: number
       /** Format: double */
       ghg_reduction_max: number
+      /** Format: double */
+      saved_emissions: number
     }
     BalanceBiofuel: {
       id: number
@@ -2238,9 +2240,6 @@ export interface components {
       /** Format: email */
       email: string
       role: string
-    }
-    CheckAdminFileRequest: {
-      files: File[]
     }
     CheckCertificateRequest: {
       entity_certificate_id: number
@@ -2971,6 +2970,8 @@ export interface components {
       penalty: number
       /** Format: double */
       target_percent: number
+      /** Format: double */
+      energy_basis: number
     }
     NavStats: {
       total_pending_action_for_admin?: number
@@ -4611,48 +4612,6 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["Response"]
-        }
-      }
-    }
-  }
-  double_counting_applications_check_admin_files_create: {
-    parameters: {
-      query: {
-        certificate_id?: string
-        /** @description Entity ID */
-        entity_id: number
-        /** @description Ordre
-         *
-         *     * `production_site` - Production site
-         *     * `-production_site` - Production site (décroissant)
-         *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
-        /** @description Which field to use when ordering the results. */
-        ordering?: string
-        producers?: string
-        production_sites?: string
-        /** @description A search term. */
-        search?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CheckAdminFileRequest"]
-        "application/x-www-form-urlencoded": components["schemas"]["CheckAdminFileRequest"]
-        "multipart/form-data": components["schemas"]["CheckAdminFileRequest"]
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CheckFileResponse"][]
         }
       }
     }
@@ -7776,6 +7735,27 @@ export interface operations {
       }
     }
   }
+  tiruert_mac_fossil_fuel_export_retrieve: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   objectives: {
     parameters: {
       query: {
@@ -8651,6 +8631,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   sector = "sector",
   status = "status",
   type = "type",
+  saved_emissions = "saved_emissions",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",

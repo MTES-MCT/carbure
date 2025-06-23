@@ -237,13 +237,23 @@ class TeneurService:
             target_volume,
         )
 
-        # Transform producted emissions (gCO2/MJ) into avoided emissions (tCO2)
-        pci = data["biofuel"].pci_litre
-        volume_energy = target_volume * pci  # MJ
-        max_avoided_emissions = (GHG_REFERENCE_RED_II - min_emissions_rate) * volume_energy / 1000000  # tCO2
-        min_avoided_emissions = (GHG_REFERENCE_RED_II - max_emissions_rate) * volume_energy / 1000000  # tCO2
+        max_avoided_emissions = TeneurService.convert_producted_emissions_to_avoided_emissions(
+            target_volume, data["biofuel"], min_emissions_rate
+        )
+        min_avoided_emissions = TeneurService.convert_producted_emissions_to_avoided_emissions(
+            target_volume, data["biofuel"], max_emissions_rate
+        )
 
         return min_avoided_emissions, max_avoided_emissions
+
+    @staticmethod
+    def convert_producted_emissions_to_avoided_emissions(volume, biofuel, emissions_rate):
+        """
+        Convert producted emissions (gCO2/MJ) into avoided emissions (tCO2)
+        """
+        pci = biofuel.pci_litre
+        volume_energy = volume * pci  # MJ
+        return (GHG_REFERENCE_RED_II - emissions_rate) * volume_energy / 1000000  # tCO2
 
     @staticmethod
     def prepare_data(data, unit):

@@ -196,4 +196,7 @@ export const CONVERSIONS = {
     MJ_TO_GJ: (value: number) => value / 1000,
     GJ_TO_MJ: (value: number) => value * 1000,
   },
+  euros: {
+    centsToKEuros: (value: number) => (value / 100000).toFixed(2),
+  },
 }
