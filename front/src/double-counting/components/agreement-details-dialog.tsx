@@ -146,7 +146,12 @@ const AgreementTabs = ({ agreement }: AgreementTabsProps) => {
         sticky
       />
 
-      {focus === "quotas" && <QuotasTable quotas={agreement.quotas} />}
+      {focus === "quotas" && (
+        <QuotasTable
+          quotas={agreement.quotas}
+          dc_agreement_id={agreement.certificate_id}
+        />
+      )}
 
       {focus === "sourcing_forecast" && (
         <SourcingFullTable sourcing={agreement.application.sourcing ?? []} />

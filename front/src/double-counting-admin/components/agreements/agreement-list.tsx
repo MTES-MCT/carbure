@@ -64,7 +64,7 @@ const AgreementList = ({
     {
       header: t("Site de production"),
       key: "production_site",
-      cell: (a) => <Cell text={a.production_site?.name || "-"} />,
+      cell: (a) => <Cell text={a.production_site || "-"} />,
     },
     {
       header: t("Validité"),
