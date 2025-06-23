@@ -393,34 +393,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
-  /api/double-counting/agreements/{id}/download-link/:
-    get:
-      operationId: double_counting_agreements_download_link_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Certificat Double Compte.
-          required: true
-      tags:
-        - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementDownloadLink"
-          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -781,6 +753,40 @@ paths:
                   value: csv file.*
                   summary: Example of export response.
           description: ""
+  /api/double-counting/applications/{id}/files/{file_id}/:
+    delete:
+      operationId: double_counting_applications_files_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: file_id
+          schema:
+            type: integer
+          description: File ID to delete
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
   /api/double-counting/applications/{id}/update-approved-quotas/:
     post:
       operationId: double_counting_applications_update_approved_quotas_create
@@ -825,6 +831,45 @@ paths:
                   value:
                     status: success
                   summary: Example of response.
+          description: ""
+  /api/double-counting/applications/{id}/upload-files/:
+    post:
+      operationId: double_counting_applications_upload_files_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
           description: ""
   /api/double-counting/applications/add/:
     post:
@@ -7381,12 +7426,6 @@ components:
       required:
         - delivery_site_id
         - ownership_type
-    AgreementDownloadLink:
-      type: object
-      properties:
-        download_link:
-          type: string
-          format: uri
     AgreementLists:
       type: object
       properties:
@@ -7443,6 +7482,14 @@ components:
         - country
         - id
         - name
+    ApplicationFileUploadRequest:
+      type: object
+      properties:
+        extra_files:
+          type: array
+          items:
+            type: string
+            format: binary
     ApplicationListe:
       type: object
       properties:
@@ -8361,6 +8408,11 @@ components:
         file:
           type: string
           format: binary
+        extra_files:
+          type: array
+          items:
+            type: string
+            format: binary
       required:
         - entity_id
         - file
@@ -8427,10 +8479,14 @@ components:
         download_link:
           type: string
           readOnly: true
+        has_dechets_industriels:
+          type: boolean
+          readOnly: true
       required:
         - created_at
         - documents
         - download_link
+        - has_dechets_industriels
         - id
         - period_end
         - period_start
@@ -8455,7 +8511,7 @@ components:
           readOnly: true
         production_site:
           allOf:
-            - $ref: "#/components/schemas/DoubleCountingProductionSite"
+            - $ref: "#/components/schemas/DoubleCountingProductionSitePreview"
           readOnly: true
         period_start:
           type: string
@@ -8507,6 +8563,7 @@ components:
           $ref: "#/components/schemas/FileTypeEnum"
         url:
           type: string
+          readOnly: true
       required:
         - id
         - url
@@ -8654,6 +8711,18 @@ components:
         - name
         - outputs
         - producer
+    DoubleCountingProductionSitePreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+      required:
+        - id
+        - name
     DoubleCountingQuota:
       type: object
       properties:
@@ -9675,11 +9744,13 @@ components:
         - sourcing_history
     FileTypeEnum:
       enum:
-        - SOURCING
+        - EXCEL
+        - EXTRA
         - DECISION
       type: string
       description: |-
-        * `SOURCING` - SOURCING
+        * `EXCEL` - EXCEL
+        * `EXTRA` - EXTRA
         * `DECISION` - DECISION
     GenericCertificate:
       type: object

@@ -57,4 +57,5 @@ export const overallObjective: MainObjective = {
   quantity_available: 141631.71604577947,
   target_percent: 0.67,
   penalty: 0,
+  energy_basis: 0,
 }

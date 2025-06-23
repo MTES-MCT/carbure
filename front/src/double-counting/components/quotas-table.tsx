@@ -1,4 +1,4 @@
-import { Cell, Column } from "common/components/table"
+import { Cell, Column } from "common/components/table2"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { DoubleCountingQuota } from "../types"

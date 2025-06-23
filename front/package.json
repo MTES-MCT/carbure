@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.14.1",
+    "@codegouvfr/react-dsfr": "^1.22.3",
     "@sentry/react": "^8.30.0",
     "@sentry/vite-plugin": "^3.3.1",
     "@testing-library/jest-dom": "^5.16.5",
@@ -77,6 +77,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "translate": "i18next",
+    "translate-missing": "node scripts/translate-missing.js",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
     "prestart": "react-dsfr update-icons",

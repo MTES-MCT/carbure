@@ -2,18 +2,20 @@ import { BaseFileInput, BaseFileInputProps } from "../base-file-input"
 
 export type FileInputProps = Omit<
   BaseFileInputProps,
-  "nativeInputProps" | "multiple"
+  "nativeInputProps" | "multiple" | "onChange" | "value"
 > & {
   value?: File
   onChange?: (value: File | undefined) => void
 }
 
-export const FileInput = ({ onChange, ...props }: FileInputProps) => {
+export const FileInput = ({ onChange, value, ...props }: FileInputProps) => {
   return (
     <BaseFileInput
+      {...props}
+      value={value}
       onChange={(e) => (onChange ? onChange(e?.target.files?.[0]) : undefined)}
       multiple={false}
-      {...props}
+      placeholder={value?.name ?? props.placeholder}
     />
   )
 }

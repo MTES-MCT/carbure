@@ -1,16 +1,14 @@
 import useEntity from "common/hooks/entity"
-import { Button } from "common/components/button"
+import { Button } from "common/components/button2"
 import HashRoute from "common/components/hash-route"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-
-import { Download } from "common/components/icons"
-import NoResult from "common/components/no-result"
-import { ActionBar } from "common/components/scaffold"
-import Table, { Cell, Column, Order } from "common/components/table"
-import Tabs from "common/components/tabs"
+import { NoResult } from "common/components/no-result2"
+import { Content } from "common/components/scaffold"
+import { Cell, Column, Order, Table } from "common/components/table2"
+import { Tabs } from "common/components/tabs2"
 import { useQuery } from "common/hooks/async"
 import { formatDateYear } from "common/utils/formatters"
 import { useState } from "react"
@@ -81,7 +79,7 @@ const AgreementList = ({
       header: t("Quotas") + " " + currentYear,
       cell: (a) => (
         <Cell
-          text={`${a.quotas_progression ? Math.round(a.quotas_progression * 100) : "-"} %`}
+          text={`${a.quotas_progression ? Math.round(a.quotas_progression * 100) + "%" : "-"}`}
         />
       ),
     },
@@ -102,38 +100,34 @@ const AgreementList = ({
 
   return (
     <>
-      <section>
-        <ActionBar>
-          <Tabs
-            focus={tab}
-            variant="switcher"
-            onFocus={setTab}
-            tabs={[
-              {
-                key: "active",
-                label: t("Actifs ({{count}})", {
-                  count: snapshot?.agreements_active,
-                }),
-              },
-              {
-                key: "expired",
-                label: t("Expirés ({{ count }})", {
-                  count: snapshot?.agreements_expired,
-                }),
-              },
-              {
-                key: "incoming",
-                label: t("À venir ({{ count }})", {
-                  count: snapshot?.agreements_incoming,
-                }),
-              },
-            ]}
-          />
-
-          {tab === "active" && agreements && agreements.active.length > 0 && (
-            <ExportAgreementsButton />
-          )}
-        </ActionBar>
+      {tab === "active" && agreements && agreements.active.length > 0 && (
+        <ExportAgreementsButton />
+      )}
+      <Tabs
+        focus={tab}
+        onFocus={setTab}
+        tabs={[
+          {
+            key: "active",
+            label: t("Actifs ({{count}})", {
+              count: snapshot?.agreements_active,
+            }),
+          },
+          {
+            key: "expired",
+            label: t("Expirés ({{ count }})", {
+              count: snapshot?.agreements_expired,
+            }),
+          },
+          {
+            key: "incoming",
+            label: t("À venir ({{ count }})", {
+              count: snapshot?.agreements_incoming,
+            }),
+          },
+        ]}
+      />
+      <Content>
         <AgreementFilters
           filters={CLIENT_FILTERS}
           selected={state.filters}
@@ -166,7 +160,7 @@ const AgreementList = ({
             />
           </>
         )}
-      </section>
+      </Content>
       <HashRoute path="agreement/:id" element={<AgreementDetailsDialog />} />
     </>
   )
@@ -191,10 +185,11 @@ export const ExportAgreementsButton = () => {
   const entity = useEntity()
   return (
     <Button
-      asideX={true}
-      icon={Download}
-      label={t("Exporter les agréments")}
-      action={() => api.downloadDoubleCountingAgreementList(entity.id)}
-    />
+      iconId="ri-download-line"
+      onClick={() => api.downloadDoubleCountingAgreementList(entity.id)}
+      asideX
+    >
+      {t("Exporter les agréments")}
+    </Button>
   )
 }

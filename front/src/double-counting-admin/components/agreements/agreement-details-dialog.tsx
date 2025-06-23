@@ -1,8 +1,7 @@
 import useEntity from "common/hooks/entity"
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Download, Return } from "common/components/icons"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -19,12 +18,12 @@ import { Fragment, useState } from "react"
 import { compact } from "common/utils/collection"
 import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
 import { ProductionTable } from "../../../double-counting/components/production-table"
-import { FilesTable } from "../../../double-counting/components/files-table"
-import Tabs from "common/components/tabs"
+import { Tabs } from "common/components/tabs2"
 import { ROUTE_URLS } from "common/utils/routes"
-import { ProductionSiteForm } from "settings/components/production-site-dialog"
 import { ProductionSiteDetails } from "common/types"
 import GenerateDecisionDialog from "../generate-decision-dialog/generate-decision-dialog"
+import { ProductionSiteRecap } from "double-counting/components/applications/application-tabs/production-site-recap"
+import { FilesManager } from "double-counting/components/files-manager"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -61,19 +60,18 @@ export const AgreementDetailsDialog = () => {
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog fullscreen onClose={closeDialog}>
-        <header>
-          <AgreementStatusTag status={agreement?.status} />
-          <h1>
-            {t("Agrément double comptage n°{{dcNumber}}", {
-              dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
-            })}{" "}
-          </h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
+      <Dialog
+        fullscreen
+        onClose={closeDialog}
+        header={
+          <>
+            <Dialog.Title>
+              <AgreementStatusTag status={agreement?.status} />
+              {t("Agrément double comptage n°{{dcNumber}}", {
+                dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
+              })}
+            </Dialog.Title>
+            <Dialog.Description>
               <Trans
                 values={{
                   producer: agreement?.producer ?? "N/A",
@@ -93,62 +91,54 @@ export const AgreementDetailsDialog = () => {
                 }}
                 defaults="Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>"
               />
-            </p>
-          </section>
-
-          {!application && !applicationResponse.loading && (
-            <section>
-              <p>
-                <Trans>
-                  Aucune demande n'a été associée. Pour afficher les quotas
-                  approuvés, ajouter le demande associée à cet agrément dans
-                  l'onglet "demandes en attente".
-                </Trans>
-              </p>
-            </section>
-          )}
-          {application &&
-            application.status !== DoubleCountingStatus.ACCEPTED && (
-              <section>
-                <p>La demande est en cours de traitement...</p>
-                <Button
-                  variant="link"
-                  asideY
-                  action={() =>
-                    navigate(
-                      `/org/${entity.id}/double-counting/applications#application/${application.id}`
-                    )
-                  }
-                >
-                  {"Voir la demande d'agrément à valider"}
-                </Button>
-              </section>
-            )}
-
-          {application &&
-            application.status === DoubleCountingStatus.ACCEPTED && (
-              <AgreementTabs
-                agreement={agreement}
-                productionSite={application.production_site}
-              />
-            )}
-        </main>
-
-        <footer>
-          {application && (
+            </Dialog.Description>
+          </>
+        }
+        footer={
+          application && (
             <Button
-              variant="primary"
-              action={() => openGenerateDecisionDialog()}
-              icon={Download}
+              onClick={() => openGenerateDecisionDialog()}
+              iconId="ri-download-line"
             >
               <Trans>Générer la décision</Trans>
             </Button>
+          )
+        }
+      >
+        {!application && !applicationResponse.loading && (
+          <section>
+            <p>
+              <Trans>
+                Aucune demande n'a été associée. Pour afficher les quotas
+                approuvés, ajouter le demande associée à cet agrément dans
+                l'onglet "demandes en attente".
+              </Trans>
+            </p>
+          </section>
+        )}
+        {application &&
+          application.status !== DoubleCountingStatus.ACCEPTED && (
+            <section>
+              <p>La demande est en cours de traitement...</p>
+              <Button
+                customPriority="link"
+                asideY
+                linkProps={{
+                  to: `/org/${entity.id}/double-counting/applications#application/${application.id}`,
+                }}
+              >
+                {"Voir la demande d'agrément à valider"}
+              </Button>
+            </section>
           )}
 
-          <Button icon={Return} action={closeDialog}>
-            <Trans>Retour</Trans>
-          </Button>
-        </footer>
+        {application &&
+          application.status === DoubleCountingStatus.ACCEPTED && (
+            <AgreementTabs
+              agreement={agreement}
+              productionSite={application.production_site}
+            />
+          )}
 
         {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
@@ -167,65 +157,51 @@ const AgreementTabs = ({
   const { t } = useTranslation()
   return (
     <>
-      <section>
-        <Tabs
-          variant="switcher"
-          tabs={compact([
-            {
-              key: "production_site",
-              label: t("Site de production"),
-            },
-            {
-              key: "quotas",
-              label: t("Quotas"),
-            },
-            {
-              key: "sourcing_forecast",
-              label: t("Approvisionnement"),
-            },
-            {
-              key: "production",
-              label: t("Production"),
-            },
-            {
-              key: "fichiers",
-              label: t("Fichiers"),
-            },
-          ])}
-          focus={focus}
-          onFocus={setFocus}
-        />
-      </section>
+      <Tabs
+        sticky
+        tabs={compact([
+          {
+            key: "production_site",
+            label: t("Site de production"),
+          },
+          {
+            key: "quotas",
+            label: t("Quotas"),
+          },
+          {
+            key: "sourcing_forecast",
+            label: t("Approvisionnement"),
+          },
+          {
+            key: "production",
+            label: t("Production"),
+          },
+          {
+            key: "fichiers",
+            label: t("Fichiers"),
+          },
+        ])}
+        focus={focus}
+        onFocus={setFocus}
+      />
       {focus === "production_site" && productionSite && (
-        <section>
-          <ProductionSiteForm readOnly productionSite={productionSite} />
-        </section>
+        <ProductionSiteRecap productionSite={productionSite} />
       )}
-      {focus === "quotas" && (
-        <section>
-          <QuotasTable quotas={agreement.quotas} />
-        </section>
-      )}
+      {focus === "quotas" && <QuotasTable quotas={agreement.quotas} />}
 
       {focus === "sourcing_forecast" && (
-        <section>
-          <SourcingFullTable sourcing={agreement.application.sourcing ?? []} />
-        </section>
+        <SourcingFullTable sourcing={agreement.application.sourcing ?? []} />
       )}
 
       {focus === "production" && (
-        <section>
-          <ProductionTable
-            production={agreement.application.production ?? []}
-            sourcing={agreement.application.sourcing ?? []}
-            hasAgreement={true}
-          />
-        </section>
+        <ProductionTable
+          production={agreement.application.production ?? []}
+          sourcing={agreement.application.sourcing ?? []}
+          hasAgreement={true}
+        />
       )}
       {focus === "fichiers" && (
-        <section>
-          <FilesTable application={agreement.application} />
-        </section>
+        <FilesManager readOnly files={agreement.application.documents} />
       )}
     </>
   )

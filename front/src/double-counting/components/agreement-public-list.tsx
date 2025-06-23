@@ -1,16 +1,20 @@
-import NoResult from "common/components/no-result"
+import { NoResult } from "common/components/no-result2"
 import { Main } from "common/components/scaffold"
-import Table from "common/components/table"
+import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import useTitle from "common/hooks/title"
 import { formatDateYear } from "common/utils/formatters"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../double-counting/api"
+import { usePrivateNavigation } from "common/layouts/navigation"
+import { Title } from "common/components/title"
 
 const AgreementPublicList = () => {
   const { t } = useTranslation()
   useTitle(t("Listes des unités de production de biocarburants reconnues"))
-
+  usePrivateNavigation(
+    t("Listes des unités de production de biocarburants reconnues")
+  )
   const agreementsResponse = useQuery(
     api.getDoubleCountingAgreementsPublicList,
     {
@@ -23,13 +27,13 @@ const AgreementPublicList = () => {
   return (
     <Main>
       <section>
-        <h1>
+        <Title is="h1" as="h4">
           <Trans>
             Listes des unités de production de biocarburants reconnues au titre
             du décret n°2019-570 du 7 juin 2019 portant sur la taxe incitative
             relative à l'incorporation des biocarburants
           </Trans>
-        </h1>
+        </Title>
       </section>
       <section>
         {agreements && (

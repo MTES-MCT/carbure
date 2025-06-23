@@ -1,6 +1,6 @@
-import Button from "common/components/button"
-import { NumberInput } from "common/components/input"
-import { Cell, Column } from "common/components/table"
+import { Button } from "common/components/button2"
+import { NumberInput } from "common/components/inputs2"
+import { Cell, Column } from "common/components/table2"
 import { formatNumber, formatPercentage } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { DoubleCountingProduction, DoubleCountingSourcing } from "../types"
@@ -93,6 +93,7 @@ export const ProductionTable = ({
           setQuotas={setQuotas}
         />
       ),
+      style: { minWidth: "200px" },
     })
   }
 
@@ -110,10 +111,8 @@ const ApprovedQuotasCell = ({
   setQuotas,
 }: ApprovedQuotasCellProps) => {
   const { t } = useTranslation()
-  // const [approvedQuota, setApprovedQuota] = useState(production.approved_quota)
 
   const onSetMaximumVolume = () => {
-    // setApprovedQuota(production.requested_quota)
     setQuotas({
       ...quotas,
       [production.id]: production.requested_quota,
@@ -125,19 +124,12 @@ const ApprovedQuotasCell = ({
       value={quotas[production.id]}
       max={production.requested_quota}
       onChange={(value) => {
-        // setApprovedQuota(value)
         setQuotas({
           ...quotas,
           [production.id]: value,
         })
       }}
-      rightContent={
-        <Button
-          label={t("Max")}
-          action={onSetMaximumVolume}
-          variant="primary"
-        />
-      }
+      addon={<Button onClick={onSetMaximumVolume}>{t("Max")}</Button>}
     />
   )
 }

@@ -49,3 +49,10 @@ export const WithValue: Story = {
     value: "une valeur par defaut",
   },
 }
+
+export const ReadOnly: Story = {
+  args: {
+    readOnly: true,
+    value: "une valeur par defaut",
+  },
+}

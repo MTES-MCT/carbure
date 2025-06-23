@@ -1,9 +1,8 @@
 import useEntity from "common/hooks/entity"
 import { EntityType } from "common/types"
-import { Button } from "common/components/button"
-import { Confirm, Dialog } from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Confirm, Dialog } from "common/components/dialog2"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross, Download, Return, Save } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -15,9 +14,10 @@ import * as api from "../../../api"
 import { DoubleCountingStatus as DCStatus } from "../../../../double-counting/types"
 import { ApplicationInfo } from "../application-info"
 import ApplicationStatus from "../../../../double-counting/components/application-status"
-import ApplicationTabs from "../application-tabs"
 import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
 import GenerateDecisionDialog from "double-counting-admin/components/generate-decision-dialog/generate-decision-dialog"
+import ApplicationTabs from "double-counting/components/applications/application-tabs"
+import { Notice } from "common/components/notice"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -77,6 +77,9 @@ export const ApplicationDetailsDialog = () => {
     (p) => p.approved_quota === -1
   )
 
+  const isPendingFiles =
+    application?.has_dechets_industriels && application.documents.length <= 1
+
   const onUpdateQuotas = (quotas: Record<string, number>) => {
     setQuotasIsUpdated(true)
     setQuotas(quotas)
@@ -113,11 +116,11 @@ export const ApplicationDetailsDialog = () => {
   async function submitReject() {
     portal((close) => (
       <Confirm
-        variant="danger"
+        customVariant="danger"
         title={t("Refuser la demande d'agrément")}
         description={t("Voulez-vous vraiment refuser cette demande d'agrément double comptage ?")} // prettier-ignore
         confirm={t("Refuser")}
-        icon={Cross}
+        icon="ri-close-line"
         onClose={close}
         onConfirm={async () => {
           if (application) {
@@ -158,81 +161,88 @@ export const ApplicationDetailsDialog = () => {
     ))
   }
 
-  if (!application) {
-    return null
-  }
-
   return (
     <Portal onClose={closeDialog}>
-      <Dialog fullscreen onClose={closeDialog}>
-        <header>
-          <ApplicationStatus big status={dcaStatus} />
-          <h1>{t("Demande d'agrément double comptage")} </h1>
-        </header>
+      <Dialog
+        fullscreen
+        onClose={closeDialog}
+        header={
+          <>
+            <Dialog.Title>
+              <ApplicationStatus status={dcaStatus} />
+              {t("Demande d'agrément double comptage")}
+            </Dialog.Title>
+            <Dialog.Description>
+              <ApplicationInfo application={application} />
 
-        <main>
-          <ApplicationInfo application={application} />
-
-          {application && (
-            <ApplicationTabs
-              productionSite={application.production_site}
-              sourcing={application.sourcing}
-              production={application.production}
-              quotas={quotas}
-              setQuotas={onUpdateQuotas}
-              application={application}
-            />
-          )}
-        </main>
-
-        <footer>
-          {!applicationResponse.loading && (
-            <>
-              {isAdmin && (
-                <Button
-                  loading={approveQuotas.loading}
-                  disabled={!quotasIsUpdated}
-                  variant="primary"
-                  icon={Save}
-                  action={submitQuotas}
+              {isPendingFiles && (
+                <Notice
+                  variant="info"
+                  icon="ri-error-warning-line"
+                  title={t("Spécificité Déchets industriels et CIVE:")}
+                  style={{ marginTop: "var(--spacing-m)" }}
                 >
-                  <Trans>Enregistrer</Trans>
-                </Button>
+                  {t("Fichier en attente")}
+                </Notice>
               )}
+            </Dialog.Description>
+          </>
+        }
+        footer={
+          <>
+            {!applicationResponse.loading && (
+              <>
+                <Button
+                  loading={rejectApplication.loading}
+                  disabled={applicationResponse.loading}
+                  customPriority="danger"
+                  iconId="ri-close-line"
+                  onClick={submitReject}
+                >
+                  <Trans>Refuser</Trans>
+                </Button>
+                <Button
+                  disabled={applicationResponse.loading || !hasQuotas}
+                  customPriority="success"
+                  iconId="ri-check-line"
+                  onClick={displayAcceptApplicationDetailsDialog}
+                >
+                  <Trans>Valider les quotas</Trans>
+                </Button>
 
-              <Button
-                icon={Download}
-                variant="warning"
-                action={displayGenerateDecisionDialog}
-                disabled={applicationResponse.loading || !hasQuotas}
-              >
-                <Trans>Générer la décision</Trans>
-              </Button>
-
-              <Button
-                disabled={applicationResponse.loading || !hasQuotas}
-                variant="success"
-                icon={Check}
-                action={displayAcceptApplicationDetailsDialog}
-              >
-                <Trans>Valider les quotas</Trans>
-              </Button>
-
-              <Button
-                loading={rejectApplication.loading}
-                disabled={applicationResponse.loading}
-                variant="danger"
-                icon={Cross}
-                action={submitReject}
-              >
-                <Trans>Refuser</Trans>
-              </Button>
-            </>
-          )}
-          <Button icon={Return} action={closeDialog}>
-            <Trans>Retour</Trans>
-          </Button>
-        </footer>
+                <Button
+                  iconId="ri-download-line"
+                  priority="secondary"
+                  onClick={displayGenerateDecisionDialog}
+                  disabled={applicationResponse.loading || !hasQuotas}
+                >
+                  <Trans>Générer la décision</Trans>
+                </Button>
+                {isAdmin && (
+                  <Button
+                    loading={approveQuotas.loading}
+                    disabled={!quotasIsUpdated}
+                    onClick={submitQuotas}
+                  >
+                    <Trans>Enregistrer</Trans>
+                  </Button>
+                )}
+              </>
+            )}
+          </>
+        }
+      >
+        {application && (
+          <ApplicationTabs
+            readOnly
+            productionSite={application.production_site}
+            sourcing={application.sourcing}
+            production={application.production}
+            quotas={quotas}
+            setQuotas={onUpdateQuotas}
+            files={application.documents}
+          />
+        )}
 
         {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>

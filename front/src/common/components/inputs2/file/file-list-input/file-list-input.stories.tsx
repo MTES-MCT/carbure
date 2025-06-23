@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { FileListInput } from "./file-list-input"
+import { useState } from "react"
 
 const meta: Meta<typeof FileListInput> = {
   component: FileListInput,
@@ -9,6 +10,10 @@ const meta: Meta<typeof FileListInput> = {
   },
   parameters: {
     chromatic: { disableSnapshot: true },
+  },
+  render: (args) => {
+    const [files, setFiles] = useState<FileList>()
+    return <FileListInput {...args} value={files} onChange={setFiles} />
   },
 }
 
