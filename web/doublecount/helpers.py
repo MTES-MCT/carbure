@@ -655,8 +655,10 @@ def get_agreement_quotas(agreement: DoubleCountingRegistration):
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
     # tous les couples BC / MP pour le site de production sur une année
-    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota", "year").filter(
-        dca_id=application.id, approved_quota__gt=0
+    detailed_quotas = (
+        DoubleCountingProduction.objects.select_related("biofuel", "feedstock")
+        .values("biofuel", "feedstock", "approved_quota", "year")
+        .filter(dca_id=application.id, approved_quota__gt=0)
     )
 
     # tous les lots pour des MP double compté pour le site de production regroupé par couple et par année

@@ -5885,6 +5885,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -5896,6 +5897,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -5924,6 +5926,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - name: page
@@ -6499,6 +6503,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -6510,6 +6515,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -6538,6 +6544,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - name: page
@@ -6748,6 +6756,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -6759,6 +6768,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -6787,6 +6797,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - in: query
@@ -7033,6 +7045,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -7044,6 +7057,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -7072,6 +7086,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - in: query
@@ -8771,7 +8787,8 @@ components:
             - $ref: "#/components/schemas/EntitySummary"
           readOnly: true
         production_site:
-          $ref: "#/components/schemas/DoubleCountingProductionSite"
+          type: string
+          readOnly: true
         valid_until:
           type: string
           format: date

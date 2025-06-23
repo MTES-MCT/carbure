@@ -2550,7 +2550,7 @@ export interface components {
       /** Format: date */
       valid_from: string
       readonly producer: components["schemas"]["EntitySummary"]
-      production_site: components["schemas"]["DoubleCountingProductionSite"]
+      readonly production_site: string
       /** Format: date */
       valid_until: string
       readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
@@ -7879,7 +7879,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -8215,7 +8217,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -8283,7 +8287,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -8371,7 +8377,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -8672,6 +8680,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   ValueMinusfrom_to = "-from_to",
   ValueMinuspending_operations = "-pending_operations",
   ValueMinusquantity = "-quantity",
+  ValueMinussaved_emissions = "-saved_emissions",
   ValueMinussector = "-sector",
   ValueMinusstatus = "-status",
   ValueMinustype = "-type",
@@ -8683,10 +8692,10 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   from_to = "from_to",
   pending_operations = "pending_operations",
   quantity = "quantity",
+  saved_emissions = "saved_emissions",
   sector = "sector",
   status = "status",
   type = "type",
-  saved_emissions = "saved_emissions",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
