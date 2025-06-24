@@ -34,6 +34,7 @@ services:
       VITE_APP_ENV: ${IMAGE_TAG}
       CHROMATIC_PROJECT_TOKEN: ${CHROMATIC_PROJECT_TOKEN}
       SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     build:
       context: ./front
     volumes:
