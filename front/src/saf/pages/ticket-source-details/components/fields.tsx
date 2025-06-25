@@ -44,11 +44,6 @@ export const TicketSourceFields = ({
           readOnly
         />
         <TextInput
-          label={t("Propriétaire")}
-          value={ticketSource.added_by?.name}
-          readOnly
-        />
-        <TextInput
           label={t("Date de livraison")}
           value={
             ticketSource.parent_lot?.delivery_date
@@ -62,9 +57,9 @@ export const TicketSourceFields = ({
         <TextInput
           label={t("Producteur")}
           value={
-            ticketSource.carbure_producer?.name ??
-            ticketSource.unknown_producer ??
-            ""
+            ticketSource.carbure_producer?.name ||
+            ticketSource.unknown_producer ||
+            t("Inconnu")
           }
           readOnly
         />

@@ -1,7 +1,7 @@
 import { Button } from "common/components/button2"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import TicketTag from "saf/components/tickets/tag"
+import TicketTag from "saf/components/ticket-tag"
 import { SafTicketSource } from "saf/types"
 import { Collapse } from "common/components/collapse2"
 import { Ellipsis } from "common/components/scaffold"

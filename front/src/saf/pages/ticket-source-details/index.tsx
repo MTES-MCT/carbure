@@ -93,6 +93,7 @@ export const TicketSourceDetails = ({
               {t("Volume CAD n°")}
               {ticketSource?.carbure_id ?? "..."}
             </span>
+            -<span>{ticketSource?.added_by.name}</span>
           </Dialog.Title>
         }
         footer={
@@ -121,15 +122,15 @@ export const TicketSourceDetails = ({
           <TicketSourceFields ticketSource={ticketSource} />
         </section>
 
+        <section>
+          <TicketSourceParent ticketSource={ticketSource} />
+        </section>
+
         {hasAssignements && (
           <section ref={refToScroll}>
             <AssignedTickets ticketSource={ticketSource} />
           </section>
         )}
-
-        <section>
-          <TicketSourceParent ticketSource={ticketSource} />
-        </section>
 
         {ticketSourceResponse.loading && <LoaderOverlay />}
       </Dialog>
