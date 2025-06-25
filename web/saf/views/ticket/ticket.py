@@ -58,9 +58,11 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
     ]
 
     def get_permissions(self):
-        if self.action in ["reject", "accept"]:
+        if self.action == "accept":
+            return [HasAirlineWriteRights()]
+        if self.action == "reject":
             return [(HasAirlineWriteRights | HasSafOperatorWriteRights | HasSafTraderWriteRights)()]
-        if self.action == "cancel":
+        if self.action in ("cancel", "credit_source"):
             return [(HasSafOperatorWriteRights | HasSafTraderWriteRights)()]
         return super().get_permissions()
 
@@ -87,6 +89,7 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
             "carbure_production_site",
             "supplier",
             "client",
+            "reception_airport",
         )
 
     @extend_schema(responses={200: SafTicketPreviewSerializer})
