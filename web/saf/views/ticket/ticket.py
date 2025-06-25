@@ -31,7 +31,7 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
     lookup_field = "id"
     permission_classes = (
         IsAuthenticated,
-        HasUserRights(None, [Entity.OPERATOR, Entity.AIRLINE]),
+        HasUserRights(None, [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE]),
     )
     serializer_class = SafTicketBaseSerializer
     filterset_class = TicketFilter
@@ -50,9 +50,9 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
 
     def get_permissions(self):
         if self.action in ["reject", "accept"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE])]
         if self.action == "cancel":
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR, Entity.SAF_TRADER])]
         return super().get_permissions()
 
     def get_serializer_class(self):
@@ -113,15 +113,14 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
         },
     )
     def retrieve(self, request, id):
-        entity_id = self.request.query_params.get("entity_id")
-        entity = Entity.objects.get(id=entity_id)
+        entity = request.entity
         if entity.entity_type == Entity.AIRLINE:
-            ticket = SafTicket.objects.select_related("parent_ticket_source").get(id=id, client_id=entity_id)
+            ticket = SafTicket.objects.select_related("parent_ticket_source").get(id=id, client_id=entity.id)
         else:
-            ticket_filter = Q(id=id) & (Q(supplier_id=entity_id) | Q(client_id=entity_id))
+            ticket_filter = Q(id=id) & (Q(supplier_id=entity.id) | Q(client_id=entity.id))
             ticket = get_object_or_404(SafTicket.objects.select_related("parent_ticket_source"), ticket_filter)
 
-            if ticket.supplier_id != int(entity_id):
+            if ticket.supplier_id != entity.id:
                 ticket.parent_ticket_source = None
 
         serializer = self.get_serializer(ticket)

@@ -44,7 +44,6 @@ class FilterActionMixin:
         query_params = request.GET.copy()
 
         filter = request.query_params.get("filter")
-        entity_id = self.request.query_params.get("entity_id")
 
         if not filter:
             raise Exception("No filter was specified")
@@ -61,7 +60,7 @@ class FilterActionMixin:
             "feedstocks": "feedstock__code",
             "consumption_types": "consumption_type",
         }
-        entity = Entity.objects.get(id=entity_id)
+        entity = request.entity
         if entity.entity_type != Entity.AIRLINE:
             filters.update(
                 {

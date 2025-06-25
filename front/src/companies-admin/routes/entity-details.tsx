@@ -43,6 +43,9 @@ const EntityDetails = () => {
   const isEnabled = Boolean(entityData?.is_enabled)
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
+  const isSAFTrader = entityData?.entity_type === EntityType.SAF_Trader
+  const isSAFEntity = isAirline || isSAFTrader
+
   const canApprove =
     entity.isAdmin ||
     entity.hasAdminRight("AIRLINE") ||
@@ -71,14 +74,22 @@ const EntityDetails = () => {
             key: "info",
             label: t("Informations"),
           },
-          !isAirline && { key: "depot", path: "#depot", label: "Depots" },
-          isProducer && { key: "production", path: "#production", label: t("Sites de production") }, // prettier-ignore
+          !isSAFEntity && {
+            key: "depot",
+            path: "#depot",
+            label: "Depots",
+          },
+          isProducer && {
+            key: "production",
+            path: "#production",
+            label: t("Sites de production"),
+          },
           isProducer && {
             path: "#double-counting",
             key: "double-counting",
             label: t("Double comptage"),
           },
-          !isAirline && {
+          !isSAFEntity && {
             key: "certificates",
             path: "#certificates",
             label: t("Certificats"),
@@ -95,7 +106,7 @@ const EntityDetails = () => {
         {entityData && (
           <CompanyInfo readOnly company={entityData} key={entityData.id} />
         )}
-        {entityData && !isAirline && (
+        {entityData && !isSAFEntity && (
           <DeliverySitesSettings
             readOnly
             entity={entityData}
@@ -120,7 +131,7 @@ const EntityDetails = () => {
             }
           />
         )}
-        {!isAirline && (
+        {!isSAFEntity && (
           <Certificates readOnly={!isEnabled} entity_id={companyId} />
         )}
       </section>

@@ -44,7 +44,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   })
 
   const [types, setTypes] = useState<EntityType[] | undefined>(
-    hasAirlineOnly ? [EntityType.Airline] : undefined
+    hasAirlineOnly ? [EntityType.Airline, EntityType.SAF_Trader] : undefined
   )
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
@@ -78,6 +78,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               EntityType.Airline,
               EntityType.CPO,
               EntityType.PowerOrHeatProducer,
+              EntityType.SAF_Trader,
             ]}
           />
         )}

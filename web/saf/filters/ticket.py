@@ -56,6 +56,7 @@ class TicketFilter(django_filters.FilterSet):
     def filter_entity_id(self, queryset, name, value):
         ticket_type = self.data.get("type")
         entity = Entity.objects.get(id=value)
+
         if entity.entity_type == Entity.AIRLINE:
             return queryset.filter(client_id=value)
 
