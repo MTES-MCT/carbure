@@ -5,15 +5,11 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import {
-  CBQueryParams,
-  CBQueryStates,
-  CBSnapshot,
-} from "common/hooks/query-builder-2"
+import { CBQueryParams, CBQueryStates } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiSafTicketsGetParametersQueryOrder_by,
-  PathsApiSafTicketSourcesGetParametersQueryOrder,
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
   ConsumptionTypeEnum as ConsumptionType,
@@ -34,11 +30,6 @@ export interface SafSnapshot {
   tickets_received: number
   tickets_received_accepted: number
   tickets_received_pending: number
-}
-
-export interface SafAirlineSnapshot extends CBSnapshot {
-  tickets_pending: number
-  tickets_accepted: number
 }
 
 export interface SafLot {
@@ -93,7 +84,7 @@ export type SafTicketType = "assigned" | "received"
 export interface SafStates
   extends CBQueryStates<SafTicketStatus, SafTicketType> {
   filters: SafFilterSelection
-  snapshot?: SafSnapshot | SafAirlineSnapshot
+  snapshot?: SafSnapshot
 }
 
 export type SafTicketOrder = PathsApiSafTicketsGetParametersQueryOrder_by
@@ -111,7 +102,10 @@ export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
 export enum SafFilter {
   Feedstocks = "feedstock",
   Periods = "period",
-  Clients = "client",
+  Clients = "clients",
+  Suppliers = "supplier",
+  AddedBy = "added_by",
+  Airport = "reception_airport",
   CountriesOfOrigin = "country_of_origin",
   ProductionSites = "production_site",
   DeliverySites = "delivery_site",
@@ -119,7 +113,7 @@ export enum SafFilter {
 }
 
 export type SafTicketSourceOrder =
-  PathsApiSafTicketSourcesGetParametersQueryOrder
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by
 
 export interface SafTicketSourceQuery
   extends CBQueryParams<

@@ -239,7 +239,7 @@ export function cancelSafTicket(entity_id: number, ticket_id: number) {
 }
 
 export function creditSafTicketSource(entity_id: number, ticket_id: number) {
-  return api.GET("/saf/tickets/{id}/credit-source/", {
+  return api.POST("/saf/tickets/{id}/credit-source/", {
     params: {
       query: {
         entity_id,

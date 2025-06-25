@@ -90,6 +90,7 @@ export const safTicketSource: SafTicketSourcePreview = {
     carbure_id: "1",
   },
   parent_ticket: undefined,
+  added_by: operator,
 }
 
 export const lotPreview: LotPreview = {
@@ -185,6 +186,7 @@ export const safTicketSource2: SafTicketSourcePreview = {
     id: 1,
     carbure_id: "1",
   },
+  added_by: operator,
 }
 
 export const safTicket: SafTicketPreview = {
@@ -201,6 +203,7 @@ export const safTicket: SafTicketPreview = {
   ghg_reduction: 74,
   status: SafTicketStatus.PENDING,
   created_at: "2022-02-08",
+  reception_airport: safAirport,
 }
 
 export const safTicketAssignedDetails: SafTicketDetails = {
