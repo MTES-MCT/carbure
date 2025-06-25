@@ -16,25 +16,27 @@ class TicketStatusEnum(Enum):
 class TicketSourceFilter(django_filters.FilterSet):
     year = django_filters.NumberFilter(field_name="year")
 
-    period = django_filters.BaseInFilter(field_name="delivery_period", lookup_expr="in")
-    feedstock = django_filters.BaseInFilter(field_name="feedstock__code", lookup_expr="in")
-    client = django_filters.BaseInFilter(field_name="saf_tickets__client__name", lookup_expr="in")
+    period = django_filters.AllValuesMultipleFilter(field_name="delivery_period")
+    feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
+    added_by = django_filters.AllValuesMultipleFilter(field_name="added_by__name")
+    clients = django_filters.AllValuesMultipleFilter(field_name="saf_tickets__client__name")
     supplier = django_filters.CharFilter(method="filter_supplier")
-    country_of_origin = django_filters.BaseInFilter(field_name="country_of_origin__code_pays", lookup_expr="in")
-    production_site = django_filters.BaseInFilter(field_name="carbure_production_site__name", lookup_expr="in")
-    delivery_site = django_filters.BaseInFilter(field_name="parent_lot__carbure_delivery_site__name", lookup_expr="in")
+    country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
+    production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
+    delivery_site = django_filters.AllValuesMultipleFilter(field_name="parent_lot__carbure_delivery_site__name")
 
     status = django_filters.ChoiceFilter(
         choices=[(item.name, item.value) for item in TicketStatusEnum],
         method="filter_status",
     )
 
-    order = django_filters.OrderingFilter(
+    order_by = django_filters.OrderingFilter(
         fields=(
             ("total_volume", "volume"),
             ("delivery_period", "period"),
             ("feedstock__code", "feedstock"),
             ("ghg_reduction", "ghg_reduction"),
+            ("added_by__name", "added_by"),
         )
     )
 
@@ -69,10 +71,11 @@ class TicketSourceFilter(django_filters.FilterSet):
             "year",
             "period",
             "feedstock",
-            "client",
+            "clients",
             "supplier",
             "country_of_origin",
             "production_site",
             "delivery_site",
             "status",
+            "added_by",
         ]

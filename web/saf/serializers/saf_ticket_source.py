@@ -60,6 +60,7 @@ class SafTicketSourcePreviewSerializer(serializers.ModelSerializer):
             "assigned_tickets",
             "parent_lot",
             "parent_ticket",
+            "added_by",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -68,6 +69,7 @@ class SafTicketSourcePreviewSerializer(serializers.ModelSerializer):
     assigned_tickets = serializers.SerializerMethodField()
     parent_lot = SafParentLotSerializer(read_only=True, required=False)
     parent_ticket = SafParentTicketSerializer(required=False)
+    added_by = EntityPreviewSerializer(read_only=True)
 
     @extend_schema_field(SafAssignedTicketSerializer(many=True))
     def get_assigned_tickets(self, obj):
@@ -78,7 +80,6 @@ class SafTicketSourceSerializer(SafTicketSourcePreviewSerializer):
     class Meta:
         model = SafTicketSource
         fields = SafTicketSourcePreviewSerializer.Meta.fields + [
-            "added_by",
             "carbure_producer",
             "unknown_producer",
             "carbure_production_site",
@@ -97,7 +98,6 @@ class SafTicketSourceSerializer(SafTicketSourcePreviewSerializer):
             "ghg_total",
         ]
 
-    added_by = EntityPreviewSerializer(read_only=True)
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_lot = CarbureLotPublicSerializer(required=False)

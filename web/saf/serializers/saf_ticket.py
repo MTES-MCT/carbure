@@ -25,6 +25,7 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
     country_of_origin = CountrySerializer(read_only=True)
     supplier = serializers.SlugRelatedField(read_only=True, slug_field="name")
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    reception_airport = AirportSerializer(read_only=True, required=False)
 
     class Meta:
         model = SafTicket
@@ -45,14 +46,30 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
             "consumption_type",
             "ets_status",
             "created_at",
+            "reception_airport",
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+
+        if not request:
+            return data
+
+        entity = request.entity
+        is_admin = entity.entity_type in (Entity.ADMIN, Entity.EXTERNAL_ADMIN)
+        is_airline = entity.entity_type == Entity.AIRLINE
+
+        if not is_airline and not is_admin:
+            data["ets_status"] = None
+
+        return data
 
 
 class SafTicketSerializer(SafTicketPreviewSerializer):
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_ticket_source = SafRelatedTicketSourceSerializer(read_only=True)
-    reception_airport = AirportSerializer(read_only=True)
     child_ticket_sources = serializers.SerializerMethodField()
 
     class Meta:
@@ -78,7 +95,6 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
             "client_comment",
             "parent_ticket_source",
             "shipping_method",
-            "reception_airport",
             "child_ticket_sources",
         ]
 

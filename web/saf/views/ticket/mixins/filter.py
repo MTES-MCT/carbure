@@ -60,6 +60,7 @@ class FilterActionMixin:
             "client": "client__name",
             "country_of_origin": "country_of_origin__code_pays",
             "production_site": "carbure_production_site__name",
+            "reception_airport": "reception_airport__name",
         }
 
         column = filters.get(filter)

@@ -3628,13 +3628,20 @@ paths:
       operationId: saf_ticket_sources_list
       parameters:
         - in: query
-          name: client
+          name: added_by
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
+          style: form
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
           style: form
         - in: query
           name: country_of_origin
@@ -3642,8 +3649,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: delivery_site
@@ -3651,8 +3657,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -3666,20 +3671,21 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
+                - -added_by
                 - -feedstock
                 - -ghg_reduction
                 - -period
                 - -volume
+                - added_by
                 - feedstock
                 - ghg_reduction
                 - period
@@ -3695,6 +3701,8 @@ paths:
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
             * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `added_by` - Added by
+            * `-added_by` - Added by (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -3723,8 +3731,7 @@ paths:
               type: integer
               maximum: 2147483647
               minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: production_site
@@ -3732,8 +3739,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: search
           required: false
@@ -3853,13 +3859,20 @@ paths:
       operationId: saf_ticket_sources_export_retrieve
       parameters:
         - in: query
-          name: client
+          name: added_by
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
+          style: form
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
           style: form
         - in: query
           name: country_of_origin
@@ -3867,8 +3880,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: delivery_site
@@ -3876,8 +3888,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -3891,20 +3902,21 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
+                - -added_by
                 - -feedstock
                 - -ghg_reduction
                 - -period
                 - -volume
+                - added_by
                 - feedstock
                 - ghg_reduction
                 - period
@@ -3920,6 +3932,8 @@ paths:
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
             * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `added_by` - Added by
+            * `-added_by` - Added by (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -3936,8 +3950,7 @@ paths:
               type: integer
               maximum: 2147483647
               minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: production_site
@@ -3945,8 +3958,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: search
           required: false
@@ -3998,13 +4010,20 @@ paths:
       operationId: saf_ticket_sources_filters_retrieve
       parameters:
         - in: query
-          name: client
+          name: added_by
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
+          style: form
+        - in: query
+          name: clients
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
           style: form
         - in: query
           name: country_of_origin
@@ -4012,8 +4031,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: delivery_site
@@ -4021,8 +4039,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -4036,8 +4053,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: filter
@@ -4045,16 +4061,18 @@ paths:
             type: string
           description: Filter string to apply
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
+                - -added_by
                 - -feedstock
                 - -ghg_reduction
                 - -period
                 - -volume
+                - added_by
                 - feedstock
                 - ghg_reduction
                 - period
@@ -4070,6 +4088,8 @@ paths:
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
             * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `added_by` - Added by
+            * `-added_by` - Added by (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4086,8 +4106,7 @@ paths:
               type: integer
               maximum: 2147483647
               minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: production_site
@@ -4095,8 +4114,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: search
           required: false
@@ -4200,8 +4218,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: client
@@ -4209,8 +4226,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: consumption_type
@@ -4224,8 +4240,10 @@ paths:
                 - MAC
                 - MAC_DECLASSEMENT
                 - null
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MAC` - MAC
+            * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          explode: true
           style: form
         - in: query
           name: country_of_origin
@@ -4233,8 +4251,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -4248,8 +4265,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4264,6 +4280,7 @@ paths:
                 - -feedstock
                 - -ghg_reduction
                 - -period
+                - -reception_airport
                 - -supplier
                 - -volume
                 - client
@@ -4272,6 +4289,7 @@ paths:
                 - feedstock
                 - ghg_reduction
                 - period
+                - reception_airport
                 - supplier
                 - volume
           description: |-
@@ -4293,6 +4311,8 @@ paths:
             * `-supplier` - Supplier (décroissant)
             * `consumption_type` - Consumption type
             * `-consumption_type` - Consumption type (décroissant)
+            * `reception_airport` - Reception airport
+            * `-reception_airport` - Reception airport (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4321,8 +4341,7 @@ paths:
               type: integer
               maximum: 2147483647
               minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: production_site
@@ -4330,8 +4349,15 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
+          style: form
+        - in: query
+          name: reception_airport
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
           style: form
         - name: search
           required: false
@@ -4357,8 +4383,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: year
@@ -4494,8 +4519,8 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
   /api/saf/tickets/{id}/credit-source/:
-    get:
-      operationId: saf_tickets_credit_source_retrieve
+    post:
+      operationId: saf_tickets_credit_source_create
       parameters:
         - in: query
           name: entity_id
@@ -4580,8 +4605,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: client
@@ -4589,8 +4613,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: consumption_type
@@ -4604,8 +4627,10 @@ paths:
                 - MAC
                 - MAC_DECLASSEMENT
                 - null
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MAC` - MAC
+            * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          explode: true
           style: form
         - in: query
           name: country_of_origin
@@ -4613,8 +4638,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -4628,8 +4652,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4644,6 +4667,7 @@ paths:
                 - -feedstock
                 - -ghg_reduction
                 - -period
+                - -reception_airport
                 - -supplier
                 - -volume
                 - client
@@ -4652,6 +4676,7 @@ paths:
                 - feedstock
                 - ghg_reduction
                 - period
+                - reception_airport
                 - supplier
                 - volume
           description: |-
@@ -4673,6 +4698,8 @@ paths:
             * `-supplier` - Supplier (décroissant)
             * `consumption_type` - Consumption type
             * `-consumption_type` - Consumption type (décroissant)
+            * `reception_airport` - Reception airport
+            * `-reception_airport` - Reception airport (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4689,8 +4716,7 @@ paths:
               type: integer
               maximum: 2147483647
               minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: production_site
@@ -4698,8 +4724,15 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
+          style: form
+        - in: query
+          name: reception_airport
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
           style: form
         - name: search
           required: false
@@ -4725,8 +4758,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: year
@@ -4758,8 +4790,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: client
@@ -4767,8 +4798,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: consumption_type
@@ -4782,8 +4812,10 @@ paths:
                 - MAC
                 - MAC_DECLASSEMENT
                 - null
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MAC` - MAC
+            * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          explode: true
           style: form
         - in: query
           name: country_of_origin
@@ -4791,8 +4823,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -4806,8 +4837,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: filter
@@ -4827,6 +4857,7 @@ paths:
                 - -feedstock
                 - -ghg_reduction
                 - -period
+                - -reception_airport
                 - -supplier
                 - -volume
                 - client
@@ -4835,6 +4866,7 @@ paths:
                 - feedstock
                 - ghg_reduction
                 - period
+                - reception_airport
                 - supplier
                 - volume
           description: |-
@@ -4856,6 +4888,8 @@ paths:
             * `-supplier` - Supplier (décroissant)
             * `consumption_type` - Consumption type
             * `-consumption_type` - Consumption type (décroissant)
+            * `reception_airport` - Reception airport
+            * `-reception_airport` - Reception airport (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4872,8 +4906,7 @@ paths:
               type: integer
               maximum: 2147483647
               minimum: -2147483648
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: production_site
@@ -4881,8 +4914,15 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
+          style: form
+        - in: query
+          name: reception_airport
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
           style: form
         - name: search
           required: false
@@ -4908,8 +4948,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: year
@@ -11081,6 +11120,10 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        reception_airport:
+          allOf:
+            - $ref: "#/components/schemas/Airport"
+          readOnly: true
         free_field:
           type: string
           nullable: true
@@ -11149,10 +11192,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/ShippingMethodEnum"
           nullable: true
-        reception_airport:
-          allOf:
-            - $ref: "#/components/schemas/Airport"
-          readOnly: true
         child_ticket_sources:
           type: array
           items:
@@ -11235,6 +11274,10 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        reception_airport:
+          allOf:
+            - $ref: "#/components/schemas/Airport"
+          readOnly: true
       required:
         - assignment_period
         - biofuel
@@ -11243,6 +11286,7 @@ components:
         - created_at
         - feedstock
         - id
+        - reception_airport
         - supplier
         - volume
         - year
@@ -11521,7 +11565,12 @@ components:
           readOnly: true
         parent_ticket:
           $ref: "#/components/schemas/SafParentTicket"
+        added_by:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
       required:
+        - added_by
         - assigned_tickets
         - assigned_volume
         - biofuel

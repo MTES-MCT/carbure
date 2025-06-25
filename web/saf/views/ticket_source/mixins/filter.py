@@ -4,6 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from core.models import Entity
+
 
 class FilterActionMixin:
     @extend_schema(
@@ -55,14 +57,21 @@ class FilterActionMixin:
         queryset = filterset.qs
 
         filters = {
-            "client": "saf_tickets__client__name",
+            "clients": "saf_tickets__client__name",
             "period": "delivery_period",
             "feedstock": "feedstock__code",
             "country_of_origin": "country_of_origin__code_pays",
             "production_site": "carbure_production_site__name",
             "delivery_site": "parent_lot__carbure_delivery_site__name",
-            "supplier": "parent_supplier",
         }
+
+        if request.entity.entity_type in (Entity.ADMIN, Entity.EXTERNAL_ADMIN):
+            filters.update(
+                {
+                    "supplier": "parent_supplier",
+                    "added_by": "added_by__name",
+                }
+            )
 
         column = filters.get(filter)
         if not column:  # raise an error for unknown filters

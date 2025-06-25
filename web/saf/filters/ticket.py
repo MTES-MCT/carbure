@@ -9,14 +9,15 @@ class TicketFilter(django_filters.FilterSet):
     entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_type", required=True)
     year = django_filters.NumberFilter(field_name="year")
 
-    period = django_filters.BaseInFilter(field_name="assignment_period", lookup_expr="in")
-    biofuel = django_filters.BaseInFilter(field_name="biofuel__code", lookup_expr="in")
-    feedstock = django_filters.BaseInFilter(field_name="feedstock__code", lookup_expr="in")
-    client = django_filters.BaseInFilter(field_name="client__name", lookup_expr="in")
-    supplier = django_filters.BaseInFilter(field_name="supplier__name", lookup_expr="in")
-    country_of_origin = django_filters.BaseInFilter(field_name="country_of_origin__code_pays", lookup_expr="in")
-    production_site = django_filters.BaseInFilter(field_name="carbure_production_site__name", lookup_expr="in")
-    consumption_type = django_filters.BaseInFilter(field_name="consumption_type", lookup_expr="in")
+    period = django_filters.AllValuesMultipleFilter(field_name="assignment_period")
+    biofuel = django_filters.AllValuesMultipleFilter(field_name="biofuel__code")
+    feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
+    client = django_filters.AllValuesMultipleFilter(field_name="client__name")
+    supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
+    country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
+    production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
+    consumption_type = django_filters.AllValuesMultipleFilter(field_name="consumption_type")
+    reception_airport = django_filters.AllValuesMultipleFilter(field_name="reception_airport__name")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -28,6 +29,7 @@ class TicketFilter(django_filters.FilterSet):
             ("created_at", "created_at"),
             ("supplier__name", "supplier"),
             ("consumption_type", "consumption_type"),
+            ("reception_airport__name", "reception_airport"),
         )
     )
 
@@ -54,4 +56,5 @@ class TicketFilter(django_filters.FilterSet):
             "country_of_origin",
             "production_site",
             "consumption_type",
+            "reception_airport",
         ]
