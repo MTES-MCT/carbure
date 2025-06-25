@@ -1,9 +1,9 @@
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource } from "saf/types"
+import { SafTicketSource, SafTicketSourcePreview } from "saf/types"
 
 export interface TicketSourceTagProps {
-  ticketSource: SafTicketSource | undefined
+  ticketSource: SafTicketSourcePreview | SafTicketSource | undefined
 }
 
 export const TicketSourceTag = ({
