@@ -11,10 +11,10 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import { TicketAssignment } from "saf/components/assignment/simple-assignment"
-import ParentLot from "./parent-lot"
+import { TicketSourceParent } from "./components/ticket-source-parent"
 import TicketSourceTag from "../../components/ticket-source-tag"
-import AssignedTickets from "./assigned-tickets"
-import TicketSourceFields from "./fields"
+import AssignedTickets from "./components/assigned-tickets"
+import TicketSourceFields from "./components/fields"
 import {
   NavigationButtons,
   NavigationButtonsProps,
@@ -45,6 +45,12 @@ export const TicketSourceDetails = ({
   })
 
   const ticketSource = ticketSourceResponse.result?.data
+
+  const isOwner = ticketSource?.added_by.id === entity.id
+
+  const assignedVolume = ticketSource?.assigned_volume ?? 0
+  const totalVolume = ticketSource?.total_volume ?? 0
+  const hasRemainingVolume = assignedVolume < totalVolume
 
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
@@ -99,31 +105,32 @@ export const TicketSourceDetails = ({
                 baseIdsList={baseIdsList}
               />
             )}
-            {ticketSource?.assigned_volume !== undefined &&
-              ticketSource?.total_volume !== undefined &&
-              ticketSource.assigned_volume < ticketSource.total_volume && (
-                <Button
-                  iconId="ri-send-plane-line"
-                  priority="primary"
-                  onClick={showAssignement}
-                >
-                  {t("Affecter")}
-                </Button>
-              )}
+            {isOwner && hasRemainingVolume && (
+              <Button
+                iconId="ri-send-plane-line"
+                priority="primary"
+                onClick={showAssignement}
+              >
+                {t("Affecter")}
+              </Button>
+            )}
           </>
         }
       >
         <section>
           <TicketSourceFields ticketSource={ticketSource} />
         </section>
+
         {hasAssignements && (
           <section ref={refToScroll}>
             <AssignedTickets ticketSource={ticketSource} />
           </section>
         )}
+
         <section>
-          <ParentLot parent_lot={ticketSource?.parent_lot} />
+          <TicketSourceParent ticketSource={ticketSource} />
         </section>
+
         {ticketSourceResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>

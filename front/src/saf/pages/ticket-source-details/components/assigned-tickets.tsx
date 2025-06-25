@@ -1,8 +1,6 @@
 import { Button } from "common/components/button2"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
-import { SafAssignedTicket } from "saf/types"
 import TicketTag from "saf/components/tickets/tag"
 import { SafTicketSource } from "saf/types"
 import { Collapse } from "common/components/collapse2"
@@ -14,17 +12,6 @@ const AssignedTickets = ({
   ticketSource: SafTicketSource | undefined
 }) => {
   const { t } = useTranslation()
-  const location = useLocation()
-
-  const navigate = useNavigate()
-
-  const showTicket = (ticket: SafAssignedTicket) => {
-    navigate({
-      pathname: location.pathname,
-      search: location.search,
-      hash: `ticket/${ticket?.id}`,
-    })
-  }
 
   if (!ticketSource) return null
 
@@ -42,7 +29,10 @@ const AssignedTickets = ({
         {ticketSource.assigned_tickets.map((ticket) => {
           return (
             <li key={ticket.id}>
-              <Button customPriority="link" onClick={() => showTicket(ticket)}>
+              <Button
+                customPriority="link"
+                linkProps={{ href: `#ticket/${ticket?.id}` }}
+              >
                 <Ellipsis>{ticket.client}</Ellipsis> -{" "}
                 {formatNumber(ticket.volume)} L -{" "}
                 {formatDate(
