@@ -17,8 +17,8 @@ import { SafFilters } from "saf/components/filters"
 import { useAutoStatus } from "./index.hooks"
 import { TicketDetails } from "saf/pages/ticket-details"
 import TicketSourceDetail from "saf/pages/ticket-source-details"
-import { StatusSwitcher } from "./status-switcher"
-import TicketSourcesTable from "./table"
+import { StatusSwitcher } from "./components/status-switcher"
+import TicketSourcesTable from "./components/table"
 import { NoResult } from "common/components/no-result2"
 import {
   useCBQueryBuilder,

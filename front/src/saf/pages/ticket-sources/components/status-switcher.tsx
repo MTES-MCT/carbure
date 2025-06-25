@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { SafSnapshot } from "saf/types"
-import { SafTicketSourceStatus } from "../../types"
+import { SafTicketSourceStatus } from "../../../types"
 import { Tabs } from "common/components/tabs2"
-import { DraftFill, SendPlaneLine } from "common/components/icon"
 
 interface StatusSwitcherProps {
   status: SafTicketSourceStatus
@@ -26,13 +25,15 @@ export const StatusSwitcher = ({
           key: SafTicketSourceStatus.AVAILABLE,
           path: "../ticket-sources/available",
           label: `${t("Disponible")} (${count?.ticket_sources_available ?? 0})`,
-          icon: DraftFill,
+          icon: "fr-icon-draft-line",
+          iconActive: "fr-icon-draft-fill",
         },
         {
           key: SafTicketSourceStatus.HISTORY,
           path: "../ticket-sources/history",
           label: `${t("Historique")} (${count?.ticket_sources_history ?? 0})`,
-          icon: SendPlaneLine,
+          icon: "fr-icon-send-plane-line",
+          iconActive: "fr-icon-send-plane-fill",
         },
       ]}
     />
