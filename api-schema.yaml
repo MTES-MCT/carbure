@@ -10988,7 +10988,19 @@ components:
           maxLength: 64
       required:
         - id
-    SafParentTicketSource:
+    SafParentTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+      required:
+        - id
+    SafRelatedTicketSource:
       type: object
       properties:
         id:
@@ -11131,7 +11143,7 @@ components:
           nullable: true
         parent_ticket_source:
           allOf:
-            - $ref: "#/components/schemas/SafParentTicketSource"
+            - $ref: "#/components/schemas/SafRelatedTicketSource"
           readOnly: true
         shipping_method:
           allOf:
@@ -11141,11 +11153,17 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
+        child_ticket_sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafRelatedTicketSource"
+          readOnly: true
       required:
         - assignment_period
         - biofuel
         - carbure_producer
         - carbure_production_site
+        - child_ticket_sources
         - client
         - country_of_origin
         - created_at
@@ -11279,6 +11297,8 @@ components:
           readOnly: true
         parent_lot:
           $ref: "#/components/schemas/CarbureLotPublic"
+        parent_ticket:
+          $ref: "#/components/schemas/SafParentTicket"
         added_by:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -11345,7 +11365,6 @@ components:
         - delivery_period
         - feedstock
         - id
-        - parent_lot
         - total_volume
         - year
     SafTicketSourceAssignment:
@@ -11500,6 +11519,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/SafParentLot"
           readOnly: true
+        parent_ticket:
+          $ref: "#/components/schemas/SafParentTicket"
       required:
         - assigned_tickets
         - assigned_volume

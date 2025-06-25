@@ -3440,7 +3440,11 @@ export interface components {
       readonly id: number
       carbure_id?: string
     }
-    SafParentTicketSource: {
+    SafParentTicket: {
+      readonly id: number
+      carbure_id?: string | null
+    }
+    SafRelatedTicketSource: {
       readonly id: number
       carbure_id?: string | null
       /** Format: double */
@@ -3498,9 +3502,10 @@ export interface components {
       /** Format: double */
       ghg_total?: number
       client_comment?: string | null
-      readonly parent_ticket_source: components["schemas"]["SafParentTicketSource"]
+      readonly parent_ticket_source: components["schemas"]["SafRelatedTicketSource"]
       shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
       readonly reception_airport: components["schemas"]["Airport"]
+      readonly child_ticket_sources: components["schemas"]["SafRelatedTicketSource"][]
     }
     SafTicketPreview: {
       readonly id: number
@@ -3541,7 +3546,8 @@ export interface components {
       /** Format: double */
       ghg_reduction?: number
       readonly assigned_tickets: components["schemas"]["SafAssignedTicket"][]
-      parent_lot: components["schemas"]["CarbureLotPublic"]
+      parent_lot?: components["schemas"]["CarbureLotPublic"]
+      parent_ticket?: components["schemas"]["SafParentTicket"]
       readonly added_by: components["schemas"]["EntityPreview"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
@@ -3625,6 +3631,7 @@ export interface components {
       ghg_reduction?: number
       readonly assigned_tickets: components["schemas"]["SafAssignedTicket"][]
       readonly parent_lot: components["schemas"]["SafParentLot"]
+      parent_ticket?: components["schemas"]["SafParentTicket"]
     }
     SeachCompanyRequest: {
       registration_id: string

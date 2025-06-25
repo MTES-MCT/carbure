@@ -1,12 +1,14 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from core.models import Entity
 from core.serializers import AirportSerializer, EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket
 from saf.models.saf_ticket_source import SafTicketSource
 
 
-class SafParentTicketSourceSerializer(serializers.ModelSerializer):
+class SafRelatedTicketSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SafTicketSource
         fields = [
@@ -49,8 +51,9 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
 class SafTicketSerializer(SafTicketPreviewSerializer):
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
-    parent_ticket_source = SafParentTicketSourceSerializer(read_only=True)
+    parent_ticket_source = SafRelatedTicketSourceSerializer(read_only=True)
     reception_airport = AirportSerializer(read_only=True)
+    child_ticket_sources = serializers.SerializerMethodField()
 
     class Meta:
         model = SafTicket
@@ -76,4 +79,29 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
             "parent_ticket_source",
             "shipping_method",
             "reception_airport",
+            "child_ticket_sources",
         ]
+
+    @extend_schema_field(SafRelatedTicketSourceSerializer(many=True))
+    def get_child_ticket_sources(self, obj):
+        return SafRelatedTicketSourceSerializer(obj.safticketsource_set, many=True).data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+
+        if not request:
+            return data
+
+        entity = request.entity
+        is_admin = entity.entity_type in (Entity.ADMIN, Entity.EXTERNAL_ADMIN)
+        is_supplier = instance.supplier_id == entity.id
+        is_client = instance.client_id == entity.id
+
+        if not is_supplier and not is_admin:
+            data["parent_ticket_source"] = None
+
+        if not is_client and not is_admin:
+            data["child_ticket_sources"] = []
+
+        return data
