@@ -29,7 +29,7 @@ export const RejectAssignment = ({
     invalidates: [
       "ticket-details",
       "airline-snapshot",
-      "operator-snapshot",
+      "saf-snapshot",
       "tickets",
       `nav-stats-${entity.id}`,
     ],
@@ -47,7 +47,6 @@ export const RejectAssignment = ({
   }
 
   const rejectTicket = async () => {
-    //TO TEST comment below and add ticketRejected()
     await rejectSafTicket.execute(entity.id, ticket.id, comment!)
   }
 

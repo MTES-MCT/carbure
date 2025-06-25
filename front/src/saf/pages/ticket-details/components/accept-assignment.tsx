@@ -38,7 +38,7 @@ export const AcceptAssignment = ({
   const acceptSafTicket = useMutation(acceptTicketApi, {
     invalidates: [
       "ticket-details",
-      "airline-snapshot",
+      "saf-snapshot",
       "tickets",
       `nav-stats-${entity.id}`,
     ],

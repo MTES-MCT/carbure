@@ -28,7 +28,7 @@ export const CancelAssignment = ({
     invalidates: [
       "ticket-source-details",
       "tickets",
-      "operator-snapshot",
+      "saf-snapshot",
       "ticket-sources",
     ],
   })

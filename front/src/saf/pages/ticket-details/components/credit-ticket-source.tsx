@@ -24,7 +24,7 @@ export const CreditTicketSource = ({
   const notify = useNotify()
 
   const creditSafTicketSource = useMutation(api.creditSafTicketSource, {
-    invalidates: ["ticket-sources", "tickets", "operator-snapshot"],
+    invalidates: ["ticket-sources", "tickets", "saf-snapshot"],
   })
 
   const ticketSourceCredited = () => {
