@@ -51,7 +51,11 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
       <DialogSection label={t("Producteur")}>
         <TextInput
           label={t("Production")}
-          value={ticket.carbure_producer?.name ?? ticket.unknown_producer ?? ""}
+          value={
+            ticket.carbure_producer?.name ||
+            ticket.unknown_producer ||
+            t("Inconnu")
+          }
           readOnly
         />
         <TextInput

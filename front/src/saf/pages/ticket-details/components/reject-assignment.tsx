@@ -9,7 +9,7 @@ import { useMutation } from "common/hooks/async"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SafTicket } from "saf/types"
-import TicketTag from "../../../components/tickets/tag"
+import TicketTag from "saf/components/ticket-tag"
 import { rejectTicket as rejectTicketApi } from "saf/api"
 interface RejectAssignmentProps {
   ticket: SafTicket

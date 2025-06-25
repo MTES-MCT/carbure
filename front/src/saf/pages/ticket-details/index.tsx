@@ -8,7 +8,7 @@ import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
-import TicketTag from "saf/components/tickets/tag"
+import TicketTag from "saf/components/ticket-tag"
 import CancelAssignment from "./components/cancel-assignment"
 import ClientComment from "saf/pages/ticket-details/components/client-comment"
 import CreditTicketSource from "./components/credit-ticket-source"
@@ -105,7 +105,7 @@ export const TicketDetails = ({
           <Dialog.Title>
             <TicketTag status={ticket?.status} />
             {t("Ticket n°")}
-            {ticket?.carbure_id ?? "..."}
+            {ticket?.carbure_id ?? "..."} - {ticket?.supplier}
           </Dialog.Title>
         }
         footer={
