@@ -19,7 +19,7 @@ import { getTicketFilters, getTickets, downloadTickets } from "saf/api"
 import { SafFilters } from "saf/components/filters"
 import { useAutoStatus } from "./index.hooks"
 import { TicketDetails } from "saf/pages/ticket-details"
-import { SafStatusSwitcher } from "./status-switcher"
+import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "saf/components/tickets/table"
 import { TicketSourceDetails } from "saf/pages/ticket-source-details"
 import {
@@ -90,7 +90,7 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
 
   return (
     <>
-      <SafStatusSwitcher
+      <StatusSwitcher
         onSwitch={actions.setStatus}
         type={type}
         count={snapshot}
