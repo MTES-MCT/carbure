@@ -9,11 +9,12 @@ import {
   SafTicketsResponse,
   SafTicketStatus,
 } from "saf/types"
-import TicketTag from "./tag"
+import TicketTag from "saf/components/ticket-tag"
 import { Order, Table, Cell, Column } from "common/components/table2"
 import { Pagination } from "common/components/pagination2/pagination"
 import { NoResult } from "common/components/no-result2"
 import { formatConsumptionType } from "saf/utils/formatters"
+import useEntity from "common/hooks/entity"
 
 export interface TicketsTableProps {
   loading: boolean
@@ -36,7 +37,10 @@ export const TicketsTable = memo(
     client,
     rowLink,
   }: TicketsTableProps) => {
+    const entity = useEntity()
     const columns = useColumns()
+
+    const isAdmin = entity.isAdmin || entity.isExternal
 
     const total = ticketsData?.count ?? 0
     const count = ticketsData?.results.length ?? 0
@@ -54,7 +58,9 @@ export const TicketsTable = memo(
               rows={tickets}
               columns={compact([
                 columns.status,
-                client ? columns.supplier : columns.client,
+                !isAdmin && (client ? columns.supplier : columns.client),
+                isAdmin && columns.supplier,
+                isAdmin && columns.client,
                 columns.availableVolume,
                 columns.period,
                 columns.feedstock,

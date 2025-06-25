@@ -19,8 +19,8 @@ import { getTicketFilters, getTickets, downloadTickets } from "saf/api"
 import { SafFilters } from "saf/components/filters"
 import { useAutoStatus } from "./index.hooks"
 import { TicketDetails } from "saf/pages/ticket-details"
-import { StatusSwitcher } from "./status-switcher"
-import TicketsTable from "saf/components/tickets/table"
+import { StatusSwitcher } from "./components/status-switcher"
+import TicketsTable from "saf/pages/tickets/components/table"
 import { TicketSourceDetails } from "saf/pages/ticket-source-details"
 import {
   useCBQueryBuilder,
@@ -83,10 +83,13 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
 
     return response.data?.results ?? []
   }
-  const filters =
-    type === "received"
-      ? OPERATOR_RECEIVED_FILTERS //
-      : OPERATOR_ASSIGNED_FILTERS
+
+  const isAdmin = entity.isAdmin || entity.isExternal
+
+  let filters: SafFilter[] = []
+  if (isAdmin) filters = ADMIN_FILTERS
+  else if (type === "received") filters = RECEIVED_FILTERS
+  else if (type === "assigned") filters = ASSIGNED_FILTERS
 
   return (
     <>
@@ -150,19 +153,27 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
   )
 }
 
-const OPERATOR_RECEIVED_FILTERS = [
+const RECEIVED_FILTERS = [
+  SafFilter.Suppliers,
   SafFilter.Periods,
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,
   SafFilter.ProductionSites,
   SafFilter.ConsumptionTypes,
+  SafFilter.Airport,
 ]
 
-const OPERATOR_ASSIGNED_FILTERS = [
+const ASSIGNED_FILTERS = [
   SafFilter.Clients,
   SafFilter.Periods,
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,
   SafFilter.ProductionSites,
   SafFilter.ConsumptionTypes,
+  SafFilter.Airport,
+]
+
+const ADMIN_FILTERS = [
+  SafFilter.AddedBy, //
+  ...ASSIGNED_FILTERS,
 ]
