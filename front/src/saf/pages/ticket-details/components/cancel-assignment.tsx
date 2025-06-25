@@ -6,7 +6,7 @@ import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { SafTicket } from "saf/types"
-import * as api from "../../api"
+import * as api from "../../../api"
 import TicketTag from "saf/components/tickets/tag"
 
 interface CancelAssignmentProps {

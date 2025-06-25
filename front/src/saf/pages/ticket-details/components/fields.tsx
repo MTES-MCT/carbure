@@ -5,10 +5,10 @@ import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 // TODO: change import
-import DurabilityFields from "../../components/durability-fields"
-import { SafTicketDetails } from "../../types"
+import DurabilityFields from "../../../components/durability-fields"
+import { SafTicketDetails } from "../../../types"
 import { EtsStatusEnum } from "api-schema"
-import { DialogSection } from "../../components/dialog-section"
+import { DialogSection } from "../../../components/dialog-section"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined

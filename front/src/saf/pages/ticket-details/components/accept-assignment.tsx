@@ -90,6 +90,7 @@ export const AcceptAssignment = ({
             <RadioGroup
               {...form.bind("ets_status")}
               required
+              label={t("Statut ETS")}
               options={[
                 {
                   value: EtsStatusEnum.ETS_VALUATION,

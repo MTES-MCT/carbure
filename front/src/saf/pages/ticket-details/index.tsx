@@ -9,18 +9,19 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
 import TicketTag from "saf/components/tickets/tag"
-import CancelAssignment from "./cancel-assignment"
-import ClientComment from "saf/pages/ticket-details/client-comment"
-import CreditTicketSource from "./credit-ticket-source"
-import { TicketFields } from "saf/pages/ticket-details/fields"
-import LinkedTicketSource from "./linked-ticket-source"
-import RejectAssignment from "saf/pages/ticket-details/reject-assignment"
+import CancelAssignment from "./components/cancel-assignment"
+import ClientComment from "saf/pages/ticket-details/components/client-comment"
+import CreditTicketSource from "./components/credit-ticket-source"
+import { TicketFields } from "saf/pages/ticket-details/components/fields"
+import LinkedTicketSource from "./components/linked-ticket-source"
+import RejectAssignment from "saf/pages/ticket-details/components/reject-assignment"
 import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
 import { UserRole } from "common/types"
 import { getTicketDetails } from "saf/api"
+import AcceptAssignment from "./components/accept-assignment"
 
 export type TicketDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -45,8 +46,14 @@ export const TicketDetails = ({
   })
 
   const ticket = ticketResponse.result?.data
-  const canUpdateTicket =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
+
+  const canWrite = entity.hasRights(UserRole.ReadWrite, UserRole.Admin)
+
+  const isClient = ticket?.client === entity.name
+  const isSupplier = ticket?.supplier === entity.name
+
+  const isPending = ticket?.status === SafTicketStatus.PENDING
+  const isCancelable = isPending || ticket?.status === SafTicketStatus.REJECTED
 
   const showCancelModal = () => {
     portal((close) => (
@@ -58,22 +65,33 @@ export const TicketDetails = ({
     ))
   }
 
-  const closeDialog = () => {
-    navigate({ search: location.search, hash: "#" })
+  const showAcceptModal = () => {
+    portal((close) => {
+      if (entity.isAirline) {
+        return (
+          <AcceptAssignment //
+            ticket={ticket!}
+            onClose={close}
+          />
+        )
+      } else {
+        return (
+          <CreditTicketSource
+            ticket={ticket!}
+            onClose={close}
+            onCredit={closeDialog}
+          />
+        )
+      }
+    })
   }
 
   const showRejectModal = () => {
     portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
   }
 
-  const showAcceptModal = async () => {
-    portal((close) => (
-      <CreditTicketSource
-        ticket={ticket!}
-        onClose={close}
-        onCredit={closeDialog}
-      />
-    ))
+  const closeDialog = () => {
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
@@ -83,7 +101,6 @@ export const TicketDetails = ({
         header={
           <Dialog.Title>
             <TicketTag status={ticket?.status} />
-
             {t("Ticket n°")}
             {ticket?.carbure_id ?? "..."}
           </Dialog.Title>
@@ -98,48 +115,45 @@ export const TicketDetails = ({
                 baseIdsList={baseIdsList}
               />
             )}
-            {ticket?.status === SafTicketStatus.PENDING &&
-              ticket?.client === entity.name && (
-                <>
-                  <Button
-                    iconId="ri-check-line"
-                    customPriority="success"
-                    onClick={showAcceptModal}
-                    disabled={!canUpdateTicket}
-                  >
-                    {t("Accepter")}
-                  </Button>
-                  <Button
-                    iconId="ri-close-line"
-                    customPriority="danger"
-                    onClick={showRejectModal}
-                    disabled={!canUpdateTicket}
-                  >
-                    {t("Refuser")}
-                  </Button>
-                </>
-              )}
 
-            {ticket?.client !== entity.name &&
-              ticket?.status &&
-              [SafTicketStatus.PENDING, SafTicketStatus.REJECTED].includes(
-                ticket?.status
-              ) && (
+            {isClient && isPending && (
+              <>
+                <Button
+                  iconId="ri-check-line"
+                  customPriority="success"
+                  onClick={showAcceptModal}
+                  disabled={!canWrite}
+                >
+                  {t("Accepter")}
+                </Button>
                 <Button
                   iconId="ri-close-line"
                   customPriority="danger"
-                  onClick={showCancelModal}
-                  disabled={!canUpdateTicket}
+                  onClick={showRejectModal}
+                  disabled={!canWrite}
                 >
-                  {t("Annuler l'affectation")}
+                  {t("Refuser")}
                 </Button>
-              )}
+              </>
+            )}
+
+            {isSupplier && isCancelable && (
+              <Button
+                iconId="ri-close-line"
+                customPriority="danger"
+                onClick={showCancelModal}
+                disabled={!canWrite}
+              >
+                {t("Annuler l'affectation")}
+              </Button>
+            )}
           </>
         }
       >
         <section>
           <TicketFields ticket={ticket} />
         </section>
+
         <ClientComment ticket={ticket} />
 
         {ticket?.supplier === entity.name && (
@@ -148,6 +162,7 @@ export const TicketDetails = ({
             title={t("Volume parent")}
           />
         )}
+
         {ticketResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>

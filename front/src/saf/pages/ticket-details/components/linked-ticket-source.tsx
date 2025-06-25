@@ -1,6 +1,5 @@
 import { Button } from "common/components/button2"
 import { Collapse } from "common/components/collapse2"
-import { useLocation, useNavigate } from "react-router-dom"
 import { SafParentTicketSource } from "saf/types"
 
 const LinkedTicketSource = ({
@@ -10,20 +9,12 @@ const LinkedTicketSource = ({
   ticket_source?: SafParentTicketSource
   title: string
 }) => {
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  const showTicketSourceDetails = () => {
-    navigate({
-      pathname: location.pathname,
-      search: location.search,
-      hash: `ticket-source/${ticket_source?.id}`,
-    })
-  }
-
   return (
     <Collapse defaultExpanded label={title}>
-      <Button customPriority="link" onClick={showTicketSourceDetails}>
+      <Button
+        customPriority="link"
+        linkProps={{ href: `#ticket-source/${ticket_source?.id}` }}
+      >
         Volume #{ticket_source?.carbure_id}
       </Button>
     </Collapse>
