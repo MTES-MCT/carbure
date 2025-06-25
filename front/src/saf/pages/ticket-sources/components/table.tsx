@@ -6,12 +6,13 @@ import { memo, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useNavigate } from "react-router-dom"
 import { SafTicketSourcePreview, SafTicketSourceStatus } from "saf/types"
-import { TicketSourceTag } from "./tag"
 import { usePortal } from "common/components/portal"
 import { useNotify } from "common/components/notifications"
 import TicketsGroupedAssignment from "saf/components/assignment/grouped-assignment"
 import { Text } from "common/components/text"
 import { useSafRules } from "saf/hooks/useSafRules"
+import useEntity from "common/hooks/entity"
+import TicketSourceTag from "saf/components/ticket-source-tag"
 
 export interface TicketSourcesTableProps {
   loading: boolean
@@ -40,12 +41,15 @@ export const TicketSourcesTable = memo(
     const portal = usePortal()
     const notify = useNotify()
     const { canUpdateTicket } = useSafRules()
+    const entity = useEntity()
 
     const selectedTicketSources = useMemo(() => {
       return ticketSources.filter((ticketSource) =>
         selected.includes(ticketSource.id)
       )
     }, [ticketSources, selected])
+
+    const isAdmin = entity.isAdmin || entity.isExternal
 
     const totalVolume = selectedTicketSources.reduce(
       (total, ticketSource) => total + ticketSource.total_volume,
@@ -56,6 +60,8 @@ export const TicketSourcesTable = memo(
       0
     )
     const remainingVolume = totalVolume - assignedVolume
+
+    const canAssign = !isAdmin && status === SafTicketSourceStatus.AVAILABLE
 
     const handleTicketsAssigned = (
       volume: number,
@@ -93,7 +99,7 @@ export const TicketSourcesTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={ticketSources}
-        hasSelectionColumn={status === SafTicketSourceStatus.AVAILABLE}
+        hasSelectionColumn={canAssign}
         selectionText={t(
           "{{count}} volumes sélectionnés pour un total de {{remainingVolume}} L",
           {
@@ -107,6 +113,7 @@ export const TicketSourcesTable = memo(
         columns={compact([
           columns.status,
           columns.availableVolume,
+          isAdmin && columns.addedBy,
           columns.clients,
           columns.period,
           columns.feedstock,
@@ -151,6 +158,14 @@ export function useColumns() {
           )} L`}
           sub={`/${formatNumber(ticketSource.total_volume)} L`}
         />
+      ),
+    },
+
+    addedBy: {
+      key: "added_by",
+      header: t("Ajouté par"),
+      cell: (ticketSource: SafTicketSourcePreview) => (
+        <Cell text={ticketSource.added_by.name} />
       ),
     },
 
@@ -213,10 +228,9 @@ export function useColumns() {
     },
 
     parentLot: {
-      key: "parent_lot",
-      header: t("Lot parent"),
+      header: t("Parent"),
       cell: (ticketSource: SafTicketSourcePreview) => (
-        <ParentLotButton lot={ticketSource.parent_lot} />
+        <ParentButton ticketSource={ticketSource} />
       ),
     },
   }
@@ -225,21 +239,30 @@ export function useColumns() {
 export default TicketSourcesTable
 
 export interface ParentLotButtonProps {
-  lot?: SafTicketSourcePreview["parent_lot"]
+  ticketSource?: SafTicketSourcePreview
 }
 
-export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
+export const ParentButton = ({ ticketSource }: ParentLotButtonProps) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
 
-  if (!lot) return <Cell text={t("N/A")} />
+  let hash = "#"
+  let id = t("N/A")
 
-  const showLotDetails = () => {
+  if (ticketSource?.parent_ticket) {
+    id = ticketSource.parent_ticket.carbure_id ?? id
+    hash = `#ticket/${ticketSource.parent_ticket.id}`
+  } else if (ticketSource?.parent_lot) {
+    id = ticketSource.parent_lot.carbure_id ?? id
+    hash = `#lot/${ticketSource?.parent_lot.id}`
+  }
+
+  function showParentDetails() {
     navigate({
       pathname: location.pathname,
       search: location.search,
-      hash: `lot/${lot.id}`,
+      hash,
     })
   }
 
@@ -249,15 +272,15 @@ export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
         <Button
           captive
           customPriority="link"
-          title={t("Lot initial")}
-          onClick={showLotDetails}
+          title={t("Parent")}
+          onClick={showParentDetails}
         >
           <Text size="sm" is="span">
-            #{lot.carbure_id}
+            #{id}
           </Text>
         </Button>
       }
-      tooltipText={`#${lot.carbure_id}`}
+      tooltipText={`#${id}`}
     />
   )
 }

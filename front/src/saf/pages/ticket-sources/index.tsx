@@ -63,6 +63,8 @@ export const SafTicketSources = ({ year, snapshot }: TicketSourcesProps) => {
     params: [query],
   })
 
+  const isAdmin = entity.isAdmin || entity.isExternal
+
   const ticketSourcesData = ticketSourcesResponse.result?.data
   const ids = ticketSourcesData?.results.map((ticket) => ticket.id)
 
@@ -108,7 +110,7 @@ export const SafTicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
         <SafFilters
-          filters={FILTERS}
+          filters={isAdmin ? ADMIN_FILTERS : FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
@@ -176,4 +178,10 @@ const FILTERS = [
   SafFilter.CountriesOfOrigin,
   SafFilter.ProductionSites,
   SafFilter.DeliverySites,
+]
+
+const ADMIN_FILTERS = [
+  SafFilter.AddedBy, //
+  SafFilter.Suppliers,
+  ...FILTERS,
 ]
