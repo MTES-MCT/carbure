@@ -89,6 +89,7 @@ export const safTicketSource: SafTicketSourcePreview = {
     id: 1,
     carbure_id: "1",
   },
+  parent_ticket: undefined,
 }
 
 export const lotPreview: LotPreview = {
@@ -234,6 +235,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   ghg_total: 23.5,
   parent_ticket_source: safTicketSource,
   reception_airport: safAirport,
+  child_ticket_sources: [],
 }
 
 export const safTicketReceivedDetails: SafTicketDetails = {

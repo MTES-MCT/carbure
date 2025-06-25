@@ -1,12 +1,12 @@
 import { Button } from "common/components/button2"
 import { Collapse } from "common/components/collapse2"
-import { SafParentTicketSource } from "saf/types"
+import { SafRelatedTicketSource } from "saf/types"
 
 const LinkedTicketSource = ({
   ticket_source,
   title,
 }: {
-  ticket_source?: SafParentTicketSource
+  ticket_source?: SafRelatedTicketSource
   title: string
 }) => {
   return (

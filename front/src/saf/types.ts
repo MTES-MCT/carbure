@@ -137,4 +137,4 @@ export type SafTicketSource = apiTypes["SafTicketSource"]
 export type SafTicketSourceDetails = apiTypes["SafTicketSource"]
 
 export type SafTicketSourcePreview = apiTypes["SafTicketSourcePreview"]
-export type SafParentTicketSource = apiTypes["SafParentTicketSource"]
+export type SafRelatedTicketSource = apiTypes["SafRelatedTicketSource"]

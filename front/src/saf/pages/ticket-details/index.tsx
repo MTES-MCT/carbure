@@ -51,9 +51,12 @@ export const TicketDetails = ({
 
   const isClient = ticket?.client === entity.name
   const isSupplier = ticket?.supplier === entity.name
+  const isAdmin = entity.isAdmin || entity.isExternal
 
   const isPending = ticket?.status === SafTicketStatus.PENDING
   const isCancelable = isPending || ticket?.status === SafTicketStatus.REJECTED
+
+  const hasChildVolume = Boolean(ticket?.child_ticket_sources.length)
 
   const showCancelModal = () => {
     portal((close) => (
@@ -156,10 +159,17 @@ export const TicketDetails = ({
 
         <ClientComment ticket={ticket} />
 
-        {ticket?.supplier === entity.name && (
+        {(isSupplier || isAdmin) && (
           <LinkedTicketSource
-            ticket_source={ticket.parent_ticket_source}
+            ticket_source={ticket?.parent_ticket_source}
             title={t("Volume parent")}
+          />
+        )}
+
+        {hasChildVolume && (isClient || isAdmin) && (
+          <LinkedTicketSource
+            ticket_source={ticket?.child_ticket_sources[0]}
+            title={t("Volume enfant")}
           />
         )}
 
