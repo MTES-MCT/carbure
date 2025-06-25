@@ -9,6 +9,7 @@ import { getYears, getSnapshot } from "saf/api"
 import { SafTicketSources } from "./pages/ticket-sources"
 import { SafTickets } from "./pages/tickets"
 import LotDetails from "transaction-details/components/lots"
+import { LotDetails as AdminLotDetails } from "control-details/components/lot"
 import HashRoute from "common/components/hash-route"
 
 export const Saf = () => {
@@ -88,7 +89,19 @@ export const Saf = () => {
         />
       </Routes>
 
-      <HashRoute path="lot/:id" element={<LotDetails />} />
+      {entity.isAdmin && (
+        <HashRoute
+          path="lot/:id"
+          element={<AdminLotDetails neighbors={[]} />}
+        />
+      )}
+
+      {(entity.isAirline || entity.isOperator || entity.isSafTrader) && (
+        <HashRoute //
+          path="lot/:id"
+          element={<LotDetails />}
+        />
+      )}
     </Main>
   )
 }
