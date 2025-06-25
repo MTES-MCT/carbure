@@ -1,14 +1,20 @@
 from django.db.models import Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
 from elec.filters.transfer_certificates import TransferCertificateFilter
 from elec.models import ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights, HasElecTransferAdminRights
+from elec.permissions import (
+    HasCpoRights,
+    HasCpoWriteRights,
+    HasElecAdminRights,
+    HasElecOperatorRights,
+    HasElecOperatorWriteRights,
+    HasElecTransferAdminRights,
+)
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 from .mixins import ActionMixin
@@ -36,17 +42,15 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
     serializer_class = ElecTransferCertificateSerializer
     filterset_class = TransferCertificateFilter
     pagination_class = TransferCertificatePagination
-    permission_classes = [
-        IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights | HasElecTransferAdminRights)
-    ]
+    permission_classes = [HasCpoRights | HasElecOperatorRights | HasElecAdminRights | HasElecTransferAdminRights]
     lookup_field = "id"
     search_fields = ["supplier__name", "client__name", "certificate_id"]
 
     def get_permission(self):
         if self.action in ("accept", "reject"):
-            return [IsAuthenticated(), HasElecOperatorUserRights()]
+            return [HasElecOperatorWriteRights()]
         if self.action == "cancel":
-            return [IsAuthenticated(), HasCpoUserRights()]
+            return [HasCpoWriteRights()]
 
         return super().get_permissions()
 

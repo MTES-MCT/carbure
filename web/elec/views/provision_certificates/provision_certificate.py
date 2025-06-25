@@ -1,14 +1,13 @@
 from django.db.models import Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
 from elec.filters.provision_certificates import ProvisionCertificateFilter
 from elec.models import ElecProvisionCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights
+from elec.permissions import HasCpoRights, HasCpoWriteRights, HasElecAdminRights
 from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
 
 from .mixins import ActionMixin
@@ -36,15 +35,17 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
     serializer_class = ElecProvisionCertificateSerializer
     filterset_class = ProvisionCertificateFilter
     pagination_class = ProvisionCertificatePagination
-    permission_classes = [IsAuthenticated & (HasCpoUserRights | HasElecAdminRights)]
+    permission_classes = [HasCpoRights | HasElecAdminRights]
     lookup_field = "id"
     search_fields = ["cpo__name", "operating_unit"]
 
     def get_permissions(self):
-        if self.action in ("balance", "transfer"):
-            return [IsAuthenticated(), HasCpoUserRights()]
+        if self.action == "balance":
+            return [HasCpoRights()]
+        if self.action == "transfer":
+            return [HasCpoWriteRights()]
         if self.action == "import_certificates":
-            return [IsAuthenticated(), HasElecAdminRights()]
+            return [HasElecAdminRights()]
 
         return super().get_permissions()
 

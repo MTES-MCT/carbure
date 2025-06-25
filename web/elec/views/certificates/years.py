@@ -5,12 +5,11 @@ from drf_spectacular.utils import (
     extend_schema,
 )
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Entity
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights, HasElecTransferAdminRights
+from elec.permissions import HasCpoRights, HasElecAdminRights, HasElecOperatorRights, HasElecTransferAdminRights
 
 
 @extend_schema(
@@ -40,9 +39,7 @@ from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperat
     responses={200: {"type": "array", "items": {"type": "integer"}}},
 )
 @api_view(["GET"])
-@permission_classes(
-    [IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights | HasElecTransferAdminRights)]
-)
+@permission_classes([HasCpoRights | HasElecOperatorRights | HasElecAdminRights | HasElecTransferAdminRights])
 def get_years(request, *args, **kwargs):
     entity = request.entity
 

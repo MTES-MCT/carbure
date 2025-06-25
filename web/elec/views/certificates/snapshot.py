@@ -1,11 +1,10 @@
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from core.models import Entity
+from core.models import Entity, ExternalAdminRights
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperatorUserRights, HasElecTransferAdminRights
+from elec.permissions import HasCpoRights, HasElecAdminRights, HasElecOperatorRights, HasElecTransferAdminRights
 
 
 @extend_schema(
@@ -54,9 +53,7 @@ from elec.permissions import HasCpoUserRights, HasElecAdminRights, HasElecOperat
     },
 )
 @api_view(["GET"])
-@permission_classes(
-    [IsAuthenticated & (HasCpoUserRights | HasElecOperatorUserRights | HasElecAdminRights | HasElecTransferAdminRights)]
-)
+@permission_classes([HasCpoRights | HasElecOperatorRights | HasElecAdminRights | HasElecTransferAdminRights])
 def get_snapshot(request, *args, **kwargs):
     entity = request.entity
     year = request.query_params.get("year")
@@ -70,6 +67,8 @@ def get_snapshot(request, *args, **kwargs):
     elif entity.entity_type == Entity.OPERATOR:
         provision_certificates = provision_certificates.none()
         transfer_certificates = transfer_certificates.filter(client=entity)
+    elif entity.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
+        provision_certificates = provision_certificates.none()
 
     snapshot = {
         "provision_certificates_available": provision_certificates.filter(remaining_energy_amount__gt=0.01).count(),
