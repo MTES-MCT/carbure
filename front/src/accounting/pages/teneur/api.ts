@@ -6,7 +6,7 @@ import {
   Objectives,
   UnconstrainedCategoryObjective,
 } from "./types"
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
 
@@ -218,9 +218,5 @@ export const validateTeneurElec = async (entity_id: number) => {
 }
 
 export const downloadMacFossilFuel = (entity_id: number) => {
-  window.open(
-    `/api/tiruert/mac-fossil-fuel/export/?entity_id=${entity_id}`,
-    "_blank",
-    "noopener,noreferrer"
-  )
+  download("/tiruert/mac-fossil-fuel/export/", { entity_id })
 }

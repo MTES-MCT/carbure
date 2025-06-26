@@ -7803,12 +7803,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description No response body */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
       }
     }
   }

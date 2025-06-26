@@ -5725,7 +5725,15 @@ paths:
         - {}
       responses:
         "200":
-          description: No response body
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: mac_export.xlsx
+                  summary: Example of export response.
+          description: ""
   /api/tiruert/objectives/:
     get:
       operationId: objectives
