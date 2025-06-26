@@ -134,7 +134,7 @@ const Org = () => {
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
-  const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
+  const isTiruertAdmin = isExternal && entity.hasAdminRight("TIRIB")
   const isTransferredElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
   const userIsMTEDGEC = user?.rights.find(
@@ -144,19 +144,24 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
-      {(isIndustry || isPowerOrHeatProducer || isAdmin || allowAccounting) && (
-        <>
-          {(userIsMTEDGEC || allowAccounting || accise_number !== "") && (
-            <Route path="accounting/*" element={<MaterialAccounting />} />
-          )}
-          <Route path="transactions/:year/*" element={<Transactions />} />
 
+      {(isIndustry || isPowerOrHeatProducer) && (
+        <>
+          <Route path="transactions/:year/*" element={<Transactions />} />
           <Route
             path="transactions"
             element={<Navigate replace to={`${currentYear}`} />}
           />
           <Route path="*" element={<Navigate replace to="transactions" />} />
         </>
+      )}
+
+      {(userIsMTEDGEC ||
+        isAdmin ||
+        isTiruertAdmin ||
+        isOperator ||
+        accise_number !== "") && (
+        <Route path="accounting/*" element={<MaterialAccounting />} />
       )}
 
       {((has_saf && isOperator) || isSAFTrader) && (
