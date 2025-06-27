@@ -200,31 +200,28 @@ class Node:
             if not is_similar(new_value, old_value):
                 diff[attr] = (new_value, old_value)
 
-        if self._parent is None and self._children is None:
-            fields_to_nullify = [
-                "unknown_producer",
-                "unknown_production_site",
-                "production_site_double_counting_certificate",
-                "carbure_producer",
-                "carbure_production_site",
-                "production_site_certificate",
-                "production_country",
-            ]
-
-            # for production fields, if they are not in 'data', we nullify them
-            # (because frontend application doesn't send them if user empty them)
-            for field in fields_to_nullify:
-                if field not in data and hasattr(self.data, field):
-                    old_value = getattr(self.data, field)
-                    if old_value is not None:
-                        diff[field] = (None, old_value)
-
         # if an entity_id is specified, check if it has the right to apply the diff
         if entity_id is not None:
             allowed_diff = self.get_allowed_diff(diff, entity_id)
             if len(allowed_diff) != len(diff):
                 forbidden_fields = list(set(diff) - set(allowed_diff))
-                raise Exception(f"Forbidden to update the following attributes: {', '.join(forbidden_fields)}")
+
+                # filter out forbidden fields that have None or empty values
+                # these fields will be silently ignored instead of raising an error
+                significant_forbidden_fields = []
+                for field in forbidden_fields:
+                    new_value, old_value = diff[field]
+                    # consider a field significant if the new value is not None/empty
+                    if new_value is not None and new_value != "" and new_value != []:
+                        significant_forbidden_fields.append(field)
+                    else:
+                        # remove this field from the diff
+                        del diff[field]
+
+                if significant_forbidden_fields:
+                    raise Exception(
+                        f"Forbidden to update the following attributes: {', '.join(significant_forbidden_fields)}"
+                    )
 
         # apply the diff if everything went fine
         return self.apply_diff(diff)
