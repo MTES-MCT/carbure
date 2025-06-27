@@ -8,8 +8,8 @@ from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.carburetypes import CarbureError
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
-from transactions.api.lots.tests.tests_utils import get_lot
 from transactions.factories.certificate import GenericCertificateFactory
+from transactions.api.lots.tests.tests_utils import get_lot, lot_to_form_data
 from transactions.models import YearConfig
 
 
@@ -114,7 +114,10 @@ class LotsFlowTest(TestCase):
         lotdata["lot_id"] = lot.id
         lotdata["volume"] = 42000
         lotdata["delivery_date"] = "01/01/2022"
-        response = self.client.post(reverse("transactions-lots-update"), lotdata)
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            lot_to_form_data(lot, self.producer, **lotdata),
+        )
         assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.volume == 42000

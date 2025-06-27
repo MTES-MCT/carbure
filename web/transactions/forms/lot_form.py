@@ -80,11 +80,8 @@ class LotForm(forms.Form):
         quantity_data = {}
 
         for field in form_data:
-            # ignore fields that were not send as part of the request
-            if field not in self.data:
-                continue
             # if the option is enabled, skip empty fields
-            if ignore_empty and form_data[field] in ("", None):
+            if ignore_empty and (field not in self.data or form_data[field] in ("", None)):
                 continue
 
             lot_field = FORM_TO_LOT_FIELD.get(field, field)
@@ -92,9 +89,12 @@ class LotForm(forms.Form):
             if field in ("quantity", "unit", "volume", "weight", "lhv_amount"):
                 quantity_data[field] = form_data[field]
             elif field == "carbure_production_site":
-                producer = form_data["carbure_producer_id"]
-                if producer:
-                    lot_data["carbure_production_site"] = form_data[field].filter(created_by=producer).first()
+                if not form_data[field] or not form_data[field].exists():
+                    lot_data[field] = None
+                else:
+                    producer = form_data["carbure_producer_id"]
+                    if producer:
+                        lot_data["carbure_production_site"] = form_data[field].filter(created_by=producer).first()
             elif field == "carbure_delivery_site_depot_id":
                 lot_data["carbure_delivery_site"] = form_data[field].first()
             elif field in FORM_TO_LOT_FIELD:

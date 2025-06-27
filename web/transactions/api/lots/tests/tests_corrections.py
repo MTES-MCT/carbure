@@ -7,8 +7,8 @@ from django.urls import reverse
 from core.carburetypes import CarbureError
 from core.models import CarbureLot, Entity
 from core.tests_utils import setup_current_user
-from transactions.api.lots.tests.tests_utils import get_lot
 from transactions.factories.certificate import GenericCertificateFactory
+from transactions.api.lots.tests.tests_utils import get_lot, lot_to_form_data
 from transactions.models import YearConfig
 
 
@@ -108,7 +108,7 @@ class LotCorrectionTest(TestCase):
         assert lot.lot_status == CarbureLot.PENDING
         response = self.client.post(
             reverse("transactions-lots-update"),
-            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
+            lot_to_form_data(lot, self.producer, volume=42000),
         )
         assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
@@ -129,7 +129,7 @@ class LotCorrectionTest(TestCase):
         # we update
         response = self.client.post(
             reverse("transactions-lots-update"),
-            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
+            lot_to_form_data(lot, self.producer, volume=42000),
         )
         assert response.status_code == 200
 
