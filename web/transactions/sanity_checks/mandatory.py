@@ -56,15 +56,34 @@ def check_missing_production_site_comdate(lot: CarbureLot):
         )
 
 
-def check_production_info(lot: CarbureLot):
+def check_production_info(lot: CarbureLot, prefetched_data):
+    errors = []
     entity_is_simple_producer = lot.added_by.entity_type == Entity.PRODUCER and not lot.added_by.has_trading
     if entity_is_simple_producer and not (lot.carbure_producer and lot.carbure_production_site):
-        return generic_error(
-            error=CarbureSanityCheckErrors.MISSING_PRODUCTION_INFO,
-            lot=lot,
-            field="production_site",
-            is_blocking=True,
+        errors.append(
+            generic_error(
+                error=CarbureSanityCheckErrors.MISSING_PRODUCTION_INFO,
+                lot=lot,
+                field="production_site",
+                is_blocking=True,
+            )
         )
+
+    if (
+        lot.carbure_production_site
+        and lot.carbure_production_site.country.code_pays == "FR"
+        and lot.carbure_production_site.name.upper() not in prefetched_data["my_production_sites"]
+    ):
+        errors.append(
+            generic_error(
+                error=CarbureSanityCheckErrors.FR_PRODUCTION_SITE,
+                lot=lot,
+                field="production_site",
+                is_blocking=True,
+            )
+        )
+
+    return errors
 
 
 def check_missing_transport_document_reference(lot: CarbureLot):
