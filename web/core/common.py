@@ -14,7 +14,8 @@ from pandas._typing import Scalar
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import Carbure, CarbureUnit
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, Entity, GenericCertificate, TransactionDistance
+from core.models import Biocarburant, CarbureLot, GenericCertificate, TransactionDistance
+from transactions.models import ProductionSite
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 
@@ -205,18 +206,21 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None).strip()
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
-        if (
-            entity.entity_type == Entity.PRODUCER
-            and production_site.upper() in prefetched_data["my_production_sites"]
-            and (producer is None or producer == "" or producer.upper() == entity.name.upper() or not entity.has_trading)
-        ):
-            # I am the producer
-            lot["carbure_production_site"] = production_site
-            # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
+
+        carbure_production_site = ProductionSite.objects.filter(name=production_site).first()
+        if carbure_production_site:
+            lot["carbure_production_site"] = carbure_production_site.name
+            lot["unknown_production_site"] = ""
+            if carbure_production_site.producer:
+                lot["carbure_producer_id"] = carbure_production_site.producer.id
+            else:
+                lot["unknown_producer"] = producer
         else:
-            # I am not the producer
-            lot["unknown_producer"] = producer
             lot["unknown_production_site"] = production_site
+            lot["unknown_producer"] = producer
+            lot["carbure_production_site"] = ""
+            lot["carbure_producer_id"] = None
+
             lot["production_country_code"] = lot_row.get("production_site_country", None)
             lot["production_site_commissioning_date"] = lot_row.get("production_site_commissioning_date", "")
             supplier = lot_row.get("supplier", "").upper()
@@ -225,19 +229,14 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             else:
                 lot["unknown_supplier"] = supplier
 
-            # Auto-complétion des certificats de double comptage (seulement si je ne suis PAS le producteur)
-            double_counting_cert = lot["production_site_double_counting_certificate"]
-            if double_counting_cert and double_counting_cert in prefetched_data["double_counting_certificates"]:
-                dc_cert_variations = prefetched_data["double_counting_certificates"][double_counting_cert]
-                if dc_cert_variations:
-                    dc_cert = dc_cert_variations[0]
-                    if dc_cert.production_site:
-                        lot["unknown_producer"] = dc_cert.production_site.producer.name
-                        lot["unknown_production_site"] = dc_cert.production_site.name
-                        if dc_cert.production_site.country:
-                            lot["production_country_code"] = dc_cert.production_site.country.code_pays
-                        if dc_cert.production_site.date_mise_en_service:
-                            lot["production_site_commissioning_date"] = dc_cert.production_site.date_mise_en_service
+        double_counting_cert = lot["production_site_double_counting_certificate"]
+        if double_counting_cert and double_counting_cert in prefetched_data["double_counting_certificates"]:
+            dc_cert_variations = prefetched_data["double_counting_certificates"][double_counting_cert]
+            if dc_cert_variations:
+                dc_cert = dc_cert_variations[0]
+                if dc_cert.production_site:
+                    lot["carbure_producer_id"] = dc_cert.production_site.producer.id
+                    lot["carbure_production_site"] = dc_cert.production_site.name
 
         lot["vendor_certificate"] = lot_row.get("vendor_certificate", "")
         lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
