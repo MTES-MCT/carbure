@@ -2,7 +2,7 @@ import React from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
-import { Fieldset, useBind, useFormContext } from "common/components/form"
+import { Fieldset, useFormContext } from "common/components/form"
 import {
   DateInput,
   DateInputProps,
@@ -15,7 +15,6 @@ import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common/components/icons"
 import { Country, ProductionSite, EntityPreview } from "common/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
-import { compact, uniqueBy } from "common/utils/collection"
 import { isSAF } from "saf/utils/guards"
 
 interface ProductionFieldsProps {
@@ -41,57 +40,40 @@ export const ProducerField = (
   props: AutocompleteProps<EntityPreview | string>
 ) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const bind = useBind<LotFormValue>()
-
-  const { value: producer, ...bound } = bind("producer")
+  const { value, bind, setField } = useFormContext<LotFormValue>()
+  const producer = value.producer
   const isKnown = producer instanceof Object
 
-  if (entity.isAdmin) {
-    return (
-      <Autocomplete
-        label={t("Producteur")}
-        value={producer}
-        icon={isKnown ? UserCheck : undefined}
-        create={norm.identity}
-        defaultOptions={producer ? [producer] : undefined}
-        getOptions={api.findProducers}
-        normalize={norm.normalizeEntityPreviewOrUnknown}
-        {...bound}
-        {...props}
-      />
-    )
+  // Function to create unknown producer when user types free text
+  const createUnknownProducer = (text: string): string => {
+    return text
   }
 
-  // for entities that aren't producers, only show a simple text input to type an unknown producer
-  if (!entity.isProducer) {
-    return (
-      <TextInput
-        label={t("Producteur")}
-        icon={isKnown ? UserCheck : undefined}
-        value={isKnown ? producer.name : producer}
-        {...bound}
-        {...(props as TextInputProps)}
-      />
-    )
+  const handleChange = (newValue: EntityPreview | string | undefined) => {
+    setField("producer", newValue)
   }
 
-  const defaultOptions = uniqueBy(
-    compact([producer, entity]),
-    (v) => norm.normalizeEntityPreviewOrUnknown(v).label
-  )
+  // If producer is a string (unknown producer), add it to defaultOptions
+  // so the Autocomplete can display it correctly
+  const defaultOptions = React.useMemo(() => {
+    if (typeof producer === "string" && producer) {
+      return [producer]
+    }
+    return producer && typeof producer === "object" ? [producer] : undefined
+  }, [producer])
 
   return (
     <Autocomplete
       label={t("Producteur")}
       value={producer}
-      icon={isKnown ? UserCheck : undefined}
-      create={norm.identity}
       defaultOptions={defaultOptions}
+      icon={isKnown ? UserCheck : undefined}
+      getOptions={api.findProducers}
       normalize={norm.normalizeEntityPreviewOrUnknown}
-      {...bound}
+      create={createUnknownProducer}
+      onChange={handleChange}
+      error={bind("producer").error}
       {...props}
-      disabled={(!entity.has_trading && !entity.has_stocks) || bound.disabled}
     />
   )
 }
@@ -100,12 +82,33 @@ export const ProductionSiteField = (
   props: AutocompleteProps<ProductionSite | string>
 ) => {
   const { t } = useTranslation()
-  const { value, bind } = useFormContext<LotFormValue>()
+  const { value, bind, setField, setDisabledFields } =
+    useFormContext<LotFormValue>()
 
   const { value: productionSite, ...bound } = bind("production_site")
   const isKnown = productionSite instanceof Object
 
   const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
+
+  const handleChange = (newSite: ProductionSite | string | undefined) => {
+    setField("production_site", newSite)
+
+    if (!newSite) {
+      setField("production_country", undefined)
+      setField("production_site_commissioning_date", undefined)
+      setField("production_site_double_counting_certificate", undefined)
+      setDisabledFields([])
+    } else if (
+      typeof newSite === "object" &&
+      "dc_reference" in newSite &&
+      newSite.dc_reference
+    ) {
+      setField(
+        "production_site_double_counting_certificate",
+        newSite.dc_reference
+      )
+    }
+  }
 
   // for unknown producers, we show a simple input to type unknown production sites
   if (producer === undefined) {
@@ -114,7 +117,8 @@ export const ProductionSiteField = (
         label={t("Site de production")}
         icon={isKnown ? UserCheck : undefined}
         value={isKnown ? productionSite.name : productionSite}
-        {...bound}
+        onChange={(newValue) => handleChange(newValue)}
+        error={bound.error}
         {...(props as TextInputProps)}
       />
     )
@@ -130,7 +134,8 @@ export const ProductionSiteField = (
       defaultOptions={isKnown ? [productionSite] : undefined}
       getOptions={(query) => api.findProductionSites(query, producer)}
       normalize={norm.normalizeProductionSiteOrUnknown}
-      {...bound}
+      onChange={handleChange}
+      error={bound.error}
       {...props}
     />
   )
@@ -190,20 +195,6 @@ export const ProductionSiteDoubleCountingCertificateField = (
   const bound = bind("production_site_double_counting_certificate")
   const isKnown =
     value.production_site && typeof value.production_site === "object"
-  const dcProps = isKnown
-    ? {
-        ...props,
-        error: bound.error,
-        value:
-          value.production_site_double_counting_certificate ||
-          (value.production_site &&
-          typeof value.production_site === "object" &&
-          "dc_reference" in value.production_site
-            ? value.production_site.dc_reference
-            : undefined) ||
-          t("détection..."),
-      }
-    : { ...props, ...bound }
 
   const certificate =
     value.certificates?.production_site_double_counting_certificate ?? undefined
@@ -211,9 +202,12 @@ export const ProductionSiteDoubleCountingCertificateField = (
   if (isKnown) {
     return (
       <TextInput
+        disabled
         icon={<CertificateIcon certificate={certificate} />}
         label={t("Certificat double-comptage")}
-        {...dcProps}
+        value={value.production_site_double_counting_certificate || ""}
+        error={bound.error}
+        {...props}
       />
     )
   }
@@ -237,15 +231,8 @@ export const ProductionSiteDoubleCountingCertificateField = (
     )
     if (selected) {
       setField("production_country", selected.production_site.country)
-
-      if (!entity.isProducer) {
-        setField("producer", selected.producer.name)
-        setField("production_site", selected.production_site.name)
-      } else {
-        setField("producer", selected.producer)
-        setField("production_site", selected.production_site)
-      }
-
+      setField("producer", selected.producer)
+      setField("production_site", selected.production_site)
       setField(
         "production_site_commissioning_date",
         selected.production_site.date_mise_en_service
@@ -261,13 +248,13 @@ export const ProductionSiteDoubleCountingCertificateField = (
     <Autocomplete
       icon={<CertificateIcon certificate={certificate} />}
       label={t("Certificat double-comptage")}
-      {...dcProps}
       required={!isSAF(value.biofuel)}
       getOptions={getOptionsWithStore}
       normalize={(id: string) => ({ label: id, value: id })}
-      {...bound}
-      {...props}
+      value={value.production_site_double_counting_certificate || ""}
+      error={bound.error}
       onChange={handleChange}
+      {...props}
     />
   )
 }
