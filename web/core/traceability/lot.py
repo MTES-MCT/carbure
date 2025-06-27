@@ -145,6 +145,7 @@ class LotNode(Node):
         "production_country_id",
         "production_site_commissioning_date",
         "production_site_certificate",
+        "production_site_certificate_type",
         "production_site_double_counting_certificate",
         "eec",
         "el",
@@ -292,7 +293,7 @@ class LotNode(Node):
     def derive_fields(self, update):
         derived_fields = {}
         for field, value in update.items():
-            if field == "delivery_date":
+            if field == "delivery_date" and value:
                 derived_fields["year"] = value.year
                 derived_fields["period"] = value.year * 100 + value.month
             if field == "carbure_production_site" and value:
