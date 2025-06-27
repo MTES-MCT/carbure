@@ -86,5 +86,6 @@
   "DELIVERY_DATE_VALIDITY": "The delivery date of the batch is prior to the date of receipt of the stock from which it originates.",
   "MISSING_PRODUCTION_INFO": "Production information are missing",
   "UNKNOWN_CERTIFICATE": "The supplier certificate is unknown",
-  "INVALID_CERTIFICATE": "The supplier certificate is expired or not yet active for this delivery date"
+  "INVALID_CERTIFICATE": "The supplier certificate is expired or not yet active for this delivery date",
+  "FR_PRODUCTION_SITE": "You have selected a French production site. Only the producer can add batches of biofuels. Please contact the producer to add this batch."
 }
