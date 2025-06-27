@@ -199,16 +199,16 @@ class StocksFlowTest(TestCase):
         assert failed is None
 
         # 7: update a draft, check that volume is correctly adjusted
-        data = {
+        # Pour les lots issus de stock, on ne peut modifier que certains champs
+        update_data = {
+            "entity_id": self.producer.id,
             "lot_id": lot.id,
             "volume": 9000,
-            "entity_id": self.producer.id,
             "delivery_date": today,
-            "delivery_site_country_id": "DE",
             "transport_document_reference": "FR-UPDATED-DAE",
             "unknown_client": "FOREIGN CLIENT",
         }
-        response = self.client.post(reverse("transactions-lots-update"), data)
+        response = self.client.post(reverse("transactions-lots-update"), update_data)
         assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.volume == 9000  # volume updated
@@ -217,8 +217,12 @@ class StocksFlowTest(TestCase):
         assert stock.remaining_volume == 1000
 
         # 8 update a draft with more than volume left, ensure lot and stock are not updated
-        data["volume"] = 11000
-        response = self.client.post(reverse("transactions-lots-update"), data)
+        update_data_invalid = {
+            "entity_id": self.producer.id,
+            "lot_id": lot.id,
+            "volume": 11000,
+        }
+        response = self.client.post(reverse("transactions-lots-update"), update_data_invalid)
         assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.volume == 9000  # volume NOT updated
