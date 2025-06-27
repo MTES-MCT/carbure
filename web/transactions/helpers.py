@@ -8,7 +8,7 @@ from django.db.models.query import QuerySet
 
 from core.carburetypes import CarbureStockErrors, CarbureUnit
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
-from transactions.models import YearConfig
+from transactions.models import ProductionSite, YearConfig
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
 
@@ -100,7 +100,7 @@ def fill_production_info(lot, data, entity, prefetched_data):
     errors = []
     # possibilities:
     # Case 1: I have a parent_lot or parent_stock -> copy production info
-    # Case 2: I am a producer and this is my own production (unknown_producer is None) -> I am the producer, ensure production_site is known  # noqa: E501
+    # Case 2: Production site is known (carbure_production_site) -> fill production site, producer, production country, commissioning date, double counting certificate # noqa: E501
     # Case 3: all other cases (unknown producer / unknown production site) -> fill unknown_producer and unknown_production_site  # noqa: E501
 
     # CASE 1
@@ -115,25 +115,23 @@ def fill_production_info(lot, data, entity, prefetched_data):
         # NEW LOT
         lot.production_site_certificate = data.get("production_site_certificate", None)
         lot.production_site_certificate_type = data.get("production_site_certificate_type", None)
-        carbure_production_site = data.get("carbure_production_site", "").upper()
+        carbure_production_site = data.get("carbure_production_site", "")
+
         # CASE 2
-        if carbure_production_site and entity.entity_type == Entity.PRODUCER:
-            lot.carbure_producer = entity
-            lot.unknown_producer = None
-            if carbure_production_site in prefetched_data["my_production_sites"]:
-                lot.carbure_production_site = prefetched_data["my_production_sites"][carbure_production_site]
+        if carbure_production_site:
+            carbure_producer_id = data.get("carbure_producer_id", None)
+            if carbure_producer_id and int(carbure_producer_id) in prefetched_data["clients"]:
+                lot.carbure_producer = prefetched_data["clients"][int(carbure_producer_id)]
             else:
-                lot.carbure_production_site = None
-                errors.append(
-                    GenericError(
-                        lot=lot,
-                        field="carbure_production_site",
-                        error=COULD_NOT_FIND_PRODUCTION_SITE,
-                        value=carbure_production_site,
-                        display_to_creator=True,
-                        is_blocking=True,
-                    )
-                )
+                lot.carbure_producer = None
+            lot.unknown_producer = None
+
+            if carbure_production_site.upper() in prefetched_data["my_production_sites"]:
+                lot.carbure_production_site = prefetched_data["my_production_sites"][carbure_production_site.upper()]
+            else:
+                production_site = ProductionSite.objects.filter(name=carbure_production_site).first()
+                lot.carbure_production_site = production_site if production_site else None
+
             lot.unknown_production_site = None
             lot.production_country = lot.carbure_production_site.country if lot.carbure_production_site else None
             lot.production_site_commissioning_date = (
@@ -646,7 +644,7 @@ def bulk_insert_lots(
         .filter(added_by=entity)
         .order_by("-id")[0 : len(lots)]
     )
-    errors = reversed(errors)  # lots are fetched by DESC ID
+    errors = list(reversed(errors))  # lots are fetched by DESC ID, convert to list to avoid iterator consumption
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:
             e.lot_id = lot.id
