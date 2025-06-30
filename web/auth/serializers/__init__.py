@@ -1,4 +1,5 @@
 from .activate import ActivateAccountSerializer
+from .change_email import RequestEmailChangeSerializer, ConfirmEmailChangeSerializer, ChangeEmailErrors
 from .login import UserLoginSerializer
 from .request_activation_link import UserResendActivationLinkSerializer
 from .reset_password import ResetPasswordSerializer

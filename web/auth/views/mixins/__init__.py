@@ -1,16 +1,18 @@
 from .activate import ActivateAccountAction
+from .change_email import ChangeEmailActionMixin
 from .login import UserLoginAction
 from .logout import UserLogoutAction
 from .register import UserCreationAction
 from .request_activation_link import UserResendActivationLinkAction
 from .request_otp import RequestOTPAction
-from .verify_otp import VerifyOTPAction
-from .request_password_reset import RequestPasswordResetAction
 from .reset_password import ResetPasswordAction
+from .request_password_reset import RequestPasswordResetAction
+from .verify_otp import VerifyOTPAction
 
 
 class AuthActionMixin(
     ActivateAccountAction,
+    ChangeEmailActionMixin,
     UserLoginAction,
     UserLogoutAction,
     UserCreationAction,
