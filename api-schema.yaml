@@ -48,6 +48,57 @@ paths:
                     message: Could not activate user account
                   summary: Activation failed
           description: Bad request - missing fields.
+  /api/auth/confirm-email-change/:
+    post:
+      operationId: auth_confirm_email_change_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailChangeRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailChangeRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailChangeRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmEmailChangeSuccess"
+              examples:
+                Succès:
+                  value:
+                    status: success
+          description: Email mis à jour avec succès
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmEmailChangeError"
+              examples:
+                CodeIncorrect:
+                  value:
+                    error: OTP_NOT_OK
+                  summary: Code incorrect
+                CodeExpiré:
+                  value:
+                    error: OTP_CODE_EXPIRED
+                  summary: Code expiré
+                AucuneDemandeEnCours:
+                  value:
+                    error: NO_CHANGE_REQUEST
+                  summary: Aucune demande en cours
+          description: "Erreurs possibles: données invalides, aucune demande en cours,
+            code expiré, code incorrect"
   /api/auth/login/:
     post:
       operationId: auth_login_create
@@ -176,6 +227,55 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/auth/request-email-change/:
+    post:
+      operationId: auth_request_email_change_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestEmailChangeRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestEmailChangeRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestEmailChangeRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestEmailChangeSuccess"
+              examples:
+                Succès:
+                  value:
+                    status: otp_sent
+          description: Code OTP envoyé avec succès à la nouvelle adresse email
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestEmailChangeError"
+              examples:
+                ErreurDeValidation:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      new_email:
+                        - Cette adresse email est déjà utilisée par un autre
+                          compte.
+                      password:
+                        - Mot de passe incorrect.
+                  summary: Erreur de validation
+          description: "Erreurs possibles: données invalides, mot de passe incorrect,
+            email déjà utilisé"
   /api/auth/request-otp/:
     get:
       operationId: auth_request_otp_retrieve
@@ -8087,6 +8187,38 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
+    ConfirmEmailChangeError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur général
+        errors:
+          type: string
+          description: Détails des erreurs de validation
+        error:
+          type: string
+          description: Code d'erreur spécifique
+    ConfirmEmailChangeRequest:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+        otp_token:
+          type: string
+          minLength: 1
+          maxLength: 6
+      required:
+        - new_email
+        - otp_token
+    ConfirmEmailChangeSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: success
     ConsumptionTypeEnum:
       enum:
         - MAC
@@ -10796,6 +10928,38 @@ components:
       required:
         - entity_id
         - role
+    RequestEmailChangeError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur général
+        errors:
+          type: string
+          description: Détails des erreurs de validation
+        error:
+          type: string
+          description: Code d'erreur spécifique
+    RequestEmailChangeRequest:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - new_email
+        - password
+    RequestEmailChangeSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: otp_sent
     RequestPasswordResetRequest:
       type: object
       properties:

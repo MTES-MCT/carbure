@@ -12,3 +12,15 @@ export function revokeMyself(entity_id: number) {
     body: { entity_id },
   })
 }
+
+export function requestEmailChange(new_email: string, password: string) {
+  return (apiFetch as any).POST("/auth/request-email-change/", {
+    body: { new_email, password },
+  })
+}
+
+export function confirmEmailChange(new_email: string, otp_token: string) {
+  return (apiFetch as any).POST("/auth/confirm-email-change/", {
+    body: { new_email, otp_token },
+  })
+}

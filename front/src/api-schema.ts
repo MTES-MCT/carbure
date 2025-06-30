@@ -15,6 +15,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/auth/confirm-email-change/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_confirm_email_change_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/auth/login/": {
     parameters: {
       query?: never
@@ -73,6 +89,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["auth_request_activation_link_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-email-change/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_request_email_change_create"]
     delete?: never
     options?: never
     head?: never
@@ -2276,6 +2308,23 @@ export interface components {
       registered_zipcode: string
       registered_country: components["schemas"]["RegistrationCountry"]
     }
+    ConfirmEmailChangeError: {
+      /** @description Message d'erreur général */
+      message?: string
+      /** @description Détails des erreurs de validation */
+      errors?: string
+      /** @description Code d'erreur spécifique */
+      error?: string
+    }
+    ConfirmEmailChangeRequest: {
+      /** Format: email */
+      new_email: string
+      otp_token: string
+    }
+    ConfirmEmailChangeSuccess: {
+      /** @default success */
+      status: string
+    }
     /**
      * @description * `MAC` - MAC
      *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
@@ -3387,6 +3436,23 @@ export interface components {
       role: string
       entity_id: number
     }
+    RequestEmailChangeError: {
+      /** @description Message d'erreur général */
+      message?: string
+      /** @description Détails des erreurs de validation */
+      errors?: string
+      /** @description Code d'erreur spécifique */
+      error?: string
+    }
+    RequestEmailChangeRequest: {
+      /** Format: email */
+      new_email: string
+      password: string
+    }
+    RequestEmailChangeSuccess: {
+      /** @default otp_sent */
+      status: string
+    }
     RequestPasswordResetRequest: {
       username: string
     }
@@ -4060,6 +4126,41 @@ export interface operations {
       }
     }
   }
+  auth_confirm_email_change_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConfirmEmailChangeRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ConfirmEmailChangeRequest"]
+        "multipart/form-data": components["schemas"]["ConfirmEmailChangeRequest"]
+      }
+    }
+    responses: {
+      /** @description Email mis à jour avec succès */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConfirmEmailChangeSuccess"]
+        }
+      }
+      /** @description Erreurs possibles: données invalides, aucune demande en cours, code expiré, code incorrect */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConfirmEmailChangeError"]
+        }
+      }
+    }
+  }
   auth_login_create: {
     parameters: {
       query?: never
@@ -4161,6 +4262,41 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["UserCreation"]
+        }
+      }
+    }
+  }
+  auth_request_email_change_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RequestEmailChangeRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RequestEmailChangeRequest"]
+        "multipart/form-data": components["schemas"]["RequestEmailChangeRequest"]
+      }
+    }
+    responses: {
+      /** @description Code OTP envoyé avec succès à la nouvelle adresse email */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RequestEmailChangeSuccess"]
+        }
+      }
+      /** @description Erreurs possibles: données invalides, mot de passe incorrect, email déjà utilisé */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RequestEmailChangeError"]
         }
       }
     }
