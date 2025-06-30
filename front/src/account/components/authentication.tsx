@@ -204,13 +204,14 @@ export const AccountAuthentication = () => {
         <h1>
           <Trans>Identifiants</Trans>
         </h1>
-        {!isEditing && (
+        {!isEditing && user.email && (
           <Button
             asideX
             variant="primary"
             icon={Edit}
             label={t("Modifier mes identifiants")}
             action={() => setIsEditing(true)}
+            disabled={requestEmailChangeMutation.loading}
           />
         )}
       </header>
