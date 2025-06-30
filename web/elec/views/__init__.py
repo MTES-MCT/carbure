@@ -1,0 +1,1 @@
+from .charge_point import ChargePointViewSet
