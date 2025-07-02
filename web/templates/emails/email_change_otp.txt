@@ -4,10 +4,10 @@ Vous avez demandé à changer votre adresse email pour : {{ new_email }}
 
 Votre code de confirmation est : {{ otp_token }}
 
-Ce code expire à {{ token_expiry }}.
+Ce code est valable jusqu'à {{ token_expiry }}.
 
 Si vous n'avez pas demandé ce changement, veuillez ignorer cet email.
 
-Cordialement,
+Bonne journée,
+
 L'équipe CarbuRe
-{{ domain }}
