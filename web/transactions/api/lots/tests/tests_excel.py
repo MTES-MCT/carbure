@@ -181,11 +181,11 @@ class LotsExcelImportTest(TestCase):
 
         lots = self.send_excel(self.owner, "test_lot_template.xlsx")
 
-        assert lots.filter(carbure_producer=None).count() == 8
-        assert lots.filter(unknown_producer="Owner").count() == 3
+        assert lots.filter(carbure_producer=None).count() == 4
+        assert lots.filter(carbure_producer__name="Owner").count() == 4
 
-        assert lots.filter(carbure_production_site=None).count() == 8
-        assert lots.filter(unknown_production_site="Owner Production Site").count() == 4
+        assert lots.filter(carbure_production_site=None).count() == 4
+        assert lots.filter(carbure_production_site__name="Owner Production Site").count() == 4
 
         assert lots.filter(carbure_supplier=self.owner).count() == 6
         assert lots.filter(carbure_supplier=None, unknown_supplier="Unknown").count() == 2
@@ -212,11 +212,11 @@ class LotsExcelImportTest(TestCase):
 
         lots = self.send_excel(self.owner, "test_lot_template.xlsx")
 
-        assert lots.filter(carbure_producer=None).count() == 8
-        assert lots.filter(unknown_producer="Owner").count() == 3
+        assert lots.filter(carbure_producer=None).count() == 4
+        assert lots.filter(carbure_producer__name="Owner").count() == 4
 
-        assert lots.filter(carbure_production_site=None).count() == 8
-        assert lots.filter(unknown_production_site="Owner Production Site").count() == 4
+        assert lots.filter(carbure_production_site=None).count() == 4
+        assert lots.filter(carbure_production_site__name="Owner Production Site").count() == 4
 
         assert lots.filter(carbure_supplier=self.owner).count() == 6
         assert lots.filter(carbure_supplier=None, unknown_supplier="Unknown").count() == 2
