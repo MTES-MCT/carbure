@@ -1,1 +1,0 @@
-from .provision_certificate import ElecProvisionCertificateViewSet
