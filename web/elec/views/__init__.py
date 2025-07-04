@@ -1,1 +1,1 @@
-from elec.views.provision_certificate import ElecProvisionCertificateViewSet
+from elec.views.provision_certificate_qualicharge import ElecProvisionCertificateQualichargeViewSet
