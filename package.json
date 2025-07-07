@@ -18,8 +18,8 @@
     "translate-missing": "cd front; npm run translate-missing"
   },
   "engines": {
-    "node": "16.16.0",
-    "npm": "8.11"
+    "node": "22.17.0",
+    "npm": "10.9.2"
   },
   "cacheDirectories": [
     "front/node_modules"
