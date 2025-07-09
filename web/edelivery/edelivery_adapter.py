@@ -17,13 +17,12 @@ def request_headers():
 def send_SOAP_request(message):
     payload = f"""\
 <soap:Envelope
+  xmlns:eb="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/"
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-  xmlns:ns="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/"
-  xmlns:_1="http://eu.domibus.wsplugin/"
-  xmlns:xm="http://www.w3.org/2005/05/xmlmime">
+  xmlns:ws="http://eu.domibus.wsplugin/">
 
   <soap:Header>
-    <eb:Messaging xmlns:eb="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/">
+    <eb:Messaging>
       <eb:UserMessage>
         <eb:MessageInfo>
           <eb:Timestamp>{message.timestamp}</eb:Timestamp>
@@ -53,11 +52,11 @@ def send_SOAP_request(message):
   </soap:Header>
 
   <soap:Body>
-    <_1:submitRequest>
+    <ws:submitRequest>
       <payload payloadId="cid:message" contentType="text/xml">
         <value>{message.encoded()}</value>
       </payload>
-    </_1:submitRequest>
+    </ws:submitRequest>
   </soap:Body>
 </soap:Envelope>"""
 
