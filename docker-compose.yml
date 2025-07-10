@@ -42,6 +42,16 @@ services:
     networks:
       - carbure
 
+  carbure-test:
+    image: carbure_test:local
+    container_name: carbure_test
+    profiles: [test]
+    extends:
+      carbure-django
+    environment:
+      TEST: 1
+    command: "pipenv run python3 web/manage.py test web --keepdb"
+
   carbure-django:
     image: carbure_app:local
     container_name: carbure_app
