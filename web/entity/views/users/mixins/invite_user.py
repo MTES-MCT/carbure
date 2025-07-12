@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.utils.crypto import get_random_string
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
@@ -85,7 +86,7 @@ class InviteUserActionMixin:
             # Create a new user (non active) with a random password
             user = User.objects.create_user(
                 email=email,
-                password=User.objects.make_random_password(20),
+                password=get_random_string(length=20),
                 is_active=False,
             )
             user.save()
