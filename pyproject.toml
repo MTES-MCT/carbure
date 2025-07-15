@@ -18,7 +18,6 @@ select = [
     "B006", # Mutable argument default
     "B007", # unused loop variable
     "INP", # No PEP420
-    "PT", # Pytest rules
 ]
 ignore = [
     "T201", # Print
