@@ -1,8 +1,6 @@
 import i18n from "i18n"
-import formatTime from "date-fns/format"
-import formatDistanceToNow from "date-fns/formatDistanceToNow"
-import fr from "date-fns/locale/fr"
-import en from "date-fns/locale/en-GB"
+import { format as formatTime, formatDistanceToNow } from "date-fns"
+import { fr, enGB as en } from "date-fns/locale"
 import { ExtendedUnit, Unit } from "common/types"
 import i18next from "i18next"
 
@@ -117,12 +115,9 @@ export function formatDate(date: Date | string | null, format = "dd/MM/yyyy") {
   }
 
   try {
-    const formatted = formatTime(
-      new Date(date),
-      format,
-      // @ts-ignore it says it only want strings but it actually doesn't
-      { locale: i18n.language === "fr" ? fr : en }
-    )
+    const formatted = formatTime(new Date(date), format, {
+      locale: i18n.language === "fr" ? fr : en,
+    })
 
     return formatted
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
