@@ -26,13 +26,10 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             <>
               <Trans
                 i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d’un PCI théorique."
-                values={{
-                  mac: "mises à consommation 2023",
-                }}
                 components={{
                   a: (
                     <Download
-                      label="mises à consommation 2023"
+                      label={t("mises à consommation") + " 2023"}
                       linkProps={{
                         href: downloadMacFossilFuel(entity.id),
                       }}

@@ -50,7 +50,7 @@ export const QuotasTable = ({ quotas, dc_agreement_id }: QuotasTableProps) => {
       header: t("Lots concernés"),
       cell: (p) =>
         !p.lot_count ? (
-          t("-")
+          "-"
         ) : (
           <Button customPriority="link" linkProps={{ to: getPreviewURL(p) }}>
             {t("Voir les lots")} ({formatNumber(p.lot_count ?? 0)})
