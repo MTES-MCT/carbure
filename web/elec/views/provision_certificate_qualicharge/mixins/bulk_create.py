@@ -1,11 +1,8 @@
 from django.db import transaction
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.decorators import action, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework_api_key.permissions import HasAPIKey
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from core.models import Entity
 from elec.models import ElecProvisionCertificateQualicharge
@@ -26,8 +23,6 @@ class BulkCreateMixin:
         methods=["post"],
         url_path="bulk-create",
     )
-    @authentication_classes([JWTAuthentication])
-    @permission_classes([HasAPIKey & IsAuthenticated])
     def bulk_create(self, request, *args, **kwargs):
         serializer = ProvisionCertificateBulkSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)

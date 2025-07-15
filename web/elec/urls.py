@@ -1,4 +1,5 @@
 from django.urls import path
+
 from rest_framework_nested.routers import SimpleRouter
 
 from .api import urlpatterns as api_urlpatterns
@@ -7,6 +8,11 @@ from .views import ProvisionCertificateViewSet, TransferCertificateViewSet, get_
 router = SimpleRouter()
 router.register("provision-certificates", ProvisionCertificateViewSet, basename="provision-certificates")
 router.register("transfer-certificates", TransferCertificateViewSet, basename="transfer-certificates")
+router.register(
+    "provision-certificates-qualicharge",
+    ElecProvisionCertificateQualichargeViewSet,
+    basename="elec-provision-certificate-qualicharge",
+)
 
 urlpatterns = (
     api_urlpatterns
