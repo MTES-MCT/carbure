@@ -1,15 +1,12 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from rest_framework_nested.routers import SimpleRouter
 
 from elec.views import ElecProvisionCertificateQualichargeViewSet
 
-router = DefaultRouter()
+router = SimpleRouter()
 router.register(
-    r"provision-certificates-qualicharge",
+    "provision-certificates-qualicharge",
     ElecProvisionCertificateQualichargeViewSet,
     basename="elec-provision-certificate-qualicharge",
 )
 
-urlpatterns = [
-    path("", include(router.urls)),
-]
+urlpatterns = router.urls
