@@ -53,11 +53,30 @@ export const api = createClient<newPaths>({
 })
 api.use(middleware)
 
+/**
+ * Get the download url for a given endpoint and params
+ * @param endpoint - The endpoint to download from
+ * @param params - The params to pass to the endpoint
+ * @returns The download url
+ */
+export function getDownloadUrl<Path extends PathsWithGetMethod>(
+  endpoint: Path,
+  params: QueryParams<Path>
+) {
+  return API_ROOT + endpoint + "?" + toSearchParams(params)
+}
+
+/**
+ * Download a file from the given endpoint and params
+ * @param endpoint - The endpoint to download from
+ * @param params - The params to pass to the endpoint
+ * @returns The download url
+ */
 export function download<Path extends PathsWithGetMethod>(
   endpoint: Path,
   params: QueryParams<Path>
 ) {
-  return window.open(API_ROOT + endpoint + "?" + toSearchParams(params))
+  return window.open(getDownloadUrl(endpoint, params))
 }
 
 export function toSearchParams(params: any) {

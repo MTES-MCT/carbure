@@ -1,0 +1,15 @@
+.download {
+  display: inline-block;
+}
+
+.download [href] {
+  background-image: var(--underline-img), var(--underline-img);
+}
+
+.download.no-padding {
+  padding: 0;
+}
+
+.download.no-margin {
+  margin-bottom: 0;
+}

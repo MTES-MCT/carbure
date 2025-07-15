@@ -6,6 +6,7 @@ import { RecapData } from "../recap-data"
 import { floorNumber, formatNumber } from "common/utils/formatters"
 import useEntity from "common/hooks/entity"
 import { downloadMacFossilFuel } from "../../api"
+import { Download } from "common/components/download"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -24,31 +25,22 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           {!isAdminOrExternal && (
             <>
               <Trans
-                i18nKey="Ces objectifs sont calculés sur la base de vos <a>{{mac}}</a> et d’un PCI théorique."
+                i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d’un PCI théorique."
                 values={{
                   mac: "mises à consommation 2023",
                 }}
                 components={{
-                  strong: <strong />,
                   a: (
-                    <a
-                      className="fr-link--download fr-link"
-                      style={{
-                        backgroundImage:
-                          "var(--underline-img), var(--underline-img)",
+                    <Download
+                      label="mises à consommation 2023"
+                      linkProps={{
+                        href: downloadMacFossilFuel(entity.id),
                       }}
-                      download="true"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        downloadMacFossilFuel(entity.id)
-                      }}
-                      target="_blank"
-                      rel="noopener noreferrer"
                     />
                   ),
                 }}
               />
+              <br />
               <br />
             </>
           )}

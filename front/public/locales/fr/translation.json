@@ -165,7 +165,7 @@
   "Catégories objectivées": "Catégories objectivées",
   "Catégories pour lesquelles un objectif minimal est requis.": "Catégories pour lesquelles un objectif minimal est requis.",
   "Avancement global": "Avancement global",
-  "Ces objectifs sont calculés sur la base de vos <a>{{mac}}</a> et d’un PCI théorique.": "Ces objectifs sont calculés sur la base de vos <a>{{mac}}</a> et d’un PCI théorique.",
+  "Ces objectifs sont calculés sur la base de vos <a></a> et d’un PCI théorique.": "Ces objectifs sont calculés sur la base de vos <a></a> et d’un PCI théorique.",
   "Base calculée : {{energy_basis}} GJ": "Base calculée : {{energy_basis}} GJ",
   "Total annuel à la date du {{date}}": "Total annuel à la date du {{date}}",
   "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)": "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
