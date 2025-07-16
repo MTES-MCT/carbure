@@ -85,11 +85,11 @@ const OperationsBiofuels = () => {
         <>
           <Notice noColor variant="warning" isClosable={true}>
             {t(
-              'Vos opération d\'incorporation et de mise à consommation ont le statut "validé" par défaut dans le cadre de cette bêta.'
+              'Vos opérations d\'incorporation et de mise à consommation de biocarburants ont le statut "validé" par défaut dans le cadre de cette bêta.'
             )}
             <br />
             {t(
-              "Ce comportement est temporaire, dans l’attente de l’implémentation du mécanisme officiel de validation par les douanes."
+              "Ce comportement est temporaire, dans l’attente de l’implémentation du mécanisme officiel de validation par un tiers."
             )}
           </Notice>
           <RecapQuantity
