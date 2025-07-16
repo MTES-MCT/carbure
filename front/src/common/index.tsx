@@ -127,6 +127,7 @@ const Org = () => {
     isPowerOrHeatProducer,
     isSafTrader,
     has_elec,
+    has_saf,
     accise_number,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
@@ -138,7 +139,7 @@ const Org = () => {
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
-  const isSafOperator = isOperator && has_elec
+  const isSafOperator = isOperator && has_saf
 
   return (
     <Routes>

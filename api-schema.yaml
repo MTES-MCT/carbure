@@ -4236,10 +4236,8 @@ paths:
               type: string
               nullable: true
               enum:
-                - ""
                 - MAC
                 - MAC_DECLASSEMENT
-                - null
           description: |-
             * `MAC` - MAC
             * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
@@ -4623,10 +4621,8 @@ paths:
               type: string
               nullable: true
               enum:
-                - ""
                 - MAC
                 - MAC_DECLASSEMENT
-                - null
           description: |-
             * `MAC` - MAC
             * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
@@ -4808,10 +4804,8 @@ paths:
               type: string
               nullable: true
               enum:
-                - ""
                 - MAC
                 - MAC_DECLASSEMENT
-                - null
           description: |-
             * `MAC` - MAC
             * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT

@@ -12,7 +12,7 @@ import {
   PathsApiSafTicketSourcesGetParametersQueryOrder_by,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
-  ConsumptionTypeEnum as ConsumptionType,
+  PathsApiSafTicketsGetParametersQueryConsumption_type as ConsumptionType,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus,
 } from "api-schema"
 

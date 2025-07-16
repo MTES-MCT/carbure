@@ -2281,7 +2281,7 @@ export interface components {
      *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
      * @enum {string}
      */
-    ConsumptionTypeEnum: ConsumptionTypeEnum
+    ConsumptionTypeEnum: PathsApiSafTicketsGetParametersQueryConsumption_type
     /**
      * @description * `NO_PROBLEMO` - NO_PROBLEMO
      *     * `IN_CORRECTION` - IN_CORRECTION
@@ -6874,7 +6874,7 @@ export interface operations {
         client?: string[]
         /** @description * `MAC` - MAC
          *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
-        consumption_type?: ("" | "MAC" | "MAC_DECLASSEMENT" | null)[]
+        consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[]
         country_of_origin?: string[]
         /** @description Entity ID */
         entity_id: number
@@ -7108,7 +7108,7 @@ export interface operations {
         client?: string[]
         /** @description * `MAC` - MAC
          *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
-        consumption_type?: ("" | "MAC" | "MAC_DECLASSEMENT" | null)[]
+        consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[]
         country_of_origin?: string[]
         /** @description Entity ID */
         entity_id: number
@@ -7171,7 +7171,7 @@ export interface operations {
         client?: string[]
         /** @description * `MAC` - MAC
          *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
-        consumption_type?: ("" | "MAC" | "MAC_DECLASSEMENT" | null)[]
+        consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[]
         country_of_origin?: string[]
         /** @description Entity ID */
         entity_id: number
@@ -8509,6 +8509,10 @@ export enum PathsApiSafTicketSourcesGetParametersQueryStatus {
   AVAILABLE = "AVAILABLE",
   HISTORY = "HISTORY",
 }
+export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
+  MAC = "MAC",
+  MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
+}
 export enum PathsApiSafTicketsGetParametersQueryOrder_by {
   ValueMinusclient = "-client",
   ValueMinusconsumption_type = "-consumption_type",
@@ -8683,10 +8687,6 @@ export enum CertificateTypeEnum {
   ISCC = "ISCC",
   REDCERT = "REDCERT",
   Value2BS = "2BS",
-}
-export enum ConsumptionTypeEnum {
-  MAC = "MAC",
-  MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
 }
 export enum CorrectionStatusEnum {
   NO_PROBLEMO = "NO_PROBLEMO",

@@ -16,7 +16,9 @@ class TicketFilter(django_filters.FilterSet):
     supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
     country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
     production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
-    consumption_type = django_filters.AllValuesMultipleFilter(field_name="consumption_type")
+    consumption_type = django_filters.MultipleChoiceFilter(
+        field_name="consumption_type", choices=SafTicket.CONSUMPTION_TYPES
+    )
     reception_airport = django_filters.AllValuesMultipleFilter(field_name="reception_airport__name")
 
     order_by = django_filters.OrderingFilter(
