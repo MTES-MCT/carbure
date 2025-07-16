@@ -13,7 +13,6 @@ class EnvelopeTest(TestCase):
         message.initiator_id.return_value = "initiator"
         message.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
         message.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
-
         envelope = Envelope(message)
         expected_payload = """\
 <soap:Envelope
