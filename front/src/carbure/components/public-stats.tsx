@@ -1,6 +1,6 @@
 import { Main } from "common/components/scaffold"
 import useTitle from "common/hooks/title"
-import IframeResizer from "iframe-resizer-react"
+import IframeResizer from "@iframe-resizer/react"
 import { useTranslation } from "react-i18next"
 
 const currentYear = new Date().getFullYear()
@@ -16,6 +16,7 @@ const PublicStats = () => {
     <Main>
       <section>
         <IframeResizer
+          license="00000000-0000-0000-0000-000000000000"
           src={`${publicLink}?annee=${currentYear}#hide_parameters=annee`}
           frameBorder="0"
           allowTransparency

@@ -1,7 +1,7 @@
 import { Fieldset, useFormContext } from "common/components/form"
 import { BlankField, NumberInput, TextInput } from "common/components/input"
 import { formatGHG, formatPercentage } from "common/utils/formatters"
-import isAfter from "date-fns/isAfter"
+import { isAfter } from "date-fns"
 import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
 import useEntity from "common/hooks/entity"
