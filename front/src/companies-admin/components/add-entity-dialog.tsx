@@ -68,7 +68,7 @@ export const AddEntityDialog = ({
                 normalize={norm.normalizeEntityType}
                 options={
                   hasAirlineOnly
-                    ? [EntityType.Airline]
+                    ? [EntityType.Airline, EntityType.SAF_Trader]
                     : [
                         EntityType.Operator,
                         EntityType.Producer,
@@ -78,6 +78,7 @@ export const AddEntityDialog = ({
                         EntityType.ExternalAdmin,
                         EntityType.CPO,
                         EntityType.PowerOrHeatProducer,
+                        EntityType.SAF_Trader,
                       ]
                 }
                 {...bind("entity_type")}

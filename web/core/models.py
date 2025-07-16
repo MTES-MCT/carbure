@@ -51,6 +51,7 @@ class Entity(models.Model):
     UNKNOWN = "Unknown"
     CPO = "Charge Point Operator"
     POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
+    SAF_TRADER = "SAF Trader"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -62,6 +63,7 @@ class Entity(models.Model):
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
+        (SAF_TRADER, "Trader de SAF"),
     )
     UNIT_CHOICE = (("l", "litres"), ("kg", "kg"), ("MJ", "MJ"))
 
@@ -94,7 +96,7 @@ class Entity(models.Model):
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
     notifications_enabled = models.BooleanField(default=False)
     preferred_unit = models.CharField(max_length=64, choices=UNIT_CHOICE, default="l")
-    has_saf = models.BooleanField(default=False)
+    has_saf = models.BooleanField(default=False)  # flag to tell if an operator or an airline can trade SAF
     activity_description = models.TextField(blank=True, default="")
     website = models.URLField(blank=True, default="")
     vat_number = models.CharField(max_length=32, blank=True, default="")

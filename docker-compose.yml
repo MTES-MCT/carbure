@@ -34,6 +34,7 @@ services:
       VITE_APP_ENV: ${IMAGE_TAG}
       CHROMATIC_PROJECT_TOKEN: ${CHROMATIC_PROJECT_TOKEN}
       SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     build:
       context: ./front
     volumes:
@@ -41,6 +42,16 @@ services:
       - /app/node_modules
     networks:
       - carbure
+
+  carbure-test:
+    image: carbure_test:local
+    container_name: carbure_test
+    profiles: [test]
+    extends:
+      carbure-django
+    environment:
+      TEST: 1
+    command: "pipenv run python3 web/manage.py test web --keepdb"
 
   carbure-django:
     image: carbure_app:local

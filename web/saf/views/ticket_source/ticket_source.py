@@ -1,15 +1,20 @@
 from django.db.models import F, Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, UserRights
+from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
-from core.permissions import HasUserRights
 from saf.filters import TicketSourceFilter
 from saf.models import SafTicketSource
-from saf.serializers import SafTicketSourceDetailsSerializer, SafTicketSourceSerializer
+from saf.permissions import (
+    HasSafAdminRights,
+    HasSafOperatorRights,
+    HasSafOperatorWriteRights,
+    HasSafTraderRights,
+    HasSafTraderWriteRights,
+)
+from saf.serializers import SafTicketSourcePreviewSerializer, SafTicketSourceSerializer
 
 from .mixins import ActionMixin
 
@@ -20,12 +25,21 @@ class SafTicketSourcePagination(MetadataPageNumberPagination):
     }
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+)
 class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, ActionMixin):
     lookup_field = "id"
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.OPERATOR]),
-    )
+    queryset = SafTicketSource.objects.all()
+    permission_classes = [HasSafOperatorRights | HasSafTraderRights | HasSafAdminRights]
     serializer_class = SafTicketSourceSerializer
     pagination_class = SafTicketSourcePagination
     filterset_class = TicketSourceFilter
@@ -40,40 +54,25 @@ class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet,
     ]
 
     def get_permissions(self):
-        if self.action in ["grouped_assign", "assign", "credit"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
+        if self.action in ["grouped_assign", "assign"]:
+            return [(HasSafOperatorWriteRights | HasSafTraderWriteRights)()]
         return super().get_permissions()
 
     def get_serializer_class(self):
-        if self.action == "retrieve":
-            return SafTicketSourceDetailsSerializer
+        if self.action == "list":
+            return SafTicketSourcePreviewSerializer
         return super().get_serializer_class()
 
     def get_queryset(self):
-        queryset = SafTicketSource.objects.none()
-        if self.request and not self.request.user.is_anonymous:
-            queryset = (
-                SafTicketSource.objects.select_related(
-                    "feedstock",
-                    "biofuel",
-                    "country_of_origin",
-                    "carbure_production_site",
-                )
-                .prefetch_related("saf_tickets")
-                .prefetch_related("saf_tickets__client")
-            )
-        return queryset
+        queryset = super().get_queryset()
 
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        entity = self.request.entity
+        if entity.entity_type in (Entity.OPERATOR, Entity.SAF_TRADER):
+            queryset = queryset.filter(added_by=entity)
+
+        return queryset.prefetch_related("saf_tickets", "saf_tickets__client").select_related(
+            "feedstock",
+            "biofuel",
+            "country_of_origin",
+            "carbure_production_site",
+        )

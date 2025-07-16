@@ -2,7 +2,7 @@ import time
 
 import openpyxl
 from django.http import HttpResponse
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from openpyxl.utils import get_column_letter
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
@@ -20,7 +20,19 @@ from tiruert.models import MacFossilFuel
             description="Authorised entity ID.",
             required=True,
         ),
-    ]
+    ],
+    examples=[
+        OpenApiExample(
+            "Example of export response.",
+            value="mac_export.xlsx",
+            request_only=False,
+            response_only=True,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
+    ],
+    responses={
+        (200, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"): OpenApiTypes.STR,
+    },
 )
 class MacFossilFuelExportViewSet(GenericViewSet):
     queryset = MacFossilFuel.objects.all()

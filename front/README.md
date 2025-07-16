@@ -84,7 +84,7 @@ elec/
         index.tsx
         types.ts
         charge-points/
-          admin-audit-charge-points.spec.tsx 
+          admin-audit-charge-points.spec.tsx
           index.tsx
         meter-readings/
           index.tsx
@@ -122,18 +122,49 @@ You'll then need to go to Chromatic if the visual differences between the previo
 ## Type safety between frontend and backend
 
 ### Schema generation
+
 The backend exposes its data structure through a YAML schema. This schema can be generated using the `generate-schema` command in the root package.json. This command will analyze the Python backend code and create a comprehensive OpenAPI schema that describes all available endpoints and their data types.
 
 ### Converting YAML to TypeScript
+
 The `generate-schema-ts` command handles the full process of generating TypeScript types from the backend schema:
+
 1. First, it generates the YAML schema from the Python code
 2. Then, it processes this schema through a JavaScript script that can override specific schema information (particularly useful for enums where value names need to be used as variable names)
 3. Finally, it uses the `openapi-typescript` library to convert the processed YAML schema into TypeScript type definitions
 
 ### Development workflow
+
 During development, to ensure that backend changes haven't impacted the frontend type safety, you can run the `generate-and-check-types` command from the root directory. This command will:
+
 1. Generate a fresh schema from the current backend state
 2. Convert it to TypeScript types
 3. Run the TypeScript compiler to check for any type errors that might have been introduced by the backend changes
 
 This workflow ensures strong type safety between the frontend and backend, catching potential integration issues early in the development process.
+
+## Translations
+
+Translation files are placed inside the `front/public/locales` folder. Each direct subfolder there should be named after a language code (ex: fr, en).
+Inside those subfolders, there should be `.json` files, that contain a simple object with only key/value pairs.
+
+To use translations in frontend code, you have two methods:
+
+- using the react-i18next hook
+- using the `<Trans>` component
+
+You can find more details about their use in the [official documentation](https://react.i18next.com/guides/quick-start#translate-your-content).
+
+If no namespace is specified when using those tools, the translations will be located in the file `{locale}/translation.json`.
+
+You can prefill this file automatically by calling the command `npm run translate`: it will detect all the places where i18next is used in frontend code, and generate key/value pairs for each translation found.
+
+Each new detected key will be added to the translation files of each locale, and then 3 operations must be done manually:
+
+- On the french translation file, find each key where `count` was used ([https://www.i18next.com/translation-function/plurals]()), and adapt the value for each case (`{key}_one`, `{key}_many`, `{key}_other`)
+- Once the french side is done, run the following command `npm run translate-missing`: it will find all the untranslated keys inside the english translation file, and translate them automatically using the free DeepL API
+- Double-check that the new english translations are correct before committing.
+
+> [!NOTE]
+> For the automatic translation to work, you'll need to add a DEEPL_API_KEY in your local .env
+> You can either create your own key with your personal DeepL account (recommended), or use the shared one that you can find in Vaultwarden.

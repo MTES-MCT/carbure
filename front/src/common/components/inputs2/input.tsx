@@ -10,7 +10,11 @@ type CommonInputProps = {
 // Props to be exposed to all inputs (text/number/date etc...)
 export type InputProps = Omit<
   InputPropsDSFR,
-  "nativeInputProps" | "textArea" | "nativeTextAreaProps" | "label"
+  | "nativeInputProps"
+  | "textArea"
+  | "nativeTextAreaProps"
+  | "label"
+  | "nativeLabelProps"
 > &
   ExtendedInputProps &
   CommonInputProps

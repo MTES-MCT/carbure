@@ -151,6 +151,10 @@ section.actionbar {
   white-space: pre-wrap;
 }
 
+.row--gap-md {
+  gap: var(--spacing-2w);
+}
+
 .grid {
   --grid-cell-width: 192px;
   display: grid;
@@ -162,6 +166,10 @@ section.actionbar {
 
 .grid--gap-xl {
   grid-gap: var(--spacing-4w);
+}
+
+.grid--gap-lg {
+  grid-gap: var(--spacing-3w);
 }
 
 .grid > * {
@@ -192,6 +200,10 @@ section.actionbar {
   height: 1px;
   background-color: var(--border-default-grey);
   margin: var(--spacing-2w) 0;
+}
+
+.divider--no-margin::after {
+  margin: 0;
 }
 
 hr {

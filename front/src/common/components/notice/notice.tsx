@@ -7,7 +7,7 @@
 import { useState } from "react"
 import cl from "clsx"
 import css from "./notice.module.css"
-import { IconProps } from "../icon"
+import { Icon, IconName } from "../icon"
 import { Button } from "../button2"
 
 type CustomRenderer = (config: { close: () => void }) => React.ReactNode
@@ -15,7 +15,7 @@ export type NoticeVariant = "info" | "warning" | "alert"
 
 export interface NoticeProps {
   variant?: NoticeVariant
-  icon?: React.ComponentType<IconProps> | null
+  icon?: IconName
   title?: string
   children?: React.ReactNode | CustomRenderer
 
@@ -38,7 +38,7 @@ export interface NoticeProps {
 
 export const Notice = ({
   variant = "info",
-  icon: Icon,
+  icon,
   title,
   children,
   className,
@@ -77,7 +77,9 @@ export const Notice = ({
     >
       <div className={css.notice__body}>
         <div className={css["notice__body-content"]}>
-          {Icon ? <Icon size="md" className={css.notice__icon} /> : null}
+          {icon ? (
+            <Icon name={icon} size="md" className={css.notice__icon} />
+          ) : null}
           {title && (
             <span className={css.notice__title}>
               <strong>{title}</strong>

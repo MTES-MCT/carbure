@@ -1,0 +1,7 @@
+.select-field-children {
+  margin-top: var(--spacing-1w);
+}
+
+.no-margin-bottom:global(.fr-select-group) {
+  margin-bottom: 0;
+}
