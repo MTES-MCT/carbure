@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import logging
 import os
 
 import environ
@@ -404,3 +405,6 @@ SPECTACULAR_SETTINGS = {
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
     # OTHER SETTINGS
 }
+
+if env("TEST"):
+    REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET

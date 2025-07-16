@@ -20,6 +20,7 @@ export function addCompany(
       name,
       has_saf,
       has_elec,
+      entity_type,
     },
   })
 }

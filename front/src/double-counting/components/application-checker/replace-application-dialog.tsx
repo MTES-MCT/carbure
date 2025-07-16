@@ -1,6 +1,5 @@
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
-import { Plus, Return } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useTranslation } from "react-i18next"
 
 export type ReplaceApplicationDialogProps = {
@@ -21,29 +20,18 @@ export const ReplaceApplicationDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Remplacer le dossier existant")}</h1>
-      </header>
-
-      <main>
-        <p>
-          {t(
-            "Le dossier que vous souhaitez ajouter existe déjà. Voulez-vous le remplacer ?"
-          )}
-        </p>
-      </main>
-
-      <footer>
-        <Button
-          icon={Plus}
-          label={t("Remplacer le dossier")}
-          variant="primary"
-          action={replaceApplication}
-        />
-
-        <Button icon={Return} label={t("Annuler")} action={onClose} asideX />
-      </footer>
+    <Dialog
+      onClose={onClose}
+      header={<Dialog.Title>{t("Remplacer le dossier existant")}</Dialog.Title>}
+      footer={
+        <Button iconId="fr-icon-add-line" onClick={replaceApplication}>
+          {t("Remplacer le dossier")}
+        </Button>
+      }
+    >
+      {t(
+        "Le dossier que vous souhaitez ajouter existe déjà. Voulez-vous le remplacer ?"
+      )}
     </Dialog>
   )
 }

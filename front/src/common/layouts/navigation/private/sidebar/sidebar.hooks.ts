@@ -35,7 +35,7 @@ export const usePrivateSidebar = () => {
   return [
     admin,
     ...biofuels,
-    doubleCount,
+    ...doubleCount,
     ...elec,
     ...chargePoints,
     saf,

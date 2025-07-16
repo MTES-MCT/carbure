@@ -57,6 +57,14 @@ export const ROUTE_URLS = {
     }
   },
 
+  DOUBLE_COUNTING: (entity_id: number) => {
+    const baseUrl = urlWithOrgId(entity_id, "/double-counting")
+
+    return {
+      AGREEMENTS: `${baseUrl}/agreements`,
+    }
+  },
+
   ELEC: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/elec/${year}`)
 

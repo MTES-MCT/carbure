@@ -7,6 +7,8 @@ import {
   FileDownloadLine,
   FileTextFill,
   FileTextLine,
+  HomeFill,
+  HomeLine,
 } from "common/components/icon"
 import { apiTypes } from "common/services/api-fetch.types"
 
@@ -18,9 +20,22 @@ type DoubleCountParams = Pick<
 export const useDoubleCount = (params?: DoubleCountParams) => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { isAdmin, hasAdminRight } = useEntity()
+  const { isAdmin, hasAdminRight, isProducer } = useEntity()
 
   const doubleCount: MenuSection = {
+    title: t("Double-comptage"),
+    condition: isProducer,
+    children: [
+      {
+        path: routes.DOUBLE_COUNTING().AGREEMENTS,
+        title: t("Agréments"),
+        icon: HomeLine,
+        iconActive: HomeFill,
+      },
+    ],
+  }
+
+  const doubleCountAdmin: MenuSection = {
     title: t("Double-comptage"),
     condition: isAdmin || hasAdminRight("DCA"),
     children: [
@@ -40,5 +55,5 @@ export const useDoubleCount = (params?: DoubleCountParams) => {
     ],
   }
 
-  return doubleCount
+  return [doubleCount, doubleCountAdmin]
 }

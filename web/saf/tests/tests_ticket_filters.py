@@ -46,7 +46,7 @@ class SafTicketFiltersTest(TestCase):
             "year": 2021,
             "status": "PENDING",
             "type": "assigned",
-            "filter": "feedstocks",
+            "filter": "feedstock",
         }
         response = self.client.get(reverse("saf-tickets-filters"), query)
         assert response.status_code == 200
@@ -58,7 +58,7 @@ class SafTicketFiltersTest(TestCase):
             "year": 2022,
             "status": "PENDING",
             "type": "assigned",
-            "filter": "feedstocks",
+            "filter": "feedstock",
         }
         response = self.client.get(reverse("saf-tickets-filters"), query)
 
@@ -71,8 +71,8 @@ class SafTicketFiltersTest(TestCase):
             "year": 2022,
             "status": "PENDING",
             "type": "assigned",
-            "filter": "feedstocks",
-            "periods": 202201,
+            "filter": "feedstock",
+            "period": 202201,
         }
         response = self.client.get(reverse("saf-tickets-filters"), query)
 
@@ -85,7 +85,7 @@ class SafTicketFiltersTest(TestCase):
             "year": 2022,
             "status": "PENDING",
             "type": "assigned",
-            "filter": "periods",
+            "filter": "period",
         }
         response = self.client.get(reverse("saf-tickets-filters"), query)
 
@@ -98,7 +98,7 @@ class SafTicketFiltersTest(TestCase):
             "year": 2022,
             "status": "PENDING",
             "type": "assigned",
-            "filter": "clients",
+            "filter": "client",
         }
         response = self.client.get(reverse("saf-tickets-filters"), query)
 

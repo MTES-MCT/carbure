@@ -1,10 +1,9 @@
 import { AxiosError } from "axios"
 import useEntity from "common/hooks/entity"
-import Button, { ExternalLink } from "common/components/button"
-import Dialog from "common/components/dialog"
-import { Form, useForm } from "common/components/form"
-import { Check, Return, Upload } from "common/components/icons"
-import { FileInput } from "common/components/input"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
+import { Form, useForm } from "common/components/form2"
+import { FileInput } from "common/components/inputs2"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -56,14 +55,10 @@ const DoubleCountingFilesCheckerDialog = ({
 
   async function submitFile() {
     if (!value.doubleCountingFile) return
-    const resp = await uploadFile.execute(
-      entity.id,
-      value.doubleCountingFile as File
-    )
+    const resp = await uploadFile.execute(entity.id, value.doubleCountingFile)
     const checkedFile = resp.data?.file
 
     if (checkedFile) {
-      onClose()
       if (checkedFile.error_count) {
         portal((close) => (
           <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />
@@ -81,59 +76,60 @@ const DoubleCountingFilesCheckerDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Vérification de dossier de double comptage")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <Form id="dc-checker">
-            <p>
-              {t(
-                "Cet outil vous permet de vérifier le dossier au format Excel avant de l'envoyer à la DGEC."
-              )}
-            </p>
-            <p>
-              <Trans>
-                Le modèle Excel à remplir est disponible{" "}
-                <ExternalLink
-                  href={
-                    "https://ecologie.gouv.fr/sites/default/files/documents/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202025_1.xlsx"
-                  }
-                >
-                  sur ce lien
-                </ExternalLink>
-                .
-              </Trans>
-            </p>
-            <FileInput
-              loading={uploadFile.loading}
-              icon={value.doubleCountingFile ? Check : Upload}
-              label={t("Importer le fichier excel à analyser")}
-              placeholder={
-                value.doubleCountingFile
-                  ? value.doubleCountingFile.name
-                  : t("Choisir un fichier")
-              }
-              {...bind("doubleCountingFile")}
-            />
-          </Form>
-        </section>
-      </main>
-
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={
+        <Dialog.Title>
+          {t("Vérification de dossier de double comptage")}
+        </Dialog.Title>
+      }
+      footer={
         <Button
-          submit="dc-request"
+          nativeButtonProps={{ form: "dc-checker" }}
           loading={uploadFile.loading}
           disabled={!value.doubleCountingFile}
-          variant="primary"
-          icon={Check}
-          action={submitFile}
-          label={t("Vérifier le fichier")}
-        />
-        <Button icon={Return} action={onClose} label={t("Annuler")} />
-      </footer>
+          onClick={submitFile}
+          type="submit"
+          iconId="ri-check-line"
+        >
+          {t("Vérifier le fichier")}
+        </Button>
+      }
+    >
+      <Form id="dc-checker">
+        <p>
+          {t(
+            "Cet outil vous permet de vérifier le dossier au format Excel avant de l'envoyer à la DGEC."
+          )}
+        </p>
+        <p>
+          <Trans>
+            Le modèle Excel à remplir est disponible{" "}
+            <Button
+              linkProps={{
+                href: "https://www.ecologie.gouv.fr/sites/default/files/documents/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202024_0.xlsx",
+              }}
+              customPriority="link"
+            >
+              sur ce lien
+            </Button>
+            .
+          </Trans>
+        </p>
+        <div>
+          <hr />
+          <FileInput
+            loading={uploadFile.loading}
+            label={t("Importer le dossier double comptage à analyser")}
+            placeholder={
+              value.doubleCountingFile
+                ? value.doubleCountingFile.name
+                : t("Choisir un fichier")
+            }
+            {...bind("doubleCountingFile")}
+          />
+        </div>
+      </Form>
     </Dialog>
   )
 }

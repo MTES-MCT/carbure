@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { FileInput } from "./file-input"
+import { useState } from "react"
 
 const meta: Meta<typeof FileInput> = {
   component: FileInput,
@@ -9,6 +10,10 @@ const meta: Meta<typeof FileInput> = {
   },
   parameters: {
     chromatic: { disableSnapshot: true },
+  },
+  render: (args) => {
+    const [file, setFile] = useState<File>()
+    return <FileInput {...args} value={file} onChange={setFile} />
   },
 }
 

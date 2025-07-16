@@ -655,8 +655,10 @@ def get_agreement_quotas(agreement: DoubleCountingRegistration):
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
     # tous les couples BC / MP pour le site de production sur une année
-    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota", "year").filter(
-        dca_id=application.id, approved_quota__gt=0
+    detailed_quotas = (
+        DoubleCountingProduction.objects.select_related("biofuel", "feedstock")
+        .values("biofuel", "feedstock", "approved_quota", "year")
+        .filter(dca_id=application.id, approved_quota__gt=0)
     )
 
     # tous les lots pour des MP double compté pour le site de production regroupé par couple et par année
@@ -747,3 +749,12 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
             sourcing_data.append(sourcing)
 
     return sourcing_data, sourcing_errors
+
+
+def check_has_dechets_industriels(production_data):
+    if production_data is None:
+        return False
+    for row in production_data:
+        if row["feedstock"]["code"] in ["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]:
+            return True
+    return False

@@ -17,13 +17,22 @@ class TestCase(DjangoTestCase):
 
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
+        self.airline = Entity.objects.create(name="Airline", entity_type=Entity.AIRLINE)
         self.ticket_client = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
+
         self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN"), (self.airline, "ADMIN")]
         )
         
         self.client1 = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
         self.client2 = Entity.objects.filter(entity_type=Entity.OPERATOR)[2]
+
+        self.entity.has_saf = True
+        self.entity.save()
+        self.ticket_client.has_saf = True
+        self.ticket_client.save()
+        self.client2.has_saf = True
+        self.client2.save()
 
         SafTicketSource.objects.all().delete()
         self.ticket_source = SafTicketSourceFactory.create(
