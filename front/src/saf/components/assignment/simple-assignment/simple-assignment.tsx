@@ -9,14 +9,13 @@ import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSourceDetails } from "saf/pages/operator/types"
-import * as api from "../../../pages/operator/api"
+import * as api from "saf/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "../period-select"
 import { VolumeInput } from "../volume-input"
 import { ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
-import { ConsumptionType } from "saf/types"
+import { ConsumptionType, SafTicketSourceDetails } from "saf/types"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails

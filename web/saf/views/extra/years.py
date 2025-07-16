@@ -1,5 +1,3 @@
-import traceback
-
 from django.db.models import Q
 from drf_spectacular.utils import (
     OpenApiExample,
@@ -7,14 +5,12 @@ from drf_spectacular.utils import (
     OpenApiTypes,
     extend_schema,
 )
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Entity
-from core.permissions import HasUserRights
 from saf.models import SafTicket, SafTicketSource
+from saf.permissions import HasAirlineRights, HasSafAdminRights, HasSafOperatorRights, HasSafTraderRights
 from saf.serializers.schema import ErrorResponseSerializer
 
 
@@ -51,25 +47,23 @@ class ExtraError:
     responses={200: {"type": "array", "items": {"type": "integer"}}, 400: ErrorResponseSerializer},
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.OPERATOR, Entity.SAF_TRADER, Entity.AIRLINE])])
+@permission_classes([HasAirlineRights | HasSafTraderRights | HasSafOperatorRights | HasSafAdminRights])
 def get_years(request, *args, **kwargs):
-    try:
-        entity_id = request.query_params.get("entity_id")
-        entity = Entity.objects.get(id=entity_id)
-        if entity.entity_type == Entity.AIRLINE:
-            ticket_years = SafTicket.objects.filter(client_id=entity_id).values_list("year", flat=True).distinct()
-            years = sorted(set(ticket_years))
-        else:
-            ticket_source_years = (
-                SafTicketSource.objects.filter(added_by_id=entity_id).values_list("year", flat=True).distinct()
-            )
-            client_or_supplier = Q(supplier_id=entity_id) | Q(client_id=entity_id)
-            ticket_years = SafTicket.objects.filter(client_or_supplier).values_list("year", flat=True).distinct()
-            years = sorted(set(list(ticket_source_years) + list(ticket_years)))
-        return Response(years, status=status.HTTP_200_OK)
-    except Exception:
-        traceback.print_exc()
-        return Response(
-            {"message": ExtraError.YEAR_LISTING_FAILED},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    entity = request.entity
+
+    tickets = SafTicket.objects.all()
+    ticket_sources = SafTicketSource.objects.all()
+
+    if entity.entity_type == Entity.AIRLINE:
+        tickets = tickets.filter(client=entity)
+        ticket_sources = ticket_sources.none()
+
+    if entity.entity_type in (Entity.OPERATOR, Entity.SAF_TRADER):
+        tickets = tickets.filter(Q(client=entity) | Q(supplier=entity))
+        ticket_sources = ticket_sources.filter(added_by=entity)
+
+    ticket_source_years = ticket_sources.values_list("year", flat=True).distinct()
+    ticket_years = tickets.values_list("year", flat=True).distinct()
+
+    years = sorted(set(list(ticket_source_years) + list(ticket_years)))
+    return Response(years)

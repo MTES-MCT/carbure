@@ -5,22 +5,22 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import {
-  CBQueryParams,
-  CBQueryStates,
-  CBSnapshot,
-} from "common/hooks/query-builder-2"
+import { CBQueryParams, CBQueryStates } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
-  PathsApiSafTicketsGetParametersQueryOrder,
-  PathsApiSafTicketSourcesGetParametersQueryOrder,
+  PathsApiSafTicketsGetParametersQueryOrder_by,
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
-  PathsApiSafTicketsGetParametersQueryConsumption_types as ConsumptionType,
+  PathsApiSafTicketsGetParametersQueryConsumption_type as ConsumptionType,
+  PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus,
 } from "api-schema"
 
+// Generated enum is EnumStatus and the name is not readable
+export { SafTicketSourceStatus, SafTicketStatus, ConsumptionType }
+
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator
-export interface SafOperatorSnapshot {
+export interface SafSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
   tickets_assigned: number
@@ -30,11 +30,6 @@ export interface SafOperatorSnapshot {
   tickets_received: number
   tickets_received_accepted: number
   tickets_received_pending: number
-}
-
-export interface SafAirlineSnapshot extends CBSnapshot {
-  tickets_pending: number
-  tickets_accepted: number
 }
 
 export interface SafLot {
@@ -47,10 +42,11 @@ export interface SafLot {
 export type LotPreview = apiTypes["CarbureLotPublic"]
 
 export type SafTicketPreview = apiTypes["SafTicketPreview"]
+export type SafAssignedTicket = apiTypes["SafAssignedTicket"]
 
 export type SafTicket = apiTypes["SafTicket"]
 
-export type SafTicketDetails = apiTypes["SafTicketDetails"]
+export type SafTicketDetails = apiTypes["SafTicket"]
 
 export interface SafProduction {
   carbure_producer: Entity | null
@@ -81,16 +77,20 @@ export interface SafTicketAssignementQuery {
   free_field: string
 }
 
-export type SafTicketsResponse = apiTypes["PaginatedSafTicketList"]
+export type SafTicketsResponse = apiTypes["PaginatedSafTicketPreviewList"]
+
+export type SafTicketType = "assigned" | "received"
 
 export interface SafStates
-  extends CBQueryStates<SafTicketStatus, SafQueryType> {
+  extends CBQueryStates<SafTicketStatus, SafTicketType> {
   filters: SafFilterSelection
-  snapshot?: SafOperatorSnapshot | SafAirlineSnapshot
+  snapshot?: SafSnapshot
 }
 
-export interface SafQuery
-  extends CBQueryParams<SafColumsOrder[], SafTicketStatus, SafQueryType> {
+export type SafTicketOrder = PathsApiSafTicketsGetParametersQueryOrder_by
+
+export interface SafTicketQuery
+  extends CBQueryParams<SafTicketOrder[], SafTicketStatus, SafTicketType> {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
@@ -100,26 +100,24 @@ export interface SafQuery
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
 
 export enum SafFilter {
-  Feedstocks = "feedstocks",
-  Periods = "periods",
+  Feedstocks = "feedstock",
+  Periods = "period",
   Clients = "clients",
-  CountriesOfOrigin = "countries_of_origin",
-  ProductionSites = "production_sites",
-  DeliverySites = "delivery_sites",
-  ConsumptionTypes = "consumption_types",
+  Suppliers = "supplier",
+  AddedBy = "added_by",
+  Airport = "reception_airport",
+  CountriesOfOrigin = "country_of_origin",
+  ProductionSites = "production_site",
+  DeliverySites = "delivery_site",
+  ConsumptionTypes = "consumption_type",
 }
 
-export type SafQueryType = "assigned" | "received"
+export type SafTicketSourceOrder =
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by
 
-// Airline
-export type SafColumsOrder = PathsApiSafTicketsGetParametersQueryOrder
-
-// Operator
-export type SafOperatorColumnsOrder =
-  PathsApiSafTicketSourcesGetParametersQueryOrder
-export interface SafOperatorQuery
+export interface SafTicketSourceQuery
   extends CBQueryParams<
-    SafOperatorColumnsOrder[],
+    SafTicketSourceOrder[],
     SafTicketSourceSatus,
     undefined
   > {
@@ -128,5 +126,9 @@ export interface SafOperatorQuery
   [SafFilter.Clients]?: string[]
 }
 
-// Generated enum is EnumStatus and the name is not readable
-export { SafTicketStatus, ConsumptionType }
+export type SafTicketSource = apiTypes["SafTicketSource"]
+
+export type SafTicketSourceDetails = apiTypes["SafTicketSource"]
+
+export type SafTicketSourcePreview = apiTypes["SafTicketSourcePreview"]
+export type SafRelatedTicketSource = apiTypes["SafRelatedTicketSource"]

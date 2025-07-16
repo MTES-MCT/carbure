@@ -14,17 +14,16 @@ import {
   formatPeriodFromDate,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource } from "saf/pages/operator/types"
-import * as api from "../../pages/operator/api"
+import * as api from "saf/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 import { ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
-import { ConsumptionType } from "saf/types"
+import { ConsumptionType, SafTicketSourcePreview } from "saf/types"
 
 export interface TicketsGroupedAssignmentProps {
-  ticketSources: SafTicketSource[]
+  ticketSources: SafTicketSourcePreview[]
   remainingVolume: number
   onClose: () => void
   onTicketsAssigned: (

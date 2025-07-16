@@ -101,7 +101,6 @@ class SafTicketDetailsTest(TestCase):
             "carbure_id": "carbure-id-t-001",
             "year": 2022,
             "assignment_period": 202201,
-            "created_at": "2022-01-01T01:00:00+01:00",
             "status": "PENDING",
             "volume": 30000.0,
             "agreement_date": "2022-06-20",
@@ -124,9 +123,6 @@ class SafTicketDetailsTest(TestCase):
                 "name": "Huile cotraitée - Carburéacteur",
                 "name_en": "Co-processed oil - jet",
                 "code": "HCC",
-                "pci_kg": 43.0,
-                "pci_litre": 33.0,
-                "masse_volumique": 0.0,
             },
             "country_of_origin": {
                 "name": "Espagne",
@@ -156,6 +152,11 @@ class SafTicketDetailsTest(TestCase):
             "shipping_method": None,
             "reception_airport": None,
             "consumption_type": None,
+            "ets_status": None,
+            "child_ticket_sources": [],
         }
 
-        assert response.json() == expected_ticket
+        data = response.json()
+        data.pop("created_at")
+
+        assert data == expected_ticket

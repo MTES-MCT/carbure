@@ -1,26 +1,27 @@
 import django_filters
-from django.db.models import Q
-from drf_spectacular.utils import extend_schema_field
-from rest_framework.serializers import CharField, ChoiceField, IntegerField, ListField
 
 from core.models import Entity
 from saf.models import SafTicket
 
 
 class TicketFilter(django_filters.FilterSet):
-    entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_entity_id", required=True)
     status = django_filters.ChoiceFilter(choices=SafTicket.ticket_statuses)
+    entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_type", required=True)
     year = django_filters.NumberFilter(field_name="year")
 
-    periods = django_filters.CharFilter(method="filter_periods")
-    feedstocks = django_filters.CharFilter(method="filter_feedstocks")
-    clients = django_filters.CharFilter(method="filter_clients")
-    suppliers = django_filters.CharFilter(method="filter_suppliers")
-    countries_of_origin = django_filters.CharFilter(method="filter_countries_of_origin")
-    production_sites = django_filters.CharFilter(method="filter_production_sites")
-    consumption_types = django_filters.CharFilter(method="filter_consumption_types")
+    period = django_filters.AllValuesMultipleFilter(field_name="assignment_period")
+    biofuel = django_filters.AllValuesMultipleFilter(field_name="biofuel__code")
+    feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
+    client = django_filters.AllValuesMultipleFilter(field_name="client__name")
+    supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
+    country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
+    production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
+    consumption_type = django_filters.MultipleChoiceFilter(
+        field_name="consumption_type", choices=SafTicket.CONSUMPTION_TYPES
+    )
+    reception_airport = django_filters.AllValuesMultipleFilter(field_name="reception_airport__name")
 
-    order = django_filters.OrderingFilter(
+    order_by = django_filters.OrderingFilter(
         fields=(
             ("client__name", "client"),
             ("volume", "volume"),
@@ -28,9 +29,21 @@ class TicketFilter(django_filters.FilterSet):
             ("feedstock__code", "feedstock"),
             ("ghg_reduction", "ghg_reduction"),
             ("created_at", "created_at"),
-            ("suppliers", "suppliers"),
+            ("supplier__name", "supplier"),
+            ("consumption_type", "consumption_type"),
+            ("reception_airport__name", "reception_airport"),
         )
     )
+
+    def filter_type(self, queryset, name, value):
+        entity = Entity.objects.get(pk=value)
+        ticket_type = self.data.get("type")
+        if entity.entity_type in (Entity.AIRLINE, Entity.OPERATOR, Entity.SAF_TRADER):
+            if ticket_type == "assigned":
+                return queryset.filter(supplier=entity)
+            elif ticket_type == "received":
+                return queryset.filter(client=entity)
+        return queryset
 
     class Meta:
         model = SafTicket
@@ -38,100 +51,12 @@ class TicketFilter(django_filters.FilterSet):
             "entity_id",
             "status",
             "year",
-            "periods",
-            "feedstocks",
-            "clients",
-            "suppliers",
-            "countries_of_origin",
-            "production_sites",
-            "consumption_types",
+            "period",
+            "feedstock",
+            "client",
+            "supplier",
+            "country_of_origin",
+            "production_site",
+            "consumption_type",
+            "reception_airport",
         ]
-
-    def filter_multiple_values(self, queryset, field_name, param_name):
-        values = self.data.getlist(param_name)
-        if values:
-            return queryset.filter(Q(**{f"{field_name}__in": values}))
-        return queryset
-
-    def filter_entity_id(self, queryset, name, value):
-        ticket_type = self.data.get("type")
-        entity = Entity.objects.get(id=value)
-
-        if entity.entity_type == Entity.AIRLINE:
-            return queryset.filter(client_id=value)
-
-        if ticket_type == "assigned":
-            return queryset.filter(supplier_id=value)
-        elif ticket_type == "received":
-            return queryset.filter(client_id=value)
-        return queryset
-
-    @extend_schema_field(
-        ListField(
-            child=IntegerField(),
-            help_text="List of periods provided via ?periods=period1&periods=period2&periods=period3",
-            required=False,
-        )
-    )
-    def filter_periods(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "assignment_period", "periods")
-
-    @extend_schema_field(
-        ListField(
-            child=CharField(),
-            help_text="List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3",
-            required=False,
-        )
-    )
-    def filter_feedstocks(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "feedstock__code", "feedstocks")
-
-    @extend_schema_field(
-        ListField(
-            child=CharField(),
-            help_text="List of clients provided via ?clients=client1&clients=client2&clients=client3",
-            required=False,
-        )
-    )
-    def filter_clients(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "client__name", "clients")
-
-    @extend_schema_field(
-        ListField(
-            child=CharField(),
-            help_text="List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3",
-            required=False,
-        )
-    )
-    def filter_suppliers(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "supplier__name", "suppliers")
-
-    @extend_schema_field(
-        ListField(
-            child=CharField(),
-            help_text="List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2",
-            required=False,
-        )
-    )
-    def filter_countries_of_origin(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "country_of_origin__code_pays", "countries_of_origin")
-
-    @extend_schema_field(
-        ListField(
-            child=CharField(),
-            help_text="List of production sites provided via ?production_sites=site1&production_sites=site2",
-            required=False,
-        )
-    )
-    def filter_production_sites(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "carbure_production_site__name", "production_sites")
-
-    @extend_schema_field(
-        ListField(
-            child=ChoiceField(choices=SafTicket.CONSUMPTION_TYPES),
-            help_text="List of consumption types provided via ?consumption_types=value1&consumption_types=value2",
-            required=False,
-        )
-    )
-    def filter_consumption_types(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "consumption_type", "consumption_types")

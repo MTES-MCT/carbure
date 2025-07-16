@@ -11,7 +11,7 @@ class SafCreditTicketSourceTest(TestCase):
 
         self.ticket = SafTicketFactory.create(
             supplier_id=self.entity.id,
-            client_id=self.entity.id,
+            client_id=self.airline.id,
             volume=10000,
             parent_ticket_source_id=self.ticket_source.id,
         )
@@ -20,11 +20,11 @@ class SafCreditTicketSourceTest(TestCase):
         self.ticket.status = SafTicket.PENDING
         self.ticket.save()
         query = {
-            "entity_id": self.entity.id,
+            "entity_id": self.airline.id,
             "ticket_id": self.ticket.id,
             "ets_status": "ETS_VALUATION",
         }
-        query_params = f"?entity_id={self.entity.id}"
+        query_params = f"?entity_id={self.airline.id}"
         assert self.ticket.status == SafTicket.PENDING
         assert self.ticket.ets_status is None
         response = self.client.post(
