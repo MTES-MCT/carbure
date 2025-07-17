@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
+from rest_framework.throttling import ScopedRateThrottle
 
 from auth.serializers import ActivateAccountSerializer
 from auth.tokens import account_activation_token
@@ -14,6 +15,9 @@ from core.carburetypes import CarbureError
 
 
 class ActivateAccountAction:
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "1/s"
+
     @extend_schema(
         request=ActivateAccountSerializer,
         responses={

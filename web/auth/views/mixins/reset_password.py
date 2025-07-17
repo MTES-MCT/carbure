@@ -7,12 +7,16 @@ from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 
 from auth.serializers import ResetPasswordSerializer
 from core.carburetypes import CarbureError
 
 
 class ResetPasswordAction:
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "1/s"
+
     @extend_schema(
         request=ResetPasswordSerializer,
         examples=[
