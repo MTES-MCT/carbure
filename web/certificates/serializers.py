@@ -129,6 +129,7 @@ class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
 
 
 class ProductionSiteResourceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     name = serializers.CharField()
     city = serializers.CharField()
     address = serializers.CharField()

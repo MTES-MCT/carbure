@@ -3393,6 +3393,7 @@ export interface components {
       created_by?: number | null
     }
     ProductionSiteResource: {
+      id: number
       name: string
       city: string
       address: string

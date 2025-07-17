@@ -10882,6 +10882,8 @@ components:
     ProductionSiteResource:
       type: object
       properties:
+        id:
+          type: integer
         name:
           type: string
         city:
@@ -10900,6 +10902,7 @@ components:
         - city
         - country
         - date_mise_en_service
+        - id
         - name
         - postal_code
     RegistrationCountry:
