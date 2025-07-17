@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 from rest_framework.throttling import ScopedRateThrottle
+from web.core.throttle import UserEmailThrottle
 
 from core.helpers import send_mail
 from core.utils import CarbureEnv
@@ -60,7 +61,7 @@ def send_new_token(request, device):
 
 
 class RequestOTPAction:
-    throttle_classes = [ScopedRateThrottle]
+    throttle_classes = [ScopedRateThrottle, UserEmailThrottle]
     throttle_scope = "1/s"
 
     @extend_schema(

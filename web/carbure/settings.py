@@ -385,8 +385,15 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.ScopedRateThrottle",
+        "core.throttle.UserEmailThrottle",
+        "core.throttle.AnonEmailThrottle",
     ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "5/s", "user": "10/s", "1/s": "1/s"},
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/s",
+        "user": "10/s",
+        "1/s": "1/s",  # scoped throttle with name equal to the value
+        "10/day": "10/day",
+    },
 }
 SPECTACULAR_SETTINGS = {
     "TITLE": "Carbure API",
