@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
@@ -16,7 +16,7 @@ import { UserCheck } from "common/components/icons"
 import { Country, ProductionSite, EntityPreview } from "common/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { isSAF } from "saf/utils/guards"
-
+import { apiTypes } from "common/services/api-fetch.types"
 interface ProductionFieldsProps {
   readOnly?: boolean
 }
@@ -40,7 +40,7 @@ export const ProducerField = (
   props: AutocompleteProps<EntityPreview | string>
 ) => {
   const { t } = useTranslation()
-  const { value, bind, setField } = useFormContext<LotFormValue>()
+  const { value, bind } = useFormContext<LotFormValue>()
   const producer = value.producer
   const isKnown = producer instanceof Object
 
@@ -49,13 +49,9 @@ export const ProducerField = (
     return text
   }
 
-  const handleChange = (newValue: EntityPreview | string | undefined) => {
-    setField("producer", newValue)
-  }
-
   // If producer is a string (unknown producer), add it to defaultOptions
   // so the Autocomplete can display it correctly
-  const defaultOptions = React.useMemo(() => {
+  const defaultOptions = useMemo(() => {
     if (typeof producer === "string" && producer) {
       return [producer]
     }
@@ -65,14 +61,12 @@ export const ProducerField = (
   return (
     <Autocomplete
       label={t("Producteur")}
-      value={producer}
       defaultOptions={defaultOptions}
       icon={isKnown ? UserCheck : undefined}
       getOptions={api.findProducers}
       normalize={norm.normalizeEntityPreviewOrUnknown}
       create={createUnknownProducer}
-      onChange={handleChange}
-      error={bind("producer").error}
+      {...bind("producer")}
       {...props}
     />
   )
@@ -184,7 +178,9 @@ export const ProductionSiteDoubleCountingCertificateField = (
   const { value, bind, setField, setDisabledFields } =
     useFormContext<LotFormValue>()
   const entity = useEntity()
-  const lastResultsRef = React.useRef<any[]>([])
+  const lastResultsRef = useRef<
+    apiTypes["DoubleCountingRegistrationResource"][]
+  >([])
   const isAdminEditing = value.lot === undefined && entity.isAdmin
 
   // hide field for non-DC feedstocks
@@ -205,7 +201,7 @@ export const ProductionSiteDoubleCountingCertificateField = (
         disabled
         icon={<CertificateIcon certificate={certificate} />}
         label={t("Certificat double-comptage")}
-        value={value.production_site_double_counting_certificate || ""}
+        value={bound.value ?? ""}
         error={bound.error}
         {...props}
       />
@@ -215,7 +211,10 @@ export const ProductionSiteDoubleCountingCertificateField = (
   const getOptionsWithStore = async (query: string) => {
     const results = await api.findDcAgreements(query)
     lastResultsRef.current = results
-    return results.map((item: any) => item.certificate_id)
+    return results.map(
+      (item: apiTypes["DoubleCountingRegistrationResource"]) =>
+        item.certificate_id
+    )
   }
 
   const handleChange = (selectedId: string | undefined) => {
@@ -251,8 +250,7 @@ export const ProductionSiteDoubleCountingCertificateField = (
       required={!isSAF(value.biofuel)}
       getOptions={getOptionsWithStore}
       normalize={(id: string) => ({ label: id, value: id })}
-      value={value.production_site_double_counting_certificate || ""}
-      error={bound.error}
+      {...bound}
       onChange={handleChange}
       {...props}
     />
