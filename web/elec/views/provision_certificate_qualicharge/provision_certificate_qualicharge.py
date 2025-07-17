@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from elec.filters.provision_certificate import ProvisionCertificateFilter
+from elec.filters.provision_certificate import ProvisionCertificateQualichargeFilter
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ElecProvisionCertificateQualichargeSerializer
 
@@ -15,7 +15,7 @@ class ElecProvisionCertificateQualichargeViewSet(
 ):
     queryset = ElecProvisionCertificateQualicharge.objects.all()
     serializer_class = ElecProvisionCertificateQualichargeSerializer
-    filterset_class = ProvisionCertificateFilter
+    filterset_class = ProvisionCertificateQualichargeFilter
     http_method_names = ["get", "post"]
 
     def initialize_request(self, request, *args, **kwargs):
