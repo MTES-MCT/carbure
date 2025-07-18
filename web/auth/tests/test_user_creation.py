@@ -46,4 +46,4 @@ class UserCreationSerializerTest(TestCase):
         serializer = UserCreationSerializer(data=data)
         assert not serializer.is_valid()
         assert "email" in serializer.errors
-        assert serializer.errors["email"][0] == "Un objet Utilisateur avec ce champ adresse électronique existe déjà."
+        assert serializer.errors["email"][0] == "Un objet utilisateur avec ce champ adresse électronique existe déjà."
