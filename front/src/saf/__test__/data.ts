@@ -16,22 +16,19 @@ import {
 } from "common/types"
 import {
   LotPreview,
-  SafOperatorSnapshot,
-  SafTicket,
+  SafAssignedTicket,
+  SafSnapshot,
   SafTicketDetails,
   SafTicketPreview,
+  SafTicketSourcePreview,
   SafTicketsResponse,
   SafTicketStatus,
-} from "saf/types"
-
-import {
-  SafTicketSource,
   SafTicketSourceDetails,
-} from "saf/pages/operator/types"
+} from "saf/types"
 import { SiteTypeEnum } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
-export const safOperatorSnapshot: SafOperatorSnapshot = {
+export const safOperatorSnapshot: SafSnapshot = {
   ticket_sources_available: 11,
   ticket_sources_history: 3,
   tickets_assigned: 2,
@@ -75,7 +72,7 @@ const safAirport: Airport = {
   postal_code: "75000",
 }
 
-export const safTicketSource: SafTicketSource = {
+export const safTicketSource: SafTicketSourcePreview = {
   id: 12343,
   carbure_id: "A12332",
   year: 2022,
@@ -92,6 +89,8 @@ export const safTicketSource: SafTicketSource = {
     id: 1,
     carbure_id: "1",
   },
+  parent_ticket: undefined,
+  added_by: operator,
 }
 
 export const lotPreview: LotPreview = {
@@ -118,7 +117,7 @@ export const lotPreview: LotPreview = {
   production_country: country1,
 }
 
-export const safTicketPreview1: SafTicketPreview = {
+export const safTicketPreview1: SafAssignedTicket = {
   id: 92343,
   carbure_id: "X12332",
   client: "Air France",
@@ -128,7 +127,7 @@ export const safTicketPreview1: SafTicketPreview = {
   assignment_period: 202401,
 }
 
-export const safTicketPreview2: SafTicketPreview = {
+export const safTicketPreview2: SafAssignedTicket = {
   id: 92344,
   carbure_id: "X12333",
   client: "CORSAIR",
@@ -158,7 +157,6 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   carbure_production_site: productionSite,
   unknown_production_site: "",
   production_site_commissioning_date: "2000-01-31",
-
   eec: 14.5,
   el: 0,
   ep: 7,
@@ -171,7 +169,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   ghg_total: 23.5,
 }
 
-export const safTicketSource2: SafTicketSource = {
+export const safTicketSource2: SafTicketSourcePreview = {
   id: 22343,
   carbure_id: "B21234",
   year: 2022,
@@ -188,9 +186,10 @@ export const safTicketSource2: SafTicketSource = {
     id: 1,
     carbure_id: "1",
   },
+  added_by: operator,
 }
 
-export const safTicket: SafTicket = {
+export const safTicket: SafTicketPreview = {
   id: 12343,
   carbure_id: "A22332",
   year: 2022,
@@ -203,6 +202,8 @@ export const safTicket: SafTicket = {
   country_of_origin: country1,
   ghg_reduction: 74,
   status: SafTicketStatus.PENDING,
+  created_at: "2022-02-08",
+  reception_airport: safAirport,
 }
 
 export const safTicketAssignedDetails: SafTicketDetails = {
@@ -237,6 +238,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   ghg_total: 23.5,
   parent_ticket_source: safTicketSource,
   reception_airport: safAirport,
+  child_ticket_sources: [],
 }
 
 export const safTicketReceivedDetails: SafTicketDetails = {

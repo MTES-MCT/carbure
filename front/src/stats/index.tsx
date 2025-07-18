@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import IframeResizer from "iframe-resizer-react"
+import IframeResizer from "@iframe-resizer/react"
 import { LoaderOverlay, Main } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import useTitle from "common/hooks/title"
@@ -29,6 +29,7 @@ const Stats = () => {
     <Main>
       <section>
         <IframeResizer
+          license="00000000-0000-0000-0000-000000000000"
           onResized={() => setIsLoaded(true)}
           src={statsData?.metabase_iframe_url}
           frameBorder="0"

@@ -9,6 +9,7 @@ import { useUnit } from "common/hooks/unit"
 import { debounce } from "common/utils/functions"
 import { useTranslation } from "react-i18next"
 import { TransfertGHGRangeFormProps } from "./ghg-range-form.types"
+import { ceilNumber, floorNumber } from "common/utils/formatters"
 
 type TransfertGHGRangeFormComponentProps = {
   balance: Balance
@@ -47,6 +48,9 @@ export const TransfertGHGRangeForm = ({
   const entity = useEntity()
   const { value, setField } = useFormContext<TransfertGHGRangeFormProps>()
 
+  const ghgReductionMin = floorNumber(balance?.ghg_reduction_min ?? 50, 1)
+  const ghgReductionMax = ceilNumber(balance?.ghg_reduction_max ?? 100, 1)
+
   const { result } = useQuery(debouncedGetBalance, {
     key: "balance-ghg-min-max",
     params: [
@@ -68,13 +72,25 @@ export const TransfertGHGRangeForm = ({
 
   return (
     <>
-      <GHGRangeForm
-        min={Math.floor(balance.ghg_reduction_min)}
-        max={Math.ceil(balance.ghg_reduction_max)}
-      />
-      {
+      {ghgReductionMin !== ghgReductionMax ? (
+        <>
+          <GHGRangeForm min={ghgReductionMin} max={ghgReductionMax} />
+          <Notice noColor variant="info">
+            {t("Solde disponible pour ces taux de réduction")}
+            {" : "}
+            <b>
+              {formatUnit(
+                result?.available_balance ?? balance.available_balance,
+                {
+                  fractionDigits: 0,
+                }
+              )}
+            </b>
+          </Notice>
+        </>
+      ) : (
         <Notice noColor variant="info">
-          {t("Solde disponible pour ces taux de réduction")}
+          {t("Solde disponible")}
           {" : "}
           <b>
             {formatUnit(
@@ -84,8 +100,12 @@ export const TransfertGHGRangeForm = ({
               }
             )}
           </b>
+          <br />
+          {t("Pour un taux de réduction GES de")}
+          {" : "}
+          <b>{ghgReductionMin}%</b>
         </Notice>
-      }
+      )}
     </>
   )
 }

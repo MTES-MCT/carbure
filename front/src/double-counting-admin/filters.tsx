@@ -1,9 +1,8 @@
-import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import * as norm from "common/utils/normalizers"
-import { Grid } from "common/components/scaffold"
 import { Normalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
 import { AgreementFilter, AgreementFilterSelection } from "./types"
+import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 
 export interface FiltersProps {
   filters: AgreementFilter[]
@@ -26,44 +25,24 @@ export function AgreementFilters({
     [AgreementFilter.ProductionSites]: t("Sites de production"),
   }
 
+  const computedFilters = filters.reduce(
+    (acc, filter) => {
+      acc[filter] = filterLabels[filter]
+      return acc
+    },
+    {} as Record<AgreementFilter, string>
+  )
+
   return (
-    <Grid>
-      {filters.map((filter) => (
-        <FilterSelect
-          key={filter}
-          field={filter}
-          placeholder={filterLabels[filter]}
-          value={selected[filter]}
-          onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
-          getOptions={() => getFilterOptions(filter)}
-        />
-      ))}
-    </Grid>
+    <FilterMultiSelect2
+      filterLabels={computedFilters}
+      selected={selected}
+      onSelect={onSelect}
+      getFilterOptions={getFilterOptions}
+      normalizers={filterNormalizers}
+    />
   )
 }
-
-export type FilterSelectProps = { field: AgreementFilter } & Omit<
-  MultiSelectProps<string>,
-  "options"
->
-
-export const FilterSelect = ({
-  field,
-  value = [],
-  onChange,
-  ...props
-}: FilterSelectProps) => (
-  <MultiSelect
-    {...props}
-    clear
-    search
-    variant="solid"
-    value={value}
-    onChange={onChange}
-    normalize={filterNormalizers[field]}
-    sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
-  />
-)
 
 type FilterNormalizers = Partial<Record<AgreementFilter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {

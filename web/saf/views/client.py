@@ -25,5 +25,6 @@ class ClientViewSet(
     def get_queryset(self):
         is_airline = Q(entity_type=Entity.AIRLINE)
         is_saf_operator = Q(entity_type=Entity.OPERATOR, has_saf=True)
-        queryset = Entity.objects.filter(is_airline | is_saf_operator).order_by("name")
+        is_saf_trader = Q(entity_type=Entity.SAF_TRADER)
+        queryset = Entity.objects.filter(is_airline | is_saf_operator | is_saf_trader).order_by("name")
         return queryset

@@ -46,6 +46,7 @@ export function producerAddDoubleCountingApplication(
   producer_id: number,
   production_site_id: number,
   file: File,
+  extraFiles?: File[],
   should_replace = false
 ) {
   return apiFetch.POST("/double-counting/applications/add/", {
@@ -56,18 +57,37 @@ export function producerAddDoubleCountingApplication(
       production_site_id,
       should_replace,
       file,
+      extra_files: extraFiles,
     },
   })
 }
 
-export function getDoubleCountingAgreementDownloadLink(
+export function uploadDoubleCountingApplicationFiles(
   entity_id: number,
-  agreement_id: number
+  application_id: number,
+  extra_files: File[]
 ) {
-  return apiFetch.GET("/double-counting/agreements/{id}/download-link/", {
+  return apiFetch.POST("/double-counting/applications/{id}/upload-files/", {
     params: {
       query: { entity_id },
-      path: { id: agreement_id },
+      path: { id: application_id },
     },
+    body: { extra_files },
   })
+}
+
+export function deleteDoubleCountingApplicationFile(
+  entity_id: number,
+  application_id: number,
+  file_id: number
+) {
+  return apiFetch.DELETE(
+    "/double-counting/applications/{id}/files/{file_id}/",
+    {
+      params: {
+        query: { entity_id },
+        path: { id: application_id, file_id },
+      },
+    }
+  )
 }

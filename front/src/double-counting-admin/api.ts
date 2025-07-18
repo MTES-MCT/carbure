@@ -162,10 +162,3 @@ export function getDoubleCountingAgreement(
     },
   })
 }
-
-export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
-  return apiFetch.POST("/double-counting/applications/check-admin-files/", {
-    params: { query: { entity_id } },
-    body: { files: Array.from(files) },
-  })
-}

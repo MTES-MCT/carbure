@@ -5,7 +5,6 @@ from doublecount.models import DoubleCountingProduction
 from doublecount.serializers import (
     BiofuelSerializer,
     DoubleCountingApplicationSerializer,
-    DoubleCountingProductionSiteSerializer,
     EntitySummarySerializer,
     FeedStockSerializer,
 )
@@ -14,7 +13,7 @@ from .models import DoubleCountingRegistration
 
 
 class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
-    production_site = DoubleCountingProductionSiteSerializer()
+    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer = serializers.SerializerMethodField()
     quotas_progression = serializers.SerializerMethodField()
 

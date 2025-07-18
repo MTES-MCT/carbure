@@ -25,7 +25,7 @@ import {
 import { Certificate, EntityCertificate, UserRole } from "common/types"
 import Alert from "common/components/alert"
 import Select from "common/components/select"
-import isBefore from "date-fns/isBefore"
+import { isBefore } from "date-fns"
 import { compact } from "common/utils/collection"
 import Form from "common/components/form"
 

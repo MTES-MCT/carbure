@@ -91,26 +91,52 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
         onChange={onBalanceChange}
       />
 
-      <DoubleRange
-        disabled={fullBalance === undefined}
-        step={0.1}
-        min={ghgReductionMin}
-        max={ghgReductionMax}
-        suffix="%"
-        label={t("Définissez le taux de réduction GES des lots à prélever")}
-        minRange={bind("gesBoundMin")}
-        maxRange={bind("gesBoundMax")}
-      />
+      {ghgReductionMin !== ghgReductionMax ? (
+        <>
+          <DoubleRange
+            disabled={fullBalance === undefined}
+            step={0.1}
+            min={ghgReductionMin}
+            max={ghgReductionMax}
+            suffix="%"
+            label={t("Définissez le taux de réduction GES des lots à prélever")}
+            minRange={bind("gesBoundMin")}
+            maxRange={bind("gesBoundMax")}
+          />
 
-      <Notice noColor variant="info">
-        {t("Solde disponible pour ces taux de réduction")}
-        {" : "}
-        <b>
-          {formatUnit(value.balance?.available_balance ?? 0, ExtendedUnit.GJ, {
-            fractionDigits: 0,
-          })}
-        </b>
-      </Notice>
+          <Notice noColor variant="info">
+            {t("Solde disponible pour ces taux de réduction")}
+            {" : "}
+            <b>
+              {formatUnit(
+                value.balance?.available_balance ?? 0,
+                ExtendedUnit.GJ,
+                {
+                  fractionDigits: 0,
+                }
+              )}
+            </b>
+          </Notice>
+        </>
+      ) : (
+        <Notice noColor variant="info">
+          {t("Solde disponible")}
+          {" : "}
+          <b>
+            {formatUnit(
+              value.balance?.available_balance ?? 0,
+              ExtendedUnit.GJ,
+              {
+                fractionDigits: 0,
+              }
+            )}
+          </b>
+          <br />
+          {t("Pour un taux de réduction GES de")}
+          {" : "}
+          <b>{ghgReductionMin}%</b>
+        </Notice>
+      )}
     </>
   )
 }

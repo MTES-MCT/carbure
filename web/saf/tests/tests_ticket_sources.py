@@ -104,7 +104,6 @@ class SafTicketSourcesTest(TestCase):
             "carbure_id": "carbure-id-001",
             "year": 2022,
             "delivery_period": 202201,
-            # "created_at": "2022-01-01T01:00:00+01:00",
             "total_volume": 30000.0,
             "assigned_volume": 0.0,
             "feedstock": {
@@ -132,13 +131,18 @@ class SafTicketSourcesTest(TestCase):
                     "agreement_date": "2022-06-20",
                     "assignment_period": 202201,
                     "carbure_id": "carbure-id-t-001",
-                    # "created_at": "2022-01-01T01:00:00+01:00",
                     "client": self.ticket_client.name,
                     "id": 4321,
                     "status": "PENDING",
                     "volume": 30000.0,
                 }
             ],
+            "parent_ticket": None,
+            "added_by": {
+                "id": 14,
+                "name": "AOT",
+                "entity_type": "Opérateur",
+            },
         }
 
         # do not check created_at as its automatically generated

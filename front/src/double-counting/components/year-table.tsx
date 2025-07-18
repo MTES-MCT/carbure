@@ -1,4 +1,6 @@
-import Table, { Column } from "common/components/table"
+import { Box, Divider } from "common/components/scaffold"
+import { Table, Column } from "common/components/table2"
+import { Title } from "common/components/title"
 import { Fragment } from "react"
 
 function groupRowsByYear<T extends { year: number }>(items: T[]) {
@@ -26,15 +28,18 @@ function YearTable<T extends { year: number }>({
   return (
     <Fragment>
       {Object.entries(rowsByYear).map(([year, yearRows], i) => (
-        <Fragment key={year}>
-          <h2>{year}</h2>
+        <Box key={year}>
+          <Title is="p" as="h6">
+            {year}
+          </Title>
+          <Divider noMargin />
           <Table
             headless={i > 0}
             columns={columns}
             rows={yearRows}
             onAction={onAction}
           />
-        </Fragment>
+        </Box>
       ))}
     </Fragment>
   )

@@ -150,6 +150,7 @@ class SafTicketSourceDetailsTest(TestCase):
                 }
             ],
             "parent_lot": None,
+            "parent_ticket": None,
         }
 
         # do not check created_at as its automatically generated

@@ -63,14 +63,22 @@ export const Panel = ({
 )
 
 // a container that automatically arranges its content into a grid
-export const Grid = (props: JSX.IntrinsicElements["div"] & { gap?: "xl" }) => (
+export const Grid = ({
+  cols,
+  gap,
+  ...props
+}: JSX.IntrinsicElements["div"] & { gap?: "xl" | "lg"; cols?: number }) => (
   <div
     {...props}
-    className={cl(
-      css.grid,
-      props.className,
-      props.gap && css[`grid--gap-${props.gap}`]
-    )}
+    className={cl(css.grid, props.className, gap && css[`grid--gap-${gap}`])}
+    style={{
+      ...props.style,
+      ...(cols
+        ? {
+            gridTemplateColumns: `repeat(${cols}, minmax(var(--grid-cell-width), 1fr))`,
+          }
+        : {}),
+    }}
   />
 )
 
@@ -101,12 +109,13 @@ export const Row = ({
   asideX,
   asideY,
   className,
+  gap,
   ...props
-}: JSX.IntrinsicElements["div"] & Layout) => (
+}: JSX.IntrinsicElements["div"] & Layout & { gap?: "md" }) => (
   <div
     {...props}
     {...layout({ asideX, asideY })}
-    className={cl(css.row, className)}
+    className={cl(css.row, className, gap && css[`row--gap-${gap}`])}
   />
 )
 
@@ -139,8 +148,18 @@ export const Box = ({
   />
 )
 
-export const Divider = (props: JSX.IntrinsicElements["div"]) => (
-  <div {...props} className={cl(css.divider, props.className)} />
+export const Divider = ({
+  noMargin,
+  ...props
+}: JSX.IntrinsicElements["div"] & { noMargin?: boolean }) => (
+  <div
+    {...props}
+    className={cl(
+      css.divider,
+      props.className,
+      noMargin && css["divider--no-margin"]
+    )}
+  />
 )
 
 export interface Layout {

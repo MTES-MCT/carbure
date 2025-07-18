@@ -9,14 +9,13 @@ import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSourceDetails } from "saf/pages/operator/types"
-import * as api from "../../../pages/operator/api"
+import * as api from "saf/api"
 import * as apiResources from "common/api"
 import { PeriodSelect } from "../period-select"
 import { VolumeInput } from "../volume-input"
 import { ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
-import { ConsumptionType } from "saf/types"
+import { ConsumptionType, SafTicketSourceDetails } from "saf/types"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails
@@ -82,6 +81,11 @@ export const TicketAssignment = ({
     return apiResources.findAirports(query)
   }
 
+  const supplierIsOperator = entity.isOperator
+  const clientIsOperator = value.client?.entity_type === EntityType.Operator
+  const clientIsAirline = value.client?.entity_type === EntityType.Airline
+  const clientIsSafTrader = value.client?.entity_type === EntityType.SAF_Trader
+
   return (
     <Portal onClose={onClose}>
       <Dialog
@@ -132,7 +136,7 @@ export const TicketAssignment = ({
             {...bind("client")}
           />
 
-          {value.client?.entity_type === EntityType.Operator && (
+          {clientIsOperator && (
             <TextInput //TODO for transfer only
               required
               label={t("N° du certificat d'acquisition")}
@@ -141,7 +145,7 @@ export const TicketAssignment = ({
             />
           )}
 
-          {value.client?.entity_type === EntityType.Airline && (
+          {(clientIsAirline || clientIsSafTrader) && (
             <>
               <Autocomplete
                 required
@@ -166,23 +170,29 @@ export const TicketAssignment = ({
                   { value: ShippingMethodEnum.BARGE, label: t("Barge") },
                 ]}
               />
-
-              <Autocomplete
-                label={t("Type de consommation")}
-                placeholder={t("Sélectionnez un type")}
-                {...bind("consumption_type")}
-                options={[
-                  {
-                    value: ConsumptionType.MAC,
-                    label: t("Mise à consommation mandat FR/EU"),
-                  },
-                  {
-                    value: ConsumptionType.MAC_DECLASSEMENT,
-                    label: t("Mise à consommation hors mandat (déclassement)"),
-                  },
-                ]}
-              />
             </>
+          )}
+
+          {/* Si fournisseur == Opérateur & client == Trader ou Cie. aérienne → type de conso
+          Si fournisseur == Opérateur & client == Opérateur → PAS de type de conso (DAE)
+          Si fournisseur == Trader & client == Cie. aérienne → PAS de type de conso */}
+
+          {supplierIsOperator && (clientIsAirline || clientIsSafTrader) && (
+            <Autocomplete
+              label={t("Type de consommation")}
+              placeholder={t("Sélectionnez un type")}
+              {...bind("consumption_type")}
+              options={[
+                {
+                  value: ConsumptionType.MAC,
+                  label: t("Mise à consommation mandat FR/EU"),
+                },
+                {
+                  value: ConsumptionType.MAC_DECLASSEMENT,
+                  label: t("Mise à consommation hors mandat (déclassement)"),
+                },
+              ]}
+            />
           )}
 
           <TextInput

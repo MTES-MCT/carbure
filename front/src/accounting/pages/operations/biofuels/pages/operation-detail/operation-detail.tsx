@@ -178,20 +178,24 @@ export const OperationDetail = () => {
             fractionDigits: 0,
           }),
         },
-        operation.type === OperationType.ACQUISITION && {
+        (operation.type === OperationType.ACQUISITION ||
+          (operation.type === OperationType.TRANSFERT &&
+            operation?.quantity > 0)) && {
           label: t("Expéditeur"),
           value: operation._entity ?? "-",
         },
         [OperationType.CESSION, OperationType.TRANSFERT].includes(
           operation.type as OperationType
-        ) && {
-          label: t("Destinataire"),
-          value: operation._entity ?? "-",
-        },
-        operation.type !== OperationType.TENEUR && {
-          label: t("Dépôt expéditeur"),
-          value: operation._depot ?? "-",
-        },
+        ) &&
+          operation.quantity < 0 && {
+            label: t("Destinataire"),
+            value: operation._entity ?? "-",
+          },
+        operation.type !== OperationType.TENEUR &&
+          operation.type !== OperationType.TRANSFERT && {
+            label: t("Dépôt expéditeur"),
+            value: operation._depot ?? "-",
+          },
         operation.type !== OperationType.DEVALUATION &&
           operation.type === OperationType.ACQUISITION &&
           operation.status !== OperationsStatus.PENDING && {

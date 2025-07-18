@@ -1,5 +1,5 @@
-import Checkbox from "common/components/checkbox"
-import { Cell, Column } from "common/components/table"
+import { Checkbox } from "common/components/inputs2"
+import { Cell, Column } from "common/components/table2"
 import { formatNumber } from "common/utils/formatters"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -116,12 +116,12 @@ export const SourcingFullTable = ({
     <>
       {sourcing?.length > 0 && (
         <Checkbox
-          readOnly
           value={aggregateSourcing}
           onChange={() => setAggregateSourcing(!aggregateSourcing)}
-        >
-          {t("Agréger les données d'approvisionnement par matière première")}
-        </Checkbox>
+          label={t(
+            "Agréger les données d'approvisionnement par matière première"
+          )}
+        ></Checkbox>
       )}
       {!aggregateSourcing && <SourcingTable sourcing={sourcing ?? []} />}
       {aggregateSourcing && (

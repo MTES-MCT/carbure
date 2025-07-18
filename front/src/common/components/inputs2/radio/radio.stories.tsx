@@ -45,3 +45,16 @@ export const Controlled: Story = {
     value: "2",
   },
 }
+
+export const WithLabel: Story = {
+  args: {
+    label: "Label",
+  },
+}
+
+export const ReadOnly: Story = {
+  args: {
+    label: "Label",
+    readOnly: true,
+  },
+}

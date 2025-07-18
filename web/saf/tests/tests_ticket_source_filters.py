@@ -79,7 +79,7 @@ class SafTicketSourceFiltersTest(TestCase):
             "entity_id": self.entity.id,
             "year": 2021,
             "status": "AVAILABLE",
-            "filter": "feedstocks",
+            "filter": "feedstock",
         }
         response = self.client.get(reverse("saf-ticket-sources-filters"), query)
         assert response.status_code == 200
@@ -90,7 +90,7 @@ class SafTicketSourceFiltersTest(TestCase):
             "entity_id": self.entity.id,
             "year": 2022,
             "status": "AVAILABLE",
-            "filter": "feedstocks",
+            "filter": "feedstock",
         }
         response = self.client.get(reverse("saf-ticket-sources-filters"), query)
 
@@ -104,8 +104,8 @@ class SafTicketSourceFiltersTest(TestCase):
             "entity_id": self.entity.id,
             "year": 2022,
             "status": "AVAILABLE",
-            "filter": "feedstocks",
-            "periods": 202202,
+            "filter": "feedstock",
+            "period": 202202,
         }
         response = self.client.get(reverse("saf-ticket-sources-filters"), query)
 
@@ -117,7 +117,7 @@ class SafTicketSourceFiltersTest(TestCase):
             "entity_id": self.entity.id,
             "year": 2022,
             "status": "AVAILABLE",
-            "filter": "periods",
+            "filter": "period",
         }
         response = self.client.get(reverse("saf-ticket-sources-filters"), query)
 

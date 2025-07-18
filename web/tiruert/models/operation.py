@@ -161,7 +161,7 @@ def create_tiruert_operations_from_lots(lots):
     if not valid_lots:
         return []
 
-    valid_lots = list(valid_lots)[:10]
+    valid_lots = list(valid_lots)
     valid_lots = ep2_processing(valid_lots)
 
     # Group validated_lots by delivery_type, feedstock, biofuel and depot

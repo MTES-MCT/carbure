@@ -234,6 +234,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Administration Externe")
     case EntityType.Airline:
       return i18next.t("Compagnie aérienne")
+    case EntityType.SAF_Trader:
+      return i18next.t("Trader de SAF")
     case EntityType.CPO:
       return i18next.t("Aménageur de bornes électriques")
     case EntityType.PowerOrHeatProducer:
@@ -354,4 +356,11 @@ export function identity<T>(value: T) {
 
 export function isString(value: any): value is string {
   return typeof value === "string"
+}
+
+export function getYesNoOptions() {
+  return [
+    { value: true, label: i18next.t("Oui") },
+    { value: false, label: i18next.t("Non") },
+  ]
 }

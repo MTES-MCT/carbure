@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from core.models import Entity, UserRights, UserRightsRequests
@@ -58,8 +59,7 @@ class GrantAccessActionMixin:
         serializer.is_valid(raise_exception=True)
         right_request = serializer.validated_data.get("request_id")
         if right_request.entity.id != entity.id:
-            # TODO: permission denieded
-            pass
+            raise PermissionDenied()
 
         try:
             right_request.status = "ACCEPTED"

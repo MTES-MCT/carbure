@@ -77,14 +77,11 @@ export const CardProgress = ({
                 ) : null}
               </Title>
               {!!penalty && (
-                <Text className={css["card-progress__penalty"]} size="sm">
+                <Text size="sm">
                   Sanction :{" "}
-                  {formatNumber(
-                    Number(CONVERSIONS.euros.centsToKEuros(penalty)),
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}{" "}
+                  {formatNumber(CONVERSIONS.euros.centsToKEuros(penalty), {
+                    fractionDigits: 0,
+                  })}{" "}
                   k€
                 </Text>
               )}

@@ -307,7 +307,7 @@ export const ProductionSiteForm = ({
             <hr />
 
             <TagAutocomplete
-              label={t("Matières premières")}
+              label={t("Matieres premieres")}
               readOnly={readOnly}
               placeholder={t("Ajouter matières premières...")}
               defaultOptions={value.matieres_premieres}

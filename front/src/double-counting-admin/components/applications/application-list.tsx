@@ -1,12 +1,12 @@
 import useEntity from "common/hooks/entity"
 import HashRoute from "common/components/hash-route"
-import NoResult from "common/components/no-result"
-import { ActionBar } from "common/components/scaffold"
-import Table, { Cell, Column } from "common/components/table"
-import Tabs from "common/components/tabs"
+import { NoResult } from "common/components/no-result2"
+import { ActionBar, Content } from "common/components/scaffold"
+import { Cell, Column, Table } from "common/components/table2"
+import { Tabs } from "common/components/tabs2"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
@@ -97,29 +97,28 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
 
   return (
     <>
-      <section>
-        <ActionBar>
-          <Tabs
-            focus={tab}
-            variant="switcher"
-            onFocus={setTab}
-            tabs={[
-              {
-                key: "pending",
-                label: t("En attente ({{count}})", {
-                  count: snapshot?.applications_pending,
-                }),
-              },
-              {
-                key: "rejected",
-                label: t("Refusé ({{ count }})", {
-                  count: snapshot?.applications_rejected,
-                }),
-              },
-            ]}
-          />
-        </ActionBar>
+      <ActionBar>
+        <Tabs
+          focus={tab}
+          onFocus={setTab}
+          tabs={[
+            {
+              key: "pending",
+              label: t("En attente ({{count}})", {
+                count: snapshot?.applications_pending,
+              }),
+            },
+            {
+              key: "rejected",
+              label: t("Refusé ({{ count }})", {
+                count: snapshot?.applications_rejected,
+              }),
+            },
+          ]}
+        />
+      </ActionBar>
 
+      <Content>
         <AgreementFilters
           filters={CLIENT_FILTERS}
           selected={state.filters}
@@ -127,28 +126,24 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
           getFilterOptions={getAgreementFilter}
         />
 
-        <Fragment>
-          {!applications ||
-          (tab === "pending" && applications.pending.length === 0) ||
-          (tab === "rejected" && applications.rejected.length === 0) ? (
-            <NoResult
-              label={t("Aucune demande trouvée")}
-              loading={applicationsResponse.loading}
-            />
-          ) : (
-            <Table
-              loading={applicationsResponse.loading}
-              columns={columns}
-              rows={
-                tab === "pending"
-                  ? applications?.pending
-                  : applications?.rejected
-              }
-              onAction={showApplicationDialog}
-            />
-          )}
-        </Fragment>
-      </section>
+        {!applications ||
+        (tab === "pending" && applications.pending.length === 0) ||
+        (tab === "rejected" && applications.rejected.length === 0) ? (
+          <NoResult
+            label={t("Aucune demande trouvée")}
+            loading={applicationsResponse.loading}
+          />
+        ) : (
+          <Table
+            loading={applicationsResponse.loading}
+            columns={columns}
+            rows={
+              tab === "pending" ? applications?.pending : applications?.rejected
+            }
+            onAction={showApplicationDialog}
+          />
+        )}
+      </Content>
       <HashRoute
         path="application/:id"
         element={<ApplicationDetailsDialog />}

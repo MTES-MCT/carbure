@@ -1,5 +1,4 @@
-import endOfMonth from "date-fns/endOfMonth"
-import subMonths from "date-fns/subMonths"
+import { endOfMonth, subMonths } from "date-fns"
 import { Lot, LotStatus } from "transactions/types"
 
 export function getCurrentDeadline() {

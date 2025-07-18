@@ -51,6 +51,9 @@ class DoubleCountingApplication(models.Model):
             "status": self.status,
         }
 
+    def has_dechets_industriels(self):
+        return self.production.filter(feedstock__code__in=["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]).exists()
+
     class Meta:
         db_table = "double_counting_applications"
         ordering = ["certificate_id"]
@@ -182,15 +185,16 @@ class DoubleCountingProductionHistory(models.Model):
 
 class DoubleCountingDocFile(models.Model):
     DECISION = "DECISION"
-    SOURCING = "SOURCING"
-    FILE_TYPE = ((SOURCING, SOURCING), (DECISION, DECISION))
+    EXTRA = "EXTRA"
+    EXCEL = "EXCEL"
+    FILE_TYPE = ((EXCEL, EXCEL), (EXTRA, EXTRA), (DECISION, DECISION))
 
     url = models.TextField()
     certificate_id = models.CharField(max_length=16, default="")
     file_name = models.CharField(max_length=128, default="")
-    file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
+    file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=EXTRA)
     dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="documents")
-    link_expiry_dt = models.DateTimeField()
+    link_expiry_dt = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:

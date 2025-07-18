@@ -6,6 +6,7 @@ import { RecapData } from "../recap-data"
 import { floorNumber, formatNumber } from "common/utils/formatters"
 import useEntity from "common/hooks/entity"
 import { downloadMacFossilFuel } from "../../api"
+import { Download } from "common/components/download"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -14,50 +15,41 @@ type OverallProgressProps = {
 export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const { isAdmin } = entity
+  const isAdminOrExternal = isAdmin || entity.isExternal
   return (
     <ObjectiveSection
       title={t("Avancement global")}
       description={
         <>
-          <span>
-            <Trans
-              i18nKey="Ces objectifs sont calculés sur la base de vos <a>{{mac}}</a> et d’un PCI théorique."
-              values={{
-                mac: "mises à consommation 2023",
-              }}
-              components={{
-                strong: <strong />,
-                a: (
-                  <a
-                    className="fr-link--download fr-link"
-                    style={{
-                      backgroundImage:
-                        "var(--underline-img), var(--underline-img)",
-                    }}
-                    download="true"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      downloadMacFossilFuel(entity.id)
-                    }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                ),
-              }}
-            />
-          </span>
-          <br />
-          <span>
-            <Trans
-              i18nKey="Base calculée : {{energy_basis}} GJ"
-              values={{
-                energy_basis: formatNumber(objective?.energy_basis ?? 0, {
-                  fractionDigits: 0,
-                }),
-              }}
-            />
-          </span>
+          {!isAdminOrExternal && (
+            <>
+              <Trans
+                i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d’un PCI théorique."
+                components={{
+                  a: (
+                    <Download
+                      label={t("mises à consommation") + " 2023"}
+                      linkProps={{
+                        href: downloadMacFossilFuel(entity.id),
+                      }}
+                    />
+                  ),
+                }}
+              />
+              <br />
+              <br />
+            </>
+          )}
+
+          <Trans
+            i18nKey="Base calculée : {{energy_basis}} GJ"
+            values={{
+              energy_basis: formatNumber(objective?.energy_basis ?? 0, {
+                fractionDigits: 0,
+              }),
+            }}
+          />
         </>
       }
     >

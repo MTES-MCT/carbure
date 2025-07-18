@@ -24,6 +24,7 @@ export default defineConfig({
     hmr: {
       path: "/ws",
     },
+    allowedHosts: (process.env.ALLOWED_HOSTS ?? "localhost").split(","),
   },
   build: {
     outDir: "./build",

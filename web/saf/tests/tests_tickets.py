@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.urls import reverse
 
 from core.models import Biocarburant, MatierePremiere, Pays
@@ -17,7 +15,6 @@ class SafTicketsTest(TestCase):
         self.ticket = SafTicket.objects.create(
             id=4321,
             carbure_id="carbure-id-t-001",
-            created_at=datetime(2022, 1, 1),
             year=2022,
             assignment_period=202201,
             status=SafTicket.PENDING,
@@ -76,10 +73,10 @@ class SafTicketsTest(TestCase):
             "year": 2022,
             "assignment_period": 202201,
             "status": "PENDING",
-            "supplier": self.entity.name,
-            "client": self.ticket_client.name,
-            "volume": 30000.0,
             "agreement_date": "2022-06-20",
+            "supplier": "AOT",
+            "client": "ARMORINE",
+            "volume": 30000.0,
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
                 "name_en": "CI/CII Animal fat",
@@ -99,7 +96,13 @@ class SafTicketsTest(TestCase):
                 "is_in_europe": True,
             },
             "ghg_reduction": 65.0,
-            "consumption_type": SafTicket.MAC,
+            "consumption_type": "MAC",
+            "ets_status": None,
+            "reception_airport": None,
         }
-        assert response.json()["results"][0] == expected_ticket
+
+        data = response.json()["results"][0]
+        data.pop("created_at")
+
+        assert data == expected_ticket
         assert response.json()["count"] == 2

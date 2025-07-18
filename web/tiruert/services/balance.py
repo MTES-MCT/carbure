@@ -133,8 +133,6 @@ class BalanceService:
 
         for operation in operations:
             credit_operation = operation.is_credit(entity_id)
-            if credit_operation and operation.status == Operation.PENDING:
-                continue
 
             depot = None
             if group_by == BalanceService.GROUP_BY_DEPOT:
@@ -162,16 +160,17 @@ class BalanceService:
                     if group_by != BalanceService.GROUP_BY_CATEGORY:
                         balance[key]["biofuel"] = operation.biofuel
 
-                # Update available balance
-                BalanceService._update_available_balance(
-                    balance, key, operation, detail, credit_operation, conversion_factor
-                )
-
-                # Update quantity and teneur only if the operation date is after the date_from
-                if date_from is None or operation.created_at >= date_from:
-                    BalanceService._update_quantity_and_teneur(
+                if not (credit_operation and operation.status == Operation.PENDING):
+                    # Update available balance
+                    BalanceService._update_available_balance(
                         balance, key, operation, detail, credit_operation, conversion_factor
                     )
+
+                    # Update quantity and teneur only if the operation date is after the date_from
+                    if date_from is None or operation.created_at >= date_from:
+                        BalanceService._update_quantity_and_teneur(
+                            balance, key, operation, detail, credit_operation, conversion_factor
+                        )
 
                 # Update GHG reduction min and max values
                 if group_by not in BalanceService.GROUP_BY_ALL:

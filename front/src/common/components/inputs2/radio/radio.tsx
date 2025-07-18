@@ -7,8 +7,11 @@ import { Label, LabelProps } from "../base-input"
 import styles from "./radio.module.css"
 import cl from "clsx"
 
+// The DSFR does not support boolean values for the radio buttons
 type RadioValueType =
-  RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
+  | RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
+  | boolean
+
 // Simplify the usage of the RadioButtons component
 type OptionsProps<V extends RadioValueType> = Omit<
   RadioButtonsProps["options"][number],
@@ -24,19 +27,23 @@ export type RadioGroupProps<V extends RadioValueType> = Omit<
 > & {
   options: OptionsProps<V>[]
   value?: V
-  onChange: (value: V) => void
-  required?: boolean
-}
+  onChange?: (value: V) => void
+} & Omit<LabelProps, "label"> & {
+    label?: LabelProps["label"]
+  }
 
 export const RadioGroup = <V extends RadioValueType>({
   options,
   onChange,
   required,
+  label,
+  readOnly,
+  hasTooltip,
+  title,
   ...props
 }: RadioGroupProps<V>) => {
   const optionsWithNativeInputProps = options.map((option) => ({
     ...option,
-    label: <Label {...option} />,
     nativeInputProps: {
       value: option.value,
       onChange: (e: ChangeEvent<HTMLInputElement>) =>
@@ -46,13 +53,28 @@ export const RadioGroup = <V extends RadioValueType>({
         : {}),
       required,
     },
-  }))
+  })) as RadioButtonsProps["options"]
 
   return (
     <RadioButtons
       {...props}
       options={optionsWithNativeInputProps}
-      className={cl(props.className, styles["radio-group"])}
+      className={cl(
+        props.className,
+        styles["radio-group"],
+        readOnly && styles["radio-group--read-only"]
+      )}
+      legend={
+        <Label
+          label={label}
+          readOnly={readOnly}
+          hasTooltip={hasTooltip}
+          required={required}
+          title={title}
+        />
+      }
+      disabled={readOnly ?? props.disabled}
+      small={readOnly ?? props.small}
     />
   )
 }

@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
@@ -6,6 +7,7 @@ from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
 from core.models import Entity
 from core.permissions import HasAdminRights, HasUserRights
 from doublecount.filters import AgreementFilter
+from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 from doublecount.views.agreements.mixins import ActionMixin
 
 
@@ -21,8 +23,37 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     )
 
     def get_queryset(self):
-        return DoubleCountingRegistration.objects.all().select_related(
-            "production_site", "production_site__created_by", "application"
+        queryset = super().get_queryset()
+
+        if self.action == "retrieve":
+            queryset = queryset.select_related(
+                "application",
+                "application__producer",
+                "application__production_site__created_by",
+                "application__production_site",
+                "application__production_site__country",
+            ).prefetch_related(
+                # For application sourcing with their related data
+                Prefetch(
+                    "application__sourcing",
+                    queryset=DoubleCountingSourcing.objects.select_related(
+                        "feedstock", "origin_country", "supply_country", "transit_country"
+                    ),
+                ),
+                # For application production with their related data
+                Prefetch(
+                    "application__production",
+                    queryset=DoubleCountingProduction.objects.select_related("biofuel", "feedstock"),
+                ),
+                # For application documents
+                "application__documents",
+                "application__production_site__productionsiteinput_set",
+                "application__production_site__productionsiteoutput_set",
+            )
+
+        return queryset.select_related(
+            "production_site",
+            "production_site__created_by",
         )
 
     def get_permissions(self):

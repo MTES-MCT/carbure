@@ -2,13 +2,8 @@ import traceback
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import (
-    OpenApiExample,
-    OpenApiParameter,
-    OpenApiTypes,
-    extend_schema,
-)
-from rest_framework import serializers, status
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -22,11 +17,6 @@ class SafTicketAcceptError:
     TICKET_NOT_FOUND = "TICKET_NOT_FOUND"
 
 
-class CreditTicketSourceSerializer(serializers.Serializer):
-    ticket_id = serializers.IntegerField()
-    entity_id = serializers.IntegerField()
-
-
 class CreditActionMixin:
     @extend_schema(
         parameters=[
@@ -38,6 +28,7 @@ class CreditActionMixin:
                 required=True,
             )
         ],
+        request=None,
         examples=[
             OpenApiExample(
                 "Example of credit response.",
@@ -47,7 +38,7 @@ class CreditActionMixin:
             ),
         ],
     )
-    @action(methods=["get"], detail=True, url_path="credit-source")
+    @action(methods=["post"], detail=True, url_path="credit-source")
     def credit_source(self, request, id=None):
         entity_id = int(request.query_params.get("entity_id"))
         ticket = get_object_or_404(SafTicket, id=id, client_id=entity_id)

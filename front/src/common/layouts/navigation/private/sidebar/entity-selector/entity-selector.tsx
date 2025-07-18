@@ -51,6 +51,8 @@ export const EntitySelector = ({ className }: { className?: string }) => {
         return t("Aménageur")
       case EntityType.PowerOrHeatProducer:
         return t("Producteur")
+      case EntityType.SAF_Trader:
+        return t("Trader de SAF")
       case EntityType.Unknown:
       default:
         return t("Inconnu")

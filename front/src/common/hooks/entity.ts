@@ -21,6 +21,7 @@ export interface EntityManager extends Entity {
   isPowerOrHeatProducer: boolean
   isIndustry: boolean
   isCPO: boolean
+  isSafTrader: boolean
   canTrade: boolean
   hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) => boolean
   hasRights: (...roles: UserRole[]) => boolean
@@ -76,6 +77,7 @@ export function useEntityManager(
     isPowerOrHeatProducer: type === EntityType.PowerOrHeatProducer,
     isTrader: type === EntityType.Trader,
     isCPO: type === EntityType.CPO,
+    isSafTrader: type === EntityType.SAF_Trader,
     isIndustry: isIndustry(type),
     canTrade: canTrade,
     website: entity?.website ?? "",

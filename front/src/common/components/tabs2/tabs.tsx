@@ -5,36 +5,39 @@ import { useEffect, useState } from "react"
 import cl from "clsx"
 import css from "./tabs.module.css"
 import { Text } from "../text"
-import { IconProps } from "../icon"
+import { IconName, Icon } from "../icon"
 
 export type TabVariant = "header"
 
-export interface Tab {
-  key: string
+export interface Tab<T extends string> {
+  key: T
   label: React.ReactNode
-  icon?: React.ComponentType<IconProps>
+  icon?: IconName
+  iconActive?: IconName
   path?: string
 }
 
-export interface TabsProps extends Layout {
+export interface TabsProps<T extends string> extends Layout {
   className?: string
   style?: React.CSSProperties
   variant?: TabVariant
   keepSearch?: boolean
-  tabs: Tab[]
-  focus?: string
-  onFocus?: (tab: string) => void
+  tabs: Tab<T>[]
+  focus?: T
+  onFocus?: (tab: T) => void
+  sticky?: boolean
   // children?: (tab: string) => React.ReactNode
 }
-export const Tabs = ({
+export const Tabs = <T extends string>({
   className,
   style,
   keepSearch,
   tabs: tabsConfig,
   focus: controlledFocus,
   onFocus,
+  sticky,
   ...props
-}: TabsProps) => {
+}: TabsProps<T>) => {
   const matcher = useMatcher()
   const location = useLocation()
   const tabs = tabsConfig.filter(Boolean)
@@ -44,14 +47,19 @@ export const Tabs = ({
   useEffect(() => {
     setFocus(controlledFocus ?? match?.key)
   }, [controlledFocus, match?.key])
+
   return (
-    <nav {...layout(props)} className={cl(css.tabs, className)} style={style}>
-      {tabs.map(({ icon: Icon, ...tab }) => {
+    <nav
+      {...layout(props)}
+      className={cl(css.tabs, className, sticky && css.sticky)}
+      style={style}
+    >
+      {tabs.map(({ icon, iconActive, ...tab }) => {
         const props = {
           className: cl(
             css.tab,
             tab.key === focus && css.active,
-            Icon && css.icon
+            icon && css.icon
           ),
           onClick: () => {
             setFocus(tab.key)
@@ -63,7 +71,12 @@ export const Tabs = ({
         if (!tab.path) {
           return (
             <Text is="button" fontWeight="bold" {...props} key={tab.key}>
-              {Icon && <Icon size="sm" />}
+              {((icon && tab.key !== focus) || (!iconActive && icon)) && (
+                <Icon size="sm" name={icon} />
+              )}
+              {iconActive && tab.key === focus && (
+                <Icon size="sm" name={iconActive} />
+              )}
               {tab.label}
             </Text>
           )
@@ -78,7 +91,12 @@ export const Tabs = ({
               {...props}
               key={tab.key}
             >
-              {Icon && <Icon size="sm" />}
+              {((icon && tab.key !== focus) || (!iconActive && icon)) && (
+                <Icon size="sm" name={icon} />
+              )}
+              {iconActive && tab.key === focus && (
+                <Icon size="sm" name={iconActive} />
+              )}
               {tab.label}
             </Text>
           )
@@ -94,7 +112,12 @@ export const Tabs = ({
             {...props}
             key={tab.key}
           >
-            {Icon && <Icon size="sm" />}
+            {((icon && tab.key !== focus) || (!iconActive && icon)) && (
+              <Icon size="sm" name={icon} />
+            )}
+            {iconActive && tab.key === focus && (
+              <Icon size="sm" name={iconActive} />
+            )}
             {tab.label}
           </Text>
         )
