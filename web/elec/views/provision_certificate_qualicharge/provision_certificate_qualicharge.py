@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from elec.filters.provision_certificate import ProvisionCertificateQualichargeFilter
+from elec.filters import ProvisionCertificateQualichargeFilter
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ElecProvisionCertificateQualichargeSerializer
 

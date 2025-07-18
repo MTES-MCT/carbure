@@ -97,7 +97,8 @@ paths:
                   value:
                     error: NO_CHANGE_REQUEST
                   summary: Aucune demande en cours
-          description: "Erreurs possibles: données invalides, aucune demande en cours,
+          description:
+            "Erreurs possibles: données invalides, aucune demande en cours,
             code expiré, code incorrect"
   /api/auth/login/:
     post:
@@ -274,7 +275,8 @@ paths:
                       password:
                         - Mot de passe incorrect.
                   summary: Erreur de validation
-          description: "Erreurs possibles: données invalides, mot de passe incorrect,
+          description:
+            "Erreurs possibles: données invalides, mot de passe incorrect,
             email déjà utilisé"
   /api/auth/request-otp/:
     get:
@@ -355,7 +357,8 @@ paths:
                       current_password:
                         - PASSWORDS_MATCH
                   summary: Mots de passe identiques
-          description: "Erreurs possibles: données invalides, mot de passe actuel
+          description:
+            "Erreurs possibles: données invalides, mot de passe actuel
             incorrect, nouveau mot de passe invalide"
   /api/auth/request-password-reset/:
     post:
@@ -1725,7 +1728,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Certificat de Fourniture
+          description:
+            A unique integer value identifying this Certificat de Fourniture
             (elec).
           required: true
       tags:
@@ -7600,7 +7604,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -7701,7 +7706,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -8643,6 +8649,62 @@ paths:
               schema:
                 error: NOTHING_TO_DECLARE
           description: Error message
+  /api/token/:
+    post:
+      operationId: token_create
+      description: >-
+        Takes a set of user credentials and returns an access and refresh JSON
+        web
+
+        token pair to prove the authentication of those credentials.
+      tags:
+        - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenObtainPairRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TokenObtainPairRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TokenObtainPairRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenObtainPair"
+          description: ""
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+        - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenRefresh"
+          description: ""
   /api/user/:
     get:
       operationId: user_retrieve
@@ -10947,10 +11009,14 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityTypeEnum"
           readOnly: true
+        registration_id:
+          type: string
+          readOnly: true
       required:
         - entity_type
         - id
         - name
+        - registration_id
     EntityProductionSite:
       type: object
       properties:
@@ -11859,6 +11925,27 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+    OperationalUnitRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 5
+          maxLength: 5
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        stations:
+          type: array
+          items:
+            $ref: "#/components/schemas/StationRequest"
+      required:
+        - code
+        - from
+        - to
     OtpResponse:
       type: object
       properties:
@@ -13340,6 +13427,49 @@ components:
         has_trading:
           type: boolean
           default: false
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+        - access
+        - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - email
+        - password
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+      required:
+        - access
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - refresh
     TransportDocumentTypeEnum:
       enum:
         - DAU
@@ -13683,7 +13813,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:
@@ -13803,6 +13934,16 @@ components:
         - email
         - requests
         - rights
+    ValidatedByEnum:
+      enum:
+        - DGEC
+        - AMENAGEUR
+        - BOTH
+      type: string
+      description: |-
+        * `DGEC` - DGEC
+        * `AMENAGEUR` - AMENAGEUR
+        * `BOTH` - BOTH
     VerifyOTPRequest:
       type: object
       description: A serializer for submitting the OTP sent via email. Includes
@@ -13846,3 +13987,7 @@ components:
       type: apiKey
       in: cookie
       name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
