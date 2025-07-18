@@ -1,6 +1,7 @@
 .checkbox[type="checkbox"]:checked {
   background-color: var(--background-active-blue-france);
-  background-image: radial-gradient(
+  background-image:
+    radial-gradient(
       at 5px 4px,
       transparent 4px,
       var(--border-active-blue-france) 4px,
@@ -76,7 +77,8 @@
     100% 0.25rem,
     center;
   background-repeat: no-repeat;
-  background-image: radial-gradient(
+  background-image:
+    radial-gradient(
       at 5px 4px,
       transparent 4px,
       var(--border-action-high-blue-france) 4px,

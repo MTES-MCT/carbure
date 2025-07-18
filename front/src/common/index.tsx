@@ -24,8 +24,7 @@ const ElecCPO = lazy(() => import("elec/cpo"))
 const ChargePoints = lazy(() => import("elec-charge-points/charge-points"))
 const ElecOperator = lazy(() => import("elec/operator"))
 const Registry = lazy(() => import("registry"))
-const SafAirline = lazy(() => import("saf/pages/airline"))
-const SafOperator = lazy(() => import("saf/pages/operator"))
+const Saf = lazy(() => import("saf"))
 const Settings = lazy(() => import("settings"))
 const Stats = lazy(() => import("stats"))
 const Transactions = lazy(() => import("transactions"))
@@ -126,13 +125,13 @@ const Org = () => {
     isAirline,
     isCPO,
     isPowerOrHeatProducer,
-    isSAFTrader,
-    has_saf,
+    isSafTrader,
     has_elec,
+    has_saf,
     accise_number,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
-  const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
+  const isSafAdmin = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
   const isTiruertAdmin = isExternal && entity.hasAdminRight("TIRIB")
   const isTransferredElecAdmin =
@@ -140,6 +139,8 @@ const Org = () => {
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
+  const isSafOperator = isOperator && has_saf
+
   return (
     <Routes>
       <Route path="settings" element={<Settings />} />
@@ -164,34 +165,8 @@ const Org = () => {
         <Route path="accounting/*" element={<MaterialAccounting />} />
       )}
 
-      {((has_saf && isOperator) || isSAFTrader) && (
-        <>
-          <Route path="saf/:year/*" element={<SafOperator />} />
-          <Route
-            path="saf"
-            element={<Navigate replace to={`${currentYear}/ticket-sources`} />}
-          />
-          <Route
-            path="*"
-            element={
-              <Navigate replace to={`saf/${currentYear}/tickets-sources`} />
-            }
-          />
-        </>
-      )}
-
-      {isAirline && (
-        <>
-          <Route path="saf/:year/*" element={<SafAirline />} />
-          <Route
-            path="saf"
-            element={<Navigate replace to={`${currentYear}/tickets`} />}
-          />
-          <Route
-            path="*"
-            element={<Navigate replace to={`saf/${currentYear}/tickets`} />}
-          />
-        </>
+      {(isAirline || isSafOperator || isSafTrader || isAdmin || isSafAdmin) && (
+        <Route path="saf/:year/*" element={<Saf />} />
       )}
       {isProducer && (
         <>
@@ -296,7 +271,7 @@ const Org = () => {
           />
         </>
       )}
-      {hasAirline && (
+      {isSafAdmin && (
         <Route path="*" element={<Navigate replace to="entities" />} />
       )}
     </Routes>

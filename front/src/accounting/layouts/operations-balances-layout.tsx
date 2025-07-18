@@ -4,14 +4,15 @@ import { useTranslation } from "react-i18next"
 import { Outlet, useParams } from "react-router-dom"
 import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
+import useEntity from "common/hooks/entity"
 
 const OperationsBalancesLayout = () => {
   const { t } = useTranslation()
+  const { has_elec, isOperator } = useEntity()
 
   // extract current TIRUERT section: "balances" or "operations"
   const params = useParams()
   const [sector] = (params["*"] ?? "").split("/")
-
   return (
     <>
       <Tabs
@@ -22,12 +23,13 @@ const OperationsBalancesLayout = () => {
             path: `${sector}/${SectorTabs.BIOFUELS}`,
             icon: "fr-icon-gas-station-fill",
           },
-          {
-            key: SectorTabs.ELEC,
-            label: t("Électricité"),
-            path: `${sector}/${SectorTabs.ELEC}`,
-            icon: "fr-icon-charging-pile-2-fill",
-          },
+          isOperator &&
+            has_elec && {
+              key: SectorTabs.ELEC,
+              label: t("Électricité"),
+              path: `${sector}/${SectorTabs.ELEC}`,
+              icon: "fr-icon-charging-pile-2-fill",
+            },
         ])}
       />
 

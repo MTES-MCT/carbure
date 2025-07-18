@@ -9,6 +9,7 @@ from core.tests_utils import setup_current_user
 class Endpoint:
     change_user_role = reverse("api-entity-users-change-role")
     invite_user = reverse("api-entity-users-invite-user")
+    accept_user = reverse("api-entity-users-accept-user")
 
 
 User = get_user_model()
@@ -28,7 +29,7 @@ class EntityUserTest(TestCase):
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
 
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "ADMIN")], True)
 
         user_model = get_user_model()
         self.user2 = user_model.objects.create_user(
@@ -163,3 +164,12 @@ class EntityUserTest(TestCase):
             == 1
         )
         assert UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count() == 1
+
+    def test_grant_access(self):
+        right_request = UserRightsRequests.objects.create(user=self.user2, entity=self.trader, role=UserRights.ADMIN)
+
+        response = self.client.post(f"{Endpoint.accept_user}?entity_id={self.admin.pk}", {"request_id": right_request.id})
+        assert response.status_code == 403
+
+        response = self.client.post(f"{Endpoint.accept_user}?entity_id={self.trader.pk}", {"request_id": right_request.id})
+        assert response.status_code == 200
