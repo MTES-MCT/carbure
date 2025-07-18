@@ -48,9 +48,7 @@ const EmailConfirmationModal = ({
         const { error: errorCode } = errorData
 
         if (errorCode?.includes("INVALID_OTP")) {
-          notify(t("Le code saisi est incorrect."), {
-            variant: "danger",
-          })
+          notify(t("Le code saisi est incorrect."), { variant: "danger" })
         } else if (errorCode?.includes("OTP_CODE_EXPIRED")) {
           notify(t("Le code a expiré. Veuillez refaire une demande."), {
             variant: "danger",
@@ -58,9 +56,7 @@ const EmailConfirmationModal = ({
         } else if (errorCode?.includes("NO_CHANGE_REQUEST")) {
           notify(
             t("Il n'y a pas de demande de changement pour l'email passé."),
-            {
-              variant: "danger",
-            }
+            { variant: "danger" }
           )
         } else {
           notify(t("Erreur lors de la validation du code."), {
@@ -138,6 +134,7 @@ export const AccountAuthentication = () => {
 
   const { value, bind } = useForm({
     email: user.email,
+    newEmail: "" as string | undefined,
     password: "" as string | undefined,
   })
 
@@ -145,10 +142,12 @@ export const AccountAuthentication = () => {
     onSuccess: () => {
       portal((close) => (
         <EmailConfirmationModal
-          newEmail={value.email!}
+          newEmail={value.newEmail!}
           onClose={close}
           onSuccess={() => {
             setIsEditing(false)
+            bind("email").onChange(value.newEmail || "")
+            bind("newEmail").onChange("")
             bind("password").onChange("")
           }}
         />
@@ -168,9 +167,7 @@ export const AccountAuthentication = () => {
         if (errors.new_email?.includes("EMAIL_ALREADY_USED")) {
           notify(
             t("Cette adresse email est déjà utilisée par un autre compte."),
-            {
-              variant: "danger",
-            }
+            { variant: "danger" }
           )
         }
         if (errors.password?.includes("WRONG_PASSWORD")) {
@@ -187,14 +184,14 @@ export const AccountAuthentication = () => {
   })
 
   const handleSave = () => {
-    if (value.email && value.password) {
-      requestEmailChangeMutation.execute(value.email, value.password)
+    if (value.newEmail && value.password) {
+      requestEmailChangeMutation.execute(value.newEmail, value.password)
     }
   }
 
   const handleCancel = () => {
     setIsEditing(false)
-    bind("email").onChange(user.email)
+    bind("newEmail").onChange("")
     bind("password").onChange("")
   }
 
@@ -228,15 +225,24 @@ export const AccountAuthentication = () => {
           onSubmit={isEditing ? handleSave : undefined}
         >
           <TextInput
-            readOnly={!isEditing}
-            label={t("Adresse email")}
+            readOnly={true}
+            label={t("Adresse email actuelle")}
             type="email"
-            required={isEditing}
             value={value.email}
-            onChange={(val) => bind("email").onChange(val || "")}
-            error={bind("email").error}
             style={{ width: "100%" }}
           />
+
+          {isEditing && (
+            <TextInput
+              label={t("Nouvelle adresse email")}
+              type="email"
+              required
+              value={value.newEmail}
+              onChange={(val) => bind("newEmail").onChange(val || "")}
+              error={bind("newEmail").error}
+              style={{ width: "100%" }}
+            />
+          )}
 
           {isEditing && (
             <TextInput
@@ -273,7 +279,7 @@ export const AccountAuthentication = () => {
               label={t("Valider")}
               submit="update-email-form"
               loading={requestEmailChangeMutation.loading}
-              disabled={!value.email || !value.password}
+              disabled={!value.newEmail || !value.password}
             />
           </div>
         )}
