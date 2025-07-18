@@ -37,6 +37,7 @@ from tiruert.models import MacFossilFuel
 class MacFossilFuelExportViewSet(GenericViewSet):
     queryset = MacFossilFuel.objects.all()
     filterset_class = MacFilter
+    serializer_class = None
 
     @action(detail=False, methods=["get"], url_path="export")
     def export_macfossilfuel_to_excel(self, request, *args, **kwargs):
