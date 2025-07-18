@@ -2266,6 +2266,42 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/token/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Takes a set of user credentials and returns an access and refresh JSON web
+     *     token pair to prove the authentication of those credentials. */
+    post: operations["token_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/token/refresh/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Takes a refresh type JSON web token and returns an access type JSON web
+     *     token if the refresh token is valid. */
+    post: operations["token_refresh_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/user/": {
     parameters: {
       query?: never
@@ -3196,6 +3232,7 @@ export interface components {
       readonly id: number
       readonly name: string
       readonly entity_type: components["schemas"]["EntityTypeEnum"]
+      readonly registration_id: string
     }
     EntityProductionSite: {
       readonly id: number
@@ -3570,6 +3607,14 @@ export interface components {
      * @enum {string}
      */
     OperationTypeEnum: OperationTypeEnum
+    OperationalUnitRequest: {
+      code: string
+      /** Format: date */
+      from: string
+      /** Format: date */
+      to: string
+      stations?: components["schemas"]["StationRequest"][]
+    }
     OtpResponse: {
       valid_until: string
     }
@@ -4204,6 +4249,20 @@ export interface components {
       /** @default false */
       has_trading: boolean
     }
+    TokenObtainPair: {
+      readonly access: string
+      readonly refresh: string
+    }
+    TokenObtainPairRequest: {
+      email: string
+      password: string
+    }
+    TokenRefresh: {
+      readonly access: string
+    }
+    TokenRefreshRequest: {
+      refresh: string
+    }
     /**
      * @description * `DAU` - DAU
      *     * `DAE` - DAE
@@ -4375,6 +4434,13 @@ export interface components {
       rights: components["schemas"]["UserRights"][]
       requests: components["schemas"]["UserRightsRequests"][]
     }
+    /**
+     * @description * `DGEC` - DGEC
+     *     * `AMENAGEUR` - AMENAGEUR
+     *     * `BOTH` - BOTH
+     * @enum {string}
+     */
+    ValidatedByEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by
     /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
     VerifyOTPRequest: {
       /** Entrez le code à 6 chiffres reçu par email */
@@ -9680,6 +9746,56 @@ export interface operations {
         }
         content: {
           "application/json": unknown
+        }
+      }
+    }
+  }
+  token_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TokenObtainPairRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["TokenObtainPairRequest"]
+        "multipart/form-data": components["schemas"]["TokenObtainPairRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TokenObtainPair"]
+        }
+      }
+    }
+  }
+  token_refresh_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TokenRefreshRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["TokenRefreshRequest"]
+        "multipart/form-data": components["schemas"]["TokenRefreshRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TokenRefresh"]
         }
       }
     }
