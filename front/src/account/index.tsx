@@ -32,11 +32,11 @@ const Account = () => {
         />
       </Routes>
       <section>
-        <AccountAccesRights />
+        <AccountAuthentication />
       </section>
 
       <section>
-        <AccountAuthentication />
+        <AccountAccesRights />
       </section>
     </Main>
   )

@@ -87,7 +87,7 @@ paths:
               examples:
                 CodeIncorrect:
                   value:
-                    error: OTP_NOT_OK
+                    error: INVALID_OTP
                   summary: Code incorrect
                 CodeExpiré:
                   value:
@@ -296,6 +296,66 @@ paths:
                     valid_until: 07/03/2024, 14:09
                   summary: Example response.
           description: ""
+  /api/auth/request-password-change/:
+    post:
+      operationId: auth_request_password_change_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordSuccess"
+              examples:
+                Succès:
+                  value:
+                    status: success
+          description: Mot de passe modifié avec succès
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordError"
+              examples:
+                MotDePasseActuelIncorrect:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      current_password:
+                        - WRONG_CURRENT_PASSWORD
+                  summary: Mot de passe actuel incorrect
+                NouveauMotDePasseInvalide:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      new_password:
+                        - INVALID_NEW_PASSWORD
+                  summary: Nouveau mot de passe invalide
+                MotsDePasseIdentiques:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      new_password:
+                        - PASSWORDS_MATCH
+                  summary: Mots de passe identiques
+          description: "Erreurs possibles: données invalides, mot de passe actuel
+            incorrect, nouveau mot de passe invalide"
   /api/auth/request-password-reset/:
     post:
       operationId: auth_request_password_reset_create
@@ -3088,7 +3148,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserRightsResponseSeriaizer"
+                $ref: "#/components/schemas/UserRightsResponse"
           description: ""
   /api/entities/users/invite-user/:
     post:
@@ -7512,7 +7572,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserSettingsResponseSeriaizer"
+                $ref: "#/components/schemas/UserSettingsResponse"
           description: ""
   /api/user/request-access:
     post:
@@ -8207,6 +8267,40 @@ components:
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+    ChangePasswordError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur général
+        errors:
+          type: string
+          description: Détails des erreurs de validation
+    ChangePasswordRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        confirm_new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - confirm_new_password
+        - current_password
+        - new_password
+    ChangePasswordSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: success
     ChangeRoleRequest:
       type: object
       properties:
@@ -11025,9 +11119,6 @@ components:
         errors:
           type: string
           description: Détails des erreurs de validation
-        error:
-          type: string
-          description: Code d'erreur spécifique
     RequestEmailChangeRequest:
       type: object
       properties:
@@ -12335,9 +12426,7 @@ components:
         entity:
           $ref: "#/components/schemas/UserEntity"
         role:
-          allOf:
-            - $ref: "#/components/schemas/RoleEnum"
-          readOnly: true
+          $ref: "#/components/schemas/RoleEnum"
         expiration_date:
           type: string
           format: date-time
@@ -12346,7 +12435,6 @@ components:
         - email
         - entity
         - name
-        - role
     UserRightsRequests:
       type: object
       properties:
@@ -12403,13 +12491,13 @@ components:
         - Accepted
         - Rejected
         - Revoked
-    UserRightsResponseSeriaizer:
+    UserRightsResponse:
       type: object
       properties:
         rights:
           type: array
           items:
-            $ref: "#/components/schemas/UserRightsSeriaizer"
+            $ref: "#/components/schemas/UserRights"
         requests:
           type: array
           items:
@@ -12417,29 +12505,7 @@ components:
       required:
         - requests
         - rights
-    UserRightsSeriaizer:
-      type: object
-      properties:
-        name:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          readOnly: true
-        entity:
-          $ref: "#/components/schemas/UserEntity"
-        role:
-          $ref: "#/components/schemas/RoleEnum"
-        expiration_date:
-          type: string
-          format: date-time
-          nullable: true
-      required:
-        - email
-        - entity
-        - name
-    UserSettingsResponseSeriaizer:
+    UserSettingsResponse:
       type: object
       properties:
         email:
