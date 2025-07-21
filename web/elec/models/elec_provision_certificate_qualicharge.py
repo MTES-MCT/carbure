@@ -5,7 +5,9 @@ class ElecProvisionCertificateQualicharge(models.Model):
     DGEC = "DGEC"
     AMENAGEUR = "AMENAGEUR"
     BOTH = "BOTH"
+    NO_ONE = "NO_ONE"
     VALIDATION_CHOICES = (
+        (NO_ONE, NO_ONE),
         (DGEC, DGEC),
         (AMENAGEUR, AMENAGEUR),
         (BOTH, BOTH),
@@ -19,7 +21,7 @@ class ElecProvisionCertificateQualicharge(models.Model):
     station_id = station_id = models.CharField(max_length=64)
     energy_amount = models.FloatField()  # unit = MWh
     is_controlled_by_qualicharge = models.BooleanField(default=False)
-    validated_by = models.CharField(max_length=16, choices=VALIDATION_CHOICES, default=None, null=True, blank=True)
+    validated_by = models.CharField(max_length=16, choices=VALIDATION_CHOICES, default=NO_ONE, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:

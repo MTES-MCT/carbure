@@ -7,12 +7,10 @@ from elec.filters import ProvisionCertificateQualichargeFilter
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ElecProvisionCertificateQualichargeSerializer
 
-from .mixins import BulkCreateMixin, BulkUpdateMixin
+from .mixins import ActionMixin
 
 
-class ElecProvisionCertificateQualichargeViewSet(
-    mixins.ListModelMixin, BulkCreateMixin, BulkUpdateMixin, viewsets.GenericViewSet
-):
+class ElecProvisionCertificateQualichargeViewSet(mixins.ListModelMixin, ActionMixin, viewsets.GenericViewSet):
     queryset = ElecProvisionCertificateQualicharge.objects.all()
     serializer_class = ElecProvisionCertificateQualichargeSerializer
     filterset_class = ProvisionCertificateQualichargeFilter
