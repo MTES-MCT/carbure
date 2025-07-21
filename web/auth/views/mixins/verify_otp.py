@@ -9,15 +9,13 @@ from drf_spectacular.utils import (
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 
 from auth.serializers import VerifyOTPSerializer
 from core.carburetypes import CarbureError
 
 
 class VerifyOTPAction:
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = "1/s"
+    throttle_scope = "10/day"
 
     @extend_schema(
         request=VerifyOTPSerializer,

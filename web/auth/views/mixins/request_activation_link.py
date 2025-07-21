@@ -7,7 +7,6 @@ from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 
 from auth.serializers import UserResendActivationLinkSerializer
 from auth.tokens import account_activation_token
@@ -49,8 +48,7 @@ def send_notification_mail(user, request):
 
 
 class UserResendActivationLinkAction:
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = "1/s"
+    throttle_scope = "10/day"
 
     @extend_schema(
         request=UserResendActivationLinkSerializer,

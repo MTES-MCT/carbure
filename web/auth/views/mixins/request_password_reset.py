@@ -8,7 +8,6 @@ from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 
 from core.carburetypes import CarbureError
 from core.helpers import send_mail
@@ -47,8 +46,7 @@ def retrieve_email(data):
 
 
 class RequestPasswordResetAction:
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = "1/s"
+    throttle_scope = "10/day"
 
     @extend_schema(
         request=RequestPasswordResetSerializer,

@@ -385,13 +385,10 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.ScopedRateThrottle",
-        "core.throttle.UserEmailThrottle",
-        "core.throttle.AnonEmailThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "5/s",
         "user": "10/s",
-        "1/s": "1/s",  # scoped throttle with name equal to the value
         "10/day": "10/day",
     },
 }
@@ -419,12 +416,15 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": env("REDIS_URL"),
+if not env("TEST"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": env("REDIS_URL"),
+        }
     }
-}
 
 if env("TEST"):
     REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}

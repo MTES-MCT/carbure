@@ -1,16 +1,13 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
-from web.core.throttle import AnonEmailThrottle
 
 from auth.serializers import UserCreationSerializer
 from auth.views.mixins.mail_helper import send_account_activation_email
 
 
 class UserCreationAction:
-    throttle_classes = [ScopedRateThrottle, AnonEmailThrottle]
-    throttle_scope = "1/s"
+    throttle_scope = "10/day"
 
     @extend_schema(
         request=UserCreationSerializer,
