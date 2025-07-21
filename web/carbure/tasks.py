@@ -19,7 +19,6 @@ from elec.scripts.create_meter_readings_application_reminder import create_meter
 from ml.scripts.calc_ml_score import calc_ml_score
 from ml.scripts.load_data import load_ml_data
 from saf.models.saf_ticket_source import create_ticket_sources_from_lots
-from saf.scripts.link_dgac_to_airlines import link_dgac_to_airlines
 from tiruert.models.operation import create_tiruert_operations_from_lots
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
 
@@ -85,10 +84,6 @@ if env.get("IMAGE_TAG") == "prod":
         last_month = first - datetime.timedelta(days=1)
         period = last_month.year * 100 + last_month.month
         calc_ml_score(period=period)
-
-    @db_periodic_task(crontab(day_of_week=7, hour=2, minute=0))
-    def periodic_link_dgac_to_airlines() -> None:
-        link_dgac_to_airlines()
 
     @periodic_task(crontab(hour=6, minute=0))
     def restart_metabase_container() -> None:
