@@ -105,10 +105,12 @@ export const FileActions = ({ file, readOnly, onDelete }: FileActionProps) => {
         linkProps={{ href: file.url, target: "_blank" }}
         priority="secondary"
         title={t("Télécharger")}
+        size="small"
       />
       {!readOnly && file.file_type !== "EXCEL" && (
         <Button
           iconId="fr-icon-delete-fill"
+          size="small"
           priority="secondary"
           title={t("Supprimer")}
           onClick={() =>
