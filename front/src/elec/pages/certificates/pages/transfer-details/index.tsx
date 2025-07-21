@@ -10,11 +10,11 @@ import { getTransferCertificateDetails } from "../../api"
 import { TextInput } from "common/components/inputs2"
 import { formatDate, formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
-import TicketTag from "saf/components/tickets/tag"
 import { AcceptTransferCertificate } from "../../components/accept-transfer-certificate"
 import { RejectTransferCertificate } from "../../components/reject-transfer-certificate"
 import { CancelTransferCertificate } from "../../components/cancel-transfer-certificate"
 import { TransferCertificateStatus } from "../../types"
+import TicketTag from "saf/components/ticket-tag"
 
 export const TransferCertificateDetails = () => {
   const { t } = useTranslation()

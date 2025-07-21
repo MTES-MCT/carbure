@@ -2,12 +2,12 @@ import {
   PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by,
   PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by,
   PathsApiSafTicketsGetParametersQueryStatus,
-  SourceEnum,
+  PathsApiElecV2ProvisionCertificatesGetParametersQuerySource,
 } from "api-schema"
 import { CBQueryParams } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
-export { SourceEnum as ProvisionCertificateSource }
+export { PathsApiElecV2ProvisionCertificatesGetParametersQuerySource as ProvisionCertificateSource }
 export { PathsApiSafTicketsGetParametersQueryStatus as TransferCertificateStatus }
 
 export type ElecCertificateSnapshot = {
