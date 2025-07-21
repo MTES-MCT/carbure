@@ -86,7 +86,7 @@ const EmailConfirmationModal = ({
         <section>
           <p>
             {t(
-              "Un code à 6 chiffres a été envoyé à l'adresse {{email}}. Veuillez le saisir dans le champs ci-dessous pour confirmer le changement d'email :",
+              "Un code à 6 chiffres a été envoyé à l'adresse {{email}}. Veuillez le saisir dans le champ ci-dessous pour confirmer le changement d'email :",
               { email: newEmail }
             )}
           </p>
