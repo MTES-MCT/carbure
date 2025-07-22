@@ -6479,6 +6479,8 @@ export interface operations {
   resources_entities_list: {
     parameters: {
       query?: {
+        /** @description Only show entities allowed to be tiruert */
+        allowed_tiruert?: boolean
         /** @description Only keep specific entity types */
         entity_type?: string[]
         /** @description Only show enabled entities */
