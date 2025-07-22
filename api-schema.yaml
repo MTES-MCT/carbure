@@ -314,16 +314,12 @@ paths:
               type: string
               enum:
                 - -certificate_id
-                - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
-                - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -334,10 +330,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
-            * `created_at` - Created at
-            * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id
             * `-certificate_id` - Certificate id (décroissant)
           explode: false
@@ -431,16 +423,12 @@ paths:
               type: string
               enum:
                 - -certificate_id
-                - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
-                - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -451,10 +439,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
-            * `created_at` - Created at
-            * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id
             * `-certificate_id` - Certificate id (décroissant)
           explode: false
@@ -512,16 +496,12 @@ paths:
               type: string
               enum:
                 - -certificate_id
-                - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
-                - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -532,10 +512,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
-            * `created_at` - Created at
-            * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id
             * `-certificate_id` - Certificate id (décroissant)
           explode: false
@@ -597,16 +573,12 @@ paths:
               type: string
               enum:
                 - -certificate_id
-                - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
-                - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -617,10 +589,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
-            * `created_at` - Created at
-            * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id
             * `-certificate_id` - Certificate id (décroissant)
           explode: false
@@ -687,16 +655,12 @@ paths:
               type: string
               enum:
                 - -certificate_id
-                - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
-                - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -707,10 +671,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
-            * `created_at` - Created at
-            * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id
             * `-certificate_id` - Certificate id (décroissant)
           explode: false
@@ -1121,13 +1081,11 @@ paths:
                 - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
                 - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -1138,8 +1096,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id
@@ -1229,13 +1185,11 @@ paths:
                 - -created_at
                 - -producer
                 - -production_site
-                - -status
                 - -valid_until
                 - certificate_id
                 - created_at
                 - producer
                 - production_site
-                - status
                 - valid_until
           description: |-
             Ordre
@@ -1246,8 +1200,6 @@ paths:
             * `-valid_until` - Valid until (décroissant)
             * `producer` - Producer
             * `-producer` - Producer (décroissant)
-            * `status` - Status
-            * `-status` - Status (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
             * `certificate_id` - Certificate id

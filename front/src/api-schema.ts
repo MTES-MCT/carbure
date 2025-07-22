@@ -4195,10 +4195,6 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
-         *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
@@ -4266,10 +4262,6 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
-         *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
@@ -4310,10 +4302,6 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
-         *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
@@ -4354,10 +4342,6 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
-         *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
@@ -4400,10 +4384,6 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
-         *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
@@ -4703,13 +4683,11 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        order_by?: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         producers?: string
@@ -4756,13 +4734,11 @@ export interface operations {
          *     * `-valid_until` - Valid until (décroissant)
          *     * `producer` - Producer
          *     * `-producer` - Producer (décroissant)
-         *     * `status` - Status
-         *     * `-status` - Status (décroissant)
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
          *     * `certificate_id` - Certificate id
          *     * `-certificate_id` - Certificate id (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+        order_by?: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         producers?: string
@@ -8545,16 +8521,24 @@ export interface operations {
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
   ValueMinuscertificate_id = "-certificate_id",
+  ValueMinusproducer = "-producer",
+  ValueMinusproduction_site = "-production_site",
+  ValueMinusvalid_until = "-valid_until",
+  certificate_id = "certificate_id",
+  producer = "producer",
+  production_site = "production_site",
+  valid_until = "valid_until",
+}
+export enum PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by {
+  ValueMinuscertificate_id = "-certificate_id",
   ValueMinuscreated_at = "-created_at",
   ValueMinusproducer = "-producer",
   ValueMinusproduction_site = "-production_site",
-  ValueMinusstatus = "-status",
   ValueMinusvalid_until = "-valid_until",
   certificate_id = "certificate_id",
   created_at = "created_at",
   producer = "producer",
   production_site = "production_site",
-  status = "status",
   valid_until = "valid_until",
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
