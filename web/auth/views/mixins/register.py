@@ -1,9 +1,12 @@
+from django.contrib.auth import get_user_model
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from auth.serializers import UserCreationSerializer
 from auth.views.mixins.mail_helper import send_account_activation_email
+
+User = get_user_model()
 
 
 class UserCreationAction:
@@ -26,7 +29,12 @@ class UserCreationAction:
         serializer = UserCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.save()
-        send_account_activation_email(user, request)
+        email = serializer.validated_data.get("email")
+        user_already_exists = User.objects.filter(email=email).exists()
 
+        if not user_already_exists:
+            user = serializer.save()
+            send_account_activation_email(user, request)
+
+        # Always return the same response to avoid enumeration
         return Response({"status": "success"})

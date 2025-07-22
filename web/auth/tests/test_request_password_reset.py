@@ -7,7 +7,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.carburetypes import CarbureError
 from core.utils import CarbureEnv
 
 User = get_user_model()
@@ -63,8 +62,8 @@ class RequestPasswordResetTests(TestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    def test_responds_with_http_400_error_when_user_unknown(self):
+    def test_responds_with_http_200_even_when_user_unknown(self):
         response = self.client.post(self.request_password_reset_url, {"username": "unknown@example.com"})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["message"] == CarbureError.PASSWORD_RESET_USER_NOT_FOUND
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"status": "success"}

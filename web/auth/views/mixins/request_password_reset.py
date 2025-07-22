@@ -5,11 +5,10 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from drf_spectacular.utils import OpenApiExample, extend_schema
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from core.carburetypes import CarbureError
 from core.helpers import send_mail
 from core.utils import CarbureEnv
 
@@ -67,7 +66,4 @@ class RequestPasswordResetAction:
             return Response({"status": "success"})
 
         except Exception:
-            return Response(
-                {"message": CarbureError.PASSWORD_RESET_USER_NOT_FOUND},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"status": "success"})  # Always return success to avoid enumeration
