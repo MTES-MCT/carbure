@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react"
+import { ReactNode } from "react"
 import css from "./editable-card.module.css"
 import cl from "clsx"
 import { Button } from "common/components/button2"
@@ -6,6 +6,9 @@ import { Title } from "common/components/title"
 import { Text } from "common/components/text"
 import { Divider } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
+import { EditableCardProvider, useEditableCard } from "./editable-card.provider"
+import { Form, FormProps } from "common/components/form2"
+
 interface EditableCardProps {
   title: string
   description?: string
@@ -14,12 +17,7 @@ interface EditableCardProps {
    * Children can be a function that receives the editing state and a function to set it.
    * It can also be a ReactNode.
    */
-  children:
-    | React.ReactNode
-    | ((props: {
-        isEditing: boolean
-        setIsEditing: (editing: boolean) => void
-      }) => ReactNode)
+  children: React.ReactNode | ((props: { isEditing: boolean }) => ReactNode)
 
   /**
    * Actions to display in the header.
@@ -27,35 +25,27 @@ interface EditableCardProps {
    * If the value is null, no actions will be displayed.
    */
   headerActions?: ReactNode
-  onEdit?: () => void
-  onCancel?: () => void
-  onSave?: Promise<unknown>
   defaultIsEditing?: boolean
   className?: string
 }
 
-export const EditableCard = ({
+// Composant interne qui utilise le contexte
+const EditableCardContent = ({
   title,
   description,
   children,
   headerActions,
-  onEdit,
-  onSave,
-  onCancel,
-  defaultIsEditing,
   className,
 }: EditableCardProps) => {
   const { t } = useTranslation()
-  const [isEditing, setIsEditing] = useState(defaultIsEditing ?? false)
+  const { isEditing, setIsEditing } = useEditableCard()
 
   const handleEdit = () => {
     setIsEditing(true)
-    onEdit?.()
   }
 
   const handleCancel = () => {
     setIsEditing(false)
-    onCancel?.()
   }
 
   return (
@@ -105,10 +95,36 @@ export const EditableCard = ({
       <Divider noMargin />
 
       <div className={css["editable-card__content"]}>
-        {typeof children === "function"
-          ? children({ isEditing, setIsEditing })
-          : children}
+        {typeof children === "function" ? children({ isEditing }) : children}
       </div>
     </div>
   )
 }
+
+/**
+ * A form that will close the editing state of the EditableCard when the onSubmit prop is triggered on success.
+ * @param props - The props of the Form component.
+ * @returns The Form component.
+ */
+const EditableCardForm = <T,>(props: FormProps<T>) => {
+  const { isEditing, setIsEditing } = useEditableCard()
+
+  const onSubmit: FormProps<T>["onSubmit"] = async (...args) => {
+    await props.onSubmit?.(...args)
+    setIsEditing(!isEditing)
+  }
+  return <Form {...props} onSubmit={onSubmit} />
+}
+
+export const EditableCard = ({
+  defaultIsEditing,
+  ...props
+}: EditableCardProps) => {
+  return (
+    <EditableCardProvider defaultIsEditing={defaultIsEditing}>
+      <EditableCardContent {...props} />
+    </EditableCardProvider>
+  )
+}
+
+EditableCard.Form = EditableCardForm

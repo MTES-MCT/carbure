@@ -1,15 +1,13 @@
 import useEntity from "common/hooks/entity"
 import { Country, Entity, UserRole } from "common/types"
-import Button from "common/components/button"
-import { Form, useForm } from "common/components/form2"
-import { Save } from "common/components/icons"
+import { useForm } from "common/components/form2"
 import { TextInput } from "common/components/inputs2"
-import { LoaderOverlay } from "common/components/scaffold"
+import { Grid, LoaderOverlay } from "common/components/scaffold"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api/company"
 import { CompanyFormValue, SearchCompanyPreview } from "companies/types"
-import Autocomplete from "common/components/autocomplete"
+import { Autocomplete } from "common/components/autocomplete2"
 import { findCountries } from "common/api"
 import { normalizeCountry } from "common/utils/normalizers"
 import { usePortal } from "common/components/portal"
@@ -17,13 +15,17 @@ import CompanyInfoSirenDialog from "./company-info-siren-dialog"
 import { EditableCard } from "common/molecules/editable-card"
 import { Notice } from "common/components/notice"
 import { Icon } from "common/components/icon"
+import { Button } from "common/components/button2"
 
 type CompanyInfoProps = {
   company?: Entity
   readOnly?: boolean
 }
 
-const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
+const CompanyInfo = ({
+  company,
+  readOnly: _readOnly = false,
+}: CompanyInfoProps) => {
   const { t } = useTranslation()
   const loggedEntity = useEntity()
   const portal = usePortal()
@@ -32,8 +34,7 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
 
   const isAllowedToEdit =
     !_readOnly &&
-    company &&
-    loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+    (!company || loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite))
 
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
@@ -42,9 +43,9 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
 
   const canSave = hasChange(entity, companyForm.value)
 
-  const onSubmitForm = (formValue: CompanyFormValue | undefined) => {
+  const onSubmitForm = async (formValue: CompanyFormValue | undefined) => {
     if (formValue && canSave) {
-      updateEntity.execute(
+      await updateEntity.execute(
         entity.id,
         formValue.activity_description!,
         formValue.legal_name!,
@@ -103,7 +104,7 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
             : undefined
         }
       >
-        {({ isEditing, setIsEditing }) => (
+        {({ isEditing }) => (
           <>
             {isAllowedToEdit && (
               <Notice
@@ -125,123 +126,134 @@ const CompanyInfo = ({ company, readOnly: _readOnly }: CompanyInfoProps) => {
               </Notice>
             )}
 
-            <Form form={companyForm} id="entity-info" onSubmit={onSubmitForm}>
-              <Autocomplete
-                required
-                readOnly={!isAllowedToEdit || !isEditing}
-                label={t("Pays")}
-                placeholder={t("Rechercher un pays...")}
-                getOptions={findCountries}
-                normalize={normalizeCountry}
-                {...companyForm.bind("registered_country")}
-              />
+            <EditableCard.Form form={companyForm} onSubmit={onSubmitForm}>
+              <Grid cols={2} gap="lg">
+                <Autocomplete
+                  required
+                  readOnly={!isAllowedToEdit || !isEditing}
+                  label={t("Pays")}
+                  placeholder={t("Rechercher un pays...")}
+                  getOptions={findCountries}
+                  normalize={normalizeCountry}
+                  {...companyForm.bind("registered_country")}
+                />
 
-              <TextInput
-                required
-                readOnly={!isAllowedToEdit || !isEditing}
-                label={t(
-                  "N° d'enregistrement de la société (SIREN ou équivalent)"
-                )}
-                {...companyForm.bind("registration_id")}
-                disabled={isLockedField}
-              />
+                <TextInput
+                  required
+                  readOnly={!isAllowedToEdit || !isEditing}
+                  label={t(
+                    "N° d'enregistrement de la société (SIREN ou équivalent)"
+                  )}
+                  {...companyForm.bind("registration_id")}
+                  disabled={isLockedField}
+                />
 
-              <TextInput
-                required
-                readOnly={!isAllowedToEdit || !isEditing}
-                label={t("Nom légal")}
-                {...companyForm.bind("legal_name")}
-                disabled={isLockedField}
-              />
-              <TextInput
-                required
-                readOnly={!isAllowedToEdit || !isEditing}
-                label={t("Adresse de la société (Numéro et rue)")}
-                {...companyForm.bind("registered_address")}
-                disabled={isLockedField}
-              />
-              <TextInput
-                required
-                readOnly={!isAllowedToEdit || !isEditing}
-                label={t("Ville")}
-                {...companyForm.bind("registered_city")}
-                disabled={isLockedField}
-              />
-              <TextInput
-                required
-                readOnly={!isAllowedToEdit || !isEditing}
-                label={t("Code postal")}
-                {...companyForm.bind("registered_zipcode")}
-                disabled={isLockedField}
-              />
-            </Form>
-            {isAllowedToEdit && (
-              <section>
+                <TextInput
+                  required
+                  readOnly={!isAllowedToEdit || !isEditing}
+                  label={t("Nom légal")}
+                  {...companyForm.bind("legal_name")}
+                  disabled={isLockedField}
+                />
+                <TextInput
+                  required
+                  readOnly={!isAllowedToEdit || !isEditing}
+                  label={t("Adresse de la société (Numéro et rue)")}
+                  {...companyForm.bind("registered_address")}
+                  disabled={isLockedField}
+                />
+                <TextInput
+                  required
+                  readOnly={!isAllowedToEdit || !isEditing}
+                  label={t("Ville")}
+                  {...companyForm.bind("registered_city")}
+                  disabled={isLockedField}
+                />
+                <TextInput
+                  required
+                  readOnly={!isAllowedToEdit || !isEditing}
+                  label={t("Code postal")}
+                  {...companyForm.bind("registered_zipcode")}
+                  disabled={isLockedField}
+                />
+              </Grid>
+              {isAllowedToEdit && isEditing && (
                 <Button
                   asideX
-                  submit="entity-info"
+                  type="submit"
                   disabled={!canSave}
-                  icon={Save}
-                  variant="primary"
-                  label={t("Enregistrer les modifications")}
-                />
-              </section>
-            )}
+                  iconId="ri-save-line"
+                >
+                  {t("Sauvegarder")}
+                </Button>
+              )}
+            </EditableCard.Form>
 
             {updateEntity.loading && <LoaderOverlay />}
           </>
         )}
       </EditableCard>
       <EditableCard title={t("Coordonnées du contact principal")}>
-        <Form form={companyForm} id="entity-info" onSubmit={onSubmitForm}>
-          <TextInput
-            required
-            readOnly={!isAllowedToEdit}
-            label={t("Contact principal")}
-            placeholder="Jean-Pierre Champollion"
-            {...companyForm.bind("sustainability_officer")}
-          />
-          <TextInput
-            required
-            type="tel"
-            pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
-            label={t(
-              "N° téléphone contact principal (commence par +33 pour la France)"
+        {({ isEditing }) => (
+          <EditableCard.Form form={companyForm} onSubmit={onSubmitForm}>
+            <Grid cols={2} gap="lg">
+              <TextInput
+                required
+                readOnly={!isAllowedToEdit || !isEditing}
+                label={t("Contact principal")}
+                placeholder="Jean-Pierre Champollion"
+                {...companyForm.bind("sustainability_officer")}
+              />
+              <TextInput
+                readOnly={!isAllowedToEdit || !isEditing}
+                placeholder="https://www.example.com"
+                type="url"
+                label={t("Site web (https://...)")}
+                {...companyForm.bind("website")}
+              />
+              <TextInput
+                required
+                type="tel"
+                pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
+                label={t(
+                  "N° téléphone contact principal (commence par +33 pour la France)"
+                )}
+                placeholder="exemple : +33612345678"
+                readOnly={!isAllowedToEdit || !isEditing}
+                {...companyForm.bind("sustainability_officer_phone_number")}
+              />
+              <TextInput
+                readOnly={!isAllowedToEdit || !isEditing}
+                label={t("Numéro de TVA")}
+                {...companyForm.bind("vat_number")}
+              />
+            </Grid>
+            <TextInput
+              required
+              type="email"
+              readOnly={!isAllowedToEdit || !isEditing}
+              label={t("Email contact principal")}
+              {...companyForm.bind("sustainability_officer_email")}
+            />
+            {/* <TextArea
+           required
+           maxLength={5000}
+           readOnly={!isAllowedToEdit}
+           label={t("Description de l'activité")}
+           {...companyForm.bind("activity_description")}
+         /> */}
+            {isAllowedToEdit && isEditing && (
+              <Button
+                asideX
+                type="submit"
+                disabled={!canSave}
+                iconId="ri-save-line"
+              >
+                {t("Sauvegarder")}
+              </Button>
             )}
-            placeholder="exemple : +33612345678"
-            readOnly={!isAllowedToEdit}
-            {...companyForm.bind("sustainability_officer_phone_number")}
-          />
-          <TextInput
-            required
-            type="email"
-            readOnly={!isAllowedToEdit}
-            label={t("Email contact principal")}
-            {...companyForm.bind("sustainability_officer_email")}
-          />
-
-          {/* <TextArea
-            required
-            maxLength={5000}
-            readOnly={!isAllowedToEdit}
-            label={t("Description de l'activité")}
-            {...companyForm.bind("activity_description")}
-          /> */}
-
-          <TextInput
-            readOnly={!isAllowedToEdit}
-            placeholder="https://www.example.com"
-            type="url"
-            label={t("Site web (https://...)")}
-            {...companyForm.bind("website")}
-          />
-
-          <TextInput
-            readOnly={!isAllowedToEdit}
-            label={t("Numéro de TVA")}
-            {...companyForm.bind("vat_number")}
-          />
-        </Form>
+          </EditableCard.Form>
+        )}
       </EditableCard>
     </>
   )
