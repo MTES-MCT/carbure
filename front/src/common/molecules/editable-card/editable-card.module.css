@@ -1,0 +1,22 @@
+.editable-card {
+  padding: var(--spacing-4w);
+  border: 1px solid var(--border-default-grey);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3w);
+}
+
+.editable-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-2w);
+}
+
+.editable-card__title {
+  color: var(--artwork-major-blue-france);
+}
+
+.editable-card__description {
+  color: var(--text-default-grey);
+}
