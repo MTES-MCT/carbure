@@ -381,6 +381,16 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "core.utils.CustomPageNumberPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/s",
+        "user": "10/s",
+        "10/day": "10/day",
+    },
 }
 SPECTACULAR_SETTINGS = {
     "TITLE": "Carbure API",
@@ -406,5 +416,15 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
+if not env("TEST"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": env("REDIS_URL"),
+        }
+    }
+
 if env("TEST"):
     REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}

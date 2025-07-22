@@ -46,6 +46,8 @@ def retrieve_email(data):
 
 
 class RequestPasswordResetAction:
+    throttle_scope = "10/day"
+
     @extend_schema(
         request=RequestPasswordResetSerializer,
         examples=[
