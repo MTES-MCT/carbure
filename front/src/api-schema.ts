@@ -495,14 +495,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/certificates/clients/": {
+  "/api/elec/certificates/clients/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_certificates_clients_list"]
+    get: operations["elec_certificates_clients_list"]
     put?: never
     post?: never
     delete?: never
@@ -511,14 +511,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/certificates/snapshot/": {
+  "/api/elec/certificates/snapshot/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_certificates_snapshot_retrieve"]
+    get: operations["elec_certificates_snapshot_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -527,14 +527,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/certificates/years/": {
+  "/api/elec/certificates/years/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_certificates_years_retrieve"]
+    get: operations["elec_certificates_years_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -543,14 +543,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/": {
+  "/api/elec/provision-certificates/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_provision_certificates_list"]
+    get: operations["elec_provision_certificates_list"]
     put?: never
     post?: never
     delete?: never
@@ -559,14 +559,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/{id}/": {
+  "/api/elec/provision-certificates/{id}/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_provision_certificates_retrieve"]
+    get: operations["elec_provision_certificates_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -575,14 +575,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/balance/": {
+  "/api/elec/provision-certificates/balance/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_provision_certificates_balance_retrieve"]
+    get: operations["elec_provision_certificates_balance_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -591,7 +591,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/export/": {
+  "/api/elec/provision-certificates/export/": {
     parameters: {
       query?: never
       header?: never
@@ -607,14 +607,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/filters/": {
+  "/api/elec/provision-certificates/filters/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_provision_certificates_filters_retrieve"]
+    get: operations["elec_provision_certificates_filters_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -623,7 +623,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/import/": {
+  "/api/elec/provision-certificates/import/": {
     parameters: {
       query?: never
       header?: never
@@ -632,14 +632,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["elec_v2_provision_certificates_import_create"]
+    post: operations["elec_provision_certificates_import_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/provision-certificates/transfer/": {
+  "/api/elec/provision-certificates/transfer/": {
     parameters: {
       query?: never
       header?: never
@@ -648,21 +648,21 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["elec_v2_provision_certificates_transfer_create"]
+    post: operations["elec_provision_certificates_transfer_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/": {
+  "/api/elec/transfer-certificates/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_transfer_certificates_list"]
+    get: operations["elec_transfer_certificates_list"]
     put?: never
     post?: never
     delete?: never
@@ -671,14 +671,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/{id}/": {
+  "/api/elec/transfer-certificates/{id}/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_transfer_certificates_retrieve"]
+    get: operations["elec_transfer_certificates_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -687,7 +687,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/{id}/accept/": {
+  "/api/elec/transfer-certificates/{id}/accept/": {
     parameters: {
       query?: never
       header?: never
@@ -696,14 +696,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["elec_v2_transfer_certificates_accept_create"]
+    post: operations["elec_transfer_certificates_accept_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/{id}/cancel/": {
+  "/api/elec/transfer-certificates/{id}/cancel/": {
     parameters: {
       query?: never
       header?: never
@@ -712,14 +712,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["elec_v2_transfer_certificates_cancel_create"]
+    post: operations["elec_transfer_certificates_cancel_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/{id}/reject/": {
+  "/api/elec/transfer-certificates/{id}/reject/": {
     parameters: {
       query?: never
       header?: never
@@ -728,14 +728,14 @@ export interface paths {
     }
     get?: never
     put?: never
-    post: operations["elec_v2_transfer_certificates_reject_create"]
+    post: operations["elec_transfer_certificates_reject_create"]
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/export/": {
+  "/api/elec/transfer-certificates/export/": {
     parameters: {
       query?: never
       header?: never
@@ -751,14 +751,14 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/elec-v2/transfer-certificates/filters/": {
+  "/api/elec/transfer-certificates/filters/": {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    get: operations["elec_v2_transfer_certificates_filters_retrieve"]
+    get: operations["elec_transfer_certificates_filters_retrieve"]
     put?: never
     post?: never
     delete?: never
@@ -3807,7 +3807,7 @@ export interface components {
      *     * `4` - T4
      * @enum {integer}
      */
-    QuarterEnum: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter
+    QuarterEnum: PathsApiElecProvisionCertificatesGetParametersQueryQuarter
     RegistrationCountry: {
       name: string
       name_en: string
@@ -4181,7 +4181,7 @@ export interface components {
      *     * `QUALICHARGE` - QUALICHARGE
      * @enum {string}
      */
-    SourceEnum: PathsApiElecV2ProvisionCertificatesGetParametersQuerySource
+    SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource
     StatsResponse: {
       metabase_iframe_url: string
     }
@@ -5336,7 +5336,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_certificates_clients_list: {
+  elec_certificates_clients_list: {
     parameters: {
       query?: {
         /** @description Entity querying the endpoint */
@@ -5360,7 +5360,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_certificates_snapshot_retrieve: {
+  elec_certificates_snapshot_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5390,7 +5390,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_certificates_years_retrieve: {
+  elec_certificates_years_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5412,7 +5412,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_provision_certificates_list: {
+  elec_provision_certificates_list: {
     parameters: {
       query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -5434,7 +5434,7 @@ export interface operations {
          *     * `-operating_unit` - Operating unit (décroissant)
          *     * `source` - Source
          *     * `-source` - Source (décroissant) */
-        order_by?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by[]
+        order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -5442,11 +5442,11 @@ export interface operations {
         /** @description Number of results to return per page. */
         page_size?: number
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        quarter?: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter[]
+        quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[]
         /** @description A search term. */
         search?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        source?: (PathsApiElecV2ProvisionCertificatesGetParametersQuerySource | null)[]
+        source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[]
         status?: string
         year?: number
       }
@@ -5466,7 +5466,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_provision_certificates_retrieve: {
+  elec_provision_certificates_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5491,7 +5491,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_provision_certificates_balance_retrieve: {
+  elec_provision_certificates_balance_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5537,7 +5537,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_provision_certificates_filters_retrieve: {
+  elec_provision_certificates_filters_retrieve: {
     parameters: {
       query: {
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
@@ -5561,15 +5561,15 @@ export interface operations {
          *     * `-operating_unit` - Operating unit (décroissant)
          *     * `source` - Source
          *     * `-source` - Source (décroissant) */
-        order_by?: PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by[]
+        order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        quarter?: PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter[]
+        quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[]
         /** @description A search term. */
         search?: string
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
-        source?: (PathsApiElecV2ProvisionCertificatesGetParametersQuerySource | null)[]
+        source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[]
         status?: string
         year?: number
       }
@@ -5589,7 +5589,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_provision_certificates_import_create: {
+  elec_provision_certificates_import_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5621,7 +5621,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_provision_certificates_transfer_create: {
+  elec_provision_certificates_transfer_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5649,7 +5649,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_transfer_certificates_list: {
+  elec_transfer_certificates_list: {
     parameters: {
       query: {
         certificate_id?: string
@@ -5679,7 +5679,7 @@ export interface operations {
          *     * `-transfer_date` - Transfer date (décroissant)
          *     * `consumption_date` - Consumption date
          *     * `-consumption_date` - Consumption date (décroissant) */
-        order_by?: PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by[]
+        order_by?: PathsApiElecTransferCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
@@ -5710,7 +5710,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_transfer_certificates_retrieve: {
+  elec_transfer_certificates_retrieve: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5735,7 +5735,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_transfer_certificates_accept_create: {
+  elec_transfer_certificates_accept_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5765,7 +5765,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_transfer_certificates_cancel_create: {
+  elec_transfer_certificates_cancel_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5789,7 +5789,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_transfer_certificates_reject_create: {
+  elec_transfer_certificates_reject_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -5841,7 +5841,7 @@ export interface operations {
       }
     }
   }
-  elec_v2_transfer_certificates_filters_retrieve: {
+  elec_transfer_certificates_filters_retrieve: {
     parameters: {
       query: {
         certificate_id?: string
@@ -5873,7 +5873,7 @@ export interface operations {
          *     * `-transfer_date` - Transfer date (décroissant)
          *     * `consumption_date` - Consumption date
          *     * `-consumption_date` - Consumption date (décroissant) */
-        order_by?: PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by[]
+        order_by?: PathsApiElecTransferCertificatesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A search term. */
@@ -9613,7 +9613,7 @@ export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
   production_site = "production_site",
   valid_until = "valid_until",
 }
-export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by {
+export enum PathsApiElecProvisionCertificatesGetParametersQueryOrder_by {
   ValueMinuscpo = "-cpo",
   ValueMinusoperating_unit = "-operating_unit",
   ValueMinusquarter = "-quarter",
@@ -9625,18 +9625,18 @@ export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryOrder_by {
   remaining_energy_amount = "remaining_energy_amount",
   source = "source",
 }
-export enum PathsApiElecV2ProvisionCertificatesGetParametersQueryQuarter {
+export enum PathsApiElecProvisionCertificatesGetParametersQueryQuarter {
   Value1 = 1,
   Value2 = 2,
   Value3 = 3,
   Value4 = 4,
 }
-export enum PathsApiElecV2ProvisionCertificatesGetParametersQuerySource {
+export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
   MANUAL = "MANUAL",
   METER_READINGS = "METER_READINGS",
   QUALICHARGE = "QUALICHARGE",
 }
-export enum PathsApiElecV2TransferCertificatesGetParametersQueryOrder_by {
+export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
   ValueMinuscertificate_id = "-certificate_id",
   ValueMinusconsumption_date = "-consumption_date",
   ValueMinuscpo = "-cpo",

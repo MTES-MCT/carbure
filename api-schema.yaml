@@ -345,13 +345,14 @@ paths:
                     message: INVALID_DATA
                     errors:
                       new_password:
-                        - INVALID_NEW_PASSWORD
+                        - Ce mot de passe est trop court. Il doit contenir au
+                          minimum 8 caractères.
                   summary: Nouveau mot de passe invalide
                 MotsDePasseIdentiques:
                   value:
                     message: INVALID_DATA
                     errors:
-                      new_password:
+                      current_password:
                         - PASSWORDS_MATCH
                   summary: Mots de passe identiques
           description: "Erreurs possibles: données invalides, mot de passe actuel
@@ -1395,9 +1396,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
           description: ""
-  /api/elec-v2/certificates/clients/:
+  /api/elec/certificates/clients/:
     get:
-      operationId: elec_v2_certificates_clients_list
+      operationId: elec_certificates_clients_list
       parameters:
         - in: query
           name: entity_id
@@ -1410,7 +1411,7 @@ paths:
             type: string
           description: Search within the field `name`
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1423,9 +1424,9 @@ paths:
                 items:
                   $ref: "#/components/schemas/EntityPreview"
           description: ""
-  /api/elec-v2/certificates/snapshot/:
+  /api/elec/certificates/snapshot/:
     get:
-      operationId: elec_v2_certificates_snapshot_retrieve
+      operationId: elec_certificates_snapshot_retrieve
       parameters:
         - in: query
           name: entity_id
@@ -1440,7 +1441,7 @@ paths:
           description: Year
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1475,9 +1476,9 @@ paths:
                     ...: ...
                   summary: Example of filters response.
           description: ""
-  /api/elec-v2/certificates/years/:
+  /api/elec/certificates/years/:
     get:
-      operationId: elec_v2_certificates_years_retrieve
+      operationId: elec_certificates_years_retrieve
       parameters:
         - in: query
           name: entity_id
@@ -1486,7 +1487,7 @@ paths:
           description: Entity ID
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1508,9 +1509,9 @@ paths:
                     - 2024
                   summary: Example of filters response.
           description: ""
-  /api/elec-v2/provision-certificates/:
+  /api/elec/provision-certificates/:
     get:
-      operationId: elec_v2_provision_certificates_list
+      operationId: elec_provision_certificates_list
       parameters:
         - in: query
           name: cpo
@@ -1635,7 +1636,7 @@ paths:
           schema:
             type: integer
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1646,9 +1647,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecProvisionCertificateList"
           description: ""
-  /api/elec-v2/provision-certificates/{id}/:
+  /api/elec/provision-certificates/{id}/:
     get:
-      operationId: elec_v2_provision_certificates_retrieve
+      operationId: elec_provision_certificates_retrieve
       parameters:
         - in: query
           name: entity_id
@@ -1664,7 +1665,7 @@ paths:
             (elec).
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1675,9 +1676,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ElecProvisionCertificate"
           description: ""
-  /api/elec-v2/provision-certificates/balance/:
+  /api/elec/provision-certificates/balance/:
     get:
-      operationId: elec_v2_provision_certificates_balance_retrieve
+      operationId: elec_provision_certificates_balance_retrieve
       parameters:
         - in: query
           name: entity_id
@@ -1686,7 +1687,7 @@ paths:
           description: Entity ID
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1700,7 +1701,7 @@ paths:
                   balance:
                     type: integer
           description: ""
-  /api/elec-v2/provision-certificates/export/:
+  /api/elec/provision-certificates/export/:
     get:
       operationId: export_provision_certificates_excel
       parameters:
@@ -1711,7 +1712,7 @@ paths:
           description: Entity ID
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1724,9 +1725,9 @@ paths:
                 format: binary
                 description: Excel file download
           description: ""
-  /api/elec-v2/provision-certificates/filters/:
+  /api/elec/provision-certificates/filters/:
     get:
-      operationId: elec_v2_provision_certificates_filters_retrieve
+      operationId: elec_provision_certificates_filters_retrieve
       parameters:
         - in: query
           name: cpo
@@ -1844,7 +1845,7 @@ paths:
           schema:
             type: integer
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1866,9 +1867,9 @@ paths:
                     - HVOE
                   summary: Example of filters response.
           description: ""
-  /api/elec-v2/provision-certificates/import/:
+  /api/elec/provision-certificates/import/:
     post:
-      operationId: elec_v2_provision_certificates_import_create
+      operationId: elec_provision_certificates_import_create
       parameters:
         - in: query
           name: entity_id
@@ -1877,7 +1878,7 @@ paths:
           description: Entity ID
           required: true
       tags:
-        - elec-v2
+        - elec
       requestBody:
         content:
           multipart/form-data:
@@ -1901,9 +1902,9 @@ paths:
                 type: object
                 properties: {}
           description: ""
-  /api/elec-v2/provision-certificates/transfer/:
+  /api/elec/provision-certificates/transfer/:
     post:
-      operationId: elec_v2_provision_certificates_transfer_create
+      operationId: elec_provision_certificates_transfer_create
       parameters:
         - in: query
           name: entity_id
@@ -1912,7 +1913,7 @@ paths:
           description: Entity ID
           required: true
       tags:
-        - elec-v2
+        - elec
       requestBody:
         content:
           application/json:
@@ -1935,9 +1936,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ElecTransferCertificate"
           description: ""
-  /api/elec-v2/transfer-certificates/:
+  /api/elec/transfer-certificates/:
     get:
-      operationId: elec_v2_transfer_certificates_list
+      operationId: elec_transfer_certificates_list
       parameters:
         - in: query
           name: certificate_id
@@ -2071,7 +2072,7 @@ paths:
           schema:
             type: number
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -2082,9 +2083,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecTransferCertificateList"
           description: ""
-  /api/elec-v2/transfer-certificates/{id}/:
+  /api/elec/transfer-certificates/{id}/:
     get:
-      operationId: elec_v2_transfer_certificates_retrieve
+      operationId: elec_transfer_certificates_retrieve
       parameters:
         - in: query
           name: entity_id
@@ -2099,7 +2100,7 @@ paths:
           description: A unique integer value identifying this Certificat de Cession (elec).
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -2110,9 +2111,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ElecTransferCertificate"
           description: ""
-  /api/elec-v2/transfer-certificates/{id}/accept/:
+  /api/elec/transfer-certificates/{id}/accept/:
     post:
-      operationId: elec_v2_transfer_certificates_accept_create
+      operationId: elec_transfer_certificates_accept_create
       parameters:
         - in: query
           name: entity_id
@@ -2127,7 +2128,7 @@ paths:
           description: A unique integer value identifying this Certificat de Cession (elec).
           required: true
       tags:
-        - elec-v2
+        - elec
       requestBody:
         content:
           application/json:
@@ -2146,9 +2147,9 @@ paths:
       responses:
         "200":
           description: No response body
-  /api/elec-v2/transfer-certificates/{id}/cancel/:
+  /api/elec/transfer-certificates/{id}/cancel/:
     post:
-      operationId: elec_v2_transfer_certificates_cancel_create
+      operationId: elec_transfer_certificates_cancel_create
       parameters:
         - in: query
           name: entity_id
@@ -2163,16 +2164,16 @@ paths:
           description: A unique integer value identifying this Certificat de Cession (elec).
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
       responses:
         "200":
           description: No response body
-  /api/elec-v2/transfer-certificates/{id}/reject/:
+  /api/elec/transfer-certificates/{id}/reject/:
     post:
-      operationId: elec_v2_transfer_certificates_reject_create
+      operationId: elec_transfer_certificates_reject_create
       parameters:
         - in: query
           name: entity_id
@@ -2187,7 +2188,7 @@ paths:
           description: A unique integer value identifying this Certificat de Cession (elec).
           required: true
       tags:
-        - elec-v2
+        - elec
       requestBody:
         content:
           application/json:
@@ -2206,7 +2207,7 @@ paths:
       responses:
         "200":
           description: No response body
-  /api/elec-v2/transfer-certificates/export/:
+  /api/elec/transfer-certificates/export/:
     get:
       operationId: export_transfer_certificates_excel
       parameters:
@@ -2217,7 +2218,7 @@ paths:
           description: Entity ID
           required: true
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -2230,9 +2231,9 @@ paths:
                 format: binary
                 description: Excel file download
           description: ""
-  /api/elec-v2/transfer-certificates/filters/:
+  /api/elec/transfer-certificates/filters/:
     get:
-      operationId: elec_v2_transfer_certificates_filters_retrieve
+      operationId: elec_transfer_certificates_filters_retrieve
       parameters:
         - in: query
           name: certificate_id
@@ -2359,7 +2360,7 @@ paths:
           schema:
             type: number
       tags:
-        - elec-v2
+        - elec
       security:
         - cookieAuth: []
         - basicAuth: []
