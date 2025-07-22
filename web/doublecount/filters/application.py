@@ -9,6 +9,9 @@ class ApplicationFilter(django_filters.FilterSet):
         fields=(
             ("production_site__name", "production_site"),
             ("valid_until", "valid_until"),
+            ("production_site__created_by__name", "producer"),
+            ("created_at", "created_at"),
+            ("certificate_id", "certificate_id"),
         )
     )
     certificate_id = django_filters.CharFilter(method="filter_certificate_id")

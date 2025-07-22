@@ -63,15 +63,21 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     {
       header: t("N° d'agrément"),
       cell: (a) => <Cell text={a.certificate_id} />,
+      key: AgreementOrder.certificate_id,
     },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
+    {
+      header: t("Producteur"),
+      cell: (a) => <Cell text={a.producer.name} />,
+      key: AgreementOrder.producer,
+    },
     {
       header: t("Site de production"),
       cell: (a) => <Cell text={a.production_site.name} />,
+      key: AgreementOrder.production_site,
     },
     {
       header: t("Validité"),
-      key: "valid_until",
+      key: AgreementOrder.valid_until,
       cell: (a) => (
         <Cell
           text={`${formatDateYear(a.period_start)}-${formatDateYear(a.period_end)}`}
@@ -81,6 +87,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     {
       header: t("Date de soumission"),
       cell: (a) => <Cell text={formatDate(a.created_at)} />,
+      key: AgreementOrder.created_at,
     },
   ]
 
@@ -141,6 +148,8 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
               tab === "pending" ? applications?.pending : applications?.rejected
             }
             onAction={showApplicationDialog}
+            order={state.order}
+            onOrder={actions.setOrder}
           />
         )}
       </Content>
