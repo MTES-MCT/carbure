@@ -24,6 +24,7 @@ interface EditableCardProps {
   /**
    * Actions to display in the header.
    * If not provided, the default actions (Edit/Cancel)will be displayed.
+   * If the value is null, no actions will be displayed.
    */
   headerActions?: ReactNode
   onEdit?: () => void
@@ -69,7 +70,7 @@ export const EditableCard = ({
 
         {headerActions}
 
-        {!headerActions ? (
+        {headerActions === undefined ? (
           <>
             {!isEditing && (
               <Button

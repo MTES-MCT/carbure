@@ -40,3 +40,10 @@ export const CustomHeaderActions: Story = {
     headerActions: <Button>Custom button</Button>,
   },
 }
+
+export const NoHeaderActions: Story = {
+  args: {
+    children: <div>children</div>,
+    headerActions: null,
+  },
+}
