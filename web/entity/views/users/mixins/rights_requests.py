@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.models import UserRightsRequests
-from user.serializers.user import UserRightsRequestsSerializer as UserRightsRequestsSeriaizer
+from user.serializers.user import UserRightsRequestsSerializer
 
 User = get_user_model()
 
@@ -28,7 +28,7 @@ class RightsRequestsActionMixin:
             ),
             OpenApiParameter(name="company_id", type=int, description="Filter by entity ID."),
         ],
-        responses=UserRightsRequestsSeriaizer(many=True),
+        responses=UserRightsRequestsSerializer(many=True),
     )
     @action(detail=False, methods=["get"], url_path="rights-requests")
     def rights_requests(self, request):
@@ -44,5 +44,5 @@ class RightsRequestsActionMixin:
         if q:
             requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
 
-        requests_sez = UserRightsRequestsSeriaizer(instance=requests, many=True)  # [r.natural_key() for r in requests]
+        requests_sez = UserRightsRequestsSerializer(instance=requests, many=True)  # [r.natural_key() for r in requests]
         return Response(requests_sez.data)

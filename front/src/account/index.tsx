@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next"
 import { Main } from "common/components/scaffold"
 import { AccountAccesRights, EntityDialog } from "./components/access-rights"
-import { AccountAuthentication } from "./components/authentication"
+import { AccountAuthentication } from "./components/authentication/authentication"
+// import { AccountAuthentication as AccountAuthenticationOrig } from "./components/authentication"
 import useTitle from "common/hooks/title"
 import { CompanyRegistrationDialog } from "companies/components/registration-dialog"
 import { Route, Routes, useNavigate } from "react-router-dom"
@@ -32,11 +33,11 @@ const Account = () => {
         />
       </Routes>
       <section>
-        <AccountAccesRights />
+        <AccountAuthentication />
       </section>
 
       <section>
-        <AccountAuthentication />
+        <AccountAccesRights />
       </section>
     </Main>
   )
