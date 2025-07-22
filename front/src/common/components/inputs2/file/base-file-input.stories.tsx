@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { BaseFileInput } from "./base-file-input"
 
 const meta: Meta<typeof BaseFileInput> = {

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { RadioGroup } from "./radio"
-import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { useState } from "react"
 const meta: Meta<typeof RadioGroup> = {
   component: RadioGroup,
