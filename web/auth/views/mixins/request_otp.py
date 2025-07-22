@@ -59,6 +59,8 @@ def send_new_token(request, device):
 
 
 class RequestOTPAction:
+    throttle_scope = "10/day"
+
     @extend_schema(
         request=None,
         responses={

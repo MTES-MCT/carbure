@@ -89,10 +89,10 @@ export function useEntityManager(
       entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false,
 
     hasRights: (...roles: UserRole[]) =>
-      (entityRights && roles.includes(entityRights.role)) ?? false,
+      entityRights?.role ? roles.includes(entityRights.role) : false,
 
     canWrite: () =>
-      entityRights
+      entityRights?.role
         ? [UserRole.ReadWrite, UserRole.Admin].includes(entityRights.role)
         : false,
   }

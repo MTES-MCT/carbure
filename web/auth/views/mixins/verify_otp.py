@@ -15,6 +15,8 @@ from core.carburetypes import CarbureError
 
 
 class VerifyOTPAction:
+    throttle_scope = "10/day"
+
     @extend_schema(
         request=VerifyOTPSerializer,
         examples=[

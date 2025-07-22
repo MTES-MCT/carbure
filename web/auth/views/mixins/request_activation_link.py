@@ -48,6 +48,8 @@ def send_notification_mail(user, request):
 
 
 class UserResendActivationLinkAction:
+    throttle_scope = "10/day"
+
     @extend_schema(
         request=UserResendActivationLinkSerializer,
         examples=[

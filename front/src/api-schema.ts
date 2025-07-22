@@ -15,6 +15,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/auth/confirm-email-change/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_confirm_email_change_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/auth/login/": {
     parameters: {
       query?: never
@@ -79,6 +95,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/auth/request-email-change/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_request_email_change_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/auth/request-otp/": {
     parameters: {
       query?: never
@@ -89,6 +121,22 @@ export interface paths {
     get: operations["auth_request_otp_retrieve"]
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/auth/request-password-change/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["auth_request_password_change_create"]
     delete?: never
     options?: never
     head?: never
@@ -2523,6 +2571,21 @@ export interface components {
      * @enum {string}
      */
     CertificateTypeEnum: CertificateTypeEnum
+    ChangePasswordError: {
+      /** @description Message d'erreur général */
+      message?: string
+      /** @description Détails des erreurs de validation */
+      errors?: string
+    }
+    ChangePasswordRequest: {
+      current_password: string
+      new_password: string
+      confirm_new_password: string
+    }
+    ChangePasswordSuccess: {
+      /** @default success */
+      status: string
+    }
     ChangeRoleRequest: {
       /** Format: email */
       email: string
@@ -2547,6 +2610,23 @@ export interface components {
       registered_city: string
       registered_zipcode: string
       registered_country: components["schemas"]["RegistrationCountry"]
+    }
+    ConfirmEmailChangeError: {
+      /** @description Message d'erreur général */
+      message?: string
+      /** @description Détails des erreurs de validation */
+      errors?: string
+      /** @description Code d'erreur spécifique */
+      error?: string
+    }
+    ConfirmEmailChangeRequest: {
+      /** Format: email */
+      new_email: string
+      otp_token: string
+    }
+    ConfirmEmailChangeSuccess: {
+      /** @default success */
+      status: string
     }
     /**
      * @description * `MAC` - MAC
@@ -3745,6 +3825,21 @@ export interface components {
       role: string
       entity_id: number
     }
+    RequestEmailChangeError: {
+      /** @description Message d'erreur général */
+      message?: string
+      /** @description Détails des erreurs de validation */
+      errors?: string
+    }
+    RequestEmailChangeRequest: {
+      /** Format: email */
+      new_email: string
+      password: string
+    }
+    RequestEmailChangeSuccess: {
+      /** @default otp_sent */
+      status: string
+    }
     RequestPasswordResetRequest: {
       username: string
     }
@@ -4243,7 +4338,7 @@ export interface components {
       /** Format: email */
       readonly email: string
       entity: components["schemas"]["UserEntity"]
-      readonly role: components["schemas"]["RoleEnum"]
+      role?: components["schemas"]["RoleEnum"]
       /** Format: date-time */
       expiration_date?: string | null
     }
@@ -4267,20 +4362,11 @@ export interface components {
      * @enum {string}
      */
     UserRightsRequestsStatusEnum: UserRightsRequestsStatusEnum
-    UserRightsResponseSeriaizer: {
-      rights: components["schemas"]["UserRightsSeriaizer"][]
+    UserRightsResponse: {
+      rights: components["schemas"]["UserRights"][]
       requests: components["schemas"]["UserRightsRequests"][]
     }
-    UserRightsSeriaizer: {
-      readonly name: string
-      /** Format: email */
-      readonly email: string
-      entity: components["schemas"]["UserEntity"]
-      role?: components["schemas"]["RoleEnum"]
-      /** Format: date-time */
-      expiration_date?: string | null
-    }
-    UserSettingsResponseSeriaizer: {
+    UserSettingsResponse: {
       /** Format: email */
       email: string
       rights: components["schemas"]["UserRights"][]
@@ -4343,6 +4429,41 @@ export interface operations {
         }
         content: {
           "application/json": unknown
+        }
+      }
+    }
+  }
+  auth_confirm_email_change_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConfirmEmailChangeRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ConfirmEmailChangeRequest"]
+        "multipart/form-data": components["schemas"]["ConfirmEmailChangeRequest"]
+      }
+    }
+    responses: {
+      /** @description Email mis à jour avec succès */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConfirmEmailChangeSuccess"]
+        }
+      }
+      /** @description Erreurs possibles: données invalides, aucune demande en cours, code expiré, code incorrect */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConfirmEmailChangeError"]
         }
       }
     }
@@ -4452,6 +4573,41 @@ export interface operations {
       }
     }
   }
+  auth_request_email_change_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RequestEmailChangeRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["RequestEmailChangeRequest"]
+        "multipart/form-data": components["schemas"]["RequestEmailChangeRequest"]
+      }
+    }
+    responses: {
+      /** @description Code OTP envoyé avec succès à la nouvelle adresse email */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RequestEmailChangeSuccess"]
+        }
+      }
+      /** @description Erreurs possibles: données invalides, mot de passe incorrect, email déjà utilisé */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RequestEmailChangeError"]
+        }
+      }
+    }
+  }
   auth_request_otp_retrieve: {
     parameters: {
       query?: never
@@ -4467,6 +4623,41 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["OtpResponse"]
+        }
+      }
+    }
+  }
+  auth_request_password_change_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChangePasswordRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ChangePasswordRequest"]
+        "multipart/form-data": components["schemas"]["ChangePasswordRequest"]
+      }
+    }
+    responses: {
+      /** @description Mot de passe modifié avec succès */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ChangePasswordSuccess"]
+        }
+      }
+      /** @description Erreurs possibles: données invalides, mot de passe actuel incorrect, nouveau mot de passe invalide */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ChangePasswordError"]
         }
       }
     }
@@ -7048,7 +7239,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserRightsResponseSeriaizer"]
+          "application/json": components["schemas"]["UserRightsResponse"]
         }
       }
     }
@@ -9360,7 +9551,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["UserSettingsResponseSeriaizer"]
+          "application/json": components["schemas"]["UserSettingsResponse"]
         }
       }
     }

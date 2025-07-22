@@ -11,6 +11,6 @@ class AuthViewSet(viewsets.ViewSet, AuthActionMixin):
     permission_classes = []
 
     def get_permissions(self):
-        if self.action in ["request_otp", "verify_otp"]:
+        if self.action in ["request_otp", "verify_otp", "request_email_change", "confirm_email_change", "change_password"]:
             return [IsAuthenticated()]
         return super().get_permissions()

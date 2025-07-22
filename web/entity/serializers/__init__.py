@@ -1,8 +1,8 @@
 from .users import (
     EntityUserEntitySerializer as UserEntitySerializer,
-    UserRightsRequestsSeriaizer,
-    UserRightsResponseSeriaizer,
-    UserRightsSeriaizer,
+    UserRightsRequestsSerializer,
+    UserRightsResponseSerializer,
+    UserRightsSerializer,
     EntityMetricsSerializer,
 )
 from .depot import (
