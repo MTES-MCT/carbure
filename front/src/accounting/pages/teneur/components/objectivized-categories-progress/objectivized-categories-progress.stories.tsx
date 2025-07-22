@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { ObjectivizedCategoriesProgress } from "./objectivized-categories-progress"
 import { objectivizedCategories } from "../../__test__/data"
 
