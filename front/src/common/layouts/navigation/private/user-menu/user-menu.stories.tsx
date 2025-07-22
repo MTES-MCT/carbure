@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { UserMenu } from "./user-menu"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 
 const meta: Meta<typeof UserMenu> = {
   component: UserMenu,

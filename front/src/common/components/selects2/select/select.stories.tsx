@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Select } from "./select"
 import { ReactNode, useState } from "react"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 
 const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
   component: Select,
