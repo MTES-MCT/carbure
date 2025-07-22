@@ -4,7 +4,7 @@ import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
-import { AgreementListQuery } from "./types"
+import { AgreementListQuery, ApplicationListQuery } from "./types"
 // GLOBAL
 
 export function getSnapshot(entity_id: number) {
@@ -15,7 +15,7 @@ export function getSnapshot(entity_id: number) {
 
 // APPLICATIONS
 
-export function getDoubleCountingApplicationList(query: AgreementListQuery) {
+export function getDoubleCountingApplicationList(query: ApplicationListQuery) {
   return apiFetch.GET("/double-counting/applications/list-admin/", {
     params: {
       query,
@@ -25,7 +25,7 @@ export function getDoubleCountingApplicationList(query: AgreementListQuery) {
 
 export function getApplicationFilters(
   field: string,
-  query: AgreementListQuery
+  query: ApplicationListQuery
 ) {
   return apiFetch
     .GET("/double-counting/applications/filters/", {
@@ -160,12 +160,5 @@ export function getDoubleCountingAgreement(
       query: { entity_id },
       path: { id: agreement_id },
     },
-  })
-}
-
-export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
-  return apiFetch.POST("/double-counting/applications/check-admin-files/", {
-    params: { query: { entity_id } },
-    body: { files: Array.from(files) },
   })
 }

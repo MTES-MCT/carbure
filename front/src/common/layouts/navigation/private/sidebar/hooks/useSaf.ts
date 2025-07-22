@@ -15,43 +15,36 @@ type SafParams = Pick<apiTypes["NavStats"], "tickets">
 export const useSaf = (params?: SafParams) => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { has_saf, isOperator, isAirline } = useEntity()
+  const entity = useEntity()
+
+  const { isAirline, isSafTrader, isAdmin } = entity
+  const isSafOperator = entity.isOperator && entity.has_saf
+  const isSafAdmin = entity.isExternal && entity.hasAdminRight("AIRLINE")
 
   const saf: MenuSection = {
     title: t("Aviation"),
-    condition: (has_saf && isOperator) || isAirline,
+    condition:
+      isAirline || isSafOperator || isSafTrader || isAdmin || isSafAdmin,
     children: [
       {
         path: routes.SAF().TICKET_SOURCES,
         title: t("Volumes SAF"),
         icon: ContrastDropLine,
         iconActive: ContrastDropFill,
-        condition: has_saf && isOperator,
+        condition: !isAirline && !isSafAdmin,
       },
       {
         path: routes.SAF().TICKETS_ASSIGNED,
         title: t("Tickets affectés"),
         icon: ArrowGoForwardLine,
-        condition: has_saf && isOperator,
+        condition: !isAirline,
       },
       {
         path: routes.SAF().TICKETS_RECEIVED,
         title: t("Tickets reçus"),
         icon: ArrowGoBackLine,
-        condition: has_saf && isOperator,
-      },
-      {
-        path: routes.SAF().TICKETS_PENDING,
-        title: t("Tickets en attente"),
         additionalInfo: params?.tickets,
-        icon: ArrowGoBackLine,
-        condition: isAirline,
-      },
-      {
-        path: routes.SAF().TICKETS_ACCEPTED,
-        title: t("Tickets acceptés"),
-        icon: ArrowGoForwardLine,
-        condition: isAirline,
+        condition: isAirline || isSafOperator || isSafTrader,
       },
     ],
   }

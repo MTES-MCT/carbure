@@ -313,8 +313,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -324,6 +328,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -393,34 +401,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
-  /api/double-counting/agreements/{id}/download-link/:
-    get:
-      operationId: double_counting_agreements_download_link_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Certificat Double Compte.
-          required: true
-      tags:
-        - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementDownloadLink"
-          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -442,8 +422,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -453,6 +437,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -507,8 +495,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -518,6 +510,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -576,8 +572,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -587,6 +587,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -650,8 +654,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -661,6 +669,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -781,6 +793,40 @@ paths:
                   value: csv file.*
                   summary: Example of export response.
           description: ""
+  /api/double-counting/applications/{id}/files/{file_id}/:
+    delete:
+      operationId: double_counting_applications_files_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: file_id
+          schema:
+            type: integer
+          description: File ID to delete
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
   /api/double-counting/applications/{id}/update-approved-quotas/:
     post:
       operationId: double_counting_applications_update_approved_quotas_create
@@ -825,6 +871,45 @@ paths:
                   value:
                     status: success
                   summary: Example of response.
+          description: ""
+  /api/double-counting/applications/{id}/upload-files/:
+    post:
+      operationId: double_counting_applications_upload_files_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ApplicationFileUploadRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
           description: ""
   /api/double-counting/applications/add/:
     post:
@@ -992,8 +1077,14 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -created_at
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - created_at
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -1003,6 +1094,12 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -1084,8 +1181,14 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -created_at
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - created_at
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -1095,6 +1198,12 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -3535,46 +3644,35 @@ paths:
             application/json:
               schema:
                 type: object
-                oneOf:
-                  - type: object
-                    properties:
-                      tickets_pending:
-                        type: integer
-                      tickets_accepted:
-                        type: integer
-                    required:
-                      - tickets_pending
-                      - tickets_accepted
-                  - type: object
-                    properties:
-                      ticket_sources_available:
-                        type: integer
-                      ticket_sources_history:
-                        type: integer
-                      tickets_assigned:
-                        type: integer
-                      tickets_assigned_pending:
-                        type: integer
-                      tickets_assigned_accepted:
-                        type: integer
-                      tickets_assigned_rejected:
-                        type: integer
-                      tickets_received:
-                        type: integer
-                      tickets_received_pending:
-                        type: integer
-                      tickets_received_accepted:
-                        type: integer
-                    required:
-                      - ticket_sources_available
-                      - ticket_sources_history
-                      - tickets_assigned
-                      - tickets_assigned_pending
-                      - tickets_assigned_accepted
-                      - tickets_assigned_rejected
-                      - tickets_received
-                      - tickets_received_pending
-                      - tickets_received_accepted
+                properties:
+                  ticket_sources_available:
+                    type: integer
+                  ticket_sources_history:
+                    type: integer
+                  tickets_assigned:
+                    type: integer
+                  tickets_assigned_pending:
+                    type: integer
+                  tickets_assigned_accepted:
+                    type: integer
+                  tickets_assigned_rejected:
+                    type: integer
+                  tickets_received:
+                    type: integer
+                  tickets_received_pending:
+                    type: integer
+                  tickets_received_accepted:
+                    type: integer
+                required:
+                  - ticket_sources_available
+                  - ticket_sources_history
+                  - tickets_assigned
+                  - tickets_assigned_pending
+                  - tickets_assigned_accepted
+                  - tickets_assigned_rejected
+                  - tickets_received
+                  - tickets_received_pending
+                  - tickets_received_accepted
               examples:
                 ExampleOfFiltersResponse.:
                   value:
@@ -3594,57 +3692,64 @@ paths:
       operationId: saf_ticket_sources_list
       parameters:
         - in: query
+          name: added_by
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: clients
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of clients provided via
-            ?clients=client1&clients=client2&clients=client3
+          explode: true
+          style: form
         - in: query
-          name: countries_of_origin
+          name: country_of_origin
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of countries of origin provided via
-            ?countries_of_origin=country1&countries_of_origin=country2
+          explode: true
+          style: form
         - in: query
-          name: delivery_sites
+          name: delivery_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of delivery sites provided via
-            ?delivery_sites=site1&delivery_sites=site2
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
-            type: number
+            type: integer
+          description: Entity ID
           required: true
         - in: query
-          name: feedstocks
+          name: feedstock
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of feedstocks provided via
-            ?feedstocks=feedstock1&feedstocks=feedstock2
+          explode: true
+          style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
+                - -added_by
                 - -feedstock
                 - -ghg_reduction
                 - -period
                 - -volume
+                - added_by
                 - feedstock
                 - ghg_reduction
                 - period
@@ -3660,6 +3765,8 @@ paths:
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
             * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `added_by` - Added by
+            * `-added_by` - Added by (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -3681,22 +3788,23 @@ paths:
           schema:
             type: integer
         - in: query
-          name: periods
+          name: period
           schema:
             type: array
             items:
               type: integer
-          description: List of periods provided via
-            ?periods=period1&periods=period2&periods=period3
+              maximum: 2147483647
+              minimum: -2147483648
+          explode: true
+          style: form
         - in: query
-          name: production_sites
+          name: production_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of production sites provided via
-            ?production_sites=site1&production_sites=site2
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -3714,7 +3822,7 @@ paths:
             * `HISTORY` - HISTORY
             * `AVAILABLE` - AVAILABLE
         - in: query
-          name: suppliers
+          name: supplier
           schema:
             type: array
             items:
@@ -3736,7 +3844,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSafTicketSourceList"
+                $ref: "#/components/schemas/PaginatedSafTicketSourcePreviewList"
           description: ""
   /api/saf/ticket-sources/{id}/:
     get:
@@ -3764,7 +3872,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafTicketSourceDetails"
+                $ref: "#/components/schemas/SafTicketSource"
           description: ""
   /api/saf/ticket-sources/{id}/assign/:
     post:
@@ -3815,57 +3923,64 @@ paths:
       operationId: saf_ticket_sources_export_retrieve
       parameters:
         - in: query
+          name: added_by
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: clients
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of clients provided via
-            ?clients=client1&clients=client2&clients=client3
+          explode: true
+          style: form
         - in: query
-          name: countries_of_origin
+          name: country_of_origin
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of countries of origin provided via
-            ?countries_of_origin=country1&countries_of_origin=country2
+          explode: true
+          style: form
         - in: query
-          name: delivery_sites
+          name: delivery_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of delivery sites provided via
-            ?delivery_sites=site1&delivery_sites=site2
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
-            type: number
+            type: integer
+          description: Entity ID
           required: true
         - in: query
-          name: feedstocks
+          name: feedstock
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of feedstocks provided via
-            ?feedstocks=feedstock1&feedstocks=feedstock2
+          explode: true
+          style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
+                - -added_by
                 - -feedstock
                 - -ghg_reduction
                 - -period
                 - -volume
+                - added_by
                 - feedstock
                 - ghg_reduction
                 - period
@@ -3881,6 +3996,8 @@ paths:
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
             * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `added_by` - Added by
+            * `-added_by` - Added by (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -3890,22 +4007,23 @@ paths:
           schema:
             type: string
         - in: query
-          name: periods
+          name: period
           schema:
             type: array
             items:
               type: integer
-          description: List of periods provided via
-            ?periods=period1&periods=period2&periods=period3
+              maximum: 2147483647
+              minimum: -2147483648
+          explode: true
+          style: form
         - in: query
-          name: production_sites
+          name: production_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of production sites provided via
-            ?production_sites=site1&production_sites=site2
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -3923,7 +4041,7 @@ paths:
             * `HISTORY` - HISTORY
             * `AVAILABLE` - AVAILABLE
         - in: query
-          name: suppliers
+          name: supplier
           schema:
             type: array
             items:
@@ -3956,62 +4074,69 @@ paths:
       operationId: saf_ticket_sources_filters_retrieve
       parameters:
         - in: query
+          name: added_by
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: clients
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of clients provided via
-            ?clients=client1&clients=client2&clients=client3
+          explode: true
+          style: form
         - in: query
-          name: countries_of_origin
+          name: country_of_origin
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of countries of origin provided via
-            ?countries_of_origin=country1&countries_of_origin=country2
+          explode: true
+          style: form
         - in: query
-          name: delivery_sites
+          name: delivery_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of delivery sites provided via
-            ?delivery_sites=site1&delivery_sites=site2
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
-            type: number
+            type: integer
+          description: Entity ID
           required: true
         - in: query
-          name: feedstocks
+          name: feedstock
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of feedstocks provided via
-            ?feedstocks=feedstock1&feedstocks=feedstock2
+          explode: true
+          style: form
         - in: query
           name: filter
           schema:
             type: string
           description: Filter string to apply
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
+                - -added_by
                 - -feedstock
                 - -ghg_reduction
                 - -period
                 - -volume
+                - added_by
                 - feedstock
                 - ghg_reduction
                 - period
@@ -4027,6 +4152,8 @@ paths:
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
             * `-ghg_reduction` - Ghg reduction (décroissant)
+            * `added_by` - Added by
+            * `-added_by` - Added by (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4036,22 +4163,23 @@ paths:
           schema:
             type: string
         - in: query
-          name: periods
+          name: period
           schema:
             type: array
             items:
               type: integer
-          description: List of periods provided via
-            ?periods=period1&periods=period2&periods=period3
+              maximum: 2147483647
+              minimum: -2147483648
+          explode: true
+          style: form
         - in: query
-          name: production_sites
+          name: production_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of production sites provided via
-            ?production_sites=site1&production_sites=site2
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -4069,7 +4197,7 @@ paths:
             * `HISTORY` - HISTORY
             * `AVAILABLE` - AVAILABLE
         - in: query
-          name: suppliers
+          name: supplier
           schema:
             type: array
             items:
@@ -4149,71 +4277,82 @@ paths:
       operationId: saf_tickets_list
       parameters:
         - in: query
-          name: clients
+          name: biofuel
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of clients provided via
-            ?clients=client1&clients=client2&clients=client3
+          explode: true
+          style: form
         - in: query
-          name: consumption_types
+          name: client
           schema:
             type: array
             items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: consumption_type
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
               enum:
                 - MAC
                 - MAC_DECLASSEMENT
-              type: string
-              description: |-
-                * `MAC` - MAC
-                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
-          description: List of consumption types provided via
-            ?consumption_types=value1&consumption_types=value2
+          description: |-
+            * `MAC` - MAC
+            * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          explode: true
+          style: form
         - in: query
-          name: countries_of_origin
+          name: country_of_origin
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of countries of origin provided via
-            ?countries_of_origin=country1&countries_of_origin=country2
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
-            type: number
+            type: integer
+          description: Entity ID
           required: true
         - in: query
-          name: feedstocks
+          name: feedstock
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of feedstocks provided via
-            ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
+          explode: true
+          style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
                 - -client
+                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
                 - -period
-                - -suppliers
+                - -reception_airport
+                - -supplier
                 - -volume
                 - client
+                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
                 - period
-                - suppliers
+                - reception_airport
+                - supplier
                 - volume
           description: |-
             Ordre
@@ -4230,8 +4369,12 @@ paths:
             * `-ghg_reduction` - Ghg reduction (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
-            * `suppliers` - Suppliers
-            * `-suppliers` - Suppliers (décroissant)
+            * `supplier` - Supplier
+            * `-supplier` - Supplier (décroissant)
+            * `consumption_type` - Consumption type
+            * `-consumption_type` - Consumption type (décroissant)
+            * `reception_airport` - Reception airport
+            * `-reception_airport` - Reception airport (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4253,22 +4396,31 @@ paths:
           schema:
             type: integer
         - in: query
-          name: periods
+          name: period
           schema:
             type: array
             items:
               type: integer
-          description: List of periods provided via
-            ?periods=period1&periods=period2&periods=period3
+              maximum: 2147483647
+              minimum: -2147483648
+          explode: true
+          style: form
         - in: query
-          name: production_sites
+          name: production_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of production sites provided via
-            ?production_sites=site1&production_sites=site2
+          explode: true
+          style: form
+        - in: query
+          name: reception_airport
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -4288,14 +4440,13 @@ paths:
             * `ACCEPTED` - Accepté
             * `REJECTED` - Refusé
         - in: query
-          name: suppliers
+          name: supplier
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4310,7 +4461,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSafTicketList"
+                $ref: "#/components/schemas/PaginatedSafTicketPreviewList"
           description: ""
   /api/saf/tickets/{id}/:
     get:
@@ -4338,7 +4489,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafTicketDetails"
+                $ref: "#/components/schemas/SafTicket"
           description: ""
   /api/saf/tickets/{id}/accept/:
     post:
@@ -4430,8 +4581,8 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
   /api/saf/tickets/{id}/credit-source/:
-    get:
-      operationId: saf_tickets_credit_source_retrieve
+    post:
+      operationId: saf_tickets_credit_source_create
       parameters:
         - in: query
           name: entity_id
@@ -4455,7 +4606,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SafTicketBase"
+                $ref: "#/components/schemas/SafTicket"
               examples:
                 ExampleOfCreditResponse.:
                   value:
@@ -4511,71 +4662,82 @@ paths:
       operationId: saf_tickets_export_retrieve
       parameters:
         - in: query
-          name: clients
+          name: biofuel
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of clients provided via
-            ?clients=client1&clients=client2&clients=client3
+          explode: true
+          style: form
         - in: query
-          name: consumption_types
+          name: client
           schema:
             type: array
             items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: consumption_type
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
               enum:
                 - MAC
                 - MAC_DECLASSEMENT
-              type: string
-              description: |-
-                * `MAC` - MAC
-                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
-          description: List of consumption types provided via
-            ?consumption_types=value1&consumption_types=value2
+          description: |-
+            * `MAC` - MAC
+            * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          explode: true
+          style: form
         - in: query
-          name: countries_of_origin
+          name: country_of_origin
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of countries of origin provided via
-            ?countries_of_origin=country1&countries_of_origin=country2
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
-            type: number
+            type: integer
+          description: Entity ID
           required: true
         - in: query
-          name: feedstocks
+          name: feedstock
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of feedstocks provided via
-            ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
+          explode: true
+          style: form
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
                 - -client
+                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
                 - -period
-                - -suppliers
+                - -reception_airport
+                - -supplier
                 - -volume
                 - client
+                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
                 - period
-                - suppliers
+                - reception_airport
+                - supplier
                 - volume
           description: |-
             Ordre
@@ -4592,8 +4754,12 @@ paths:
             * `-ghg_reduction` - Ghg reduction (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
-            * `suppliers` - Suppliers
-            * `-suppliers` - Suppliers (décroissant)
+            * `supplier` - Supplier
+            * `-supplier` - Supplier (décroissant)
+            * `consumption_type` - Consumption type
+            * `-consumption_type` - Consumption type (décroissant)
+            * `reception_airport` - Reception airport
+            * `-reception_airport` - Reception airport (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4603,22 +4769,31 @@ paths:
           schema:
             type: string
         - in: query
-          name: periods
+          name: period
           schema:
             type: array
             items:
               type: integer
-          description: List of periods provided via
-            ?periods=period1&periods=period2&periods=period3
+              maximum: 2147483647
+              minimum: -2147483648
+          explode: true
+          style: form
         - in: query
-          name: production_sites
+          name: production_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of production sites provided via
-            ?production_sites=site1&production_sites=site2
+          explode: true
+          style: form
+        - in: query
+          name: reception_airport
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -4638,14 +4813,13 @@ paths:
             * `ACCEPTED` - Accepté
             * `REJECTED` - Refusé
         - in: query
-          name: suppliers
+          name: supplier
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4671,76 +4845,87 @@ paths:
       operationId: saf_tickets_filters_retrieve
       parameters:
         - in: query
-          name: clients
+          name: biofuel
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of clients provided via
-            ?clients=client1&clients=client2&clients=client3
+          explode: true
+          style: form
         - in: query
-          name: consumption_types
+          name: client
           schema:
             type: array
             items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: consumption_type
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
               enum:
                 - MAC
                 - MAC_DECLASSEMENT
-              type: string
-              description: |-
-                * `MAC` - MAC
-                * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
-          description: List of consumption types provided via
-            ?consumption_types=value1&consumption_types=value2
+          description: |-
+            * `MAC` - MAC
+            * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+          explode: true
+          style: form
         - in: query
-          name: countries_of_origin
+          name: country_of_origin
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of countries of origin provided via
-            ?countries_of_origin=country1&countries_of_origin=country2
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
-            type: number
+            type: integer
+          description: Entity ID
           required: true
         - in: query
-          name: feedstocks
+          name: feedstock
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of feedstocks provided via
-            ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3
+          explode: true
+          style: form
         - in: query
           name: filter
           schema:
             type: string
           description: Filter string to apply
         - in: query
-          name: order
+          name: order_by
           schema:
             type: array
             items:
               type: string
               enum:
                 - -client
+                - -consumption_type
                 - -created_at
                 - -feedstock
                 - -ghg_reduction
                 - -period
-                - -suppliers
+                - -reception_airport
+                - -supplier
                 - -volume
                 - client
+                - consumption_type
                 - created_at
                 - feedstock
                 - ghg_reduction
                 - period
-                - suppliers
+                - reception_airport
+                - supplier
                 - volume
           description: |-
             Ordre
@@ -4757,8 +4942,12 @@ paths:
             * `-ghg_reduction` - Ghg reduction (décroissant)
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
-            * `suppliers` - Suppliers
-            * `-suppliers` - Suppliers (décroissant)
+            * `supplier` - Supplier
+            * `-supplier` - Supplier (décroissant)
+            * `consumption_type` - Consumption type
+            * `-consumption_type` - Consumption type (décroissant)
+            * `reception_airport` - Reception airport
+            * `-reception_airport` - Reception airport (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4768,22 +4957,31 @@ paths:
           schema:
             type: string
         - in: query
-          name: periods
+          name: period
           schema:
             type: array
             items:
               type: integer
-          description: List of periods provided via
-            ?periods=period1&periods=period2&periods=period3
+              maximum: 2147483647
+              minimum: -2147483648
+          explode: true
+          style: form
         - in: query
-          name: production_sites
+          name: production_site
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of production sites provided via
-            ?production_sites=site1&production_sites=site2
+          explode: true
+          style: form
+        - in: query
+          name: reception_airport
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -4803,14 +5001,13 @@ paths:
             * `ACCEPTED` - Accepté
             * `REJECTED` - Refusé
         - in: query
-          name: suppliers
+          name: supplier
           schema:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -5680,7 +5877,15 @@ paths:
         - {}
       responses:
         "200":
-          description: No response body
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: mac_export.xlsx
+                  summary: Example of export response.
+          description: ""
   /api/tiruert/objectives/:
     get:
       operationId: objectives
@@ -5840,6 +6045,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -5851,6 +6057,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -5879,6 +6086,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - name: page
@@ -6454,6 +6663,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -6465,6 +6675,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -6493,6 +6704,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - name: page
@@ -6703,6 +6916,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -6714,6 +6928,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -6742,6 +6957,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - in: query
@@ -6988,6 +7205,7 @@ paths:
                 - -from_to
                 - -pending_operations
                 - -quantity
+                - -saved_emissions
                 - -sector
                 - -status
                 - -type
@@ -6999,6 +7217,7 @@ paths:
                 - from_to
                 - pending_operations
                 - quantity
+                - saved_emissions
                 - sector
                 - status
                 - type
@@ -7027,6 +7246,8 @@ paths:
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
             * `-pending_operations` - pending_operations (descending)
+            * `saved_emissions` - saved_emissions
+            * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
         - in: query
@@ -7381,12 +7602,6 @@ components:
       required:
         - delivery_site_id
         - ownership_type
-    AgreementDownloadLink:
-      type: object
-      properties:
-        download_link:
-          type: string
-          format: uri
     AgreementLists:
       type: object
       properties:
@@ -7443,6 +7658,14 @@ components:
         - country
         - id
         - name
+    ApplicationFileUploadRequest:
+      type: object
+      properties:
+        extra_files:
+          type: array
+          items:
+            type: string
+            format: binary
     ApplicationListe:
       type: object
       properties:
@@ -8361,6 +8584,11 @@ components:
         file:
           type: string
           format: binary
+        extra_files:
+          type: array
+          items:
+            type: string
+            format: binary
       required:
         - entity_id
         - file
@@ -8427,10 +8655,14 @@ components:
         download_link:
           type: string
           readOnly: true
+        has_dechets_industriels:
+          type: boolean
+          readOnly: true
       required:
         - created_at
         - documents
         - download_link
+        - has_dechets_industriels
         - id
         - period_end
         - period_start
@@ -8455,7 +8687,7 @@ components:
           readOnly: true
         production_site:
           allOf:
-            - $ref: "#/components/schemas/DoubleCountingProductionSite"
+            - $ref: "#/components/schemas/DoubleCountingProductionSitePreview"
           readOnly: true
         period_start:
           type: string
@@ -8507,6 +8739,7 @@ components:
           $ref: "#/components/schemas/FileTypeEnum"
         url:
           type: string
+          readOnly: true
       required:
         - id
         - url
@@ -8654,6 +8887,18 @@ components:
         - name
         - outputs
         - producer
+    DoubleCountingProductionSitePreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+      required:
+        - id
+        - name
     DoubleCountingQuota:
       type: object
       properties:
@@ -8702,7 +8947,8 @@ components:
             - $ref: "#/components/schemas/EntitySummary"
           readOnly: true
         production_site:
-          $ref: "#/components/schemas/DoubleCountingProductionSite"
+          type: string
+          readOnly: true
         valid_until:
           type: string
           format: date
@@ -9464,6 +9710,7 @@ components:
         - Compagnie aérienne
         - Unknown
         - Power or Heat Producer
+        - SAF Trader
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -9476,6 +9723,7 @@ components:
         * `Compagnie aérienne` - Compagnie aérienne
         * `Unknown` - Unknown
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        * `SAF Trader` - Trader de SAF
       x-enum-varnames:
         - Producer
         - Operator
@@ -9675,11 +9923,13 @@ components:
         - sourcing_history
     FileTypeEnum:
       enum:
-        - SOURCING
+        - EXCEL
+        - EXTRA
         - DECISION
       type: string
       description: |-
-        * `SOURCING` - SOURCING
+        * `EXCEL` - EXCEL
+        * `EXTRA` - EXTRA
         * `DECISION` - DECISION
     GenericCertificate:
       type: object
@@ -10381,7 +10631,7 @@ components:
             $ref: "#/components/schemas/OperationList"
         total_quantity:
           type: number
-    PaginatedSafTicketList:
+    PaginatedSafTicketPreviewList:
       type: object
       required:
         - count
@@ -10403,10 +10653,10 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/SafTicket"
+            $ref: "#/components/schemas/SafTicketPreview"
         total_volume:
           type: number
-    PaginatedSafTicketSourceList:
+    PaginatedSafTicketSourcePreviewList:
       type: object
       required:
         - count
@@ -10428,7 +10678,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/SafTicketSource"
+            $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
     PatchedElecOperationUpdateRequest:
@@ -10787,36 +11037,7 @@ components:
         - ReadWrite
         - Admin
         - Auditor
-    SafBiofuel:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 64
-        name_en:
-          type: string
-          maxLength: 64
-        code:
-          type: string
-          maxLength: 16
-        pci_kg:
-          type: number
-          format: double
-        pci_litre:
-          type: number
-          format: double
-        masse_volumique:
-          type: number
-          format: double
-      required:
-        - code
-        - name
-        - name_en
-    SafTicket:
-      oneOf:
-        - $ref: "#/components/schemas/SafTicketBase"
-        - $ref: "#/components/schemas/SafTicketAirline"
-    SafTicketAirline:
+    SafAssignedTicket:
       type: object
       properties:
         id:
@@ -10826,146 +11047,16 @@ components:
           type: string
           nullable: true
           maxLength: 64
-        year:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        assignment_period:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
+        client:
+          type: string
+          readOnly: true
         agreement_date:
           type: string
           format: date
           nullable: true
-        supplier:
-          type: string
-          readOnly: true
-        client:
-          type: string
-          readOnly: true
         volume:
           type: number
           format: double
-        feedstock:
-          allOf:
-            - $ref: "#/components/schemas/FeedStock"
-          readOnly: true
-        biofuel:
-          allOf:
-            - $ref: "#/components/schemas/Biofuel"
-          readOnly: true
-        country_of_origin:
-          allOf:
-            - $ref: "#/components/schemas/Country"
-          readOnly: true
-        ghg_reduction:
-          type: number
-          format: double
-        consumption_type:
-          allOf:
-            - $ref: "#/components/schemas/ConsumptionTypeEnum"
-          nullable: true
-        ets_status:
-          allOf:
-            - $ref: "#/components/schemas/EtsStatusEnum"
-          nullable: true
-      required:
-        - assignment_period
-        - biofuel
-        - client
-        - country_of_origin
-        - feedstock
-        - id
-        - supplier
-        - volume
-        - year
-    SafTicketBase:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        carbure_id:
-          type: string
-          nullable: true
-          maxLength: 64
-        year:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        assignment_period:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
-        agreement_date:
-          type: string
-          format: date
-          nullable: true
-        supplier:
-          type: string
-          readOnly: true
-        client:
-          type: string
-          readOnly: true
-        volume:
-          type: number
-          format: double
-        feedstock:
-          allOf:
-            - $ref: "#/components/schemas/FeedStock"
-          readOnly: true
-        biofuel:
-          allOf:
-            - $ref: "#/components/schemas/Biofuel"
-          readOnly: true
-        country_of_origin:
-          allOf:
-            - $ref: "#/components/schemas/Country"
-          readOnly: true
-        ghg_reduction:
-          type: number
-          format: double
-        consumption_type:
-          allOf:
-            - $ref: "#/components/schemas/ConsumptionTypeEnum"
-          nullable: true
-      required:
-        - assignment_period
-        - biofuel
-        - client
-        - country_of_origin
-        - feedstock
-        - id
-        - supplier
-        - volume
-        - year
-    SafTicketDetails:
-      oneOf:
-        - $ref: "#/components/schemas/SafTicketDetailsBase"
-        - $ref: "#/components/schemas/SafTicketDetailsAirline"
-    SafTicketDetailsAirline:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        carbure_id:
-          type: string
-          nullable: true
-          maxLength: 64
-        year:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        assignment_period:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
         status:
           $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         created_at:
@@ -10973,130 +11064,60 @@ components:
           format: date-time
           readOnly: true
           nullable: true
-        supplier:
-          type: string
-          readOnly: true
-        client:
-          type: string
-          readOnly: true
-        free_field:
-          type: string
-          nullable: true
-        agreement_date:
-          type: string
-          format: date
-          nullable: true
-        agreement_reference:
-          type: string
-          nullable: true
-          maxLength: 64
-        volume:
-          type: number
-          format: double
-        feedstock:
-          allOf:
-            - $ref: "#/components/schemas/FeedStock"
-          readOnly: true
-        biofuel:
-          allOf:
-            - $ref: "#/components/schemas/SafBiofuel"
-          readOnly: true
-        country_of_origin:
-          allOf:
-            - $ref: "#/components/schemas/Country"
-          readOnly: true
-        carbure_producer:
-          allOf:
-            - $ref: "#/components/schemas/EntityPreview"
-          readOnly: true
-        unknown_producer:
-          type: string
-          nullable: true
-          maxLength: 64
-        carbure_production_site:
-          allOf:
-            - $ref: "#/components/schemas/ProductionSite"
-          readOnly: true
-        unknown_production_site:
-          type: string
-          nullable: true
-          maxLength: 64
-        production_site_commissioning_date:
-          type: string
-          format: date
-          nullable: true
-        eec:
-          type: number
-          format: double
-        el:
-          type: number
-          format: double
-        ep:
-          type: number
-          format: double
-        etd:
-          type: number
-          format: double
-        eu:
-          type: number
-          format: double
-        esca:
-          type: number
-          format: double
-        eccs:
-          type: number
-          format: double
-        eccr:
-          type: number
-          format: double
-        eee:
-          type: number
-          format: double
-        ghg_reduction:
-          type: number
-          format: double
-        ghg_total:
-          type: number
-          format: double
-        client_comment:
-          type: string
-          nullable: true
-        parent_ticket_source:
-          allOf:
-            - $ref: "#/components/schemas/SafTicketSourcePreview"
-          readOnly: true
-        shipping_method:
-          allOf:
-            - $ref: "#/components/schemas/ShippingMethodEnum"
-          nullable: true
-        reception_airport:
-          allOf:
-            - $ref: "#/components/schemas/Airport"
-          readOnly: true
-        consumption_type:
-          allOf:
-            - $ref: "#/components/schemas/ConsumptionTypeEnum"
-          nullable: true
-        ets_status:
-          allOf:
-            - $ref: "#/components/schemas/EtsStatusEnum"
-          nullable: true
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
       required:
         - assignment_period
-        - biofuel
-        - carbure_producer
-        - carbure_production_site
         - client
-        - country_of_origin
         - created_at
-        - feedstock
         - id
-        - parent_ticket_source
-        - reception_airport
-        - supplier
         - volume
-        - year
-    SafTicketDetailsBase:
+    SafParentLot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          maxLength: 64
+      required:
+        - id
+    SafParentTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+      required:
+        - id
+    SafRelatedTicketSource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carbure_id:
+          type: string
+          nullable: true
+          maxLength: 64
+        total_volume:
+          type: number
+          format: double
+        assigned_volume:
+          type: number
+          format: double
+      required:
+        - assigned_volume
+        - id
+        - total_volume
+    SafTicket:
       type: object
       properties:
         id:
@@ -11116,10 +11137,9 @@ components:
           minimum: -2147483648
         status:
           $ref: "#/components/schemas/saf.filters.TicketFilter.status"
-        created_at:
+        agreement_date:
           type: string
-          format: date-time
-          readOnly: true
+          format: date
           nullable: true
         supplier:
           type: string
@@ -11127,17 +11147,6 @@ components:
         client:
           type: string
           readOnly: true
-        free_field:
-          type: string
-          nullable: true
-        agreement_date:
-          type: string
-          format: date
-          nullable: true
-        agreement_reference:
-          type: string
-          nullable: true
-          maxLength: 64
         volume:
           type: number
           format: double
@@ -11147,12 +11156,39 @@ components:
           readOnly: true
         biofuel:
           allOf:
-            - $ref: "#/components/schemas/SafBiofuel"
+            - $ref: "#/components/schemas/Biofuel"
           readOnly: true
         country_of_origin:
           allOf:
             - $ref: "#/components/schemas/Country"
           readOnly: true
+        ghg_reduction:
+          type: number
+          format: double
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
+        ets_status:
+          allOf:
+            - $ref: "#/components/schemas/EtsStatusEnum"
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reception_airport:
+          allOf:
+            - $ref: "#/components/schemas/Airport"
+          readOnly: true
+        free_field:
+          type: string
+          nullable: true
+        agreement_reference:
+          type: string
+          nullable: true
+          maxLength: 64
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -11200,9 +11236,6 @@ components:
         eee:
           type: number
           format: double
-        ghg_reduction:
-          type: number
-          format: double
         ghg_total:
           type: number
           format: double
@@ -11211,25 +11244,23 @@ components:
           nullable: true
         parent_ticket_source:
           allOf:
-            - $ref: "#/components/schemas/SafTicketSourcePreview"
+            - $ref: "#/components/schemas/SafRelatedTicketSource"
           readOnly: true
         shipping_method:
           allOf:
             - $ref: "#/components/schemas/ShippingMethodEnum"
           nullable: true
-        reception_airport:
-          allOf:
-            - $ref: "#/components/schemas/Airport"
+        child_ticket_sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafRelatedTicketSource"
           readOnly: true
-        consumption_type:
-          allOf:
-            - $ref: "#/components/schemas/ConsumptionTypeEnum"
-          nullable: true
       required:
         - assignment_period
         - biofuel
         - carbure_producer
         - carbure_production_site
+        - child_ticket_sources
         - client
         - country_of_origin
         - created_at
@@ -11250,33 +11281,73 @@ components:
           type: string
           nullable: true
           maxLength: 64
-        client:
-          type: string
-          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assignment_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
         agreement_date:
           type: string
           format: date
           nullable: true
+        supplier:
+          type: string
+          readOnly: true
+        client:
+          type: string
+          readOnly: true
         volume:
           type: number
           format: double
-        status:
-          $ref: "#/components/schemas/saf.filters.TicketFilter.status"
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        ghg_reduction:
+          type: number
+          format: double
+        consumption_type:
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
+          nullable: true
+        ets_status:
+          allOf:
+            - $ref: "#/components/schemas/EtsStatusEnum"
+          nullable: true
         created_at:
           type: string
           format: date-time
           readOnly: true
           nullable: true
-        assignment_period:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+        reception_airport:
+          allOf:
+            - $ref: "#/components/schemas/Airport"
+          readOnly: true
       required:
         - assignment_period
+        - biofuel
         - client
+        - country_of_origin
         - created_at
+        - feedstock
         - id
+        - reception_airport
+        - supplier
         - volume
+        - year
     SafTicketSource:
       type: object
       properties:
@@ -11324,22 +11395,78 @@ components:
         assigned_tickets:
           type: array
           items:
-            $ref: "#/components/schemas/SafTicketPreview"
+            $ref: "#/components/schemas/SafAssignedTicket"
           readOnly: true
         parent_lot:
+          $ref: "#/components/schemas/CarbureLotPublic"
+        parent_ticket:
+          $ref: "#/components/schemas/SafParentTicket"
+        added_by:
           allOf:
-            - $ref: "#/components/schemas/SafTicketSourceParentLot"
+            - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        carbure_producer:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        unknown_producer:
+          type: string
+          nullable: true
+          maxLength: 64
+        carbure_production_site:
+          allOf:
+            - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        unknown_production_site:
+          type: string
+          nullable: true
+          maxLength: 64
+        production_site_commissioning_date:
+          type: string
+          format: date
+          nullable: true
+        eec:
+          type: number
+          format: double
+        el:
+          type: number
+          format: double
+        ep:
+          type: number
+          format: double
+        etd:
+          type: number
+          format: double
+        eu:
+          type: number
+          format: double
+        esca:
+          type: number
+          format: double
+        eccs:
+          type: number
+          format: double
+        eccr:
+          type: number
+          format: double
+        eee:
+          type: number
+          format: double
+        ghg_total:
+          type: number
+          format: double
       required:
+        - added_by
         - assigned_tickets
         - assigned_volume
         - biofuel
+        - carbure_producer
+        - carbure_production_site
         - country_of_origin
         - created_at
         - delivery_period
         - feedstock
         - id
-        - parent_lot
         - total_volume
         - year
     SafTicketSourceAssignment:
@@ -11404,126 +11531,6 @@ components:
         - assignment_period
         - client_id
         - volume
-    SafTicketSourceDetails:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        carbure_id:
-          type: string
-          nullable: true
-          maxLength: 64
-        year:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        delivery_period:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-          nullable: true
-        added_by:
-          allOf:
-            - $ref: "#/components/schemas/EntityPreview"
-          readOnly: true
-        total_volume:
-          type: number
-          format: double
-        assigned_volume:
-          type: number
-          format: double
-        feedstock:
-          allOf:
-            - $ref: "#/components/schemas/FeedStock"
-          readOnly: true
-        biofuel:
-          allOf:
-            - $ref: "#/components/schemas/Biofuel"
-          readOnly: true
-        country_of_origin:
-          allOf:
-            - $ref: "#/components/schemas/Country"
-          readOnly: true
-        assigned_tickets:
-          type: array
-          items:
-            $ref: "#/components/schemas/SafTicketPreview"
-          readOnly: true
-        carbure_producer:
-          allOf:
-            - $ref: "#/components/schemas/EntityPreview"
-          readOnly: true
-        unknown_producer:
-          type: string
-          nullable: true
-          maxLength: 64
-        carbure_production_site:
-          allOf:
-            - $ref: "#/components/schemas/ProductionSite"
-          readOnly: true
-        unknown_production_site:
-          type: string
-          nullable: true
-          maxLength: 64
-        production_site_commissioning_date:
-          type: string
-          format: date
-          nullable: true
-        eec:
-          type: number
-          format: double
-        el:
-          type: number
-          format: double
-        ep:
-          type: number
-          format: double
-        etd:
-          type: number
-          format: double
-        eu:
-          type: number
-          format: double
-        esca:
-          type: number
-          format: double
-        eccs:
-          type: number
-          format: double
-        eccr:
-          type: number
-          format: double
-        eee:
-          type: number
-          format: double
-        ghg_reduction:
-          type: number
-          format: double
-        ghg_total:
-          type: number
-          format: double
-        parent_lot:
-          $ref: "#/components/schemas/CarbureLotPublic"
-      required:
-        - added_by
-        - assigned_tickets
-        - assigned_volume
-        - biofuel
-        - carbure_producer
-        - carbure_production_site
-        - country_of_origin
-        - created_at
-        - delivery_period
-        - feedstock
-        - id
-        - parent_lot
-        - total_volume
-        - year
     SafTicketSourceGroupAssignmentRequest:
       type: object
       properties:
@@ -11561,17 +11568,6 @@ components:
         - client_id
         - ticket_sources_ids
         - volume
-    SafTicketSourceParentLot:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        carbure_id:
-          type: string
-          maxLength: 64
-      required:
-        - id
     SafTicketSourcePreview:
       type: object
       properties:
@@ -11582,16 +11578,68 @@ components:
           type: string
           nullable: true
           maxLength: 64
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        delivery_period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
         total_volume:
           type: number
           format: double
         assigned_volume:
           type: number
           format: double
+        feedstock:
+          allOf:
+            - $ref: "#/components/schemas/FeedStock"
+          readOnly: true
+        biofuel:
+          allOf:
+            - $ref: "#/components/schemas/Biofuel"
+          readOnly: true
+        country_of_origin:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        ghg_reduction:
+          type: number
+          format: double
+        assigned_tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafAssignedTicket"
+          readOnly: true
+        parent_lot:
+          allOf:
+            - $ref: "#/components/schemas/SafParentLot"
+          readOnly: true
+        parent_ticket:
+          $ref: "#/components/schemas/SafParentTicket"
+        added_by:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
       required:
+        - added_by
+        - assigned_tickets
         - assigned_volume
+        - biofuel
+        - country_of_origin
+        - created_at
+        - delivery_period
+        - feedstock
         - id
+        - parent_lot
         - total_volume
+        - year
     SeachCompanyRequest:
       type: object
       properties:

@@ -12,11 +12,12 @@ import { ChangeEvent, useId } from "react"
 import cl from "clsx"
 import css from "./checkbox.module.css"
 
-type CheckboxProps = Omit<CheckboxDSFRProps, "options"> & {
+type CheckboxProps = Omit<CheckboxDSFRProps, "options" | "name"> & {
   label?: string
   value?: boolean
   captive?: boolean
   onChange?: (value: boolean) => void
+  name?: string
 }
 
 export const Checkbox = ({
@@ -25,6 +26,7 @@ export const Checkbox = ({
   onChange,
   captive = false,
   small,
+  name,
   ...props
 }: CheckboxProps) => {
   const generatedId = useId()
@@ -56,6 +58,7 @@ export const Checkbox = ({
         )}
         onClick={captive ? (e) => e.stopPropagation() : undefined}
         onChange={(e) => onChange?.(e.target.checked)}
+        name={name}
       />
     )
   }

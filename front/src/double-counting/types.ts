@@ -18,7 +18,6 @@ export enum DoubleCountingExtendedStatus {
   REJECTED = DoubleCountingStatus.REJECTED,
   EXPIRED = DoubleCountingAgreementStatus.EXPIRED,
   EXPIRES_SOON = DoubleCountingAgreementStatus.EXPIRES_SOON,
-  INCOMING = DoubleCountingAgreementStatus.INCOMING,
 }
 
 export type DoubleCountingApplicationOverview =
@@ -30,6 +29,8 @@ export interface DoubleCountingSourcingAggregation {
   count: number
   feedstock: Feedstock
 }
+
+export type DoubleCountingApplication = apiTypes["DoubleCountingApplication"]
 
 export type DoubleCountingSourcing = apiTypes["DoubleCountingSourcing"]
 
@@ -115,4 +116,8 @@ export type DoubleCountingFileInfo = apiTypes["CheckFileResponse"]["file"]
 export interface CheckDoubleCountingFilesResponse {
   files: DoubleCountingFileInfo[]
   checked_at: string
+}
+
+export type DoubleCountingFile = apiTypes["DoubleCountingDocFile"] & {
+  file?: File
 }

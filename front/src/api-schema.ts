@@ -175,22 +175,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/double-counting/agreements/{id}/download-link/": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get: operations["double_counting_agreements_download_link_retrieve"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   "/api/double-counting/agreements/agreement-admin/": {
     parameters: {
       query?: never
@@ -287,6 +271,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/double-counting/applications/{id}/files/{file_id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: operations["double_counting_applications_files_destroy"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/double-counting/applications/{id}/update-approved-quotas/": {
     parameters: {
       query?: never
@@ -297,6 +297,22 @@ export interface paths {
     get?: never
     put?: never
     post: operations["double_counting_applications_update_approved_quotas_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/double-counting/applications/{id}/upload-files/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["double_counting_applications_upload_files_create"]
     delete?: never
     options?: never
     head?: never
@@ -1462,9 +1478,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get: operations["saf_tickets_credit_source_retrieve"]
+    get?: never
     put?: never
-    post?: never
+    post: operations["saf_tickets_credit_source_create"]
     delete?: never
     options?: never
     head?: never
@@ -2005,10 +2021,6 @@ export interface components {
       blending_is_outsourced: boolean
       blending_entity_id?: number
     }
-    AgreementDownloadLink: {
-      /** Format: uri */
-      download_link?: string
-    }
     AgreementLists: {
       active: components["schemas"]["DoubleCountingRegistration"][]
       incoming: components["schemas"]["DoubleCountingRegistration"][]
@@ -2025,6 +2037,9 @@ export interface components {
       postal_code?: string
       gps_coordinates?: string | null
       is_ue_airport?: boolean
+    }
+    ApplicationFileUploadRequest: {
+      extra_files?: File[]
     }
     ApplicationListe: {
       rejected: components["schemas"]["DoubleCountingApplicationPartial"][]
@@ -2266,7 +2281,7 @@ export interface components {
      *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
      * @enum {string}
      */
-    ConsumptionTypeEnum: PathsApiSafTicketsGetParametersQueryConsumption_types
+    ConsumptionTypeEnum: PathsApiSafTicketsGetParametersQueryConsumption_type
     /**
      * @description * `NO_PROBLEMO` - NO_PROBLEMO
      *     * `IN_CORRECTION` - IN_CORRECTION
@@ -2415,6 +2430,7 @@ export interface components {
       should_replace: boolean
       /** Format: binary */
       file: File
+      extra_files?: File[]
     }
     /**
      * @description * `ACTIVE` - ACTIVE
@@ -2444,13 +2460,14 @@ export interface components {
       readonly production: components["schemas"]["DoubleCountingProduction"][]
       readonly documents: components["schemas"]["DoubleCountingDocFile"][]
       readonly download_link: string
+      readonly has_dechets_industriels: boolean
     }
     DoubleCountingApplicationPartial: {
       readonly id: number
       /** Format: date-time */
       readonly created_at: string
       readonly producer: components["schemas"]["EntitySummary"]
-      readonly production_site: components["schemas"]["DoubleCountingProductionSite"]
+      readonly production_site: components["schemas"]["DoubleCountingProductionSitePreview"]
       /** Format: date */
       period_start: string
       /** Format: date */
@@ -2470,7 +2487,7 @@ export interface components {
       readonly id: number
       file_name?: string
       file_type?: components["schemas"]["FileTypeEnum"]
-      url: string
+      readonly url: string
     }
     DoubleCountingProduction: {
       readonly id: number
@@ -2512,6 +2529,10 @@ export interface components {
       readonly outputs: components["schemas"]["Biofuel"][]
       readonly certificates: components["schemas"]["ProductionSiteCertificate"][]
     }
+    DoubleCountingProductionSitePreview: {
+      readonly id: number
+      name: string
+    }
     DoubleCountingQuota: {
       approved_quota: number
       biofuel: components["schemas"]["Biofuel"]
@@ -2529,7 +2550,7 @@ export interface components {
       /** Format: date */
       valid_from: string
       readonly producer: components["schemas"]["EntitySummary"]
-      production_site: components["schemas"]["DoubleCountingProductionSite"]
+      readonly production_site: string
       /** Format: date */
       valid_until: string
       readonly status: components["schemas"]["DoubleCountingAgreementStatus"]
@@ -2822,6 +2843,7 @@ export interface components {
      *     * `Compagnie aérienne` - Compagnie aérienne
      *     * `Unknown` - Unknown
      *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+     *     * `SAF Trader` - Trader de SAF
      * @enum {string}
      */
     EntityTypeEnum: EntityTypeEnum
@@ -2899,7 +2921,8 @@ export interface components {
       global_errors: components["schemas"]["FileError"][]
     }
     /**
-     * @description * `SOURCING` - SOURCING
+     * @description * `EXCEL` - EXCEL
+     *     * `EXTRA` - EXTRA
      *     * `DECISION` - DECISION
      * @enum {string}
      */
@@ -3236,7 +3259,7 @@ export interface components {
       results: components["schemas"]["OperationList"][]
       total_quantity?: number
     }
-    PaginatedSafTicketList: {
+    PaginatedSafTicketPreviewList: {
       /** @example 123 */
       count: number
       /**
@@ -3249,10 +3272,10 @@ export interface components {
        * @example http://api.example.org/accounts/?page=2
        */
       previous?: string | null
-      results: components["schemas"]["SafTicket"][]
+      results: components["schemas"]["SafTicketPreview"][]
       total_volume?: number
     }
-    PaginatedSafTicketSourceList: {
+    PaginatedSafTicketSourcePreviewList: {
       /** @example 123 */
       count: number
       /**
@@ -3265,7 +3288,7 @@ export interface components {
        * @example http://api.example.org/accounts/?page=2
        */
       previous?: string | null
-      results: components["schemas"]["SafTicketSource"][]
+      results: components["schemas"]["SafTicketSourcePreview"][]
       total_available_volume?: number
     }
     PatchedElecOperationUpdateRequest: {
@@ -3400,21 +3423,36 @@ export interface components {
      * @enum {string}
      */
     RoleEnum: RoleEnum
-    SafBiofuel: {
-      name: string
-      name_en: string
-      code: string
+    SafAssignedTicket: {
+      readonly id: number
+      carbure_id?: string | null
+      readonly client: string
+      /** Format: date */
+      agreement_date?: string | null
       /** Format: double */
-      pci_kg?: number
-      /** Format: double */
-      pci_litre?: number
-      /** Format: double */
-      masse_volumique?: number
+      volume: number
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
+      /** Format: date-time */
+      readonly created_at: string | null
+      assignment_period: number
     }
-    SafTicket:
-      | components["schemas"]["SafTicketBase"]
-      | components["schemas"]["SafTicketAirline"]
-    SafTicketAirline: {
+    SafParentLot: {
+      readonly id: number
+      carbure_id?: string
+    }
+    SafParentTicket: {
+      readonly id: number
+      carbure_id?: string | null
+    }
+    SafRelatedTicketSource: {
+      readonly id: number
+      carbure_id?: string | null
+      /** Format: double */
+      total_volume: number
+      /** Format: double */
+      assigned_volume: number
+    }
+    SafTicket: {
       readonly id: number
       carbure_id?: string | null
       year: number
@@ -3433,48 +3471,11 @@ export interface components {
       ghg_reduction?: number
       consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
       ets_status?: components["schemas"]["EtsStatusEnum"] | null
-    }
-    SafTicketBase: {
-      readonly id: number
-      carbure_id?: string | null
-      year: number
-      assignment_period: number
-      status?: components["schemas"]["saf.filters.TicketFilter.status"]
-      /** Format: date */
-      agreement_date?: string | null
-      readonly supplier: string
-      readonly client: string
-      /** Format: double */
-      volume: number
-      readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
-      readonly country_of_origin: components["schemas"]["Country"]
-      /** Format: double */
-      ghg_reduction?: number
-      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
-    }
-    SafTicketDetails:
-      | components["schemas"]["SafTicketDetailsBase"]
-      | components["schemas"]["SafTicketDetailsAirline"]
-    SafTicketDetailsAirline: {
-      readonly id: number
-      carbure_id?: string | null
-      year: number
-      assignment_period: number
-      status?: components["schemas"]["saf.filters.TicketFilter.status"]
       /** Format: date-time */
       readonly created_at: string | null
-      readonly supplier: string
-      readonly client: string
+      readonly reception_airport: components["schemas"]["Airport"]
       free_field?: string | null
-      /** Format: date */
-      agreement_date?: string | null
       agreement_reference?: string | null
-      /** Format: double */
-      volume: number
-      readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["SafBiofuel"]
-      readonly country_of_origin: components["schemas"]["Country"]
       readonly carbure_producer: components["schemas"]["EntityPreview"]
       unknown_producer?: string | null
       readonly carbure_production_site: components["schemas"]["ProductionSite"]
@@ -3500,81 +3501,34 @@ export interface components {
       /** Format: double */
       eee?: number
       /** Format: double */
-      ghg_reduction?: number
-      /** Format: double */
       ghg_total?: number
       client_comment?: string | null
-      readonly parent_ticket_source: components["schemas"]["SafTicketSourcePreview"]
+      readonly parent_ticket_source: components["schemas"]["SafRelatedTicketSource"]
       shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
-      readonly reception_airport: components["schemas"]["Airport"]
-      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
-      ets_status?: components["schemas"]["EtsStatusEnum"] | null
-    }
-    SafTicketDetailsBase: {
-      readonly id: number
-      carbure_id?: string | null
-      year: number
-      assignment_period: number
-      status?: components["schemas"]["saf.filters.TicketFilter.status"]
-      /** Format: date-time */
-      readonly created_at: string | null
-      readonly supplier: string
-      readonly client: string
-      free_field?: string | null
-      /** Format: date */
-      agreement_date?: string | null
-      agreement_reference?: string | null
-      /** Format: double */
-      volume: number
-      readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["SafBiofuel"]
-      readonly country_of_origin: components["schemas"]["Country"]
-      readonly carbure_producer: components["schemas"]["EntityPreview"]
-      unknown_producer?: string | null
-      readonly carbure_production_site: components["schemas"]["ProductionSite"]
-      unknown_production_site?: string | null
-      /** Format: date */
-      production_site_commissioning_date?: string | null
-      /** Format: double */
-      eec?: number
-      /** Format: double */
-      el?: number
-      /** Format: double */
-      ep?: number
-      /** Format: double */
-      etd?: number
-      /** Format: double */
-      eu?: number
-      /** Format: double */
-      esca?: number
-      /** Format: double */
-      eccs?: number
-      /** Format: double */
-      eccr?: number
-      /** Format: double */
-      eee?: number
-      /** Format: double */
-      ghg_reduction?: number
-      /** Format: double */
-      ghg_total?: number
-      client_comment?: string | null
-      readonly parent_ticket_source: components["schemas"]["SafTicketSourcePreview"]
-      shipping_method?: components["schemas"]["ShippingMethodEnum"] | null
-      readonly reception_airport: components["schemas"]["Airport"]
-      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
+      readonly child_ticket_sources: components["schemas"]["SafRelatedTicketSource"][]
     }
     SafTicketPreview: {
       readonly id: number
       carbure_id?: string | null
-      readonly client: string
+      year: number
+      assignment_period: number
+      status?: components["schemas"]["saf.filters.TicketFilter.status"]
       /** Format: date */
       agreement_date?: string | null
+      readonly supplier: string
+      readonly client: string
       /** Format: double */
       volume: number
-      status?: components["schemas"]["saf.filters.TicketFilter.status"]
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly country_of_origin: components["schemas"]["Country"]
+      /** Format: double */
+      ghg_reduction?: number
+      consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null
+      ets_status?: components["schemas"]["EtsStatusEnum"] | null
       /** Format: date-time */
       readonly created_at: string | null
-      assignment_period: number
+      readonly reception_airport: components["schemas"]["Airport"]
     }
     SafTicketSource: {
       readonly id: number
@@ -3592,8 +3546,36 @@ export interface components {
       readonly country_of_origin: components["schemas"]["Country"]
       /** Format: double */
       ghg_reduction?: number
-      readonly assigned_tickets: components["schemas"]["SafTicketPreview"][]
-      readonly parent_lot: components["schemas"]["SafTicketSourceParentLot"]
+      readonly assigned_tickets: components["schemas"]["SafAssignedTicket"][]
+      parent_lot?: components["schemas"]["CarbureLotPublic"]
+      parent_ticket?: components["schemas"]["SafParentTicket"]
+      readonly added_by: components["schemas"]["EntityPreview"]
+      readonly carbure_producer: components["schemas"]["EntityPreview"]
+      unknown_producer?: string | null
+      readonly carbure_production_site: components["schemas"]["ProductionSite"]
+      unknown_production_site?: string | null
+      /** Format: date */
+      production_site_commissioning_date?: string | null
+      /** Format: double */
+      eec?: number
+      /** Format: double */
+      el?: number
+      /** Format: double */
+      ep?: number
+      /** Format: double */
+      etd?: number
+      /** Format: double */
+      eu?: number
+      /** Format: double */
+      esca?: number
+      /** Format: double */
+      eccs?: number
+      /** Format: double */
+      eccr?: number
+      /** Format: double */
+      eee?: number
+      /** Format: double */
+      ghg_total?: number
     }
     SafTicketSourceAssignment: {
       client_id: number
@@ -3619,52 +3601,6 @@ export interface components {
       consumption_type?: string | null
       shipping_method?: string | null
     }
-    SafTicketSourceDetails: {
-      readonly id: number
-      carbure_id?: string | null
-      year: number
-      delivery_period: number
-      /** Format: date-time */
-      readonly created_at: string | null
-      readonly added_by: components["schemas"]["EntityPreview"]
-      /** Format: double */
-      total_volume: number
-      /** Format: double */
-      assigned_volume: number
-      readonly feedstock: components["schemas"]["FeedStock"]
-      readonly biofuel: components["schemas"]["Biofuel"]
-      readonly country_of_origin: components["schemas"]["Country"]
-      readonly assigned_tickets: components["schemas"]["SafTicketPreview"][]
-      readonly carbure_producer: components["schemas"]["EntityPreview"]
-      unknown_producer?: string | null
-      readonly carbure_production_site: components["schemas"]["ProductionSite"]
-      unknown_production_site?: string | null
-      /** Format: date */
-      production_site_commissioning_date?: string | null
-      /** Format: double */
-      eec?: number
-      /** Format: double */
-      el?: number
-      /** Format: double */
-      ep?: number
-      /** Format: double */
-      etd?: number
-      /** Format: double */
-      eu?: number
-      /** Format: double */
-      esca?: number
-      /** Format: double */
-      eccs?: number
-      /** Format: double */
-      eccr?: number
-      /** Format: double */
-      eee?: number
-      /** Format: double */
-      ghg_reduction?: number
-      /** Format: double */
-      ghg_total?: number
-      parent_lot: components["schemas"]["CarbureLotPublic"]
-    }
     SafTicketSourceGroupAssignmentRequest: {
       client_id: number
       /** Format: double */
@@ -3678,17 +3614,26 @@ export interface components {
       shipping_method?: string | null
       ticket_sources_ids: number[]
     }
-    SafTicketSourceParentLot: {
-      readonly id: number
-      carbure_id?: string
-    }
     SafTicketSourcePreview: {
       readonly id: number
       carbure_id?: string | null
+      year: number
+      delivery_period: number
+      /** Format: date-time */
+      readonly created_at: string | null
       /** Format: double */
       total_volume: number
       /** Format: double */
       assigned_volume: number
+      readonly feedstock: components["schemas"]["FeedStock"]
+      readonly biofuel: components["schemas"]["Biofuel"]
+      readonly country_of_origin: components["schemas"]["Country"]
+      /** Format: double */
+      ghg_reduction?: number
+      readonly assigned_tickets: components["schemas"]["SafAssignedTicket"][]
+      readonly parent_lot: components["schemas"]["SafParentLot"]
+      parent_ticket?: components["schemas"]["SafParentTicket"]
+      readonly added_by: components["schemas"]["EntityPreview"]
     }
     SeachCompanyRequest: {
       registration_id: string
@@ -4247,7 +4192,11 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -4299,31 +4248,6 @@ export interface operations {
       }
     }
   }
-  double_counting_agreements_download_link_retrieve: {
-    parameters: {
-      query: {
-        /** @description Entity ID */
-        entity_id: number
-      }
-      header?: never
-      path: {
-        /** @description A unique integer value identifying this Certificat Double Compte. */
-        id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AgreementDownloadLink"]
-        }
-      }
-    }
-  }
   double_counting_agreements_agreement_admin_retrieve: {
     parameters: {
       query: {
@@ -4335,7 +4259,11 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -4371,7 +4299,11 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -4407,7 +4339,11 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -4445,7 +4381,11 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
         order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
@@ -4529,6 +4469,33 @@ export interface operations {
       }
     }
   }
+  double_counting_applications_files_destroy: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description File ID to delete */
+        file_id: number
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
   double_counting_applications_update_approved_quotas_create: {
     parameters: {
       query: {
@@ -4547,6 +4514,37 @@ export interface operations {
         "application/json": components["schemas"]["UpdatedQuotasRequest"]
         "application/x-www-form-urlencoded": components["schemas"]["UpdatedQuotasRequest"]
         "multipart/form-data": components["schemas"]["UpdatedQuotasRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Response"]
+        }
+      }
+    }
+  }
+  double_counting_applications_upload_files_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Dossier Double Compte. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ApplicationFileUploadRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ApplicationFileUploadRequest"]
+        "multipart/form-data": components["schemas"]["ApplicationFileUploadRequest"]
       }
     }
     responses: {
@@ -4682,8 +4680,14 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
+        order_by?: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         producers?: string
@@ -4727,8 +4731,14 @@ export interface operations {
          *     * `production_site` - Production site
          *     * `-production_site` - Production site (décroissant)
          *     * `valid_until` - Valid until
-         *     * `-valid_until` - Valid until (décroissant) */
-        order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[]
+         *     * `-valid_until` - Valid until (décroissant)
+         *     * `producer` - Producer
+         *     * `-producer` - Producer (décroissant)
+         *     * `created_at` - Created at
+         *     * `-created_at` - Created at (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant) */
+        order_by?: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         producers?: string
@@ -6612,22 +6622,17 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json":
-            | {
-                tickets_pending: number
-                tickets_accepted: number
-              }
-            | {
-                ticket_sources_available: number
-                ticket_sources_history: number
-                tickets_assigned: number
-                tickets_assigned_pending: number
-                tickets_assigned_accepted: number
-                tickets_assigned_rejected: number
-                tickets_received: number
-                tickets_received_pending: number
-                tickets_received_accepted: number
-              }
+          "application/json": {
+            ticket_sources_available: number
+            ticket_sources_history: number
+            tickets_assigned: number
+            tickets_assigned_pending: number
+            tickets_assigned_accepted: number
+            tickets_assigned_rejected: number
+            tickets_received: number
+            tickets_received_pending: number
+            tickets_received_accepted: number
+          }
         }
       }
       400: {
@@ -6643,15 +6648,13 @@ export interface operations {
   saf_ticket_sources_list: {
     parameters: {
       query: {
-        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
+        added_by?: string[]
         clients?: string[]
-        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
-        countries_of_origin?: string[]
-        /** @description List of delivery sites provided via ?delivery_sites=site1&delivery_sites=site2 */
-        delivery_sites?: string[]
+        country_of_origin?: string[]
+        delivery_site?: string[]
+        /** @description Entity ID */
         entity_id: number
-        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2 */
-        feedstocks?: string[]
+        feedstock?: string[]
         /** @description Ordre
          *
          *     * `volume` - Volume
@@ -6661,25 +6664,25 @@ export interface operations {
          *     * `feedstock` - Feedstock
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
-         *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
+         *     * `-ghg_reduction` - Ghg reduction (décroissant)
+         *     * `added_by` - Added by
+         *     * `-added_by` - Added by (décroissant) */
+        order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
         page_size?: number
-        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
-        periods?: number[]
-        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
-        production_sites?: string[]
+        period?: number[]
+        production_site?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `HISTORY` - HISTORY
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
-        suppliers?: string[]
+        supplier?: string[]
         year?: number
       }
       header?: never
@@ -6693,7 +6696,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedSafTicketSourceList"]
+          "application/json": components["schemas"]["PaginatedSafTicketSourcePreviewList"]
         }
       }
     }
@@ -6718,7 +6721,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicketSourceDetails"]
+          "application/json": components["schemas"]["SafTicketSource"]
         }
       }
     }
@@ -6757,15 +6760,13 @@ export interface operations {
   saf_ticket_sources_export_retrieve: {
     parameters: {
       query: {
-        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
+        added_by?: string[]
         clients?: string[]
-        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
-        countries_of_origin?: string[]
-        /** @description List of delivery sites provided via ?delivery_sites=site1&delivery_sites=site2 */
-        delivery_sites?: string[]
+        country_of_origin?: string[]
+        delivery_site?: string[]
+        /** @description Entity ID */
         entity_id: number
-        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2 */
-        feedstocks?: string[]
+        feedstock?: string[]
         /** @description Ordre
          *
          *     * `volume` - Volume
@@ -6775,21 +6776,21 @@ export interface operations {
          *     * `feedstock` - Feedstock
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
-         *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
+         *     * `-ghg_reduction` - Ghg reduction (décroissant)
+         *     * `added_by` - Added by
+         *     * `-added_by` - Added by (décroissant) */
+        order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
-        periods?: number[]
-        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
-        production_sites?: string[]
+        period?: number[]
+        production_site?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `HISTORY` - HISTORY
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
-        suppliers?: string[]
+        supplier?: string[]
         year?: number
       }
       header?: never
@@ -6811,15 +6812,13 @@ export interface operations {
   saf_ticket_sources_filters_retrieve: {
     parameters: {
       query: {
-        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
+        added_by?: string[]
         clients?: string[]
-        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
-        countries_of_origin?: string[]
-        /** @description List of delivery sites provided via ?delivery_sites=site1&delivery_sites=site2 */
-        delivery_sites?: string[]
+        country_of_origin?: string[]
+        delivery_site?: string[]
+        /** @description Entity ID */
         entity_id: number
-        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2 */
-        feedstocks?: string[]
+        feedstock?: string[]
         /** @description Filter string to apply */
         filter?: string
         /** @description Ordre
@@ -6831,21 +6830,21 @@ export interface operations {
          *     * `feedstock` - Feedstock
          *     * `-feedstock` - Feedstock (décroissant)
          *     * `ghg_reduction` - Ghg reduction
-         *     * `-ghg_reduction` - Ghg reduction (décroissant) */
-        order?: PathsApiSafTicketSourcesGetParametersQueryOrder[]
+         *     * `-ghg_reduction` - Ghg reduction (décroissant)
+         *     * `added_by` - Added by
+         *     * `-added_by` - Added by (décroissant) */
+        order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
-        periods?: number[]
-        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
-        production_sites?: string[]
+        period?: number[]
+        production_site?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `HISTORY` - HISTORY
          *     * `AVAILABLE` - AVAILABLE */
         status?: PathsApiSafTicketSourcesGetParametersQueryStatus
         /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
-        suppliers?: string[]
+        supplier?: string[]
         year?: number
       }
       header?: never
@@ -6903,15 +6902,15 @@ export interface operations {
   saf_tickets_list: {
     parameters: {
       query: {
-        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
-        clients?: string[]
-        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
-        consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
-        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
-        countries_of_origin?: string[]
+        biofuel?: string[]
+        client?: string[]
+        /** @description * `MAC` - MAC
+         *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
+        consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[]
+        country_of_origin?: string[]
+        /** @description Entity ID */
         entity_id: number
-        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3 */
-        feedstocks?: string[]
+        feedstock?: string[]
         /** @description Ordre
          *
          *     * `client` - Client
@@ -6926,27 +6925,29 @@ export interface operations {
          *     * `-ghg_reduction` - Ghg reduction (décroissant)
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
-         *     * `suppliers` - Suppliers
-         *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsGetParametersQueryOrder[]
+         *     * `supplier` - Supplier
+         *     * `-supplier` - Supplier (décroissant)
+         *     * `consumption_type` - Consumption type
+         *     * `-consumption_type` - Consumption type (décroissant)
+         *     * `reception_airport` - Reception airport
+         *     * `-reception_airport` - Reception airport (décroissant) */
+        order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
         /** @description A page number within the paginated result set. */
         page?: number
         /** @description Number of results to return per page. */
         page_size?: number
-        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
-        periods?: number[]
-        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
-        production_sites?: string[]
+        period?: number[]
+        production_site?: string[]
+        reception_airport?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
         status?: PathsApiSafTicketsGetParametersQueryStatus
-        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
-        suppliers?: string[]
+        supplier?: string[]
         year?: number
       }
       header?: never
@@ -6960,7 +6961,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["PaginatedSafTicketList"]
+          "application/json": components["schemas"]["PaginatedSafTicketPreviewList"]
         }
       }
     }
@@ -6985,7 +6986,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicketDetails"]
+          "application/json": components["schemas"]["SafTicket"]
         }
       }
     }
@@ -7068,7 +7069,7 @@ export interface operations {
       }
     }
   }
-  saf_tickets_credit_source_retrieve: {
+  saf_tickets_credit_source_create: {
     parameters: {
       query: {
         /** @description Entity ID */
@@ -7088,7 +7089,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["SafTicketBase"]
+          "application/json": components["schemas"]["SafTicket"]
         }
       }
     }
@@ -7135,15 +7136,15 @@ export interface operations {
   saf_tickets_export_retrieve: {
     parameters: {
       query: {
-        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
-        clients?: string[]
-        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
-        consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
-        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
-        countries_of_origin?: string[]
+        biofuel?: string[]
+        client?: string[]
+        /** @description * `MAC` - MAC
+         *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
+        consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[]
+        country_of_origin?: string[]
+        /** @description Entity ID */
         entity_id: number
-        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3 */
-        feedstocks?: string[]
+        feedstock?: string[]
         /** @description Ordre
          *
          *     * `client` - Client
@@ -7158,23 +7159,25 @@ export interface operations {
          *     * `-ghg_reduction` - Ghg reduction (décroissant)
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
-         *     * `suppliers` - Suppliers
-         *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsGetParametersQueryOrder[]
+         *     * `supplier` - Supplier
+         *     * `-supplier` - Supplier (décroissant)
+         *     * `consumption_type` - Consumption type
+         *     * `-consumption_type` - Consumption type (décroissant)
+         *     * `reception_airport` - Reception airport
+         *     * `-reception_airport` - Reception airport (décroissant) */
+        order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
-        periods?: number[]
-        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
-        production_sites?: string[]
+        period?: number[]
+        production_site?: string[]
+        reception_airport?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
         status?: PathsApiSafTicketsGetParametersQueryStatus
-        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
-        suppliers?: string[]
+        supplier?: string[]
         year?: number
       }
       header?: never
@@ -7196,15 +7199,15 @@ export interface operations {
   saf_tickets_filters_retrieve: {
     parameters: {
       query: {
-        /** @description List of clients provided via ?clients=client1&clients=client2&clients=client3 */
-        clients?: string[]
-        /** @description List of consumption types provided via ?consumption_types=value1&consumption_types=value2 */
-        consumption_types?: PathsApiSafTicketsGetParametersQueryConsumption_types[]
-        /** @description List of countries of origin provided via ?countries_of_origin=country1&countries_of_origin=country2 */
-        countries_of_origin?: string[]
+        biofuel?: string[]
+        client?: string[]
+        /** @description * `MAC` - MAC
+         *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
+        consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[]
+        country_of_origin?: string[]
+        /** @description Entity ID */
         entity_id: number
-        /** @description List of feedstocks provided via ?feedstocks=feedstock1&feedstocks=feedstock2&feedstocks=feedstock3 */
-        feedstocks?: string[]
+        feedstock?: string[]
         /** @description Filter string to apply */
         filter?: string
         /** @description Ordre
@@ -7221,23 +7224,25 @@ export interface operations {
          *     * `-ghg_reduction` - Ghg reduction (décroissant)
          *     * `created_at` - Created at
          *     * `-created_at` - Created at (décroissant)
-         *     * `suppliers` - Suppliers
-         *     * `-suppliers` - Suppliers (décroissant) */
-        order?: PathsApiSafTicketsGetParametersQueryOrder[]
+         *     * `supplier` - Supplier
+         *     * `-supplier` - Supplier (décroissant)
+         *     * `consumption_type` - Consumption type
+         *     * `-consumption_type` - Consumption type (décroissant)
+         *     * `reception_airport` - Reception airport
+         *     * `-reception_airport` - Reception airport (décroissant) */
+        order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[]
         /** @description Which field to use when ordering the results. */
         ordering?: string
-        /** @description List of periods provided via ?periods=period1&periods=period2&periods=period3 */
-        periods?: number[]
-        /** @description List of production sites provided via ?production_sites=site1&production_sites=site2 */
-        production_sites?: string[]
+        period?: number[]
+        production_site?: string[]
+        reception_airport?: string[]
         /** @description A search term. */
         search?: string
         /** @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé */
         status?: PathsApiSafTicketsGetParametersQueryStatus
-        /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
-        suppliers?: string[]
+        supplier?: string[]
         year?: number
       }
       header?: never
@@ -7747,12 +7752,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description No response body */
       200: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
       }
     }
   }
@@ -7824,7 +7830,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -8160,7 +8168,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         /** @description A page number within the paginated result set. */
         page?: number
@@ -8228,7 +8238,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -8316,7 +8328,9 @@ export interface operations {
          *     * `available_balance` - available_balance
          *     * `-available_balance` - available_balance (descending)
          *     * `pending_operations` - pending_operations
-         *     * `-pending_operations` - pending_operations (descending) */
+         *     * `-pending_operations` - pending_operations (descending)
+         *     * `saved_emissions` - saved_emissions
+         *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
@@ -8506,16 +8520,34 @@ export interface operations {
   }
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
+  ValueMinuscertificate_id = "-certificate_id",
+  ValueMinusproducer = "-producer",
   ValueMinusproduction_site = "-production_site",
   ValueMinusvalid_until = "-valid_until",
+  certificate_id = "certificate_id",
+  producer = "producer",
   production_site = "production_site",
   valid_until = "valid_until",
 }
-export enum PathsApiSafTicketSourcesGetParametersQueryOrder {
+export enum PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by {
+  ValueMinuscertificate_id = "-certificate_id",
+  ValueMinuscreated_at = "-created_at",
+  ValueMinusproducer = "-producer",
+  ValueMinusproduction_site = "-production_site",
+  ValueMinusvalid_until = "-valid_until",
+  certificate_id = "certificate_id",
+  created_at = "created_at",
+  producer = "producer",
+  production_site = "production_site",
+  valid_until = "valid_until",
+}
+export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
+  ValueMinusadded_by = "-added_by",
   ValueMinusfeedstock = "-feedstock",
   ValueMinusghg_reduction = "-ghg_reduction",
   ValueMinusperiod = "-period",
   ValueMinusvolume = "-volume",
+  added_by = "added_by",
   feedstock = "feedstock",
   ghg_reduction = "ghg_reduction",
   period = "period",
@@ -8525,24 +8557,28 @@ export enum PathsApiSafTicketSourcesGetParametersQueryStatus {
   AVAILABLE = "AVAILABLE",
   HISTORY = "HISTORY",
 }
-export enum PathsApiSafTicketsGetParametersQueryConsumption_types {
+export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
   MAC = "MAC",
   MAC_DECLASSEMENT = "MAC_DECLASSEMENT",
 }
-export enum PathsApiSafTicketsGetParametersQueryOrder {
+export enum PathsApiSafTicketsGetParametersQueryOrder_by {
   ValueMinusclient = "-client",
+  ValueMinusconsumption_type = "-consumption_type",
   ValueMinuscreated_at = "-created_at",
   ValueMinusfeedstock = "-feedstock",
   ValueMinusghg_reduction = "-ghg_reduction",
   ValueMinusperiod = "-period",
-  ValueMinussuppliers = "-suppliers",
+  ValueMinusreception_airport = "-reception_airport",
+  ValueMinussupplier = "-supplier",
   ValueMinusvolume = "-volume",
   client = "client",
+  consumption_type = "consumption_type",
   created_at = "created_at",
   feedstock = "feedstock",
   ghg_reduction = "ghg_reduction",
   period = "period",
-  suppliers = "suppliers",
+  reception_airport = "reception_airport",
+  supplier = "supplier",
   volume = "volume",
 }
 export enum PathsApiSafTicketsGetParametersQueryStatus {
@@ -8617,6 +8653,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   ValueMinusfrom_to = "-from_to",
   ValueMinuspending_operations = "-pending_operations",
   ValueMinusquantity = "-quantity",
+  ValueMinussaved_emissions = "-saved_emissions",
   ValueMinussector = "-sector",
   ValueMinusstatus = "-status",
   ValueMinustype = "-type",
@@ -8628,10 +8665,10 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   from_to = "from_to",
   pending_operations = "pending_operations",
   quantity = "quantity",
+  saved_emissions = "saved_emissions",
   sector = "sector",
   status = "status",
   type = "type",
-  saved_emissions = "saved_emissions",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
   ESSENCE = "ESSENCE",
@@ -8747,6 +8784,7 @@ export enum EntityTypeEnum {
   Airline = "Compagnie a\u00E9rienne",
   Unknown = "Unknown",
   PowerOrHeatProducer = "Power or Heat Producer",
+  SAF_Trader = "SAF Trader",
 }
 export enum EtsStatusEnum {
   ETS_VALUATION = "ETS_VALUATION",
@@ -8762,7 +8800,8 @@ export enum ExtAdminPagesEnum {
   TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
 }
 export enum FileTypeEnum {
-  SOURCING = "SOURCING",
+  EXCEL = "EXCEL",
+  EXTRA = "EXTRA",
   DECISION = "DECISION",
 }
 export enum GesOptionEnum {

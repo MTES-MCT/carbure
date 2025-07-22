@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 COPY index.html ./
-RUN npm install
+RUN npm clean-install
 COPY tsconfig.json ./
 COPY public ./
 COPY src ./
