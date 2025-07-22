@@ -19,6 +19,7 @@ import { ReplaceApplicationDialog } from "./replace-application-dialog"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 import { HttpError } from "common/services/api-fetch"
 import { compact } from "common/utils/collection"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export type SendApplicationProducerDialogProps = {
   file: File
@@ -172,7 +173,7 @@ function MissingAddress({
       <Button
         customPriority="link"
         linkProps={{
-          to: `/org/${entity.id}/settings#production`,
+          to: ROUTE_URLS.SETTINGS(entity.id).PRODUCTION,
           onClick: closeAll,
         }}
       >

@@ -6,6 +6,7 @@ import { AlertCircle, Plus } from "common/components/icons"
 import Portal from "common/components/portal"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
+import { ROUTE_URLS } from "common/utils/routes"
 
 interface CompanyInfoMissingSirenDialogProps {
   onClose: () => void
@@ -20,7 +21,7 @@ export const CompanyInfoMissingSirenDialog = ({
 
   const goToCompanySettings = () => {
     onClose()
-    navigate(`/org/${entity.id}/settings#info`)
+    navigate(ROUTE_URLS.SETTINGS(entity.id).INFO)
   }
 
   return (

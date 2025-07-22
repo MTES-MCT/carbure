@@ -116,7 +116,19 @@ export const ROUTE_URLS = {
     }
   },
 
-  SETTINGS: (entity_id: number) => urlWithOrgId(entity_id, "/settings"),
+  SETTINGS: (entity_id: number) => {
+    const baseUrl = urlWithOrgId(entity_id, "/settings")
+
+    return {
+      ROOT: baseUrl,
+      OPTIONS: `${baseUrl}/options`,
+      INFO: `${baseUrl}/info`,
+      CERTIFICATES: `${baseUrl}/certificates`,
+      PRODUCTION: `${baseUrl}/production`,
+      DEPOT: `${baseUrl}/depot`,
+      USERS: `${baseUrl}/users`,
+    }
+  },
 
   USER_GUIDE: "https://carbure-1.gitbook.io/faq",
 
