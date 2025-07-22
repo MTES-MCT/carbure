@@ -40,7 +40,7 @@ class VerifyOTPAction:
 
         serializer = VerifyOTPSerializer(data=request.data, user=request.user)
         serializer.is_valid(raise_exception=True)
-        device = EmailDevice.objects.get(user=request.user)
+        device = EmailDevice.objects.get(user=request.user, name="email")
         otp_token = serializer.validated_data["otp_token"]
 
         is_allowed, reason = device.verify_is_allowed()
