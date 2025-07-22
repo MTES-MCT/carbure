@@ -3460,6 +3460,11 @@ paths:
       operationId: resources_entities_list
       parameters:
         - in: query
+          name: allowed_tiruert
+          schema:
+            type: boolean
+          description: Only show entities allowed to be tiruert
+        - in: query
           name: entity_type
           schema:
             type: array
