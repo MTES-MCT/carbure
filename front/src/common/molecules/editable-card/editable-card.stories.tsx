@@ -23,14 +23,20 @@ export const Default: Story = {
 
 export const CustomChildren: Story = {
   args: {
-    children: ({ isEditing, setIsEditing }) => (
+    children: ({ isEditing }) => (
       <div>
         <p>isEditing: {isEditing ? "true" : "false"}</p>
-        <button onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? "Stop editing" : "Start editing"}
-        </button>
+        <EditableCard.Button
+          priority="secondary"
+          onClick={() => new Promise((resolve) => setTimeout(resolve, 5000))}
+        >
+          Edit
+        </EditableCard.Button>
       </div>
     ),
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
   },
 }
 
