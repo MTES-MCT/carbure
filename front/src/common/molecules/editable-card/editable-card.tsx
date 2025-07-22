@@ -29,6 +29,7 @@ interface EditableCardProps {
   headerActions?: ReactNode
   onEdit?: () => void
   onCancel?: () => void
+  onSave?: Promise<unknown>
   defaultIsEditing?: boolean
   className?: string
 }
@@ -39,6 +40,7 @@ export const EditableCard = ({
   children,
   headerActions,
   onEdit,
+  onSave,
   onCancel,
   defaultIsEditing,
   className,
@@ -102,7 +104,7 @@ export const EditableCard = ({
 
       <Divider noMargin />
 
-      <div>
+      <div className={css["editable-card__content"]}>
         {typeof children === "function"
           ? children({ isEditing, setIsEditing })
           : children}

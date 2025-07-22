@@ -4,7 +4,7 @@
  * compatible with the DSFR CSS.
  * This is why we are using the native HTML element and only style it with CSS.
  */
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import cl from "clsx"
 import css from "./notice.module.css"
 import { Icon, IconName } from "../icon"
@@ -24,8 +24,8 @@ export interface NoticeProps {
   isClosable?: boolean
   onClose?: () => void
 
-  // The text displayed in the link
-  linkText?: string
+  // The node displayed in the link
+  linkText?: ReactNode
 
   // The URL of the link. If provided, a link will be displayed in the notice. If not, a button triggers the action event.
   linkHref?: string
