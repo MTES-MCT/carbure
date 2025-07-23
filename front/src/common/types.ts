@@ -77,6 +77,7 @@ export { CategoryEnum }
 // Add units that are not defined in the schema
 export enum ExtendedUnit {
   GJ = "GJ",
+  MWh = "MWh",
 }
 
 export { Unit }

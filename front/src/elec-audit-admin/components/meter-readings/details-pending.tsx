@@ -1,6 +1,6 @@
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { ElecMeterReadingsApplicationDetails } from "elec/types"
+import { ElecMeterReadingsApplicationDetails } from "elec-charge-points/types"
 import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css" // Re-uses images from ~leaflet package
 import "leaflet/dist/leaflet.css"

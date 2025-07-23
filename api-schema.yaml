@@ -345,13 +345,14 @@ paths:
                     message: INVALID_DATA
                     errors:
                       new_password:
-                        - INVALID_NEW_PASSWORD
+                        - Ce mot de passe est trop court. Il doit contenir au
+                          minimum 8 caractères.
                   summary: Nouveau mot de passe invalide
                 MotsDePasseIdentiques:
                   value:
                     message: INVALID_DATA
                     errors:
-                      new_password:
+                      current_password:
                         - PASSWORDS_MATCH
                   summary: Mots de passe identiques
           description: "Erreurs possibles: données invalides, mot de passe actuel
@@ -1394,6 +1395,992 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
+          description: ""
+  /api/elec/certificates/clients/:
+    get:
+      operationId: elec_certificates_clients_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity querying the endpoint
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityPreview"
+          description: ""
+  /api/elec/certificates/snapshot/:
+    get:
+      operationId: elec_certificates_snapshot_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  provision_certificates_available:
+                    type: integer
+                  provision_certificates_history:
+                    type: integer
+                  transfer_certificates_pending:
+                    type: integer
+                  transfer_certificates_accepted:
+                    type: integer
+                  transfer_certificates_rejected:
+                    type: integer
+                required:
+                  - provision_certificates_available
+                  - provision_certificates_history
+                  - transfer_certificates_pending
+                  - transfer_certificates_accepted
+                  - transfer_certificates_rejected
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    provision_certificates_available: 5
+                    transfer_certificates_pending: 10
+                    ...: ...
+                  summary: Example of filters response.
+          description: ""
+  /api/elec/certificates/years/:
+    get:
+      operationId: elec_certificates_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
+  /api/elec/provision-certificates/:
+    get:
+      operationId: elec_provision_certificates_list
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -cpo
+                - -operating_unit
+                - -quarter
+                - -remaining_energy_amount
+                - -source
+                - cpo
+                - operating_unit
+                - quarter
+                - remaining_energy_amount
+                - source
+          description: |-
+            Ordre
+
+            * `quarter` - Quarter
+            * `-quarter` - Quarter (décroissant)
+            * `remaining_energy_amount` - Remaining energy amount
+            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operating_unit` - Operating unit
+            * `-operating_unit` - Operating unit (décroissant)
+            * `source` - Source
+            * `-source` - Source (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: quarter
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - MANUAL
+                - METER_READINGS
+                - null
+                - QUALICHARGE
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateList"
+          description: ""
+  /api/elec/provision-certificates/{id}/:
+    get:
+      operationId: elec_provision_certificates_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Fourniture
+            (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecProvisionCertificate"
+          description: ""
+  /api/elec/provision-certificates/balance/:
+    get:
+      operationId: elec_provision_certificates_balance_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: integer
+          description: ""
+  /api/elec/provision-certificates/export/:
+    get:
+      operationId: export_provision_certificates_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: Excel file download
+          description: ""
+  /api/elec/provision-certificates/filters/:
+    get:
+      operationId: elec_provision_certificates_filters_retrieve
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -cpo
+                - -operating_unit
+                - -quarter
+                - -remaining_energy_amount
+                - -source
+                - cpo
+                - operating_unit
+                - quarter
+                - remaining_energy_amount
+                - source
+          description: |-
+            Ordre
+
+            * `quarter` - Quarter
+            * `-quarter` - Quarter (décroissant)
+            * `remaining_energy_amount` - Remaining energy amount
+            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operating_unit` - Operating unit
+            * `-operating_unit` - Operating unit (décroissant)
+            * `source` - Source
+            * `-source` - Source (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: quarter
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - MANUAL
+                - METER_READINGS
+                - null
+                - QUALICHARGE
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - ETBE
+                    - Ethanol
+                    - EMHV
+                    - B100
+                    - HVOE
+                  summary: Example of filters response.
+          description: ""
+  /api/elec/provision-certificates/import/:
+    post:
+      operationId: elec_provision_certificates_import_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+              required:
+                - file
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          description: ""
+  /api/elec/provision-certificates/transfer/:
+    post:
+      operationId: elec_provision_certificates_transfer_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferCertificate"
+          description: ""
+  /api/elec/transfer-certificates/:
+    get:
+      operationId: elec_transfer_certificates_list
+      parameters:
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: client
+          schema:
+            type: integer
+        - in: query
+          name: consumption_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: month
+          schema:
+            type: number
+        - in: query
+          name: operator
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -certificate_id
+                - -consumption_date
+                - -cpo
+                - -energy_amount
+                - -operator
+                - -status
+                - -transfer_date
+                - certificate_id
+                - consumption_date
+                - cpo
+                - energy_amount
+                - operator
+                - status
+                - transfer_date
+          description: |-
+            Ordre
+
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operator` - Operator
+            * `-operator` - Operator (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
+            * `transfer_date` - Transfer date
+            * `-transfer_date` - Transfer date (décroissant)
+            * `consumption_date` - Consumption date
+            * `-consumption_date` - Consumption date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: supplier
+          schema:
+            type: integer
+        - in: query
+          name: transfer_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: used_in_tiruert
+          schema:
+            type: boolean
+        - in: query
+          name: year
+          schema:
+            type: number
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecTransferCertificateList"
+          description: ""
+  /api/elec/transfer-certificates/{id}/:
+    get:
+      operationId: elec_transfer_certificates_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferCertificate"
+          description: ""
+  /api/elec/transfer-certificates/{id}/accept/:
+    post:
+      operationId: elec_transfer_certificates_accept_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/elec/transfer-certificates/{id}/cancel/:
+    post:
+      operationId: elec_transfer_certificates_cancel_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/elec/transfer-certificates/{id}/reject/:
+    post:
+      operationId: elec_transfer_certificates_reject_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/elec/transfer-certificates/export/:
+    get:
+      operationId: export_transfer_certificates_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: Excel file download
+          description: ""
+  /api/elec/transfer-certificates/filters/:
+    get:
+      operationId: elec_transfer_certificates_filters_retrieve
+      parameters:
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: client
+          schema:
+            type: integer
+        - in: query
+          name: consumption_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: month
+          schema:
+            type: number
+        - in: query
+          name: operator
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -certificate_id
+                - -consumption_date
+                - -cpo
+                - -energy_amount
+                - -operator
+                - -status
+                - -transfer_date
+                - certificate_id
+                - consumption_date
+                - cpo
+                - energy_amount
+                - operator
+                - status
+                - transfer_date
+          description: |-
+            Ordre
+
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operator` - Operator
+            * `-operator` - Operator (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
+            * `transfer_date` - Transfer date
+            * `-transfer_date` - Transfer date (décroissant)
+            * `consumption_date` - Consumption date
+            * `-consumption_date` - Consumption date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: supplier
+          schema:
+            type: integer
+        - in: query
+          name: transfer_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: used_in_tiruert
+          schema:
+            type: boolean
+        - in: query
+          name: year
+          schema:
+            type: number
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - ETBE
+                    - Ethanol
+                    - EMHV
+                    - B100
+                    - HVOE
+                  summary: Example of filters response.
           description: ""
   /api/entities/:
     get:
@@ -9438,6 +10425,124 @@ components:
         * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
         * `CESSION` - CESSION
         * `TENEUR` - TENEUR
+    ElecProvisionCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        source:
+          allOf:
+            - $ref: "#/components/schemas/SourceEnum"
+          nullable: true
+        quarter:
+          allOf:
+            - $ref: "#/components/schemas/QuarterEnum"
+          minimum: -2147483648
+          maximum: 2147483647
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        operating_unit:
+          type: string
+          maxLength: 64
+        energy_amount:
+          type: number
+          format: double
+        remaining_energy_amount:
+          type: number
+          format: double
+      required:
+        - cpo
+        - energy_amount
+        - id
+        - operating_unit
+        - quarter
+        - remaining_energy_amount
+        - year
+    ElecTransferAcceptRequest:
+      type: object
+      properties:
+        used_in_tiruert:
+          type: string
+          minLength: 1
+        consumption_date:
+          type: string
+          format: date
+      required:
+        - used_in_tiruert
+    ElecTransferCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        client:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        transfer_date:
+          type: string
+          format: date
+        energy_amount:
+          type: number
+          format: double
+        status:
+          $ref: "#/components/schemas/ElecTransferCertificateStatusEnum"
+        certificate_id:
+          type: string
+          maxLength: 32
+        used_in_tiruert:
+          type: boolean
+        consumption_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+        - certificate_id
+        - client
+        - energy_amount
+        - id
+        - supplier
+        - transfer_date
+    ElecTransferCertificateStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+    ElecTransferRejectRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+      required:
+        - comment
+    ElecTransferRequest:
+      type: object
+      properties:
+        energy_amount:
+          type: number
+          format: double
+        client:
+          type: integer
+      required:
+        - client
+        - energy_amount
     EmptyResponse:
       type: object
       properties:
@@ -10745,6 +11850,56 @@ components:
             $ref: "#/components/schemas/ElecOperationList"
         total_quantity:
           type: number
+    PaginatedElecProvisionCertificateList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecProvisionCertificate"
+        available_energy:
+          type: number
+    PaginatedElecTransferCertificateList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecTransferCertificate"
+        transferred_energy:
+          type: number
     PaginatedEntityPreviewList:
       type: object
       required:
@@ -11063,6 +12218,18 @@ components:
         - name
         - postal_code
         - site_siret
+    QuarterEnum:
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      type: integer
+      description: |-
+        * `1` - T1
+        * `2` - T2
+        * `3` - T3
+        * `4` - T4
     RegistrationCountry:
       type: object
       properties:
@@ -12029,6 +13196,16 @@ components:
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
+    SourceEnum:
+      enum:
+        - MANUAL
+        - METER_READINGS
+        - QUALICHARGE
+      type: string
+      description: |-
+        * `MANUAL` - MANUAL
+        * `METER_READINGS` - METER_READINGS
+        * `QUALICHARGE` - QUALICHARGE
     StatsResponse:
       type: object
       properties:

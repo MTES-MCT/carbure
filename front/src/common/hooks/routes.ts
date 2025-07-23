@@ -23,11 +23,14 @@ export const useRoutes = () => {
 
     DOUBLE_COUNTING: () => ROUTE_URLS.DOUBLE_COUNTING(entity.id),
 
-    ELEC: (year: number = currentYear) => ROUTE_URLS.ELEC(entity.id, year),
+    ELEC: () => ROUTE_URLS.ELEC(entity.id),
     ELEC_ADMIN: (year: number = currentYear) =>
       ROUTE_URLS.ELEC_ADMIN(entity.id, year),
     ELEC_AUDITOR: (year: number = currentYear) =>
       ROUTE_URLS.ELEC_AUDITOR(entity.id, year),
+
+    ELEC_V2: (year: number = currentYear) =>
+      ROUTE_URLS.ELEC_V2(entity.id, year),
 
     SAF: (year: number = currentYear) => ROUTE_URLS.SAF(entity.id, year),
 

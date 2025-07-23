@@ -159,7 +159,7 @@ export function Table<T>({
           const link = rowLink?.(row)
 
           const cells = columns.filter(isVisible).map((column, i) => (
-            <div
+            <Text
               key={column.key ?? i}
               style={column.style}
               className={cl(
@@ -167,9 +167,11 @@ export function Table<T>({
                 column.className,
                 column.small && css.small
               )}
+              is="div"
+              size="sm"
             >
               {column.cell(row)}
-            </div>
+            </Text>
           ))
 
           return (

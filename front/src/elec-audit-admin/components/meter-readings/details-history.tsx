@@ -1,5 +1,5 @@
 import { Divider } from "common/components/divider"
-import { ElecMeterReadingsApplicationDetails } from "elec/types"
+import { ElecMeterReadingsApplicationDetails } from "elec-charge-points/types"
 import SampleSummary from "../sample/details-sample-summary"
 import ChargePointsSampleMap from "../sample/sample-map"
 import ApplicationSummary from "./details-application-summary"

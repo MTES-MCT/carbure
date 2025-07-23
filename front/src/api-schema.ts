@@ -495,6 +495,278 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec/certificates/clients/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_certificates_clients_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/certificates/snapshot/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_certificates_snapshot_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/certificates/years/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_certificates_years_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/balance/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_balance_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["export_provision_certificates_excel"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/import/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_provision_certificates_import_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates/transfer/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_provision_certificates_transfer_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/{id}/accept/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_transfer_certificates_accept_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/{id}/cancel/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_transfer_certificates_cancel_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/{id}/reject/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations["elec_transfer_certificates_reject_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/export/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["export_transfer_certificates_excel"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/transfer-certificates/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_transfer_certificates_filters_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/entities/": {
     parameters: {
       query?: never
@@ -2757,6 +3029,52 @@ export interface components {
      * @enum {string}
      */
     ElecOperationTypeEnum: ElecOperationTypeEnum
+    ElecProvisionCertificate: {
+      readonly id: number
+      readonly cpo: components["schemas"]["EntityPreview"]
+      source?: components["schemas"]["SourceEnum"] | null
+      quarter: components["schemas"]["QuarterEnum"]
+      year: number
+      operating_unit: string
+      /** Format: double */
+      energy_amount: number
+      /** Format: double */
+      remaining_energy_amount: number
+    }
+    ElecTransferAcceptRequest: {
+      used_in_tiruert: string
+      /** Format: date */
+      consumption_date?: string
+    }
+    ElecTransferCertificate: {
+      readonly id: number
+      readonly supplier: components["schemas"]["EntityPreview"]
+      readonly client: components["schemas"]["EntityPreview"]
+      /** Format: date */
+      transfer_date: string
+      /** Format: double */
+      energy_amount: number
+      status?: components["schemas"]["ElecTransferCertificateStatusEnum"]
+      certificate_id: string
+      used_in_tiruert?: boolean
+      /** Format: date */
+      consumption_date?: string | null
+    }
+    /**
+     * @description * `PENDING` - PENDING
+     *     * `ACCEPTED` - ACCEPTED
+     *     * `REJECTED` - REJECTED
+     * @enum {string}
+     */
+    ElecTransferCertificateStatusEnum: PathsApiSafTicketsGetParametersQueryStatus
+    ElecTransferRejectRequest: {
+      comment: string
+    }
+    ElecTransferRequest: {
+      /** Format: double */
+      energy_amount: number
+      client: number
+    }
     EmptyResponse: {
       empty?: string
     }
@@ -3308,6 +3626,38 @@ export interface components {
       results: components["schemas"]["ElecOperationList"][]
       total_quantity?: number
     }
+    PaginatedElecProvisionCertificateList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecProvisionCertificate"][]
+      available_energy?: number
+    }
+    PaginatedElecTransferCertificateList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecTransferCertificate"][]
+      transferred_energy?: number
+    }
     PaginatedEntityPreviewList: {
       /** @example 123 */
       count: number
@@ -3450,6 +3800,14 @@ export interface components {
       dc_reference?: string
       created_by?: number | null
     }
+    /**
+     * @description * `1` - T1
+     *     * `2` - T2
+     *     * `3` - T3
+     *     * `4` - T4
+     * @enum {integer}
+     */
+    QuarterEnum: PathsApiElecProvisionCertificatesGetParametersQueryQuarter
     RegistrationCountry: {
       name: string
       name_en: string
@@ -3817,6 +4175,13 @@ export interface components {
      * @enum {string}
      */
     SiteTypeEnum: SiteTypeEnum
+    /**
+     * @description * `MANUAL` - MANUAL
+     *     * `METER_READINGS` - METER_READINGS
+     *     * `QUALICHARGE` - QUALICHARGE
+     * @enum {string}
+     */
+    SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource
     StatsResponse: {
       metabase_iframe_url: string
     }
@@ -4967,6 +5332,570 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ApplicationSnapshot"]
+        }
+      }
+    }
+  }
+  elec_certificates_clients_list: {
+    parameters: {
+      query?: {
+        /** @description Entity querying the endpoint */
+        entity_id?: number
+        /** @description Search within the field `name` */
+        query?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EntityPreview"][]
+        }
+      }
+    }
+  }
+  elec_certificates_snapshot_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Year */
+        year: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            provision_certificates_available: number
+            provision_certificates_history: number
+            transfer_certificates_pending: number
+            transfer_certificates_accepted: number
+            transfer_certificates_rejected: number
+          }
+        }
+      }
+    }
+  }
+  elec_certificates_years_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": number[]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_list: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Ordre
+         *
+         *     * `quarter` - Quarter
+         *     * `-quarter` - Quarter (décroissant)
+         *     * `remaining_energy_amount` - Remaining energy amount
+         *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operating_unit` - Operating unit
+         *     * `-operating_unit` - Operating unit (décroissant)
+         *     * `source` - Source
+         *     * `-source` - Source (décroissant) */
+        order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[]
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[]
+        status?: string
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecProvisionCertificateList"]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Fourniture (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecProvisionCertificate"]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_balance_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            balance?: number
+          }
+        }
+      }
+    }
+  }
+  export_provision_certificates_excel: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": File
+        }
+      }
+    }
+  }
+  elec_provision_certificates_filters_retrieve: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Ordre
+         *
+         *     * `quarter` - Quarter
+         *     * `-quarter` - Quarter (décroissant)
+         *     * `remaining_energy_amount` - Remaining energy amount
+         *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operating_unit` - Operating unit
+         *     * `-operating_unit` - Operating unit (décroissant)
+         *     * `source` - Source
+         *     * `-source` - Source (décroissant) */
+        order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[]
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[]
+        status?: string
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_import_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Format: binary
+           * @description CSV file to import
+           */
+          file: File
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": Record<string, never>
+        }
+      }
+    }
+  }
+  elec_provision_certificates_transfer_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecTransferRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecTransferRequest"]
+        "multipart/form-data": components["schemas"]["ElecTransferRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificate"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_list: {
+    parameters: {
+      query: {
+        certificate_id?: string
+        client?: number
+        consumption_date?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
+        month?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operator?: string[]
+        /** @description Ordre
+         *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operator` - Operator
+         *     * `-operator` - Operator (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant)
+         *     * `transfer_date` - Transfer date
+         *     * `-transfer_date` - Transfer date (décroissant)
+         *     * `consumption_date` - Consumption date
+         *     * `-consumption_date` - Consumption date (décroissant) */
+        order_by?: PathsApiElecTransferCertificatesGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description A search term. */
+        search?: string
+        status?: string
+        supplier?: number
+        transfer_date?: string
+        used_in_tiruert?: boolean
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecTransferCertificateList"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_retrieve: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecTransferCertificate"]
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_accept_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecTransferAcceptRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecTransferAcceptRequest"]
+        "multipart/form-data": components["schemas"]["ElecTransferAcceptRequest"]
+      }
+    }
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  elec_transfer_certificates_cancel_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  elec_transfer_certificates_reject_create: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Cession (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ElecTransferRejectRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ElecTransferRejectRequest"]
+        "multipart/form-data": components["schemas"]["ElecTransferRejectRequest"]
+      }
+    }
+    responses: {
+      /** @description No response body */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  export_transfer_certificates_excel: {
+    parameters: {
+      query: {
+        /** @description Entity ID */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": File
+        }
+      }
+    }
+  }
+  elec_transfer_certificates_filters_retrieve: {
+    parameters: {
+      query: {
+        certificate_id?: string
+        client?: number
+        consumption_date?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        energy_amount?: number
+        /** @description Entity ID */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter?: string
+        month?: number
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operator?: string[]
+        /** @description Ordre
+         *
+         *     * `status` - Status
+         *     * `-status` - Status (décroissant)
+         *     * `energy_amount` - Energy amount
+         *     * `-energy_amount` - Energy amount (décroissant)
+         *     * `cpo` - Cpo
+         *     * `-cpo` - Cpo (décroissant)
+         *     * `operator` - Operator
+         *     * `-operator` - Operator (décroissant)
+         *     * `certificate_id` - Certificate id
+         *     * `-certificate_id` - Certificate id (décroissant)
+         *     * `transfer_date` - Transfer date
+         *     * `-transfer_date` - Transfer date (décroissant)
+         *     * `consumption_date` - Consumption date
+         *     * `-consumption_date` - Consumption date (décroissant) */
+        order_by?: PathsApiElecTransferCertificatesGetParametersQueryOrder_by[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        status?: string
+        supplier?: number
+        transfer_date?: string
+        used_in_tiruert?: boolean
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
         }
       }
     }
@@ -8683,6 +9612,45 @@ export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
   ValueMinusvalid_until = "-valid_until",
   production_site = "production_site",
   valid_until = "valid_until",
+}
+export enum PathsApiElecProvisionCertificatesGetParametersQueryOrder_by {
+  ValueMinuscpo = "-cpo",
+  ValueMinusoperating_unit = "-operating_unit",
+  ValueMinusquarter = "-quarter",
+  ValueMinusremaining_energy_amount = "-remaining_energy_amount",
+  ValueMinussource = "-source",
+  cpo = "cpo",
+  operating_unit = "operating_unit",
+  quarter = "quarter",
+  remaining_energy_amount = "remaining_energy_amount",
+  source = "source",
+}
+export enum PathsApiElecProvisionCertificatesGetParametersQueryQuarter {
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
+}
+export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
+  MANUAL = "MANUAL",
+  METER_READINGS = "METER_READINGS",
+  QUALICHARGE = "QUALICHARGE",
+}
+export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
+  ValueMinuscertificate_id = "-certificate_id",
+  ValueMinusconsumption_date = "-consumption_date",
+  ValueMinuscpo = "-cpo",
+  ValueMinusenergy_amount = "-energy_amount",
+  ValueMinusoperator = "-operator",
+  ValueMinusstatus = "-status",
+  ValueMinustransfer_date = "-transfer_date",
+  certificate_id = "certificate_id",
+  consumption_date = "consumption_date",
+  cpo = "cpo",
+  energy_amount = "energy_amount",
+  operator = "operator",
+  status = "status",
+  transfer_date = "transfer_date",
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
   ValueMinusadded_by = "-added_by",

@@ -65,16 +65,8 @@ export const ROUTE_URLS = {
     }
   },
 
-  ELEC: (entity_id: number, year: number) => {
-    const baseUrl = urlWithOrgId(entity_id, `/elec/${year}`)
-
+  ELEC: (entity_id: number) => {
     return {
-      CERTIFICATES: {
-        PENDING: `${baseUrl}/pending`,
-        ACCEPTED: `${baseUrl}/accepted`,
-      },
-      PROVISIONNED_ENERGY: `${baseUrl}/provisioned`,
-      TRANSFERRED_ENERGY: `${baseUrl}/transferred`,
       CHARGE_POINTS: {
         PENDING: urlWithOrgId(entity_id, "/charge-points/applications"),
         METER_READINGS: urlWithOrgId(
@@ -86,15 +78,12 @@ export const ROUTE_URLS = {
     }
   },
   ELEC_ADMIN: (entity_id: number, year: number) => {
-    const baseUrl = urlWithOrgId(entity_id, `/elec-admin/${year}`)
     const baseChargePointsUrl = urlWithOrgId(
       entity_id,
       `/elec-admin-audit/${year}`
     )
 
     return {
-      PROVISION: `${baseUrl}/provision`,
-      TRANSFER: `${baseUrl}/transfer`,
       CHARGE_POINTS: {
         PENDING: `${baseChargePointsUrl}/charge-points`,
         METER_READINGS: `${baseChargePointsUrl}/meter-readings`,
@@ -103,6 +92,16 @@ export const ROUTE_URLS = {
   },
   ELEC_AUDITOR: (entity_id: number, year: number) =>
     urlWithOrgId(entity_id, `/elec-audit/${year}`),
+
+  ELEC_V2: (entity_id: number, year: number) => {
+    const certURL = urlWithOrgId(entity_id, `/elec-v2/certificates/${year}`)
+    return {
+      CERTIFICATES: {
+        PROVISION: `${certURL}/provision`,
+        TRANSFER: `${certURL}/transfer`,
+      },
+    }
+  },
 
   SAF: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/saf/${year}`)
