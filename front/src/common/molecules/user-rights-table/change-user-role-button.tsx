@@ -1,13 +1,12 @@
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
-import { Edit, Return } from "common/components/icons"
 import { UserRightRequest, UserRole } from "common/types"
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { usePortal } from "common/components/portal"
-import Dialog from "common/components/dialog"
+import { Dialog } from "common/components/dialog2"
 import { type PortalInstance } from "common/components/portal"
-import { Form } from "common/components/form"
-import { RadioGroup } from "common/components/radio"
+import { Form } from "common/components/form2"
+import { RadioGroup } from "common/components/inputs2"
 
 import useEntity from "common/hooks/entity"
 import { getUserRoleOptions } from "common/utils/normalizers"
@@ -43,43 +42,43 @@ export const ChangeUserRoleDialog = ({
     }
   }
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Modifier le rôle")}</h1>
-      </header>
-      <main>
-        <section>
-          {t("Modifier le rôle de l'utilisateur {{userEmail}} ?", {
-            userEmail,
-          })}
-        </section>
-        <section>
-          <Form id="access-right" onSubmit={handleSubmit}>
-            <RadioGroup
-              label={t("Rôle")}
-              name="role"
-              value={role}
-              onChange={setRole}
-              options={getUserRoleOptions([
-                UserRole.ReadOnly,
-                UserRole.ReadWrite,
-                UserRole.Admin,
-              ])}
-            />
-          </Form>
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={<Dialog.Title>{t("Modifier le rôle")}</Dialog.Title>}
+      footer={
         <Button
-          variant="primary"
           loading={loading}
-          icon={Edit}
-          label={t("Modifier le rôle")}
+          iconId="ri-pencil-line"
           disabled={!entity || !role}
-          submit="access-right"
-        />
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
+          type="submit"
+          nativeButtonProps={{
+            form: "access-right",
+          }}
+        >
+          {t("Modifier le rôle")}
+        </Button>
+      }
+    >
+      <section>
+        {t("Modifier le rôle de l'utilisateur {{userEmail}} ?", {
+          userEmail,
+        })}
+      </section>
+      <section>
+        <Form id="access-right" onSubmit={handleSubmit}>
+          <RadioGroup
+            label={t("Rôle")}
+            name="role"
+            value={role}
+            onChange={setRole}
+            options={getUserRoleOptions([
+              UserRole.ReadOnly,
+              UserRole.ReadWrite,
+              UserRole.Admin,
+            ])}
+          />
+        </Form>
+      </section>
     </Dialog>
   )
 }
@@ -100,10 +99,10 @@ export const ChangeUserRoleButton = ({
   return (
     <Button
       captive
-      variant="icon"
-      icon={Edit}
+      iconId="ri-pencil-line"
       title={t("Modifier le rôle")}
-      action={() =>
+      priority="tertiary no outline"
+      onClick={() =>
         portal((close) => (
           <ChangeUserRoleDialog
             request={request}

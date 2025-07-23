@@ -26,11 +26,11 @@ import Table, { actionColumn, Cell } from "common/components/table"
 import Dialog, { Confirm } from "common/components/dialog"
 import Autocomplete from "common/components/autocomplete"
 import { RadioGroup } from "common/components/radio"
-import Tag, { TagVariant } from "common/components/tag"
 import Form from "common/components/form"
 import { useMatomo } from "matomo"
 import { useNotify } from "common/components/notifications"
 import { useNavigate } from "react-router-dom"
+import Badge, { BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
@@ -250,10 +250,10 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
 export const RightStatus = ({ status }: { status: UserRightStatus }) => {
   const { t } = useTranslation()
 
-  const statusVariant: Record<UserRightStatus, TagVariant> = {
+  const statusVariant: Record<UserRightStatus, BadgeProps["severity"]> = {
     [UserRightStatus.Accepted]: "success",
     [UserRightStatus.Pending]: "info",
-    [UserRightStatus.Rejected]: "danger",
+    [UserRightStatus.Rejected]: "error",
     [UserRightStatus.Revoked]: "warning",
   }
 
@@ -264,5 +264,5 @@ export const RightStatus = ({ status }: { status: UserRightStatus }) => {
     [UserRightStatus.Revoked]: t("Révoqué"),
   }
 
-  return <Tag variant={statusVariant[status]} label={statusLabels[status]} />
+  return <Badge severity={statusVariant[status]}>{statusLabels[status]}</Badge>
 }

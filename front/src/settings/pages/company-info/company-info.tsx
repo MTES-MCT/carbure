@@ -112,6 +112,7 @@ const CompanyInfo = ({
           // Reset the form to the initial entity data
           companyForm.setValue(getCompanyDataFromEntity(entity))
         }}
+        headerActions={!isAllowedToEdit && null}
       >
         {isAllowedToEdit && (
           <Notice
@@ -204,6 +205,7 @@ const CompanyInfo = ({
           // Reset the form to the initial entity data
           companyForm.setValue(getCompanyDataFromEntity(entity))
         }}
+        headerActions={!isAllowedToEdit && null}
       >
         {({ isEditing }) => (
           <EditableCard.Form form={companyForm} onSubmit={onSubmitForm}>

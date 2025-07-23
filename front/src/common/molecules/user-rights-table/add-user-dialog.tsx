@@ -1,12 +1,10 @@
 import { getUserRoleOptions } from "common/utils/normalizers"
-import Dialog from "common/components/dialog"
-import Button from "common/components/button"
-import Form, { useForm } from "common/components/form"
+import { Dialog } from "common/components/dialog2"
+import { Button } from "common/components/button2"
+import { Form, useForm } from "common/components/form2"
 import { type PortalInstance } from "common/components/portal"
-import { RadioGroup } from "common/components/radio"
 import { useTranslation } from "react-i18next"
-import { TextInput } from "common/components/input"
-import { Mail, Plus, Return } from "common/components/icons"
+import { TextInput, RadioGroup } from "common/components/inputs2"
 import { UserRole } from "common/types"
 import { useAsyncCallback } from "react-async-hook"
 import { useNotify } from "common/components/notifications"
@@ -54,41 +52,40 @@ export const AddUserDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Ajouter un utilisateur")}</h1>
-      </header>
-      <main>
-        <section>{t("Veuillez remplir les informations suivantes :")}</section>
-        <section>
-          <Form id="add-user" onSubmit={handleSubmit}>
-            <TextInput
-              variant="outline"
-              icon={Mail}
-              type="email"
-              label={t("Adresse email")}
-              hideError={false}
-              {...bind("email")}
-            />
-            <RadioGroup
-              label={t("Rôle")}
-              options={getUserRoleOptions()}
-              {...bind("role")}
-            />
-          </Form>
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      size="medium"
+      onClose={onClose}
+      header={<Dialog.Title>{t("Ajouter un utilisateur")}</Dialog.Title>}
+      footer={
         <Button
-          variant="primary"
-          icon={Plus}
-          label={t("Ajouter")}
+          iconId="ri-add-line"
           disabled={!value.email || !value.role}
           loading={addNewUserMutation.loading}
-          submit="add-user"
-        />
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
+          type="submit"
+          nativeButtonProps={{
+            form: "add-user",
+          }}
+        >
+          {t("Ajouter")}
+        </Button>
+      }
+    >
+      <section>{t("Veuillez remplir les informations suivantes :")}</section>
+      <section>
+        <Form id="add-user" onSubmit={handleSubmit}>
+          <TextInput
+            iconId="ri-mail-line"
+            type="email"
+            label={t("Adresse email")}
+            {...bind("email")}
+          />
+          <RadioGroup
+            label={t("Rôle")}
+            options={getUserRoleOptions()}
+            {...bind("role")}
+          />
+        </Form>
+      </section>
     </Dialog>
   )
 }
