@@ -28,6 +28,7 @@ interface EditableCardProps {
   defaultIsEditing?: boolean
   isEditing?: boolean
   onEdit?: (isEditing: boolean) => void
+  onCancel?: () => void
   className?: string
 }
 
@@ -40,11 +41,12 @@ const EditableCardContent = ({
   className,
   isEditing: controlledIsEditing,
   onEdit: controlledOnEdit,
+  onCancel: controlledOnCancel,
 }: EditableCardProps) => {
   const { t } = useTranslation()
   const { isEditing, setIsEditing } = useEditableCard()
 
-  // Utilise l'état contrôlé si fourni, sinon utilise l'état interne
+  // Use controlled state if provided, otherwise use internal state
   const currentIsEditing =
     controlledIsEditing !== undefined ? controlledIsEditing : isEditing
 
@@ -57,6 +59,7 @@ const EditableCardContent = ({
   }
 
   const handleCancel = () => {
+    controlledOnCancel?.()
     if (controlledOnEdit) {
       controlledOnEdit(false)
     } else {
