@@ -17,7 +17,7 @@ import { AgreementDetailsDialog } from "double-counting/components/agreement-det
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import CompanyInfo from "settings/components/company-info"
+import CompanyInfo from "settings/pages/company-info"
 import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExtAdminPagesEnum } from "api-schema"

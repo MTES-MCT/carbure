@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react"
+import { useState, Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
 import useEntity, { useRights } from "common/hooks/entity"
@@ -6,28 +6,22 @@ import { useNotify } from "common/components/notifications"
 import { useQuery, useMutation } from "common/hooks/async"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
-import { Panel, Row } from "common/components/scaffold"
-import Button from "common/components/button"
-import Dialog, { Confirm } from "common/components/dialog"
-import Table, { Cell, actionColumn } from "common/components/table"
-import Autocomplete from "common/components/autocomplete"
-import {
-  Cross,
-  Plus,
-  Return,
-  Refresh,
-  AlertCircle,
-} from "common/components/icons"
+import { Row } from "common/components/scaffold"
+import { Button } from "common/components/button2"
+import { Dialog, Confirm } from "common/components/dialog2"
+import { Cell, Table } from "common/components/table2"
+import { Autocomplete } from "common/components/autocomplete2"
 import {
   normalizeCertificate,
   normalizeEntityCertificate,
 } from "common/utils/normalizers"
 import { Certificate, EntityCertificate, UserRole } from "common/types"
-import Alert from "common/components/alert"
-import Select from "common/components/select"
 import { isBefore } from "date-fns"
-import { compact } from "common/utils/collection"
-import Form from "common/components/form"
+import { Form } from "common/components/form2"
+import { EditableCard } from "common/molecules/editable-card"
+import Badge, { BadgeProps } from "@codegouvfr/react-dsfr/Badge"
+import i18next from "i18next"
+import { Notice } from "common/components/notice"
 
 const Certificates = () => {
   const { t } = useTranslation()
@@ -63,46 +57,39 @@ const Certificates = () => {
   const validCertificates = certificateData.filter(e => !isExpired(e.certificate.valid_until)) // prettier-ignore
 
   return (
-    <Panel id="certificates">
-      <header>
-        <h1>{t("Certificats")}</h1>
-        {canModify && (
+    <EditableCard
+      title={t("Certificats")}
+      headerActions={
+        canModify ? (
           <Button
             asideX
-            variant="primary"
-            icon={Plus}
-            label={t("Ajouter un certificat")}
-            action={() =>
+            iconId="ri-add-line"
+            onClick={() =>
               portal((close) => <CertificateAddDialog onClose={close} />)
             }
-          />
-        )}
-      </header>
-
-      <section>
-        <Select
-          disabled={!canModify}
-          label={t("Certificat par défaut")}
-          placeholder={t("Sélectionner un certificat")}
-          value={entity.default_certificate ?? undefined}
-          onChange={setDefaultCertificate.execute}
-          options={validCertificates}
-          normalize={normalizeEntityCertificate}
-          style={{ flex: 1 }}
-        />
-      </section>
+          >
+            {t("Ajouter un certificat")}
+          </Button>
+        ) : null
+      }
+    >
+      <Autocomplete
+        disabled={!canModify}
+        label={t("Certificat par défaut")}
+        placeholder={t("Sélectionner un certificat")}
+        value={entity.default_certificate ?? undefined}
+        onChange={setDefaultCertificate.execute}
+        options={validCertificates}
+        normalize={normalizeEntityCertificate}
+        style={{ flex: 1 }}
+      />
 
       {certificateData.length === 0 && (
-        <>
-          <section>
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              label={t("Aucun certificat associé à cette société")}
-            />
-          </section>
-          <footer />
-        </>
+        <Notice
+          variant="warning"
+          icon="ri-error-warning-line"
+          title={t("Aucun certificat associé à cette société")}
+        />
       )}
 
       {certificateData.length > 0 && (
@@ -117,6 +104,13 @@ const Certificates = () => {
             }
           }}
           columns={[
+            {
+              key: "validition",
+              header: t("Statut"),
+              orderBy: (c) => getValidationString({ link: c }),
+              cell: (c) => <Validation link={c} />,
+            },
+
             {
               key: "id",
               header: t("ID"),
@@ -153,19 +147,16 @@ const Certificates = () => {
               cell: (c) => <ExpirationDate link={c} readOnly={!canModify} />,
             },
             {
-              key: "validition",
-              header: t("Validation"),
-              orderBy: (c) => c?.rejected_by_admin?.toString() ?? "",
-              cell: (c) => <Validation link={c} />,
-            },
-            actionColumn<EntityCertificate>((c) =>
-              compact([
+              header: t("Action"),
+              cell: (c) =>
                 canModify && (
                   <Button
                     captive
-                    variant="icon"
-                    icon={Cross}
-                    action={() =>
+                    iconId="ri-close-line"
+                    title="Delete certificate"
+                    priority="tertiary no outline"
+                    style={{ color: "var(--text-default-grey)" }}
+                    onClick={() =>
                       portal((close) => (
                         <Confirm
                           title={t("Suppression certificat")}
@@ -173,8 +164,8 @@ const Certificates = () => {
                             "Voulez-vous supprimer ce certificat ?"
                           )}
                           confirm={t("Supprimer")}
-                          icon={Cross}
-                          variant="danger"
+                          icon="ri-close-line"
+                          customVariant="danger"
                           onClose={close}
                           onConfirm={() =>
                             deleteCertificate.execute(
@@ -183,17 +174,17 @@ const Certificates = () => {
                               c.certificate.certificate_type
                             )
                           }
+                          hideCancel
                         />
                       ))
                     }
                   />
                 ),
-              ])
-            ),
+            },
           ]}
         />
       )}
-    </Panel>
+    </EditableCard>
   )
 }
 
@@ -224,50 +215,50 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
   })
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Ajouter un certificat")}</h1>
-      </header>
-      <main>
-        <section>
-          {t(
-            "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
-          )}
-        </section>
-        <section>
-          <Form id="add-certificate">
-            <Autocomplete
-              autoFocus
-              label={t("Rechercher un certificat")}
-              value={certificate}
-              onChange={setCertificate}
-              getOptions={(query) =>
-                api.getCertificates(query).then((res) => res.data ?? [])
-              }
-              normalize={normalizeCertificate}
-            />
-          </Form>
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={<Dialog.Title>{t("Ajouter un certificat")}</Dialog.Title>}
+      footer={
         <Button
           asideX
-          submit="add-certificate"
+          type="submit"
+          nativeButtonProps={{
+            form: "add-certificate",
+          }}
           loading={addCertificate.loading}
           disabled={!certificate}
-          variant="primary"
-          icon={Plus}
-          label={t("Ajouter")}
-          action={() =>
+          iconId="ri-add-line"
+          onClick={() =>
             addCertificate.execute(
               entity.id,
               certificate!.certificate_id,
               certificate!.certificate_type
             )
           }
-        />
-        <Button icon={Return} label={t("Retour")} action={onClose} />
-      </footer>
+        >
+          {t("Ajouter")}
+        </Button>
+      }
+    >
+      <section>
+        {t(
+          "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        )}
+      </section>
+      <section>
+        <Form id="add-certificate">
+          <Autocomplete
+            autoFocus
+            label={t("Rechercher un certificat")}
+            value={certificate}
+            onChange={setCertificate}
+            getOptions={(query) =>
+              api.getCertificates(query).then((res) => res.data ?? [])
+            }
+            normalize={normalizeCertificate}
+          />
+        </Form>
+      </section>
     </Dialog>
   )
 }
@@ -276,26 +267,26 @@ type ValidationProps = {
   link: EntityCertificate
 }
 
-export const Validation = ({ link }: ValidationProps) => {
-  const { t } = useTranslation()
-
+const getValidationString = ({ link }: ValidationProps): string => {
   const expired = isExpired(link.certificate.valid_until)
 
-  const getValidationString = (): string => {
-    if (expired) return t("Expiré")
-    if (link.rejected_by_admin) return t("Refusé")
-    if (link.checked_by_admin) return t("Accepté")
-    return t("En cours")
+  if (expired) return i18next.t("Expiré")
+  if (link.rejected_by_admin) return i18next.t("Refusé")
+  if (link.checked_by_admin) return i18next.t("Accepté")
+  return i18next.t("En cours")
+}
+
+export const Validation = ({ link }: ValidationProps) => {
+  const expired = isExpired(link.certificate.valid_until)
+
+  const getSeverity = (): BadgeProps["severity"] => {
+    if (expired) return "warning"
+    if (link.rejected_by_admin) return "error"
+    if (link.checked_by_admin) return "success"
+    return "info"
   }
 
-  const getRowStyle = (): { color: string } | undefined => {
-    if (link.rejected_by_admin || expired)
-      return { color: "var(--orange-dark)" }
-    if (!link.checked_by_admin) return { color: "var(--orange-medium)" }
-    return undefined
-  }
-
-  return <Row style={getRowStyle()}>{getValidationString()}</Row>
+  return <Badge severity={getSeverity()}>{getValidationString({ link })}</Badge>
 }
 
 type ExpirationDateProps = {
@@ -328,9 +319,9 @@ export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
           {!readOnly ? (
             <Button
               captive
-              icon={Refresh}
-              label={t("Mettre à jour")}
-              action={() =>
+              priority="tertiary"
+              iconId="ri-arrow-go-forward-line"
+              onClick={() =>
                 portal((close) => (
                   <CertificateUpdateDialog
                     oldCertificate={link.certificate}
@@ -338,7 +329,9 @@ export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
                   />
                 ))
               }
-            />
+            >
+              {t("Mettre à jour")}
+            </Button>
           ) : (
             formatted
           )}
@@ -383,49 +376,21 @@ const CertificateUpdateDialog = ({
   })
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Mettre à jour un certificat")}</h1>
-      </header>
-      <main>
-        <section>
-          {t(
-            "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui remplacera le certificat expiré."
-          )}
-        </section>
-        <section>
-          <Form id="replace-certificate">
-            <Autocomplete
-              autoFocus
-              label={t("Rechercher un certificat")}
-              value={certificate}
-              onChange={setCertificate}
-              getOptions={(query) =>
-                api.getCertificates(query).then((res) => res.data ?? [])
-              }
-              normalize={normalizeCertificate}
-            />
-          </Form>
-          <Alert variant="info" style={{ display: "inline-block" }}>
-            <strong>{t("Votre certificat n'est pas dans la liste ?")}</strong>
-            <p>
-              {t(
-                "La liste des certificats approuvés par CarbuRe est mise à jour automatiquement tous les dimanches en se référant à la liste publique des certificats affichés sur les sites internet des organismes certificateurs."
-              )}
-            </p>
-          </Alert>
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      size="medium"
+      onClose={onClose}
+      header={<Dialog.Title>{t("Mettre à jour un certificat")}</Dialog.Title>}
+      footer={
         <Button
           asideX
-          submit="replace-certificate"
+          type="submit"
+          nativeButtonProps={{
+            form: "replace-certificate",
+          }}
           loading={updateCertificate.loading}
           disabled={!certificate}
-          variant="primary"
-          icon={Refresh}
-          label={t("Mettre à jour")}
-          action={() =>
+          iconId="ri-arrow-go-forward-line"
+          onClick={() =>
             updateCertificate.execute(
               entity.id,
               oldCertificate!.certificate_id,
@@ -434,9 +399,39 @@ const CertificateUpdateDialog = ({
               certificate!.certificate_type
             )
           }
+        >
+          {t("Mettre à jour")}
+        </Button>
+      }
+    >
+      <p>
+        {t(
+          "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui remplacera le certificat expiré."
+        )}
+      </p>
+
+      <Form id="replace-certificate">
+        <Autocomplete
+          autoFocus
+          label={t("Rechercher un certificat")}
+          value={certificate}
+          onChange={setCertificate}
+          getOptions={(query) =>
+            api.getCertificates(query).then((res) => res.data ?? [])
+          }
+          normalize={normalizeCertificate}
         />
-        <Button icon={Return} label={t("Retour")} action={onClose} />
-      </footer>
+      </Form>
+      <Notice
+        variant="info"
+        title={t("Votre certificat n'est pas dans la liste ?")}
+      >
+        <p>
+          {t(
+            "La liste des certificats approuvés par CarbuRe est mise à jour automatiquement tous les dimanches en se référant à la liste publique des certificats affichés sur les sites internet des organismes certificateurs."
+          )}
+        </p>
+      </Notice>
     </Dialog>
   )
 }
