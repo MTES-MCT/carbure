@@ -1,13 +1,12 @@
-import Alert from "common/components/alert"
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
-import { AlertCircle, Plus } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { SirenPicker } from "../../companies/components/siren-picker"
+import { Notice } from "common/components/notice"
 
 interface CompanyInfoSirenDialogProps {
   onClose: () => void
@@ -43,9 +42,9 @@ export const CompanyInfoSirenDialog = ({
         }
       )
     }
-    if (warning) {
-      setPrefetchedCompanyWarning(warning)
-    }
+
+    setPrefetchedCompanyWarning(warning ?? undefined)
+
     setPrefetchedCompany(company)
   }
 
@@ -56,63 +55,51 @@ export const CompanyInfoSirenDialog = ({
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <h1>{t("Trouver ma société")} </h1>
-        </header>
-
-        <main>
-          <section>
-            <p>
-              <Trans>
-                Rechercher votre société dans la base de données
-                entreprises.data.gouv :
-              </Trans>
-            </p>
-          </section>
-          <section>
-            <SirenPicker onSelect={fillFormWithFoundCompany} />
-
-            {prefetchedCompany && (
-              <>
-                <p>
-                  {prefetchedCompany.legal_name} (
-                  {prefetchedCompany.registered_address}{" "}
-                  {prefetchedCompany.registered_zipcode}{" "}
-                  {prefetchedCompany.registered_city})
-                </p>
-              </>
-            )}
-            {prefetchedCompanyWarning && (
-              <Alert icon={AlertCircle} variant="warning">
-                {prefetchedCompanyWarning}
-              </Alert>
-            )}
-          </section>
-
-          {!prefetchedCompany && (
-            <section>
-              <Alert icon={AlertCircle} variant="info">
-                <Trans>
-                  Votre société n'est pas immatriculée en France ? Choisissez
-                  votre pays dans le formulaire afin de remplir manuellement les
-                  données associées.
-                </Trans>
-              </Alert>
-            </section>
-          )}
-        </main>
-
-        <footer>
+      <Dialog
+        onClose={onClose}
+        header={<Dialog.Title>{t("Trouver ma société")}</Dialog.Title>}
+        footer={
           <Button
             asideX
-            action={onSubmit}
+            onClick={onSubmit}
             disabled={!prefetchedCompany}
-            icon={Plus}
-            variant="primary"
-            label={t("Remplir les données")}
-          />
-        </footer>
+            iconId="ri-add-line"
+          >
+            {t("Remplir les données")}
+          </Button>
+        }
+      >
+        <p>
+          <Trans>
+            Rechercher votre société dans la base de données
+            entreprises.data.gouv :
+          </Trans>
+        </p>
+        <SirenPicker onSelect={fillFormWithFoundCompany} />
+
+        {prefetchedCompany && (
+          <p>
+            {prefetchedCompany.legal_name} (
+            {prefetchedCompany.registered_address}{" "}
+            {prefetchedCompany.registered_zipcode}{" "}
+            {prefetchedCompany.registered_city})
+          </p>
+        )}
+        {prefetchedCompanyWarning && (
+          <Notice variant="warning" icon="ri-error-warning-line">
+            {prefetchedCompanyWarning}
+          </Notice>
+        )}
+
+        {!prefetchedCompany && (
+          <Notice icon="ri-error-warning-line" variant="info">
+            <Trans>
+              Votre société n'est pas immatriculée en France ? Choisissez votre
+              pays dans le formulaire afin de remplir manuellement les données
+              associées.
+            </Trans>
+          </Notice>
+        )}
       </Dialog>
     </Portal>
   )

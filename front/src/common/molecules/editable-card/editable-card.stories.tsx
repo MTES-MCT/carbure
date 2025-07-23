@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { EditableCard } from "./editable-card"
 import { Button } from "common/components/button2"
+import { useState } from "react"
 
 const meta = {
   component: EditableCard,
@@ -26,12 +27,15 @@ export const CustomChildren: Story = {
     children: ({ isEditing }) => (
       <div>
         <p>isEditing: {isEditing ? "true" : "false"}</p>
-        <EditableCard.Button
-          priority="secondary"
-          onClick={() => new Promise((resolve) => setTimeout(resolve, 5000))}
-        >
-          Edit
-        </EditableCard.Button>
+        {isEditing ? (
+          <EditableCard.Form
+            onSubmit={() => new Promise((resolve) => setTimeout(resolve, 2000))}
+          >
+            <button type="submit">Valider pour fermer le formulaire</button>
+          </EditableCard.Form>
+        ) : (
+          <p>Ouvrez le composant pour tester le comportement</p>
+        )}
       </div>
     ),
   },
@@ -51,5 +55,26 @@ export const NoHeaderActions: Story = {
   args: {
     children: <div>children</div>,
     headerActions: null,
+  },
+}
+
+export const ControlledEditing: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+  render: (args) => {
+    const [isEditing, setIsEditing] = useState(false)
+
+    return (
+      <EditableCard {...args} isEditing={isEditing} onEdit={setIsEditing}>
+        <p>isEditing: {isEditing ? "true" : "false"}</p>
+        <button onClick={() => setIsEditing(!isEditing)}>
+          controler l'ouverture/fermeture
+        </button>
+      </EditableCard>
+    )
+  },
+  args: {
+    children: null,
   },
 }

@@ -26,6 +26,8 @@ interface EditableCardProps {
    */
   headerActions?: ReactNode
   defaultIsEditing?: boolean
+  isEditing?: boolean
+  onEdit?: (isEditing: boolean) => void
   className?: string
 }
 
@@ -36,16 +38,30 @@ const EditableCardContent = ({
   children,
   headerActions,
   className,
+  isEditing: controlledIsEditing,
+  onEdit: controlledOnEdit,
 }: EditableCardProps) => {
   const { t } = useTranslation()
   const { isEditing, setIsEditing } = useEditableCard()
 
+  // Utilise l'état contrôlé si fourni, sinon utilise l'état interne
+  const currentIsEditing =
+    controlledIsEditing !== undefined ? controlledIsEditing : isEditing
+
   const handleEdit = () => {
-    setIsEditing(true)
+    if (controlledOnEdit) {
+      controlledOnEdit(true)
+    } else {
+      setIsEditing(true)
+    }
   }
 
   const handleCancel = () => {
-    setIsEditing(false)
+    if (controlledOnEdit) {
+      controlledOnEdit(false)
+    } else {
+      setIsEditing(false)
+    }
   }
 
   return (
@@ -64,7 +80,7 @@ const EditableCardContent = ({
 
         {headerActions === undefined ? (
           <>
-            {!isEditing && (
+            {!currentIsEditing && (
               <Button
                 onClick={handleEdit}
                 asideX
@@ -76,7 +92,7 @@ const EditableCardContent = ({
                 {t("Modifier")}
               </Button>
             )}
-            {isEditing && (
+            {currentIsEditing && (
               <Button
                 onClick={handleCancel}
                 asideX
