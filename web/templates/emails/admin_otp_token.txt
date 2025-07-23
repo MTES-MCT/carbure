@@ -1,0 +1,13 @@
+Bonjour {{ user.name }},
+
+Vous avez demandé à vous connecter en tant qu'administrateur.
+
+Votre code de confirmation est : {{ otp_token }}
+
+Ce code est valable jusqu'à {{ token_expiry }}.
+
+Si vous n'êtes pas à l'origine de cette demande, veuillez contacter un administrateur.
+
+Bonne journée,
+
+L'équipe CarbuRe
