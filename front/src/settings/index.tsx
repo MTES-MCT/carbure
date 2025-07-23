@@ -9,8 +9,8 @@ import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import useTitle from "common/hooks/title"
 import { compact } from "common/utils/collection"
-import Certificates from "./components/certificates"
-import CompanyInfo from "./components/company-info"
+import Certificates from "./pages/certificates"
+import CompanyInfo from "./pages/company-info"
 import CompanyOptions from "./pages/company-options"
 import { EntityUserRights } from "./components/user-rights"
 import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
@@ -41,32 +41,43 @@ const Settings = () => {
             path: routes.SETTINGS.OPTIONS,
             key: "options",
             label: t("Options"),
+            icon: "ri-settings-2-line",
+            iconActive: "ri-settings-2-fill",
           },
           {
             path: routes.SETTINGS.INFO,
             key: "info",
             label: t("Informations"),
-          },
-
-          hasCertificates && {
-            path: "certificates",
-            key: "certificates",
-            label: t("Certificats"),
-          },
-          isProducer && {
-            path: "production",
-            key: "production",
-            label: t("Sites de production"),
-          },
-          hasDepot && {
-            path: "depot",
-            key: "depot",
-            label: t("Dépôts"),
+            icon: "ri-profile-line",
+            iconActive: "ri-profile-fill",
           },
           entity.hasRights(UserRole.Admin) && {
             path: "users",
             key: "users",
             label: t("Utilisateurs"),
+            icon: "ri-user-line",
+            iconActive: "ri-user-fill",
+          },
+          hasCertificates && {
+            path: "certificates",
+            key: "certificates",
+            label: t("Certificats"),
+            icon: "ri-file-text-line",
+            iconActive: "ri-file-text-fill",
+          },
+          isProducer && {
+            path: "production",
+            key: "production",
+            label: t("Sites de production"),
+            icon: "ri-building-line",
+            iconActive: "ri-building-fill",
+          },
+          hasDepot && {
+            path: "depot",
+            key: "depot",
+            label: t("Dépôts"),
+            icon: "ri-building-4-line",
+            iconActive: "ri-building-4-fill",
           },
         ])}
       />
