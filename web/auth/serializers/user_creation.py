@@ -32,7 +32,10 @@ class UserCreationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"password2": _("The two password fields didn't match.")})
 
         try:
-            password_validation.validate_password(data["password2"], self.instance)
+            # Create a temporary user instance for password validation
+            # UserAttributeSimilarityValidator requires a user instance to check against
+            temp_user = User(**{k: v for k, v in data.items() if k not in ("password1", "password2")})
+            password_validation.validate_password(data["password2"], temp_user)
         except serializers.ValidationError as e:
             raise serializers.ValidationError({"password2": e.messages})
 
