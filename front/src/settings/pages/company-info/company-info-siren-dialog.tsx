@@ -5,7 +5,7 @@ import Portal from "common/components/portal"
 import { SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { SirenPicker } from "../../companies/components/siren-picker"
+import { SirenPicker } from "common/molecules/siren-picker"
 import { Notice } from "common/components/notice"
 
 interface CompanyInfoSirenDialogProps {
