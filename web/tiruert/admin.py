@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from tiruert.models import FossilFuel, FossilFuelCategory, FossilFuelCategoryConsiderationRate, Objective, Operation
+from tiruert.models import (
+    FossilFuel,
+    FossilFuelCategory,
+    FossilFuelCategoryConsiderationRate,
+    MacFossilFuel,
+    Objective,
+    Operation,
+)
 from tiruert.models.elec_operation import ElecOperation
 
 from .admin_actions import perform_bulk_operations_validation
@@ -78,3 +85,10 @@ class ElecOperationAdmin(admin.ModelAdmin):
     ]
     search_fields = ["credited_entity__name", "debited_entity__name", "credited_entity__id", "debited_entity__id"]
     list_filter = ["type", "status"]
+
+
+@admin.register(MacFossilFuel)
+class MacFossilFuelAdmin(admin.ModelAdmin):
+    list_display = ["fuel", "operator", "volume", "period", "year", "depot"]
+    list_filter = ["year", "operator__name"]
+    search_fields = ["operator__name"]
