@@ -1,9 +1,8 @@
 import { useTranslation } from "react-i18next"
 import { UserRightRequest } from "common/types"
 import { usePortal } from "common/components/portal"
-import Button from "common/components/button"
-import { Cross } from "common/components/icons"
-import { Confirm } from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Confirm } from "common/components/dialog2"
 
 type RejectUserButtonProps = {
   onRejectUser: () => void
@@ -22,19 +21,20 @@ export const RejectUserButton = ({
   return (
     <Button
       captive
-      variant="icon"
-      icon={Cross}
+      iconId="ri-close-line"
       title={t("Refuser")}
-      action={() =>
+      priority="tertiary no outline"
+      onClick={() =>
         portal((close) => (
           <Confirm
             title={t("Refuser un utilisateur")}
             description={t("Voulez vous refuser l'accès à votre société à {{user}} ?", { user })} // prettier-ignore
             confirm={t("Refuser")}
-            icon={Cross}
-            variant="danger"
+            icon="ri-close-line"
+            customVariant="danger"
             onConfirm={() => Promise.resolve(onRejectUser())}
             onClose={close}
+            hideCancel
           />
         ))
       }
