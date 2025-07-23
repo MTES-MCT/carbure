@@ -1,7 +1,7 @@
-import { AxiosError } from "axios"
-import { TextInput } from "common/components/input"
+import { TextInput } from "common/components/inputs2"
 import { useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
+import { HttpError } from "common/services/api-fetch"
 import * as api from "companies/api"
 import { SearchCompanyPreview } from "companies/types"
 import { useRef, useState } from "react"
@@ -33,13 +33,15 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
       setError(undefined)
     },
     onError: (err) => {
-      const error = (err as AxiosError<{ error: string }>).response?.data.error
+      onSelect()
+      const error = (err as HttpError).data.error
+
       if (error === "NO_COMPANY_FOUND") {
         const message = t(
           "Aucune entreprise n'a été trouvée avec ce numéro de SIREN"
         )
         notifyError(err, message)
-        onSelect()
+
         setError(message)
         return
       }
@@ -76,7 +78,8 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
         autoFocus
         loading={companyResponse.loading}
         value={siren}
-        error={error}
+        state={error ? "error" : undefined}
+        stateRelatedMessage={error}
         type="siren"
         label={t("SIREN de votre entreprise")}
         onChange={typeSiren}
