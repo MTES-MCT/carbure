@@ -68,6 +68,7 @@ export const CompanyInfoSirenDialog = ({
             {t("Remplir les données")}
           </Button>
         }
+        size="medium"
       >
         <p>
           <Trans>
@@ -77,8 +78,9 @@ export const CompanyInfoSirenDialog = ({
         </p>
         <SirenPicker onSelect={fillFormWithFoundCompany} />
 
-        {prefetchedCompany && (
-          <p>
+        {/* Display the company name if it exists and no warning */}
+        {prefetchedCompany && !prefetchedCompanyWarning && (
+          <p style={{ marginTop: "4px" }}>
             {prefetchedCompany.legal_name} (
             {prefetchedCompany.registered_address}{" "}
             {prefetchedCompany.registered_zipcode}{" "}
@@ -86,18 +88,27 @@ export const CompanyInfoSirenDialog = ({
           </p>
         )}
         {prefetchedCompanyWarning && (
-          <Notice variant="warning" icon="ri-error-warning-line">
-            {prefetchedCompanyWarning}
+          <Notice
+            variant="warning"
+            icon="ri-error-warning-line"
+            title={t("Ce SIREN est déjà utilisé")}
+          >
+            <p style={{ marginTop: "4px" }}>{prefetchedCompanyWarning}</p>
           </Notice>
         )}
 
         {!prefetchedCompany && (
-          <Notice icon="ri-error-warning-line" variant="info">
-            <Trans>
-              Votre société n'est pas immatriculée en France ? Choisissez votre
-              pays dans le formulaire afin de remplir manuellement les données
-              associées.
-            </Trans>
+          <Notice
+            icon="ri-error-warning-line"
+            variant="info"
+            title={t("Votre société n'est pas immatriculée en France ?")}
+          >
+            <p style={{ marginTop: "4px" }}>
+              <Trans>
+                Choisissez votre pays dans le formulaire afin de remplir
+                manuellement les données associées.
+              </Trans>
+            </p>
           </Notice>
         )}
       </Dialog>

@@ -73,7 +73,8 @@ export function updateEntity(
     body: {
       activity_description,
       legal_name,
-
+      registered_address,
+      registered_city,
       registered_country_code,
       registered_zipcode,
       registration_id,
