@@ -9,5 +9,6 @@ export const findEligibleTiruertEntities = (
     is_enabled: true,
     entity_type: [EntityType.Operator],
     is_tiruert_liable: true,
+    allowed_tiruert: true,
   }).then((response) => response.filter((entity) => entity.id !== entity_id))
 }
