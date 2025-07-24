@@ -3,19 +3,18 @@ import { Trans, useTranslation } from "react-i18next"
 import { Entity, ProductionSiteDetails, UserRole } from "common/types"
 
 import { useRights } from "common/hooks/entity"
-import { Alert } from "common/components/alert"
-import Button from "common/components/button"
-import { Confirm } from "common/components/dialog"
-import { AlertCircle, Cross, Plus } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Confirm } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import { LoaderOverlay, Panel } from "common/components/scaffold"
-import Table, { Cell, actionColumn } from "common/components/table"
+import { LoaderOverlay } from "common/components/scaffold"
+import { Table, Cell } from "common/components/table2"
 import { useMutation, useQuery } from "common/hooks/async"
-import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
-import * as api from "../api/production-sites"
+import * as api from "../../api/production-sites"
 import { ProductionSiteDialog } from "./production-site-dialog"
+import { Notice } from "common/components/notice"
+import { EditableCard } from "common/molecules/editable-card"
 
 type ProductionSitesSettingsProps = {
   readOnly?: boolean
@@ -95,38 +94,31 @@ const ProductionSitesSettings = ({
         title={t("Suppression site")}
         description={t("Voulez-vous vraiment supprimer le site de production {{site}} ?", { site: prodSite.name })} // prettier-ignore
         confirm={t("Supprimer")}
-        icon={Cross}
-        variant="danger"
+        icon="ri-close-line"
+        customVariant="danger"
         onClose={close}
         onConfirm={() => deleteProductionSite.execute(entity.id, prodSite.id)}
+        hideCancel
       />
     ))
   }
 
   return (
-    <Panel id="production">
-      <header>
-        <h1>{t("Sites de production")}</h1>
-        {canModify && (
-          <Button
-            asideX
-            variant="primary"
-            icon={Plus}
-            action={createProductionSite}
-            label={t("Ajouter un site de production")}
-          />
-        )}
-      </header>
-
+    <EditableCard
+      title={t("Sites de production")}
+      description={t("Gérez les sites de production de votre entreprise ici.")}
+      headerActions={
+        canModify && (
+          <Button asideX iconId="ri-add-line" onClick={createProductionSite}>
+            {t("Ajouter un site de production")}
+          </Button>
+        )
+      }
+    >
       {prodSitesData.length === 0 && (
-        <>
-          <section>
-            <Alert icon={AlertCircle} variant="warning">
-              <Trans>Aucun site de production trouvé</Trans>
-            </Alert>
-          </section>
-          <footer />
-        </>
+        <Notice icon="ri-error-warning-line" variant="warning">
+          <Trans>Aucun site de production trouvé</Trans>
+        </Notice>
       )}
 
       {prodSitesData.length > 0 && (
@@ -155,25 +147,26 @@ const ProductionSitesSettings = ({
                   <Cell text={formatDate(ps.date_mise_en_service)} />
                 ),
             },
-            actionColumn<ProductionSiteDetails>((prodSite) =>
-              compact([
+            {
+              header: t("Action"),
+              cell: (ps) =>
                 canModify && (
                   <Button
                     captive
-                    variant="icon"
-                    icon={Cross}
+                    priority="tertiary no outline"
+                    iconId="ri-close-line"
                     title={t("Supprimer le site de production")}
-                    action={() => removeProductionSite(prodSite)}
+                    onClick={() => removeProductionSite(ps)}
+                    style={{ color: "var(--text-default-grey)" }}
                   />
                 ),
-              ])
-            ),
+            },
           ]}
         />
       )}
 
       {productionSites.loading && <LoaderOverlay />}
-    </Panel>
+    </EditableCard>
   )
 }
 

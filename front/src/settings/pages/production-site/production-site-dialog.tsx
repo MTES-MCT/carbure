@@ -1,4 +1,4 @@
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 
 import {
   Biofuel,
@@ -10,26 +10,24 @@ import {
 } from "common/types"
 
 import * as common from "common/api"
-import Form, { useForm } from "common/components/form"
+import { Form, useForm } from "common/components/form2"
 
 import {
   normalizeBiofuel,
   normalizeCountry,
   normalizeFeedstock,
 } from "common/utils/normalizers"
-import Autocomplete from "common/components/autocomplete"
-import Button from "common/components/button"
-import Checkbox from "common/components/checkbox"
-import Dialog from "common/components/dialog"
-import { Return, Save } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { Autocomplete } from "common/components/autocomplete2"
+
+import { Dialog } from "common/components/dialog2"
+import { TextInput, Checkbox, RadioGroup } from "common/components/inputs2"
 import { useNotify } from "common/components/notifications"
-import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
-import TagAutocomplete from "common/components/tag-autocomplete"
+import { TagAutocomplete } from "common/components/tag-autocomplete2"
 import { useMutation } from "common/hooks/async"
-import * as api from "../api/production-sites"
+import * as api from "../../api/production-sites"
 import useEntity from "common/hooks/entity"
+import { Button } from "common/components/button2"
 
 interface ProductionSiteFormValue {
   displayInDialog?: boolean
@@ -57,7 +55,6 @@ type ProductionSiteDialogProps = {
   productionSite?: ProductionSiteDetails
   readOnly?: boolean
   onClose?: () => void
-  displayFormOnly?: boolean
 }
 
 export const ProductionSiteDialog = ({
@@ -66,16 +63,13 @@ export const ProductionSiteDialog = ({
   productionSite,
   readOnly,
   onClose,
-  displayFormOnly,
 }: ProductionSiteDialogProps) => {
   return (
-    <Dialog onClose={() => onClose && onClose()}>
-      {!displayFormOnly && (
-        <header>
-          <h1>{title}</h1>
-        </header>
-      )}
-
+    <Dialog
+      onClose={() => onClose && onClose()}
+      header={<Dialog.Title>{title}</Dialog.Title>}
+      size="medium"
+    >
       <ProductionSiteForm
         productionSite={productionSite}
         readOnly={readOnly}
@@ -187,179 +181,170 @@ export const ProductionSiteForm = ({
 
   return (
     <>
-      <main>
-        {description && (
-          <section>
-            <p>{description}</p>
-          </section>
-        )}
-
+      {description && (
         <section>
-          <Form id="production-site" onSubmit={submitProductionSite}>
-            <TextInput
-              autoFocus
-              readOnly={readOnly}
-              label={t("Nom du site")}
-              {...bind("name")}
-              required
-            />
-
-            <Row style={{ gap: "var(--spacing-m)" }}>
-              <TextInput
-                readOnly={readOnly}
-                label={t("N° d'identification (SIRET)")}
-                {...bind("site_id")}
-                required
-              />
-              <TextInput
-                readOnly={readOnly}
-                type="date"
-                label={t("Date de mise en service")}
-                style={{ flex: 1 }}
-                {...bind("date_mise_en_service")}
-                required
-              />
-            </Row>
-
-            <hr />
-
-            <TextInput
-              readOnly={readOnly}
-              label={t("Adresse postale")}
-              {...bind("address")}
-              required
-            />
-            <Row style={{ gap: "var(--spacing-m)" }}>
-              <TextInput
-                readOnly={readOnly}
-                label={t("Ville")}
-                {...bind("city")}
-                required
-              />
-              <TextInput
-                readOnly={readOnly}
-                label={t("Code postal")}
-                {...bind("postal_code")}
-                required
-              />
-            </Row>
-
-            <Autocomplete
-              readOnly={readOnly}
-              label={t("Pays")}
-              placeholder={t("Rechercher un pays...")}
-              getOptions={common.findCountries}
-              normalize={normalizeCountry}
-              {...bind("country")}
-              required
-            />
-
-            <hr />
-
-            <TextInput
-              readOnly={readOnly}
-              label={t("Nom du gérant")}
-              {...bind("manager_name")}
-              required
-            />
-
-            <Row style={{ gap: "var(--spacing-m)" }}>
-              <TextInput
-                readOnly={readOnly}
-                label={t("N° de téléphone du gérant")}
-                {...bind("manager_phone")}
-                required
-              />
-              <TextInput
-                readOnly={readOnly}
-                label={t("Addresse email du gérant")}
-                {...bind("manager_email")}
-                required
-              />
-            </Row>
-
-            <hr />
-
-            <Checkbox
-              label={t("Éligible double-comptage ?")}
-              {...bind("eligible_dc")}
-              disabled
-            />
-            {value.eligible_dc && (
-              <TextInput
-                label={t("Référence double-comptage")}
-                {...bind("dc_reference")}
-                disabled
-                required
-              />
-            )}
-
-            <hr />
-
-            <RadioGroup
-              label={t("Options GES")}
-              options={gesOptions}
-              {...bind("ges_option")}
-              disabled={readOnly}
-              required
-            />
-
-            <hr />
-
-            <TagAutocomplete
-              label={t("Matieres premieres")}
-              readOnly={readOnly}
-              placeholder={t("Ajouter matières premières...")}
-              defaultOptions={value.matieres_premieres}
-              getOptions={common.findFeedstocks}
-              normalize={normalizeFeedstock}
-              {...bind("matieres_premieres")}
-              required
-            />
-            <TagAutocomplete
-              readOnly={readOnly}
-              label={t("Biocarburants")}
-              placeholder={t("Ajouter biocarburants...")}
-              defaultOptions={value.biocarburants}
-              getOptions={common.findBiofuels}
-              normalize={normalizeBiofuel}
-              {...bind("biocarburants")}
-              required
-            />
-
-            <hr />
-
-            <TagAutocomplete
-              readOnly={readOnly}
-              label={t("Certificats (2BS, ISCC)")}
-              placeholder={t("Rechercher des certificats...")}
-              defaultOptions={value.certificates}
-              getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
-              {...bind("certificates")}
-              required
-            />
-          </Form>
+          <p>{description}</p>
         </section>
-      </main>
+      )}
 
-      <footer>
-        {!readOnly && (
-          <Button
-            asideX
-            loading={addProdSite.loading || updateProdSite.loading}
-            variant="primary"
-            submit="production-site"
-            icon={Save}
-            disabled={updateProdSite.loading}
-            label={t("Sauvegarder")}
+      <Form id="production-site" onSubmit={submitProductionSite}>
+        <TextInput
+          autoFocus
+          readOnly={readOnly}
+          label={t("Nom du site")}
+          {...bind("name")}
+          required
+        />
+
+        <Row style={{ gap: "var(--spacing-m)" }}>
+          <TextInput
+            readOnly={readOnly}
+            label={t("N° d'identification (SIRET)")}
+            {...bind("site_id")}
+            required
+          />
+          <TextInput
+            readOnly={readOnly}
+            type="date"
+            label={t("Date de mise en service")}
+            style={{ flex: 1 }}
+            {...bind("date_mise_en_service")}
+            required
+          />
+        </Row>
+
+        <hr />
+
+        <TextInput
+          readOnly={readOnly}
+          label={t("Adresse postale")}
+          {...bind("address")}
+          required
+        />
+        <Row style={{ gap: "var(--spacing-m)" }}>
+          <TextInput
+            readOnly={readOnly}
+            label={t("Ville")}
+            {...bind("city")}
+            required
+          />
+          <TextInput
+            readOnly={readOnly}
+            label={t("Code postal")}
+            {...bind("postal_code")}
+            required
+          />
+        </Row>
+
+        <Autocomplete
+          readOnly={readOnly}
+          label={t("Pays")}
+          placeholder={t("Rechercher un pays...")}
+          getOptions={common.findCountries}
+          normalize={normalizeCountry}
+          {...bind("country")}
+          required
+        />
+
+        <hr />
+
+        <TextInput
+          readOnly={readOnly}
+          label={t("Nom du gérant")}
+          {...bind("manager_name")}
+          required
+        />
+
+        <Row style={{ gap: "var(--spacing-m)" }}>
+          <TextInput
+            readOnly={readOnly}
+            label={t("N° de téléphone du gérant")}
+            {...bind("manager_phone")}
+            required
+          />
+          <TextInput
+            readOnly={readOnly}
+            label={t("Addresse email du gérant")}
+            {...bind("manager_email")}
+            required
+          />
+        </Row>
+
+        <hr />
+
+        <Checkbox
+          label={t("Éligible double-comptage ?")}
+          {...bind("eligible_dc")}
+          disabled
+        />
+        {value.eligible_dc && (
+          <TextInput
+            label={t("Référence double-comptage")}
+            {...bind("dc_reference")}
+            disabled
+            required
           />
         )}
-        {onClose && (
-          <Button asideX={readOnly} icon={Return} action={onClose}>
-            <Trans>Retour</Trans>
-          </Button>
-        )}
-      </footer>
+
+        <hr />
+
+        <RadioGroup
+          label={t("Options GES")}
+          options={gesOptions}
+          {...bind("ges_option")}
+          disabled={readOnly}
+          required
+        />
+
+        <hr />
+
+        <TagAutocomplete
+          label={t("Matieres premieres")}
+          readOnly={readOnly}
+          placeholder={t("Ajouter matières premières...")}
+          defaultOptions={value.matieres_premieres}
+          getOptions={common.findFeedstocks}
+          normalize={normalizeFeedstock}
+          {...bind("matieres_premieres")}
+          required
+        />
+        <TagAutocomplete
+          readOnly={readOnly}
+          label={t("Biocarburants")}
+          placeholder={t("Ajouter biocarburants...")}
+          defaultOptions={value.biocarburants}
+          getOptions={common.findBiofuels}
+          normalize={normalizeBiofuel}
+          {...bind("biocarburants")}
+          required
+        />
+
+        <hr />
+
+        <TagAutocomplete
+          readOnly={readOnly}
+          label={t("Certificats (2BS, ISCC)")}
+          placeholder={t("Rechercher des certificats...")}
+          defaultOptions={value.certificates}
+          getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
+          {...bind("certificates")}
+          required
+        />
+      </Form>
+      {!readOnly && (
+        <Button
+          asideX
+          loading={addProdSite.loading || updateProdSite.loading}
+          type="submit"
+          nativeButtonProps={{
+            form: "production-site",
+          }}
+          iconId="ri-save-line"
+          disabled={updateProdSite.loading}
+        >
+          {t("Sauvegarder")}
+        </Button>
+      )}
     </>
   )
 }

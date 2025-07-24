@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 
 import DeliverySitesSettings from "./pages/delivery-site"
-import ProductionSitesSettings from "./components/production-site"
+import ProductionSitesSettings from "./pages/production-site"
 
 import useEntity from "common/hooks/entity"
 import { UserRole } from "common/types"
