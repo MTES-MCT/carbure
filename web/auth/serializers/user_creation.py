@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model, password_validation
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from core.validators import validate_name
+
 User = get_user_model()
 
 
@@ -26,6 +28,10 @@ class UserCreationSerializer(serializers.ModelSerializer):
         Validate and normalize the email address, without raising an exception if it already exists.
         """
         return User.objects.normalize_email(value)
+
+    def validate_name(self, value):
+        validate_name(value)
+        return value
 
     def validate(self, data):
         if data["password1"] != data["password2"]:

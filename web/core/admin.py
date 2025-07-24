@@ -16,6 +16,7 @@ from django_admin_listfilter_dropdown.filters import (
     RelatedOnlyDropdownFilter,
 )
 
+from auth.validators import validate_name
 from core.models import (
     Biocarburant,
     CarbureLot,
@@ -237,6 +238,31 @@ class UserCreationForm(UserCreationForm):
             raise forms.ValidationError("Fill out both fields")
         return password2
 
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        if name:
+            validate_name(name)
+        return name
+
+
+class UserChangeForm(forms.ModelForm):
+    """
+    Edit form for the User model
+    """
+
+    class Meta:
+        model = User
+        fields = "__all__"
+        widgets = {
+            "password": forms.HiddenInput(),
+        }
+
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        if name:
+            validate_name(name)
+        return name
+
 
 class UserAdmin(NamedUserAdmin):
     """
@@ -245,6 +271,7 @@ class UserAdmin(NamedUserAdmin):
     """
 
     add_form = UserCreationForm
+    form = UserChangeForm
     add_fieldsets = (
         (
             None,
