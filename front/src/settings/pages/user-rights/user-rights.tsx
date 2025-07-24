@@ -21,9 +21,11 @@ export const EntityUserRights = () => {
 
   const inviteUser = useInviteUser()
 
-  return (
+  return rights.map(({ title, description, data }) => (
     <UserRightsTable
-      rights={rights}
+      title={title}
+      description={description}
+      rights={data}
       onChangeUserRole={(role, request) =>
         changeUserRole.execute(entity.id, request.user[0] ?? "", role)
       }
@@ -37,5 +39,5 @@ export const EntityUserRights = () => {
       }
       onAddNewUser={(email, role) => inviteUser.execute(entity.id, email, role)}
     />
-  )
+  ))
 }
