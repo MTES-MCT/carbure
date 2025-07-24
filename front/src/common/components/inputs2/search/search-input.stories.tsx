@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { SearchInput } from "./search-input"
-import { expect, fn, userEvent, waitFor, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<typeof SearchInput> = {
   component: SearchInput,

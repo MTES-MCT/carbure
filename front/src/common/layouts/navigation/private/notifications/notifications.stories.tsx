@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { Notifications } from "./notifications"
-import { userEvent, waitFor, within } from "storybook/test"
+import { userEvent, waitFor, within } from "@storybook/test"
 import { okNotifications, okNotificationsAcked } from "./__test__/api"
 import { COMMON_MOCKS } from "@storybook/mocks/common"
 
