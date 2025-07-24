@@ -474,8 +474,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -485,6 +489,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -575,8 +583,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -586,6 +598,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -640,8 +656,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -651,6 +671,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -709,8 +733,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -720,6 +748,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -783,8 +815,12 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -794,6 +830,10 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -1198,8 +1238,14 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -created_at
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - created_at
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -1209,6 +1255,12 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -1290,8 +1342,14 @@ paths:
             items:
               type: string
               enum:
+                - -certificate_id
+                - -created_at
+                - -producer
                 - -production_site
                 - -valid_until
+                - certificate_id
+                - created_at
+                - producer
                 - production_site
                 - valid_until
           description: |-
@@ -1301,6 +1359,12 @@ paths:
             * `-production_site` - Production site (décroissant)
             * `valid_until` - Valid until
             * `-valid_until` - Valid until (décroissant)
+            * `producer` - Producer
+            * `-producer` - Producer (décroissant)
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -4542,6 +4606,11 @@ paths:
     get:
       operationId: resources_entities_list
       parameters:
+        - in: query
+          name: allowed_tiruert
+          schema:
+            type: boolean
+          description: Only show entities allowed to be tiruert
         - in: query
           name: entity_type
           schema:

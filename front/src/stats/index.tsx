@@ -29,7 +29,7 @@ const Stats = () => {
     <Main>
       <section>
         <IframeResizer
-          license="00000000-0000-0000-0000-000000000000"
+          license="GPLv3"
           onResized={() => setIsLoaded(true)}
           src={statsData?.metabase_iframe_url}
           frameBorder="0"
