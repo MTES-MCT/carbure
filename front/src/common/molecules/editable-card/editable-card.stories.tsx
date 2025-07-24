@@ -1,5 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
-
+import { Meta, StoryObj } from "@storybook/react"
 import { EditableCard } from "./editable-card"
 import { Button } from "common/components/button2"
 import { useState } from "react"
