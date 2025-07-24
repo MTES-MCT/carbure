@@ -22,7 +22,7 @@ import {
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
 import { AgreementFilters } from "../../filters"
-import { AgreementFilter, AgreementOrder } from "double-counting-admin/types"
+import { AgreementFilter, ApplicationOrder } from "double-counting-admin/types"
 
 type ApplicationListProps = {
   snapshot: DoubleCountingApplicationSnapshot | undefined
@@ -43,7 +43,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     currentYear,
     tab
   )
-  const query = useCBQueryBuilder<AgreementOrder[], string, undefined>(state)
+  const query = useCBQueryBuilder<ApplicationOrder[], string, undefined>(state)
   const applicationsResponse = useQuery(api.getDoubleCountingApplicationList, {
     key: "dc-applications",
     params: [query],
@@ -63,15 +63,21 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     {
       header: t("N° d'agrément"),
       cell: (a) => <Cell text={a.certificate_id} />,
+      key: ApplicationOrder.certificate_id,
     },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
+    {
+      header: t("Producteur"),
+      cell: (a) => <Cell text={a.producer.name} />,
+      key: ApplicationOrder.producer,
+    },
     {
       header: t("Site de production"),
       cell: (a) => <Cell text={a.production_site.name} />,
+      key: ApplicationOrder.production_site,
     },
     {
       header: t("Validité"),
-      key: "valid_until",
+      key: ApplicationOrder.valid_until,
       cell: (a) => (
         <Cell
           text={`${formatDateYear(a.period_start)}-${formatDateYear(a.period_end)}`}
@@ -81,6 +87,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     {
       header: t("Date de soumission"),
       cell: (a) => <Cell text={formatDate(a.created_at)} />,
+      key: ApplicationOrder.created_at,
     },
   ]
 
@@ -141,6 +148,8 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
               tab === "pending" ? applications?.pending : applications?.rejected
             }
             onAction={showApplicationDialog}
+            order={state.order}
+            onOrder={actions.setOrder}
           />
         )}
       </Content>

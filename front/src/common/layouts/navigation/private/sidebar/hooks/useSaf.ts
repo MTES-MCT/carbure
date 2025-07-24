@@ -31,7 +31,7 @@ export const useSaf = (params?: SafParams) => {
         title: t("Volumes SAF"),
         icon: ContrastDropLine,
         iconActive: ContrastDropFill,
-        condition: !isAirline,
+        condition: !isAirline && !isSafAdmin,
       },
       {
         path: routes.SAF().TICKETS_ASSIGNED,
