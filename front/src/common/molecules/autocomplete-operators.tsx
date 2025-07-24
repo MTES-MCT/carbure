@@ -1,6 +1,9 @@
 import { EntityPreview } from "common/types"
 import { normalizeEntityPreview } from "common/utils/normalizers"
-import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import {
+  Autocomplete,
+  AutocompleteProps,
+} from "common/components/autocomplete2"
 import { useTranslation } from "react-i18next"
 import { findOperators } from "../api"
 
