@@ -162,7 +162,6 @@ export const DeliverySiteForm = ({
         {...bind("site_type")}
         required
         readOnly={isReadOnly}
-        orientation="horizontal"
       />
 
       {(isCogenerationPlant || isPowerPlant) && (
