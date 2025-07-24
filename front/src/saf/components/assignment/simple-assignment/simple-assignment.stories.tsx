@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from "@storybook/react-vite"
+import { Meta, StoryObj } from "@storybook/react"
 import { TicketAssignment } from "./simple-assignment"
 import { safTicketSourceDetails } from "saf/__test__/data"
-import { expect, fn, userEvent, waitFor, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import { okFindClients, assignSafTicket } from "saf/__test__/api"
 
 const meta = {

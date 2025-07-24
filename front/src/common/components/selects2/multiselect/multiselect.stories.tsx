@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { MultiSelect } from "./multiselect"
 import { ReactNode, useState } from "react"
-import { userEvent, waitFor, within } from "storybook/test"
+import { userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<
   typeof MultiSelect<{ label: ReactNode; value: string }, string>

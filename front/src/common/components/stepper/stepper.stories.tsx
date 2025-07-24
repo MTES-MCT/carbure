@@ -1,7 +1,7 @@
-import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryFn, StoryObj } from "@storybook/react"
 import { Stepper } from "./stepper"
 import { Step, StepperProvider } from "./stepper.provider"
-import { userEvent, waitFor, within } from "storybook/test"
+import { userEvent, waitFor, within } from "@storybook/test"
 
 const loadStepsDecorator = (steps: Step<string>[]) => (Story: StoryFn) => {
   return (
