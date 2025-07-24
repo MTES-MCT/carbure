@@ -86,6 +86,7 @@ export const AccountAccesRights = () => {
               small: true,
               header: "Statut",
               cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
+              style: { minWidth: "130px" },
             },
             {
               header: t("Organisation"),
