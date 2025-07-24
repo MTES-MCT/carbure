@@ -115,7 +115,8 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.create_agreement()
 
         response = self.client.get(
-            reverse("double-counting-agreements-agreement-admin"), {"entity_id": self.admin.id, "year": 2023}
+            reverse("double-counting-agreements-agreement-admin"),
+            {"entity_id": self.admin.id, "year": 2023, "order_by": "production_site"},
         )
         assert response.status_code == 200
         data = response.json()

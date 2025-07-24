@@ -34,6 +34,12 @@ from core.serializers import EntityPreviewSerializer
             required=False,
             type=bool,
         ),
+        OpenApiParameter(
+            name="allowed_tiruert",
+            description="Only show entities allowed to be tiruert",
+            required=False,
+            type=bool,
+        ),
     ],
     responses=EntityPreviewSerializer(many=True),
 )
@@ -44,7 +50,7 @@ def get_entities(request, *args, **kwargs):
     is_enabled = request.query_params.get("is_enabled") == "true"
     entity_type = request.query_params.getlist("entity_type")
     is_tiruert_liable = request.query_params.get("is_tiruert_liable") == "true"
-
+    allowed_tiruert = request.query_params.get("allowed_tiruert") == "true"
     entities = Entity.objects.all().order_by("name")
 
     if query:
@@ -55,6 +61,8 @@ def get_entities(request, *args, **kwargs):
         entities = entities.filter(is_enabled=True)
     if is_tiruert_liable:
         entities = entities.filter(is_tiruert_liable=True)
+    if allowed_tiruert:
+        entities = entities.exclude(accise_number__exact="")
 
     serializer = EntityPreviewSerializer(entities, many=True)
     return Response(serializer.data)

@@ -44,9 +44,7 @@ class AgreementAdminListActionMixin:
 
         year = self.request.query_params.get("year", datetime.now().year)
 
-        agreements_active = queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year)).order_by(
-            "production_site__name"
-        )
+        agreements_active = queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year))
 
         agreements_incoming = queryset.filter(Q(valid_from__year__gt=year))
         agreements_expired = queryset.filter(Q(valid_until__year__lt=year))

@@ -24,7 +24,7 @@ export const useAccounting = () => {
       },
       {
         path: routes.ACCOUNTING.OPERATIONS.ROOT,
-        title: t("Comptabilité"),
+        title: t("Opérations"),
         icon: createIcon({ name: "ri-bar-chart-2-line" }),
         iconActive: createIcon({ name: "ri-bar-chart-2-fill" }),
         condition: !isAdmin && !hasAdminRight("TIRIB"),

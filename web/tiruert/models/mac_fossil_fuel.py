@@ -41,7 +41,7 @@ class MacFossilFuel(models.Model):
     objects = MacFossilFuelManager()
 
     def __str__(self):
-        return self.fuel, self.operator, self.volume, self.period, self.depot
+        return f"{self.fuel} - {self.operator} - {self.volume} - {self.period} - {self.depot}"
 
     class Meta:
         db_table = "fossil_fuel_mac"

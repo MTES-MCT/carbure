@@ -16,7 +16,7 @@ const PublicStats = () => {
     <Main>
       <section>
         <IframeResizer
-          license="00000000-0000-0000-0000-000000000000"
+          license="GPLv3"
           src={`${publicLink}?annee=${currentYear}#hide_parameters=annee`}
           frameBorder="0"
           allowTransparency

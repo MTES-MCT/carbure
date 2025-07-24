@@ -7,7 +7,7 @@ import {
 } from "common/hooks/query-builder-2"
 import { NoResult } from "common/components/no-result2"
 import { Content } from "common/components/scaffold"
-import { Cell, Column, Order, Table } from "common/components/table2"
+import { Cell, Column, Table } from "common/components/table2"
 import { Tabs } from "common/components/tabs2"
 import { useQuery } from "common/hooks/async"
 import { formatDateYear } from "common/utils/formatters"
@@ -37,7 +37,6 @@ const AgreementList = ({
   const entity = useEntity()
   const navigate = useNavigate()
   const location = useLocation()
-  const [order, setOrder] = useState<Order | undefined>(undefined)
   const currentYear = new Date().getFullYear()
 
   const [state, actions] = useCBQueryParamsStore<string, undefined>(
@@ -58,17 +57,22 @@ const AgreementList = ({
     },
     {
       header: t("N° d'agrément"),
-      cell: (a) => <span>{a.certificate_id}</span>,
+      cell: (a) => <Cell text={a.certificate_id} />,
+      key: AgreementOrder.certificate_id,
     },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer?.name} /> },
+    {
+      header: t("Producteur"),
+      cell: (a) => <Cell text={a.producer?.name} />,
+      key: AgreementOrder.producer,
+    },
     {
       header: t("Site de production"),
-      key: "production_site",
+      key: AgreementOrder.production_site,
       cell: (a) => <Cell text={a.production_site || "-"} />,
     },
     {
       header: t("Validité"),
-      key: "valid_until",
+      key: AgreementOrder.valid_until,
       cell: (a) => (
         <Cell
           text={`${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`}
@@ -155,8 +159,8 @@ const AgreementList = ({
                     : agreements.incoming
               }
               onAction={showApplicationDialog}
-              order={order}
-              onOrder={setOrder}
+              order={state.order}
+              onOrder={actions.setOrder}
             />
           </>
         )}
