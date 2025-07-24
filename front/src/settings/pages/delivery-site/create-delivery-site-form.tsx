@@ -129,7 +129,7 @@ export const DeliverySiteForm = ({
           readOnly={isReadOnly}
         />
       </Grid>
-      <Grid cols={3}>
+      <Grid cols={3} gap="lg">
         <AutoCompleteCountries
           label={t("Pays")}
           {...bind("country")}
@@ -161,7 +161,7 @@ export const DeliverySiteForm = ({
         options={depotTypeOptions}
         {...bind("site_type")}
         required
-        disabled={isReadOnly}
+        readOnly={isReadOnly}
         orientation="horizontal"
       />
 
