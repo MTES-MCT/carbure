@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-import DeliverySitesSettings from "./components/delivery-site/delivery-site"
+import DeliverySitesSettings from "./pages/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
 
 import useEntity from "common/hooks/entity"
