@@ -18,6 +18,12 @@ import { EditableCard } from "../editable-card"
 import { Notice } from "common/components/notice"
 
 type EntityUserRightsProps = {
+  // Overrides default user title
+  title?: string
+
+  // Overrides default user description
+  description?: string
+
   rights: UserRightRequest[]
 
   readOnly?: boolean
@@ -54,6 +60,8 @@ const RIGHTS_ORDER = {
 }
 
 export const UserRightsTable = ({
+  title: overrideTitle,
+  description: overrideDescription,
   rights,
   readOnly,
   isSearchable = false,
@@ -67,6 +75,11 @@ export const UserRightsTable = ({
   const { t } = useTranslation()
   const [query, setQuery] = useState<string>("")
   const portal = usePortal()
+
+  const title = overrideTitle ?? t("Utilisateurs")
+  const description =
+    overrideDescription ??
+    t("Gérez les membres de votre équipe ici selon leurs droits.")
 
   const displaySearchInput =
     isSearchable && (query.length > 0 || rights.length > 0)
@@ -82,10 +95,8 @@ export const UserRightsTable = ({
 
   return (
     <EditableCard
-      title={t("Utilisateurs")}
-      description={t(
-        "Gérez les membres de votre équipe ici selon leurs droits."
-      )}
+      title={title}
+      description={description}
       headerActions={
         onAddNewUser ? (
           <Button
