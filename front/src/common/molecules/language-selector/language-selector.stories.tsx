@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { LanguageSelector } from "./language-selector"
 
 const meta: Meta<typeof LanguageSelector> = {

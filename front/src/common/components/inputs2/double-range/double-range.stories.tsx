@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { DoubleRange } from "./double-range"
 import { useState } from "react"
 

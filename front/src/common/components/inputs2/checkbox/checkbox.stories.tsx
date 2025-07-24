@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { Checkbox } from "./checkbox"
-import { expect, fn, userEvent, waitFor, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import { useState } from "react"
 
 const meta: Meta<typeof Checkbox> = {

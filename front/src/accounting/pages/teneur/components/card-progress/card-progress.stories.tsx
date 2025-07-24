@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { CardProgress } from "./card-progress"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 
