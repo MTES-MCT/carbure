@@ -15,8 +15,6 @@ from auth.serializers import VerifyOTPSerializer
 
 
 class VerifyOTPAction:
-    throttle_scope = "10/day"
-
     @extend_schema(
         request=VerifyOTPSerializer,
         examples=[

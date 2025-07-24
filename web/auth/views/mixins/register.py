@@ -10,8 +10,6 @@ User = get_user_model()
 
 
 class UserCreationAction:
-    throttle_scope = "10/day"
-
     @extend_schema(
         request=UserCreationSerializer,
         examples=[
