@@ -1,7 +1,10 @@
 import { findCountries } from "common/api"
 import { Country } from "common/types"
 import { normalizeCountry } from "common/utils/normalizers"
-import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import {
+  Autocomplete,
+  AutocompleteProps,
+} from "common/components/autocomplete2"
 import { useTranslation } from "react-i18next"
 
 export const AutoCompleteCountries = (props: AutocompleteProps<Country>) => {

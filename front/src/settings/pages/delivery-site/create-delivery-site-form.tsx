@@ -7,10 +7,14 @@ import {
   OwnershipType,
   EntityPreview,
 } from "common/types"
-import Form, { useForm } from "common/components/form"
-import { NumberInput, TextInput } from "common/components/input"
-import { RadioGroup } from "common/components/radio"
-import { Row } from "common/components/scaffold"
+import { Form, useForm } from "common/components/form2"
+import {
+  NumberInput,
+  TextInput,
+  RadioGroup,
+  Checkbox,
+} from "common/components/inputs2"
+import { Grid } from "common/components/scaffold"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteOperators } from "common/molecules/autocomplete-operators"
 import {
@@ -19,7 +23,6 @@ import {
   useOwnerShipTypeOptions,
 } from "./delivery-site.hooks"
 import useEntity from "common/hooks/entity"
-import Checkbox from "common/components/checkbox"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -108,38 +111,58 @@ export const DeliverySiteForm = ({
 
   return (
     <Form id={formId} onSubmit={() => handleSubmit(value)}>
+      <Grid cols={2}>
+        <TextInput
+          type="text"
+          label={t("Nom du site")}
+          {...bind("name")}
+          required
+          readOnly={isReadOnly}
+        />
+
+        <TextInput
+          type="text"
+          label={t("Identifiant officiel")}
+          placeholder="Ex: FR1A00000580012"
+          {...bind("customs_id")}
+          required
+          readOnly={isReadOnly}
+        />
+      </Grid>
+      <Grid cols={3}>
+        <AutoCompleteCountries
+          label={t("Pays")}
+          {...bind("country")}
+          required
+          readOnly={isReadOnly}
+        />
+        <TextInput
+          label={t("Ville")}
+          {...bind("city")}
+          required
+          readOnly={isReadOnly}
+          value={value.city ?? ""}
+        />
+        <TextInput
+          label={t("Code postal")}
+          {...bind("postal_code")}
+          required
+          readOnly={isReadOnly}
+        />
+      </Grid>
       <TextInput
-        variant="outline"
-        type="text"
-        label={t("Nom du site")}
-        {...bind("name")}
+        label={t("Adresse")}
+        {...bind("address")}
         required
         readOnly={isReadOnly}
       />
-
-      <TextInput
-        variant="outline"
-        type="text"
-        label={t("Identifiant officiel")}
-        placeholder="Ex: FR1A00000580012"
-        {...bind("customs_id")}
-        required
-        readOnly={isReadOnly}
-      />
-
-      <AutoCompleteCountries
-        label={t("Pays")}
-        {...bind("country")}
-        required
-        readOnly={isReadOnly}
-      />
-
       <RadioGroup
         label={t("Type de dépôt")}
         options={depotTypeOptions}
         {...bind("site_type")}
         required
         disabled={isReadOnly}
+        orientation="horizontal"
       />
 
       {(isCogenerationPlant || isPowerPlant) && (
@@ -174,29 +197,6 @@ export const DeliverySiteForm = ({
           readOnly={isReadOnly}
         />
       )}
-
-      <TextInput
-        label={t("Adresse")}
-        {...bind("address")}
-        required
-        readOnly={isReadOnly}
-      />
-
-      <Row style={{ gap: "var(--spacing-s)" }}>
-        <TextInput
-          label={t("Ville")}
-          {...bind("city")}
-          required
-          readOnly={isReadOnly}
-          value={value.city ?? ""}
-        />
-        <TextInput
-          label={t("Code postal")}
-          {...bind("postal_code")}
-          required
-          readOnly={isReadOnly}
-        />
-      </Row>
 
       {entity.entity_type === EntityType.Operator && (
         <>
