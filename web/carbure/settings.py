@@ -75,7 +75,6 @@ CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod")
 # OTP Email Configuration
 OTP_EMAIL_TOKEN_VALIDITY = 1800  # 30 minutes
 OTP_EMAIL_THROTTLE_FACTOR = 2
-# OTP_EMAIL_COOLDOWN_DURATION = 60
 
 # Application definition
 INSTALLED_APPS = [
