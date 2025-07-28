@@ -7092,27 +7092,26 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
-            type: array
-            items:
-              enum:
-                - CONV
-                - ANN-IX-A
-                - ANN-IX-B
-                - TALLOL
-                - OTHER
-                - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+            type: string
+            enum:
+              - ANN-IX-A
+              - ANN-IX-B
+              - CONV
+              - EP2AM
+              - OTHER
+              - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
         - in: query
           name: date_from
           schema:
@@ -7147,41 +7146,35 @@ paths:
           schema:
             type: string
         - in: query
-          name: ges_bound_max
-          schema:
-            type: number
-        - in: query
-          name: ges_bound_min
-          schema:
-            type: number
-        - in: query
           name: operation
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -7266,49 +7259,53 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
-              type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+            type: string
+            enum:
+              - ACCEPTED
+              - CANCELED
+              - CORRECTED
+              - DECLARED
+              - DRAFT
+              - PENDING
+              - REJECTED
+              - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -7705,27 +7702,26 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
-            type: array
-            items:
-              enum:
-                - CONV
-                - ANN-IX-A
-                - ANN-IX-B
-                - TALLOL
-                - OTHER
-                - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+            type: string
+            enum:
+              - ANN-IX-A
+              - ANN-IX-B
+              - CONV
+              - EP2AM
+              - OTHER
+              - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
         - in: query
           name: date_from
           schema:
@@ -7777,29 +7773,31 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -7884,49 +7882,53 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
-              type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+            type: string
+            enum:
+              - ACCEPTED
+              - CANCELED
+              - CORRECTED
+              - DECLARED
+              - DRAFT
+              - PENDING
+              - REJECTED
+              - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -7959,27 +7961,26 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
-            type: array
-            items:
-              enum:
-                - CONV
-                - ANN-IX-A
-                - ANN-IX-B
-                - TALLOL
-                - OTHER
-                - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+            type: string
+            enum:
+              - ANN-IX-A
+              - ANN-IX-B
+              - CONV
+              - EP2AM
+              - OTHER
+              - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
         - in: query
           name: date_from
           schema:
@@ -8018,41 +8019,35 @@ paths:
           schema:
             type: string
         - in: query
-          name: ges_bound_max
-          schema:
-            type: number
-        - in: query
-          name: ges_bound_min
-          schema:
-            type: number
-        - in: query
           name: operation
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -8125,49 +8120,53 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
-              type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+            type: string
+            enum:
+              - ACCEPTED
+              - CANCELED
+              - CORRECTED
+              - DECLARED
+              - DRAFT
+              - PENDING
+              - REJECTED
+              - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -8242,27 +8241,26 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
-            type: array
-            items:
-              enum:
-                - CONV
-                - ANN-IX-A
-                - ANN-IX-B
-                - TALLOL
-                - OTHER
-                - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+            type: string
+            enum:
+              - ANN-IX-A
+              - ANN-IX-B
+              - CONV
+              - EP2AM
+              - OTHER
+              - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
         - in: query
           name: date_from
           schema:
@@ -8307,41 +8305,35 @@ paths:
           schema:
             type: string
         - in: query
-          name: ges_bound_max
-          schema:
-            type: number
-        - in: query
-          name: ges_bound_min
-          schema:
-            type: number
-        - in: query
           name: operation
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -8414,49 +8406,53 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
-              type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+            type: string
+            enum:
+              - ACCEPTED
+              - CANCELED
+              - CORRECTED
+              - DECLARED
+              - DRAFT
+              - PENDING
+              - REJECTED
+              - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -11695,6 +11691,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationLotRequest"
+        draft:
+          type: boolean
+          default: false
       required:
         - biofuel
         - customs_category
@@ -11796,6 +11795,7 @@ components:
         - DECLARED
         - CORRECTED
         - VALIDATED
+        - DRAFT
       type: string
       description: |-
         * `PENDING` - PENDING
@@ -11805,6 +11805,7 @@ components:
         * `DECLARED` - DECLARED
         * `CORRECTED` - CORRECTED
         * `VALIDATED` - VALIDATED
+        * `DRAFT` - DRAFT
     OperationTypeEnum:
       enum:
         - INCORPORATION

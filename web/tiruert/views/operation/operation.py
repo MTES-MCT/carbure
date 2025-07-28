@@ -161,6 +161,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     default=Value(None),
                     output_field=FloatField(),
                 ),
+                _transaction=Case(
+                    When(credited_entity_id=self.request.entity.id, then=Value("CREDIT")),
+                    When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
             )
         )
 
@@ -286,6 +292,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         if instance.type in [Operation.CESSION, Operation.TENEUR, Operation.TRANSFERT] and instance.status in [
             Operation.PENDING,
             Operation.REJECTED,
+            Operation.DRAFT,
         ]:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
