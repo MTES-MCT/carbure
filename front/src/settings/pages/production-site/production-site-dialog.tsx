@@ -22,7 +22,7 @@ import { Autocomplete } from "common/components/autocomplete2"
 import { Dialog } from "common/components/dialog2"
 import { TextInput, Checkbox, RadioGroup } from "common/components/inputs2"
 import { useNotify } from "common/components/notifications"
-import { Row } from "common/components/scaffold"
+import { Divider, Grid } from "common/components/scaffold"
 import { TagAutocomplete } from "common/components/tag-autocomplete2"
 import { useMutation } from "common/hooks/async"
 import * as api from "../../api/production-sites"
@@ -67,14 +67,18 @@ export const ProductionSiteDialog = ({
   return (
     <Dialog
       onClose={() => onClose && onClose()}
-      header={<Dialog.Title>{title}</Dialog.Title>}
+      header={
+        <>
+          <Dialog.Title>{title}</Dialog.Title>
+          <Dialog.Description>{description}</Dialog.Description>
+        </>
+      }
       size="medium"
     >
       <ProductionSiteForm
         productionSite={productionSite}
         readOnly={readOnly}
         onClose={onClose}
-        description={description}
       />
     </Dialog>
   )
@@ -196,7 +200,7 @@ export const ProductionSiteForm = ({
           required
         />
 
-        <Row style={{ gap: "var(--spacing-m)" }}>
+        <Grid cols={2} gap="lg">
           <TextInput
             readOnly={readOnly}
             label={t("N° d'identification (SIRET)")}
@@ -211,9 +215,9 @@ export const ProductionSiteForm = ({
             {...bind("date_mise_en_service")}
             required
           />
-        </Row>
+        </Grid>
 
-        <hr />
+        <Divider noMargin />
 
         <TextInput
           readOnly={readOnly}
@@ -221,7 +225,7 @@ export const ProductionSiteForm = ({
           {...bind("address")}
           required
         />
-        <Row style={{ gap: "var(--spacing-m)" }}>
+        <Grid cols={2} gap="lg">
           <TextInput
             readOnly={readOnly}
             label={t("Ville")}
@@ -234,7 +238,7 @@ export const ProductionSiteForm = ({
             {...bind("postal_code")}
             required
           />
-        </Row>
+        </Grid>
 
         <Autocomplete
           readOnly={readOnly}
@@ -246,7 +250,7 @@ export const ProductionSiteForm = ({
           required
         />
 
-        <hr />
+        <Divider noMargin />
 
         <TextInput
           readOnly={readOnly}
@@ -255,7 +259,7 @@ export const ProductionSiteForm = ({
           required
         />
 
-        <Row style={{ gap: "var(--spacing-m)" }}>
+        <Grid cols={2} gap="lg">
           <TextInput
             readOnly={readOnly}
             label={t("N° de téléphone du gérant")}
@@ -268,9 +272,9 @@ export const ProductionSiteForm = ({
             {...bind("manager_email")}
             required
           />
-        </Row>
+        </Grid>
 
-        <hr />
+        <Divider noMargin />
 
         <Checkbox
           label={t("Éligible double-comptage ?")}
@@ -286,7 +290,7 @@ export const ProductionSiteForm = ({
           />
         )}
 
-        <hr />
+        <Divider noMargin />
 
         <RadioGroup
           label={t("Options GES")}
@@ -296,7 +300,7 @@ export const ProductionSiteForm = ({
           required
         />
 
-        <hr />
+        <Divider noMargin />
 
         <TagAutocomplete
           label={t("Matieres premieres")}
@@ -319,7 +323,7 @@ export const ProductionSiteForm = ({
           required
         />
 
-        <hr />
+        <Divider noMargin />
 
         <TagAutocomplete
           readOnly={readOnly}
