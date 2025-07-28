@@ -63,7 +63,7 @@ if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
-SESSION_COOKIE_AGE = 60 * 60 * 24  # 24 hours
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 5  # 5 days
 SESSION_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod")
