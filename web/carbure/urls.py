@@ -7,10 +7,12 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from auth.views import admin_login_redirect
 from carbure.api.redirect_app import redirect_app
 
 urlpatterns = [
     re_path("app/(.*)", redirect_app),
+    path("admin/login/", admin_login_redirect, name="admin_login_redirect"),
     path("admin/", admin.site.urls),
     # YOUR PATTERNS
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

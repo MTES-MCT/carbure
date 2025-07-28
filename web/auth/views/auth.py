@@ -1,9 +1,14 @@
+from django.shortcuts import redirect
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from auth.serializers import UserCreationSerializer
 
 from .mixins import AuthActionMixin
+
+
+def admin_login_redirect(request):
+    return redirect("/auth/login/", permanent=True)
 
 
 class AuthViewSet(viewsets.ViewSet, AuthActionMixin):

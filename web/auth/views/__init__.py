@@ -1,1 +1,1 @@
-from .auth import AuthViewSet
+from .auth import AuthViewSet, admin_login_redirect
