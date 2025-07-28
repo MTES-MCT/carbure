@@ -11,7 +11,6 @@ from carbure.api.redirect_app import redirect_app
 
 urlpatterns = [
     re_path("app/(.*)", redirect_app),
-    path("admin/otp/", include("admin_otp.urls")),
     path("admin/", admin.site.urls),
     # YOUR PATTERNS
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
