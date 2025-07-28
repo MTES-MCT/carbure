@@ -58,7 +58,7 @@ def FiltersActionFactory(filters: Callable[[Request], dict[str, str]]):
                 raise Exception(f"Filter '{filter_param}' not found")
 
             # Use pre-filtered queryset for distinct values
-            values = filterset.qs.values_list(filter_obj.field_name, flat=True).distinct()
-            return Response({v for v in values if v is not None})
+            values = filterset.qs.values_list(filter_obj.field_name, flat=True).distinct().order_by(filter_obj.field_name)
+            return Response([v for v in values if v is not None])
 
     return FiltersActionMixin
