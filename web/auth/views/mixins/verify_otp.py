@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django_otp import login as login_with_device
 from django_otp import user_has_device
 from django_otp.plugins.otp_email.models import EmailDevice
@@ -11,12 +12,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from auth.serializers import VerifyOTPSerializer
-from core.carburetypes import CarbureError
 
 
 class VerifyOTPAction:
-    throttle_scope = "10/day"
-
     @extend_schema(
         request=VerifyOTPSerializer,
         examples=[
@@ -40,20 +38,29 @@ class VerifyOTPAction:
 
         serializer = VerifyOTPSerializer(data=request.data, user=request.user)
         serializer.is_valid(raise_exception=True)
-        device = EmailDevice.objects.get(user=request.user)
+        device = EmailDevice.objects.get(user=request.user, name="email")
         otp_token = serializer.validated_data["otp_token"]
+
+        is_allowed, reason = device.verify_is_allowed()
+        if not is_allowed:
+            locked_until_utc = reason.get("locked_until")
+            locked_until_local = timezone.localtime(locked_until_utc)
+            formatted_time = locked_until_local.strftime("%H:%M:%S")
+            failure_count = reason.get("failure_count", 0)
+
+            raise ValidationError(
+                {
+                    "message": _("Trop de tentatives incorrectes (%d échecs). Prochaine tentative possible à partir de %s.")
+                    % (failure_count, formatted_time)
+                }
+            )
+
+        now = timezone.now()
+        if now > device.valid_until:
+            raise ValidationError({"message": _("Le code de sécurité a expiré. Veuillez demander un nouveau code.")})
 
         if device.verify_token(otp_token):
             login_with_device(request, device)
             return Response({"status": "success"})
         else:
-            is_allowed, _ = device.verify_is_allowed()
-            now = timezone.now()
-            if now > device.valid_until:
-                raise ValidationError({"message": CarbureError.OTP_EXPIRED_CODE})
-            elif device.token != otp_token:
-                raise ValidationError({"message": CarbureError.OTP_INVALID_CODE})
-            elif not is_allowed:
-                raise ValidationError({"message": CarbureError.OTP_RATE_LIMITED})
-            else:
-                raise ValidationError({"message": CarbureError.OTP_UNKNOWN_ERROR})
+            raise ValidationError({"message": _("Le code de sécurité est incorrect.")})

@@ -9,6 +9,7 @@ import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { useEffect } from "react"
+import { HttpError } from "common/services/api-fetch"
 
 const OTP = () => {
   const { t } = useTranslation()
@@ -16,9 +17,7 @@ const OTP = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const { value, bind } = useForm({
-    otp: "" as string | undefined,
-  })
+  const { value, bind } = useForm({ otp: "" as string | undefined })
 
   const verifyOTP = useMutation(api.verifyOTP, {
     invalidates: ["user-settings"],
@@ -28,8 +27,12 @@ const OTP = () => {
       navigate("/")
     },
 
-    onError: () => {
-      notify(t("La vérification du code a échoué !"), { variant: "danger" })
+    onError: (error) => {
+      const errorData = (error as HttpError)?.data
+
+      for (const field in errorData) {
+        notify(errorData[field], { variant: "danger" })
+      }
     },
   })
 

@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Vérification OTP' %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<h1 style="text-align:center;">{% trans 'Vérification OTP' %}</h1>
+
+
+{% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+{% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+    </p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+    <p class="errornote">
+        {{ error }}
+    </p>
+{% endfor %}
+{% endif %}
+
+<div id="content-main">
+    
+    <div class="submit-row">
+        <p>{% trans 'Un code de vérification a été envoyé à votre adresse email. Veuillez saisir ce code pour finaliser votre connexion.' %}</p>
+    </div>
+    
+    <form method="post" id="login-form">{% csrf_token %}
+        <div class="form-row" style="text-align:center;"> 
+            <div class="fieldBox">
+                {{ form.otp_token.errors }}
+                {{ form.otp_token.label_tag }} {{ form.otp_token }}
+                {% if form.otp_token.help_text %}
+                    <div class="help">{{ form.otp_token.help_text }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Vérifier' %}" />
+        </div>
+    </form>
+    
+    <div class="submit-row">
+        <p><a href="{% url 'admin:login' %}">{% trans 'Retour à la connexion' %}</a></p>
+    </div>
+</div>
+{% endblock %}

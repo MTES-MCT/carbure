@@ -29,7 +29,7 @@ def device_with_updated_validity(user):
     if not user_has_device(user):
         create_device(user)
 
-    device = EmailDevice.objects.get(user=user)
+    device = EmailDevice.objects.get(user=user, name="email")
     now = timezone.now()
     if now > device.valid_until:
         device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
@@ -59,8 +59,6 @@ def send_new_token(request, device):
 
 
 class RequestOTPAction:
-    throttle_scope = "10/day"
-
     @extend_schema(
         request=None,
         responses={
