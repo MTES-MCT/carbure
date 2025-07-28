@@ -1,7 +1,7 @@
 import useEntity from "common/hooks/entity"
 import { Country, Entity, UserRole } from "common/types"
 import { useForm, Form } from "common/components/form2"
-import { TextInput } from "common/components/inputs2"
+import { TextArea, TextInput } from "common/components/inputs2"
 import { Grid, LoaderOverlay } from "common/components/scaffold"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
@@ -112,7 +112,7 @@ const CompanyInfo = ({
           // Reset the form to the initial entity data
           companyForm.setValue(getCompanyDataFromEntity(entity))
         }}
-        headerActions={!isAllowedToEdit && null}
+        headerActions={!isAllowedToEdit ? null : undefined}
       >
         {isAllowedToEdit && (
           <Notice
@@ -205,7 +205,7 @@ const CompanyInfo = ({
           // Reset the form to the initial entity data
           companyForm.setValue(getCompanyDataFromEntity(entity))
         }}
-        headerActions={!isAllowedToEdit && null}
+        headerActions={!isAllowedToEdit ? null : undefined}
       >
         {({ isEditing }) => (
           <EditableCard.Form form={companyForm} onSubmit={onSubmitForm}>
@@ -248,13 +248,13 @@ const CompanyInfo = ({
               label={t("Email contact principal")}
               {...companyForm.bind("sustainability_officer_email")}
             />
-            {/* <TextArea
-           required
-           maxLength={5000}
-           readOnly={!isAllowedToEdit}
-           label={t("Description de l'activité")}
-           {...companyForm.bind("activity_description")}
-         /> */}
+            <TextArea
+              required
+              maxLength={5000}
+              readOnly={!isAllowedToEdit || !isEditing}
+              label={t("Description de l'activité")}
+              {...companyForm.bind("activity_description")}
+            />
             {isAllowedToEdit && isEditing && (
               <Button
                 asideX
