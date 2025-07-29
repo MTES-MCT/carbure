@@ -18,7 +18,7 @@ class ElecProvisionCertificateQualicharge(models.Model):
     date_to = models.DateField()
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)
-    station_id = station_id = models.CharField(max_length=64)
+    station_id = models.CharField(max_length=64)
     energy_amount = models.FloatField()  # unit = MWh
     is_controlled_by_qualicharge = models.BooleanField(default=False)
     validated_by = models.CharField(max_length=16, choices=VALIDATION_CHOICES, default=NO_ONE, blank=True)
