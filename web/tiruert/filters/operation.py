@@ -7,6 +7,7 @@ from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter, AllV
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ListField
 
+from core.models import MatierePremiere
 from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
 
@@ -23,6 +24,8 @@ class BaseFilter(FilterSet):
     depot = CharFilter(method="filter_depot")
     type = MultipleChoiceFilter(choices=(("CREDIT", "CREDIT"), ("DEBIT", "DEBIT")), field_name="_transaction")
     period = CharFilter(method="filter_period")
+    customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
+    status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
 
     order_by = CustomOrderingFilter(
         fields=(

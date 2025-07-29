@@ -3511,8 +3511,7 @@ export interface components {
       to_depot?: number | null
       export_country?: number | null
       lots: components["schemas"]["OperationLotRequest"][]
-      /** @default false */
-      draft: boolean
+      status?: components["schemas"]["OperationStatusEnum"]
     }
     OperationList: {
       readonly id: number
@@ -8927,7 +8926,7 @@ export interface operations {
          *     * `TALLOL` - Tallol
          *     * `OTHER` - Autre
          *     * `EP2AM` - EP2AM */
-        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
         depot?: string[]
@@ -8991,7 +8990,7 @@ export interface operations {
          *     * `CORRECTED` - CORRECTED
          *     * `VALIDATED` - VALIDATED
          *     * `DRAFT` - DRAFT */
-        status?: PathsApiTiruertOperationsGetParametersQueryStatus
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         /** @description * `CREDIT` - CREDIT
          *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
@@ -9291,7 +9290,7 @@ export interface operations {
          *     * `TALLOL` - Tallol
          *     * `OTHER` - Autre
          *     * `EP2AM` - EP2AM */
-        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         /** @description Date from where to calculate teneur and quantity */
         date_from?: string
         date_to?: string
@@ -9358,7 +9357,7 @@ export interface operations {
          *     * `CORRECTED` - CORRECTED
          *     * `VALIDATED` - VALIDATED
          *     * `DRAFT` - DRAFT */
-        status?: PathsApiTiruertOperationsGetParametersQueryStatus
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         /** @description * `CREDIT` - CREDIT
          *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
@@ -9391,7 +9390,7 @@ export interface operations {
          *     * `TALLOL` - Tallol
          *     * `OTHER` - Autre
          *     * `EP2AM` - EP2AM */
-        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
         depot?: string[]
@@ -9451,7 +9450,7 @@ export interface operations {
          *     * `CORRECTED` - CORRECTED
          *     * `VALIDATED` - VALIDATED
          *     * `DRAFT` - DRAFT */
-        status?: PathsApiTiruertOperationsGetParametersQueryStatus
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         /** @description * `CREDIT` - CREDIT
          *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
@@ -9508,7 +9507,7 @@ export interface operations {
          *     * `TALLOL` - Tallol
          *     * `OTHER` - Autre
          *     * `EP2AM` - EP2AM */
-        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category
+        customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
         depot?: string[]
@@ -9568,7 +9567,7 @@ export interface operations {
          *     * `CORRECTED` - CORRECTED
          *     * `VALIDATED` - VALIDATED
          *     * `DRAFT` - DRAFT */
-        status?: PathsApiTiruertOperationsGetParametersQueryStatus
+        status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
         /** @description * `CREDIT` - CREDIT
          *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]

@@ -139,7 +139,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "to_depot",
             "export_country",
             "lots",
-            "draft",
+            "status",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -148,7 +148,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
         }
 
     lots = OperationLotSerializer(many=True, required=True)
-    draft = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -159,7 +158,10 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, unit)
 
-            if validated_data["type"] in [
+            if validated_data["type"] in [Operation.TRANSFERT]:
+                if validated_data.get("status") is not Operation.DRAFT:
+                    validated_data["status"] = Operation.PENDING
+            elif validated_data["type"] in [
                 Operation.INCORPORATION,
                 Operation.MAC_BIO,
                 Operation.LIVRAISON_DIRECTE,
@@ -168,9 +170,6 @@ class OperationInputSerializer(serializers.ModelSerializer):
                 validated_data["status"] = Operation.ACCEPTED
             else:
                 validated_data["status"] = Operation.PENDING
-
-            if validated_data.pop("draft", False):
-                validated_data["status"] = Operation.DRAFT
 
             # Create the operation
             operation = Operation.objects.create(**validated_data)

@@ -3,7 +3,11 @@ import { TransfertDialogForm } from "./transfert-dialog.types"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { createOperation } from "accounting/api/operations"
-import { Balance, CreateOperationType } from "accounting/types"
+import {
+  Balance,
+  CreateOperationType,
+  OperationsStatus,
+} from "accounting/types"
 import { useMutation } from "common/hooks/async"
 import { useUnit } from "common/hooks/unit"
 import { useRef } from "react"
@@ -36,7 +40,7 @@ export const useTransfertDialog = ({
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
       lots: values.selected_lots!,
-      draft,
+      status: draft ? OperationsStatus.DRAFT : undefined,
     })
   }
 

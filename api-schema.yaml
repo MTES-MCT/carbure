@@ -7097,14 +7097,16 @@ paths:
         - in: query
           name: customs_category
           schema:
-            type: string
-            enum:
-              - ANN-IX-A
-              - ANN-IX-B
-              - CONV
-              - EP2AM
-              - OTHER
-              - TALLOL
+            type: array
+            items:
+              type: string
+              enum:
+                - ANN-IX-A
+                - ANN-IX-B
+                - CONV
+                - EP2AM
+                - OTHER
+                - TALLOL
           description: |-
             * `CONV` - Conventionnel
             * `ANN-IX-A` - ANNEXE IX-A
@@ -7112,6 +7114,8 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -7273,16 +7277,18 @@ paths:
         - in: query
           name: status
           schema:
-            type: string
-            enum:
-              - ACCEPTED
-              - CANCELED
-              - CORRECTED
-              - DECLARED
-              - DRAFT
-              - PENDING
-              - REJECTED
-              - VALIDATED
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
           description: |-
             * `PENDING` - PENDING
             * `ACCEPTED` - ACCEPTED
@@ -7292,6 +7298,8 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
@@ -7707,14 +7715,16 @@ paths:
         - in: query
           name: customs_category
           schema:
-            type: string
-            enum:
-              - ANN-IX-A
-              - ANN-IX-B
-              - CONV
-              - EP2AM
-              - OTHER
-              - TALLOL
+            type: array
+            items:
+              type: string
+              enum:
+                - ANN-IX-A
+                - ANN-IX-B
+                - CONV
+                - EP2AM
+                - OTHER
+                - TALLOL
           description: |-
             * `CONV` - Conventionnel
             * `ANN-IX-A` - ANNEXE IX-A
@@ -7722,6 +7732,8 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -7896,16 +7908,18 @@ paths:
         - in: query
           name: status
           schema:
-            type: string
-            enum:
-              - ACCEPTED
-              - CANCELED
-              - CORRECTED
-              - DECLARED
-              - DRAFT
-              - PENDING
-              - REJECTED
-              - VALIDATED
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
           description: |-
             * `PENDING` - PENDING
             * `ACCEPTED` - ACCEPTED
@@ -7915,6 +7929,8 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
@@ -7966,14 +7982,16 @@ paths:
         - in: query
           name: customs_category
           schema:
-            type: string
-            enum:
-              - ANN-IX-A
-              - ANN-IX-B
-              - CONV
-              - EP2AM
-              - OTHER
-              - TALLOL
+            type: array
+            items:
+              type: string
+              enum:
+                - ANN-IX-A
+                - ANN-IX-B
+                - CONV
+                - EP2AM
+                - OTHER
+                - TALLOL
           description: |-
             * `CONV` - Conventionnel
             * `ANN-IX-A` - ANNEXE IX-A
@@ -7981,6 +7999,8 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -8134,16 +8154,18 @@ paths:
         - in: query
           name: status
           schema:
-            type: string
-            enum:
-              - ACCEPTED
-              - CANCELED
-              - CORRECTED
-              - DECLARED
-              - DRAFT
-              - PENDING
-              - REJECTED
-              - VALIDATED
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
           description: |-
             * `PENDING` - PENDING
             * `ACCEPTED` - ACCEPTED
@@ -8153,6 +8175,8 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
@@ -8246,14 +8270,16 @@ paths:
         - in: query
           name: customs_category
           schema:
-            type: string
-            enum:
-              - ANN-IX-A
-              - ANN-IX-B
-              - CONV
-              - EP2AM
-              - OTHER
-              - TALLOL
+            type: array
+            items:
+              type: string
+              enum:
+                - ANN-IX-A
+                - ANN-IX-B
+                - CONV
+                - EP2AM
+                - OTHER
+                - TALLOL
           description: |-
             * `CONV` - Conventionnel
             * `ANN-IX-A` - ANNEXE IX-A
@@ -8261,6 +8287,8 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -8420,16 +8448,18 @@ paths:
         - in: query
           name: status
           schema:
-            type: string
-            enum:
-              - ACCEPTED
-              - CANCELED
-              - CORRECTED
-              - DECLARED
-              - DRAFT
-              - PENDING
-              - REJECTED
-              - VALIDATED
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
           description: |-
             * `PENDING` - PENDING
             * `ACCEPTED` - ACCEPTED
@@ -8439,6 +8469,8 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
@@ -11691,9 +11723,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationLotRequest"
-        draft:
-          type: boolean
-          default: false
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
       required:
         - biofuel
         - customs_category
@@ -12088,6 +12119,8 @@ components:
         to_depot:
           type: integer
           nullable: true
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
     Pays:
       type: object
       properties:
