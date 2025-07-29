@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     "simple_history",
     "tiruert",
     "user",
+    "biomethane",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
