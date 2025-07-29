@@ -92,6 +92,9 @@ class Entity(models.Model):
     is_enabled = models.BooleanField(default=True)
     is_tiruert_liable = models.BooleanField(default=False)
 
+    # Biomethane
+    is_red_ii = models.BooleanField(default=False)
+
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
     notifications_enabled = models.BooleanField(default=False)
