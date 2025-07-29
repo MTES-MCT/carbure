@@ -3,9 +3,14 @@ import { TransfertDialogForm } from "./transfert-dialog.types"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { createOperation } from "accounting/api/operations"
-import { Balance, CreateOperationType } from "accounting/types"
+import {
+  Balance,
+  CreateOperationType,
+  OperationsStatus,
+} from "accounting/types"
 import { useMutation } from "common/hooks/async"
 import { useUnit } from "common/hooks/unit"
+import { useRef } from "react"
 
 type TransfertDialogProps = {
   balance: Balance
@@ -24,32 +29,42 @@ export const useTransfertDialog = ({
   const notify = useNotify()
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
+  const isDraftRef = useRef<boolean>(false)
 
-  const onSubmit = () =>
-    createOperation(entity.id, {
+  const onSubmit = (draft = false) => {
+    isDraftRef.current = draft
+    return createOperation(entity.id, {
       type: CreateOperationType.TRANSFERT,
       credited_entity: values.credited_entity?.id,
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
       lots: values.selected_lots!,
+      status: draft ? OperationsStatus.DRAFT : undefined,
     })
+  }
 
   const mutation = useMutation(onSubmit, {
     invalidates: ["balances"],
     onSuccess: () => {
       onOperationCreated()
-      notify(
-        t(
-          "Le transfert de droits d'une quantité de {{quantity}} a été réalisé avec succès",
-          {
-            quantity: formatUnit(values.quantity!, {
-              fractionDigits: 0,
-            }),
-          }
-        ),
-        { variant: "success" }
-      )
+      if (isDraftRef.current) {
+        notify(t("L'opération a été enregistrée en tant que brouillon."), {
+          variant: "success",
+        })
+      } else {
+        notify(
+          t(
+            "Le transfert de droits d'une quantité de {{quantity}} a été réalisé avec succès",
+            {
+              quantity: formatUnit(values.quantity!, {
+                fractionDigits: 0,
+              }),
+            }
+          ),
+          { variant: "success" }
+        )
+      }
       onClose()
     },
     onError: () => {

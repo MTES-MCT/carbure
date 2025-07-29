@@ -80,6 +80,8 @@ export const formatOperationStatus = (
       return i18next.t("Corrigé")
     case OperationsStatus.VALIDATED:
       return i18next.t("Validé")
+    case OperationsStatus.DRAFT:
+      return i18next.t("Brouillon")
     default:
       return i18next.t("Inconnu")
   }

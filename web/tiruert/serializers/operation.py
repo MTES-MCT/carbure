@@ -139,6 +139,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "to_depot",
             "export_country",
             "lots",
+            "status",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -157,7 +158,10 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, unit)
 
-            if validated_data["type"] in [
+            if validated_data["type"] in [Operation.TRANSFERT]:
+                if validated_data.get("status") is not Operation.DRAFT:
+                    validated_data["status"] = Operation.PENDING
+            elif validated_data["type"] in [
                 Operation.INCORPORATION,
                 Operation.MAC_BIO,
                 Operation.LIVRAISON_DIRECTE,
@@ -192,9 +196,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
 class OperationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
-        fields = [
-            "to_depot",
-        ]
+        fields = ["to_depot", "status"]
 
 
 class OperationCorrectionSerializer(serializers.Serializer):

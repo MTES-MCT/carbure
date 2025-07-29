@@ -3511,6 +3511,7 @@ export interface components {
       to_depot?: number | null
       export_country?: number | null
       lots: components["schemas"]["OperationLotRequest"][]
+      status?: components["schemas"]["OperationStatusEnum"]
     }
     OperationList: {
       readonly id: number
@@ -3552,6 +3553,7 @@ export interface components {
      *     * `DECLARED` - DECLARED
      *     * `CORRECTED` - CORRECTED
      *     * `VALIDATED` - VALIDATED
+     *     * `DRAFT` - DRAFT
      * @enum {string}
      */
     OperationStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus
@@ -3730,6 +3732,7 @@ export interface components {
     }
     PatchedOperationUpdateRequest: {
       to_depot?: number | null
+      status?: components["schemas"]["OperationStatusEnum"]
     }
     Pays: {
       code_pays: string
@@ -8917,6 +8920,12 @@ export interface operations {
     parameters: {
       query: {
         biofuel?: string[]
+        /** @description * `CONV` - Conventionnel
+         *     * `ANN-IX-A` - ANNEXE IX-A
+         *     * `ANN-IX-B` - ANNEXE IX-B
+         *     * `TALLOL` - Tallol
+         *     * `OTHER` - Autre
+         *     * `EP2AM` - EP2AM */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -8926,8 +8935,16 @@ export interface operations {
         /** @description Authorised entity ID. */
         entity_id: number
         from_to?: string
-        ges_bound_max?: number
-        ges_bound_min?: number
+        /** @description * `INCORPORATION` - INCORPORATION
+         *     * `CESSION` - CESSION
+         *     * `TENEUR` - TENEUR
+         *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+         *     * `MAC_BIO` - MAC_BIO
+         *     * `EXPORTATION` - EXPORTATION
+         *     * `DEVALUATION` - DEVALUATION
+         *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+         *     * `TRANSFERT` - TRANSFERT
+         *     * `ACQUISITION` - ACQUISITION */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
@@ -8961,8 +8978,21 @@ export interface operations {
         /** @description Number of results to return per page. */
         page_size?: number
         period?: string[]
+        /** @description * `ESSENCE` - ESSENCE
+         *     * `GAZOLE` - GAZOLE
+         *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED
+         *     * `CANCELED` - CANCELED
+         *     * `DECLARED` - DECLARED
+         *     * `CORRECTED` - CORRECTED
+         *     * `VALIDATED` - VALIDATED
+         *     * `DRAFT` - DRAFT */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        /** @description * `CREDIT` - CREDIT
+         *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
@@ -9254,6 +9284,12 @@ export interface operations {
     parameters: {
       query: {
         biofuel?: string[]
+        /** @description * `CONV` - Conventionnel
+         *     * `ANN-IX-A` - ANNEXE IX-A
+         *     * `ANN-IX-B` - ANNEXE IX-B
+         *     * `TALLOL` - Tallol
+         *     * `OTHER` - Autre
+         *     * `EP2AM` - EP2AM */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         /** @description Date from where to calculate teneur and quantity */
         date_from?: string
@@ -9266,6 +9302,16 @@ export interface operations {
         ges_bound_min?: number
         /** @description Group by sector, lot or depot. */
         group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by
+        /** @description * `INCORPORATION` - INCORPORATION
+         *     * `CESSION` - CESSION
+         *     * `TENEUR` - TENEUR
+         *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+         *     * `MAC_BIO` - MAC_BIO
+         *     * `EXPORTATION` - EXPORTATION
+         *     * `DEVALUATION` - DEVALUATION
+         *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+         *     * `TRANSFERT` - TRANSFERT
+         *     * `ACQUISITION` - ACQUISITION */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
@@ -9299,8 +9345,21 @@ export interface operations {
         /** @description Number of results to return per page. */
         page_size?: number
         period?: string[]
+        /** @description * `ESSENCE` - ESSENCE
+         *     * `GAZOLE` - GAZOLE
+         *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED
+         *     * `CANCELED` - CANCELED
+         *     * `DECLARED` - DECLARED
+         *     * `CORRECTED` - CORRECTED
+         *     * `VALIDATED` - VALIDATED
+         *     * `DRAFT` - DRAFT */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        /** @description * `CREDIT` - CREDIT
+         *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
@@ -9325,6 +9384,12 @@ export interface operations {
     parameters: {
       query: {
         biofuel?: string[]
+        /** @description * `CONV` - Conventionnel
+         *     * `ANN-IX-A` - ANNEXE IX-A
+         *     * `ANN-IX-B` - ANNEXE IX-B
+         *     * `TALLOL` - Tallol
+         *     * `OTHER` - Autre
+         *     * `EP2AM` - EP2AM */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -9334,8 +9399,16 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter
         from_to?: string
-        ges_bound_max?: number
-        ges_bound_min?: number
+        /** @description * `INCORPORATION` - INCORPORATION
+         *     * `CESSION` - CESSION
+         *     * `TENEUR` - TENEUR
+         *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+         *     * `MAC_BIO` - MAC_BIO
+         *     * `EXPORTATION` - EXPORTATION
+         *     * `DEVALUATION` - DEVALUATION
+         *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+         *     * `TRANSFERT` - TRANSFERT
+         *     * `ACQUISITION` - ACQUISITION */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
@@ -9365,8 +9438,21 @@ export interface operations {
          *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
+        /** @description * `ESSENCE` - ESSENCE
+         *     * `GAZOLE` - GAZOLE
+         *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED
+         *     * `CANCELED` - CANCELED
+         *     * `DECLARED` - DECLARED
+         *     * `CORRECTED` - CORRECTED
+         *     * `VALIDATED` - VALIDATED
+         *     * `DRAFT` - DRAFT */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        /** @description * `CREDIT` - CREDIT
+         *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
@@ -9415,6 +9501,12 @@ export interface operations {
     parameters: {
       query: {
         biofuel?: string[]
+        /** @description * `CONV` - Conventionnel
+         *     * `ANN-IX-A` - ANNEXE IX-A
+         *     * `ANN-IX-B` - ANNEXE IX-B
+         *     * `TALLOL` - Tallol
+         *     * `OTHER` - Autre
+         *     * `EP2AM` - EP2AM */
         customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[]
         date_from?: string
         date_to?: string
@@ -9424,8 +9516,16 @@ export interface operations {
         /** @description Filter string to apply */
         filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter
         from_to?: string
-        ges_bound_max?: number
-        ges_bound_min?: number
+        /** @description * `INCORPORATION` - INCORPORATION
+         *     * `CESSION` - CESSION
+         *     * `TENEUR` - TENEUR
+         *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+         *     * `MAC_BIO` - MAC_BIO
+         *     * `EXPORTATION` - EXPORTATION
+         *     * `DEVALUATION` - DEVALUATION
+         *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+         *     * `TRANSFERT` - TRANSFERT
+         *     * `ACQUISITION` - ACQUISITION */
         operation?: PathsApiTiruertOperationsGetParametersQueryOperation[]
         /** @description Ordre
          *
@@ -9455,8 +9555,21 @@ export interface operations {
          *     * `-saved_emissions` - saved_emissions (descending) */
         order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[]
         period?: string[]
+        /** @description * `ESSENCE` - ESSENCE
+         *     * `GAZOLE` - GAZOLE
+         *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
         sector?: PathsApiTiruertOperationsGetParametersQuerySector[]
+        /** @description * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED
+         *     * `CANCELED` - CANCELED
+         *     * `DECLARED` - DECLARED
+         *     * `CORRECTED` - CORRECTED
+         *     * `VALIDATED` - VALIDATED
+         *     * `DRAFT` - DRAFT */
         status?: PathsApiTiruertOperationsGetParametersQueryStatus[]
+        /** @description * `CREDIT` - CREDIT
+         *     * `DEBIT` - DEBIT */
         type?: PathsApiTiruertElecOperationsGetParametersQueryType[]
         /** @description Specify the volume unit. */
         unit?: PathsApiTiruertOperationsGetParametersQueryUnit
@@ -9786,24 +9899,24 @@ export enum PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter {
   type = "type",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
-  CONV = "CONV",
   ANN_IX_A = "ANN-IX-A",
   ANN_IX_B = "ANN-IX-B",
-  TALLOL = "TALLOL",
-  OTHER = "OTHER",
+  CONV = "CONV",
   EP2AM = "EP2AM",
+  OTHER = "OTHER",
+  TALLOL = "TALLOL",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
-  INCORPORATION = "INCORPORATION",
+  ACQUISITION = "ACQUISITION",
   CESSION = "CESSION",
-  TENEUR = "TENEUR",
+  CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+  DEVALUATION = "DEVALUATION",
+  EXPORTATION = "EXPORTATION",
+  INCORPORATION = "INCORPORATION",
   LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
   MAC_BIO = "MAC_BIO",
-  EXPORTATION = "EXPORTATION",
-  DEVALUATION = "DEVALUATION",
-  CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+  TENEUR = "TENEUR",
   TRANSFERT = "TRANSFERT",
-  ACQUISITION = "ACQUISITION",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   ValueMinusavailable_balance = "-available_balance",
@@ -9832,17 +9945,18 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
   type = "type",
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
+  CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
   ESSENCE = "ESSENCE",
   GAZOLE = "GAZOLE",
-  CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
-  PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
   CANCELED = "CANCELED",
-  DECLARED = "DECLARED",
   CORRECTED = "CORRECTED",
+  DECLARED = "DECLARED",
+  DRAFT = "DRAFT",
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
   VALIDATED = "VALIDATED",
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
