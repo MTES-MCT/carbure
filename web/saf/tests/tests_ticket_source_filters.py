@@ -129,7 +129,7 @@ class SafTicketSourceFiltersTest(TestCase):
             "entity_id": self.entity.id,
             "year": 2022,
             "status": "AVAILABLE",
-            "filter": "clients",
+            "filter": "client",
         }
         response = self.client.get(reverse("saf-ticket-sources-filters"), query)
 
