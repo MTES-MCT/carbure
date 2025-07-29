@@ -1,9 +1,15 @@
 from django.urls import path
-
 from rest_framework_nested.routers import SimpleRouter
 
 from .api import urlpatterns as api_urlpatterns
-from .views import ProvisionCertificateViewSet, TransferCertificateViewSet, get_clients, get_snapshot, get_years
+from .views import (
+    ElecProvisionCertificateQualichargeViewSet,
+    ProvisionCertificateViewSet,
+    TransferCertificateViewSet,
+    get_clients,
+    get_snapshot,
+    get_years,
+)
 
 router = SimpleRouter()
 router.register("provision-certificates", ProvisionCertificateViewSet, basename="provision-certificates")
