@@ -38,10 +38,10 @@ class BiomethaneEntityConfigAgreement(models.Model):
     cmax_annualized = models.BooleanField()
     cmax_annualized_value = models.FloatField()
     pap_contracted = models.FloatField()
-    signature_date = models.DateField()
-    effective_date = models.DateField()
-    general_conditions_file = models.FileField()
-    specific_conditions_file = models.FileField()
+    signature_date = models.DateField(null=True, blank=True)
+    effective_date = models.DateField(null=True, blank=True)
+    general_conditions_file = models.FileField(null=True, blank=True)
+    specific_conditions_file = models.FileField(null=True, blank=True)
 
     class Meta:
         db_table = "biomethane_entity_config_agreement"
