@@ -453,6 +453,101 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/agreement/:
+    post:
+      operationId: create_biomethane_entity_config_agreement
+      description: Create a new agreement.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEntityConfigAgreementAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEntityConfigAgreementAddRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEntityConfigAgreementAddRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEntityConfigAgreementAdd"
+          description: The newly created agreement.
+        "400":
+          description: Invalid input data.
+  /api/biomethane/agreement/list/:
+    get:
+      operationId: biomethane_agreement_list_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEntityConfigAgreement"
+          description: ""
+  /api/biomethane/agreement/patch/:
+    patch:
+      operationId: patch_biomethane_entity_config_agreement
+      description: Patch a biomethane entity config agreement
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigAgreementAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigAgreementAddRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigAgreementAddRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEntityConfigAgreementAdd"
+          description: The updated agreement.
+        "400":
+          description: Invalid input data.
   /api/double-counting/agreements/:
     get:
       operationId: double_counting_agreements_list
@@ -9423,6 +9518,135 @@ components:
         - code
         - name
         - name_en
+    BiomethaneEntityConfigAgreement:
+      type: object
+      properties:
+        tariff_reference:
+          $ref: "#/components/schemas/TariffReferenceEnum"
+        buyer:
+          type: integer
+        installation_category:
+          type: string
+          maxLength: 128
+        cmax:
+          type: number
+          format: double
+        cmax_annualized:
+          type: boolean
+        cmax_annualized_value:
+          type: number
+          format: double
+        pap_contracted:
+          type: number
+          format: double
+        signature_date:
+          type: string
+          format: date
+          nullable: true
+        effective_date:
+          type: string
+          format: date
+          nullable: true
+        general_conditions_file:
+          type: string
+          format: uri
+          nullable: true
+        specific_conditions_file:
+          type: string
+          format: uri
+          nullable: true
+        amendments:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneEntityConfigAmendment"
+          readOnly: true
+      required:
+        - amendments
+        - buyer
+        - cmax
+        - cmax_annualized
+        - cmax_annualized_value
+        - installation_category
+        - pap_contracted
+        - tariff_reference
+    BiomethaneEntityConfigAgreementAdd:
+      type: object
+      properties:
+        tariff_reference:
+          $ref: "#/components/schemas/TariffReferenceEnum"
+        buyer:
+          type: integer
+        installation_category:
+          type: string
+          maxLength: 128
+        cmax:
+          type: number
+          format: double
+        cmax_annualized:
+          type: boolean
+        cmax_annualized_value:
+          type: number
+          format: double
+        pap_contracted:
+          type: number
+          format: double
+      required:
+        - buyer
+        - cmax
+        - cmax_annualized
+        - cmax_annualized_value
+        - installation_category
+        - pap_contracted
+        - tariff_reference
+    BiomethaneEntityConfigAgreementAddRequest:
+      type: object
+      properties:
+        tariff_reference:
+          $ref: "#/components/schemas/TariffReferenceEnum"
+        buyer:
+          type: integer
+        installation_category:
+          type: string
+          minLength: 1
+          maxLength: 128
+        cmax:
+          type: number
+          format: double
+        cmax_annualized:
+          type: boolean
+        cmax_annualized_value:
+          type: number
+          format: double
+        pap_contracted:
+          type: number
+          format: double
+      required:
+        - buyer
+        - cmax
+        - cmax_annualized
+        - cmax_annualized_value
+        - installation_category
+        - pap_contracted
+        - tariff_reference
+    BiomethaneEntityConfigAmendment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contract:
+          type: integer
+        signature_date:
+          type: string
+          format: date
+        effective_date:
+          type: string
+          format: date
+      required:
+        - contract
+        - effective_date
+        - id
+        - signature_date
     CarbureLotPublic:
       type: object
       properties:
@@ -11510,6 +11734,7 @@ components:
         - Unknown
         - Power or Heat Producer
         - SAF Trader
+        - Producteur de biométhane
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -11523,6 +11748,7 @@ components:
         * `Unknown` - Unknown
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
         * `SAF Trader` - Trader de SAF
+        * `Producteur de biométhane` - Producteur de biométhane
       x-enum-varnames:
         - Producer
         - Operator
@@ -12580,6 +12806,28 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedBiomethaneEntityConfigAgreementAddRequest:
+      type: object
+      properties:
+        tariff_reference:
+          $ref: "#/components/schemas/TariffReferenceEnum"
+        buyer:
+          type: integer
+        installation_category:
+          type: string
+          minLength: 1
+          maxLength: 128
+        cmax:
+          type: number
+          format: double
+        cmax_annualized:
+          type: boolean
+        cmax_annualized_value:
+          type: number
+          format: double
+        pap_contracted:
+          type: number
+          format: double
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
@@ -13844,6 +14092,18 @@ components:
           type: string
       required:
         - metabase_iframe_url
+    TariffReferenceEnum:
+      enum:
+        - 2011
+        - 2021
+        - 2022
+        - 2023
+      type: integer
+      description: |-
+        * `2011` - 2011
+        * `2021` - 2021
+        * `2022` - 2022
+        * `2023` - 2023
     ToggleElecRequest:
       type: object
       properties:
