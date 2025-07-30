@@ -31,7 +31,8 @@ AMENDMENT_OBJECT_CHOICES = [
 
 class BiomethaneEntityConfigAgreement(models.Model):
     tariff_reference = models.CharField(choices=TARIFF_REFERENCE_CHOICES, max_length=28)
-    buyer = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    buyer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="buyer")
+    entity = models.OneToOneField(Entity, on_delete=models.CASCADE, primary_key=True)
     installation_category = models.CharField(max_length=128)
     cmax = models.FloatField()
     cmax_annualized = models.BooleanField()
