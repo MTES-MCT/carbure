@@ -30,6 +30,9 @@
       "version": "detect"
     }
   },
+  "ignorePatterns": [
+    "src/api-schema.ts"
+  ],
   "overrides": [
     {
       "files": [
