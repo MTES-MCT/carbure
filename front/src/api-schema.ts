@@ -191,6 +191,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/agreement/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Create a new agreement. */
+        post: operations["create_biomethane_entity_config_agreement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/agreement/list/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_agreement_list_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/agreement/patch/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Patch a biomethane entity config agreement */
+        patch: operations["patch_biomethane_entity_config_agreement"];
+        trace?: never;
+    };
     "/api/double-counting/agreements/": {
         parameters: {
             query?: never;
@@ -2446,6 +2496,59 @@ export interface components {
             name_en: string;
             code: string;
         };
+        BiomethaneEntityConfigAgreement: {
+            tariff_reference: components["schemas"]["TariffReferenceEnum"];
+            buyer: number;
+            installation_category: string;
+            /** Format: double */
+            cmax: number;
+            cmax_annualized: boolean;
+            /** Format: double */
+            cmax_annualized_value: number;
+            /** Format: double */
+            pap_contracted: number;
+            /** Format: date */
+            signature_date?: string | null;
+            /** Format: date */
+            effective_date?: string | null;
+            /** Format: uri */
+            general_conditions_file?: string | null;
+            /** Format: uri */
+            specific_conditions_file?: string | null;
+            readonly amendments: components["schemas"]["BiomethaneEntityConfigAmendment"][];
+        };
+        BiomethaneEntityConfigAgreementAdd: {
+            tariff_reference: components["schemas"]["TariffReferenceEnum"];
+            buyer: number;
+            installation_category: string;
+            /** Format: double */
+            cmax: number;
+            cmax_annualized: boolean;
+            /** Format: double */
+            cmax_annualized_value: number;
+            /** Format: double */
+            pap_contracted: number;
+        };
+        BiomethaneEntityConfigAgreementAddRequest: {
+            tariff_reference: components["schemas"]["TariffReferenceEnum"];
+            buyer: number;
+            installation_category: string;
+            /** Format: double */
+            cmax: number;
+            cmax_annualized: boolean;
+            /** Format: double */
+            cmax_annualized_value: number;
+            /** Format: double */
+            pap_contracted: number;
+        };
+        BiomethaneEntityConfigAmendment: {
+            readonly id: number;
+            contract: number;
+            /** Format: date */
+            signature_date: string;
+            /** Format: date */
+            effective_date: string;
+        };
         CarbureLotPublic: {
             readonly id: number;
             year: number;
@@ -3239,6 +3342,7 @@ export interface components {
          *     * `Unknown` - Unknown
          *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
          *     * `SAF Trader` - Trader de SAF
+         *     * `Producteur de biométhane` - Producteur de biométhane
          * @enum {string}
          */
         EntityTypeEnum: EntityTypeEnum;
@@ -3718,6 +3822,18 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedBiomethaneEntityConfigAgreementAddRequest: {
+            tariff_reference?: components["schemas"]["TariffReferenceEnum"];
+            buyer?: number;
+            installation_category?: string;
+            /** Format: double */
+            cmax?: number;
+            cmax_annualized?: boolean;
+            /** Format: double */
+            cmax_annualized_value?: number;
+            /** Format: double */
+            pap_contracted?: number;
+        };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
             credited_entity?: number | null;
@@ -4182,6 +4298,14 @@ export interface components {
         StatsResponse: {
             metabase_iframe_url: string;
         };
+        /**
+         * @description * `2011` - 2011
+         *     * `2021` - 2021
+         *     * `2022` - 2022
+         *     * `2023` - 2023
+         * @enum {integer}
+         */
+        TariffReferenceEnum: TariffReferenceEnum;
         ToggleElecRequest: {
             /** @default false */
             has_elec: boolean;
@@ -4731,6 +4855,100 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["UserCreation"];
                 };
+            };
+        };
+    };
+    create_biomethane_entity_config_agreement: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneEntityConfigAgreementAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneEntityConfigAgreementAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneEntityConfigAgreementAddRequest"];
+            };
+        };
+        responses: {
+            /** @description The newly created agreement. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEntityConfigAgreementAdd"];
+                };
+            };
+            /** @description Invalid input data. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_agreement_list_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEntityConfigAgreement"];
+                };
+            };
+        };
+    };
+    patch_biomethane_entity_config_agreement: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigAgreementAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigAgreementAddRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigAgreementAddRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated agreement. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEntityConfigAgreementAdd"];
+                };
+            };
+            /** @description Invalid input data. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -9942,7 +10160,8 @@ export enum EntityTypeEnum {
     Airline = "Compagnie a\u00E9rienne",
     Unknown = "Unknown",
     PowerOrHeatProducer = "Power or Heat Producer",
-    SAF_Trader = "SAF Trader"
+    SAF_Trader = "SAF Trader",
+    Producteur_de_biom_thane = "Producteur de biom\u00E9thane"
 }
 export enum EtsStatusEnum {
     ETS_VALUATION = "ETS_VALUATION",
@@ -10015,6 +10234,12 @@ export enum SiteTypeEnum {
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
     EFCA = "EFCA",
     AIRPORT = "AIRPORT"
+}
+export enum TariffReferenceEnum {
+    Value2011 = 2011,
+    Value2021 = 2021,
+    Value2022 = 2022,
+    Value2023 = 2023
 }
 export enum TransportDocumentTypeEnum {
     DAU = "DAU",
