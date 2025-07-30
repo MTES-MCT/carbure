@@ -111,6 +111,23 @@ class SafTicket(models.Model):
     )
     ets_status = models.CharField(max_length=16, choices=ETS_STATUS, null=True, blank=True)
 
+    origin_lot = models.ForeignKey(
+        "core.CarbureLot",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="linked_saf_ticket",
+    )
+    origin_lot_site = models.ForeignKey(
+        "transactions.Site",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="linked_saf_ticket",
+    )
+
     def generate_carbure_id(self):
         production_country = self.production_country.code_pays if self.production_country else None
         self.carbure_id = "T{period}-{production_country}-{id}".format(
