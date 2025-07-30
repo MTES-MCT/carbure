@@ -1,6 +1,6 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -24,9 +24,7 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneEntityConfigAgreementViewSet(
-    ListModelMixin, CreateModelMixin, GenericViewSet, BiomethaneEntityConfigAgreementMixin
-):
+class BiomethaneEntityConfigAgreementViewSet(CreateModelMixin, GenericViewSet, BiomethaneEntityConfigAgreementMixin):
     queryset = BiomethaneEntityConfigAgreement.objects.none()
     serializer_class = BiomethaneEntityConfigAgreementSerializer
     permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
@@ -46,14 +44,6 @@ class BiomethaneEntityConfigAgreementViewSet(
         if self.action == "create":
             return BiomethaneEntityConfigAgreementAddSerializer
         return super().get_serializer_class()
-
-    def list(self, request, *args, **kwargs):
-        try:
-            agreement = BiomethaneEntityConfigAgreement.objects.get(entity=request.entity)
-            data = BiomethaneEntityConfigAgreementSerializer(agreement).data
-            return Response(data)
-        except BiomethaneEntityConfigAgreement.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @extend_schema(
         operation_id="create_biomethane_entity_config_agreement",
