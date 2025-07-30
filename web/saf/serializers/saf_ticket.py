@@ -6,6 +6,8 @@ from core.serializers import AirportSerializer, EntityPreviewSerializer, Product
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket
 from saf.models.saf_ticket_source import SafTicketSource
+from saf.serializers.saf_ticket_source import SafParentLotSerializer
+from saf.serializers.schema import SiteSerializer
 
 
 class SafRelatedTicketSourceSerializer(serializers.ModelSerializer):
@@ -71,6 +73,8 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_ticket_source = SafRelatedTicketSourceSerializer(read_only=True)
     child_ticket_sources = serializers.SerializerMethodField()
+    origin_lot = SafParentLotSerializer(required=False)
+    origin_lot_site = SiteSerializer(required=False)
 
     class Meta:
         model = SafTicket
@@ -96,6 +100,8 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
             "parent_ticket_source",
             "shipping_method",
             "child_ticket_sources",
+            "origin_lot",
+            "origin_lot_site",
         ]
 
     @extend_schema_field(SafRelatedTicketSourceSerializer(many=True))

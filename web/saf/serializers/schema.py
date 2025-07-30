@@ -11,3 +11,8 @@ class YearSerializer(serializers.Serializer):
 
 class CommentSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False)
+
+
+class SiteSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
