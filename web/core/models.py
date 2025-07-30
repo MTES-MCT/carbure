@@ -52,6 +52,7 @@ class Entity(models.Model):
     CPO = "Charge Point Operator"
     POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
     SAF_TRADER = "SAF Trader"
+    BIOMETHANE_PRODUCER = "Producteur de biométhane"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -64,6 +65,7 @@ class Entity(models.Model):
         (UNKNOWN, "Unknown"),
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
         (SAF_TRADER, "Trader de SAF"),
+        (BIOMETHANE_PRODUCER, "Producteur de biométhane"),
     )
     UNIT_CHOICE = (("l", "litres"), ("kg", "kg"), ("MJ", "MJ"))
 
