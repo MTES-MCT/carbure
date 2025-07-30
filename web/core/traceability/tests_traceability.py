@@ -16,6 +16,7 @@ from transactions.factories import (
     CarbureStockFactory,
     CarbureStockTransformFactory,
 )
+from transactions.models.site import Site
 
 
 class TraceabilityTest(TestCase):
@@ -352,3 +353,67 @@ class TraceabilityTest(TestCase):
     def test_traceability_ticket_source_volume_check(self):
         # @TODO check that a stock with not enough volume throws an error
         pass
+
+    def test_traceability_saf_ticket_origin(self):
+        site = Site.objects.first()
+
+        random_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            added_by=self.entity2,
+            carbure_client=self.entity,
+            esca=10,
+        )
+
+        lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            added_by=self.entity2,
+            carbure_client=self.entity,
+            carbure_delivery_site=site,
+            esca=10,
+        )
+
+        ticket_source_1 = SafTicketSourceFactory.create(
+            parent_lot=lot,
+            added_by=self.entity,
+        )
+
+        ticket_1 = SafTicketFactory.create(
+            supplier=self.entity,
+            client=self.entity2,
+            parent_ticket_source=ticket_source_1,
+        )
+
+        ticket_source_2 = SafTicketSourceFactory.create(
+            parent_ticket=ticket_1,
+            added_by=self.entity2,
+        )
+
+        _ticket_2 = SafTicketFactory.create(
+            supplier=self.entity2,
+            client=self.entity,
+            parent_ticket_source=ticket_source_2,
+        )
+
+        root_node = LotNode(lot)
+
+        root_node.propagate()
+        ticket_source_1_node = root_node.children[0]
+        ticket_1_node = ticket_source_1_node.children[0]
+        ticket_source_2_node = ticket_1_node.children[0]
+        ticket_2_node = ticket_source_2_node.children[0]
+
+        assert ticket_source_1_node.type == Node.TICKET_SOURCE
+        assert ticket_1_node.type == Node.TICKET
+        assert ticket_source_2_node.type == Node.TICKET_SOURCE
+        assert ticket_2_node.type == Node.TICKET
+
+        assert root_node.data.carbure_delivery_site == site
+        assert ticket_source_1_node.data.origin_lot == lot
+        assert ticket_source_1_node.data.origin_lot_site == site
+        assert ticket_1_node.data.origin_lot == lot
+        assert ticket_1_node.data.origin_lot_site == site
+        assert ticket_source_2_node.data.origin_lot == lot
+        assert ticket_source_2_node.data.origin_lot_site == site
+        assert ticket_2_node.data.origin_lot != random_lot
+        assert ticket_2_node.data.origin_lot == lot
+        assert ticket_2_node.data.origin_lot_site == site

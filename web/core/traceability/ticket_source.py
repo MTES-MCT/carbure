@@ -21,6 +21,8 @@ class TicketSourceNode(Node):
         "production_country": True,
         "production_site_commissioning_date": True,
         "ghg_total": True,
+        "id": "origin_lot_id",
+        "carbure_delivery_site": "origin_lot_site",
         **GHG_FIELDS,
     }
 
@@ -40,6 +42,8 @@ class TicketSourceNode(Node):
         "ghg_total": True,
         "ghg_reference": True,
         "ghg_reduction": True,
+        "origin_lot": True,
+        "origin_lot_site": True,
         **GHG_FIELDS,
     }
 
