@@ -3,11 +3,23 @@ from rest_framework import serializers
 from biomethane.models import BiomethaneEntityConfigAgreement, BiomethaneEntityConfigAmendment
 
 
+class BiomethaneEntityConfigAmendmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiomethaneEntityConfigAmendment
+        fields = [
+            "id",
+            "contract",
+            "signature_date",
+            "effective_date",
+        ]
+
+
 class BiomethaneEntityConfigAgreementSerializer(serializers.ModelSerializer):
+    amendments = BiomethaneEntityConfigAmendmentSerializer(many=True, read_only=True)
+
     class Meta:
         model = BiomethaneEntityConfigAgreement
         fields = [
-            "entity",
             "tariff_reference",
             "buyer",
             "installation_category",
@@ -19,16 +31,5 @@ class BiomethaneEntityConfigAgreementSerializer(serializers.ModelSerializer):
             "effective_date",
             "general_conditions_file",
             "specific_conditions_file",
-        ]
-
-
-class BiomethaneEntityConfigAmendmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BiomethaneEntityConfigAmendment
-        fields = [
-            "id",
-            "contract",
-            "signature_date",
-            "effective_date",
-            "amendment_object",
+            "amendments",
         ]
