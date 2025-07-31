@@ -4,10 +4,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from biomethane.models.biomethane_entity_config_agreement import BiomethaneEntityConfigAgreement
-from biomethane.serializers.entity_config_agreement.list import BiomethaneEntityConfigAgreementSerializer
+from biomethane.serializers.entity_config_agreement.retrieve import BiomethaneEntityConfigAgreementSerializer
 
 
-class BiomethaneEntityConfigAgreementListMixin:
+class BiomethaneEntityConfigAgreementRetrieveMixin:
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -19,8 +19,8 @@ class BiomethaneEntityConfigAgreementListMixin:
             ),
         ]
     )
-    @action(detail=False, methods=["get"], url_path="list")
-    def list_agreement(self, request, *args, **kwargs):
+    @action(detail=False, methods=["get"], url_path="agreement")
+    def get_agreement(self, request, *args, **kwargs):
         try:
             agreement = BiomethaneEntityConfigAgreement.objects.get(entity=request.entity)
             data = BiomethaneEntityConfigAgreementSerializer(agreement).data
