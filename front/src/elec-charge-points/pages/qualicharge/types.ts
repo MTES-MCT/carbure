@@ -5,7 +5,7 @@ import {
 import { CBQueryParams } from "common/hooks/query-builder-2"
 import { apiTypes, QueryParams } from "common/services/api-fetch.types"
 
-export { QualichargeFilter, QualichargeValidatedBy }
+export { QualichargeValidatedBy, QualichargeFilter }
 
 export type ElecDataQualichargeOverview =
   apiTypes["ElecProvisionCertificateQualicharge"]
