@@ -1,12 +1,7 @@
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import {
-  getQualichargeData,
-  getQualichargeFilters,
-  getYears,
-  validateQualichargeVolumes,
-} from "./api"
+import { getQualichargeData, getYears, validateQualichargeVolumes } from "./api"
 import { Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useState } from "react"
@@ -21,17 +16,16 @@ import {
   QualichargeValidatedBy,
   QualichargeFilter,
 } from "./types"
-import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
 import { Pagination } from "common/components/pagination2"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder-2"
-import { Confirm } from "common/components/dialog2"
 import { usePortal } from "common/components/portal"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { useQualichargeColumns } from "./qualicharge.hooks"
+import { useGetFilterOptions, useQualichargeColumns } from "./qualicharge.hooks"
+import { ValidateDataDialog } from "./components/validate-data-dialog"
 
 export const useStatus = () => {
   const match = useMatch(
@@ -42,21 +36,22 @@ export const useStatus = () => {
 
 export const Qualicharge = () => {
   const { t } = useTranslation()
-  const columns = useQualichargeColumns()
+  const status = useStatus()
+  const notify = useNotify()
+  const columns = useQualichargeColumns(status)
   const portal = usePortal()
   const years = useYears("/qualicharge", getYears)
-  const [tab, setTab] = useState(QualichargeTab.PENDING)
-
+  const [tab, setTab] = useState(status)
   const entity = useEntity()
+
   const { isAdmin, isCPO } = entity
   const validator = isAdmin
     ? QualichargeValidatedBy.DGEC
     : isCPO
       ? QualichargeValidatedBy.CPO
       : undefined
-  const status = useStatus()
+
   const canValidate = status === QualichargeTab.PENDING
-  const notify = useNotify()
 
   const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
 
@@ -66,6 +61,7 @@ export const Qualicharge = () => {
     key: "qualicharge-data-not-validated",
     params: [query],
   })
+  const getFilterOptions = useGetFilterOptions(query)
 
   const validateVolumes = useMutation(validateQualichargeVolumes, {
     invalidates: ["qualicharge-data-not-validated"],
@@ -86,11 +82,10 @@ export const Qualicharge = () => {
     }
   }
 
-  const getFilterOptions = (filter: string) =>
-    getQualichargeFilters(query, filter as QualichargeFilter)
-
   const filterLabels = {
-    [QualichargeFilter.validated_by]: t("Statut"),
+    ...(status === QualichargeTab.PENDING && {
+      [QualichargeFilter.validated_by]: t("Statut"),
+    }),
     [QualichargeFilter.operating_unit]: t("Unité d'exploitation"),
     [QualichargeFilter.station_id]: t("Identifiant station"),
     [QualichargeFilter.date_from]: t("Début de la mesure"),
@@ -106,28 +101,8 @@ export const Qualicharge = () => {
       0
     )
     portal((close) => (
-      <Confirm
-        title={t("Confirmer votre action")}
-        description={
-          <>
-            <p>
-              {t(
-                "Êtes-vous sûr de valider l’ensemble des données Qualicharge sélectionnées ?"
-              )}
-            </p>
-            <p>
-              {t(
-                "Votre compte sera crédité de certificats ENR à hauteur de {{volume}} MWH, une fois la validation DGEC effectuée.",
-                {
-                  volume,
-                }
-              )}
-            </p>
-          </>
-        }
-        confirm={t("Valider")}
-        icon="ri-check-line"
-        variant="primary"
+      <ValidateDataDialog
+        volume={volume}
         onConfirm={() => Promise.resolve(handleValidateVolumes())}
         onClose={close}
       />
@@ -184,7 +159,6 @@ export const Qualicharge = () => {
                 <>
                   <Table
                     rows={result?.data?.results ?? []}
-                    //onAction={}
                     columns={columns}
                     loading={loading}
                     hasSelectionColumn={canValidate}
@@ -195,20 +169,20 @@ export const Qualicharge = () => {
                       count: state.selection.length,
                     })}
                     topActions={[
-                      <Button
+                      <Table.TopActionsButton
                         priority="tertiary no outline"
                         iconId="ri-send-plane-line"
                         onClick={openModal}
+                        colorVariant="success"
                         disabled={
                           state.selection.length === 0 ||
                           validateVolumes.loading
                         }
-                        key="validate-volumes"
                       >
                         {validateVolumes.loading
                           ? t("Validation en cours...")
                           : t("Valider")}
-                      </Button>,
+                      </Table.TopActionsButton>,
                     ]}
                   />
                   <Pagination
