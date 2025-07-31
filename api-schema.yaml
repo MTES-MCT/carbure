@@ -12406,6 +12406,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+        total_quantity:
+          type: number
     PaginatedElecTransferCertificateList:
       type: object
       required:

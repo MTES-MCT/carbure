@@ -26,6 +26,10 @@ import { usePortal } from "common/components/portal"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useGetFilterOptions, useQualichargeColumns } from "./qualicharge.hooks"
 import { ValidateDataDialog } from "./components/validate-data-dialog"
+import { RecapQuantity } from "common/molecules/recap-quantity"
+import { formatNumber } from "common/utils/formatters"
+import { Notice } from "common/components/notice"
+import { useRoutes } from "common/hooks/routes"
 
 export const useStatus = () => {
   const match = useMatch(
@@ -43,6 +47,7 @@ export const Qualicharge = () => {
   const years = useYears("/qualicharge", getYears)
   const [tab, setTab] = useState(status)
   const entity = useEntity()
+  const routes = useRoutes()
 
   const { isAdmin, isCPO } = entity
   const validator = isAdmin
@@ -157,6 +162,26 @@ export const Qualicharge = () => {
                 <NoResult />
               ) : (
                 <>
+                  <Notice
+                    linkHref={routes.CONTACT}
+                    linkText="ici."
+                    icon="ri-error-warning-line"
+                    isClosable
+                  >
+                    En cas de données inexactes, veuillez contacter notre
+                    administrateur DGEC
+                  </Notice>
+                  <RecapQuantity
+                    text={t(
+                      "{{count}} volumes pour un total de {{total}} MWh",
+                      {
+                        count: result?.data?.count,
+                        total: formatNumber(result?.data?.total_quantity ?? 0, {
+                          fractionDigits: 0,
+                        }),
+                      }
+                    )}
+                  />
                   <Table
                     rows={result?.data?.results ?? []}
                     columns={columns}

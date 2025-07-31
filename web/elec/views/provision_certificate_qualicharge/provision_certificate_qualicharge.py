@@ -3,12 +3,24 @@ from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from web.core.pagination import MetadataPageNumberPagination
 
 from elec.filters import ProvisionCertificateQualichargeFilter
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ElecProvisionCertificateQualichargeSerializer
 
 from .mixins import ActionMixin
+
+
+class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination):
+    aggregate_fields = {"total_quantity": 0}
+
+    def get_extra_metadata(self):
+        metadata = {"total_quantity": 0}
+
+        for qualichargeData in self.queryset:
+            metadata["total_quantity"] += qualichargeData.energy_amount
+        return metadata
 
 
 @extend_schema(
@@ -27,6 +39,7 @@ class ElecProvisionCertificateQualichargeViewSet(mixins.ListModelMixin, ActionMi
     serializer_class = ElecProvisionCertificateQualichargeSerializer
     filterset_class = ProvisionCertificateQualichargeFilter
     http_method_names = ["get", "post"]
+    pagination_class = ElecProvisionCertificateQualichargePagination
 
     def initialize_request(self, request, *args, **kwargs):
         if request.method == "POST" and request.path.endswith("bulk-create/"):  # Not found better way to check this

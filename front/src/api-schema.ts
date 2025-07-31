@@ -3789,6 +3789,7 @@ export interface components {
        */
       previous?: string | null
       results: components["schemas"]["ElecProvisionCertificateQualicharge"][]
+      total_quantity?: number
     }
     PaginatedElecTransferCertificateList: {
       /** @example 123 */
