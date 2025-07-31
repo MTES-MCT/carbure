@@ -1,6 +1,7 @@
+from .create import BiomethaneEntityConfigAgreementCreateMixin
 from .patch import BiomethaneEntityConfigAgreementPatchMixin
-from .list import BiomethaneEntityConfigAgreementListMixin
+from .retrieve import BiomethaneEntityConfigAgreementRetrieveMixin
 
 
-class BiomethaneEntityConfigAgreementMixin(BiomethaneEntityConfigAgreementPatchMixin, BiomethaneEntityConfigAgreementListMixin):
+class BiomethaneEntityConfigAgreementMixin(BiomethaneEntityConfigAgreementPatchMixin, BiomethaneEntityConfigAgreementRetrieveMixin, BiomethaneEntityConfigAgreementCreateMixin):
     pass
