@@ -5686,9 +5686,10 @@ export interface operations {
   }
   elec_provision_certificates_qualicharge_list: {
     parameters: {
-      query?: {
+      query: {
         date_from?: string
-        entity_id?: number
+        /** @description Authorised entity ID. */
+        entity_id: number
         not_validated?: boolean
         /** @description Les valeurs multiples doivent être séparées par des virgules. */
         operating_unit?: string[]
@@ -5727,7 +5728,10 @@ export interface operations {
   }
   bulk_create_provision_certificates_qualicharge: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -5753,7 +5757,10 @@ export interface operations {
   }
   bulk_update_provision_certificates_qualicharge: {
     parameters: {
-      query?: never
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
       header?: never
       path?: never
       cookie?: never
@@ -5781,7 +5788,8 @@ export interface operations {
     parameters: {
       query: {
         date_from?: string
-        entity_id?: number
+        /** @description Authorised entity ID. */
+        entity_id: number
         /** @description Filter string to apply */
         filter: PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter
         not_validated?: boolean

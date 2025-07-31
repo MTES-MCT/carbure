@@ -1,25 +1,26 @@
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getQualichargeData, getYears, validateQualichargeVolumes } from "./api"
+import {
+  getQualichargeData,
+  getQualichargeFilters,
+  getYears,
+  validateQualichargeVolumes,
+} from "./api"
 import { Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Tabs } from "common/components/tabs2"
-import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom"
-import { use } from "i18next"
+import { Navigate, Route, Routes, useMatch } from "react-router-dom"
 import { useQuery, useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { NoResult } from "common/components/no-result2"
-import { Cell, Column, Table } from "common/components/table2"
+import { Table } from "common/components/table2"
 import {
-  ElecDataQualichargeOverview,
   QualichargeTab,
   QualichargeValidatedBy,
   QualichargeFilter,
-  QualichargeQuery,
 } from "./types"
-import { formatDate } from "common/utils/formatters"
 import { Button } from "common/components/button2"
 import { useNotify } from "common/components/notifications"
 import { Pagination } from "common/components/pagination2"
@@ -29,40 +30,8 @@ import {
 } from "common/hooks/query-builder-2"
 import { Confirm } from "common/components/dialog2"
 import { usePortal } from "common/components/portal"
-import { QualichargeBadge } from "elec-charge-points/components/qualicharge/qualicharge-badge"
-import { api } from "common/services/api-fetch"
-
-export const useQualichargeColumns = () => {
-  const { t } = useTranslation()
-  const columns: Column<ElecDataQualichargeOverview>[] = [
-    {
-      header: t("Statut"),
-      cell: (data) => <QualichargeBadge status={data.validated_by} />,
-    },
-    {
-      header: t("Unité d'exploitation"),
-      cell: (data) => <Cell text={data.operating_unit} />,
-    },
-    {
-      header: t("Station ID"),
-      cell: (data) => <Cell text={data.station_id} />,
-    },
-    {
-      header: t("Début de la mesure"),
-      cell: (data) => <Cell text={formatDate(data.date_from)} />,
-    },
-    {
-      header: t("Fin de la mesure"),
-      cell: (data) => <Cell text={formatDate(data.date_to)} />,
-    },
-    {
-      header: t("Energie (MWh)"),
-      cell: (data) => <Cell text={data.energy_amount} />,
-    },
-  ]
-
-  return columns
-}
+import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
+import { useQualichargeColumns } from "./qualicharge.hooks"
 
 export const useStatus = () => {
   const match = useMatch(
@@ -98,44 +67,33 @@ export const Qualicharge = () => {
     params: [query],
   })
 
-  const useGetFilterOptions = (query: QualichargeQuery) => {
-    const getFilterOptions = async (filter: string) => {
-      const { data } = await api.getBalanceFilters(
-        query,
-        filter as BalancesFilter
-      )
-
-      if (!data) {
-        return []
-      }
-
-      if (filter === BalancesFilter.sector) {
-        return data?.map(normalizeSector)
-      }
-
-      return data
-    }
-
-    return getFilterOptions
-  }
-
-  const getFilterOptions = useGetFilterOptions(query)
-
   const validateVolumes = useMutation(validateQualichargeVolumes, {
     invalidates: ["qualicharge-data-not-validated"],
     onSuccess: () => {
-      ;(actions.setSelection([]),
-        notify(t("Les volumes ont été validés avec succès."), {
-          variant: "success",
-        }))
+      actions.setSelection([])
+      notify(t("Les volumes ont été validés avec succès."), {
+        variant: "success",
+      })
     },
   })
 
   const handleValidateVolumes = () => {
     if (state.selection.length > 0) {
       const certificateIds = state.selection
-      validator ? validateVolumes.execute(certificateIds, validator) : null
+      if (validator) {
+        validateVolumes.execute(entity.id, certificateIds, validator)
+      }
     }
+  }
+
+  const getFilterOptions = (filter: string) =>
+    getQualichargeFilters(query, filter as QualichargeFilter)
+
+  const filterLabels = {
+    [QualichargeFilter.validated_by]: t("Statut"),
+    [QualichargeFilter.operating_unit]: t("Unité d'exploitation"),
+    [QualichargeFilter.station_id]: t("Identifiant station"),
+    [QualichargeFilter.date_from]: t("Début de la mesure"),
   }
 
   const openModal = () => {
@@ -210,6 +168,12 @@ export const Qualicharge = () => {
         ]}
       />
       <Content>
+        <FilterMultiSelect2
+          filterLabels={filterLabels}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilterOptions={getFilterOptions}
+        />
         <Routes>
           <Route
             path="/:status"

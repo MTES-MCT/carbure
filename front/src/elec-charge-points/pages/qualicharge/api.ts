@@ -1,13 +1,10 @@
 import { api } from "common/services/api-fetch"
-import { QueryParams } from "common/services/api-fetch.types"
 import {
   QualichargeFilter,
   QualichargeTab,
   QualichargeValidatedBy,
   QualichargeQuery,
 } from "./types"
-import { CBQueryParams } from "common/hooks/query-builder-2"
-
 export function getYears(entity_id: number) {
   return api
     .GET("/elec/provision-certificates-qualicharge/filters/", {
@@ -24,12 +21,26 @@ export function getYears(entity_id: number) {
     }))
 }
 
-export function getQualichargeFilters(query: QualichargeQuery) {}
+export function getQualichargeFilters(
+  query: QualichargeQuery,
+  filter: QualichargeFilter
+) {
+  return api
+    .GET("/elec/provision-certificates-qualicharge/filters/", {
+      params: {
+        query: {
+          ...query,
+          filter,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
+}
 export function getQualichargeData(query: QualichargeQuery) {
   const query2 =
     query.status === QualichargeTab.PENDING
       ? { not_validated: true }
-      : { validated_by: QualichargeValidatedBy.BOTH }
+      : { validated_by: [QualichargeValidatedBy.BOTH] }
 
   return api.GET("/elec/provision-certificates-qualicharge/", {
     params: {
@@ -42,10 +53,16 @@ export function getQualichargeData(query: QualichargeQuery) {
 }
 
 export function validateQualichargeVolumes(
+  entity_id: number,
   certificate_ids: number[],
   validated_by: QualichargeValidatedBy
 ) {
   return api.POST("/elec/provision-certificates-qualicharge/bulk-update/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
     body: {
       certificate_ids,
       validated_by,

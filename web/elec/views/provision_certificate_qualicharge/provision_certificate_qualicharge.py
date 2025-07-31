@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import HasAPIKey
@@ -10,6 +11,17 @@ from elec.serializers.elec_provision_certificate_qualicharge import ElecProvisio
 from .mixins import ActionMixin
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
 class ElecProvisionCertificateQualichargeViewSet(mixins.ListModelMixin, ActionMixin, viewsets.GenericViewSet):
     queryset = ElecProvisionCertificateQualicharge.objects.all()
     serializer_class = ElecProvisionCertificateQualichargeSerializer
