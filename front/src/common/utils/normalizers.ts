@@ -58,6 +58,7 @@ export const normalizeEntityPreview: Normalizer<EntityPreview> = (entity) => ({
     id: entity.id,
     name: entity.name,
     entity_type: entity.entity_type,
+    registration_id: entity.registration_id,
   },
 })
 

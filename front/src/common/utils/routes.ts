@@ -74,6 +74,7 @@ export const ROUTE_URLS = {
           "/charge-points/meter-readings"
         ),
         LIST: urlWithOrgId(entity_id, "/charge-points/list"),
+        QUALICHARGE: urlWithOrgId(entity_id, "/charge-points/qualicharge"),
       },
     }
   },

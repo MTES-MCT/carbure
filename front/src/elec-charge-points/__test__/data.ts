@@ -29,6 +29,7 @@ export const elecProvisionCertificateCPOPreview: EntityPreview = {
   id: 10,
   name: "Producteur Test MTES",
   entity_type: EntityType.Producer,
+  registration_id: "",
 }
 
 //CHARGE POINTS

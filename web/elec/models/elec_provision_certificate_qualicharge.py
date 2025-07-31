@@ -3,13 +3,13 @@ from django.db import models
 
 class ElecProvisionCertificateQualicharge(models.Model):
     DGEC = "DGEC"
-    AMENAGEUR = "AMENAGEUR"
+    CPO = "CPO"
     BOTH = "BOTH"
     NO_ONE = "NO_ONE"
     VALIDATION_CHOICES = (
         (NO_ONE, NO_ONE),
         (DGEC, DGEC),
-        (AMENAGEUR, AMENAGEUR),
+        (CPO, CPO),
         (BOTH, BOTH),
     )
 

@@ -48,7 +48,7 @@ class BulkUpdateMixin:
                 qualicharge_certificates = qualicharge_certificates.exclude(id=q_certificate.id)
 
         with transaction.atomic():
-            AMENAGEUR = ElecProvisionCertificateQualicharge.AMENAGEUR
+            CPO = ElecProvisionCertificateQualicharge.CPO
             DGEC = ElecProvisionCertificateQualicharge.DGEC
             BOTH = ElecProvisionCertificateQualicharge.BOTH
             NO_ONE = ElecProvisionCertificateQualicharge.NO_ONE
@@ -56,9 +56,9 @@ class BulkUpdateMixin:
             qualicharge_certificates.filter(validated_by=NO_ONE).update(validated_by=validated_by)
 
             if validated_by == DGEC:
-                qualicharge_certificates.filter(validated_by=AMENAGEUR).update(validated_by=BOTH)
+                qualicharge_certificates.filter(validated_by=CPO).update(validated_by=BOTH)
 
-            elif validated_by == AMENAGEUR:
+            elif validated_by == CPO:
                 qualicharge_certificates.filter(validated_by=DGEC).update(validated_by=BOTH)
 
             self._create_provision_certificates_from_qualicharge(qualicharge_certificates)

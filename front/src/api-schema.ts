@@ -559,6 +559,73 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec/provision-certificates-qualicharge/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_qualicharge_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/bulk-create/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Create multiple provision certificates in bulk (from Qualicharge) */
+    post: operations["bulk_create_provision_certificates_qualicharge"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/bulk-update/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Update multiple provision certificates in bulk (from Qualicharge) */
+    post: operations["bulk_update_provision_certificates_qualicharge"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve content of a specific filter */
+    get: operations["filter_provision_certificates_qualicharge"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec/provision-certificates/{id}/": {
     parameters: {
       query?: never
@@ -3076,6 +3143,25 @@ export interface components {
       energy_amount: number
       /** Format: double */
       remaining_energy_amount: number
+      /** Format: date-time */
+      readonly created_at: string | null
+    }
+    ElecProvisionCertificateQualicharge: {
+      readonly id: number
+      /** Format: date */
+      date_from: string
+      /** Format: date */
+      date_to: string
+      year: number
+      operating_unit: string
+      station_id: string
+      /** Format: double */
+      energy_amount: number
+      is_controlled_by_qualicharge?: boolean
+      validated_by?: components["schemas"]["ValidatedByEnum"]
+      /** Format: date-time */
+      readonly created_at: string | null
+      cpo: number
     }
     ElecTransferAcceptRequest: {
       used_in_tiruert: string
@@ -3689,6 +3775,21 @@ export interface components {
       results: components["schemas"]["ElecProvisionCertificate"][]
       available_energy?: number
     }
+    PaginatedElecProvisionCertificateQualichargeList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecProvisionCertificateQualicharge"][]
+    }
     PaginatedElecTransferCertificateList: {
       /** @example 123 */
       count: number
@@ -3847,6 +3948,15 @@ export interface components {
       eligible_dc: boolean
       dc_reference?: string
       created_by?: number | null
+    }
+    ProvisionCertificateBulkRequest: {
+      entity: string
+      siren: string
+      operational_units: components["schemas"]["OperationalUnitRequest"][]
+    }
+    ProvisionCertificateUpdateBulkRequest: {
+      certificate_ids: number[]
+      validated_by: components["schemas"]["ValidatedByEnum"]
     }
     /**
      * @description * `1` - T1
@@ -4230,6 +4340,12 @@ export interface components {
      * @enum {string}
      */
     SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource
+    StationRequest: {
+      id: string
+      /** Format: double */
+      energy: number
+      is_controlled: boolean
+    }
     StatsResponse: {
       metabase_iframe_url: string
     }
@@ -4435,8 +4551,9 @@ export interface components {
       requests: components["schemas"]["UserRightsRequests"][]
     }
     /**
-     * @description * `DGEC` - DGEC
-     *     * `AMENAGEUR` - AMENAGEUR
+     * @description * `NO_ONE` - NO_ONE
+     *     * `DGEC` - DGEC
+     *     * `CPO` - CPO
      *     * `BOTH` - BOTH
      * @enum {string}
      */
@@ -5563,6 +5680,138 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["PaginatedElecProvisionCertificateList"]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_qualicharge_list: {
+    parameters: {
+      query?: {
+        date_from?: string
+        entity_id?: number
+        not_validated?: boolean
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        station_id?: string[]
+        /** @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH */
+        validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[]
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeList"]
+        }
+      }
+    }
+  }
+  bulk_create_provision_certificates_qualicharge: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProvisionCertificateBulkRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ProvisionCertificateBulkRequest"]
+        "multipart/form-data": components["schemas"]["ProvisionCertificateBulkRequest"]
+      }
+    }
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  bulk_update_provision_certificates_qualicharge: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProvisionCertificateUpdateBulkRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ProvisionCertificateUpdateBulkRequest"]
+        "multipart/form-data": components["schemas"]["ProvisionCertificateUpdateBulkRequest"]
+      }
+    }
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  filter_provision_certificates_qualicharge: {
+    parameters: {
+      query: {
+        date_from?: string
+        entity_id?: number
+        /** @description Filter string to apply */
+        filter: PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter
+        not_validated?: boolean
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        station_id?: string[]
+        /** @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH */
+        validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[]
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
         }
       }
     }
@@ -9914,6 +10163,20 @@ export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
   MANUAL = "MANUAL",
   METER_READINGS = "METER_READINGS",
   QUALICHARGE = "QUALICHARGE",
+}
+export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by {
+  BOTH = "BOTH",
+  CPO = "CPO",
+  DGEC = "DGEC",
+  NO_ONE = "NO_ONE",
+}
+export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter {
+  date_from = "date_from",
+  entity_id = "entity_id",
+  operating_unit = "operating_unit",
+  station_id = "station_id",
+  validated_by = "validated_by",
+  year = "year",
 }
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
   ValueMinuscertificate_id = "-certificate_id",
