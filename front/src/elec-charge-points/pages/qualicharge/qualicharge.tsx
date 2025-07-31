@@ -1,21 +1,17 @@
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getQualichargeData, getYears, validateQualichargeVolumes } from "./api"
+import { getQualichargeData, getYears } from "./api"
 import { Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useState } from "react"
 import { Tabs } from "common/components/tabs2"
 import { Navigate, Route, Routes, useMatch } from "react-router-dom"
-import { useQuery, useMutation } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { NoResult } from "common/components/no-result2"
 import { Table } from "common/components/table2"
-import {
-  QualichargeTab,
-  QualichargeValidatedBy,
-  QualichargeFilter,
-} from "./types"
+import { QualichargeTab, QualichargeFilter } from "./types"
 import { useNotify } from "common/components/notifications"
 import { Pagination } from "common/components/pagination2"
 import {
@@ -30,6 +26,9 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatNumber } from "common/utils/formatters"
 import { Notice } from "common/components/notice"
 import { useRoutes } from "common/hooks/routes"
+import HashRoute from "common/components/hash-route"
+import { QualichargeDataDetail } from "./components/qualicharge-data-detail"
+import { useValidateVolumes } from "./hooks/use-validate-volumes"
 
 export const useStatus = () => {
   const match = useMatch(
@@ -49,13 +48,6 @@ export const Qualicharge = () => {
   const entity = useEntity()
   const routes = useRoutes()
 
-  const { isAdmin, isCPO } = entity
-  const validator = isAdmin
-    ? QualichargeValidatedBy.DGEC
-    : isCPO
-      ? QualichargeValidatedBy.CPO
-      : undefined
-
   const canValidate = status === QualichargeTab.PENDING
 
   const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
@@ -63,13 +55,12 @@ export const Qualicharge = () => {
   const query = useCBQueryBuilder(state)
 
   const { result, loading } = useQuery(getQualichargeData, {
-    key: "qualicharge-data-not-validated",
+    key: "qualicharge-data",
     params: [query],
   })
   const getFilterOptions = useGetFilterOptions(query)
 
-  const validateVolumes = useMutation(validateQualichargeVolumes, {
-    invalidates: ["qualicharge-data-not-validated"],
+  const validateVolumes = useValidateVolumes({
     onSuccess: () => {
       actions.setSelection([])
       notify(t("Les volumes ont été validés avec succès."), {
@@ -77,15 +68,6 @@ export const Qualicharge = () => {
       })
     },
   })
-
-  const handleValidateVolumes = () => {
-    if (state.selection.length > 0) {
-      const certificateIds = state.selection
-      if (validator) {
-        validateVolumes.execute(entity.id, certificateIds, validator)
-      }
-    }
-  }
 
   const filterLabels = {
     ...(status === QualichargeTab.PENDING && {
@@ -96,7 +78,7 @@ export const Qualicharge = () => {
     [QualichargeFilter.date_from]: t("Début de la mesure"),
   }
 
-  const openModal = () => {
+  const openValidateDataModal = () => {
     const qualichargeRows =
       result?.data?.results?.filter((qualichargeData) =>
         state.selection.includes(qualichargeData.id)
@@ -108,7 +90,11 @@ export const Qualicharge = () => {
     portal((close) => (
       <ValidateDataDialog
         volume={volume}
-        onConfirm={() => Promise.resolve(handleValidateVolumes())}
+        onConfirm={() =>
+          Promise.resolve(
+            validateVolumes.handleValidateVolumes(state.selection)
+          )
+        }
         onClose={close}
       />
     ))
@@ -193,11 +179,16 @@ export const Qualicharge = () => {
                     selectionText={t("{{count}} volumes sélectionnés", {
                       count: state.selection.length,
                     })}
+                    rowLink={(row) => ({
+                      pathname: location.pathname,
+                      search: location.search,
+                      hash: `data/${row.id}`,
+                    })}
                     topActions={[
                       <Table.TopActionsButton
                         priority="tertiary no outline"
                         iconId="ri-send-plane-line"
-                        onClick={openModal}
+                        onClick={openValidateDataModal}
                         colorVariant="success"
                         disabled={
                           state.selection.length === 0 ||
@@ -223,6 +214,7 @@ export const Qualicharge = () => {
           />
           <Route path="*" element={<Navigate to={QualichargeTab.PENDING} />} />
         </Routes>
+        <HashRoute path="data/:id" element={<QualichargeDataDetail />} />
       </Content>
     </Main>
   )

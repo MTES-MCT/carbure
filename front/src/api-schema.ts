@@ -575,6 +575,22 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec/provision-certificates-qualicharge/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_qualicharge_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec/provision-certificates-qualicharge/bulk-create/": {
     parameters: {
       query?: never
@@ -5723,6 +5739,31 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeList"]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_qualicharge_retrieve: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Fourniture intermédiaire (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecProvisionCertificateQualicharge"]
         }
       }
     }
