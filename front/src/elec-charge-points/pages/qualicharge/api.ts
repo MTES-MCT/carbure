@@ -5,6 +5,16 @@ import {
   QualichargeValidatedBy,
   QualichargeQuery,
 } from "./types"
+
+const getQuery = (query: QualichargeQuery) => {
+  const query2 =
+    query.status === QualichargeTab.PENDING
+      ? { not_validated: true }
+      : { validated_by: [QualichargeValidatedBy.BOTH] }
+
+  return { ...query, ...query2 }
+}
+
 export function getYears(entity_id: number) {
   return api
     .GET("/elec/provision-certificates-qualicharge/filters/", {
@@ -29,7 +39,7 @@ export function getQualichargeFilters(
     .GET("/elec/provision-certificates-qualicharge/filters/", {
       params: {
         query: {
-          ...query,
+          ...getQuery(query),
           filter,
         },
       },
@@ -37,17 +47,9 @@ export function getQualichargeFilters(
     .then((res) => res.data ?? [])
 }
 export function getQualichargeData(query: QualichargeQuery) {
-  const query2 =
-    query.status === QualichargeTab.PENDING
-      ? { not_validated: true }
-      : { validated_by: [QualichargeValidatedBy.BOTH] }
-
   return api.GET("/elec/provision-certificates-qualicharge/", {
     params: {
-      query: {
-        ...query,
-        ...query2,
-      },
+      query: getQuery(query),
     },
   })
 }

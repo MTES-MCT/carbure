@@ -1,6 +1,6 @@
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
-import { formatQualichargeStatus } from "elec-charge-points/pages/qualicharge/formatters"
-import { QualichargeValidatedBy } from "elec-charge-points/pages/qualicharge/types"
+import { formatQualichargeStatus } from "../formatters"
+import { QualichargeValidatedBy } from "../types"
 
 export const QualichargeBadge = ({
   status,

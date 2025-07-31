@@ -10,6 +10,7 @@ import { Text } from "../text"
 import { useTranslation } from "react-i18next"
 import { Checkbox } from "../inputs2"
 import { ReactNode } from "react"
+import { Button, ButtonProps } from "../button2"
 
 export type TableVariant = "spaced" | "compact"
 
@@ -376,4 +377,19 @@ export const Cell = ({
   )
 }
 
+export const TopActionsButton = (
+  props: ButtonProps & { colorVariant: "danger" | "success" }
+) => {
+  return (
+    <Button
+      {...props}
+      className={cl(
+        props.className,
+        props.colorVariant && css[`top-actions__button--${props.colorVariant}`]
+      )}
+    />
+  )
+}
+
+Table.TopActionsButton = TopActionsButton
 export default Table
