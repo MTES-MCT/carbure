@@ -7,6 +7,7 @@ import { ChargePointsSnapshot } from "./types"
 import ElecMeterReadingsSettings from "./pages/meter-readings"
 import ChargePointsList from "./pages/list"
 import ChargePointsApplications from "./pages/applications"
+import { Qualicharge } from "./pages/qualicharge"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -42,6 +43,12 @@ const ChargePoints = () => {
         />
 
         <Route path="applications" element={<ChargePointsApplications />} />
+
+        <Route
+          path="qualicharge"
+          element={<Navigate replace to={`${currentYear}`} />}
+        />
+        <Route path="qualicharge/:year/*" element={<Qualicharge />} />
 
         <Route path="*" element={<Navigate replace to="applications" />} />
       </Routes>

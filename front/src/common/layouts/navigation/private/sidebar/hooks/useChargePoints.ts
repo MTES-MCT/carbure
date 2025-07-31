@@ -11,6 +11,8 @@ import {
   ClipboardLine,
   FileTextFill,
   FileTextLine,
+  HomeFill,
+  HomeLine,
   TodoFill,
   TodoLine,
 } from "common/components/icon/icon"
@@ -40,9 +42,14 @@ export const useChargePoints = (params?: ChargePointsParams) => {
       {
         path: routes.ELEC().CHARGE_POINTS.METER_READINGS,
         title: t("Relevés trimestriels"),
-
         icon: CalendarCheckLine,
         iconActive: CalendarCheckFill,
+      },
+      {
+        path: routes.ELEC().CHARGE_POINTS.QUALICHARGE,
+        title: t("Données Qualicharge"),
+        icon: HomeLine,
+        iconActive: HomeFill,
       },
       {
         path: routes.ELEC().CHARGE_POINTS.LIST,
