@@ -377,15 +377,16 @@ export const Cell = ({
   )
 }
 
-export const TopActionsButton = (
-  props: ButtonProps & { colorVariant: "danger" | "success" }
-) => {
+export const TopActionsButton = ({
+  colorVariant,
+  ...props
+}: ButtonProps & { colorVariant: "danger" | "success" }) => {
   return (
     <Button
       {...props}
       className={cl(
         props.className,
-        props.colorVariant && css[`top-actions__button--${props.colorVariant}`]
+        colorVariant && css[`top-actions__button--${colorVariant}`]
       )}
     />
   )

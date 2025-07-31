@@ -1806,6 +1806,35 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeList"
           description: ""
+  /api/elec/provision-certificates-qualicharge/{id}/:
+    get:
+      operationId: elec_provision_certificates_qualicharge_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Fourniture
+            intermédiaire (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+          description: ""
   /api/elec/provision-certificates-qualicharge/bulk-create/:
     post:
       operationId: bulk_create_provision_certificates_qualicharge

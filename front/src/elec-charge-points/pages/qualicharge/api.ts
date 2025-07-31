@@ -54,6 +54,17 @@ export function getQualichargeData(query: QualichargeQuery) {
   })
 }
 
+export function getQualichargeDataDetail(id: number, entity_id: number) {
+  return api.GET(`/elec/provision-certificates-qualicharge/{id}/`, {
+    params: {
+      query: {
+        entity_id,
+      },
+      path: { id },
+    },
+  })
+}
+
 export function validateQualichargeVolumes(
   entity_id: number,
   certificate_ids: number[],
