@@ -153,27 +153,27 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
   )
 }
 
-const RECEIVED_FILTERS = [
-  SafFilter.Suppliers,
+const TICKET_FILTERS = [
   SafFilter.Periods,
   SafFilter.Feedstocks,
   SafFilter.CountriesOfOrigin,
   SafFilter.ProductionSites,
   SafFilter.ConsumptionTypes,
   SafFilter.Airport,
+]
+
+const RECEIVED_FILTERS = [
+  SafFilter.Suppliers, //
+  ...TICKET_FILTERS,
 ]
 
 const ASSIGNED_FILTERS = [
-  SafFilter.Clients,
-  SafFilter.Periods,
-  SafFilter.Feedstocks,
-  SafFilter.CountriesOfOrigin,
-  SafFilter.ProductionSites,
-  SafFilter.ConsumptionTypes,
-  SafFilter.Airport,
+  SafFilter.Clients, //
+  ...TICKET_FILTERS,
 ]
 
 const ADMIN_FILTERS = [
-  SafFilter.AddedBy, //
-  ...ASSIGNED_FILTERS,
+  SafFilter.Suppliers,
+  SafFilter.Clients,
+  ...TICKET_FILTERS,
 ]

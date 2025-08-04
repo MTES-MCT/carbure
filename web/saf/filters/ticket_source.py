@@ -19,7 +19,7 @@ class TicketSourceFilter(django_filters.FilterSet):
     period = django_filters.AllValuesMultipleFilter(field_name="delivery_period")
     feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
     added_by = django_filters.AllValuesMultipleFilter(field_name="added_by__name")
-    clients = django_filters.AllValuesMultipleFilter(field_name="saf_tickets__client__name")
+    client = django_filters.AllValuesMultipleFilter(field_name="saf_tickets__client__name")
     supplier = django_filters.CharFilter(method="filter_supplier")
     country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
     production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
@@ -71,7 +71,7 @@ class TicketSourceFilter(django_filters.FilterSet):
             "year",
             "period",
             "feedstock",
-            "clients",
+            "client",
             "supplier",
             "country_of_origin",
             "production_site",

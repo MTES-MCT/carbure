@@ -102,7 +102,7 @@ export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
 export enum SafFilter {
   Feedstocks = "feedstock",
   Periods = "period",
-  Clients = "clients",
+  Clients = "client",
   Suppliers = "supplier",
   AddedBy = "added_by",
   Airport = "reception_airport",

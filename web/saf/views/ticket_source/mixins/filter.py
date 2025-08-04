@@ -57,7 +57,7 @@ class FilterActionMixin:
         queryset = filterset.qs
 
         filters = {
-            "clients": "saf_tickets__client__name",
+            "client": "saf_tickets__client__name",
             "period": "delivery_period",
             "feedstock": "feedstock__code",
             "country_of_origin": "country_of_origin__code_pays",
