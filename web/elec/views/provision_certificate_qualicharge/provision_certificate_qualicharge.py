@@ -3,10 +3,12 @@ from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from web.core.pagination import MetadataPageNumberPagination
 
+from core.models import Entity
+from core.pagination import MetadataPageNumberPagination
 from elec.filters import ProvisionCertificateQualichargeFilter
 from elec.models import ElecProvisionCertificateQualicharge
+from elec.permissions import HasCpoRights, HasElecAdminRights
 from elec.serializers.elec_provision_certificate_qualicharge import ElecProvisionCertificateQualichargeSerializer
 
 from .mixins import ActionMixin
@@ -48,6 +50,15 @@ class ElecProvisionCertificateQualichargeViewSet(
             self.authentication_classes = [JWTAuthentication]
             self.permission_classes = [HasAPIKey & IsAuthenticated]
         else:
-            self.permission_classes = [IsAuthenticated]
+            self.permission_classes = [IsAuthenticated, HasCpoRights | HasElecAdminRights]
 
         return super().initialize_request(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        entity = self.request.entity
+
+        if entity.entity_type == Entity.entity_type == Entity.CPO:
+            queryset = ElecProvisionCertificateQualicharge.objects.filter(cpo=entity)
+
+        return queryset.select_related("cpo").order_by("id")

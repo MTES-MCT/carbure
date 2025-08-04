@@ -1716,6 +1716,15 @@ paths:
       operationId: elec_provision_certificates_qualicharge_list
       parameters:
         - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
           name: date_from
           schema:
             type: string
@@ -1912,6 +1921,15 @@ paths:
       description: Retrieve content of a specific filter
       parameters:
         - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
           name: date_from
           schema:
             type: string
@@ -1927,8 +1945,8 @@ paths:
           schema:
             type: string
             enum:
+              - cpo
               - date_from
-              - entity_id
               - operating_unit
               - station_id
               - validated_by
@@ -10933,6 +10951,10 @@ components:
         id:
           type: integer
           readOnly: true
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
         date_from:
           type: string
           format: date
@@ -10961,8 +10983,6 @@ components:
           format: date-time
           readOnly: true
           nullable: true
-        cpo:
-          type: integer
       required:
         - cpo
         - created_at

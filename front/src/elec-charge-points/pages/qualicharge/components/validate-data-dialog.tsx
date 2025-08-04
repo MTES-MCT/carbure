@@ -1,4 +1,5 @@
 import { Confirm, ConfirmProps } from "common/components/dialog2"
+import useEntity from "common/hooks/entity"
 import { useTranslation } from "react-i18next"
 
 export type ValidateDataDialogProps = {
@@ -13,7 +14,7 @@ export const ValidateDataDialog = ({
   onClose,
 }: ValidateDataDialogProps) => {
   const { t } = useTranslation()
-
+  const entity = useEntity()
   return (
     <Confirm
       title={t("Confirmer votre action")}
@@ -24,14 +25,16 @@ export const ValidateDataDialog = ({
               "Êtes-vous sûr de valider l’ensemble des données Qualicharge sélectionnées ?"
             )}
           </p>
-          <p>
-            {t(
-              "Votre compte sera crédité de certificats ENR à hauteur de {{volume}} MWH, une fois la validation DGEC effectuée.",
-              {
-                volume,
-              }
-            )}
-          </p>
+          {entity.isCPO && (
+            <p>
+              {t(
+                "Votre compte sera crédité de certificats ENR à hauteur de {{volume}} MWH, une fois la validation DGEC effectuée.",
+                {
+                  volume,
+                }
+              )}
+            </p>
+          )}
         </>
       }
       confirm={t("Valider")}

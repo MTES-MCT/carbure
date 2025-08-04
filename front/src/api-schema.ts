@@ -3164,6 +3164,7 @@ export interface components {
     }
     ElecProvisionCertificateQualicharge: {
       readonly id: number
+      readonly cpo: components["schemas"]["EntityPreview"]
       /** Format: date */
       date_from: string
       /** Format: date */
@@ -3177,7 +3178,6 @@ export interface components {
       validated_by?: components["schemas"]["ValidatedByEnum"]
       /** Format: date-time */
       readonly created_at: string | null
-      cpo: number
     }
     ElecTransferAcceptRequest: {
       used_in_tiruert: string
@@ -5704,6 +5704,8 @@ export interface operations {
   elec_provision_certificates_qualicharge_list: {
     parameters: {
       query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
         date_from?: string
         /** @description Authorised entity ID. */
         entity_id: number
@@ -5829,6 +5831,8 @@ export interface operations {
   filter_provision_certificates_qualicharge: {
     parameters: {
       query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
         date_from?: string
         /** @description Authorised entity ID. */
         entity_id: number
@@ -10221,8 +10225,8 @@ export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValida
   NO_ONE = "NO_ONE",
 }
 export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter {
+  cpo = "cpo",
   date_from = "date_from",
-  entity_id = "entity_id",
   operating_unit = "operating_unit",
   station_id = "station_id",
   validated_by = "validated_by",

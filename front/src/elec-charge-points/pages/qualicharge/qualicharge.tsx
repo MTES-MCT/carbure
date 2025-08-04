@@ -1,26 +1,24 @@
-import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getQualichargeData, getYears } from "./api"
+import { getQualichargeData } from "./api"
 import { Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useState } from "react"
 import { Tabs } from "common/components/tabs2"
-import { Navigate, Route, Routes, useMatch } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import { useQuery } from "common/hooks/async"
-import useEntity from "common/hooks/entity"
 import { NoResult } from "common/components/no-result2"
 import { Table } from "common/components/table2"
 import { QualichargeTab, QualichargeFilter } from "./types"
 import { useNotify } from "common/components/notifications"
 import { Pagination } from "common/components/pagination2"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { usePortal } from "common/components/portal"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { useGetFilterOptions, useQualichargeColumns } from "./qualicharge.hooks"
+import {
+  useGetFilterOptions,
+  useQualichargeColumns,
+  useQualichargeQueryBuilder,
+} from "./qualicharge.hooks"
 import { ValidateDataDialog } from "./components/validate-data-dialog"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatNumber } from "common/utils/formatters"
@@ -29,30 +27,20 @@ import { useRoutes } from "common/hooks/routes"
 import HashRoute from "common/components/hash-route"
 import { QualichargeDataDetail } from "./components/qualicharge-data-detail"
 import { useValidateVolumes } from "./hooks/use-validate-volumes"
-
-export const useStatus = () => {
-  const match = useMatch(
-    "/org/:entity/charge-points/qualicharge/:year/:status/*"
-  )
-  return (match?.params.status ?? QualichargeTab.PENDING) as QualichargeTab
-}
+import useEntity from "common/hooks/entity"
+import { ExternalAdminPages } from "common/types"
 
 export const Qualicharge = () => {
+  const { state, actions, query, status, years } = useQualichargeQueryBuilder()
   const { t } = useTranslation()
-  const status = useStatus()
   const notify = useNotify()
   const columns = useQualichargeColumns(status)
   const portal = usePortal()
-  const years = useYears("/qualicharge", getYears)
   const [tab, setTab] = useState(status)
-  const entity = useEntity()
   const routes = useRoutes()
+  const entity = useEntity()
 
   const canValidate = status === QualichargeTab.PENDING
-
-  const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
-
-  const query = useCBQueryBuilder(state)
 
   const { result, loading } = useQuery(getQualichargeData, {
     key: "qualicharge-data",
@@ -70,6 +58,9 @@ export const Qualicharge = () => {
   })
 
   const filterLabels = {
+    ...((entity.isAdmin || entity.hasAdminRight(ExternalAdminPages.ELEC)) && {
+      [QualichargeFilter.cpo]: t("Aménageur"),
+    }),
     ...(status === QualichargeTab.PENDING && {
       [QualichargeFilter.validated_by]: t("Statut"),
     }),
@@ -148,15 +139,18 @@ export const Qualicharge = () => {
                 <NoResult />
               ) : (
                 <>
-                  <Notice
-                    linkHref={routes.CONTACT}
-                    linkText="ici."
-                    icon="ri-error-warning-line"
-                    isClosable
-                  >
-                    En cas de données inexactes, veuillez contacter notre
-                    administrateur DGEC
-                  </Notice>
+                  {entity.isCPO && (
+                    <Notice
+                      linkHref={routes.CONTACT}
+                      linkText="ici."
+                      icon="ri-error-warning-line"
+                      isClosable
+                    >
+                      En cas de données inexactes, veuillez contacter notre
+                      administrateur DGEC
+                    </Notice>
+                  )}
+
                   <RecapQuantity
                     text={t(
                       "{{count}} volumes pour un total de {{total}} MWh",
