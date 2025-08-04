@@ -32,17 +32,23 @@ const ChargePoints = () => {
   return (
     <Main>
       <Routes>
-        <Route
-          path="meter-readings"
-          element={<ElecMeterReadingsSettings companyId={entity.id} />}
-        />
+        {entity.isCPO && (
+          <>
+            <Route
+              path="meter-readings"
+              element={<ElecMeterReadingsSettings companyId={entity.id} />}
+            />
 
-        <Route
-          path="list/*"
-          element={<ChargePointsList year={currentYear} snapshot={snapshot} />}
-        />
+            <Route
+              path="list/*"
+              element={
+                <ChargePointsList year={currentYear} snapshot={snapshot} />
+              }
+            />
 
-        <Route path="applications" element={<ChargePointsApplications />} />
+            <Route path="applications" element={<ChargePointsApplications />} />
+          </>
+        )}
 
         <Route
           path="qualicharge"

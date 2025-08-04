@@ -12,7 +12,7 @@ class FilterActionMixin:
             OpenApiParameter(
                 name="filter",
                 type=str,
-                enum=["year", "validated_by", "operating_unit", "station_id", "date_from", "entity_id"],
+                enum=["year", "validated_by", "operating_unit", "station_id", "date_from", "cpo"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,
@@ -62,7 +62,7 @@ class FilterActionMixin:
             "operating_unit": "operating_unit",
             "station_id": "station_id",
             "date_from": "date_from",
-            "entity_id": "cpo__name",
+            "cpo": "cpo__name",
         }
 
         column = filters.get(filter)

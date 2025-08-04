@@ -92,6 +92,12 @@ export const useChargePoints = (params?: ChargePointsParams) => {
         icon: TodoLine,
         iconActive: TodoFill,
       },
+      {
+        path: routes.ELEC().CHARGE_POINTS.QUALICHARGE,
+        title: t("Données Qualicharge"),
+        icon: HomeLine,
+        iconActive: HomeFill,
+      },
     ],
   }
 

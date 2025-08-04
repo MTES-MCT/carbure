@@ -9,16 +9,33 @@ import {
 } from "./types"
 import { QualichargeBadge } from "./components/qualicharge-badge"
 import { formatDate } from "common/utils/formatters"
-import { getQualichargeFilters } from "./api"
+import { getQualichargeFilters, getYears } from "./api"
 import { formatQualichargeStatus } from "./formatters"
 import { compact } from "common/utils/collection"
+import useEntity from "common/hooks/entity"
+import {
+  useCBQueryBuilder,
+  useCBQueryParamsStore,
+} from "common/hooks/query-builder-2"
+import useYears from "common/hooks/years-2"
+import { useMatch } from "react-router-dom"
+import { ExternalAdminPages } from "common/types"
 
 export const useQualichargeColumns = (status: QualichargeTab) => {
   const { t } = useTranslation()
+  const entity = useEntity()
+
   const columns: Column<ElecDataQualichargeOverview>[] = compact([
     status === QualichargeTab.PENDING && {
       header: t("Statut"),
       cell: (data) => <QualichargeBadge status={data.validated_by} />,
+      style: {
+        minWidth: "240px",
+      },
+    },
+    (entity.isAdmin || entity.hasAdminRight(ExternalAdminPages.ELEC)) && {
+      header: t("Aménageur"),
+      cell: (data) => <Cell text={data.cpo.name} />,
     },
     {
       header: t("Unité d'exploitation"),
@@ -62,4 +79,22 @@ export const useGetFilterOptions = (query: QualichargeQuery) => {
   }
 
   return getFilterOptions
+}
+
+const useStatus = () => {
+  const match = useMatch(
+    "/org/:entity/charge-points/qualicharge/:year/:status/*"
+  )
+  return (match?.params.status ?? QualichargeTab.PENDING) as QualichargeTab
+}
+
+export const useQualichargeQueryBuilder = () => {
+  const entity = useEntity()
+  const status = useStatus()
+  const years = useYears("/qualicharge", getYears)
+  const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
+
+  const query = useCBQueryBuilder(state)
+
+  return { state, actions, query, status, years }
 }

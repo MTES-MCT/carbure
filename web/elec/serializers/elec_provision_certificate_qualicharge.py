@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.serializers import EntityPreviewSerializer
 from elec.models import ElecProvisionCertificateQualicharge
 
 
@@ -7,6 +8,8 @@ class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer)
     class Meta:
         model = ElecProvisionCertificateQualicharge
         fields = "__all__"
+
+    cpo = EntityPreviewSerializer(read_only=True)
 
 
 class StationSerializer(serializers.Serializer):

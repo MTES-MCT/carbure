@@ -1,10 +1,10 @@
-from django_filters import BaseInFilter, BooleanFilter, FilterSet, MultipleChoiceFilter, NumberFilter
+from django_filters import BaseInFilter, BooleanFilter, FilterSet, MultipleChoiceFilter
 
 from elec.models import ElecProvisionCertificateQualicharge
 
 
 class ProvisionCertificateQualichargeFilter(FilterSet):
-    entity_id = NumberFilter(field_name="cpo", lookup_expr="exact")
+    cpo = BaseInFilter(field_name="cpo__name", lookup_expr="in")
     not_validated = BooleanFilter(method="filter_not_validated")
     validated_by = MultipleChoiceFilter(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
     operating_unit = BaseInFilter(lookup_expr="in", field_name="operating_unit")
@@ -18,7 +18,7 @@ class ProvisionCertificateQualichargeFilter(FilterSet):
     class Meta:
         model = ElecProvisionCertificateQualicharge
         fields = [
-            "entity_id",
+            "cpo",
             "year",
             "validated_by",
             "not_validated",
