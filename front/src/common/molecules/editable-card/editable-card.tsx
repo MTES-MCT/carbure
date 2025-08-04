@@ -32,7 +32,12 @@ interface EditableCardProps {
   className?: string
 }
 
-// Composant interne qui utilise le contexte
+// Internal component that uses the context
+/**
+ * This component is a simple card with a title, description, edit button to toggle the editing state and a content area.
+ * The editing state is controlled by the component itself, but it can be overridden by the `isEditing` prop.
+ * See more examples in the storybook.
+ */
 const EditableCardContent = ({
   title,
   description,
@@ -121,7 +126,7 @@ const EditableCardContent = ({
 }
 
 /**
- * A form that will close the editing state of the EditableCard when the onSubmit prop is triggered on success.
+ * A wrapper around the Form component that will close the editing state of the EditableCard when the onSubmit prop is triggered on success.
  * @param props - The props of the Form component.
  * @returns The Form component.
  */

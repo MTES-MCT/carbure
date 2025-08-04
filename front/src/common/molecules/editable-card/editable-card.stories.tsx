@@ -21,6 +21,14 @@ export const Default: Story = {
   },
 }
 
+/**
+ * This story shows how to use the `children` prop to display a custom content.
+ * The `children` prop can be a function that receives the editing state.
+ *
+ * For our needs, we have to pass the editing state to false when the form is completed.
+ * This is why we use the `EditableCard.Form` component. It will close the editing state when the form is completed.
+ *
+ */
 export const CustomChildren: Story = {
   args: {
     children: ({ isEditing }) => (
@@ -43,20 +51,6 @@ export const CustomChildren: Story = {
   },
 }
 
-export const CustomHeaderActions: Story = {
-  args: {
-    children: <div>children</div>,
-    headerActions: <Button>Custom button</Button>,
-  },
-}
-
-export const NoHeaderActions: Story = {
-  args: {
-    children: <div>children</div>,
-    headerActions: null,
-  },
-}
-
 export const ControlledEditing: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
@@ -75,5 +69,19 @@ export const ControlledEditing: Story = {
   },
   args: {
     children: null,
+  },
+}
+
+export const CustomHeaderActions: Story = {
+  args: {
+    children: <div>children</div>,
+    headerActions: <Button>Custom button</Button>,
+  },
+}
+
+export const NoHeaderActions: Story = {
+  args: {
+    children: <div>children</div>,
+    headerActions: null,
   },
 }
