@@ -5,16 +5,16 @@ import {
   normalizeCertificate,
   normalizeCountry,
 } from "common/utils/normalizers"
-import Autocomplete from "common/components/autocomplete"
-import { useForm, Form } from "common/components/form"
-import { TextArea, TextInput } from "common/components/input"
-import Select from "common/components/select"
+import { Autocomplete } from "common/components/autocomplete2"
+import { useForm, Form } from "common/components/form2"
+import { TextArea, TextInput } from "common/components/inputs2"
 import {
   CompanyRegistrationFormValue,
   SearchCompanyPreview,
 } from "companies/types"
 import { useTranslation } from "react-i18next"
 import { getCertificates } from "settings/api/certificates"
+import { Grid } from "common/components/scaffold"
 
 interface CompanyFormProps {
   onSubmitForm: (formEntity: CompanyRegistrationFormValue | undefined) => void
@@ -41,32 +41,37 @@ export const CompanyForm = ({
           disabled
         />
       )}
+      <Grid cols={2}>
+        <TextInput
+          required
+          label={t("Nom de la société (visible dans carbure)")}
+          {...companyForm.bind("name")}
+        />
+        <TextInput
+          required
+          label={t("Nom légal")}
+          {...companyForm.bind("legal_name")}
+        />
+      </Grid>
 
-      <TextInput
-        required
-        label={t("Nom de la société (visible dans carbure)")}
-        {...companyForm.bind("name")}
-      />
-      <TextInput
-        required
-        label={t("Nom légal")}
-        {...companyForm.bind("legal_name")}
-      />
       <TextInput
         required
         label={t("Adresse de la société (Numéro et rue)")}
         {...companyForm.bind("registered_address")}
       />
-      <TextInput
-        required
-        label={t("Ville")}
-        {...companyForm.bind("registered_city")}
-      />
-      <TextInput
-        required
-        label={t("Code postal")}
-        {...companyForm.bind("registered_zipcode")}
-      />
+      <Grid cols={2}>
+        <TextInput
+          required
+          label={t("Ville")}
+          {...companyForm.bind("registered_city")}
+        />
+        <TextInput
+          required
+          label={t("Code postal")}
+          {...companyForm.bind("registered_zipcode")}
+        />
+      </Grid>
+
       <Autocomplete
         label={t("Pays")}
         placeholder={t("Rechercher un pays...")}
@@ -75,12 +80,20 @@ export const CompanyForm = ({
         {...companyForm.bind("registered_country")}
         required={isForeignCompany}
       />
-      <TextInput
-        required
-        label={t("Contact principal")}
-        placeholder="Jean-Pierre Champollion"
-        {...companyForm.bind("sustainability_officer")}
-      />
+      <Grid cols={2}>
+        <TextInput
+          required
+          label={t("Contact principal")}
+          placeholder="Jean-Pierre Champollion"
+          {...companyForm.bind("sustainability_officer")}
+        />
+        <TextInput
+          required
+          type="email"
+          label={t("Email du contact principal")}
+          {...companyForm.bind("sustainability_officer_email")}
+        />
+      </Grid>
       <TextInput
         required
         type="tel"
@@ -91,14 +104,8 @@ export const CompanyForm = ({
         placeholder="exemple : +33612345678"
         {...companyForm.bind("sustainability_officer_phone_number")}
       />
-      <TextInput
-        required
-        type="email"
-        label={t("Email du contact principal")}
-        {...companyForm.bind("sustainability_officer_email")}
-      />
 
-      <Select
+      <Autocomplete
         required
         label={t("Type d'activité")}
         placeholder={t("Précisez le type d'activité")}
@@ -157,18 +164,19 @@ export const CompanyForm = ({
         maxLength={5000}
         {...companyForm.bind("activity_description")}
       />
+      <Grid cols={2}>
+        <TextInput
+          placeholder="https://www.example.com"
+          type="url"
+          label={t("Site web (commençant par https://)")}
+          {...companyForm.bind("website")}
+        />
 
-      <TextInput
-        placeholder="https://www.example.com"
-        type="url"
-        label={t("Site web (commençant par https://)")}
-        {...companyForm.bind("website")}
-      />
-
-      <TextInput
-        label={t("Numéro de TVA")}
-        {...companyForm.bind("vat_number")}
-      />
+        <TextInput
+          label={t("Numéro de TVA")}
+          {...companyForm.bind("vat_number")}
+        />
+      </Grid>
     </Form>
   )
 }

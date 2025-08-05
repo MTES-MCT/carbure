@@ -60,10 +60,14 @@ def search_company_view(request):
 
     response_data = {"company_preview": company_preview}
     try:
-        entity = Entity.objects.get(registration_id=registration_id)
+        # Order by date_added to get the oldest entity
+        entities = Entity.objects.filter(registration_id=registration_id).order_by("date_added")
+        entity = entities.first()
         response_data["warning"] = {
             "code": SeachCompanyFormError.REGISTRATION_ID_ALREADY_USED,
-            "meta": {"company_name": entity.name},
+            "meta": {
+                "company_name": entity.name,
+            },
         }
     except Entity.DoesNotExist:
         print("no registred company wit same siret")

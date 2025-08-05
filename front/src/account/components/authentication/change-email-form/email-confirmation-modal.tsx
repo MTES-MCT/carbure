@@ -3,11 +3,10 @@ import { useMutation } from "common/hooks/async"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "../../../api"
-import Dialog from "common/components/dialog"
-import Form from "common/components/form"
-import { TextInput } from "common/components/input"
-import Button from "common/components/button"
-import { Check, Cross } from "common/components/icons"
+import { Dialog } from "common/components/dialog2"
+import { Form } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
+import { Button } from "common/components/button2"
 
 interface EmailConfirmationModalProps {
   newEmail: string
@@ -75,49 +74,43 @@ export const EmailConfirmationModal = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Confirmer le changement d'email")}</h1>
-      </header>
-      <main>
-        <section>
-          <p>
-            {t(
-              "Un code à 6 chiffres a été envoyé à l'adresse {{email}}. Veuillez le saisir dans le champ ci-dessous pour confirmer le changement d'email :",
-              { email: newEmail }
-            )}
-          </p>
-          <Form id="confirm-email-form" onSubmit={handleConfirm}>
-            <TextInput
-              label={t("Code de confirmation")}
-              type="text"
-              required
-              value={otpCode}
-              onChange={(val) => setOtpCode(val || "")}
-              placeholder={t("Saisissez le code reçu par email")}
-              style={{ width: "100%" }}
-              autoFocus
-            />
-          </Form>
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={
+        <Dialog.Title>{t("Confirmer le changement d'email")}</Dialog.Title>
+      }
+      footer={
         <Button
-          variant="primary"
-          icon={Check}
-          label={t("Valider le changement")}
-          submit="confirm-email-form"
+          iconId="ri-check-line"
           loading={confirmEmailMutation.loading}
           disabled={!otpCode.trim()}
+          type="submit"
+          nativeButtonProps={{
+            form: "confirm-email-form",
+          }}
+        >
+          {t("Valider le changement")}
+        </Button>
+      }
+    >
+      <p>
+        {t(
+          "Un code à 6 chiffres a été envoyé à l'adresse {{email}}. Veuillez le saisir dans le champ ci-dessous pour confirmer le changement d'email :",
+          { email: newEmail }
+        )}
+      </p>
+      <Form id="confirm-email-form" onSubmit={handleConfirm}>
+        <TextInput
+          label={t("Code de confirmation")}
+          type="text"
+          required
+          value={otpCode}
+          onChange={(val) => setOtpCode(val || "")}
+          placeholder={t("Saisissez le code reçu par email")}
+          style={{ width: "100%" }}
+          autoFocus
         />
-        <Button
-          variant="secondary"
-          icon={Cross}
-          label={t("Annuler")}
-          action={onClose}
-          disabled={confirmEmailMutation.loading}
-        />
-      </footer>
+      </Form>
     </Dialog>
   )
 }
