@@ -75,7 +75,7 @@ export const useBalancesBiofuelsColumns = () => {
                   sector: item.sector,
                   biofuel: item.biofuel?.code,
                   customs_category: item.customs_category,
-                  status: OperationsStatus.PENDING,
+                  status: [OperationsStatus.PENDING, OperationsStatus.DRAFT],
                 }
               )
               navigate(url)
