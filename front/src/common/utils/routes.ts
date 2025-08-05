@@ -157,7 +157,7 @@ export const ROUTE_URLS = {
  */
 export const addQueryParams = (
   url: string,
-  params: Record<string, string | number | boolean | undefined | null>,
+  params: Record<string, string | number | boolean | [] | undefined | null>,
   excludeEmptyValues: boolean = true
 ) => {
   // Sépare l'URL de base des paramètres existants

@@ -105,7 +105,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         }
         multiplicator = multiplicators.get(self.request.unit, None)
 
-        return (
+        queryset = (
             super()
             .get_queryset()
             .annotate(
@@ -170,6 +170,11 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             )
         )
 
+        # exclude operations that are drafts and credits
+        queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
+
+        return queryset
+
     @extend_schema(
         operation_id="list_operations",
         description="Retrieve a list of operations with optional filtering and pagination.",
@@ -188,7 +193,16 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         },
     )
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @extend_schema(
         operation_id="get_operation",
