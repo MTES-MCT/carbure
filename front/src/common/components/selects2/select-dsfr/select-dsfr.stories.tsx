@@ -22,10 +22,7 @@ const meta: Meta<
         <SelectDsfr
           {...args}
           value={value}
-          onChange={(item) => {
-            setValue(item)
-            console.log(item)
-          }}
+          onChange={(item) => setValue(item)}
         />
       </div>
     )
