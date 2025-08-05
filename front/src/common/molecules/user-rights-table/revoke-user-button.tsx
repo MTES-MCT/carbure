@@ -1,9 +1,8 @@
 import { useTranslation } from "react-i18next"
 import { UserRightRequest } from "common/types"
 import { usePortal } from "common/components/portal"
-import Button from "common/components/button"
-import { Cross } from "common/components/icons"
-import { Confirm } from "common/components/dialog"
+import { Button } from "common/components/button2"
+import { Confirm } from "common/components/dialog2"
 
 type RevokeUserButtonProps = {
   onRevokeUser: () => void
@@ -21,19 +20,20 @@ export const RevokeUserButton = ({
   return (
     <Button
       captive
-      variant="icon"
-      icon={Cross}
+      iconId="ri-close-line"
       title={t("Révoquer")}
-      action={() =>
+      priority="tertiary no outline"
+      onClick={() =>
         portal((close) => (
           <Confirm
             title={t("Révoquer les droits d'un utilisateur")}
             description={t("Voulez vous révoquer les droits d'accès de {{user}} à votre société ?", { user })} // prettier-ignore
             confirm={t("Révoquer")}
-            icon={Cross}
-            variant="danger"
+            icon="ri-close-line"
+            customVariant="danger"
             onConfirm={() => Promise.resolve(onRevokeUser())}
             onClose={close}
+            hideCancel
           />
         ))
       }

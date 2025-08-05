@@ -11,19 +11,14 @@ import {
 import * as common from "common/api"
 import * as api from "../../api/delivery-sites"
 import { LoaderOverlay } from "common/components/scaffold"
-import Checkbox from "common/components/checkbox"
-import Button from "common/components/button"
-import { AlertCircle, Cross, Plus } from "common/components/icons"
-import { Alert } from "common/components/alert"
-import Table, { actionColumn, Cell } from "common/components/table"
-import { Confirm, Dialog } from "common/components/dialog"
-import AutoComplete from "common/components/autocomplete"
-import { RadioGroup } from "common/components/radio"
-import { Form, useForm } from "common/components/form"
+import { Checkbox, RadioGroup } from "common/components/inputs2"
+import { Button } from "common/components/button2"
+import { Cell, Table } from "common/components/table2"
+import { Confirm, Dialog } from "common/components/dialog2"
+import { Autocomplete } from "common/components/autocomplete2"
+import { Form, useForm } from "common/components/form2"
 import useEntity, { useRights } from "common/hooks/entity"
-import { Panel } from "common/components/scaffold"
 import { normalizeDepot } from "common/utils/normalizers"
-import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -34,7 +29,9 @@ import {
   useOwnerShipTypeOptions,
 } from "./delivery-site.hooks"
 import { AutoCompleteOperators } from "common/molecules/autocomplete-operators"
-import Tag from "common/components/tag"
+import { EditableCard } from "common/molecules/editable-card"
+import { Notice } from "common/components/notice"
+import Badge from "@codegouvfr/react-dsfr/Badge"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -73,31 +70,22 @@ const DeliverySitesSettings = ({
   }
 
   return (
-    <Panel id="depot">
-      <header>
-        <h1>
-          <Trans>Dépôts</Trans>
-        </h1>
-        {!readOnly && canModify && (
-          <Button
-            asideX
-            variant="primary"
-            icon={Plus}
-            label={t("Ajouter un dépôt")}
-            action={findDeliverySite}
-          />
-        )}
-      </header>
-
+    <EditableCard
+      title={t("Dépôts")}
+      description={t("Gérez les dépôts de votre entreprise ici.")}
+      headerActions={
+        !readOnly &&
+        canModify && (
+          <Button asideX iconId="ri-add-line" onClick={findDeliverySite}>
+            {t("Ajouter un dépôt")}
+          </Button>
+        )
+      }
+    >
       {isEmpty && (
-        <>
-          <section>
-            <Alert icon={AlertCircle} variant="warning">
-              <Trans>Aucun dépôt trouvé</Trans>
-            </Alert>
-          </section>
-          <footer />
-        </>
+        <Notice icon="ri-error-warning-line" variant="warning">
+          <Trans>Aucun dépôt trouvé</Trans>
+        </Notice>
       )}
 
       {!isEmpty && (
@@ -109,9 +97,9 @@ const DeliverySitesSettings = ({
               key: "status",
               header: t("Statut"),
               cell: (ds) => (
-                <Tag variant={ds.depot?.is_enabled ? "success" : "info"}>
+                <Badge severity={ds.depot?.is_enabled ? "success" : "info"}>
                   {ds.depot?.is_enabled ? t("Validé") : t("En attente")}
-                </Tag>
+                </Badge>
               ),
             },
             {
@@ -151,19 +139,18 @@ const DeliverySitesSettings = ({
                 />
               ),
             },
-            actionColumn<EntityDepot>((ds) =>
-              compact([
-                !readOnly && canModify && (
-                  <DeleteDeliverySiteButton deliverySite={ds} />
-                ),
-              ])
-            ),
+            {
+              header: t("Action"),
+              cell: (ds) =>
+                !readOnly &&
+                canModify && <DeleteDeliverySiteButton deliverySite={ds} />,
+            },
           ]}
         />
       )}
 
       {deliverySites.loading && <LoaderOverlay />}
-    </Panel>
+    </EditableCard>
   )
 }
 
@@ -217,68 +204,72 @@ export const DeliverySiteFinderDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Ajouter un dépôt")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <p>{t("Veuillez rechercher un dépôt que vous utilisez.")}</p>
-        </section>
-
-        <section>
-          <Form id="add-depot" onSubmit={submitDepot}>
-            <AutoComplete
-              autoFocus
-              label={t("Dépôt à ajouter")}
-              placeholder={t("Rechercher un dépôt...")}
-              getOptions={(search) => common.findDepots(search, false)}
-              normalize={normalizeDepot}
-              required
-              {...bind("depot")}
-            />
-
-            <RadioGroup
-              label={t("Propriété")}
-              options={ownerShipTypeOptions}
-              {...bind("ownership_type")}
-            />
-
-            {entity && entity.entity_type === EntityType.Operator && (
-              <Checkbox
-                label={t("Incorporation potentiellement effectuée par un tiers")} // prettier-ignore
-                {...bind("blending_is_outsourced")}
-              />
-            )}
-            {value.blending_is_outsourced && (
-              <AutoCompleteOperators
-                label={t("Incorporateur Tiers")}
-                placeholder={t("Rechercher un opérateur pétrolier...")}
-                {...bind("blender")}
-              />
-            )}
-
-            <Button variant="link" action={openCreateDeliverySiteDialog}>
-              <Trans>
-                Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
-              </Trans>
-            </Button>
-          </Form>
-        </section>
-      </main>
-
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={
+        <>
+          <Dialog.Title>{t("Ajouter un dépôt")}</Dialog.Title>
+          <Dialog.Description>
+            {t("Veuillez rechercher un dépôt que vous utilisez.")}
+          </Dialog.Description>
+        </>
+      }
+      footer={
         <Button
           asideX
           loading={addDeliverySite.loading}
-          variant="primary"
-          submit="add-depot"
-          icon={Plus}
-          label={t("Ajouter")}
+          type="submit"
+          nativeButtonProps={{
+            form: "add-depot",
+          }}
+          iconId="ri-add-line"
+        >
+          {t("Ajouter")}
+        </Button>
+      }
+      fitContent
+    >
+      <Form
+        id="add-depot"
+        onSubmit={submitDepot}
+        // Handle the box shadow of the button (the content of the dialog has overflow)
+        style={{ paddingBottom: "2px" }}
+      >
+        <Autocomplete
+          autoFocus
+          label={t("Dépôt à ajouter")}
+          placeholder={t("Rechercher un dépôt...")}
+          getOptions={(search) => common.findDepots(search, false)}
+          normalize={normalizeDepot}
+          required
+          {...bind("depot")}
         />
-        <Button action={onClose} label={t("Annuler")} />
-      </footer>
+
+        <RadioGroup
+          label={t("Propriété")}
+          options={ownerShipTypeOptions}
+          {...bind("ownership_type")}
+        />
+
+        {entity && entity.entity_type === EntityType.Operator && (
+          <Checkbox
+            label={t("Incorporation potentiellement effectuée par un tiers")} // prettier-ignore
+            {...bind("blending_is_outsourced")}
+          />
+        )}
+        {value.blending_is_outsourced && (
+          <AutoCompleteOperators
+            label={t("Incorporateur Tiers")}
+            placeholder={t("Rechercher un opérateur pétrolier...")}
+            {...bind("blender")}
+          />
+        )}
+        <Button customPriority="link" onClick={openCreateDeliverySiteDialog}>
+          <Trans>
+            Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
+          </Trans>
+        </Button>
+      </Form>
     </Dialog>
   )
 }
@@ -309,17 +300,17 @@ const DeleteDeliverySiteButton = ({
   return (
     <Button
       captive
-      variant="icon"
-      icon={Cross}
+      priority="tertiary no outline"
+      iconId="ri-close-line"
       title={t("Supprimer le dépôt")}
-      action={() =>
+      onClick={() =>
         portal((close) => (
           <Confirm
             title={t("Supprimer dépôt")}
             description={t("Voulez-vous supprimer le dépôt {{depot}} de votre liste ?", { depot: deliverySite.depot!.name })} // prettier-ignore
             confirm={t("Supprimer")}
-            icon={Cross}
-            variant="danger"
+            icon="ri-close-line"
+            customVariant="danger"
             onClose={close}
             onConfirm={async () => {
               if (deliverySite.depot?.customs_id) {
@@ -329,9 +320,11 @@ const DeleteDeliverySiteButton = ({
                 )
               }
             }}
+            hideCancel
           />
         ))
       }
+      style={{ color: "var(--text-default-grey)" }}
     />
   )
 }

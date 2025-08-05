@@ -44,6 +44,8 @@ export const BaseInput = ({
 }: BaseInputProps) => {
   // Set a custom style for read only inputs
   if (readOnly) {
+    const value =
+      props.nativeInputProps?.value ?? props.nativeTextAreaProps?.value
     return (
       <div>
         <Label
@@ -53,7 +55,7 @@ export const BaseInput = ({
           readOnly={readOnly}
         />
         <Text size="sm">
-          {props.nativeInputProps?.value ?? props.nativeTextAreaProps?.value}
+          {value !== undefined && value !== "" ? value : "-"}
         </Text>
       </div>
     )

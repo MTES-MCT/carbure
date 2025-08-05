@@ -1,6 +1,5 @@
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
-import { Edit, Return } from "common/components/icons"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
 import { PortalInstance, useCloseAllPortals } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
@@ -63,32 +62,26 @@ export const CreateDeliverySiteDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Créer un nouveau dépôt")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <p>{t("Veuillez remplir les informations suivantes :")}</p>
-        </section>
-        <section>
-          <DeliverySiteForm
-            onCreate={handleSubmit}
-            formId="new-delivery-site"
-          />
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={<Dialog.Title>{t("Créer un nouveau dépôt")}</Dialog.Title>}
+      footer={
         <Button
-          variant="primary"
           loading={createNewDeliverySite.loading}
-          icon={Edit}
-          label={t("Valider")}
-          submit="new-delivery-site"
-        />
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
+          iconId="ri-pencil-line"
+          type="submit"
+          nativeButtonProps={{
+            form: "new-delivery-site",
+          }}
+        >
+          {t("Valider")}
+        </Button>
+      }
+      size="medium"
+    >
+      <p>{t("Veuillez remplir les informations suivantes :")}</p>
+
+      <DeliverySiteForm onCreate={handleSubmit} formId="new-delivery-site" />
     </Dialog>
   )
 }

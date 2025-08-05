@@ -2,6 +2,7 @@ import { EntityType } from "common/types"
 import { Notification, NotificationType } from "./types"
 import { formatDate, formatPeriod } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
+import { ROUTE_URLS } from "common/utils/routes"
 
 const getNotificationLink = (notif: Notification) => {
   const meta = notif.meta as any
@@ -23,10 +24,10 @@ const getNotificationLink = (notif: Notification) => {
       return `/org/${notif.dest.id}/transactions/${meta?.year}/in/correction?suppliers=${meta?.supplier}`
 
     case NotificationType.CERTIFICATE_EXPIRED:
-      return `/org/${notif.dest.id}/settings#certificates`
+      return ROUTE_URLS.SETTINGS(notif.dest.id).CERTIFICATES
 
     case NotificationType.CERTIFICATE_REJECTED:
-      return `/org/${notif.dest.id}/settings#certificates`
+      return ROUTE_URLS.SETTINGS(notif.dest.id).CERTIFICATES
 
     case NotificationType.DECLARATION_VALIDATED:
       return `#declaration/${meta?.period}`
@@ -36,7 +37,7 @@ const getNotificationLink = (notif: Notification) => {
 
     case NotificationType.METER_READINGS_APP_STARTED ||
       NotificationType.METER_READINGS_APP_ENDING_SOON:
-      return `/org/${notif.dest.id}/settings#elec-meter-readings`
+      return `/org/${notif.dest.id}/settings/elec-meter-readings`
 
     case NotificationType.DECLARATION_REMINDER:
       return `#declaration/${meta?.period}`

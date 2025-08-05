@@ -58,7 +58,7 @@ def accept_application(request: HttpRequest):
 
 def send_email_to_cpo(application: ElecChargePointApplication, request: HttpRequest):
     charge_point_count = application.elec_charge_points.count()
-    charge_point_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/settings#elec-charge-points"
+    charge_point_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/settings/elec-charge-points"
 
     text_message = f"""
     Bonjour,

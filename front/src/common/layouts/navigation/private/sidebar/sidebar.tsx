@@ -60,7 +60,7 @@ export const PrivateSidebar = () => {
         {entity.id !== -1 && (
           <ChildItem
             child={{
-              path: routes.SETTINGS,
+              path: routes.SETTINGS.ROOT,
               title: t("Paramètres de la société"),
               icon: SettingsLine,
               iconActive: SettingsFill,

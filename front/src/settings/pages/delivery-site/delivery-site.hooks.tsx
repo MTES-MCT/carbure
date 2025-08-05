@@ -1,6 +1,4 @@
 import { Country, SiteType, OwnershipType } from "common/types"
-import { InfoCircle } from "common/components/icons"
-import Tooltip from "common/components/tooltip"
 import { ReactNode, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -132,22 +130,8 @@ export const useGetDepotTypeOptions = ({
     }
 
     return depotTypeOptions.map(({ label, tooltip, type }) => ({
-      label: tooltip ? (
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            columnGap: "var(--spacing-xs)",
-          }}
-        >
-          {label}
-          <Tooltip title={tooltip} style={{ display: "flex" }}>
-            <InfoCircle color="#a4a4a4" size={16} />
-          </Tooltip>
-        </span>
-      ) : (
-        label
-      ),
+      label,
+      hintText: tooltip ?? undefined,
       value: type,
     }))
   }, [country, depotTypeTranslations])

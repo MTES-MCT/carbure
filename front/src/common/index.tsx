@@ -141,7 +141,7 @@ const Org = () => {
 
   return (
     <Routes>
-      <Route path="settings" element={<Settings />} />
+      <Route path="settings/*" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
 
       {(isIndustry || isPowerOrHeatProducer) && (
