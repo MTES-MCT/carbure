@@ -1,4 +1,9 @@
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext"
+import {
+  Label,
+  LabelProps,
+  ReadOnlyValue,
+} from "common/components/inputs2/base-input"
 import { defaultNormalizer, Normalizer } from "common/utils/normalize"
 
 const defaultGetValue = <T, V = T>(value: V) => {
@@ -21,7 +26,9 @@ export type SelectDsfrProps<T, V = T> = Omit<
   options: T[]
   onChange?: (value: V | undefined) => void
   normalize?: Normalizer<T, V>
-}
+} & Omit<LabelProps, "label"> & {
+    label?: LabelProps["label"]
+  }
 
 export const SelectDsfr = <T, V = T>({
   value,
@@ -29,6 +36,9 @@ export const SelectDsfr = <T, V = T>({
   options,
   onChange,
   normalize = defaultNormalizer,
+  label,
+  hasTooltip,
+  title,
   ...props
 }: SelectDsfrProps<T, V>) => {
   const normalizedOptions = options?.map((option) => {
@@ -43,6 +53,18 @@ export const SelectDsfr = <T, V = T>({
     ? normalizedOptions.find((option) => option.value === getValue?.(value))
     : undefined
 
+  if (props.readOnly) {
+    return (
+      <ReadOnlyValue
+        label={label}
+        hasTooltip={hasTooltip}
+        title={title}
+        readOnly={props.readOnly}
+        value={selectedOption?.label ?? ""}
+      />
+    )
+  }
+
   return (
     <Select
       {...props}
@@ -51,6 +73,14 @@ export const SelectDsfr = <T, V = T>({
         onChange: onChange ? (e) => onChange(e.target.value as V) : undefined,
       }}
       options={normalizedOptions}
+      label={
+        <Label
+          hasTooltip={hasTooltip}
+          required={props.required}
+          title={title}
+          label={label}
+        />
+      }
     />
   )
 }
