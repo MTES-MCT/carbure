@@ -36,6 +36,54 @@ class BiomethaneEntityConfigContractSerializer(serializers.ModelSerializer):
         ]
 
 
+def handle_fields_requirement(data, required_fields=None, errors=None, instance=None):
+    required_fields = required_fields or []
+    errors = errors or {}
+
+    tariff_reference = data.get("tariff_reference")
+
+    # If existing instance (PATCH methode), use its tariff_reference if not provided
+    if tariff_reference is None and instance:
+        tariff_reference = instance.tariff_reference
+
+    if tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_1:
+        required_fields += ["cmax", "cmax_annualized", "installation_category"]
+
+        cmax_annualized = data.get("cmax_annualized")
+        if cmax_annualized is None and instance:
+            cmax_annualized = instance.cmax_annualized
+
+        cmax_annualized_value = data.get("cmax_annualized_value")
+        if cmax_annualized_value is None and instance:
+            cmax_annualized_value = instance.cmax_annualized_value
+
+        if cmax_annualized and not cmax_annualized_value:
+            errors["cmax_annualized_value"] = ["Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."]
+
+    elif tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_2:
+        required_fields.append("pap_contracted")
+
+    missing_fields = []
+    for field in required_fields:
+        field_value = data.get(field)
+
+        # If field is not provided in data, check the instance
+        if field_value is None and instance:
+            field_value = getattr(instance, field, None)
+
+        # A field is considered missing if not in data and neither in instance
+        if not field_value:
+            missing_fields.append(field)
+
+    for field in missing_fields:
+        errors[field] = [f"Le champ {field} est obligatoire."]
+
+    if errors:
+        raise serializers.ValidationError(errors)
+
+    return data
+
+
 class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneEntityConfigContract
@@ -54,28 +102,7 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        errors = {}
-        required_fields = []
-
-        if data.get("tariff_reference") in BiomethaneEntityConfigContract.TARIFF_RULE_1:
-            required_fields.extend(["cmax", "cmax_annualized", "installation_category"])
-
-            if data.get("cmax_annualized", False) and not data.get("cmax_annualized_value"):
-                errors["cmax_annualized_value"] = [
-                    "Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."
-                ]
-
-        elif data.get("tariff_reference") in BiomethaneEntityConfigContract.TARIFF_RULE_2:
-            required_fields.append("pap_contracted")
-
-        for field in required_fields:
-            if not data.get(field):
-                errors[field] = [f"Le champ {field} est obligatoire pour l'arrêté tarifaire {data.get('tariff_reference')}."]
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return data
+        return handle_fields_requirement(data)
 
 
 class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer):
@@ -96,19 +123,25 @@ class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer)
         ]
 
     def validate(self, data):
-        # errors = {}
-        # required_fields = []
+        errors = {}
+        required_fields = []
 
-        print("Validating data:", data)
-        print("instance : ", self.instance)
+        contract_fields = [
+            "signature_date",
+            "effective_date",
+            "general_conditions_file",
+            "specific_conditions_file",
+        ]
 
-        # Rules : si
-        #    "signature_date",
-        #    "effective_date",
-        #    "general_conditions_file",
-        #    "specific_conditions_file",
-        # existent déjà, on ne peut pas les modifier
-        #
-        # dans le cas contraire, on peut les insérer mais ils sont tous obligatoires
+        if self.instance.does_contract_exist():
+            not_updatable_fields = [field for field in contract_fields if field in data]
+            for field in not_updatable_fields:
+                errors[field] = [f"Le champ {field} ne peut pas être modifié une fois le contrat signé."]
+        else:
+            # If the contract does not exist, check if any of the contract fields are provided
+            for field in contract_fields:
+                if field in data:
+                    required_fields += contract_fields
+                    continue
 
-        return data
+        return handle_fields_requirement(data, required_fields, errors, self.instance)

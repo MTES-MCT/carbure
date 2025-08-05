@@ -26,6 +26,9 @@ class BiomethaneEntityConfigContract(models.Model):
         db_table = "biomethane_entity_config_contract"
         verbose_name = "Biométhane - Contrat d'achat"
 
+    def does_contract_exist(self):
+        return bool(self.signature_date)
+
 
 class BiomethaneEntityConfigAmendment(models.Model):
     AMENDMENT_OBJECT_CHOICES = [
