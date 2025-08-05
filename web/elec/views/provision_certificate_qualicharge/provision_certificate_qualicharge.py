@@ -58,7 +58,7 @@ class ElecProvisionCertificateQualichargeViewSet(
         queryset = super().get_queryset()
         entity = self.request.entity
 
-        if entity.entity_type == Entity.entity_type == Entity.CPO:
+        if entity.entity_type == Entity.CPO:
             queryset = ElecProvisionCertificateQualicharge.objects.filter(cpo=entity)
 
         return queryset.select_related("cpo").order_by("id")
