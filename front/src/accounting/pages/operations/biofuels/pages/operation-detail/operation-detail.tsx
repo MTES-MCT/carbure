@@ -99,6 +99,7 @@ export const OperationDetail = () => {
     execute: validateDraftTransfer,
     loading: validateDraftTransferLoading,
   } = useMutation(api.patchOperation, {
+    invalidates: ["operations"],
     onSuccess: () => {
       notify(t("Le transfert a été réalisé avec succès."), {
         variant: "success",
