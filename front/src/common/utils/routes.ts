@@ -150,21 +150,24 @@ export const ROUTE_URLS = {
 }
 
 /**
- * Ajoute des paramètres de requête à une URL
- * @param url - L'URL de base
- * @param params - Un objet contenant les paramètres de requête à ajouter
- * @returns L'URL avec les paramètres de requête
+ * Adds query parameters to a URL
+ * @param url - The base URL
+ * @param params - An object containing the query parameters to add
+ * @returns The URL with query parameters
  */
 export const addQueryParams = (
   url: string,
-  params: Record<string, string | number | boolean | [] | undefined | null>,
+  params: Record<
+    string,
+    string | number | boolean | string[] | number[] | undefined | null
+  >,
   excludeEmptyValues: boolean = true
 ) => {
-  // Sépare l'URL de base des paramètres existants
+  // Separates the base URL from existing parameters
   const [baseUrl, existingQuery] = url.split("?")
   const searchParams = new URLSearchParams(existingQuery)
 
-  // Ajoute les nouveaux paramètres
+  // Adds new parameters
   Object.entries(params).forEach(([key, value]) => {
     if (
       excludeEmptyValues &&
@@ -172,7 +175,21 @@ export const addQueryParams = (
     )
       return
 
-    searchParams.append(key, value?.toString() ?? "")
+    // Array handling
+    if (Array.isArray(value)) {
+      // Filters empty values if excludeEmptyValues is true
+      const filteredValues = excludeEmptyValues
+        ? value.filter((v) => v !== null && v !== undefined && v !== "")
+        : value
+
+      // Adds each array value as a separate parameter
+      filteredValues.forEach((item) => {
+        searchParams.append(key, item?.toString() ?? "")
+      })
+    } else {
+      // Simple value handling
+      searchParams.append(key, value?.toString() ?? "")
+    }
   })
 
   const queryString = searchParams.toString()
