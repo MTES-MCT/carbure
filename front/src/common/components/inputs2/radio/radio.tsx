@@ -48,7 +48,7 @@ export const RadioGroup = <V extends RadioValueType>({
     const labelValue =
       props.value !== undefined
         ? options.find((option) => option.value === props.value)?.label
-        : undefined
+        : "-"
     return (
       <div>
         <Label
