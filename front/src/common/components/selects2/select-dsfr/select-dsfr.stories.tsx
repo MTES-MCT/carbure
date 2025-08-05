@@ -13,6 +13,7 @@ const meta: Meta<
       { label: "Item 2", value: 2 },
       { label: "Item 3", value: 3 },
     ],
+    label: "Label of the select",
   },
   render: (args) => {
     const [value, setValue] = useState<number | undefined>(args.value)
@@ -30,9 +31,16 @@ const meta: Meta<
 }
 
 type Story = StoryObj<
-  typeof SelectDsfr<{ label: ReactNode; value: number }, string>
+  typeof SelectDsfr<{ label: ReactNode; value: number }, number>
 >
 
 export default meta
 
 export const Default: Story = {}
+
+export const ReadOnly: Story = {
+  args: {
+    readOnly: true,
+    value: 2,
+  },
+}
