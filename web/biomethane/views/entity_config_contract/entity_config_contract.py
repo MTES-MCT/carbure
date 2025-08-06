@@ -43,7 +43,7 @@ class BiomethaneEntityConfigContractViewSet(
     def get_serializer_class(self):
         if self.action == "create":
             return BiomethaneEntityConfigContractAddSerializer
-        elif self.action in ["update", "partial_update"]:
+        elif self.action in ["update", "contract_patch"]:
             return BiomethaneEntityConfigContractPatchSerializer
         return BiomethaneEntityConfigContractSerializer
 

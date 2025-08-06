@@ -42,7 +42,7 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
 
     tariff_reference = data.get("tariff_reference")
 
-    # If existing instance (PATCH methode), use its tariff_reference if not provided
+    # If existing instance (PATCH method), use its tariff_reference if not provided
     if tariff_reference is None and instance:
         tariff_reference = instance.tariff_reference
 
@@ -102,6 +102,11 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         return handle_fields_requirement(data)
+
+    def create(self, validated_data):
+        if validated_data.get("cmax_annualized") is None:
+            validated_data["cmax_annualized"] = False
+        return super().create(validated_data)
 
 
 class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer):
