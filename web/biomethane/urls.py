@@ -5,10 +5,9 @@ from .views.entity_config_contract.entity_config_contract import BiomethaneEntit
 
 router = SimpleRouter()
 
-# URLs for patching a contract without an ID
 contract_viewset = BiomethaneEntityConfigContractViewSet.as_view(
     {
-        "get": "list",
+        "get": "contract_get",
         "post": "create",
         "patch": "contract_patch",
     }

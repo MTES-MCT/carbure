@@ -72,7 +72,7 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
             field_value = getattr(instance, field, None)
 
         # A field is considered missing if not in data and neither in instance
-        if not field_value:
+        if field_value is None:
             missing_fields.append(field)
 
     for field in missing_fields:
@@ -85,6 +85,9 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
 
 
 class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
+    # Allow null to distinguish between False and not provided
+    cmax_annualized = serializers.BooleanField(allow_null=True, required=False)
+
     class Meta:
         model = BiomethaneEntityConfigContract
         fields = [
@@ -95,10 +98,6 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
             "cmax_annualized",
             "cmax_annualized_value",
             "pap_contracted",
-            "signature_date",
-            "effective_date",
-            "general_conditions_file",
-            "specific_conditions_file",
         ]
 
     def validate(self, data):
@@ -106,6 +105,9 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
 
 
 class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer):
+    # Allow null to distinguish between False and not provided
+    cmax_annualized = serializers.BooleanField(allow_null=True, required=False)
+
     class Meta:
         model = BiomethaneEntityConfigContract
         fields = [

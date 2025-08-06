@@ -1,5 +1,6 @@
 from django.db import models
 
+from core import private_storage
 from core.models import Entity
 
 
@@ -35,8 +36,8 @@ class BiomethaneEntityConfigContract(models.Model):
     pap_contracted = models.FloatField(null=True, blank=True)
     signature_date = models.DateField(null=True, blank=True)
     effective_date = models.DateField(null=True, blank=True)
-    general_conditions_file = models.FileField(null=True, blank=True)
-    specific_conditions_file = models.FileField(null=True, blank=True)
+    general_conditions_file = models.FileField(storage=private_storage, null=True, blank=True)
+    specific_conditions_file = models.FileField(storage=private_storage, null=True, blank=True)
 
     class Meta:
         db_table = "biomethane_entity_config_contract"
@@ -73,7 +74,7 @@ class BiomethaneEntityConfigAmendment(models.Model):
 
     # Used only if amendment_object is OTHER
     amendment_details = models.TextField(blank=True, null=True)
-    amendment_file = models.FileField()
+    amendment_file = models.FileField(storage=private_storage)
 
     class Meta:
         db_table = "biomethane_entity_config_amendment"

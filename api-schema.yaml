@@ -455,7 +455,9 @@ paths:
           description: ""
   /api/biomethane/contract/:
     get:
-      operationId: biomethane_contract_list
+      operationId: biomethane_contract_retrieve
+      description: Retrieve the contract for the current entity. Returns a single
+        contract object.
       parameters:
         - in: query
           name: entity_id
@@ -463,30 +465,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - name: page
-          required: false
-          in: query
-          description: A page number within the paginated result set.
-          schema:
-            type: integer
-        - name: page_size
-          required: false
-          in: query
-          description: Number of results to return per page.
-          schema:
-            type: integer
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
       tags:
         - biomethane
       security:
@@ -497,8 +475,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedBiomethaneEntityConfigContractList"
-          description: ""
+                $ref: "#/components/schemas/BiomethaneEntityConfigContract"
+          description: Contract details for the entity
+        "404":
+          description: Contract not found for this entity.
     post:
       operationId: biomethane_contract_create
       parameters:
@@ -9638,6 +9618,7 @@ components:
           nullable: true
         cmax_annualized:
           type: boolean
+          nullable: true
         cmax_annualized_value:
           type: number
           format: double
@@ -9645,22 +9626,6 @@ components:
         pap_contracted:
           type: number
           format: double
-          nullable: true
-        signature_date:
-          type: string
-          format: date
-          nullable: true
-        effective_date:
-          type: string
-          format: date
-          nullable: true
-        general_conditions_file:
-          type: string
-          format: uri
-          nullable: true
-        specific_conditions_file:
-          type: string
-          format: uri
           nullable: true
       required:
         - buyer
@@ -9682,6 +9647,7 @@ components:
           nullable: true
         cmax_annualized:
           type: boolean
+          nullable: true
         cmax_annualized_value:
           type: number
           format: double
@@ -9689,22 +9655,6 @@ components:
         pap_contracted:
           type: number
           format: double
-          nullable: true
-        signature_date:
-          type: string
-          format: date
-          nullable: true
-        effective_date:
-          type: string
-          format: date
-          nullable: true
-        general_conditions_file:
-          type: string
-          format: binary
-          nullable: true
-        specific_conditions_file:
-          type: string
-          format: binary
           nullable: true
       required:
         - buyer
@@ -12655,29 +12605,6 @@ components:
             $ref: "#/components/schemas/BalanceResponse"
         total_quantity:
           type: number
-    PaginatedBiomethaneEntityConfigContractList:
-      type: object
-      required:
-        - count
-        - results
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/BiomethaneEntityConfigContract"
     PaginatedElecBalanceList:
       type: object
       required:
