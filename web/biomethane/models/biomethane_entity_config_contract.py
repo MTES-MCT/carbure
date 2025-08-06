@@ -9,8 +9,15 @@ class BiomethaneEntityConfigContract(models.Model):
 
     TARIFF_REFERENCE_CHOICES = tuple((year, year) for year in TARIFF_RULE_1 + TARIFF_RULE_2)
 
+    # Méthanisation en digesteur de produits ou déchets non dangereux,
+    # hors matières résultant du traitement des eaux usées urbaines ou industrielles
     INSTALLATION_CATEGORY_1 = "INSTALLATION_CATEGORY_1"
+
+    # Méthanisation en digesteur de produits ou déchets non dangereux,
+    # y compris des matières résultant du traitement des eaux usées urbaines ou industrielles
     INSTALLATION_CATEGORY_2 = "INSTALLATION_CATEGORY_2"
+
+    # Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés
     INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3"
     INSTALLATION_CATEGORIES = (
         (INSTALLATION_CATEGORY_1, INSTALLATION_CATEGORY_1),

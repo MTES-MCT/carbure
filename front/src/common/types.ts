@@ -87,3 +87,14 @@ export { Unit }
 export type DeepPartial<T> = T extends object
   ? { [P in keyof T]?: DeepPartial<T[P]> }
   : T
+
+/**
+ * Replace null with undefined recursively
+ */
+export type ReplaceNullWithUndefined<T> = {
+  [K in keyof T]: T[K] extends null | undefined
+    ? undefined
+    : T[K] extends infer U | null
+      ? U
+      : T[K]
+}

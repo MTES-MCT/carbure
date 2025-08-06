@@ -1,10 +1,13 @@
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext"
+import { InputProps } from "@codegouvfr/react-dsfr/Input"
 import {
   Label,
   LabelProps,
   ReadOnlyValue,
 } from "common/components/inputs2/base-input"
 import { defaultNormalizer, Normalizer } from "common/utils/normalize"
+import cl from "clsx"
+import styles from "./select-dsfr.module.css"
 
 const defaultGetValue = <T, V = T>(value: V) => {
   if (typeof value === "string") return value
@@ -17,18 +20,19 @@ const defaultGetValue = <T, V = T>(value: V) => {
   return ""
 }
 
+// The state prop has different values than the InputProps.state, so we need to pick it from the InputProps and map it to the SelectProps.state
 export type SelectDsfrProps<T, V = T> = Omit<
   SelectProps<SelectProps.Option[]>,
-  "options"
-> & {
-  value?: V | undefined
-  getValue?: (value: V) => string
-  options: T[]
-  onChange?: (value: V | undefined) => void
-  normalize?: Normalizer<T, V>
-} & Omit<LabelProps, "label"> & {
+  "options" | "state"
+> &
+  Omit<LabelProps, "label"> & {
+    value?: V | undefined
+    getValue?: (value: V) => string
+    options: T[]
+    onChange?: (value: V | undefined) => void
+    normalize?: Normalizer<T, V>
     label?: LabelProps["label"]
-  }
+  } & Pick<InputProps, "state">
 
 export const SelectDsfr = <T, V = T>({
   value,
@@ -39,6 +43,8 @@ export const SelectDsfr = <T, V = T>({
   label,
   hasTooltip,
   title,
+  state,
+  className,
   ...props
 }: SelectDsfrProps<T, V>) => {
   const normalizedOptions = options?.map((option) => {
@@ -81,6 +87,8 @@ export const SelectDsfr = <T, V = T>({
           label={label}
         />
       }
+      state={state === "success" ? "valid" : state}
+      className={cl(className, styles["select-dsfr"])}
     />
   )
 }
