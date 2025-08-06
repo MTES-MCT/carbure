@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -33,6 +33,7 @@ class BiomethaneEntityConfigContractViewSet(
     queryset = BiomethaneEntityConfigContract.objects.all()
     serializer_class = BiomethaneEntityConfigContractSerializer
     permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
+    pagination_class = None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -46,10 +47,20 @@ class BiomethaneEntityConfigContractViewSet(
             return BiomethaneEntityConfigContractPatchSerializer
         return BiomethaneEntityConfigContractSerializer
 
-    def list(self, request, *args, **kwargs):
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneEntityConfigContractSerializer,
+                description="Contract details for the entity",
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Contract not found for this entity."),
+        },
+        description="Retrieve the contract for the current entity. Returns a single contract object.",
+    )
+    def contract_get(self, request, *args, **kwargs):
         try:
             contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
-            data = self.get_serializer(contract).data
+            data = self.get_serializer(contract, many=False).data
             return Response(data)
 
         except BiomethaneEntityConfigContract.DoesNotExist:
@@ -59,7 +70,7 @@ class BiomethaneEntityConfigContractViewSet(
         try:
             contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
             serializer = self.get_serializer(contract, data=request.data, partial=True)
-            print("Partial update data:", request.data)
+
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)

@@ -198,7 +198,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["biomethane_contract_list"];
+        /** @description Retrieve the contract for the current entity. Returns a single contract object. */
+        get: operations["biomethane_contract_retrieve"];
         put?: never;
         post: operations["biomethane_contract_create"];
         delete?: never;
@@ -2505,19 +2506,11 @@ export interface components {
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
-            cmax_annualized?: boolean;
+            cmax_annualized?: boolean | null;
             /** Format: double */
             cmax_annualized_value?: number | null;
             /** Format: double */
             pap_contracted?: number | null;
-            /** Format: date */
-            signature_date?: string | null;
-            /** Format: date */
-            effective_date?: string | null;
-            /** Format: uri */
-            general_conditions_file?: string | null;
-            /** Format: uri */
-            specific_conditions_file?: string | null;
         };
         BiomethaneEntityConfigContractAddRequest: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
@@ -2525,19 +2518,11 @@ export interface components {
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
-            cmax_annualized?: boolean;
+            cmax_annualized?: boolean | null;
             /** Format: double */
             cmax_annualized_value?: number | null;
             /** Format: double */
             pap_contracted?: number | null;
-            /** Format: date */
-            signature_date?: string | null;
-            /** Format: date */
-            effective_date?: string | null;
-            /** Format: binary */
-            general_conditions_file?: File | null;
-            /** Format: binary */
-            specific_conditions_file?: File | null;
         };
         CarbureLotPublic: {
             readonly id: number;
@@ -3693,21 +3678,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["BalanceResponse"][];
             total_quantity?: number;
-        };
-        PaginatedBiomethaneEntityConfigContractList: {
-            /** @example 123 */
-            count: number;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?page=4
-             */
-            next?: string | null;
-            /**
-             * Format: uri
-             * @example http://api.example.org/accounts/?page=2
-             */
-            previous?: string | null;
-            results: components["schemas"]["BiomethaneEntityConfigContract"][];
         };
         PaginatedElecBalanceList: {
             /** @example 123 */
@@ -4882,19 +4852,11 @@ export interface operations {
             };
         };
     };
-    biomethane_contract_list: {
+    biomethane_contract_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description A page number within the paginated result set. */
-                page?: number;
-                /** @description Number of results to return per page. */
-                page_size?: number;
-                /** @description A search term. */
-                search?: string;
             };
             header?: never;
             path?: never;
@@ -4902,13 +4864,21 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Contract details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedBiomethaneEntityConfigContractList"];
+                    "application/json": components["schemas"]["BiomethaneEntityConfigContract"];
                 };
+            };
+            /** @description Contract not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
