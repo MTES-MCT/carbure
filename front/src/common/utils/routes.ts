@@ -133,8 +133,10 @@ export const ROUTE_URLS = {
   USER_GUIDE: "https://carbure-1.gitbook.io/faq",
 
   MY_ACCOUNT: {
-    INDEX: "/account",
-    ADD_COMPANY: "/account/add-company",
+    INDEX: "/account/identifiers",
+    ADD_COMPANY: "/account/companies/add",
+    COMPANIES: "/account/companies",
+    COMPANY_REGISTRATION: "/account/companies/registration",
   },
   AUTH: {
     LOGOUT: "/auth/logout",

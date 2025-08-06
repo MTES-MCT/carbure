@@ -1,5 +1,5 @@
-import { Form, useForm } from "common/components/form"
-import { TextInput } from "common/components/input"
+import { Form, useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { usePortal } from "common/components/portal"
 import { useUser } from "common/hooks/user"
 import { useTranslation } from "react-i18next"
@@ -7,14 +7,10 @@ import { useMutation } from "common/hooks/async"
 import * as api from "../../../api"
 import { useNotify } from "common/components/notifications"
 import { EmailConfirmationModal } from "./email-confirmation-modal"
-import { Check } from "common/components/icons"
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
+import { EditableCard } from "common/molecules/editable-card"
 
-export interface ChangeEmailFormProps {
-  onEmailChange: (email: string) => void
-}
-
-export const ChangeEmailForm = ({ onEmailChange }: ChangeEmailFormProps) => {
+export const ChangeEmailForm = () => {
   const portal = usePortal()
   const user = useUser()
   const { t } = useTranslation()
@@ -42,7 +38,6 @@ export const ChangeEmailForm = ({ onEmailChange }: ChangeEmailFormProps) => {
           newEmail={value.newEmail!}
           onClose={close}
           onSuccess={() => {
-            onEmailChange(value.newEmail || "")
             setValue({
               email: value.newEmail || "",
               newEmail: "",
@@ -83,36 +78,38 @@ export const ChangeEmailForm = ({ onEmailChange }: ChangeEmailFormProps) => {
   })
 
   return (
-    <Form id="update-email-form" onSubmit={handleSave}>
-      <TextInput
-        readOnly
-        label={t("Adresse email actuelle")}
-        type="email"
-        value={value.email}
-      />
+    <EditableCard title={t("Adresse email")} headerActions={null}>
+      <Form onSubmit={handleSave}>
+        <TextInput
+          disabled
+          label={t("Adresse email actuelle")}
+          type="email"
+          value={value.email}
+        />
 
-      <TextInput
-        label={t("Nouvelle adresse email")}
-        type="email"
-        required
-        {...bind("newEmail")}
-      />
+        <TextInput
+          label={t("Nouvelle adresse email")}
+          type="email"
+          required
+          {...bind("newEmail")}
+        />
 
-      <TextInput
-        label={t("Saisissez votre mot de passe pour confirmer")}
-        type="password"
-        required
-        {...bind("password")}
-      />
-      <Button
-        variant="primary"
-        icon={Check}
-        label={t("Enregistrer mon email")}
-        submit="update-email-form"
-        loading={requestEmailChangeMutation.loading}
-        disabled={!value.newEmail || !value.password}
-        asideX
-      />
-    </Form>
+        <TextInput
+          label={t("Saisissez votre mot de passe pour confirmer")}
+          type="password"
+          required
+          {...bind("password")}
+        />
+        <Button
+          iconId="ri-check-line"
+          loading={requestEmailChangeMutation.loading}
+          disabled={!value.newEmail || !value.password}
+          asideX
+          type="submit"
+        >
+          {t("Enregistrer mon email")}
+        </Button>
+      </Form>
+    </EditableCard>
   )
 }

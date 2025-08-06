@@ -1,8 +1,7 @@
-import Dialog from "common/components/dialog"
+import { Dialog } from "common/components/dialog2"
 import { useTranslation } from "react-i18next"
 import { CompanyForm } from "./company-form"
-import Button from "common/components/button"
-import { Plus } from "common/components/icons"
+import { Button } from "common/components/button2"
 import { useRegisterCompany } from "./registration-dialog.hooks"
 
 type ForeignCompanyDialogProps = {
@@ -16,31 +15,33 @@ export const ForeignCompanyDialog = ({ close }: ForeignCompanyDialogProps) => {
   })
 
   return (
-    <Dialog onClose={close}>
-      <header>
-        <h1>{t("Inscrire ma société sur CarbuRe - Hors France")} </h1>
-      </header>
-
-      <main>
-        <section>
-          <CompanyForm
-            onSubmitForm={onSubmitForm}
-            formId="foreign-company-form"
-            isForeignCompany
-          />
-        </section>
-      </main>
-
-      <footer>
+    <Dialog
+      onClose={close}
+      header={
+        <Dialog.Title>
+          {t("Inscrire ma société sur CarbuRe - Hors France")}
+        </Dialog.Title>
+      }
+      footer={
         <Button
           asideX
-          submit="foreign-company-form"
           loading={registerCompanyRequest.loading}
-          icon={Plus}
-          variant="primary"
-          label={t("Demander l'inscription de votre société")}
-        />
-      </footer>
+          iconId="ri-add-line"
+          type="submit"
+          nativeButtonProps={{
+            form: "foreign-company-form",
+          }}
+        >
+          {t("Demander l'inscription de votre société")}
+        </Button>
+      }
+      size="medium"
+    >
+      <CompanyForm
+        onSubmitForm={onSubmitForm}
+        formId="foreign-company-form"
+        isForeignCompany
+      />
     </Dialog>
   )
 }

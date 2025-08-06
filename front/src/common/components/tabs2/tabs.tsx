@@ -21,7 +21,6 @@ export interface Tab<T extends string> {
 export interface TabsProps<T extends string> extends Layout {
   className?: string
   style?: React.CSSProperties
-  variant?: TabVariant
   keepSearch?: boolean
   tabs: Tab<T>[]
   focus?: T

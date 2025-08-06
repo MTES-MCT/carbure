@@ -1,20 +1,14 @@
-import { useForm } from "common/components/form"
-import { TextInput } from "common/components/input"
-import { Button } from "common/components/button"
-import { Check } from "common/components/icons"
+import { useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
+import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
 import { Form } from "common/components/form2"
 import { useMutation } from "common/hooks/async"
 import * as api from "../../api"
 import { useNotify } from "common/components/notifications"
+import { EditableCard } from "common/molecules/editable-card"
 
-export interface ChangePasswordFormProps {
-  onPasswordChange: () => void
-}
-
-export const ChangePasswordForm = ({
-  onPasswordChange,
-}: ChangePasswordFormProps) => {
+export const ChangePasswordForm = () => {
   const notify = useNotify()
   const { t } = useTranslation()
   const { value, bind, setValue } = useForm<{
@@ -32,7 +26,6 @@ export const ChangePasswordForm = ({
       notify(t("Votre mot de passe a été modifié avec succès !"), {
         variant: "success",
       })
-      onPasswordChange()
       setValue({
         currentPassword: "",
         newPassword: "",
@@ -89,39 +82,43 @@ export const ChangePasswordForm = ({
     }
   }
   return (
-    <Form id="update-password-form" onSubmit={handlePasswordChange}>
-      <TextInput
-        label={t("Mot de passe actuel")}
-        type="password"
-        required
-        {...bind("currentPassword")}
-        style={{ width: "100%" }}
-      />
-      <TextInput
-        label={t("Nouveau mot de passe")}
-        type="password"
-        required
-        {...bind("newPassword")}
-        style={{ width: "100%" }}
-      />
-      <TextInput
-        label={t("Confirmation du nouveau mot de passe")}
-        type="password"
-        required
-        {...bind("confirmPassword")}
-        style={{ width: "100%" }}
-      />
-      <Button
-        variant="primary"
-        icon={Check}
-        label={t("Enregistrer mon mot de passe")}
-        submit="update-password-form"
-        loading={requestPasswordChangeMutation.loading}
-        disabled={
-          !value.currentPassword || !value.newPassword || !value.confirmPassword
-        }
-        asideX
-      />
-    </Form>
+    <EditableCard title={t("Mot de passe")} headerActions={null}>
+      <Form onSubmit={handlePasswordChange}>
+        <TextInput
+          label={t("Mot de passe actuel")}
+          type="password"
+          required
+          {...bind("currentPassword")}
+          style={{ width: "100%" }}
+        />
+        <TextInput
+          label={t("Nouveau mot de passe")}
+          type="password"
+          required
+          {...bind("newPassword")}
+          style={{ width: "100%" }}
+        />
+        <TextInput
+          label={t("Confirmation du nouveau mot de passe")}
+          type="password"
+          required
+          {...bind("confirmPassword")}
+          style={{ width: "100%" }}
+        />
+        <Button
+          iconId="ri-check-line"
+          loading={requestPasswordChangeMutation.loading}
+          disabled={
+            !value.currentPassword ||
+            !value.newPassword ||
+            !value.confirmPassword
+          }
+          asideX
+          type="submit"
+        >
+          {t("Enregistrer mon mot de passe")}
+        </Button>
+      </Form>
+    </EditableCard>
   )
 }

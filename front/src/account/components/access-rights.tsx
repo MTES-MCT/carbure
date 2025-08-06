@@ -18,19 +18,21 @@ import {
   getUserRoleLabel,
   normalizeEntityPreview,
 } from "common/utils/normalizers"
-import { Button } from "common/components/button"
-import { LoaderOverlay, Panel } from "common/components/scaffold"
-import { Alert } from "common/components/alert"
-import { AlertTriangle, Cross, Plus, Return } from "common/components/icons"
-import Table, { actionColumn, Cell } from "common/components/table"
-import Dialog, { Confirm } from "common/components/dialog"
-import Autocomplete from "common/components/autocomplete"
-import { RadioGroup } from "common/components/radio"
-import Form from "common/components/form"
+import { Button } from "common/components/button2"
+import { LoaderOverlay } from "common/components/scaffold"
+import { Table, Cell } from "common/components/table2"
+import { Dialog, Confirm } from "common/components/dialog2"
+import { Autocomplete } from "common/components/autocomplete2"
+import { RadioGroup } from "common/components/inputs2"
+import { Form } from "common/components/form2"
 import { useMatomo } from "matomo"
 import { useNotify } from "common/components/notifications"
-import { useNavigate } from "react-router-dom"
+import { Route, Routes, useNavigate } from "react-router-dom"
 import Badge, { BadgeProps } from "@codegouvfr/react-dsfr/Badge"
+import { EditableCard } from "common/molecules/editable-card"
+import { Notice } from "common/components/notice"
+import { ROUTE_URLS } from "common/utils/routes"
+import { CompanyRegistrationDialog } from "companies/components/registration-dialog"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
@@ -46,32 +48,27 @@ export const AccountAccesRights = () => {
   const loading = user.loading || revokeMyself.loading
 
   return (
-    <Panel>
-      <header>
-        <h1>
-          <Trans>Demandes d'accès aux sociétés</Trans>
-        </h1>
+    <EditableCard
+      title={t("Demandes d'accès aux sociétés")}
+      headerActions={
         <Button
           asideX
-          variant="primary"
-          icon={Plus}
-          label={t("Ajouter une organisation")}
-          action={() => portal((close) => <EntityDialog onClose={close} />)}
-        />
-      </header>
-
+          iconId="ri-add-line"
+          linkProps={{
+            to: ROUTE_URLS.MY_ACCOUNT.ADD_COMPANY,
+          }}
+        >
+          {t("Ajouter une organisation")}
+        </Button>
+      }
+    >
       {user.requests.length === 0 && (
-        <>
-          <section>
-            <Alert variant="warning" icon={AlertTriangle}>
-              <Trans>
-                Aucune autorisation pour ce compte, ajoutez une organisation
-                pour continuer.
-              </Trans>
-            </Alert>
-          </section>
-          <footer />
-        </>
+        <Notice variant="warning" icon="ri-error-warning-line">
+          <Trans>
+            Aucune autorisation pour ce compte, ajoutez une organisation pour
+            continuer.
+          </Trans>
+        </Notice>
       )}
 
       {user.requests.length > 0 && (
@@ -86,7 +83,7 @@ export const AccountAccesRights = () => {
               small: true,
               header: "Statut",
               cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
-              style: { minWidth: "130px" },
+              style: { minWidth: "160px" },
             },
             {
               header: t("Organisation"),
@@ -112,33 +109,48 @@ export const AccountAccesRights = () => {
                   : dateRequested
               },
             },
-            actionColumn<UserRightRequest>((right) => [
-              <Button
-                captive
-                variant="icon"
-                icon={Cross}
-                title={t("Annuler")}
-                action={() =>
-                  portal((close) => (
-                    <Confirm
-                      icon={Cross}
-                      variant="danger"
-                      title={t("Annuler mes accès")}
-                      description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
-                      confirm={t("Révoquer")}
-                      onConfirm={() => revokeMyself.execute(right.entity.id)}
-                      onClose={close}
-                    />
-                  ))
-                }
-              />,
-            ]),
+            {
+              header: t("Actions"),
+              cell: (right) => (
+                <Button
+                  captive
+                  iconId="ri-close-line"
+                  title={t("Annuler")}
+                  priority="tertiary no outline"
+                  onClick={() =>
+                    portal((close) => (
+                      <Confirm
+                        icon="ri-close-line"
+                        title={t("Annuler mes accès")}
+                        description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
+                        confirm={t("Révoquer")}
+                        onConfirm={() => revokeMyself.execute(right.entity.id)}
+                        onClose={close}
+                        hideCancel
+                      />
+                    ))
+                  }
+                />
+              ),
+            },
           ]}
         />
       )}
 
       {loading && <LoaderOverlay />}
-    </Panel>
+      <Routes>
+        <Route path="" element={null} />
+        <Route
+          path="add"
+          element={
+            <EntityDialog
+              onClose={() => navigate(ROUTE_URLS.MY_ACCOUNT.COMPANIES)}
+            />
+          }
+        />
+        <Route path="registration" element={<CompanyRegistrationDialog />} />
+      </Routes>
+    </EditableCard>
   )
 }
 
@@ -165,85 +177,90 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
 
   const showAddCompanyDialog = () => {
     onClose()
-    navigate("/account/company-registration")
+    navigate(ROUTE_URLS.MY_ACCOUNT.COMPANY_REGISTRATION)
   }
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Ajout organisation")}</h1>
-      </header>
-      <main>
-        <section>
-          {t(
-            "Recherchez la société qui vous emploie pour pouvoir accéder à ses données."
-          )}
-        </section>
-        <section>
-          <Form
-            id="access-right"
-            onSubmit={async () => {
-              matomo.push(["trackEvent", "account", "add-access-right"])
-              await requestAccess.execute(entity!.id, role!)
-              setEntity(undefined)
-            }}
-          >
-            <Autocomplete
-              autoFocus
-              label={t("Organisation")}
-              placeholder={t("Rechercher une société...")}
-              name="entity"
-              value={entity}
-              getOptions={common.findEnabledEntities}
-              onChange={setEntity}
-              normalize={normalizeEntityPreview}
-            />
-
-            <RadioGroup
-              label={t("Rôle")}
-              name="role"
-              value={role}
-              onChange={setRole}
-              options={[
-                {
-                  value: UserRole.ReadOnly,
-                  label: t("Lecture seule (consultation des lots uniquement)"),
-                },
-                {
-                  value: UserRole.ReadWrite,
-                  label: t("Lecture/écriture (création et gestion des lots)"),
-                },
-                {
-                  value: UserRole.Admin,
-                  label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-                },
-                {
-                  value: UserRole.Auditor,
-                  label: t("Audit (accès spécial pour auditeurs)"),
-                },
-              ]}
-            />
-          </Form>
-        </section>
-        <section>
-          <Button
-            variant="link"
-            label={t("Ma société n'est pas enregistrée sur CarbuRe.")}
-            action={showAddCompanyDialog}
-          />
-        </section>
-      </main>
-      <footer>
+    <Dialog
+      onClose={onClose}
+      header={
+        <>
+          <Dialog.Title>{t("Ajout organisation")}</Dialog.Title>
+          <Dialog.Description>
+            {t(
+              "Recherchez la société qui vous emploie pour pouvoir accéder à ses données."
+            )}
+          </Dialog.Description>
+        </>
+      }
+      footer={
         <Button
-          variant="primary"
           loading={requestAccess.loading}
-          icon={Plus}
-          label={t("Demander l'accès")}
+          iconId="ri-add-line"
           disabled={!entity || !role}
-          submit="access-right"
+          type="submit"
+          nativeButtonProps={{
+            form: "access-right",
+          }}
+        >
+          {t("Demander l'accès")}
+        </Button>
+      }
+      fitContent
+    >
+      <Form
+        id="access-right"
+        onSubmit={async () => {
+          matomo.push(["trackEvent", "account", "add-access-right"])
+          await requestAccess.execute(entity!.id, role!)
+          setEntity(undefined)
+        }}
+      >
+        <div>
+          <Autocomplete
+            autoFocus
+            label={t("Organisation")}
+            placeholder={t("Rechercher une société...")}
+            name="entity"
+            value={entity}
+            getOptions={common.findEnabledEntities}
+            onChange={setEntity}
+            normalize={normalizeEntityPreview}
+          />
+          <Button
+            customPriority="link"
+            onClick={showAddCompanyDialog}
+            style={{ marginTop: "8px" }}
+          >
+            {t("Ma société n'est pas enregistrée sur CarbuRe.")}
+          </Button>
+        </div>
+
+        <RadioGroup
+          label={t("Rôle")}
+          name="role"
+          value={role}
+          onChange={setRole}
+          options={[
+            {
+              value: UserRole.ReadOnly,
+              label: t("Lecture seule (consultation des lots uniquement)"),
+            },
+            {
+              value: UserRole.ReadWrite,
+              label: t("Lecture/écriture (création et gestion des lots)"),
+            },
+            {
+              value: UserRole.Admin,
+              label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
+            },
+            {
+              value: UserRole.Auditor,
+              label: t("Audit (accès spécial pour auditeurs)"),
+            },
+          ]}
         />
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
+      </Form>
     </Dialog>
   )
 }
