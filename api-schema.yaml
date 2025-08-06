@@ -9394,6 +9394,7 @@ components:
         signature_date:
           type: string
           format: date
+          nullable: true
         effective_date:
           type: string
           format: date
