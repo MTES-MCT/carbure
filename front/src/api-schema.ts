@@ -10642,6 +10642,11 @@ export enum GesOptionEnum {
   Actual = "Actual",
   NUTS2 = "NUTS2",
 }
+export enum InstallationCategoryEnum {
+  INSTALLATION_CATEGORY_1 = "INSTALLATION_CATEGORY_1",
+  INSTALLATION_CATEGORY_2 = "INSTALLATION_CATEGORY_2",
+  INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3",
+}
 export enum LotStatusEnum {
   DRAFT = "DRAFT",
   PENDING = "PENDING",
