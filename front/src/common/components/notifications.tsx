@@ -34,7 +34,9 @@ export function useNotifyError() {
 
     let errorText =
       defaultMessage ||
-      t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
+      t(
+        "La demande a échoué. Réessayez ou contactez nous via le formulaire de contact."
+      )
     if (errorCode) {
       const customErrorText = t(errorCode, { ns: "errors" })
       if (customErrorText !== errorCode) errorText = customErrorText

@@ -44,3 +44,9 @@ export const ReadOnly: Story = {
     value: 2,
   },
 }
+
+export const SuccessState: Story = {
+  args: {
+    state: "success",
+  },
+}

@@ -21,12 +21,10 @@ import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { lazy } from "react"
 
-const BiomethaneContractPage = lazy(() => import("./pages/biomethane/contract"))
-const BiomethaneInjectionPage = lazy(
-  () => import("./pages/biomethane/injection")
-)
+const BiomethaneContractPage = lazy(() => import("biomethane/pages/contract"))
+const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
 const BiomethaneProductionPage = lazy(
-  () => import("./pages/biomethane/production")
+  () => import("biomethane/pages/production")
 )
 
 const Settings = () => {

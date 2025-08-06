@@ -33,6 +33,18 @@ export type RadioGroupProps<V extends RadioValueType> = Omit<
     label?: LabelProps["label"]
   }
 
+// The value returned by the onChange event from the DSFR is a string, so we need to convert it to the correct type
+const convertValue = <V extends RadioValueType>(
+  onChangeValue: string,
+  value: V
+) => {
+  if (typeof value === "boolean") return onChangeValue === "true"
+  if (typeof value === "number") return Number(onChangeValue)
+  if (typeof value === "string") return onChangeValue
+
+  return onChangeValue as V
+}
+
 export const RadioGroup = <V extends RadioValueType>({
   options,
   onChange,
@@ -61,12 +73,15 @@ export const RadioGroup = <V extends RadioValueType>({
       </div>
     )
   }
+
   const optionsWithNativeInputProps = options.map((option) => ({
     ...option,
     nativeInputProps: {
       value: option.value,
-      onChange: (e: ChangeEvent<HTMLInputElement>) =>
-        onChange?.(e.target.value as V),
+      onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        const value = convertValue(e.target.value, option.value) as V
+        return onChange?.(value)
+      },
       ...(Object.hasOwn(props, "value") // Handle uncontrolled value
         ? { checked: option.value === props.value }
         : {}),
@@ -81,6 +96,7 @@ export const RadioGroup = <V extends RadioValueType>({
       className={cl(
         props.className,
         styles["radio-group"],
+        props.orientation === "horizontal" && styles["radio-group--horizontal"],
         readOnly && styles["radio-group--read-only"]
       )}
       legend={
