@@ -547,13 +547,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -562,46 +562,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigContractPatch"
-          description: ""
-  /api/biomethane/contract/{entity}/:
-    patch:
-      operationId: biomethane_contract_partial_update_2
-      parameters:
-        - in: path
-          name: entity
-          schema:
-            type: integer
-          description: A unique value identifying this Biométhane - Contrat d'achat.
-          required: true
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-      tags:
-        - biomethane
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigContractPatch"
+                $ref: "#/components/schemas/BiomethaneEntityConfigContract"
           description: ""
   /api/double-counting/agreements/:
     get:
@@ -9215,6 +9176,21 @@ components:
         - effective_date
         - id
         - signature_date
+    BiomethaneEntityConfigAmendmentRequest:
+      type: object
+      properties:
+        contract:
+          type: integer
+        signature_date:
+          type: string
+          format: date
+        effective_date:
+          type: string
+          format: date
+      required:
+        - contract
+        - effective_date
+        - signature_date
     BiomethaneEntityConfigContract:
       type: object
       properties:
@@ -9223,8 +9199,9 @@ components:
         buyer:
           type: integer
         installation_category:
-          type: string
-          maxLength: 128
+          allOf:
+            - $ref: "#/components/schemas/InstallationCategoryEnum"
+          nullable: true
         cmax:
           type: number
           format: double
@@ -9266,7 +9243,6 @@ components:
         - amendments
         - buyer
         - entity
-        - installation_category
         - tariff_reference
     BiomethaneEntityConfigContractAdd:
       type: object
@@ -9276,8 +9252,9 @@ components:
         buyer:
           type: integer
         installation_category:
-          type: string
-          maxLength: 128
+          allOf:
+            - $ref: "#/components/schemas/InstallationCategoryEnum"
+          nullable: true
         cmax:
           type: number
           format: double
@@ -9310,7 +9287,6 @@ components:
           nullable: true
       required:
         - buyer
-        - installation_category
         - tariff_reference
     BiomethaneEntityConfigContractAddRequest:
       type: object
@@ -9320,9 +9296,9 @@ components:
         buyer:
           type: integer
         installation_category:
-          type: string
-          minLength: 1
-          maxLength: 128
+          allOf:
+            - $ref: "#/components/schemas/InstallationCategoryEnum"
+          nullable: true
         cmax:
           type: number
           format: double
@@ -9355,51 +9331,6 @@ components:
           nullable: true
       required:
         - buyer
-        - installation_category
-        - tariff_reference
-    BiomethaneEntityConfigContractPatch:
-      type: object
-      properties:
-        tariff_reference:
-          $ref: "#/components/schemas/TariffReferenceEnum"
-        buyer:
-          type: integer
-        installation_category:
-          type: string
-          maxLength: 128
-        cmax:
-          type: number
-          format: double
-          nullable: true
-        cmax_annualized:
-          type: boolean
-        cmax_annualized_value:
-          type: number
-          format: double
-          nullable: true
-        pap_contracted:
-          type: number
-          format: double
-          nullable: true
-        signature_date:
-          type: string
-          format: date
-          nullable: true
-        effective_date:
-          type: string
-          format: date
-          nullable: true
-        general_conditions_file:
-          type: string
-          format: uri
-          nullable: true
-        specific_conditions_file:
-          type: string
-          format: uri
-          nullable: true
-      required:
-        - buyer
-        - installation_category
         - tariff_reference
     CarbureLotPublic:
       type: object
@@ -11717,6 +11648,16 @@ components:
           type: integer
       required:
         - assigned_tickets_count
+    InstallationCategoryEnum:
+      enum:
+        - INSTALLATION_CATEGORY_1
+        - INSTALLATION_CATEGORY_2
+        - INSTALLATION_CATEGORY_3
+      type: string
+      description: |-
+        * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
+        * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
+        * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
     InviteUserRequest:
       type: object
       properties:
@@ -12479,7 +12420,7 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
-    PatchedBiomethaneEntityConfigContractPatchRequest:
+    PatchedBiomethaneEntityConfigContractRequest:
       type: object
       properties:
         tariff_reference:
@@ -12487,9 +12428,9 @@ components:
         buyer:
           type: integer
         installation_category:
-          type: string
-          minLength: 1
-          maxLength: 128
+          allOf:
+            - $ref: "#/components/schemas/InstallationCategoryEnum"
+          nullable: true
         cmax:
           type: number
           format: double
@@ -12520,6 +12461,8 @@ components:
           type: string
           format: binary
           nullable: true
+        entity:
+          type: integer
     PatchedElecOperationUpdateRequest:
       type: object
       properties:

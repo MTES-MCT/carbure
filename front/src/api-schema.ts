@@ -207,22 +207,6 @@ export interface paths {
         patch: operations["biomethane_contract_partial_update"];
         trace?: never;
     };
-    "/api/biomethane/contract/{entity}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["biomethane_contract_partial_update_2"];
-        trace?: never;
-    };
     "/api/double-counting/agreements/": {
         parameters: {
             query?: never;
@@ -2486,10 +2470,17 @@ export interface components {
             /** Format: date */
             effective_date: string;
         };
+        BiomethaneEntityConfigAmendmentRequest: {
+            contract: number;
+            /** Format: date */
+            signature_date: string;
+            /** Format: date */
+            effective_date: string;
+        };
         BiomethaneEntityConfigContract: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
             buyer: number;
-            installation_category: string;
+            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
             cmax_annualized?: boolean;
@@ -2511,7 +2502,7 @@ export interface components {
         BiomethaneEntityConfigContractAdd: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
             buyer: number;
-            installation_category: string;
+            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
             cmax_annualized?: boolean;
@@ -2531,7 +2522,7 @@ export interface components {
         BiomethaneEntityConfigContractAddRequest: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
             buyer: number;
-            installation_category: string;
+            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
             cmax_annualized?: boolean;
@@ -2547,26 +2538,6 @@ export interface components {
             general_conditions_file?: File | null;
             /** Format: binary */
             specific_conditions_file?: File | null;
-        };
-        BiomethaneEntityConfigContractPatch: {
-            tariff_reference: components["schemas"]["TariffReferenceEnum"];
-            buyer: number;
-            installation_category: string;
-            /** Format: double */
-            cmax?: number | null;
-            cmax_annualized?: boolean;
-            /** Format: double */
-            cmax_annualized_value?: number | null;
-            /** Format: double */
-            pap_contracted?: number | null;
-            /** Format: date */
-            signature_date?: string | null;
-            /** Format: date */
-            effective_date?: string | null;
-            /** Format: uri */
-            general_conditions_file?: string | null;
-            /** Format: uri */
-            specific_conditions_file?: string | null;
         };
         CarbureLotPublic: {
             readonly id: number;
@@ -3473,6 +3444,13 @@ export interface components {
         GroupAssignmentResponse: {
             assigned_tickets_count: number;
         };
+        /**
+         * @description * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
+         *     * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
+         *     * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+         * @enum {string}
+         */
+        InstallationCategoryEnum: InstallationCategoryEnum;
         InviteUserRequest: {
             /** Format: email */
             email: string;
@@ -3858,10 +3836,10 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
-        PatchedBiomethaneEntityConfigContractPatchRequest: {
+        PatchedBiomethaneEntityConfigContractRequest: {
             tariff_reference?: components["schemas"]["TariffReferenceEnum"];
             buyer?: number;
-            installation_category?: string;
+            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
             cmax_annualized?: boolean;
@@ -3877,6 +3855,7 @@ export interface components {
             general_conditions_file?: File | null;
             /** Format: binary */
             specific_conditions_file?: File | null;
+            entity?: number;
         };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
@@ -4973,9 +4952,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
+                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigContractRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigContractRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigContractRequest"];
             };
         };
         responses: {
@@ -4984,38 +4963,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneEntityConfigContractPatch"];
-                };
-            };
-        };
-    };
-    biomethane_contract_partial_update_2: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique value identifying this Biométhane - Contrat d'achat. */
-                entity: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneEntityConfigContractPatch"];
+                    "application/json": components["schemas"]["BiomethaneEntityConfigContract"];
                 };
             };
         };
@@ -10364,6 +10312,11 @@ export enum GesOptionEnum {
     Default = "Default",
     Actual = "Actual",
     NUTS2 = "NUTS2"
+}
+export enum InstallationCategoryEnum {
+    INSTALLATION_CATEGORY_1 = "INSTALLATION_CATEGORY_1",
+    INSTALLATION_CATEGORY_2 = "INSTALLATION_CATEGORY_2",
+    INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3"
 }
 export enum LotStatusEnum {
     DRAFT = "DRAFT",

@@ -55,7 +55,7 @@ class BiomethaneEntityConfigContractViewSet(
         except BiomethaneEntityConfigContract.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def partial_update(self, request, *args, **kwargs):
+    def contract_patch(self, request, *args, **kwargs):
         try:
             contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
             serializer = self.get_serializer(contract, data=request.data, partial=True)
