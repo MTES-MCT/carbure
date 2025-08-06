@@ -4,7 +4,6 @@ import { InstallationCategory, TariffReference } from "biomethane/types"
 import { createContract, updateContract } from "biomethane/api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
-import { apiTypes } from "common/services/api-fetch.types"
 
 export const useTariffReferenceOptions = () => {
   const { t } = useTranslation()
@@ -63,11 +62,10 @@ export const useMutateContractInfos = (hasContract: boolean = false) => {
 
   const mutation = useMutation(
     hasContract
-      ? (data: apiTypes["BiomethaneEntityConfigContractAddRequest"]) =>
-          updateContract(entity.id, data)
-      : (data: apiTypes["BiomethaneEntityConfigContractAddRequest"]) =>
-          createContract(entity.id, data),
+      ? (data) => updateContract(entity.id, data)
+      : (data) => createContract(entity.id, data),
     {
+      invalidates: ["contract-infos"],
       onSuccess: () => {
         notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
       },

@@ -30,7 +30,16 @@ export function download(endpoint: string, params: any) {
 }
 
 // converts an javascript object into FormData
-export function toFormData(obj: any): FormData {
+export function toFormData(
+  obj: any,
+  options?: {
+    excludeNulls?: boolean
+  }
+): FormData {
+  const defaultOptions = {
+    excludeNulls: true,
+  }
+  const { excludeNulls } = { ...defaultOptions, ...options }
   const formData = new FormData()
   for (const key in obj) {
     if (obj[key] instanceof FileList) {
@@ -39,7 +48,7 @@ export function toFormData(obj: any): FormData {
       obj[key].forEach((value: any) =>
         formData.append(key, value instanceof File ? value : value.toString())
       )
-    } else if (!isEmpty(obj[key])) {
+    } else if (!isEmpty(obj[key], { excludeNulls })) {
       formData.append(key, obj[key])
     }
   }
@@ -59,11 +68,15 @@ export function toSearchParams(params: any) {
   return urlParams
 }
 
-function isEmpty(value: any) {
+function isEmpty(value: any, options?: { excludeNulls?: boolean }) {
+  const defaultOptions = {
+    excludeNulls: true,
+  }
+  const { excludeNulls } = { ...defaultOptions, ...options }
   const isNull = value === null
   const isUndefined = value === undefined
   const isEmpty = Array.isArray(value) && value.length === 0
-  return isNull || isUndefined || isEmpty
+  return (excludeNulls ? isNull : false) || isUndefined || isEmpty
 }
 
 export default api
