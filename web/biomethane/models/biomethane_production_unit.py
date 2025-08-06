@@ -1,0 +1,182 @@
+from django.db import models
+
+from core.models import Entity
+
+
+class BiomethaneProductionUnit(models.Model):
+    # Propriétaire de l'unité de production
+    producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_production_units")
+
+    # Nom de l'unité
+    unit_name = models.CharField(max_length=128)
+
+    # SIRET
+    siret_number = models.CharField(max_length=16)
+
+    # Adresse de la société
+    company_address = models.CharField(max_length=256)
+
+    # légende
+    AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"
+    AGRICULTURAL_TERRITORIAL = "AGRICULTURAL_TERRITORIAL"
+    INDUSTRIAL_TERRITORIAL = "INDUSTRIAL_TERRITORIAL"
+    HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE"
+    ISDND = "ISDND"
+
+    unit_type = models.CharField(
+        max_length=32,
+        choices=[
+            (AGRICULTURAL_AUTONOMOUS, "Agricole autonome"),
+            (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
+            (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
+            (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
+            (ISDND, "ISDND"),
+        ],
+    )
+
+    # Votre site dispose-t-il d’un agrément sanitaire ?
+    has_sanitary_approval = models.BooleanField(default=False)
+
+    # N˚ agrément sanitaire
+    sanitary_approval_number = models.CharField(max_length=32)
+
+    # Disposez vous d’une dérogation à l’hygiénisation?
+    has_hygienization_exemption = models.BooleanField(default=False)
+
+    # Dérogation à l'hygiénisation
+    TOTAL = "TOTAL"
+    PARTIAL = "PARTIAL"
+
+    hygienization_exemption_type = models.CharField(
+        max_length=16,
+        choices=[
+            (TOTAL, "Totale"),
+            (PARTIAL, "Partielle"),
+        ],
+    )
+
+    # N˚ ICPE
+    icpe_number = models.CharField(max_length=32)
+
+    # Régime ICPE
+    AUTHORIZATION = "AUTHORIZATION"
+    REGISTRATION = "REGISTRATION"
+    DECLARATION_PERIODIC_CONTROLS = "DECLARATION_PERIODIC_CONTROLS"
+
+    icpe_regime = models.CharField(
+        max_length=32,
+        choices=[
+            (AUTHORIZATION, "Autorisation"),
+            (REGISTRATION, "Enregistrement"),
+            (DECLARATION_PERIODIC_CONTROLS, "Déclaration (avec contrôles périodiques)"),
+        ],
+    )
+
+    # Type de voie
+    LIQUID_PROCESS = "LIQUID_PROCESS"
+    DRY_PROCESS = "DRY_PROCESS"
+
+    process_type = models.CharField(
+        max_length=16,
+        choices=[
+            (LIQUID_PROCESS, "Voie liquide"),
+            (DRY_PROCESS, "Voie sèche"),
+        ],
+    )
+
+    # Procédé méthanisation
+    CONTINUOUS_INFINITELY_MIXED = "CONTINUOUS_INFINITELY_MIXED"  # Continu (infiniment mélangé)
+    PLUG_FLOW_SEMI_CONTINUOUS = "PLUG_FLOW_SEMI_CONTINUOUS"  # En piston (semi-continu)
+    BATCH_SILOS = "BATCH_SILOS"  # En silos (batch)
+
+    methanization_process = models.CharField(
+        max_length=32,
+        choices=[
+            (CONTINUOUS_INFINITELY_MIXED, "Continu (infiniment mélangé)"),
+            (PLUG_FLOW_SEMI_CONTINUOUS, "En piston (semi-continu)"),
+            (BATCH_SILOS, "En silos (batch)"),
+        ],
+    )
+
+    # Rendement de l'installation de production de biométhane %
+    production_efficiency = models.FloatField()
+
+    # Débitmètre dédié à la production de biogaz
+    has_biogas_production_flowmeter = models.BooleanField(default=False)
+
+    # Débitmètre dédié au volume de biogaz traité en épuration
+    has_purification_flowmeter = models.BooleanField(default=False)
+
+    # Débitmètre dédié au volume de biogaz torché
+    has_flaring_flowmeter = models.BooleanField(default=False)
+
+    # Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur
+    has_heating_flowmeter = models.BooleanField(default=False)
+
+    # Compteur dédié à la consommation électrique au système d'épuration et traitement des évents
+    has_purification_electrical_meter = models.BooleanField(default=False)
+
+    # Compteur dédié à la consommation électrique de l'ensemble de l'unité de production
+    has_global_electrical_meter = models.BooleanField(default=False)
+
+    # Présence d'un hygiénisateur ?
+    has_hygienization_unit = models.BooleanField(default=False)
+
+    # Existence d'un procédé de valorisation du CO2 ?
+    has_co2_valorization_process = models.BooleanField(default=False)
+
+    # Séparation de phase du digestat ?
+    has_digestate_phase_separation = models.BooleanField(default=False)
+
+    # Étapes complémentaires de traitement du digestat brut
+    raw_digestate_treatment_steps = models.CharField(max_length=128)
+
+    # Étape(s) complémentaire(s) de traitement de la phase liquide
+    liquid_phase_treatment_steps = models.CharField(max_length=128)
+
+    # Étape(s) complémentaire(s) de traitement de la phase solide
+    solid_phase_treatment_steps = models.CharField(max_length=128)
+
+    # Mode de valorisation du digestat
+    SPREADING = "SPREADING"
+    COMPOSTING = "COMPOSTING"
+    INCINERATION_LANDFILLING = "INCINERATION_LANDFILLING"
+
+    digestate_valorization_method = models.CharField(
+        max_length=32,
+        choices=[
+            (SPREADING, "Épandage"),
+            (COMPOSTING, "Compostage"),
+            (INCINERATION_LANDFILLING, "Incinération / Enfouissement"),
+        ],
+    )
+
+    # Gestion de l'épandage
+    DIRECT_SPREADING = "DIRECT_SPREADING"
+    SPREADING_VIA_PROVIDER = "SPREADING_VIA_PROVIDER"
+    TRANSFER = "TRANSFER"
+    SALE = "SALE"
+
+    spreading_management = models.CharField(
+        max_length=32,
+        choices=[
+            (DIRECT_SPREADING, "Épandage direct"),
+            (SPREADING_VIA_PROVIDER, "Épandage via un prestataire"),
+            (TRANSFER, "Cession"),
+            (SALE, "Vente"),
+        ],
+    )
+
+    # En cas de vente du digestat
+    DIG_AGRI_SPECIFICATIONS = "DIG_AGRI_SPECIFICATIONS"
+    HOMOLOGATION = "HOMOLOGATION"
+    STANDARDIZED_PRODUCT = "STANDARDIZED_PRODUCT"
+
+    digestate_sale_type = models.CharField(
+        max_length=32,
+        choices=[
+            (DIG_AGRI_SPECIFICATIONS, "Cahier de charges DIG Agri"),
+            (HOMOLOGATION, "Homologation"),
+            (STANDARDIZED_PRODUCT, "Produit normé"),
+        ],
+    )
