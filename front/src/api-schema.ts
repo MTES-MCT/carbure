@@ -191,40 +191,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/biomethane/agreement/": {
+    "/api/biomethane/contract/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["biomethane_contract_list"];
         put?: never;
-        /** @description Create a new agreement. */
-        post: operations["create_biomethane_entity_config_agreement"];
+        post: operations["biomethane_contract_create"];
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["biomethane_contract_partial_update"];
         trace?: never;
     };
-    "/api/biomethane/agreement/list/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["biomethane_agreement_list_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/biomethane/agreement/patch/": {
+    "/api/biomethane/contract/{entity}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -237,8 +220,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Patch a biomethane entity config agreement */
-        patch: operations["patch_biomethane_entity_config_agreement"];
+        patch: operations["biomethane_contract_partial_update_2"];
         trace?: never;
     };
     "/api/double-counting/agreements/": {
@@ -2496,17 +2478,25 @@ export interface components {
             name_en: string;
             code: string;
         };
-        BiomethaneEntityConfigAgreement: {
+        BiomethaneEntityConfigAmendment: {
+            readonly id: number;
+            contract: number;
+            /** Format: date */
+            signature_date: string;
+            /** Format: date */
+            effective_date: string;
+        };
+        BiomethaneEntityConfigContract: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
             buyer: number;
             installation_category: string;
             /** Format: double */
-            cmax: number;
-            cmax_annualized: boolean;
+            cmax?: number | null;
+            cmax_annualized?: boolean;
             /** Format: double */
-            cmax_annualized_value: number;
+            cmax_annualized_value?: number | null;
             /** Format: double */
-            pap_contracted: number;
+            pap_contracted?: number | null;
             /** Format: date */
             signature_date?: string | null;
             /** Format: date */
@@ -2516,38 +2506,67 @@ export interface components {
             /** Format: uri */
             specific_conditions_file?: string | null;
             readonly amendments: components["schemas"]["BiomethaneEntityConfigAmendment"][];
+            entity: number;
         };
-        BiomethaneEntityConfigAgreementAdd: {
+        BiomethaneEntityConfigContractAdd: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
             buyer: number;
             installation_category: string;
             /** Format: double */
-            cmax: number;
-            cmax_annualized: boolean;
+            cmax?: number | null;
+            cmax_annualized?: boolean;
             /** Format: double */
-            cmax_annualized_value: number;
+            cmax_annualized_value?: number | null;
             /** Format: double */
-            pap_contracted: number;
+            pap_contracted?: number | null;
+            /** Format: date */
+            signature_date?: string | null;
+            /** Format: date */
+            effective_date?: string | null;
+            /** Format: uri */
+            general_conditions_file?: string | null;
+            /** Format: uri */
+            specific_conditions_file?: string | null;
         };
-        BiomethaneEntityConfigAgreementAddRequest: {
+        BiomethaneEntityConfigContractAddRequest: {
             tariff_reference: components["schemas"]["TariffReferenceEnum"];
             buyer: number;
             installation_category: string;
             /** Format: double */
-            cmax: number;
-            cmax_annualized: boolean;
+            cmax?: number | null;
+            cmax_annualized?: boolean;
             /** Format: double */
-            cmax_annualized_value: number;
+            cmax_annualized_value?: number | null;
             /** Format: double */
-            pap_contracted: number;
+            pap_contracted?: number | null;
+            /** Format: date */
+            signature_date?: string | null;
+            /** Format: date */
+            effective_date?: string | null;
+            /** Format: binary */
+            general_conditions_file?: File | null;
+            /** Format: binary */
+            specific_conditions_file?: File | null;
         };
-        BiomethaneEntityConfigAmendment: {
-            readonly id: number;
-            contract: number;
+        BiomethaneEntityConfigContractPatch: {
+            tariff_reference: components["schemas"]["TariffReferenceEnum"];
+            buyer: number;
+            installation_category: string;
+            /** Format: double */
+            cmax?: number | null;
+            cmax_annualized?: boolean;
+            /** Format: double */
+            cmax_annualized_value?: number | null;
+            /** Format: double */
+            pap_contracted?: number | null;
             /** Format: date */
-            signature_date: string;
+            signature_date?: string | null;
             /** Format: date */
-            effective_date: string;
+            effective_date?: string | null;
+            /** Format: uri */
+            general_conditions_file?: string | null;
+            /** Format: uri */
+            specific_conditions_file?: string | null;
         };
         CarbureLotPublic: {
             readonly id: number;
@@ -3697,6 +3716,21 @@ export interface components {
             results: components["schemas"]["BalanceResponse"][];
             total_quantity?: number;
         };
+        PaginatedBiomethaneEntityConfigContractList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["BiomethaneEntityConfigContract"][];
+        };
         PaginatedElecBalanceList: {
             /** @example 123 */
             count: number;
@@ -3824,17 +3858,25 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
-        PatchedBiomethaneEntityConfigAgreementAddRequest: {
+        PatchedBiomethaneEntityConfigContractPatchRequest: {
             tariff_reference?: components["schemas"]["TariffReferenceEnum"];
             buyer?: number;
             installation_category?: string;
             /** Format: double */
-            cmax?: number;
+            cmax?: number | null;
             cmax_annualized?: boolean;
             /** Format: double */
-            cmax_annualized_value?: number;
+            cmax_annualized_value?: number | null;
             /** Format: double */
-            pap_contracted?: number;
+            pap_contracted?: number | null;
+            /** Format: date */
+            signature_date?: string | null;
+            /** Format: date */
+            effective_date?: string | null;
+            /** Format: binary */
+            general_conditions_file?: File | null;
+            /** Format: binary */
+            specific_conditions_file?: File | null;
         };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
@@ -4303,10 +4345,10 @@ export interface components {
         };
         /**
          * @description * `2011` - 2011
+         *     * `2020` - 2020
          *     * `2021` - 2021
-         *     * `2022` - 2022
          *     * `2023` - 2023
-         * @enum {integer}
+         * @enum {string}
          */
         TariffReferenceEnum: TariffReferenceEnum;
         ToggleElecRequest: {
@@ -4861,47 +4903,19 @@ export interface operations {
             };
         };
     };
-    create_biomethane_entity_config_agreement: {
+    biomethane_contract_list: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BiomethaneEntityConfigAgreementAddRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneEntityConfigAgreementAddRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneEntityConfigAgreementAddRequest"];
-            };
-        };
-        responses: {
-            /** @description The newly created agreement. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneEntityConfigAgreementAdd"];
-                };
-            };
-            /** @description Invalid input data. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    biomethane_agreement_list_retrieve: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
             };
             header?: never;
             path?: never;
@@ -4914,12 +4928,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneEntityConfigAgreement"];
+                    "application/json": components["schemas"]["PaginatedBiomethaneEntityConfigContractList"];
                 };
             };
         };
     };
-    patch_biomethane_entity_config_agreement: {
+    biomethane_contract_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneEntityConfigContractAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneEntityConfigContractAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneEntityConfigContractAddRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEntityConfigContractAdd"];
+                };
+            };
+        };
+    };
+    biomethane_contract_partial_update: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -4931,27 +4973,50 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigAgreementAddRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigAgreementAddRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigAgreementAddRequest"];
+                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
             };
         };
         responses: {
-            /** @description The updated agreement. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneEntityConfigAgreementAdd"];
+                    "application/json": components["schemas"]["BiomethaneEntityConfigContractPatch"];
                 };
             };
-            /** @description Invalid input data. */
-            400: {
+        };
+    };
+    biomethane_contract_partial_update_2: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique value identifying this Biométhane - Contrat d'achat. */
+                entity: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneEntityConfigContractPatchRequest"];
+            };
+        };
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEntityConfigContractPatch"];
+                };
             };
         };
     };
@@ -7989,7 +8054,7 @@ export interface operations {
         parameters: {
             query: {
                 added_by?: string[];
-                clients?: string[];
+                client?: string[];
                 country_of_origin?: string[];
                 delivery_site?: string[];
                 /** @description Entity ID */
@@ -8101,7 +8166,7 @@ export interface operations {
         parameters: {
             query: {
                 added_by?: string[];
-                clients?: string[];
+                client?: string[];
                 country_of_origin?: string[];
                 delivery_site?: string[];
                 /** @description Entity ID */
@@ -8153,7 +8218,7 @@ export interface operations {
         parameters: {
             query: {
                 added_by?: string[];
-                clients?: string[];
+                client?: string[];
                 country_of_origin?: string[];
                 delivery_site?: string[];
                 /** @description Entity ID */
@@ -10350,10 +10415,10 @@ export enum SiteTypeEnum {
     AIRPORT = "AIRPORT"
 }
 export enum TariffReferenceEnum {
-    Value2011 = 2011,
-    Value2021 = 2021,
-    Value2022 = 2022,
-    Value2023 = 2023
+    Value2011 = "2011",
+    Value2020 = "2020",
+    Value2021 = "2021",
+    Value2023 = "2023"
 }
 export enum TransportDocumentTypeEnum {
     DAU = "DAU",
