@@ -9,10 +9,19 @@ class BiomethaneEntityConfigContract(models.Model):
 
     TARIFF_REFERENCE_CHOICES = tuple((year, year) for year in TARIFF_RULE_1 + TARIFF_RULE_2)
 
+    INSTALLATION_CATEGORY_1 = "INSTALLATION_CATEGORY_1"
+    INSTALLATION_CATEGORY_2 = "INSTALLATION_CATEGORY_2"
+    INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3"
+    INSTALLATION_CATEGORIES = (
+        (INSTALLATION_CATEGORY_1, INSTALLATION_CATEGORY_1),
+        (INSTALLATION_CATEGORY_2, INSTALLATION_CATEGORY_2),
+        (INSTALLATION_CATEGORY_3, INSTALLATION_CATEGORY_3),
+    )
+
     tariff_reference = models.CharField(choices=TARIFF_REFERENCE_CHOICES, max_length=28)
     buyer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="buyer")
     entity = models.OneToOneField(Entity, on_delete=models.CASCADE, primary_key=True)
-    installation_category = models.CharField(max_length=128)
+    installation_category = models.CharField(choices=INSTALLATION_CATEGORIES, max_length=32, null=True, blank=True)
     cmax = models.FloatField(null=True, blank=True)
     cmax_annualized = models.BooleanField(default=False)
     cmax_annualized_value = models.FloatField(null=True, blank=True)
