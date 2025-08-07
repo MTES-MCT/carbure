@@ -9,7 +9,6 @@ import {
 } from "./contract-infos.hooks"
 import { Grid } from "common/components/scaffold"
 import { Autocomplete } from "common/components/autocomplete2"
-import { findBuyerBiomethaneEntities } from "../../../api"
 import { useForm } from "common/components/form2"
 import { apiTypes } from "common/services/api-fetch.types"
 import { DeepPartial } from "common/types"
@@ -23,6 +22,7 @@ import { Button } from "common/components/button2"
 import { BiomethaneEntityConfigContract } from "biomethane/types"
 import { Notice } from "common/components/notice"
 import { REDII_CMAX_THRESHOLD, REDII_PAP_THRESHOLD } from "biomethane/config"
+import { findBuyerBiomethaneEntities } from "biomethane/api"
 
 type ContractInfosForm = DeepPartial<
   apiTypes["BiomethaneEntityConfigContractAddRequest"]
@@ -40,26 +40,6 @@ export const ContractInfos = ({
   const { execute: updateContract, loading } = useMutateContractInfos(
     contract !== undefined
   )
-
-  // const resetFields = (tariffReference?: TariffReference) => {
-  //   if (isTariffReference2011Or2020(tariffReference)) {
-  //     setValue({
-  //       ...value,
-  //       tariff_reference: tariffReference,
-  //       pap_contracted: null,
-  //     })
-  //   }
-
-  //   if (isTariffReference2021Or2023(tariffReference)) {
-  //     setValue({
-  //       ...value,
-  //       tariff_reference: tariffReference,
-  //       cmax: null,
-  //       cmax_annualized: null,
-  //       cmax_annualized_value: null,
-  //     })
-  //   }
-  // }
 
   return (
     <EditableCard

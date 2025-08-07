@@ -9,6 +9,7 @@ export const DateInput = ({ value, onChange, ...props }: DateInputProps) => {
   return (
     <Input
       {...props}
+      type="date"
       nativeInputProps={{
         value,
         onChange: onChange ? (e) => onChange(e.target.value) : undefined,
