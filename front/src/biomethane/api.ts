@@ -37,7 +37,7 @@ export const createContract = async (
 
 export const updateContract = async (
   entity_id: number,
-  data: apiTypes["PatchedBiomethaneEntityConfigContractRequest"]
+  data: apiTypes["PatchedBiomethaneEntityConfigContractPatchRequest"]
 ) => {
   const response = await api.PATCH("/biomethane/contract/", {
     params: {
