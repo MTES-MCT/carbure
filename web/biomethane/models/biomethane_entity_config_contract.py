@@ -1,7 +1,22 @@
+from datetime import datetime
+
 from django.db import models
+from django.utils.text import slugify
 
 from core import private_storage
 from core.models import Entity
+
+
+def rename_general_conditions_file(instance, filename):
+    ext = filename.split(".")[-1]
+    base_filename = f"{instance.pk}_CG_{slugify(instance.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    return f"biomethane/contracts/{base_filename}.{ext}"
+
+
+def rename_specific_conditions_file(instance, filename):
+    ext = filename.split(".")[-1]
+    base_filename = f"{instance.pk}_CP_{slugify(instance.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    return f"biomethane/contracts/{base_filename}.{ext}"
 
 
 class BiomethaneEntityConfigContract(models.Model):
@@ -36,8 +51,12 @@ class BiomethaneEntityConfigContract(models.Model):
     pap_contracted = models.FloatField(null=True, blank=True)
     signature_date = models.DateField(null=True, blank=True)
     effective_date = models.DateField(null=True, blank=True)
-    general_conditions_file = models.FileField(storage=private_storage, null=True, blank=True)
-    specific_conditions_file = models.FileField(storage=private_storage, null=True, blank=True)
+    general_conditions_file = models.FileField(
+        storage=private_storage, null=True, blank=True, upload_to=rename_general_conditions_file
+    )
+    specific_conditions_file = models.FileField(
+        storage=private_storage, null=True, blank=True, upload_to=rename_specific_conditions_file
+    )
 
     class Meta:
         db_table = "biomethane_entity_config_contract"
