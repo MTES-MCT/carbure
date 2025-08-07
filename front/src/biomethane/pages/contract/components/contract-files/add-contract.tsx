@@ -11,7 +11,7 @@ import { useAddContract } from "./add-contract.hooks"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<
-    apiTypes["PatchedBiomethaneEntityConfigContractRequest"],
+    apiTypes["PatchedBiomethaneEntityConfigContractPatchRequest"],
     | "effective_date"
     | "signature_date"
     | "general_conditions_file"

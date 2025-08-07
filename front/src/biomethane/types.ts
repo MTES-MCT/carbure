@@ -8,3 +8,6 @@ export { TariffReference, InstallationCategory }
 
 export type BiomethaneEntityConfigContract =
   apiTypes["BiomethaneEntityConfigContract"]
+
+export type BiomethaneEntityConfigAmendment =
+  apiTypes["BiomethaneEntityConfigAmendment"]

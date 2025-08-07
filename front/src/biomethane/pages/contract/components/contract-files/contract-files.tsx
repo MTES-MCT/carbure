@@ -91,7 +91,7 @@ export const ContractFiles = ({
             />
           </Grid>
 
-          <Table rows={files} columns={columns} headless={false} />
+          <Table rows={files} columns={columns} />
         </>
       )}
     </EditableCard>

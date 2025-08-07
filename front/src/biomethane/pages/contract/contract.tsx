@@ -1,3 +1,4 @@
+import { ContractAmendments } from "./components/contract-amendments/contract-amendments"
 import { ContractFiles } from "./components/contract-files"
 import { ContractInfos } from "./components/contract-infos"
 import { useGetContractInfos } from "biomethane/hooks/contract.hooks"
@@ -16,6 +17,7 @@ export const BiomethaneContractPage = () => {
         <ContractInfos contract={contractInfos} />
       )}
       <ContractFiles contract={contractInfos} />
+      <ContractAmendments contract={contractInfos} />
     </>
   )
 }
