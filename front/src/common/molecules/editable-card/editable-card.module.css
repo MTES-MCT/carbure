@@ -15,11 +15,11 @@
 
 .editable-card__title {
   color: var(--artwork-major-blue-france);
-  margin-bottom: var(--spacing-1w);
 }
 
 .editable-card__description {
   color: var(--text-default-grey);
+  margin-top: var(--spacing-1w);
 }
 
 .editable-card__content {
