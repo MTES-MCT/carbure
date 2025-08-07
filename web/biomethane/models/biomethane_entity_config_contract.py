@@ -8,14 +8,26 @@ from core.models import Entity
 
 
 def rename_general_conditions_file(instance, filename):
-    ext = filename.split(".")[-1]
     base_filename = f"{instance.pk}_CG_{slugify(instance.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    return f"biomethane/contracts/{base_filename}.{ext}"
+    return rename_file(instance, filename, base_filename)
 
 
 def rename_specific_conditions_file(instance, filename):
-    ext = filename.split(".")[-1]
     base_filename = f"{instance.pk}_CP_{slugify(instance.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    return rename_file(instance, filename, base_filename)
+
+
+def rename_amendment_file(instance, filename):
+    base_filename = (
+        f"{instance.contract.pk}_amendment_"
+        f"{slugify(instance.contract.entity.name)}_"
+        f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    )
+    return rename_file(instance, filename, base_filename)
+
+
+def rename_file(instance, filename, base_filename):
+    ext = filename.split(".")[-1]
     return f"biomethane/contracts/{base_filename}.{ext}"
 
 
@@ -90,10 +102,9 @@ class BiomethaneEntityConfigAmendment(models.Model):
     signature_date = models.DateField()
     effective_date = models.DateField()
     amendment_object = models.CharField(max_length=64, choices=AMENDMENT_OBJECT_CHOICES)
-
+    amendment_file = models.FileField(storage=private_storage, upload_to=rename_amendment_file)
     # Used only if amendment_object is OTHER
     amendment_details = models.TextField(blank=True, null=True)
-    amendment_file = models.FileField(storage=private_storage)
 
     class Meta:
         db_table = "biomethane_entity_config_amendment"

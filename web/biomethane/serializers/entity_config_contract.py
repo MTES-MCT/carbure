@@ -11,7 +11,35 @@ class BiomethaneEntityConfigAmendmentSerializer(serializers.ModelSerializer):
             "contract",
             "signature_date",
             "effective_date",
+            "amendment_object",
+            "amendment_file",
+            "amendment_details",
         ]
+
+
+class BiomethaneEntityConfigAmendmentAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiomethaneEntityConfigAmendment
+        fields = [
+            "signature_date",
+            "effective_date",
+            "amendment_object",
+            "amendment_file",
+            "amendment_details",
+        ]
+
+    def create(self, validated_data):
+        entity = self.context.get("entity")
+        if entity:
+            try:
+                contract = BiomethaneEntityConfigContract.objects.get(entity=entity)
+                validated_data["contract"] = contract
+            except BiomethaneEntityConfigContract.DoesNotExist:
+                raise serializers.ValidationError({"contract": "Aucun contrat trouvé pour cette entité."})
+        else:
+            raise serializers.ValidationError({"entity": "Entité non fournie dans le contexte."})
+
+        return super().create(validated_data)
 
 
 class BiomethaneEntityConfigContractSerializer(serializers.ModelSerializer):

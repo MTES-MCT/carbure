@@ -6,12 +6,15 @@ from rest_framework.viewsets import GenericViewSet, mixins
 
 from biomethane.models import BiomethaneEntityConfigContract
 from biomethane.serializers.entity_config_contract import (
+    BiomethaneEntityConfigAmendmentSerializer,
     BiomethaneEntityConfigContractAddSerializer,
     BiomethaneEntityConfigContractPatchSerializer,
     BiomethaneEntityConfigContractSerializer,
 )
 from core.models import Entity
 from core.permissions import HasUserRights
+
+# from .mixins import ActionMixin
 
 
 @extend_schema(
@@ -45,6 +48,8 @@ class BiomethaneEntityConfigContractViewSet(
             return BiomethaneEntityConfigContractAddSerializer
         elif self.action in ["update", "contract_patch"]:
             return BiomethaneEntityConfigContractPatchSerializer
+        elif self.action == "create_amendment":
+            return BiomethaneEntityConfigAmendmentSerializer
         return BiomethaneEntityConfigContractSerializer
 
     @extend_schema(
