@@ -28,18 +28,24 @@ class BiomethaneEntityConfigAmendmentAddSerializer(serializers.ModelSerializer):
             "amendment_details",
         ]
 
-    def create(self, validated_data):
-        entity = self.context.get("entity")
-        if entity:
-            try:
-                contract = BiomethaneEntityConfigContract.objects.get(entity=entity)
-                validated_data["contract"] = contract
-            except BiomethaneEntityConfigContract.DoesNotExist:
-                raise serializers.ValidationError({"contract": "Aucun contrat trouvé pour cette entité."})
-        else:
-            raise serializers.ValidationError({"entity": "Entité non fournie dans le contexte."})
+    amendment_object = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneEntityConfigAmendment.AMENDMENT_OBJECT_CHOICES), required=True
+    )
 
-        return super().create(validated_data)
+    def to_internal_value(self, data):
+        if hasattr(data, "getlist"):
+            data = data.copy()
+            amendment_objects = data.getlist("amendment_object")
+            data.setlist("amendment_object", amendment_objects)
+        return super().to_internal_value(data)
+
+    def validate(self, data):
+        if BiomethaneEntityConfigAmendment.OTHER in data.get("amendment_object") and not data.get("amendment_details"):
+            raise serializers.ValidationError(
+                {"amendment_details": ["Ce champ est obligatoire si amendment_object contient 'OTHER'."]}
+            )
+
+        return super().validate(data)
 
 
 class BiomethaneEntityConfigContractSerializer(serializers.ModelSerializer):
@@ -180,3 +186,16 @@ class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer)
                     continue
 
         return handle_fields_requirement(data, required_fields, errors, self.instance)
+
+    def update(self, instance, validated_data):
+        tariff_reference = validated_data.get("tariff_reference")
+        if tariff_reference is not None and tariff_reference != instance.tariff_reference:
+            # If tariff_reference is changed, reset certain fields
+            if tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_1:
+                validated_data["pap_contracted"] = None
+            elif tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_2:
+                validated_data["cmax_annualized"] = False
+                validated_data["cmax_annualized_value"] = None
+                validated_data["cmax"] = None
+
+        return super().update(instance, validated_data)
