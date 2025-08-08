@@ -94,6 +94,12 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
         return handle_fields_requirement(data)
 
     def create(self, validated_data):
+        entity = self.context.get("entity")
+        if entity:
+            if BiomethaneEntityConfigContract.objects.filter(entity=entity).exists():
+                raise serializers.ValidationError({"entity": ["Un site contract existe déjà pour cette entité."]})
+            validated_data["entity"] = entity
+
         if validated_data.get("cmax_annualized") is None:
             validated_data["cmax_annualized"] = False
         return super().create(validated_data)

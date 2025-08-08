@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_nested.routers import SimpleRouter
 
-from .views.entity_config_contract import (
+from .views import (
     BiomethaneEntityConfigContractAmendmentViewSet,
     BiomethaneEntityConfigContractViewSet,
 )
@@ -15,9 +15,9 @@ router.register(
 
 contract_viewset = BiomethaneEntityConfigContractViewSet.as_view(
     {
-        "get": "contract_get",
+        "get": "retrieve",
         "post": "create",
-        "patch": "contract_patch",
+        "patch": "update",
     }
 )
 

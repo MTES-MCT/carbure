@@ -6,7 +6,6 @@ from rest_framework.viewsets import GenericViewSet, mixins
 
 from biomethane.models import BiomethaneEntityConfigContract
 from biomethane.serializers.entity_config_contract import (
-    BiomethaneEntityConfigAmendmentSerializer,
     BiomethaneEntityConfigContractAddSerializer,
     BiomethaneEntityConfigContractPatchSerializer,
     BiomethaneEntityConfigContractSerializer,
@@ -30,7 +29,6 @@ from core.permissions import HasUserRights
 )
 class BiomethaneEntityConfigContractViewSet(
     GenericViewSet,
-    mixins.ListModelMixin,
     mixins.CreateModelMixin,
 ):
     queryset = BiomethaneEntityConfigContract.objects.all()
@@ -46,10 +44,8 @@ class BiomethaneEntityConfigContractViewSet(
     def get_serializer_class(self):
         if self.action == "create":
             return BiomethaneEntityConfigContractAddSerializer
-        elif self.action in ["update", "contract_patch"]:
+        elif self.action in ["update"]:
             return BiomethaneEntityConfigContractPatchSerializer
-        elif self.action == "create_amendment":
-            return BiomethaneEntityConfigAmendmentSerializer
         return BiomethaneEntityConfigContractSerializer
 
     @extend_schema(
@@ -62,7 +58,7 @@ class BiomethaneEntityConfigContractViewSet(
         },
         description="Retrieve the contract for the current entity. Returns a single contract object.",
     )
-    def contract_get(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         try:
             contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
             data = self.get_serializer(contract, many=False).data
@@ -71,7 +67,7 @@ class BiomethaneEntityConfigContractViewSet(
         except BiomethaneEntityConfigContract.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def contract_patch(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         try:
             contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
             serializer = self.get_serializer(contract, data=request.data, partial=True)
@@ -83,7 +79,4 @@ class BiomethaneEntityConfigContractViewSet(
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except BiomethaneEntityConfigContract.DoesNotExist:
-            return Response({"detail": "Contract not found for this entity."}, status=status.HTTP_404_NOT_FOUND)
-
-    def perform_create(self, serializer):
-        serializer.save(entity=self.request.entity)
+            return Response({"detail": "Aucun contrat trouvé pour cette entité"}, status=status.HTTP_404_NOT_FOUND)
