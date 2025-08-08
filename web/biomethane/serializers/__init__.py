@@ -3,3 +3,5 @@ from .contract_amendment import BiomethaneContractAmendmentSerializer
 from .contract import BiomethaneContractSerializer
 from .contract import BiomethaneContractAddSerializer
 from .contract import BiomethaneContractPatchSerializer
+from .injection_site import BiomethaneInjectionSiteInputSerializer
+from .injection_site import BiomethaneInjectionSiteSerializer
