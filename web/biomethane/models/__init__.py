@@ -1,2 +1,3 @@
 from .biomethane_contract import BiomethaneContract, rename_file
 from .biomethane_contract_amendment import BiomethaneContractAmendment
+from .biomethane_injection_site import BiomethaneInjectionSite
