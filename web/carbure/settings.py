@@ -443,3 +443,8 @@ if env("TEST"):
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
 
 API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
+
+if env("IMAGE_TAG") in ("dev", "local"):
+    import factory
+
+    factory.Faker._DEFAULT_LOCALE = "fr_FR"
