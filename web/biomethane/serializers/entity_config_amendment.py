@@ -44,10 +44,15 @@ class BiomethaneEntityConfigAmendmentAddSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"amendment_details": ["Ce champ est obligatoire si amendment_object contient 'OTHER'."]}
             )
+        return super().validate(data)
+
+    def create(self, validated_data):
+        entity = self.context.get("entity")
 
         try:
-            BiomethaneEntityConfigContract.objects.get(pk=self.context["entity"])
+            contract = BiomethaneEntityConfigContract.objects.get(entity=entity)
+            validated_data["contract_id"] = contract.id
         except BiomethaneEntityConfigContract.DoesNotExist:
             raise serializers.ValidationError({"contract": ["Cette entité n'a pas de contrat associé."]})
 
-        return super().validate(data)
+        return super().create(validated_data)

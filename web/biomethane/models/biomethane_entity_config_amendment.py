@@ -8,11 +8,13 @@ from core import private_storage
 
 
 def rename_amendment_file(instance, filename):
-    base_filename = (
-        f"{instance.contract.pk}_amendment_"
-        f"{slugify(instance.contract.entity.name)}_"
-        f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    )
+    try:
+        contract = BiomethaneEntityConfigContract.objects.select_related("entity").get(entity_id=instance.contract_id)
+        entity_name = slugify(contract.entity.name)
+    except BiomethaneEntityConfigContract.DoesNotExist:
+        entity_name = "unknown"
+
+    base_filename = f"{instance.contract_id}_amendment_" f"{entity_name}_" f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     return rename_file(instance, filename, base_filename)
 
 

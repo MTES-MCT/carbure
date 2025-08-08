@@ -16,14 +16,16 @@ class Migration(migrations.Migration):
             name="BiomethaneEntityConfigAgreement",
             fields=[
                 (
+                    "id",
+                    models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                (
                     "tariff_reference",
                     models.CharField(choices=[(2011, 2011), (2021, 2021), (2022, 2022), (2023, 2023)], max_length=28),
                 ),
                 (
                     "entity",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to="core.entity"
-                    ),
+                    models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="core.entity"),
                 ),
                 ("installation_category", models.CharField(max_length=128)),
                 ("cmax", models.FloatField()),
