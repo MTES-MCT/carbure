@@ -1,1 +1,2 @@
-from .biomethane_entity_config_contract import BiomethaneEntityConfigContract, BiomethaneEntityConfigAmendment
+from .biomethane_entity_config_contract import BiomethaneEntityConfigContract, rename_file
+from .biomethane_entity_config_amendment import BiomethaneEntityConfigAmendment
