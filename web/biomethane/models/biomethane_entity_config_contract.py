@@ -67,3 +67,15 @@ class BiomethaneEntityConfigContract(models.Model):
 
     def does_contract_exist(self):
         return bool(self.signature_date)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._update_red_ii_status()
+
+    def _update_red_ii_status(self):
+        if self.entity.is_red_ii:
+            return
+
+        if (self.cmax and self.cmax > 200) or (self.pap_contracted and self.pap_contracted > 19.5):
+            self.entity.is_red_ii = True
+            self.entity.save()
