@@ -439,3 +439,9 @@ if env("TEST"):
     REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
     REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
+
+
+if env("IMAGE_TAG") in ("dev", "local"):
+    import factory
+
+    factory.Faker._DEFAULT_LOCALE = "fr_FR"
