@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from biomethane.models import BiomethaneEntityConfigAmendment
+from biomethane.models import BiomethaneEntityConfigAmendment, BiomethaneEntityConfigContract
 
 
 class BiomethaneEntityConfigAmendmentSerializer(serializers.ModelSerializer):
@@ -44,5 +44,10 @@ class BiomethaneEntityConfigAmendmentAddSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"amendment_details": ["Ce champ est obligatoire si amendment_object contient 'OTHER'."]}
             )
+
+        try:
+            BiomethaneEntityConfigContract.objects.get(pk=self.context["entity"])
+        except BiomethaneEntityConfigContract.DoesNotExist:
+            raise serializers.ValidationError({"contract": ["Cette entité n'a pas de contrat associé."]})
 
         return super().validate(data)
