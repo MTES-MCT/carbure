@@ -40,3 +40,6 @@ class BiomethaneEntityConfigContractAmendmentViewSet(
         if self.action == "create":
             return BiomethaneEntityConfigAmendmentAddSerializer
         return BiomethaneEntityConfigAmendmentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(contract_id=self.request.entity.id)
