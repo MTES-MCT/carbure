@@ -1,2 +1,3 @@
 from .entity_config_contract import BiomethaneEntityConfigContractViewSet
 from .entity_config_contract import BiomethaneEntityConfigContractAmendmentViewSet
+from .injection_site import BiomethaneInjectionSiteViewSet

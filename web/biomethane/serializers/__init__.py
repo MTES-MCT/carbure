@@ -3,3 +3,5 @@ from .entity_config_amendment import BiomethaneEntityConfigAmendmentSerializer
 from .entity_config_contract import BiomethaneEntityConfigContractSerializer
 from .entity_config_contract import BiomethaneEntityConfigContractAddSerializer
 from .entity_config_contract import BiomethaneEntityConfigContractPatchSerializer
+from .injection_site import BiomethaneInjectionSiteInputSerializer
+from .injection_site import BiomethaneInjectionSiteSerializer
