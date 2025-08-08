@@ -163,3 +163,88 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
 
         response = self.client.patch(contract_url, {}, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_red_ii_status_cmax_above_threshold(self):
+        self.assertFalse(self.producer_entity.is_red_ii)
+
+        data = {
+            "tariff_reference": "2011",
+            "buyer": self.buyer_entity.id,
+            "installation_category": BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            "cmax": 250.0,  # > 200
+            "cmax_annualized": False,
+        }
+
+        response = self.client.post(self.contract_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.producer_entity.refresh_from_db()
+        self.assertTrue(self.producer_entity.is_red_ii)
+
+    def test_update_red_ii_status_pap_above_threshold(self):
+        self.assertFalse(self.producer_entity.is_red_ii)
+
+        data = {
+            "tariff_reference": "2021",
+            "buyer": self.buyer_entity.id,
+            "pap_contracted": 25.0,  # > 19.5
+        }
+
+        response = self.client.post(self.contract_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.producer_entity.refresh_from_db()
+        self.assertTrue(self.producer_entity.is_red_ii)
+
+    def test_update_red_ii_status_below_thresholds(self):
+        self.assertFalse(self.producer_entity.is_red_ii)
+
+        data = {
+            "tariff_reference": "2011",
+            "buyer": self.buyer_entity.id,
+            "installation_category": BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            "cmax": 150.0,  # <= 200
+            "cmax_annualized": False,
+        }
+
+        response = self.client.post(self.contract_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.producer_entity.refresh_from_db()
+        self.assertFalse(self.producer_entity.is_red_ii)
+
+    def test_update_red_ii_status_already_true_no_change(self):
+        self.producer_entity.is_red_ii = True
+        self.producer_entity.save()
+
+        data = {
+            "tariff_reference": "2021",
+            "buyer": self.buyer_entity.id,
+            "pap_contracted": 15.0,  # <= 19.5
+        }
+
+        response = self.client.post(self.contract_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.producer_entity.refresh_from_db()
+        self.assertTrue(self.producer_entity.is_red_ii)
+
+    def test_update_red_ii_status_on_patch(self):
+        BiomethaneEntityConfigContract.objects.create(
+            entity=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2011",
+            installation_category=BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            cmax=100.0,  # <= 200
+            cmax_annualized=False,
+        )
+
+        self.producer_entity.refresh_from_db()
+        self.assertFalse(self.producer_entity.is_red_ii)
+
+        data = {"cmax": 300.0}  # > 200
+        response = self.client.patch(self.contract_url, data, content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.producer_entity.refresh_from_db()
+        self.assertTrue(self.producer_entity.is_red_ii)
