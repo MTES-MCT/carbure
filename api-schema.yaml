@@ -475,7 +475,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigContract"
+                $ref: "#/components/schemas/BiomethaneContract"
           description: Contract details for the entity
         "404":
           description: Contract not found for this entity.
@@ -494,13 +494,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneEntityConfigContractAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractAddRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneEntityConfigContractAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractAddRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneEntityConfigContractAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractAddRequest"
         required: true
       security:
         - cookieAuth: []
@@ -510,7 +510,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigContractAdd"
+                $ref: "#/components/schemas/BiomethaneContractAdd"
           description: ""
     patch:
       operationId: biomethane_contract_partial_update
@@ -527,13 +527,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneContractPatchRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneContractPatchRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneEntityConfigContractPatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneContractPatchRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -542,7 +542,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigContractPatch"
+                $ref: "#/components/schemas/BiomethaneContractPatch"
           description: ""
   /api/biomethane/contract/amendments/:
     get:
@@ -588,7 +588,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedBiomethaneEntityConfigAmendmentList"
+                $ref: "#/components/schemas/PaginatedBiomethaneContractAmendmentList"
           description: ""
     post:
       operationId: biomethane_contract_amendments_create
@@ -605,13 +605,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneEntityConfigAmendmentAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractAmendmentAddRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneEntityConfigAmendmentAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractAmendmentAddRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneEntityConfigAmendmentAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractAmendmentAddRequest"
         required: true
       security:
         - cookieAuth: []
@@ -621,7 +621,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigAmendmentAdd"
+                $ref: "#/components/schemas/BiomethaneContractAmendmentAdd"
           description: ""
   /api/biomethane/contract/amendments/{id}/:
     get:
@@ -649,7 +649,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneEntityConfigAmendment"
+                $ref: "#/components/schemas/BiomethaneContractAmendment"
           description: ""
   /api/double-counting/agreements/:
     get:
@@ -9649,80 +9649,7 @@ components:
         - code
         - name
         - name_en
-    BiomethaneEntityConfigAmendment:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        contract:
-          type: integer
-        signature_date:
-          type: string
-          format: date
-        effective_date:
-          type: string
-          format: date
-        amendment_object:
-          $ref: "#/components/schemas/AmendmentObjectEnum"
-        amendment_file:
-          type: string
-          format: uri
-        amendment_details:
-          type: string
-          nullable: true
-      required:
-        - amendment_file
-        - amendment_object
-        - contract
-        - effective_date
-        - id
-        - signature_date
-    BiomethaneEntityConfigAmendmentAdd:
-      type: object
-      properties:
-        signature_date:
-          type: string
-          format: date
-        effective_date:
-          type: string
-          format: date
-        amendment_object:
-          $ref: "#/components/schemas/AmendmentObjectEnum"
-        amendment_file:
-          type: string
-          format: uri
-        amendment_details:
-          type: string
-          nullable: true
-      required:
-        - amendment_file
-        - amendment_object
-        - effective_date
-        - signature_date
-    BiomethaneEntityConfigAmendmentAddRequest:
-      type: object
-      properties:
-        signature_date:
-          type: string
-          format: date
-        effective_date:
-          type: string
-          format: date
-        amendment_object:
-          $ref: "#/components/schemas/AmendmentObjectEnum"
-        amendment_file:
-          type: string
-          format: binary
-        amendment_details:
-          type: string
-          nullable: true
-      required:
-        - amendment_file
-        - amendment_object
-        - effective_date
-        - signature_date
-    BiomethaneEntityConfigContract:
+    BiomethaneContract:
       type: object
       properties:
         tariff_reference:
@@ -9766,7 +9693,7 @@ components:
         amendments:
           type: array
           items:
-            $ref: "#/components/schemas/BiomethaneEntityConfigAmendment"
+            $ref: "#/components/schemas/BiomethaneContractAmendment"
           readOnly: true
         entity:
           type: integer
@@ -9775,7 +9702,7 @@ components:
         - buyer
         - entity
         - tariff_reference
-    BiomethaneEntityConfigContractAdd:
+    BiomethaneContractAdd:
       type: object
       properties:
         tariff_reference:
@@ -9804,7 +9731,7 @@ components:
       required:
         - buyer
         - tariff_reference
-    BiomethaneEntityConfigContractAddRequest:
+    BiomethaneContractAddRequest:
       type: object
       properties:
         tariff_reference:
@@ -9833,7 +9760,82 @@ components:
       required:
         - buyer
         - tariff_reference
-    BiomethaneEntityConfigContractPatch:
+    BiomethaneContractAmendment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contract:
+          type: integer
+        signature_date:
+          type: string
+          format: date
+        effective_date:
+          type: string
+          format: date
+        amendment_object: {}
+        amendment_file:
+          type: string
+          format: uri
+        amendment_details:
+          type: string
+          nullable: true
+      required:
+        - amendment_file
+        - contract
+        - effective_date
+        - id
+        - signature_date
+    BiomethaneContractAmendmentAdd:
+      type: object
+      properties:
+        signature_date:
+          type: string
+          format: date
+        effective_date:
+          type: string
+          format: date
+        amendment_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/AmendmentObjectEnum"
+        amendment_file:
+          type: string
+          format: uri
+        amendment_details:
+          type: string
+          nullable: true
+      required:
+        - amendment_file
+        - amendment_object
+        - effective_date
+        - signature_date
+    BiomethaneContractAmendmentAddRequest:
+      type: object
+      properties:
+        signature_date:
+          type: string
+          format: date
+        effective_date:
+          type: string
+          format: date
+        amendment_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/AmendmentObjectEnum"
+        amendment_file:
+          type: string
+          format: binary
+        amendment_details:
+          type: string
+          nullable: true
+      required:
+        - amendment_file
+        - amendment_object
+        - effective_date
+        - signature_date
+    BiomethaneContractPatch:
       type: object
       properties:
         tariff_reference:
@@ -12824,7 +12826,7 @@ components:
             $ref: "#/components/schemas/BalanceResponse"
         total_quantity:
           type: number
-    PaginatedBiomethaneEntityConfigAmendmentList:
+    PaginatedBiomethaneContractAmendmentList:
       type: object
       required:
         - count
@@ -12846,7 +12848,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/BiomethaneEntityConfigAmendment"
+            $ref: "#/components/schemas/BiomethaneContractAmendment"
     PaginatedElecBalanceList:
       type: object
       required:
@@ -13070,7 +13072,7 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
-    PatchedBiomethaneEntityConfigContractPatchRequest:
+    PatchedBiomethaneContractPatchRequest:
       type: object
       properties:
         tariff_reference:

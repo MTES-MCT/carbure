@@ -7,15 +7,14 @@ import { apiTypes } from "common/services/api-fetch.types"
 export { TariffReference, InstallationCategory }
 
 // Contracts
-export type BiomethaneEntityConfigContract =
-  apiTypes["BiomethaneEntityConfigContract"]
+export type BiomethaneContract = apiTypes["BiomethaneContract"]
 export type BiomethaneContractAddRequest =
-  apiTypes["BiomethaneEntityConfigContractAddRequest"]
+  apiTypes["BiomethaneContractAddRequest"]
 export type BiomethaneContractPatchRequest =
-  apiTypes["PatchedBiomethaneEntityConfigContractPatchRequest"]
+  apiTypes["PatchedBiomethaneContractPatchRequest"]
 
 // Amendments
-export type BiomethaneEntityConfigAmendment =
-  apiTypes["BiomethaneEntityConfigAmendment"]
+export type BiomethaneContractAmendment =
+  apiTypes["BiomethaneContractAmendment"]
 export type BiomethaneAmendmentAddRequest =
-  apiTypes["BiomethaneEntityConfigAmendmentAddRequest"]
+  apiTypes["BiomethaneContractAmendmentAddRequest"]
