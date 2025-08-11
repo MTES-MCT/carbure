@@ -1,7 +1,11 @@
 import { findEntities } from "common/api"
 import { api } from "common/services/api-fetch"
-import { apiTypes } from "common/services/api-fetch.types"
 import { EntityType } from "common/types"
+import {
+  BiomethaneAmendmentAddRequest,
+  BiomethaneContractAddRequest,
+  BiomethaneContractPatchRequest,
+} from "./types"
 
 // TODO: Add a new entity type for buyer of biomethane
 export const findBuyerBiomethaneEntities = async (query: string) =>
@@ -23,7 +27,7 @@ export const getContract = async (entity_id: number) => {
 
 export const createContract = async (
   entity_id: number,
-  data: apiTypes["BiomethaneEntityConfigContractAddRequest"]
+  data: BiomethaneContractAddRequest
 ) => {
   const response = await api.POST("/biomethane/contract/", {
     params: {
@@ -38,7 +42,7 @@ export const createContract = async (
 
 export const updateContract = async (
   entity_id: number,
-  data: apiTypes["PatchedBiomethaneEntityConfigContractPatchRequest"]
+  data: BiomethaneContractPatchRequest
 ) => {
   const response = await api.PATCH("/biomethane/contract/", {
     params: {
@@ -53,7 +57,7 @@ export const updateContract = async (
 
 export const addAmendment = async (
   entity_id: number,
-  data: apiTypes["BiomethaneEntityConfigAmendmentAddRequest"]
+  data: BiomethaneAmendmentAddRequest
 ) => {
   const response = await api.POST("/biomethane/contract/amendments/", {
     params: {

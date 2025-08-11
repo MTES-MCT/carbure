@@ -4,7 +4,6 @@ import { Form, useForm } from "common/components/form2"
 import { DateInput, FileInput, TextArea } from "common/components/inputs2"
 import { CheckboxGroup } from "common/components/inputs2/checkbox/checkbox"
 import { Box, Grid } from "common/components/scaffold"
-import { apiTypes } from "common/services/api-fetch.types"
 import { useTranslation } from "react-i18next"
 import { addAmendment } from "biomethane/api"
 import { useMutation } from "common/hooks/async"
@@ -13,12 +12,10 @@ import useEntity from "common/hooks/entity"
 import { AmendmentObjectEnum } from "api-schema"
 import { useAddAmendmentObjectOptions } from "./add-amendment.hooks"
 import { EditableCard } from "common/molecules/editable-card"
+import { BiomethaneAmendmentAddRequest } from "biomethane/types"
 
 type AddAmendmentForm = Partial<
-  Omit<
-    apiTypes["BiomethaneEntityConfigAmendmentAddRequest"],
-    "amendment_object"
-  > & {
+  Omit<BiomethaneAmendmentAddRequest, "amendment_object"> & {
     amendment_object: AmendmentObjectEnum[]
   }
 >

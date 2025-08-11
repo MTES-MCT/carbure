@@ -4,14 +4,14 @@ import { Form, FormManager, useForm } from "common/components/form2"
 import { DateInput, FileInput } from "common/components/inputs2"
 import { Box, Grid } from "common/components/scaffold"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
-import { apiTypes } from "common/services/api-fetch.types"
 import { ReplaceNullWithUndefined } from "common/types"
 import { useTranslation } from "react-i18next"
 import { useAddContract } from "./add-contract.hooks"
+import { BiomethaneContractPatchRequest } from "biomethane/types"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<
-    apiTypes["PatchedBiomethaneEntityConfigContractPatchRequest"],
+    BiomethaneContractPatchRequest,
     | "effective_date"
     | "signature_date"
     | "general_conditions_file"
