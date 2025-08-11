@@ -10707,10 +10707,10 @@ export enum SiteTypeEnum {
   AIRPORT = "AIRPORT",
 }
 export enum TariffReferenceEnum {
-  Value2011 = 2011,
-  Value2021 = 2021,
-  Value2022 = 2022,
-  Value2023 = 2023,
+  Value2011 = "2011",
+  Value2020 = "2020",
+  Value2021 = "2021",
+  Value2023 = "2023",
 }
 export enum TransportDocumentTypeEnum {
   DAU = "DAU",
