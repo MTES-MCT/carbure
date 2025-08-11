@@ -5,7 +5,7 @@ from core.models import Entity
 
 class BiomethaneProductionUnit(models.Model):
     # Propriétaire de l'unité de production
-    producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_production_units")
+    producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_production_unit")
 
     # Nom de l'unité
     unit_name = models.CharField(max_length=128)
