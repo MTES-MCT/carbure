@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from biomethane.models import BiomethaneEntityConfigContract
+from biomethane.models import BiomethaneContract
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -32,23 +32,23 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.contract_url = reverse("biomethane-entity-config-contract")
+        self.contract_url = reverse("biomethane-contract")
         self.contract_url += "?entity_id=" + str(self.producer_entity.id)
 
     def test_create_contract_tariff_rule_1(self):
         data = {
             "tariff_reference": "2011",
             "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
             "cmax": 100.0,
             "cmax_annualized": False,
         }
 
         response = self.client.post(self.contract_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(BiomethaneEntityConfigContract.objects.filter(entity=self.producer_entity).exists())
+        self.assertTrue(BiomethaneContract.objects.filter(entity=self.producer_entity).exists())
 
-        contract = BiomethaneEntityConfigContract.objects.get(entity=self.producer_entity)
+        contract = BiomethaneContract.objects.get(entity=self.producer_entity)
         self.assertEqual(contract.tariff_reference, "2011")
         self.assertEqual(contract.buyer_id, self.buyer_entity.id)
         self.assertEqual(contract.cmax, 100.0)
@@ -63,7 +63,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         response = self.client.post(self.contract_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        contract = BiomethaneEntityConfigContract.objects.get(entity=self.producer_entity)
+        contract = BiomethaneContract.objects.get(entity=self.producer_entity)
         self.assertEqual(contract.tariff_reference, "2021")
         self.assertEqual(contract.pap_contracted, 50.0)
 
@@ -84,7 +84,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         data = {
             "tariff_reference": "2011",
             "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
             "cmax": 100.0,
             "cmax_annualized": True,
             # Missing: cmax_annualized_value
@@ -95,7 +95,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         self.assertIn("cmax_annualized_value", response.data)
 
     def test_list_contract_exists(self):
-        BiomethaneEntityConfigContract.objects.create(
+        BiomethaneContract.objects.create(
             entity=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
         )
 
@@ -106,7 +106,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         self.assertEqual(response.data["buyer"], self.buyer_entity.id)
 
     def test_patch_contract_basic_fields(self):
-        contract = BiomethaneEntityConfigContract.objects.create(
+        contract = BiomethaneContract.objects.create(
             entity=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
         )
 
@@ -118,7 +118,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         self.assertEqual(contract.pap_contracted, 75.0)
 
     def test_patch_contract_signed_cannot_update_contract_fields(self):
-        BiomethaneEntityConfigContract.objects.create(
+        BiomethaneContract.objects.create(
             entity=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
@@ -152,7 +152,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             [(wrong_entity, "RW")],
         )
 
-        contract_url = reverse("biomethane-entity-config-contract")
+        contract_url = reverse("biomethane-contract")
         contract_url += "?entity_id=" + str(wrong_entity.id)
 
         response = self.client.get(contract_url)
@@ -170,7 +170,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         data = {
             "tariff_reference": "2011",
             "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
             "cmax": 250.0,  # > 200
             "cmax_annualized": False,
         }
@@ -202,7 +202,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         data = {
             "tariff_reference": "2011",
             "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
             "cmax": 150.0,  # <= 200
             "cmax_annualized": False,
         }
@@ -230,11 +230,11 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         self.assertTrue(self.producer_entity.is_red_ii)
 
     def test_update_red_ii_status_on_patch(self):
-        BiomethaneEntityConfigContract.objects.create(
+        BiomethaneContract.objects.create(
             entity=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2011",
-            installation_category=BiomethaneEntityConfigContract.INSTALLATION_CATEGORY_1,
+            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
             cmax=100.0,  # <= 200
             cmax_annualized=False,
         )

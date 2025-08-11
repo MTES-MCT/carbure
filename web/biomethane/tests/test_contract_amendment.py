@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from biomethane.models import BiomethaneEntityConfigAmendment, BiomethaneEntityConfigContract
+from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -33,14 +33,14 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.contract = BiomethaneEntityConfigContract.objects.create(
+        self.contract = BiomethaneContract.objects.create(
             entity=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
             pap_contracted=50.0,
         )
 
-        self.amendment_url = reverse("biomethane-entity-config-contract-amendment-list")
+        self.amendment_url = reverse("biomethane-contract-amendment-list")
         self.amendment_url += "?entity_id=" + str(self.producer_entity.id)
 
         self.test_file = SimpleUploadedFile("test_amendment.pdf", b"fake pdf content", content_type="application/pdf")
@@ -56,7 +56,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
         response = self.client.post(self.amendment_url, data, format="multipart")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        amendment = BiomethaneEntityConfigAmendment.objects.get(contract=self.contract)
+        amendment = BiomethaneContractAmendment.objects.get(contract=self.contract)
         self.assertEqual(amendment.amendment_object, ["CMAX_PAP_UPDATE"])
         self.assertEqual(str(amendment.signature_date), "2025-08-08")
         self.assertEqual(str(amendment.effective_date), "2025-08-15")
@@ -72,7 +72,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
         response = self.client.post(self.amendment_url, data, format="multipart")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        amendment = BiomethaneEntityConfigAmendment.objects.get(contract=self.contract)
+        amendment = BiomethaneContractAmendment.objects.get(contract=self.contract)
         self.assertEqual(amendment.amendment_object, ["CMAX_PAP_UPDATE", "INPUT_BONUS_UPDATE"])
 
     def test_create_amendment_with_other_requires_details(self):
@@ -100,7 +100,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
         response = self.client.post(self.amendment_url, data, format="multipart")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        amendment = BiomethaneEntityConfigAmendment.objects.get(contract=self.contract)
+        amendment = BiomethaneContractAmendment.objects.get(contract=self.contract)
         self.assertEqual(amendment.amendment_object, ["OTHER"])
         self.assertEqual(amendment.amendment_details, "Modification spécifique non listée")
 
@@ -142,7 +142,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
             [(entity_without_contract, "RW")],
         )
 
-        amendment_url = reverse("biomethane-entity-config-contract-amendment-list")
+        amendment_url = reverse("biomethane-contract-amendment-list")
         amendment_url += "?entity_id=" + str(entity_without_contract.id)
 
         data = {
@@ -157,7 +157,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
         self.assertIn("contract", response.data)
 
     def test_list_amendments(self):
-        BiomethaneEntityConfigAmendment.objects.create(
+        BiomethaneContractAmendment.objects.create(
             contract=self.contract,
             signature_date=date(2025, 7, 1),
             effective_date=date(2025, 7, 15),
@@ -165,7 +165,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
             amendment_file=self.test_file,
         )
 
-        BiomethaneEntityConfigAmendment.objects.create(
+        BiomethaneContractAmendment.objects.create(
             contract=self.contract,
             signature_date=date(2025, 8, 1),
             effective_date=date(2025, 8, 15),
@@ -192,7 +192,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
             [(wrong_entity, "RW")],
         )
 
-        amendment_url = reverse("biomethane-entity-config-contract-amendment-list")
+        amendment_url = reverse("biomethane-contract-amendment-list")
         amendment_url += "?entity_id=" + str(wrong_entity.id)
 
         response = self.client.get(amendment_url)

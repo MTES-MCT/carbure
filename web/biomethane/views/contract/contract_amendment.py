@@ -2,9 +2,9 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, mixins
 
-from biomethane.filters import BiomethaneEntityConfigContractAmendmentFilter
-from biomethane.models import BiomethaneEntityConfigAmendment
-from biomethane.serializers import BiomethaneEntityConfigAmendmentAddSerializer, BiomethaneEntityConfigAmendmentSerializer
+from biomethane.filters import BiomethaneContractAmendmentFilter
+from biomethane.models import BiomethaneContractAmendment
+from biomethane.serializers import BiomethaneContractAmendmentAddSerializer, BiomethaneContractAmendmentSerializer
 from core.models import Entity
 from core.permissions import HasUserRights
 
@@ -20,16 +20,16 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneEntityConfigContractAmendmentViewSet(
+class BiomethaneContractAmendmentViewSet(
     GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
 ):
-    queryset = BiomethaneEntityConfigAmendment.objects.all()
-    serializer_class = BiomethaneEntityConfigAmendmentSerializer
+    queryset = BiomethaneContractAmendment.objects.all()
+    serializer_class = BiomethaneContractAmendmentSerializer
     permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
-    filterset_class = BiomethaneEntityConfigContractAmendmentFilter
+    filterset_class = BiomethaneContractAmendmentFilter
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -38,5 +38,5 @@ class BiomethaneEntityConfigContractAmendmentViewSet(
 
     def get_serializer_class(self):
         if self.action == "create":
-            return BiomethaneEntityConfigAmendmentAddSerializer
-        return BiomethaneEntityConfigAmendmentSerializer
+            return BiomethaneContractAmendmentAddSerializer
+        return BiomethaneContractAmendmentSerializer

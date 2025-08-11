@@ -1,2 +1,2 @@
-from .entity_config_contract import BiomethaneEntityConfigContractViewSet
-from .entity_config_contract import BiomethaneEntityConfigContractAmendmentViewSet
+from .contract import BiomethaneContractViewSet
+from .contract import BiomethaneContractAmendmentViewSet

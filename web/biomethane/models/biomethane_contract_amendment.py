@@ -3,22 +3,22 @@ from datetime import datetime
 from django.db import models
 from django.utils.text import slugify
 
-from biomethane.models import BiomethaneEntityConfigContract, rename_file
+from biomethane.models import BiomethaneContract, rename_file
 from core import private_storage
 
 
 def rename_amendment_file(instance, filename):
     try:
-        contract = BiomethaneEntityConfigContract.objects.select_related("entity").get(entity_id=instance.contract_id)
+        contract = BiomethaneContract.objects.select_related("entity").get(id=instance.contract_id)
         entity_name = slugify(contract.entity.name)
-    except BiomethaneEntityConfigContract.DoesNotExist:
+    except BiomethaneContract.DoesNotExist:
         entity_name = "unknown"
 
     base_filename = f"{instance.contract_id}_amendment_" f"{entity_name}_" f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     return rename_file(instance, filename, base_filename)
 
 
-class BiomethaneEntityConfigAmendment(models.Model):
+class BiomethaneContractAmendment(models.Model):
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE"
     EFFECTIVE_DATE = "EFFECTIVE_DATE"
     CMAX_ANNUALIZATION = "CMAX_ANNUALIZATION"
@@ -47,7 +47,7 @@ class BiomethaneEntityConfigAmendment(models.Model):
         (OTHER, OTHER),
     ]
 
-    contract = models.ForeignKey(BiomethaneEntityConfigContract, on_delete=models.CASCADE, related_name="amendments")
+    contract = models.ForeignKey(BiomethaneContract, on_delete=models.CASCADE, related_name="amendments")
     signature_date = models.DateField()
     effective_date = models.DateField()
     amendment_object = models.JSONField(default=list)
