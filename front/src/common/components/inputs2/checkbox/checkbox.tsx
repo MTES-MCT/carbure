@@ -11,6 +11,7 @@ import { multipleSelection } from "common/utils/selection"
 import { ChangeEvent, useId } from "react"
 import cl from "clsx"
 import css from "./checkbox.module.css"
+import { Label, LabelProps } from "../base-input"
 
 type CheckboxProps = Omit<CheckboxDSFRProps, "options" | "name"> & {
   label?: string
@@ -67,7 +68,7 @@ export const Checkbox = ({
 
 export type CheckboxGroupProps<T, V> = Omit<
   CheckboxDSFRProps,
-  "options" | "name"
+  "options" | "name" | "legend"
 > & {
   options: T[]
   value: V[] | undefined
@@ -75,8 +76,8 @@ export type CheckboxGroupProps<T, V> = Omit<
   onToggle?: (value: V, checked: boolean) => void
   normalize?: Normalizer<T, V>
   name?: string
-  required?: boolean
-}
+} & LabelProps
+
 export const CheckboxGroup = <T, V extends string | number>({
   options,
   onChange,
@@ -84,6 +85,11 @@ export const CheckboxGroup = <T, V extends string | number>({
   normalize = defaultNormalizer,
   name,
   className,
+  disabled,
+  readOnly,
+  hasTooltip,
+  title,
+  label,
   ...props
 }: CheckboxGroupProps<T, V>) => {
   const selection = multipleSelection(props.value, onChange)
@@ -100,13 +106,24 @@ export const CheckboxGroup = <T, V extends string | number>({
         : {}),
       name,
       required: props.required,
+      disabled: readOnly || disabled,
     },
   }))
+
   return (
     <CheckboxDSFR
       {...props}
       options={optionsWithNativeInputProps}
       className={cl(className, css["checkbox-group"])}
+      legend={
+        <Label
+          label={label}
+          readOnly={readOnly}
+          hasTooltip={hasTooltip}
+          required={props.required}
+          title={title}
+        />
+      }
     />
   )
 }

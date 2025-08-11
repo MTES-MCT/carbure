@@ -9397,7 +9397,11 @@ components:
         effective_date:
           type: string
           format: date
-        amendment_object: {}
+        amendment_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/AmendmentObjectEnum"
+          readOnly: true
         amendment_file:
           type: string
           format: uri
@@ -9406,6 +9410,7 @@ components:
           nullable: true
       required:
         - amendment_file
+        - amendment_object
         - contract
         - effective_date
         - id

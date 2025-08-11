@@ -4,6 +4,10 @@ from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
 
 
 class BiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
+    amendment_object = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneContractAmendment.AMENDMENT_OBJECT_CHOICES), read_only=True
+    )
+
     class Meta:
         model = BiomethaneContractAmendment
         fields = [

@@ -127,6 +127,11 @@ export const ROUTE_URLS = {
       PRODUCTION: `${baseUrl}/production`,
       DEPOT: `${baseUrl}/depot`,
       USERS: `${baseUrl}/users`,
+      BIOMETHANE: {
+        CONTRACT: `${baseUrl}/biomethane/contract`,
+        PRODUCTION: `${baseUrl}/biomethane/production`,
+        INJECTION: `${baseUrl}/biomethane/injection`,
+      },
     }
   },
 

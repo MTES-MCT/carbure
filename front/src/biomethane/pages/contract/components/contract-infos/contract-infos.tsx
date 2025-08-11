@@ -34,7 +34,11 @@ export const ContractInfos = ({
   contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
-  const { bind, value } = useForm<ContractInfosForm>(contract ?? {})
+  const { bind, value } = useForm<ContractInfosForm>(
+    contract ?? {
+      cmax_annualized: false,
+    }
+  )
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
   const { execute: updateContract, loading } = useMutateContractInfos(
