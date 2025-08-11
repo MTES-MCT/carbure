@@ -28,7 +28,7 @@ export const ContractFiles = ({
       url: contract?.general_conditions_file,
     },
     {
-      name: t("Conditions spécifiques"),
+      name: t("Conditions particulières"),
       url: contract?.specific_conditions_file,
     },
   ].filter((file) => file.url !== null)
