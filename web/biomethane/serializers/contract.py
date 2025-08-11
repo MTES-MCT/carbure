@@ -1,14 +1,14 @@
 from rest_framework import serializers
 
-from biomethane.models import BiomethaneEntityConfigContract
-from biomethane.serializers import BiomethaneEntityConfigAmendmentSerializer
+from biomethane.models import BiomethaneContract
+from biomethane.serializers import BiomethaneContractAmendmentSerializer
 
 
-class BiomethaneEntityConfigContractSerializer(serializers.ModelSerializer):
-    amendments = BiomethaneEntityConfigAmendmentSerializer(many=True, read_only=True)
+class BiomethaneContractSerializer(serializers.ModelSerializer):
+    amendments = BiomethaneContractAmendmentSerializer(many=True, read_only=True)
 
     class Meta:
-        model = BiomethaneEntityConfigContract
+        model = BiomethaneContract
         fields = [
             "tariff_reference",
             "buyer",
@@ -36,7 +36,7 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
     if tariff_reference is None and instance:
         tariff_reference = instance.tariff_reference
 
-    if tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_1:
+    if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
         required_fields += ["cmax", "cmax_annualized", "installation_category"]
 
         cmax_annualized = data.get("cmax_annualized")
@@ -50,7 +50,7 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
         if cmax_annualized and not cmax_annualized_value:
             errors["cmax_annualized_value"] = ["Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."]
 
-    elif tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_2:
+    elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
         required_fields.append("pap_contracted")
 
     missing_fields = []
@@ -74,12 +74,12 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
     return data
 
 
-class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
+class BiomethaneContractAddSerializer(serializers.ModelSerializer):
     # Allow null to distinguish between False and not provided
     cmax_annualized = serializers.BooleanField(allow_null=True, required=False)
 
     class Meta:
-        model = BiomethaneEntityConfigContract
+        model = BiomethaneContract
         fields = [
             "tariff_reference",
             "buyer",
@@ -96,7 +96,7 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         entity = self.context.get("entity")
         if entity:
-            if BiomethaneEntityConfigContract.objects.filter(entity=entity).exists():
+            if BiomethaneContract.objects.filter(entity=entity).exists():
                 raise serializers.ValidationError({"entity": ["Un site contract existe déjà pour cette entité."]})
             validated_data["entity"] = entity
 
@@ -105,12 +105,12 @@ class BiomethaneEntityConfigContractAddSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer):
+class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
     # Allow null to distinguish between False and not provided
     cmax_annualized = serializers.BooleanField(allow_null=True, required=False)
 
     class Meta:
-        model = BiomethaneEntityConfigContract
+        model = BiomethaneContract
         fields = [
             "tariff_reference",
             "buyer",
@@ -153,9 +153,9 @@ class BiomethaneEntityConfigContractPatchSerializer(serializers.ModelSerializer)
         tariff_reference = validated_data.get("tariff_reference")
         if tariff_reference is not None and tariff_reference != instance.tariff_reference:
             # If tariff_reference is changed, reset certain fields
-            if tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_1:
+            if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
                 validated_data["pap_contracted"] = None
-            elif tariff_reference in BiomethaneEntityConfigContract.TARIFF_RULE_2:
+            elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
                 validated_data["cmax_annualized"] = False
                 validated_data["cmax_annualized_value"] = None
                 validated_data["cmax"] = None

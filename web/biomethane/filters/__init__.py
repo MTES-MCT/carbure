@@ -1,1 +1,1 @@
-from .entity_config_contract_amendment import BiomethaneEntityConfigContractAmendmentFilter
+from .contract_amendment import BiomethaneContractAmendmentFilter

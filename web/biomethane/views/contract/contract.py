@@ -4,11 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins
 
-from biomethane.models import BiomethaneEntityConfigContract
-from biomethane.serializers.entity_config_contract import (
-    BiomethaneEntityConfigContractAddSerializer,
-    BiomethaneEntityConfigContractPatchSerializer,
-    BiomethaneEntityConfigContractSerializer,
+from biomethane.models import BiomethaneContract
+from biomethane.serializers.contract import (
+    BiomethaneContractAddSerializer,
+    BiomethaneContractPatchSerializer,
+    BiomethaneContractSerializer,
 )
 from core.models import Entity
 from core.permissions import HasUserRights
@@ -27,12 +27,12 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneEntityConfigContractViewSet(
+class BiomethaneContractViewSet(
     GenericViewSet,
     mixins.CreateModelMixin,
 ):
-    queryset = BiomethaneEntityConfigContract.objects.all()
-    serializer_class = BiomethaneEntityConfigContractSerializer
+    queryset = BiomethaneContract.objects.all()
+    serializer_class = BiomethaneContractSerializer
     permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
@@ -43,15 +43,15 @@ class BiomethaneEntityConfigContractViewSet(
 
     def get_serializer_class(self):
         if self.action == "create":
-            return BiomethaneEntityConfigContractAddSerializer
+            return BiomethaneContractAddSerializer
         elif self.action in ["update"]:
-            return BiomethaneEntityConfigContractPatchSerializer
-        return BiomethaneEntityConfigContractSerializer
+            return BiomethaneContractPatchSerializer
+        return BiomethaneContractSerializer
 
     @extend_schema(
         responses={
             status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneEntityConfigContractSerializer,
+                response=BiomethaneContractSerializer,
                 description="Contract details for the entity",
             ),
             status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Contract not found for this entity."),
@@ -60,16 +60,16 @@ class BiomethaneEntityConfigContractViewSet(
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
+            contract = BiomethaneContract.objects.get(entity=request.entity)
             data = self.get_serializer(contract, many=False).data
             return Response(data)
 
-        except BiomethaneEntityConfigContract.DoesNotExist:
+        except BiomethaneContract.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, *args, **kwargs):
         try:
-            contract = BiomethaneEntityConfigContract.objects.get(entity=request.entity)
+            contract = BiomethaneContract.objects.get(entity=request.entity)
             serializer = self.get_serializer(contract, data=request.data, partial=True)
 
             if serializer.is_valid():
@@ -78,5 +78,5 @@ class BiomethaneEntityConfigContractViewSet(
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        except BiomethaneEntityConfigContract.DoesNotExist:
+        except BiomethaneContract.DoesNotExist:
             return Response({"detail": "Aucun contrat trouvé pour cette entité"}, status=status.HTTP_404_NOT_FOUND)

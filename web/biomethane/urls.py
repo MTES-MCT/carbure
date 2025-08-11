@@ -2,18 +2,18 @@ from django.urls import path
 from rest_framework_nested.routers import SimpleRouter
 
 from .views import (
-    BiomethaneEntityConfigContractAmendmentViewSet,
-    BiomethaneEntityConfigContractViewSet,
+    BiomethaneContractAmendmentViewSet,
+    BiomethaneContractViewSet,
 )
 
 router = SimpleRouter()
 router.register(
     "contract/amendments",
-    BiomethaneEntityConfigContractAmendmentViewSet,
-    basename="biomethane-entity-config-contract-amendment",
+    BiomethaneContractAmendmentViewSet,
+    basename="biomethane-contract-amendment",
 )
 
-contract_viewset = BiomethaneEntityConfigContractViewSet.as_view(
+contract_viewset = BiomethaneContractViewSet.as_view(
     {
         "get": "retrieve",
         "post": "create",
@@ -22,6 +22,6 @@ contract_viewset = BiomethaneEntityConfigContractViewSet.as_view(
 )
 
 urlpatterns = [
-    path("contract/", contract_viewset, name="biomethane-entity-config-contract"),
+    path("contract/", contract_viewset, name="biomethane-contract"),
     *router.urls,
 ]

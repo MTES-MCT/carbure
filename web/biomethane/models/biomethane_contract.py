@@ -22,7 +22,7 @@ def rename_file(instance, filename, base_filename):
     return f"biomethane/contracts/{base_filename}.{ext}"
 
 
-class BiomethaneEntityConfigContract(models.Model):
+class BiomethaneContract(models.Model):
     TARIFF_RULE_1 = ["2011", "2020"]
     TARIFF_RULE_2 = ["2021", "2023"]
 

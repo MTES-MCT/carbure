@@ -3,8 +3,8 @@
 import storages.backends.s3
 from django.db import migrations, models
 
-import biomethane.models.biomethane_entity_config_amendment
-import biomethane.models.biomethane_entity_config_contract
+import biomethane.models.biomethane_contract
+import biomethane.models.biomethane_contract_amendment
 
 
 class Migration(migrations.Migration):
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name="amendment_file",
             field=models.FileField(
                 storage=storages.backends.s3.S3Storage(default_acl="private", file_overwrite=True, querystring_auth=True),
-                upload_to=biomethane.models.biomethane_entity_config_amendment.rename_amendment_file,
+                upload_to=biomethane.models.biomethane_contract_amendment.rename_amendment_file,
             ),
         ),
         migrations.AlterField(
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 storage=storages.backends.s3.S3Storage(default_acl="private", file_overwrite=True, querystring_auth=True),
-                upload_to=biomethane.models.biomethane_entity_config_contract.rename_general_conditions_file,
+                upload_to=biomethane.models.biomethane_contract.rename_general_conditions_file,
             ),
         ),
         migrations.AlterField(
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 storage=storages.backends.s3.S3Storage(default_acl="private", file_overwrite=True, querystring_auth=True),
-                upload_to=biomethane.models.biomethane_entity_config_contract.rename_specific_conditions_file,
+                upload_to=biomethane.models.biomethane_contract.rename_specific_conditions_file,
             ),
         ),
     ]
