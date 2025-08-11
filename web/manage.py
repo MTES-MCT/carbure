@@ -7,6 +7,11 @@ import sys
 
 def main():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
+
+    # Set automatically TEST=1 if running tests
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        os.environ.setdefault("TEST", "1")
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
