@@ -10,7 +10,6 @@ import {
 import { Grid } from "common/components/scaffold"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useForm } from "common/components/form2"
-import { apiTypes } from "common/services/api-fetch.types"
 import { DeepPartial } from "common/types"
 import {
   isContractRedii,
@@ -19,14 +18,15 @@ import {
 } from "./contract-infos.utils"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { Button } from "common/components/button2"
-import { BiomethaneEntityConfigContract } from "biomethane/types"
+import {
+  BiomethaneContractAddRequest,
+  BiomethaneEntityConfigContract,
+} from "biomethane/types"
 import { Notice } from "common/components/notice"
 import { REDII_CMAX_THRESHOLD, REDII_PAP_THRESHOLD } from "biomethane/config"
 import { findBuyerBiomethaneEntities } from "biomethane/api"
 
-type ContractInfosForm = DeepPartial<
-  apiTypes["BiomethaneEntityConfigContractAddRequest"]
->
+type ContractInfosForm = DeepPartial<BiomethaneContractAddRequest>
 
 export const ContractInfos = ({
   contract,
