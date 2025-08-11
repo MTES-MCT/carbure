@@ -1,14 +1,13 @@
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
-import Portal, { usePortal } from "common/components/portal"
+import Portal from "common/components/portal"
 
 import { SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { SirenPicker } from "common/molecules/siren-picker"
-import { ForeignCompanyDialog } from "./foreign-company-dialog"
 import { CompanyForm } from "./company-form"
 import { useRegisterCompany } from "./registration-dialog.hooks"
 import { Notice } from "common/components/notice"
@@ -17,7 +16,6 @@ import { ROUTE_URLS } from "common/utils/routes"
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const portal = usePortal()
   const notify = useNotify()
   const [prefetchedCompany, setPrefetchedCompany] = useState<
     SearchCompanyPreview | undefined
@@ -53,10 +51,6 @@ export const CompanyRegistrationDialog = () => {
       setPrefetchedCompanyWarning(warning)
     }
     setPrefetchedCompany(company)
-  }
-
-  const openForeignCompanyDialog = () => {
-    portal((close) => <ForeignCompanyDialog close={close} />)
   }
 
   return (
@@ -106,8 +100,13 @@ export const CompanyRegistrationDialog = () => {
         )}
 
         <p>
-          <Trans>Votre société n’est pas immatriculée en France ? </Trans>
-          <Button customPriority="link" onClick={openForeignCompanyDialog}>
+          <Trans>Votre société n’est pas immatriculée en France ?</Trans>
+          <Button
+            customPriority="link"
+            linkProps={{
+              to: ROUTE_URLS.MY_ACCOUNT.FOREIGN_COMPANY_REGISTRATION,
+            }}
+          >
             <Trans>Ajoutez une société étrangère</Trans>
           </Button>
         </p>

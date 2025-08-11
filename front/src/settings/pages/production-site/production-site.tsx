@@ -127,10 +127,6 @@ const ProductionSitesSettings = ({
           onAction={readOnly ? showProductionSite : editProductionSite}
           columns={[
             {
-              header: t("ID"),
-              cell: (ps) => <Cell text={`${ps.site_siret}`} />,
-            },
-            {
               header: t("Nom"),
               cell: (ps) => <Cell text={ps.name} />,
             },

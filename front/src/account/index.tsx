@@ -19,18 +19,18 @@ const Account = () => {
       <Tabs
         tabs={[
           {
-            key: "identifiers",
-            label: t("Identifiants"),
-            path: ROUTE_URLS.MY_ACCOUNT.INDEX,
-            icon: "ri-settings-2-line",
-            iconActive: "ri-settings-2-fill",
-          },
-          {
             key: "access",
             label: t("Accès aux sociétés"),
             path: ROUTE_URLS.MY_ACCOUNT.COMPANIES,
             icon: "ri-profile-line",
             iconActive: "ri-profile-fill",
+          },
+          {
+            key: "identifiers",
+            label: t("Identifiants"),
+            path: ROUTE_URLS.MY_ACCOUNT.IDENTIFIERS,
+            icon: "ri-settings-2-line",
+            iconActive: "ri-settings-2-fill",
           },
         ]}
       />
@@ -40,7 +40,7 @@ const Account = () => {
           <Route path="companies/*" element={<AccountAccesRights />} />
           <Route
             path="*"
-            element={<Navigate to={ROUTE_URLS.MY_ACCOUNT.INDEX} />}
+            element={<Navigate to={ROUTE_URLS.MY_ACCOUNT.COMPANIES} />}
           />
         </Routes>
       </Content>

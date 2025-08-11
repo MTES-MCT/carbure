@@ -7774,7 +7774,7 @@ export interface operations {
     parameters: {
       query: {
         added_by?: string[]
-        clients?: string[]
+        client?: string[]
         country_of_origin?: string[]
         delivery_site?: string[]
         /** @description Entity ID */
@@ -7886,7 +7886,7 @@ export interface operations {
     parameters: {
       query: {
         added_by?: string[]
-        clients?: string[]
+        client?: string[]
         country_of_origin?: string[]
         delivery_site?: string[]
         /** @description Entity ID */
@@ -7938,7 +7938,7 @@ export interface operations {
     parameters: {
       query: {
         added_by?: string[]
-        clients?: string[]
+        client?: string[]
         country_of_origin?: string[]
         delivery_site?: string[]
         /** @description Entity ID */

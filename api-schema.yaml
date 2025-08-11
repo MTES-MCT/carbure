@@ -4852,7 +4852,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: clients
+          name: client
           schema:
             type: array
             items:
@@ -5083,7 +5083,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: clients
+          name: client
           schema:
             type: array
             items:
@@ -5234,7 +5234,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: clients
+          name: client
           schema:
             type: array
             items:
