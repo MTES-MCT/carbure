@@ -14,25 +14,31 @@ import { useAddAmendmentObjectOptions } from "./add-amendment.hooks"
 import { EditableCard } from "common/molecules/editable-card"
 import { BiomethaneAmendmentAddRequest } from "biomethane/types"
 
-type AddAmendmentForm = Partial<
-  Omit<BiomethaneAmendmentAddRequest, "amendment_object"> & {
-    amendment_object: AmendmentObjectEnum[]
-  }
->
+type AddAmendmentForm = Partial<BiomethaneAmendmentAddRequest>
 
 interface AddAmendmentProps {
   onClose: () => void
+  readOnly?: boolean
+  initialData?: AddAmendmentForm
 }
 
-export const AddAmendment = ({ onClose }: AddAmendmentProps) => {
+export const AddAmendment = ({
+  onClose,
+  readOnly,
+  initialData,
+}: AddAmendmentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
   const amendmentObjectOptions = useAddAmendmentObjectOptions()
+
   const form = useForm<AddAmendmentForm>({
-    amendment_details: "",
-    amendment_object: [],
+    amendment_details: initialData?.amendment_details,
+    amendment_object: initialData?.amendment_object ?? [],
+    signature_date: initialData?.signature_date,
+    effective_date: initialData?.effective_date,
+    amendment_file: initialData?.amendment_file,
   })
 
   const addAmendmentMutation = useMutation(
@@ -40,7 +46,7 @@ export const AddAmendment = ({ onClose }: AddAmendmentProps) => {
       addAmendment(entity.id, {
         signature_date: data.signature_date!,
         effective_date: data.effective_date!,
-        amendment_object: data.amendment_object![0]!,
+        amendment_object: data.amendment_object!,
         amendment_file: data.amendment_file!,
         amendment_details: data.amendment_details!,
       }),
@@ -68,16 +74,18 @@ export const AddAmendment = ({ onClose }: AddAmendmentProps) => {
     <Dialog
       header={<Dialog.Title>{t("Avenants au contrat d'achat")}</Dialog.Title>}
       footer={
-        <Button
-          loading={addAmendmentMutation.loading}
-          iconId="ri-add-line"
-          type="submit"
-          nativeButtonProps={{
-            form: "add-amendment-form",
-          }}
-        >
-          {t("Ajouter un avenant")}
-        </Button>
+        !readOnly && (
+          <Button
+            loading={addAmendmentMutation.loading}
+            iconId="ri-add-line"
+            type="submit"
+            nativeButtonProps={{
+              form: "add-amendment-form",
+            }}
+          >
+            {t("Ajouter un avenant")}
+          </Button>
+        )
       }
       size="medium"
       onClose={onClose}
@@ -89,11 +97,13 @@ export const AddAmendment = ({ onClose }: AddAmendmentProps) => {
               required
               label={t("Date de signature")}
               {...form.bind("signature_date")}
+              readOnly={readOnly}
             />
             <DateInput
               required
               label={t("Date de prise d'effet")}
               {...form.bind("effective_date")}
+              readOnly={readOnly}
             />
           </Grid>
 
@@ -103,6 +113,7 @@ export const AddAmendment = ({ onClose }: AddAmendmentProps) => {
             legend={t("Objet d'avenant")}
             hintText={t("Vous pouvez sélectionner plusieurs objets d'avenant")}
             required
+            disabled={readOnly}
           />
 
           {hasOtherSelected && (
@@ -111,20 +122,23 @@ export const AddAmendment = ({ onClose }: AddAmendmentProps) => {
               {...form.bind("amendment_details")}
               value={form.value.amendment_details ?? ""}
               required
+              readOnly={readOnly}
             />
           )}
         </Box>
-        <EditableCard
-          title={t("Déposer votre avenant ici")}
-          headerActions={null}
-        >
-          <FileInput
-            required
-            value={form.value.amendment_file}
-            onChange={(value) => form.setField("amendment_file", value)}
-            label={t("Avenant au contrat")}
-          />
-        </EditableCard>
+        {!readOnly && (
+          <EditableCard
+            title={t("Déposer votre avenant ici")}
+            headerActions={null}
+          >
+            <FileInput
+              required
+              value={form.value.amendment_file}
+              onChange={(value) => form.setField("amendment_file", value)}
+              label={t("Avenant au contrat")}
+            />
+          </EditableCard>
+        )}
       </Form>
     </Dialog>
   )

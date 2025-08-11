@@ -20,7 +20,7 @@ import { getYesNoOptions } from "common/utils/normalizers"
 import { Button } from "common/components/button2"
 import {
   BiomethaneContractAddRequest,
-  BiomethaneEntityConfigContract,
+  BiomethaneContract,
 } from "biomethane/types"
 import { Notice } from "common/components/notice"
 import { REDII_CMAX_THRESHOLD, REDII_PAP_THRESHOLD } from "biomethane/config"
@@ -31,7 +31,7 @@ type ContractInfosForm = DeepPartial<BiomethaneContractAddRequest>
 export const ContractInfos = ({
   contract,
 }: {
-  contract?: BiomethaneEntityConfigContract
+  contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
   const { bind, value } = useForm<ContractInfosForm>(contract ?? {})

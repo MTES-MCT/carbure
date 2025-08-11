@@ -4,8 +4,8 @@ import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
 import { EditableCard } from "common/molecules/editable-card"
 import {
-  BiomethaneEntityConfigAmendment,
-  BiomethaneEntityConfigContract,
+  BiomethaneContractAmendment,
+  BiomethaneContract,
 } from "biomethane/types"
 import { usePortal } from "common/components/portal"
 import { AddAmendment } from "./add-amendment"
@@ -13,13 +13,13 @@ import { AddAmendment } from "./add-amendment"
 export const ContractAmendments = ({
   contract,
 }: {
-  contract?: BiomethaneEntityConfigContract
+  contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const amendments = contract?.amendments ?? []
 
-  const columns: Column<BiomethaneEntityConfigAmendment>[] = [
+  const columns: Column<BiomethaneContractAmendment>[] = [
     {
       header: t("N° avenant"),
       cell: (amendment) => <Cell text={amendment.id.toString()} />,

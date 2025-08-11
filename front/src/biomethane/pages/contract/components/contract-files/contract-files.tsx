@@ -3,7 +3,7 @@ import { Column, Table, Cell } from "common/components/table2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
 import { EditableCard } from "common/molecules/editable-card"
-import { BiomethaneEntityConfigContract } from "biomethane/types"
+import { BiomethaneContract } from "biomethane/types"
 import { DateInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { usePortal } from "common/components/portal"
@@ -17,7 +17,7 @@ type ContractFile = {
 export const ContractFiles = ({
   contract,
 }: {
-  contract?: BiomethaneEntityConfigContract
+  contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
   const portal = usePortal()

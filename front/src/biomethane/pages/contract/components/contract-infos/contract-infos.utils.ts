@@ -1,8 +1,5 @@
 import { REDII_CMAX_THRESHOLD, REDII_PAP_THRESHOLD } from "biomethane/config"
-import {
-  TariffReference,
-  BiomethaneEntityConfigContract,
-} from "biomethane/types"
+import { TariffReference, BiomethaneContract } from "biomethane/types"
 
 export const isTariffReference2011Or2020 = (
   tariff_reference?: TariffReference
@@ -26,10 +23,7 @@ export const isTariffReference2021Or2023 = (
 
 export const isContractRedii = (
   contract?: Partial<
-    Pick<
-      BiomethaneEntityConfigContract,
-      "tariff_reference" | "cmax" | "pap_contracted"
-    >
+    Pick<BiomethaneContract, "tariff_reference" | "cmax" | "pap_contracted">
   >
 ) => {
   if (!contract) return false

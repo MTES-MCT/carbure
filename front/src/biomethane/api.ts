@@ -69,3 +69,17 @@ export const addAmendment = async (
   })
   return response.data
 }
+
+export const getAmendment = async (entity_id: number, amendment_id: number) => {
+  const response = await api.GET(`/biomethane/contract/amendments/{id}/`, {
+    params: {
+      path: {
+        id: amendment_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+  })
+  return response.data
+}
