@@ -33,6 +33,7 @@ import { EditableCard } from "common/molecules/editable-card"
 import { Notice } from "common/components/notice"
 import { ROUTE_URLS } from "common/utils/routes"
 import { CompanyRegistrationDialog } from "companies/components/registration-dialog"
+import { ForeignCompanyDialog } from "companies/components/foreign-company-dialog"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
@@ -149,6 +150,14 @@ export const AccountAccesRights = () => {
           }
         />
         <Route path="registration" element={<CompanyRegistrationDialog />} />
+        <Route
+          path="registration/foreign"
+          element={
+            <ForeignCompanyDialog
+              close={() => navigate(ROUTE_URLS.MY_ACCOUNT.COMPANIES)}
+            />
+          }
+        />
       </Routes>
     </EditableCard>
   )
