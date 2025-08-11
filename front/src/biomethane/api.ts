@@ -81,5 +81,6 @@ export const getAmendment = async (entity_id: number, amendment_id: number) => {
       },
     },
   })
+
   return response.data
 }

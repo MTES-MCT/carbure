@@ -335,8 +335,6 @@ if DEBUG:
     MIDDLEWARE += ["silk.middleware.SilkyMiddleware"]
     MIDDLEWARE.remove("csp.middleware.CSPMiddleware")
 
-if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
-    MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
 
 if env("TEST"):
     HUEY["immediate"] = True  # allow running background tasks immediately so we can have instant results in tests
@@ -448,3 +446,10 @@ if env("IMAGE_TAG") in ("dev", "local"):
     import factory
 
     factory.Faker._DEFAULT_LOCALE = "fr_FR"
+
+if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
+    MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
+
+    # Disable throtting in local
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}

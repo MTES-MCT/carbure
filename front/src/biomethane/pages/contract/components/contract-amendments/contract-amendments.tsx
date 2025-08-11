@@ -9,6 +9,9 @@ import {
 } from "biomethane/types"
 import { usePortal } from "common/components/portal"
 import { AddAmendment } from "./add-amendment"
+import HashRoute from "common/components/hash-route"
+import { AmendmentDetail } from "./amendment-detail"
+import { formatDate } from "common/utils/formatters"
 
 export const ContractAmendments = ({
   contract,
@@ -26,11 +29,11 @@ export const ContractAmendments = ({
     },
     {
       header: t("Date de signature"),
-      cell: (amendment) => <Cell text={amendment.signature_date} />,
+      cell: (amendment) => <Cell text={formatDate(amendment.signature_date)} />,
     },
     {
       header: t("Date de prise d'effet"),
-      cell: (amendment) => <Cell text={amendment.effective_date} />,
+      cell: (amendment) => <Cell text={formatDate(amendment.effective_date)} />,
     },
     {
       header: t("Télécharger"),
@@ -38,12 +41,10 @@ export const ContractAmendments = ({
         <Button
           priority="tertiary no outline"
           iconId="ri-download-line"
-          linkProps={{
-            href: amendment.amendment_file,
-            target: "_blank",
-          }}
+          onClick={() => window.open(amendment.amendment_file, "_blank")}
           size="small"
           title={t("Télécharger")}
+          captive
         />
       ),
     },
@@ -73,7 +74,18 @@ export const ContractAmendments = ({
           {t("Aucun avenant associé au contrat.")}
         </Notice>
       ) : (
-        <Table rows={amendments} columns={columns} />
+        <>
+          <Table
+            rows={amendments}
+            columns={columns}
+            rowLink={(row) => ({
+              pathname: location.pathname,
+              search: location.search,
+              hash: `amendment/${row.id}`,
+            })}
+          />
+          <HashRoute path="amendment/:id" element={<AmendmentDetail />} />
+        </>
       )}
     </EditableCard>
   )

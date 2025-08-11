@@ -110,10 +110,9 @@ export const AddAmendment = ({
           <CheckboxGroup
             {...form.bind("amendment_object")}
             options={amendmentObjectOptions}
-            legend={t("Objet d'avenant")}
+            label={t("Objet d'avenant")}
             hintText={t("Vous pouvez sélectionner plusieurs objets d'avenant")}
-            required
-            disabled={readOnly}
+            readOnly={readOnly}
           />
 
           {hasOtherSelected && (

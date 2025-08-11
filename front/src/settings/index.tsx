@@ -71,21 +71,21 @@ const Settings = () => {
             iconActive: "ri-user-fill",
           },
           isBiomethaneProducer && {
-            path: "contract",
+            path: routes.SETTINGS.BIOMETHANE.CONTRACT,
             key: "contract",
             label: t("Contrat"),
             icon: "ri-file-text-line",
             iconActive: "ri-file-text-fill",
           },
           isBiomethaneProducer && {
-            path: "production",
+            path: routes.SETTINGS.BIOMETHANE.PRODUCTION,
             key: "production",
             label: t("Production"),
             icon: "ri-building-line",
             iconActive: "ri-building-fill",
           },
           isBiomethaneProducer && {
-            path: "injection",
+            path: routes.SETTINGS.BIOMETHANE.INJECTION,
             key: "injection",
             label: t("Injection"),
             icon: "ri-todo-line",
@@ -147,9 +147,18 @@ const Settings = () => {
           )}
           {isBiomethaneProducer && (
             <>
-              <Route path="contract" element={<BiomethaneContractPage />} />
-              <Route path="production" element={<BiomethaneProductionPage />} />
-              <Route path="injection" element={<BiomethaneInjectionPage />} />
+              <Route
+                path="biomethane/contract"
+                element={<BiomethaneContractPage />}
+              />
+              <Route
+                path="biomethane/production"
+                element={<BiomethaneProductionPage />}
+              />
+              <Route
+                path="biomethane/injection"
+                element={<BiomethaneInjectionPage />}
+              />
             </>
           )}
           <Route path="*" element={<Navigate replace to={defaultTab} />} />
