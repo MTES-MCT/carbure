@@ -65,18 +65,25 @@ export const Checkbox = ({
   return <CheckboxDSFR {...props} options={options} small={small} />
 }
 
-export type CheckboxGroupProps<T, V> = Omit<CheckboxDSFRProps, "options"> & {
+export type CheckboxGroupProps<T, V> = Omit<
+  CheckboxDSFRProps,
+  "options" | "name"
+> & {
   options: T[]
   value: V[] | undefined
   onChange: (value: V[] | undefined) => void
   onToggle?: (value: V, checked: boolean) => void
   normalize?: Normalizer<T, V>
+  name?: string
+  required?: boolean
 }
 export const CheckboxGroup = <T, V extends string | number>({
   options,
   onChange,
   onToggle,
   normalize = defaultNormalizer,
+  name,
+  className,
   ...props
 }: CheckboxGroupProps<T, V>) => {
   const selection = multipleSelection(props.value, onChange)
@@ -91,7 +98,15 @@ export const CheckboxGroup = <T, V extends string | number>({
       ...(Object.hasOwn(props, "value") // Handle uncontrolled value
         ? { checked: selection.isSelected(option.value) }
         : {}),
+      name,
+      required: props.required,
     },
   }))
-  return <CheckboxDSFR {...props} options={optionsWithNativeInputProps} />
+  return (
+    <CheckboxDSFR
+      {...props}
+      options={optionsWithNativeInputProps}
+      className={cl(className, css["checkbox-group"])}
+    />
+  )
 }

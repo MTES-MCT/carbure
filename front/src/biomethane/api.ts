@@ -20,6 +20,7 @@ export const getContract = async (entity_id: number) => {
   })
   return response.data
 }
+
 export const createContract = async (
   entity_id: number,
   data: apiTypes["BiomethaneEntityConfigContractAddRequest"]
@@ -40,6 +41,21 @@ export const updateContract = async (
   data: apiTypes["PatchedBiomethaneEntityConfigContractPatchRequest"]
 ) => {
   const response = await api.PATCH("/biomethane/contract/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+    body: data,
+  })
+  return response.data
+}
+
+export const addAmendment = async (
+  entity_id: number,
+  data: apiTypes["BiomethaneEntityConfigAmendmentAddRequest"]
+) => {
+  const response = await api.POST("/biomethane/contract/amendments/", {
     params: {
       query: {
         entity_id,
