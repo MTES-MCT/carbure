@@ -6,22 +6,21 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 
 export const useTariffReferenceOptions = () => {
-  const { t } = useTranslation()
   return [
     {
-      label: t("2011"),
+      label: "2011",
       value: TariffReference.Value2011,
     },
     {
-      label: t("2020"),
+      label: "2020",
       value: TariffReference.Value2020,
     },
     {
-      label: t("2021"),
+      label: "2021",
       value: TariffReference.Value2021,
     },
     {
-      label: t("2023"),
+      label: "2023",
       value: TariffReference.Value2023,
     },
   ]
