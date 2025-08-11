@@ -138,7 +138,7 @@
   "Opération": "Operation",
   "De/à": "From/to",
   "Comptabilité": "Accounting",
-  "Dépôts": "depots",
+  "Dépôts": "Depots",
   "Débit / Crédit": "Debit / Credit",
   "Vos opérations d'incorporation et de mise à consommation de biocarburants ont le statut \"validé\" par défaut dans le cadre de cette bêta.": "Your biofuel blending and release for consumption have the default status of \"validated\" for this beta.",
   "Ce comportement est temporaire, dans l’attente de l’implémentation du mécanisme officiel de validation par un tiers.": "This behavior is temporary, pending implementation of the official third-party validation mechanism.",
