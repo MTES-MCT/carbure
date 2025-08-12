@@ -13,6 +13,8 @@ import { Button } from "common/components/button2"
 import { ValidateDataDialog } from "./validate-data-dialog"
 import { useValidateVolumes } from "../hooks/use-validate-volumes"
 import { useNotify } from "common/components/notifications"
+import { QualichargeValidatedBy } from "../types"
+import { ExternalAdminPages } from "common/types"
 
 export const QualichargeDataDetail = () => {
   const match = useHashMatch("data/:id")
@@ -49,6 +51,13 @@ export const QualichargeDataDetail = () => {
       />
     ))
   }
+
+  const isValidateButtonDisabled =
+    (result?.data?.validated_by === QualichargeValidatedBy.CPO &&
+      entity.isCPO) ||
+    (result?.data?.validated_by === QualichargeValidatedBy.DGEC &&
+      (entity.isAdmin || entity.hasAdminRight(ExternalAdminPages.ELEC)))
+
   return (
     <Portal>
       <Dialog
@@ -63,7 +72,11 @@ export const QualichargeDataDetail = () => {
           </Row>
         }
         footer={
-          <Button iconId="ri-check-line" onClick={openValidateDataModal}>
+          <Button
+            iconId="ri-check-line"
+            onClick={openValidateDataModal}
+            disabled={isValidateButtonDisabled}
+          >
             {t("Valider")}
           </Button>
         }

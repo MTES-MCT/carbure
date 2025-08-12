@@ -195,7 +195,7 @@ const Org = () => {
         />
       )}
 
-      {(isCPO || isElecAdmin) && (
+      {(isCPO || isElecAdmin || isAdmin) && (
         <Route path="charge-points/*" element={<ChargePoints />} />
       )}
 
