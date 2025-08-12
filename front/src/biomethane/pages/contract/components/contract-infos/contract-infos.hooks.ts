@@ -64,7 +64,7 @@ export const useMutateContractInfos = (hasContract: boolean = false) => {
       ? (data) => updateContract(entity.id, data)
       : (data) => createContract(entity.id, data),
     {
-      invalidates: ["contract-infos"],
+      invalidates: ["contract-infos", "user-settings"],
       onSuccess: () => {
         notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
       },
