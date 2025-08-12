@@ -14191,6 +14191,9 @@ components:
         accise_number:
           type: string
           readOnly: true
+        is_red_ii:
+          type: boolean
+          readOnly: true
       required:
         - accise_number
         - activity_description
@@ -14205,6 +14208,7 @@ components:
         - has_trading
         - id
         - is_enabled
+        - is_red_ii
         - is_tiruert_liable
         - legal_name
         - name

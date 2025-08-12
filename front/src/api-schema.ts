@@ -4530,6 +4530,7 @@ export interface components {
             readonly ext_admin_pages: components["schemas"]["ExtAdminPagesEnum"][];
             readonly is_tiruert_liable: boolean;
             readonly accise_number: string;
+            readonly is_red_ii: boolean;
         };
         UserLoginRequest: {
             username: string;

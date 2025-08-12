@@ -722,6 +722,7 @@ class UserEntitySerializer(serializers.ModelSerializer):
             "ext_admin_pages",
             "is_tiruert_liable",
             "accise_number",
+            "is_red_ii",
         ]
         read_only_fields = fields
 

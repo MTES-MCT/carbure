@@ -40,6 +40,7 @@ export const Checkbox = ({
         onChange: (e: ChangeEvent<HTMLInputElement>) =>
           onChange?.(e.target.checked),
         onClick: captive ? (e) => e.stopPropagation() : undefined,
+        disabled: props.disabled,
       },
     },
   ]

@@ -43,7 +43,7 @@ const Settings = () => {
 
   const hasCertificates = isIndustry
   const hasDepot = isIndustry || isPowerOrHeatProducer
-  const hasOptions = isIndustry
+  const hasOptions = isIndustry || isBiomethaneProducer
   const defaultTab = hasOptions ? "options" : "info"
   return (
     <Main>
