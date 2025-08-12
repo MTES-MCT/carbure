@@ -10,6 +10,10 @@ from .views.production_unit import (
     BiomethaneDigestateStorageViewSet,
     BiomethaneProductionUnitViewSet,
 )
+from .views.production_unit import (
+    BiomethaneDigestateStorageViewSet,
+    BiomethaneProductionUnitViewSet,
+)
 
 router = SimpleRouter()
 router.register(
