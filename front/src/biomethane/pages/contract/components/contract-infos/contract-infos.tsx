@@ -31,7 +31,7 @@ type ContractInfosForm = DeepPartial<BiomethaneContractAddRequest>
 export const ContractInfos = ({
   contract,
 }: {
-  contract?: BiomethaneContract
+  contract?: Pick<BiomethaneContract, keyof BiomethaneContractAddRequest>
 }) => {
   const { t } = useTranslation()
   const { bind, value } = useForm<ContractInfosForm>(
