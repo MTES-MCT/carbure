@@ -137,6 +137,7 @@ class Entity(models.Model):
             "vat_number": self.vat_number,
             "is_enabled": self.is_enabled,
             "is_tiruert_liable": self.is_tiruert_liable,
+            "is_red_ii": self.is_red_ii,
             "accise_number": self.accise_number,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
