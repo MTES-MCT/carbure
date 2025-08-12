@@ -8,7 +8,7 @@ import {
   ElecAuditorApplicationsStatus,
   ElecAuditorUploadCheckReportInfo,
 } from "elec-auditor/types"
-import { elecAuditApplicationSample } from "elec/__test__/data"
+import { elecAuditApplicationSample } from "elec-charge-points/__test__/data"
 
 export const elecAuditYears = [2024, 2023, 2020]
 export const elecAuditSnapshot: ElecAuditorApplicationsSnapshot = {

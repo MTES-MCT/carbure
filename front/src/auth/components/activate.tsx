@@ -106,22 +106,21 @@ export const ActivateRequest = () => {
   const notify = useNotify()
   const navigate = useNavigate()
 
-  const { value, bind } = useForm({
-    email: "" as string | undefined,
-  })
+  const { value, bind } = useForm({ email: "" as string | undefined })
 
   const requestActivationLink = useMutation(api.requestActivateAccount, {
     onSuccess: () => {
-      notify(t("Le nouveau lien d'activation a été envoyé !"), {
-        variant: "success",
-      })
+      notify(
+        t(
+          "Si ce compte existe, un nouveau lien d'activation vous a été envoyé"
+        ),
+        { variant: "success" }
+      )
       navigate("../register-pending")
     },
 
     onError: () => {
-      notify(t("Le lien n'a pas pu être envoyé !"), {
-        variant: "danger",
-      })
+      notify(t("Le lien n'a pas pu être envoyé !"), { variant: "danger" })
     },
   })
 

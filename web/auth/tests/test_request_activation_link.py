@@ -57,9 +57,7 @@ class RequestActivationLinkTest(TestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    def test_responds_with_http_400_error_on_request_with_unknown_email(self):
+    def test_responds_with_http_200_on_request_with_unknown_email(self):
         response = self.client.post(self.request_activation_link_url, {"email": "unknown@example.com"})
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-        data = response.json()
-        assert data == {"status": "error", "message": "Could not send activation link"}
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"status": "success"}

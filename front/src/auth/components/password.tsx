@@ -15,9 +15,7 @@ export const ResetPasswordRequest = () => {
   const notify = useNotify()
   const navigate = useNavigate()
 
-  const { value, bind } = useForm({
-    email: "" as string | undefined,
-  })
+  const { value, bind } = useForm({ email: "" as string | undefined })
 
   const requestPasswordReset = useMutation(api.requestResetPassword, {
     onSuccess: () => {
@@ -28,9 +26,7 @@ export const ResetPasswordRequest = () => {
     },
 
     onError: () => {
-      notify(t("La demande n'a pas pu être envoyée !"), {
-        variant: "danger",
-      })
+      notify(t("La demande n'a pas pu être envoyée !"), { variant: "danger" })
     },
   })
 
@@ -91,7 +87,7 @@ export const ResetPasswordPending = () => {
       <section>
         <p>
           {t(
-            "Votre demande de réinitialisation de mot de passe a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra de modifier votre mot de passe."
+            "Votre demande de réinitialisation de mot de passe a bien été envoyée. Si un compte existe avec cet email, vous recevrez un email sous peu contenant un lien qui vous permettra de modifier votre mot de passe."
           )}
         </p>
       </section>

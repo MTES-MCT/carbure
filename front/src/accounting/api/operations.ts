@@ -142,7 +142,7 @@ export const createOperationWithSimulation = (
     >
     operation: Pick<
       apiTypes["OperationInputRequest"],
-      "type" | "from_depot" | "to_depot" | "credited_entity"
+      "type" | "from_depot" | "to_depot" | "credited_entity" | "status"
     >
   }
 ) => {
@@ -167,6 +167,7 @@ export const createOperationWithSimulation = (
         from_depot: operation.from_depot,
         to_depot: operation.to_depot,
         credited_entity: operation.credited_entity,
+        status: operation.status,
       })
     }
   })

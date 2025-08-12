@@ -89,6 +89,7 @@ export function formatUnit(
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
     [ExtendedUnit.GJ]: i18next.t("GJ"),
+    [ExtendedUnit.MWh]: i18next.t("MWh"),
   }
 
   return `${formatNumber(num, options)} ${unitLabel[unit]}`
@@ -100,6 +101,7 @@ export function formatUnitOnly(unit: Unit | ExtendedUnit, count = 2) {
     [Unit.kg]: i18next.t("kg"),
     [Unit.MJ]: i18next.t("MJ"),
     [ExtendedUnit.GJ]: i18next.t("GJ"),
+    [ExtendedUnit.MWh]: i18next.t("MWh"),
   }
 
   return unitLabel[unit]
@@ -184,6 +186,12 @@ export function chunk(str: string, size: number): string[] {
   }
 
   return chunks.reverse()
+}
+
+export function formatMonth(month: number) {
+  const date = new Date(0, month - 1, 1)
+  const formatted = formatDate(date, "MMMM")
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 }
 
 export const CONVERSIONS = {

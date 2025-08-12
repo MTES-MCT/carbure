@@ -1,14 +1,11 @@
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { RightStatus } from "account/components/access-rights"
-import { Alert } from "common/components/alert"
-import { AlertCircle, Plus } from "common/components/icons"
-import { SearchInput } from "common/components/input"
-import { Button } from "common/components/button"
-import Table, { actionColumn, Cell } from "common/components/table"
+import { SearchInput } from "common/components/inputs2"
+import { Button } from "common/components/button2"
+import { actionColumn, Cell, Table } from "common/components/table2"
 import { usePortal } from "common/components/portal"
 import { UserRightRequest, UserRightStatus, UserRole } from "common/types"
 import { getUserRoleLabel } from "common/utils/normalizers"
-import { Panel } from "common/components/scaffold"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
 import { ChangeUserRoleButton } from "./change-user-role-button"
@@ -17,8 +14,16 @@ import { RevokeUserButton } from "./revoke-user-button"
 import { RejectUserButton } from "./reject-user-button"
 import { useState } from "react"
 import { AddUserDialog, AddUserDialogProps } from "./add-user-dialog"
+import { EditableCard } from "../editable-card"
+import { Notice } from "common/components/notice"
 
 type EntityUserRightsProps = {
+  // Overrides default user title
+  title?: string
+
+  // Overrides default user description
+  description?: string
+
   rights: UserRightRequest[]
 
   readOnly?: boolean
@@ -55,6 +60,8 @@ const RIGHTS_ORDER = {
 }
 
 export const UserRightsTable = ({
+  title: overrideTitle,
+  description: overrideDescription,
   rights,
   readOnly,
   isSearchable = false,
@@ -69,6 +76,11 @@ export const UserRightsTable = ({
   const [query, setQuery] = useState<string>("")
   const portal = usePortal()
 
+  const title = overrideTitle ?? t("Utilisateurs")
+  const description =
+    overrideDescription ??
+    t("Gérez les membres de votre équipe ici selon leurs droits.")
+
   const displaySearchInput =
     isSearchable && (query.length > 0 || rights.length > 0)
   // Pass all the request as parameter to let the parent do anything
@@ -82,26 +94,25 @@ export const UserRightsTable = ({
   }
 
   return (
-    <Panel id="users">
-      <header>
-        <h1>
-          <Trans>Utilisateurs</Trans>
-        </h1>
-        {onAddNewUser && (
+    <EditableCard
+      title={title}
+      description={description}
+      headerActions={
+        onAddNewUser ? (
           <Button
             asideX
-            variant="primary"
-            icon={Plus}
-            label={t("Ajouter un utilisateur")}
-            action={() =>
+            iconId="ri-add-line"
+            onClick={() =>
               portal((close) => (
                 <AddUserDialog onClose={close} onAddNewUser={onAddNewUser} />
               ))
             }
-          />
-        )}
-      </header>
-
+          >
+            {t("Ajouter un utilisateur")}
+          </Button>
+        ) : null
+      }
+    >
       <section>
         {displaySearchInput && (
           <SearchInput
@@ -112,9 +123,11 @@ export const UserRightsTable = ({
           />
         )}
         {rights.length === 0 && (
-          <Alert icon={AlertCircle} variant="warning">
-            <Trans>Aucun utilisateur associé à cette entité</Trans>
-          </Alert>
+          <Notice
+            variant="warning"
+            icon="ri-error-warning-line"
+            title={t("Aucun utilisateur associé à cette entité")}
+          />
         )}
       </section>
 
@@ -191,6 +204,6 @@ export const UserRightsTable = ({
           ])}
         />
       )}
-    </Panel>
+    </EditableCard>
   )
 }

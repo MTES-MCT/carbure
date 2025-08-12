@@ -48,6 +48,57 @@ paths:
                     message: Could not activate user account
                   summary: Activation failed
           description: Bad request - missing fields.
+  /api/auth/confirm-email-change/:
+    post:
+      operationId: auth_confirm_email_change_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailChangeRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailChangeRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailChangeRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmEmailChangeSuccess"
+              examples:
+                Succès:
+                  value:
+                    status: success
+          description: Email mis à jour avec succès
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmEmailChangeError"
+              examples:
+                CodeIncorrect:
+                  value:
+                    error: INVALID_OTP
+                  summary: Code incorrect
+                CodeExpiré:
+                  value:
+                    error: OTP_CODE_EXPIRED
+                  summary: Code expiré
+                AucuneDemandeEnCours:
+                  value:
+                    error: NO_CHANGE_REQUEST
+                  summary: Aucune demande en cours
+          description: "Erreurs possibles: données invalides, aucune demande en cours,
+            code expiré, code incorrect"
   /api/auth/login/:
     post:
       operationId: auth_login_create
@@ -176,6 +227,55 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/auth/request-email-change/:
+    post:
+      operationId: auth_request_email_change_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestEmailChangeRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RequestEmailChangeRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RequestEmailChangeRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestEmailChangeSuccess"
+              examples:
+                Succès:
+                  value:
+                    status: otp_sent
+          description: Code OTP envoyé avec succès à la nouvelle adresse email
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestEmailChangeError"
+              examples:
+                ErreurDeValidation:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      new_email:
+                        - Cette adresse email est déjà utilisée par un autre
+                          compte.
+                      password:
+                        - Mot de passe incorrect.
+                  summary: Erreur de validation
+          description: "Erreurs possibles: données invalides, mot de passe incorrect,
+            email déjà utilisé"
   /api/auth/request-otp/:
     get:
       operationId: auth_request_otp_retrieve
@@ -196,6 +296,67 @@ paths:
                     valid_until: 07/03/2024, 14:09
                   summary: Example response.
           description: ""
+  /api/auth/request-password-change/:
+    post:
+      operationId: auth_request_password_change_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordSuccess"
+              examples:
+                Succès:
+                  value:
+                    status: success
+          description: Mot de passe modifié avec succès
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordError"
+              examples:
+                MotDePasseActuelIncorrect:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      current_password:
+                        - WRONG_CURRENT_PASSWORD
+                  summary: Mot de passe actuel incorrect
+                NouveauMotDePasseInvalide:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      new_password:
+                        - Ce mot de passe est trop court. Il doit contenir au
+                          minimum 8 caractères.
+                  summary: Nouveau mot de passe invalide
+                MotsDePasseIdentiques:
+                  value:
+                    message: INVALID_DATA
+                    errors:
+                      current_password:
+                        - PASSWORDS_MATCH
+                  summary: Mots de passe identiques
+          description: "Erreurs possibles: données invalides, mot de passe actuel
+            incorrect, nouveau mot de passe invalide"
   /api/auth/request-password-reset/:
     post:
       operationId: auth_request_password_reset_create
@@ -1298,6 +1459,992 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApplicationSnapshot"
+          description: ""
+  /api/elec/certificates/clients/:
+    get:
+      operationId: elec_certificates_clients_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity querying the endpoint
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the field `name`
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityPreview"
+          description: ""
+  /api/elec/certificates/snapshot/:
+    get:
+      operationId: elec_certificates_snapshot_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  provision_certificates_available:
+                    type: integer
+                  provision_certificates_history:
+                    type: integer
+                  transfer_certificates_pending:
+                    type: integer
+                  transfer_certificates_accepted:
+                    type: integer
+                  transfer_certificates_rejected:
+                    type: integer
+                required:
+                  - provision_certificates_available
+                  - provision_certificates_history
+                  - transfer_certificates_pending
+                  - transfer_certificates_accepted
+                  - transfer_certificates_rejected
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    provision_certificates_available: 5
+                    transfer_certificates_pending: 10
+                    ...: ...
+                  summary: Example of filters response.
+          description: ""
+  /api/elec/certificates/years/:
+    get:
+      operationId: elec_certificates_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
+  /api/elec/provision-certificates/:
+    get:
+      operationId: elec_provision_certificates_list
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -cpo
+                - -operating_unit
+                - -quarter
+                - -remaining_energy_amount
+                - -source
+                - cpo
+                - operating_unit
+                - quarter
+                - remaining_energy_amount
+                - source
+          description: |-
+            Ordre
+
+            * `quarter` - Quarter
+            * `-quarter` - Quarter (décroissant)
+            * `remaining_energy_amount` - Remaining energy amount
+            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operating_unit` - Operating unit
+            * `-operating_unit` - Operating unit (décroissant)
+            * `source` - Source
+            * `-source` - Source (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: quarter
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - MANUAL
+                - METER_READINGS
+                - null
+                - QUALICHARGE
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateList"
+          description: ""
+  /api/elec/provision-certificates/{id}/:
+    get:
+      operationId: elec_provision_certificates_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Fourniture
+            (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecProvisionCertificate"
+          description: ""
+  /api/elec/provision-certificates/balance/:
+    get:
+      operationId: elec_provision_certificates_balance_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: integer
+          description: ""
+  /api/elec/provision-certificates/export/:
+    get:
+      operationId: export_provision_certificates_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: Excel file download
+          description: ""
+  /api/elec/provision-certificates/filters/:
+    get:
+      operationId: elec_provision_certificates_filters_retrieve
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -cpo
+                - -operating_unit
+                - -quarter
+                - -remaining_energy_amount
+                - -source
+                - cpo
+                - operating_unit
+                - quarter
+                - remaining_energy_amount
+                - source
+          description: |-
+            Ordre
+
+            * `quarter` - Quarter
+            * `-quarter` - Quarter (décroissant)
+            * `remaining_energy_amount` - Remaining energy amount
+            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operating_unit` - Operating unit
+            * `-operating_unit` - Operating unit (décroissant)
+            * `source` - Source
+            * `-source` - Source (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: quarter
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - MANUAL
+                - METER_READINGS
+                - null
+                - QUALICHARGE
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - ETBE
+                    - Ethanol
+                    - EMHV
+                    - B100
+                    - HVOE
+                  summary: Example of filters response.
+          description: ""
+  /api/elec/provision-certificates/import/:
+    post:
+      operationId: elec_provision_certificates_import_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to import
+              required:
+                - file
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          description: ""
+  /api/elec/provision-certificates/transfer/:
+    post:
+      operationId: elec_provision_certificates_transfer_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferCertificate"
+          description: ""
+  /api/elec/transfer-certificates/:
+    get:
+      operationId: elec_transfer_certificates_list
+      parameters:
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: client
+          schema:
+            type: integer
+        - in: query
+          name: consumption_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: month
+          schema:
+            type: number
+        - in: query
+          name: operator
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -certificate_id
+                - -consumption_date
+                - -cpo
+                - -energy_amount
+                - -operator
+                - -status
+                - -transfer_date
+                - certificate_id
+                - consumption_date
+                - cpo
+                - energy_amount
+                - operator
+                - status
+                - transfer_date
+          description: |-
+            Ordre
+
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operator` - Operator
+            * `-operator` - Operator (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
+            * `transfer_date` - Transfer date
+            * `-transfer_date` - Transfer date (décroissant)
+            * `consumption_date` - Consumption date
+            * `-consumption_date` - Consumption date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: supplier
+          schema:
+            type: integer
+        - in: query
+          name: transfer_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: used_in_tiruert
+          schema:
+            type: boolean
+        - in: query
+          name: year
+          schema:
+            type: number
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecTransferCertificateList"
+          description: ""
+  /api/elec/transfer-certificates/{id}/:
+    get:
+      operationId: elec_transfer_certificates_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecTransferCertificate"
+          description: ""
+  /api/elec/transfer-certificates/{id}/accept/:
+    post:
+      operationId: elec_transfer_certificates_accept_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferAcceptRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/elec/transfer-certificates/{id}/cancel/:
+    post:
+      operationId: elec_transfer_certificates_cancel_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/elec/transfer-certificates/{id}/reject/:
+    post:
+      operationId: elec_transfer_certificates_reject_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Cession (elec).
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ElecTransferRejectRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/elec/transfer-certificates/export/:
+    get:
+      operationId: export_transfer_certificates_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: Excel file download
+          description: ""
+  /api/elec/transfer-certificates/filters/:
+    get:
+      operationId: elec_transfer_certificates_filters_retrieve
+      parameters:
+        - in: query
+          name: certificate_id
+          schema:
+            type: string
+        - in: query
+          name: client
+          schema:
+            type: integer
+        - in: query
+          name: consumption_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: energy_amount
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: Filter string to apply
+        - in: query
+          name: month
+          schema:
+            type: number
+        - in: query
+          name: operator
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -certificate_id
+                - -consumption_date
+                - -cpo
+                - -energy_amount
+                - -operator
+                - -status
+                - -transfer_date
+                - certificate_id
+                - consumption_date
+                - cpo
+                - energy_amount
+                - operator
+                - status
+                - transfer_date
+          description: |-
+            Ordre
+
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
+            * `cpo` - Cpo
+            * `-cpo` - Cpo (décroissant)
+            * `operator` - Operator
+            * `-operator` - Operator (décroissant)
+            * `certificate_id` - Certificate id
+            * `-certificate_id` - Certificate id (décroissant)
+            * `transfer_date` - Transfer date
+            * `-transfer_date` - Transfer date (décroissant)
+            * `consumption_date` - Consumption date
+            * `-consumption_date` - Consumption date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: supplier
+          schema:
+            type: integer
+        - in: query
+          name: transfer_date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: used_in_tiruert
+          schema:
+            type: boolean
+        - in: query
+          name: year
+          schema:
+            type: number
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - ETBE
+                    - Ethanol
+                    - EMHV
+                    - B100
+                    - HVOE
+                  summary: Example of filters response.
           description: ""
   /api/entities/:
     get:
@@ -3052,7 +4199,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserRightsResponseSeriaizer"
+                $ref: "#/components/schemas/UserRightsResponse"
           description: ""
   /api/entities/users/invite-user/:
     post:
@@ -3705,7 +4852,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: clients
+          name: client
           schema:
             type: array
             items:
@@ -3936,7 +5083,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: clients
+          name: client
           schema:
             type: array
             items:
@@ -4087,7 +5234,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: clients
+          name: client
           schema:
             type: array
             items:
@@ -5945,27 +7092,30 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
             type: array
             items:
+              type: string
               enum:
-                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - TALLOL
-                - OTHER
+                - CONV
                 - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+                - OTHER
+                - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -6000,41 +7150,35 @@ paths:
           schema:
             type: string
         - in: query
-          name: ges_bound_max
-          schema:
-            type: number
-        - in: query
-          name: ges_bound_min
-          schema:
-            type: number
-        - in: query
           name: operation
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -6119,49 +7263,57 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
             type: array
             items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
               type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -6558,27 +7710,30 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
             type: array
             items:
+              type: string
               enum:
-                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - TALLOL
-                - OTHER
+                - CONV
                 - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+                - OTHER
+                - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -6630,29 +7785,31 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -6737,49 +7894,57 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
             type: array
             items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
               type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -6812,27 +7977,30 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
             type: array
             items:
+              type: string
               enum:
-                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - TALLOL
-                - OTHER
+                - CONV
                 - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+                - OTHER
+                - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -6871,41 +8039,35 @@ paths:
           schema:
             type: string
         - in: query
-          name: ges_bound_max
-          schema:
-            type: number
-        - in: query
-          name: ges_bound_min
-          schema:
-            type: number
-        - in: query
           name: operation
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -6978,49 +8140,57 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
             type: array
             items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
               type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -7095,27 +8265,30 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
+          explode: true
+          style: form
         - in: query
           name: customs_category
           schema:
             type: array
             items:
+              type: string
               enum:
-                - CONV
                 - ANN-IX-A
                 - ANN-IX-B
-                - TALLOL
-                - OTHER
+                - CONV
                 - EP2AM
-              type: string
-              description: |-
-                * `CONV` - Conventionnel
-                * `ANN-IX-A` - ANNEXE IX-A
-                * `ANN-IX-B` - ANNEXE IX-B
-                * `TALLOL` - Tallol
-                * `OTHER` - Autre
-                * `EP2AM` - EP2AM
+                - OTHER
+                - TALLOL
+          description: |-
+            * `CONV` - Conventionnel
+            * `ANN-IX-A` - ANNEXE IX-A
+            * `ANN-IX-B` - ANNEXE IX-B
+            * `TALLOL` - Tallol
+            * `OTHER` - Autre
+            * `EP2AM` - EP2AM
+          explode: true
+          style: form
         - in: query
           name: date_from
           schema:
@@ -7160,41 +8333,35 @@ paths:
           schema:
             type: string
         - in: query
-          name: ges_bound_max
-          schema:
-            type: number
-        - in: query
-          name: ges_bound_min
-          schema:
-            type: number
-        - in: query
           name: operation
           schema:
             type: array
             items:
+              type: string
               enum:
-                - INCORPORATION
+                - ACQUISITION
                 - CESSION
-                - TENEUR
+                - CUSTOMS_CORRECTION
+                - DEVALUATION
+                - EXPORTATION
+                - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
-                - EXPORTATION
-                - DEVALUATION
-                - CUSTOMS_CORRECTION
+                - TENEUR
                 - TRANSFERT
-                - ACQUISITION
-              type: string
-              description: |-
-                * `INCORPORATION` - INCORPORATION
-                * `CESSION` - CESSION
-                * `TENEUR` - TENEUR
-                * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
-                * `MAC_BIO` - MAC_BIO
-                * `EXPORTATION` - EXPORTATION
-                * `DEVALUATION` - DEVALUATION
-                * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
-                * `TRANSFERT` - TRANSFERT
-                * `ACQUISITION` - ACQUISITION
+          description: |-
+            * `INCORPORATION` - INCORPORATION
+            * `CESSION` - CESSION
+            * `TENEUR` - TENEUR
+            * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
+            * `MAC_BIO` - MAC_BIO
+            * `EXPORTATION` - EXPORTATION
+            * `DEVALUATION` - DEVALUATION
+            * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `TRANSFERT` - TRANSFERT
+            * `ACQUISITION` - ACQUISITION
+          explode: true
+          style: form
         - in: query
           name: order_by
           schema:
@@ -7267,49 +8434,57 @@ paths:
           schema:
             type: array
             items:
+              type: string
               enum:
+                - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - CARBURÉACTEUR
-              type: string
-              description: |-
-                * `ESSENCE` - ESSENCE
-                * `GAZOLE` - GAZOLE
-                * `CARBURÉACTEUR` - CARBURÉACTEUR
+          description: |-
+            * `ESSENCE` - ESSENCE
+            * `GAZOLE` - GAZOLE
+            * `CARBURÉACTEUR` - CARBURÉACTEUR
+          explode: true
+          style: form
         - in: query
           name: status
           schema:
             type: array
             items:
-              enum:
-                - PENDING
-                - ACCEPTED
-                - REJECTED
-                - CANCELED
-                - DECLARED
-                - CORRECTED
-                - VALIDATED
               type: string
-              description: |-
-                * `PENDING` - PENDING
-                * `ACCEPTED` - ACCEPTED
-                * `REJECTED` - REJECTED
-                * `CANCELED` - CANCELED
-                * `DECLARED` - DECLARED
-                * `CORRECTED` - CORRECTED
-                * `VALIDATED` - VALIDATED
+              enum:
+                - ACCEPTED
+                - CANCELED
+                - CORRECTED
+                - DECLARED
+                - DRAFT
+                - PENDING
+                - REJECTED
+                - VALIDATED
+          description: |-
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `CANCELED` - CANCELED
+            * `DECLARED` - DECLARED
+            * `CORRECTED` - CORRECTED
+            * `VALIDATED` - VALIDATED
+            * `DRAFT` - DRAFT
+          explode: true
+          style: form
         - in: query
           name: type
           schema:
             type: array
             items:
+              type: string
               enum:
                 - CREDIT
                 - DEBIT
-              type: string
-              description: |-
-                * `CREDIT` - CREDIT
-                * `DEBIT` - DEBIT
+          description: |-
+            * `CREDIT` - CREDIT
+            * `DEBIT` - DEBIT
+          explode: true
+          style: form
         - in: query
           name: unit
           schema:
@@ -7481,7 +8656,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserSettingsResponseSeriaizer"
+                $ref: "#/components/schemas/UserSettingsResponse"
           description: ""
   /api/user/request-access:
     post:
@@ -8176,6 +9351,40 @@ components:
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+    ChangePasswordError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur général
+        errors:
+          type: string
+          description: Détails des erreurs de validation
+    ChangePasswordRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        confirm_new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - confirm_new_password
+        - current_password
+        - new_password
+    ChangePasswordSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: success
     ChangeRoleRequest:
       type: object
       properties:
@@ -8244,6 +9453,38 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
+    ConfirmEmailChangeError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur général
+        errors:
+          type: string
+          description: Détails des erreurs de validation
+        error:
+          type: string
+          description: Code d'erreur spécifique
+    ConfirmEmailChangeRequest:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+        otp_token:
+          type: string
+          minLength: 1
+          maxLength: 6
+      required:
+        - new_email
+        - otp_token
+    ConfirmEmailChangeSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: success
     ConsumptionTypeEnum:
       enum:
         - MAC
@@ -9281,6 +10522,124 @@ components:
         * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
         * `CESSION` - CESSION
         * `TENEUR` - TENEUR
+    ElecProvisionCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        source:
+          allOf:
+            - $ref: "#/components/schemas/SourceEnum"
+          nullable: true
+        quarter:
+          allOf:
+            - $ref: "#/components/schemas/QuarterEnum"
+          minimum: -2147483648
+          maximum: 2147483647
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        operating_unit:
+          type: string
+          maxLength: 64
+        energy_amount:
+          type: number
+          format: double
+        remaining_energy_amount:
+          type: number
+          format: double
+      required:
+        - cpo
+        - energy_amount
+        - id
+        - operating_unit
+        - quarter
+        - remaining_energy_amount
+        - year
+    ElecTransferAcceptRequest:
+      type: object
+      properties:
+        used_in_tiruert:
+          type: string
+          minLength: 1
+        consumption_date:
+          type: string
+          format: date
+      required:
+        - used_in_tiruert
+    ElecTransferCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        client:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        transfer_date:
+          type: string
+          format: date
+        energy_amount:
+          type: number
+          format: double
+        status:
+          $ref: "#/components/schemas/ElecTransferCertificateStatusEnum"
+        certificate_id:
+          type: string
+          maxLength: 32
+        used_in_tiruert:
+          type: boolean
+        consumption_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+        - certificate_id
+        - client
+        - energy_amount
+        - id
+        - supplier
+        - transfer_date
+    ElecTransferCertificateStatusEnum:
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+    ElecTransferRejectRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+      required:
+        - comment
+    ElecTransferRequest:
+      type: object
+      properties:
+        energy_amount:
+          type: number
+          format: double
+        client:
+          type: integer
+      required:
+        - client
+        - energy_amount
     EmptyResponse:
       type: object
       properties:
@@ -10364,6 +11723,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationLotRequest"
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
       required:
         - biofuel
         - customs_category
@@ -10465,6 +11826,7 @@ components:
         - DECLARED
         - CORRECTED
         - VALIDATED
+        - DRAFT
       type: string
       description: |-
         * `PENDING` - PENDING
@@ -10474,6 +11836,7 @@ components:
         * `DECLARED` - DECLARED
         * `CORRECTED` - CORRECTED
         * `VALIDATED` - VALIDATED
+        * `DRAFT` - DRAFT
     OperationTypeEnum:
       enum:
         - INCORPORATION
@@ -10587,6 +11950,56 @@ components:
           items:
             $ref: "#/components/schemas/ElecOperationList"
         total_quantity:
+          type: number
+    PaginatedElecProvisionCertificateList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecProvisionCertificate"
+        available_energy:
+          type: number
+    PaginatedElecTransferCertificateList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecTransferCertificate"
+        transferred_energy:
           type: number
     PaginatedEntityPreviewList:
       type: object
@@ -10706,6 +12119,8 @@ components:
         to_depot:
           type: integer
           nullable: true
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
     Pays:
       type: object
       properties:
@@ -10906,6 +12321,18 @@ components:
         - name
         - postal_code
         - site_siret
+    QuarterEnum:
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      type: integer
+      description: |-
+        * `1` - T1
+        * `2` - T2
+        * `3` - T3
+        * `4` - T4
     RegistrationCountry:
       type: object
       properties:
@@ -10953,6 +12380,35 @@ components:
       required:
         - entity_id
         - role
+    RequestEmailChangeError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur général
+        errors:
+          type: string
+          description: Détails des erreurs de validation
+    RequestEmailChangeRequest:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - new_email
+        - password
+    RequestEmailChangeSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: otp_sent
     RequestPasswordResetRequest:
       type: object
       properties:
@@ -11843,6 +13299,16 @@ components:
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
+    SourceEnum:
+      enum:
+        - MANUAL
+        - METER_READINGS
+        - QUALICHARGE
+      type: string
+      description: |-
+        * `MANUAL` - MANUAL
+        * `METER_READINGS` - METER_READINGS
+        * `QUALICHARGE` - QUALICHARGE
     StatsResponse:
       type: object
       properties:
@@ -12240,9 +13706,7 @@ components:
         entity:
           $ref: "#/components/schemas/UserEntity"
         role:
-          allOf:
-            - $ref: "#/components/schemas/RoleEnum"
-          readOnly: true
+          $ref: "#/components/schemas/RoleEnum"
         expiration_date:
           type: string
           format: date-time
@@ -12251,7 +13715,6 @@ components:
         - email
         - entity
         - name
-        - role
     UserRightsRequests:
       type: object
       properties:
@@ -12308,13 +13771,13 @@ components:
         - Accepted
         - Rejected
         - Revoked
-    UserRightsResponseSeriaizer:
+    UserRightsResponse:
       type: object
       properties:
         rights:
           type: array
           items:
-            $ref: "#/components/schemas/UserRightsSeriaizer"
+            $ref: "#/components/schemas/UserRights"
         requests:
           type: array
           items:
@@ -12322,29 +13785,7 @@ components:
       required:
         - requests
         - rights
-    UserRightsSeriaizer:
-      type: object
-      properties:
-        name:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          readOnly: true
-        entity:
-          $ref: "#/components/schemas/UserEntity"
-        role:
-          $ref: "#/components/schemas/RoleEnum"
-        expiration_date:
-          type: string
-          format: date-time
-          nullable: true
-      required:
-        - email
-        - entity
-        - name
-    UserSettingsResponseSeriaizer:
+    UserSettingsResponse:
       type: object
       properties:
         email:

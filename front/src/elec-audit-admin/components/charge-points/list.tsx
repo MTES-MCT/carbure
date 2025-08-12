@@ -8,18 +8,18 @@ import {
   useCBQueryBuilder,
   useCBQueryParamsStore,
 } from "common/hooks/query-builder"
-import * as api from "elec-admin/api"
+import * as apiAdmin from "elec-charge-points/api-admin"
 import {
   ElecAdminAuditFilter,
   ElecAdminAuditSnapshot,
   ElecAdminAuditStatus,
 } from "elec-audit-admin/types"
-import ChargePointsApplicationsTable from "elec/components/charge-points/table"
-import { ElecChargePointsApplication } from "elec/types"
+import ChargePointsApplicationsTable from "elec-charge-points/components/charge-points/table"
+import { ElecChargePointsApplication } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as apiAudit from "../../api"
-import FilterMultiSelect from "../../../common/molecules/filter-select"
+import FilterMultiSelect from "common/molecules/filter-select"
 import ChargePointsApplicationDetailsDialog from "./details"
 import { usePageTitle } from "./page-title"
 import { StatusSwitcher } from "./status-switcher"
@@ -63,7 +63,7 @@ const ChargePointsApplicationsList = ({
   const downloadChargePointsApplication = (
     chargePointApplication: ElecChargePointsApplication
   ) => {
-    api.downloadChargePointsApplicationDetails(
+    apiAdmin.downloadChargePointsApplicationDetails(
       entity.id,
       chargePointApplication.cpo.id,
       chargePointApplication.id

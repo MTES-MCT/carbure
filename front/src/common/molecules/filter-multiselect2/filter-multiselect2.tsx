@@ -35,7 +35,7 @@ export const FilterMultiSelect2 = <
           search
           value={selected[filter]}
           placeholder={filterLabels[filter]}
-          sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
+          sort={(item) => (item.value === "UNKNOWN" ? "" : item.value)}
           onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
           getOptions={() => getFilterOptions(filter)}
           className={styles["filter-multiselect__filter"]}

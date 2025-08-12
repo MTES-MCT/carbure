@@ -65,13 +65,23 @@ export const TransfertDialogContent = ({
           <Stepper.Previous />
           <Stepper.Next />
           {currentStep?.key === "recap" && (
-            <Button
-              priority="primary"
-              onClick={() => mutation.execute()}
-              loading={mutation.loading}
-            >
-              {t("Transférer")}
-            </Button>
+            <>
+              <Button
+                priority="secondary"
+                onClick={() => mutation.execute(true)}
+                loading={mutation.loading}
+              >
+                {t("Sauvegarder")}
+              </Button>
+
+              <Button
+                priority="primary"
+                onClick={() => mutation.execute(false)}
+                loading={mutation.loading}
+              >
+                {t("Transférer")}
+              </Button>
+            </>
           )}
         </>
       }

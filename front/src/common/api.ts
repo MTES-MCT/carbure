@@ -145,3 +145,9 @@ export async function findMyCertificates(
     ) ?? []
   )
 }
+
+export function searchCompanyDataBySiren(registration_id: string) {
+  return apiFetch.POST("/entities/search-company/", {
+    body: { registration_id },
+  })
+}

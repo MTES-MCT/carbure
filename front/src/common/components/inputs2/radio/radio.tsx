@@ -6,6 +6,7 @@ import { ChangeEvent } from "react"
 import { Label, LabelProps } from "../base-input"
 import styles from "./radio.module.css"
 import cl from "clsx"
+import { Text } from "common/components/text"
 
 // The DSFR does not support boolean values for the radio buttons
 type RadioValueType =
@@ -42,6 +43,24 @@ export const RadioGroup = <V extends RadioValueType>({
   title,
   ...props
 }: RadioGroupProps<V>) => {
+  if (readOnly) {
+    // Get the label value from the options if a value is provided
+    const labelValue =
+      props.value !== undefined
+        ? options.find((option) => option.value === props.value)?.label
+        : "-"
+    return (
+      <div>
+        <Label
+          label={label}
+          hasTooltip={hasTooltip}
+          title={title}
+          readOnly={readOnly}
+        />
+        <Text size="sm">{labelValue}</Text>
+      </div>
+    )
+  }
   const optionsWithNativeInputProps = options.map((option) => ({
     ...option,
     nativeInputProps: {

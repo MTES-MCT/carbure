@@ -1,90 +1,121 @@
 import { useTranslation } from "react-i18next"
 
-import DeliverySitesSettings from "./components/delivery-site/delivery-site"
-import ProductionSitesSettings from "./components/production-site"
+import DeliverySitesSettings from "./pages/delivery-site"
+import ProductionSitesSettings from "./pages/production-site"
 
 import useEntity from "common/hooks/entity"
 import { UserRole } from "common/types"
-import { Main } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
+import { Content, Main } from "common/components/scaffold"
+import { Tabs } from "common/components/tabs2"
 import useTitle from "common/hooks/title"
 import { compact } from "common/utils/collection"
-import Certificates from "./components/certificates"
-import CompanyInfo from "./components/company-info"
-import CompanyOptions from "./components/company-options"
-import { EntityUserRights } from "./components/user-rights"
+import Certificates from "./pages/certificates"
+import CompanyInfo from "./pages/company-info"
+import CompanyOptions from "./pages/company-options"
+import { EntityUserRights } from "./pages/user-rights"
 import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
 import HashRoute from "common/components/hash-route"
 import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
-import useScrollToHash from "common/hooks/scroll-to-hash"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { useRoutes } from "common/hooks/routes"
+import { Navigate, Route, Routes } from "react-router-dom"
 
 const Settings = () => {
   const { t } = useTranslation()
-  useScrollToHash()
+  const routes = useRoutes()
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
   usePrivateNavigation(t("Paramètres de la société"))
+
   const { isProducer, isPowerOrHeatProducer, isIndustry } = entity
 
   const hasCertificates = isIndustry
   const hasDepot = isIndustry || isPowerOrHeatProducer
   const hasOptions = isIndustry
-
+  const defaultTab = hasOptions ? "options" : "info"
   return (
     <Main>
       <Tabs
-        variant="sticky"
         tabs={compact([
           hasOptions && {
-            path: "#options",
+            path: routes.SETTINGS.OPTIONS,
             key: "options",
             label: t("Options"),
+            icon: "ri-settings-2-line",
+            iconActive: "ri-settings-2-fill",
           },
           {
-            path: "#info",
+            path: routes.SETTINGS.INFO,
             key: "info",
             label: t("Informations"),
-          },
-
-          hasCertificates && {
-            path: "#certificates",
-            key: "certificates",
-            label: t("Certificats"),
-          },
-          isProducer && {
-            path: "#production",
-            key: "production",
-            label: t("Sites de production"),
-          },
-          hasDepot && {
-            path: "#depot",
-            key: "depot",
-            label: t("Dépôts"),
+            icon: "ri-profile-line",
+            iconActive: "ri-profile-fill",
           },
           entity.hasRights(UserRole.Admin) && {
-            path: "#users",
+            path: "users",
             key: "users",
             label: t("Utilisateurs"),
+            icon: "ri-user-line",
+            iconActive: "ri-user-fill",
+          },
+          hasCertificates && {
+            path: "certificates",
+            key: "certificates",
+            label: t("Certificats"),
+            icon: "ri-file-text-line",
+            iconActive: "ri-file-text-fill",
+          },
+          isProducer && {
+            path: "production",
+            key: "production",
+            label: t("Sites de production"),
+            icon: "ri-building-line",
+            iconActive: "ri-building-fill",
+          },
+          hasDepot && {
+            path: "depot",
+            key: "depot",
+            label: t("Dépôts"),
+            icon: "ri-building-4-line",
+            iconActive: "ri-building-4-fill",
           },
         ])}
       />
-      <section>
-        {hasOptions && <CompanyOptions />}
-        <CompanyInfo key={entity.id} />
-        {hasCertificates && <Certificates />}
-        {hasDepot && <DeliverySitesSettings entity={entity} />}
-        {isProducer && <ProductionSitesSettings entity={entity} />}
-        {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
-      </section>
-      <HashRoute
-        path="double-counting/applications/:id"
-        element={<ApplicationDetailsDialog />}
-      />
-      <HashRoute
-        path="double-counting/agreements/:id"
-        element={<AgreementDetailsDialog />}
-      />
+      <Content>
+        <HashRoute
+          path="double-counting/applications/:id"
+          element={<ApplicationDetailsDialog />}
+        />
+        <HashRoute
+          path="double-counting/agreements/:id"
+          element={<AgreementDetailsDialog />}
+        />
+
+        <Routes>
+          {hasOptions && <Route path="options" element={<CompanyOptions />} />}
+          <Route path="info" element={<CompanyInfo />} />
+          {hasCertificates && (
+            <Route path="certificates" element={<Certificates />} />
+          )}
+          {hasDepot && (
+            <Route
+              path="depot"
+              element={<DeliverySitesSettings entity={entity} />}
+            />
+          )}
+          {isProducer && (
+            <Route
+              path="production"
+              element={<ProductionSitesSettings entity={entity} />}
+            />
+          )}
+          {entity.hasRights(UserRole.Admin) && (
+            <Route path="users" element={<EntityUserRights />} />
+          )}
+
+          <Route path="*" element={<Navigate replace to={defaultTab} />} />
+        </Routes>
+      </Content>
     </Main>
   )
 }

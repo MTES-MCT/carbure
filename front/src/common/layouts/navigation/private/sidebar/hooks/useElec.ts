@@ -2,77 +2,39 @@ import useEntity from "common/hooks/entity"
 import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
-import {
-  ArrowGoBackLine,
-  ArrowGoForwardLine,
-  FileListFill,
-  FileListLine,
-  FileTextFill,
-  FileTextLine,
-  NewsPaperFill,
-  NewsPaperLine,
-} from "common/components/icon"
+import { ArrowGoBackLine, ArrowGoForwardLine } from "common/components/icon"
 import { apiTypes } from "common/services/api-fetch.types"
 
 type ElecParams = Pick<apiTypes["NavStats"], "pending_transfer_certificates">
 export const useElec = (params?: ElecParams) => {
-  const { has_elec, isOperator, isCPO, isAdmin, hasAdminRight } = useEntity()
+  const entity = useEntity()
   const { t } = useTranslation()
   const routes = useRoutes()
 
-  const elec: MenuSection = {
+  const { isAdmin, isCPO } = entity
+  const isElecOperator = entity.isOperator && entity.has_elec
+  const isElecAdmin = entity.isExternal && entity.hasAdminRight("ELEC")
+  const isElecTransferAdmin = entity.isExternal && entity.hasAdminRight("TRANSFERRED_ELEC") // prettier-ignore
+
+  const elecCerts: MenuSection = {
     title: t("Certificats d'électricité"),
-    condition: (has_elec && isOperator) || isCPO,
+    condition:
+      isCPO || isElecOperator || isAdmin || isElecAdmin || isElecTransferAdmin,
     children: [
       {
-        path: routes.ELEC().CERTIFICATES.PENDING,
-        title: t("En attente"),
-        additionalInfo: params?.pending_transfer_certificates,
-        icon: FileTextLine,
-        iconActive: FileTextFill,
-        condition: has_elec && isOperator,
-      },
-      {
-        path: routes.ELEC().CERTIFICATES.ACCEPTED,
-        title: t("Acceptés"),
-        icon: FileListLine,
-        iconActive: FileListFill,
-        condition: has_elec && isOperator,
-      },
-      {
-        path: routes.ELEC().PROVISIONNED_ENERGY,
-        title: t("Énergie disponible"),
-        icon: ArrowGoBackLine,
-        condition: isCPO,
-      },
-      {
-        path: routes.ELEC().TRANSFERRED_ENERGY,
-        title: t("Énergie cédée"),
+        path: routes.ELEC_V2().CERTIFICATES.PROVISION,
+        title: t("Cert. de fourniture"),
         icon: ArrowGoForwardLine,
-        condition: isCPO,
+        condition: isCPO || isAdmin || isElecAdmin,
+      },
+      {
+        path: routes.ELEC_V2().CERTIFICATES.TRANSFER,
+        title: t("Cert. de cession"),
+        icon: ArrowGoBackLine,
+        additionalInfo: params?.pending_transfer_certificates,
       },
     ],
   }
 
-  const elecAdmin: MenuSection = {
-    title: t("Électricité"),
-    condition:
-      isAdmin || hasAdminRight("ELEC") || hasAdminRight("TRANSFERRED_ELEC"),
-    children: [
-      {
-        path: routes.ELEC_ADMIN().PROVISION,
-        title: t("Certificats"),
-        icon: NewsPaperLine,
-        iconActive: NewsPaperFill,
-        condition: isAdmin || hasAdminRight("ELEC"),
-      },
-      {
-        path: routes.ELEC_ADMIN().TRANSFER,
-        title: t("Énergie cédée"),
-        icon: ArrowGoForwardLine,
-        condition: isAdmin || hasAdminRight("TRANSFERRED_ELEC"),
-      },
-    ],
-  }
-  return [elec, elecAdmin]
+  return [elecCerts]
 }

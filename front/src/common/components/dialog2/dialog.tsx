@@ -21,6 +21,9 @@ export interface DialogProps {
   footer?: React.ReactNode
   // Define the gap inside content
   gap?: "lg"
+
+  // Define the size of the dialog
+  size?: "medium"
   onClose: () => void
 }
 
@@ -35,6 +38,7 @@ export const Dialog = ({
   fullHeight,
   fitContent,
   gap,
+  size,
   onClose,
 }: DialogProps) => (
   <div className={css.screen}>
@@ -46,6 +50,7 @@ export const Dialog = ({
         fullWidth && css.fullWidth,
         fullHeight && css.fullHeight,
         fitContent && css.fitContent,
+        size && css[`dialog--size-${size}`],
         className
       )}
       style={style}

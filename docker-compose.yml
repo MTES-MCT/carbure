@@ -1,17 +1,16 @@
+x-carbure: &common-settings
+  env_file: .env
+  networks: [carbure]
+
 services:
   carbure-mariadb:
     image: mysql:8.0.39
     container_name: carbure_mariadb
+    <<: *common-settings
     environment:
       ENV: ${IMAGE_TAG}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - carburedb:/var/lib/mysql
-    networks:
-      - carbure
     ports:
       - 3306:3306
       - 33060:33060
@@ -19,29 +18,24 @@ services:
   carbure-redis:
     image: redis:latest
     container_name: carbure_redis
+    <<: *common-settings
     volumes:
       - carbureredis:/data
-    networks:
-      - carbure
     ports:
       - 6379:6379
 
   carbure-frontend:
     image: carbure_frontend:local
     container_name: carbure_frontend
+    <<: *common-settings
     environment:
       VITE_SENTRY_DSN: ${SENTRY_DSN}
       VITE_APP_ENV: ${IMAGE_TAG}
-      CHROMATIC_PROJECT_TOKEN: ${CHROMATIC_PROJECT_TOKEN}
-      SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     build:
       context: ./front
     volumes:
       - ./front:/app
       - /app/node_modules
-    networks:
-      - carbure
 
   carbure-test:
     image: carbure_test:local
@@ -62,39 +56,18 @@ services:
     build:
       context: .
       dockerfile: ./web/Dockerfile
+    <<: *common-settings
     environment:
-      IMAGE_TAG: ${IMAGE_TAG}
       DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
       REDIS_URL: redis://carbure-redis:6379
-      SECRET_KEY: ${SECRET_KEY}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
-      DEBUG: ${DEBUG}
       CARBURE_HOME: /app
       PYTHONPATH: /app:/app/web
-      SENTRY_DSN: ${SENTRY_DSN}
-      EMAIL_HOST: ${EMAIL_HOST}
-      EMAIL_PORT: ${EMAIL_PORT}
-      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
-      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
-      EMAIL_USE_TLS: ${EMAIL_USE_TLS}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME}
-      AWS_ENV_FOLDER_NAME: ${AWS_ENV_FOLDER_NAME}
-      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
-      AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
-      SCALINGO_TOKEN: ${SCALINGO_TOKEN}
-      SCALINGO_MYSQL_UUID: ${SCALINGO_MYSQL_UUID}
-      METABASE_SECRET_KEY: ${METABASE_SECRET_KEY}
     volumes:
       - ./web:/app/web
       - ./scripts:/app/scripts
       - ./cron:/app/cron
       - ./front:/app/front
       - uploadedfiles:/app/files
-    networks:
-      - carbure
 
   carbure-web-proxy:
     image: nginx:latest
@@ -102,10 +75,9 @@ services:
     depends_on:
       - carbure-frontend
       - carbure-django
+    <<: *common-settings
     volumes:
       - ./gateway:/etc/nginx/conf.d
-    networks:
-      - carbure
     ports:
       - 8090:80
 

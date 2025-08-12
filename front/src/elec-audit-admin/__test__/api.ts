@@ -6,7 +6,7 @@ import {
   elecChargePointApplicationDetailsPending,
   elecAuditApplicationSample,
   elecMeterReadingApplicationDetailsPending,
-} from "elec/__test__/data"
+} from "elec-charge-points/__test__/data"
 import {
   elecAdminAuditSnapshot,
   elecAdminChargePointsApplicationsList,

@@ -2,7 +2,7 @@ import { CBQueryParams, CBSnapshot } from "common/hooks/query-builder"
 import {
   ElecChargePointsApplication,
   ElecMeterReadingsApplication,
-} from "elec/types"
+} from "elec-charge-points/types"
 
 export interface ElecAdminAuditSnapshot extends CBSnapshot {
   charge_points_applications_audit_done: number

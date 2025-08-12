@@ -11,7 +11,7 @@ import {
   okMeterReadingsApplications,
   okMeterReadingsCheckError,
   okMeterReadingsCheckValid,
-} from "elec/__test__/api"
+} from "elec-charge-points/__test__/api"
 
 import { setupServer } from "msw/node"
 import defaultSettingsRequests from "./api"

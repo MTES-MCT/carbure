@@ -4,13 +4,13 @@ import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import * as api from "elec/api-cpo"
-import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
+import * as api from "elec-charge-points/api"
+import MeterReadingsApplicationsTable from "elec-charge-points/components/meter-readings/table"
 import {
   ElecAuditApplicationStatus,
   ElecMeterReadingsApplication,
   MeterReadingsApplicationUrgencyStatus,
-} from "elec/types"
+} from "elec-charge-points/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useElecMeterReadingsSettings } from "./index.hooks"
 import ElecMeterReadingsFileUpload from "./upload-dialog"

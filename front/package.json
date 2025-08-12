@@ -66,7 +66,7 @@
     "storybook-addon-mock-date": "^0.6.0",
     "storybook-addon-remix-react-router": "^3.0.1",
     "ts-node": "^10.9.2",
-    "typescript-plugin-css-modules": "^5.1.0",
+    "typescript-plugin-css-modules": "^5.2.0",
     "yaml": "^2.8.0"
   },
   "scripts": {

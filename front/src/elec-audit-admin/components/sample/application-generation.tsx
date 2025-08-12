@@ -20,7 +20,7 @@ import {
   ElecAuditApplicationStatus,
   ElecChargePointsApplicationDetails,
   ElecMeterReadingsApplicationDetails,
-} from "elec/types"
+} from "elec-charge-points/types"
 import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css" // Re-uses images from ~leaflet package
 import "leaflet/dist/leaflet.css"
