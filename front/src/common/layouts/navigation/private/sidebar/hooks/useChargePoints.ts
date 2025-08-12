@@ -17,6 +17,7 @@ import {
   TodoLine,
 } from "common/components/icon/icon"
 import { apiTypes } from "common/services/api-fetch.types"
+import { useUser } from "common/hooks/user"
 
 type ChargePointsParams = Pick<
   apiTypes["NavStats"],
@@ -25,6 +26,7 @@ type ChargePointsParams = Pick<
 
 export const useChargePoints = (params?: ChargePointsParams) => {
   const { isCPO, isAuditor, isAdmin, hasAdminRight } = useEntity()
+  const { isMTEDGEC } = useUser()
   const { t } = useTranslation()
   const routes = useRoutes()
 
@@ -48,6 +50,7 @@ export const useChargePoints = (params?: ChargePointsParams) => {
       {
         path: routes.ELEC().CHARGE_POINTS.QUALICHARGE,
         title: t("Données Qualicharge"),
+        condition: isMTEDGEC,
         icon: HomeLine,
         iconActive: HomeFill,
       },

@@ -8,6 +8,8 @@ import ElecMeterReadingsSettings from "./pages/meter-readings"
 import ChargePointsList from "./pages/list"
 import ChargePointsApplications from "./pages/applications"
 import { Qualicharge } from "./pages/qualicharge"
+import { useUser } from "common/hooks/user"
+import { ExternalAdminPages } from "common/types"
 
 const defaultSnapshot: ChargePointsSnapshot = {
   charge_points: 0,
@@ -22,6 +24,7 @@ const currentYear = new Date().getFullYear()
 
 const ChargePoints = () => {
   const entity = useEntity()
+  const { isMTEDGEC } = useUser()
   const snapshotResponse = useQuery(api.getChargePointsSnapshot, {
     key: "charge-points-snapshot",
     params: [entity.id],
@@ -50,11 +53,15 @@ const ChargePoints = () => {
           </>
         )}
 
-        <Route
-          path="qualicharge"
-          element={<Navigate replace to={`${currentYear}`} />}
-        />
-        <Route path="qualicharge/:year/*" element={<Qualicharge />} />
+        {(isMTEDGEC || entity.hasAdminRight(ExternalAdminPages.ELEC)) && (
+          <>
+            <Route
+              path="qualicharge"
+              element={<Navigate replace to={`${currentYear}`} />}
+            />
+            <Route path="qualicharge/:year/*" element={<Qualicharge />} />
+          </>
+        )}
 
         <Route path="*" element={<Navigate replace to="applications" />} />
       </Routes>

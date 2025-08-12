@@ -1,5 +1,6 @@
 import { Confirm, ConfirmProps } from "common/components/dialog2"
 import useEntity from "common/hooks/entity"
+import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 
 export type ValidateDataDialogProps = {
@@ -30,7 +31,7 @@ export const ValidateDataDialog = ({
               {t(
                 "Votre compte sera crédité de certificats ENR à hauteur de {{volume}} MWH, une fois la validation DGEC effectuée.",
                 {
-                  volume,
+                  volume: formatNumber(volume),
                 }
               )}
             </p>
@@ -42,7 +43,7 @@ export const ValidateDataDialog = ({
       variant="primary"
       onConfirm={onConfirm}
       onClose={onClose}
-      hideCancel={false}
+      hideCancel
     />
   )
 }

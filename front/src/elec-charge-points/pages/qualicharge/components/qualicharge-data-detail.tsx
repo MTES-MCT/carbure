@@ -8,13 +8,14 @@ import { getQualichargeDataDetail } from "../api"
 import useEntity from "common/hooks/entity"
 import { Box, Grid, LoaderOverlay, Row } from "common/components/scaffold"
 import { QualichargeBadge } from "./qualicharge-badge"
-import { NumberInput, TextInput } from "common/components/inputs2"
+import { TextInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { ValidateDataDialog } from "./validate-data-dialog"
 import { useValidateVolumes } from "../hooks/use-validate-volumes"
 import { useNotify } from "common/components/notifications"
 import { QualichargeValidatedBy } from "../types"
 import { ExternalAdminPages } from "common/types"
+import { formatNumber } from "common/utils/formatters"
 
 export const QualichargeDataDetail = () => {
   const match = useHashMatch("data/:id")
@@ -72,13 +73,15 @@ export const QualichargeDataDetail = () => {
           </Row>
         }
         footer={
-          <Button
-            iconId="ri-check-line"
-            onClick={openValidateDataModal}
-            disabled={isValidateButtonDisabled}
-          >
-            {t("Valider")}
-          </Button>
+          result?.data?.validated_by !== QualichargeValidatedBy.BOTH && (
+            <Button
+              iconId="ri-check-line"
+              onClick={openValidateDataModal}
+              disabled={isValidateButtonDisabled}
+            >
+              {t("Valider")}
+            </Button>
+          )
         }
         onClose={closeDialog}
         fitContent
@@ -109,9 +112,9 @@ export const QualichargeDataDetail = () => {
                 readOnly
               />
 
-              <NumberInput
+              <TextInput
                 label={t("Energie (MWh)")}
-                value={result?.data?.energy_amount}
+                value={formatNumber(result?.data?.energy_amount ?? 0)}
                 readOnly
               />
 
