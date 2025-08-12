@@ -55,6 +55,7 @@ export const company: Entity = {
   ext_admin_pages: [],
   is_tiruert_liable: false,
   accise_number: "",
+  is_red_ii: false,
 }
 
 export const producer: Entity = {
