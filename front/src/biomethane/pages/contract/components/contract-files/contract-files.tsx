@@ -31,7 +31,7 @@ export const ContractFiles = ({
       name: t("Conditions particulières"),
       url: contract?.specific_conditions_file,
     },
-  ].filter((file) => file.url !== null)
+  ].filter((file) => Boolean(file.url))
 
   const columns: Column<ContractFile>[] = [
     {
