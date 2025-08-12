@@ -5,12 +5,21 @@ from .views import (
     BiomethaneContractAmendmentViewSet,
     BiomethaneContractViewSet,
 )
+from .views.production_unit import (
+    BiomethaneDigestateStorageViewSet,
+    BiomethaneProductionUnitViewSet,
+)
 
 router = SimpleRouter()
 router.register(
     "contract/amendments",
     BiomethaneContractAmendmentViewSet,
     basename="biomethane-contract-amendment",
+)
+router.register(
+    "digestate-storage",
+    BiomethaneDigestateStorageViewSet,
+    basename="biomethane-digestate-storage",
 )
 
 contract_viewset = BiomethaneContractViewSet.as_view(
@@ -21,7 +30,16 @@ contract_viewset = BiomethaneContractViewSet.as_view(
     }
 )
 
+production_unit_viewset = BiomethaneProductionUnitViewSet.as_view(
+    {
+        "get": "retrieve",
+        "post": "create",
+        "patch": "update",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
+    path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
     *router.urls,
 ]
