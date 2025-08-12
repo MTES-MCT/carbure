@@ -26,8 +26,8 @@ class ElecProvisionCertificateQualicharge(models.Model):
 
     class Meta:
         db_table = "elec_provision_certificate_qualicharge"
-        verbose_name = "Certificat de Fourniture intermédiaire (elec)"
-        verbose_name_plural = "Certificats de Fourniture intermédiaires (elec)"
+        verbose_name = "Certificat de Fourniture Qualicharge (elec)"
+        verbose_name_plural = "Certificats de Fourniture Qualicharge (elec)"
 
     def __str__(self):
         return f"{self.cpo.name} - {self.station_id} - {self.date_from} to {self.date_to}"
