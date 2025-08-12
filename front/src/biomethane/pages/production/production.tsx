@@ -14,8 +14,8 @@ export const BiomethaneProductionPage = () => {
   return (
     <>
       <GeneralInfo productionUnit={productionUnit} />
-      <SanitaryAgreement />
-      <ICPE />
+      <SanitaryAgreement productionUnit={productionUnit} />
+      <ICPE productionUnit={productionUnit} />
       <ProductionSite />
       <DigestateProcessing />
       <DigestateStorage />

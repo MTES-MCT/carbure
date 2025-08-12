@@ -2,35 +2,68 @@ import { Button } from "common/components/button2"
 import { RadioGroup, TextInput } from "common/components/inputs2"
 import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
+import { useForm } from "common/components/form2"
+import { DeepPartial } from "common/types"
+import {
+  BiomethaneProductionUnit,
+  BiomethaneProductionUnitAddRequest,
+  IcpeRegime,
+} from "biomethane/types"
+import { useMutateProductionUnit } from "../../production.hooks"
 
-export function ICPE() {
+type ICPEForm = DeepPartial<BiomethaneProductionUnitAddRequest>
+
+export function ICPE({
+  productionUnit,
+}: {
+  productionUnit?: BiomethaneProductionUnit
+}) {
   const { t } = useTranslation()
+  const { bind, value } = useForm<ICPEForm>(productionUnit ?? {})
+  const { execute: updateProductionUnit, loading } = useMutateProductionUnit(
+    productionUnit !== undefined
+  )
+
+  const icpeRegimeOptions = [
+    {
+      value: IcpeRegime.AUTHORIZATION,
+      label: t("Autorisation"),
+    },
+    {
+      value: IcpeRegime.REGISTRATION,
+      label: t("Enregistrement"),
+    },
+    {
+      value: IcpeRegime.DECLARATION_PERIODIC_CONTROLS,
+      label: t("Déclaration (avec contrôles périodiques)"),
+    },
+  ]
 
   return (
     <EditableCard title={t("ICPE")}>
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => {}}>
+        <EditableCard.Form onSubmit={() => updateProductionUnit(value!)}>
           <TextInput
             readOnly={!isEditing}
             label={t("N° ICPE")}
             state="info"
             stateRelatedMessage={t("Code à 10 chiffres")}
+            {...bind("icpe_number")}
           />
           <RadioGroup
             readOnly={!isEditing}
             label={t("Régime ICPE")}
             orientation="horizontal"
-            options={[
-              { value: "", label: t("Autorisation") },
-              { value: "", label: t("Enregistrement") },
-              {
-                value: "",
-                label: t("Déclaration (avec contrôles périodiques)"),
-              },
-            ]}
+            options={icpeRegimeOptions}
+            {...bind("icpe_regime")}
           />
           {isEditing && (
-            <Button type="submit" iconId="ri-save-line" asideX>
+            <Button
+              type="submit"
+              iconId="ri-save-line"
+              asideX
+              loading={loading}
+            >
               {t("Sauvegarder")}
             </Button>
           )}
