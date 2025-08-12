@@ -658,19 +658,12 @@ paths:
   /api/biomethane/digestate-storage/:
     get:
       operationId: biomethane_digestate_storage_list
-      description: Retrieve all digestate storage units for the current entity.
       parameters:
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: Digestate storage unit ID.
           required: true
         - name: ordering
           required: false
@@ -697,22 +690,15 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BiomethaneDigestateStorage"
-          description: List of digestate storage units for the entity
+          description: ""
     post:
       operationId: biomethane_digestate_storage_create
-      description: Create a new digestate storage unit for the current entity.
       parameters:
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: Digestate storage unit ID.
           required: true
       tags:
         - biomethane
@@ -736,10 +722,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneDigestateStorage"
-          description: Digestate storage unit created successfully
-        "400":
-          description: Invalid data provided
+                $ref: "#/components/schemas/BiomethaneDigestateStorageAdd"
+          description: ""
   /api/biomethane/digestate-storage/{id}/:
     get:
       operationId: biomethane_digestate_storage_retrieve
@@ -754,7 +738,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: Digestate storage unit ID.
+          description: A unique integer value identifying this biomethane digestate storage.
           required: true
       tags:
         - biomethane
@@ -770,7 +754,6 @@ paths:
           description: ""
     put:
       operationId: biomethane_digestate_storage_update
-      description: Update an existing digestate storage unit.
       parameters:
         - in: query
           name: entity_id
@@ -782,7 +765,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: Digestate storage unit ID.
+          description: A unique integer value identifying this biomethane digestate storage.
           required: true
       tags:
         - biomethane
@@ -806,12 +789,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneDigestateStorage"
-          description: Digestate storage unit updated successfully
-        "400":
-          description: Invalid data provided
-        "404":
-          description: Digestate storage unit not found
+                $ref: "#/components/schemas/BiomethaneDigestateStoragePatch"
+          description: ""
     patch:
       operationId: biomethane_digestate_storage_partial_update
       parameters:
@@ -825,7 +804,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: Digestate storage unit ID.
+          description: A unique integer value identifying this biomethane digestate storage.
           required: true
       tags:
         - biomethane
@@ -852,7 +831,6 @@ paths:
           description: ""
     delete:
       operationId: biomethane_digestate_storage_destroy
-      description: Delete a digestate storage unit.
       parameters:
         - in: query
           name: entity_id
@@ -864,7 +842,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: Digestate storage unit ID.
+          description: A unique integer value identifying this biomethane digestate storage.
           required: true
       tags:
         - biomethane
@@ -873,9 +851,7 @@ paths:
         - basicAuth: []
       responses:
         "204":
-          description: Digestate storage unit deleted successfully
-        "404":
-          description: Digestate storage unit not found
+          description: No response body
   /api/biomethane/production-unit/:
     get:
       operationId: biomethane_production_unit_retrieve
@@ -9850,6 +9826,22 @@ components:
         - capacity
         - id
         - producer
+        - type
+    BiomethaneDigestateStorageAdd:
+      type: object
+      properties:
+        type:
+          type: string
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
         - type
     BiomethaneDigestateStorageAddRequest:
       type: object

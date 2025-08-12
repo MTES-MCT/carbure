@@ -247,10 +247,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** @description Retrieve all digestate storage units for the current entity. */
     get: operations["biomethane_digestate_storage_list"]
     put?: never
-    /** @description Create a new digestate storage unit for the current entity. */
     post: operations["biomethane_digestate_storage_create"]
     delete?: never
     options?: never
@@ -266,10 +264,8 @@ export interface paths {
       cookie?: never
     }
     get: operations["biomethane_digestate_storage_retrieve"]
-    /** @description Update an existing digestate storage unit. */
     put: operations["biomethane_digestate_storage_update"]
     post?: never
-    /** @description Delete a digestate storage unit. */
     delete: operations["biomethane_digestate_storage_destroy"]
     options?: never
     head?: never
@@ -2672,6 +2668,13 @@ export interface components {
     BiomethaneDigestateStorage: {
       readonly id: number
       producer: number
+      type: string
+      /** Format: double */
+      capacity: number
+      has_cover?: boolean
+      has_biogas_recovery?: boolean
+    }
+    BiomethaneDigestateStorageAdd: {
       type: string
       /** Format: double */
       capacity: number
@@ -5444,15 +5447,11 @@ export interface operations {
         search?: string
       }
       header?: never
-      path: {
-        /** @description Digestate storage unit ID. */
-        id: number
-      }
+      path?: never
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description List of digestate storage units for the entity */
       200: {
         headers: {
           [name: string]: unknown
@@ -5470,10 +5469,7 @@ export interface operations {
         entity_id: number
       }
       header?: never
-      path: {
-        /** @description Digestate storage unit ID. */
-        id: number
-      }
+      path?: never
       cookie?: never
     }
     requestBody: {
@@ -5484,21 +5480,13 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Digestate storage unit created successfully */
       201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["BiomethaneDigestateStorage"]
+          "application/json": components["schemas"]["BiomethaneDigestateStorageAdd"]
         }
-      }
-      /** @description Invalid data provided */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
     }
   }
@@ -5510,7 +5498,7 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Digestate storage unit ID. */
+        /** @description A unique integer value identifying this biomethane digestate storage. */
         id: number
       }
       cookie?: never
@@ -5535,7 +5523,7 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Digestate storage unit ID. */
+        /** @description A unique integer value identifying this biomethane digestate storage. */
         id: number
       }
       cookie?: never
@@ -5548,28 +5536,13 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Digestate storage unit updated successfully */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": components["schemas"]["BiomethaneDigestateStorage"]
+          "application/json": components["schemas"]["BiomethaneDigestateStoragePatch"]
         }
-      }
-      /** @description Invalid data provided */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Digestate storage unit not found */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
     }
   }
@@ -5581,22 +5554,15 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Digestate storage unit ID. */
+        /** @description A unique integer value identifying this biomethane digestate storage. */
         id: number
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description Digestate storage unit deleted successfully */
+      /** @description No response body */
       204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Digestate storage unit not found */
-      404: {
         headers: {
           [name: string]: unknown
         }
@@ -5612,7 +5578,7 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Digestate storage unit ID. */
+        /** @description A unique integer value identifying this biomethane digestate storage. */
         id: number
       }
       cookie?: never

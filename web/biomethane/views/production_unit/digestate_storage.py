@@ -1,5 +1,4 @@
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
-from rest_framework import status
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
@@ -21,12 +20,6 @@ from core.permissions import HasUserRights
             location=OpenApiParameter.QUERY,
             description="Authorised entity ID.",
             required=True,
-        ),
-        OpenApiParameter(
-            name="id",
-            type=int,
-            location=OpenApiParameter.PATH,
-            description="Digestate storage unit ID.",
         ),
     ]
 )
@@ -51,52 +44,3 @@ class BiomethaneDigestateStorageViewSet(ModelViewSet):
         elif self.action in ["update", "partial_update"]:
             return BiomethaneDigestateStoragePatchSerializer
         return BiomethaneDigestateStorageSerializer
-
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneDigestateStorageSerializer(many=True),
-                description="List of digestate storage units for the entity",
-            ),
-        },
-        description="Retrieve all digestate storage units for the current entity.",
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            status.HTTP_201_CREATED: OpenApiResponse(
-                response=BiomethaneDigestateStorageSerializer,
-                description="Digestate storage unit created successfully",
-            ),
-            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid data provided"),
-        },
-        description="Create a new digestate storage unit for the current entity.",
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneDigestateStorageSerializer,
-                description="Digestate storage unit updated successfully",
-            ),
-            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid data provided"),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Digestate storage unit not found"),
-        },
-        description="Update an existing digestate storage unit.",
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            status.HTTP_204_NO_CONTENT: OpenApiResponse(description="Digestate storage unit deleted successfully"),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Digestate storage unit not found"),
-        },
-        description="Delete a digestate storage unit.",
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
