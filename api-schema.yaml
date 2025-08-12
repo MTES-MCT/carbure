@@ -97,7 +97,8 @@ paths:
                   value:
                     error: NO_CHANGE_REQUEST
                   summary: Aucune demande en cours
-          description: "Erreurs possibles: données invalides, aucune demande en cours,
+          description:
+            "Erreurs possibles: données invalides, aucune demande en cours,
             code expiré, code incorrect"
   /api/auth/login/:
     post:
@@ -274,7 +275,8 @@ paths:
                       password:
                         - Mot de passe incorrect.
                   summary: Erreur de validation
-          description: "Erreurs possibles: données invalides, mot de passe incorrect,
+          description:
+            "Erreurs possibles: données invalides, mot de passe incorrect,
             email déjà utilisé"
   /api/auth/request-otp/:
     get:
@@ -355,7 +357,8 @@ paths:
                       current_password:
                         - PASSWORDS_MATCH
                   summary: Mots de passe identiques
-          description: "Erreurs possibles: données invalides, mot de passe actuel
+          description:
+            "Erreurs possibles: données invalides, mot de passe actuel
             incorrect, nouveau mot de passe invalide"
   /api/auth/request-password-reset/:
     post:
@@ -456,7 +459,8 @@ paths:
   /api/biomethane/contract/:
     get:
       operationId: biomethane_contract_retrieve
-      description: Retrieve the contract for the current entity. Returns a single
+      description:
+        Retrieve the contract for the current entity. Returns a single
         contract object.
       parameters:
         - in: query
@@ -2537,7 +2541,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Certificat de Fourniture
+          description:
+            A unique integer value identifying this Certificat de Fourniture
             (elec).
           required: true
       tags:
@@ -8407,7 +8412,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -8508,7 +8514,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -10070,7 +10077,7 @@ components:
         - amendment_object
         - effective_date
         - signature_date
-    BiomethaneContractPatchRequest:
+    BiomethaneContractPatch:
       type: object
       properties:
         tariff_reference:
@@ -10106,14 +10113,12 @@ components:
           nullable: true
         general_conditions_file:
           type: string
-          format: binary
+          format: uri
           nullable: true
         specific_conditions_file:
           type: string
-          format: binary
+          format: uri
           nullable: true
-        is_red_ii:
-          type: boolean
       required:
         - buyer
         - tariff_reference
@@ -15485,7 +15490,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:
