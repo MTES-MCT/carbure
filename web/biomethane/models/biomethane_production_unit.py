@@ -11,10 +11,10 @@ class BiomethaneProductionUnit(models.Model):
     unit_name = models.CharField(max_length=128)
 
     # SIRET
-    siret_number = models.CharField(max_length=16)
+    siret_number = models.CharField(max_length=16, null=True, blank=True)
 
     # Adresse de la société
-    company_address = models.CharField(max_length=256)
+    company_address = models.CharField(max_length=256, null=True, blank=True)
 
     # légende
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"
@@ -32,13 +32,15 @@ class BiomethaneProductionUnit(models.Model):
             (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
             (ISDND, "ISDND"),
         ],
+        null=True,
+        blank=True,
     )
 
     # Votre site dispose-t-il d’un agrément sanitaire ?
     has_sanitary_approval = models.BooleanField(default=False)
 
     # N˚ agrément sanitaire
-    sanitary_approval_number = models.CharField(max_length=32)
+    sanitary_approval_number = models.CharField(max_length=32, null=True, blank=True)
 
     # Disposez vous d’une dérogation à l’hygiénisation?
     has_hygienization_exemption = models.BooleanField(default=False)
@@ -53,10 +55,12 @@ class BiomethaneProductionUnit(models.Model):
             (TOTAL, "Totale"),
             (PARTIAL, "Partielle"),
         ],
+        null=True,
+        blank=True,
     )
 
     # N˚ ICPE
-    icpe_number = models.CharField(max_length=32)
+    icpe_number = models.CharField(max_length=32, null=True, blank=True)
 
     # Régime ICPE
     AUTHORIZATION = "AUTHORIZATION"
@@ -70,6 +74,8 @@ class BiomethaneProductionUnit(models.Model):
             (REGISTRATION, "Enregistrement"),
             (DECLARATION_PERIODIC_CONTROLS, "Déclaration (avec contrôles périodiques)"),
         ],
+        null=True,
+        blank=True,
     )
 
     # Type de voie
@@ -82,6 +88,8 @@ class BiomethaneProductionUnit(models.Model):
             (LIQUID_PROCESS, "Voie liquide"),
             (DRY_PROCESS, "Voie sèche"),
         ],
+        null=True,
+        blank=True,
     )
 
     # Procédé méthanisation
@@ -96,10 +104,12 @@ class BiomethaneProductionUnit(models.Model):
             (PLUG_FLOW_SEMI_CONTINUOUS, "En piston (semi-continu)"),
             (BATCH_SILOS, "En silos (batch)"),
         ],
+        null=True,
+        blank=True,
     )
 
     # Rendement de l'installation de production de biométhane %
-    production_efficiency = models.FloatField()
+    production_efficiency = models.FloatField(null=True, blank=True)
 
     # Débitmètre dédié à la production de biogaz
     has_biogas_production_flowmeter = models.BooleanField(default=False)
@@ -129,13 +139,13 @@ class BiomethaneProductionUnit(models.Model):
     has_digestate_phase_separation = models.BooleanField(default=False)
 
     # Étapes complémentaires de traitement du digestat brut
-    raw_digestate_treatment_steps = models.CharField(max_length=128)
+    raw_digestate_treatment_steps = models.CharField(max_length=128, null=True, blank=True)
 
     # Étape(s) complémentaire(s) de traitement de la phase liquide
-    liquid_phase_treatment_steps = models.CharField(max_length=128)
+    liquid_phase_treatment_steps = models.CharField(max_length=128, null=True, blank=True)
 
     # Étape(s) complémentaire(s) de traitement de la phase solide
-    solid_phase_treatment_steps = models.CharField(max_length=128)
+    solid_phase_treatment_steps = models.CharField(max_length=128, null=True, blank=True)
 
     # Mode de valorisation du digestat
     SPREADING = "SPREADING"
@@ -149,6 +159,8 @@ class BiomethaneProductionUnit(models.Model):
             (COMPOSTING, "Compostage"),
             (INCINERATION_LANDFILLING, "Incinération / Enfouissement"),
         ],
+        null=True,
+        blank=True,
     )
 
     # Gestion de l'épandage
@@ -165,6 +177,8 @@ class BiomethaneProductionUnit(models.Model):
             (TRANSFER, "Cession"),
             (SALE, "Vente"),
         ],
+        null=True,
+        blank=True,
     )
 
     # En cas de vente du digestat
@@ -179,4 +193,6 @@ class BiomethaneProductionUnit(models.Model):
             (HOMOLOGATION, "Homologation"),
             (STANDARDIZED_PRODUCT, "Produit normé"),
         ],
+        null=True,
+        blank=True,
     )
