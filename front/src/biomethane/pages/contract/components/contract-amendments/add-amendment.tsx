@@ -113,6 +113,7 @@ export const AddAmendment = ({
             label={t("Objet d'avenant")}
             hintText={t("Vous pouvez sélectionner plusieurs objets d'avenant")}
             readOnly={readOnly}
+            required
           />
 
           {hasOtherSelected && (

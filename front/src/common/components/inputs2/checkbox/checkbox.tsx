@@ -105,25 +105,41 @@ export const CheckboxGroup = <T, V extends string | number>({
         ? { checked: selection.isSelected(option.value) }
         : {}),
       name,
-      required: props.required,
       disabled: readOnly || disabled,
     },
   }))
 
   return (
-    <CheckboxDSFR
-      {...props}
-      options={optionsWithNativeInputProps}
-      className={cl(className, css["checkbox-group"])}
-      legend={
-        <Label
-          label={label}
-          readOnly={readOnly}
-          hasTooltip={hasTooltip}
-          required={props.required}
-          title={title}
-        />
-      }
-    />
+    <div style={{ position: "relative" }}>
+      {/* This is a hidden input that is used to validate the checkbox group */}
+      <input
+        type="text"
+        required={props.required && (props.value?.length ?? 0) === 0}
+        style={{
+          width: 0,
+          height: 0,
+          opacity: 0,
+          position: "absolute",
+          top: "20px",
+          left: 0,
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
+      <CheckboxDSFR
+        {...props}
+        options={optionsWithNativeInputProps}
+        className={cl(className, css["checkbox-group"])}
+        legend={
+          <Label
+            label={label}
+            readOnly={readOnly}
+            hasTooltip={hasTooltip}
+            required={props.required}
+            title={title}
+          />
+        }
+      />
+    </div>
   )
 }
