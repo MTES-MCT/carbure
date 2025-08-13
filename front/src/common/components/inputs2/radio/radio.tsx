@@ -59,7 +59,7 @@ export const RadioGroup = <V extends RadioValueType>({
   if (readOnly) {
     // Get the label value from the options if a value is provided
     const labelValue =
-      props.value !== undefined
+      props.value !== undefined && props.value !== null
         ? options.find((option) => option.value === props.value)?.label
         : "-"
     return (

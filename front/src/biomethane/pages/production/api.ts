@@ -1,6 +1,5 @@
 import { api } from "common/services/api-fetch"
 import {
-  BiomethaneProductionUnitAddRequest,
   BiomethaneProductionUnitPatchRequest,
   BiomethaneDigestateStorageAddRequest,
   BiomethaneDigestateStoragePatchRequest,
@@ -19,11 +18,11 @@ export const getProductionUnit = async (entity_id: number) => {
   return response.data
 }
 
-export const createProductionUnit = async (
+export const saveProductionUnit = async (
   entity_id: number,
-  data: BiomethaneProductionUnitAddRequest
+  data: BiomethaneProductionUnitPatchRequest
 ) => {
-  const response = await api.POST("/biomethane/production-unit/", {
+  const response = await api.PUT("/biomethane/production-unit/", {
     params: {
       query: {
         entity_id,
@@ -34,20 +33,6 @@ export const createProductionUnit = async (
   return response.data
 }
 
-export const updateProductionUnit = async (
-  entity_id: number,
-  data: BiomethaneProductionUnitPatchRequest
-) => {
-  const response = await api.PATCH("/biomethane/production-unit/", {
-    params: {
-      query: {
-        entity_id,
-      },
-    },
-    body: data,
-  })
-  return response.data
-}
 // Digestate Storage API
 
 export const getDigestateStorages = async (entity_id: number) => {
