@@ -97,8 +97,7 @@ paths:
                   value:
                     error: NO_CHANGE_REQUEST
                   summary: Aucune demande en cours
-          description:
-            "Erreurs possibles: données invalides, aucune demande en cours,
+          description: "Erreurs possibles: données invalides, aucune demande en cours,
             code expiré, code incorrect"
   /api/auth/login/:
     post:
@@ -275,8 +274,7 @@ paths:
                       password:
                         - Mot de passe incorrect.
                   summary: Erreur de validation
-          description:
-            "Erreurs possibles: données invalides, mot de passe incorrect,
+          description: "Erreurs possibles: données invalides, mot de passe incorrect,
             email déjà utilisé"
   /api/auth/request-otp/:
     get:
@@ -357,8 +355,7 @@ paths:
                       current_password:
                         - PASSWORDS_MATCH
                   summary: Mots de passe identiques
-          description:
-            "Erreurs possibles: données invalides, mot de passe actuel
+          description: "Erreurs possibles: données invalides, mot de passe actuel
             incorrect, nouveau mot de passe invalide"
   /api/auth/request-password-reset/:
     post:
@@ -459,8 +456,7 @@ paths:
   /api/biomethane/contract/:
     get:
       operationId: biomethane_contract_retrieve
-      description:
-        Retrieve the contract for the current entity. Returns a single
+      description: Retrieve the contract for the current entity. Returns a single
         contract object.
       parameters:
         - in: query
@@ -1956,8 +1952,7 @@ paths:
           name: id
           schema:
             type: integer
-          description:
-            A unique integer value identifying this Certificat de Fourniture
+          description: A unique integer value identifying this Certificat de Fourniture
             (elec).
           required: true
       tags:
@@ -7832,8 +7827,7 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description:
-        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -7934,8 +7928,7 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description:
-        Retrieve balances grouped by mp category / biofuel or by sector or
+      description: Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -12749,6 +12742,8 @@ components:
           type: string
           format: binary
           nullable: true
+        is_red_ii:
+          type: boolean
     PatchedBiomethaneDigestateStoragePatchRequest:
       type: object
       properties:
@@ -12772,37 +12767,48 @@ components:
           maxLength: 128
         siret_number:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 16
         company_address:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 256
         unit_type:
-          $ref: "#/components/schemas/UnitTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/UnitTypeEnum"
+          nullable: true
         has_sanitary_approval:
           type: boolean
         sanitary_approval_number:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 32
         has_hygienization_exemption:
           type: boolean
         hygienization_exemption_type:
-          $ref: "#/components/schemas/HygienizationExemptionTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/HygienizationExemptionTypeEnum"
+          nullable: true
         icpe_number:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 32
         icpe_regime:
-          $ref: "#/components/schemas/IcpeRegimeEnum"
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
         process_type:
-          $ref: "#/components/schemas/ProcessTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/ProcessTypeEnum"
+          nullable: true
         methanization_process:
-          $ref: "#/components/schemas/MethanizationProcessEnum"
+          allOf:
+            - $ref: "#/components/schemas/MethanizationProcessEnum"
+          nullable: true
         production_efficiency:
           type: number
           format: double
+          nullable: true
         has_biogas_production_flowmeter:
           type: boolean
         has_purification_flowmeter:
@@ -12823,22 +12829,28 @@ components:
           type: boolean
         raw_digestate_treatment_steps:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 128
         liquid_phase_treatment_steps:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 128
         solid_phase_treatment_steps:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 128
         digestate_valorization_method:
-          $ref: "#/components/schemas/DigestateValorizationMethodEnum"
+          allOf:
+            - $ref: "#/components/schemas/DigestateValorizationMethodEnum"
+          nullable: true
         spreading_management:
-          $ref: "#/components/schemas/SpreadingManagementEnum"
+          allOf:
+            - $ref: "#/components/schemas/SpreadingManagementEnum"
+          nullable: true
         digestate_sale_type:
-          $ref: "#/components/schemas/DigestateSaleTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
+          nullable: true
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
@@ -14473,8 +14485,7 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description:
-        A serializer for re-sending the user activation email. Includes
+      description: A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:
