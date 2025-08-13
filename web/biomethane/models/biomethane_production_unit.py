@@ -194,3 +194,7 @@ class BiomethaneProductionUnit(models.Model):
         null=True,
         blank=True,
     )
+
+    class Meta:
+        db_table = "biomethane_production_unit"
+        verbose_name = "Unité de Production de Biométhane"
