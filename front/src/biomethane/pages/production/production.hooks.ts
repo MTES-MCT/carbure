@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import { UnitType } from "biomethane/types"
 import {
   createProductionUnit,
   getProductionUnit,
@@ -9,7 +8,7 @@ import {
   addDigestateStorage,
   updateDigestateStorage,
   deleteDigestateStorage,
-} from "biomethane/api"
+} from "./api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 
@@ -21,32 +20,6 @@ export const useProductionUnit = () => {
   })
 
   return query
-}
-
-export const useUnitTypeOptions = () => {
-  const { t } = useTranslation()
-  return [
-    {
-      label: t("Agricole autonome"),
-      value: UnitType.AGRICULTURAL_AUTONOMOUS,
-    },
-    {
-      label: t("Agricole territorial"),
-      value: UnitType.AGRICULTURAL_TERRITORIAL,
-    },
-    {
-      label: t("Industriel territorial"),
-      value: UnitType.INDUSTRIAL_TERRITORIAL,
-    },
-    {
-      label: t("Déchets ménagers et biodéchets"),
-      value: UnitType.HOUSEHOLD_WASTE_BIOWASTE,
-    },
-    {
-      label: t("ISDND"),
-      value: UnitType.ISDND,
-    },
-  ]
 }
 
 /**
