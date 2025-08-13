@@ -18,3 +18,7 @@ class BiomethaneDigestateStorage(models.Model):
 
     # Récupération du biogaz
     has_biogas_recovery = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "biomethane_digestate_storage"
+        verbose_name = "Stockage de Digestat"
