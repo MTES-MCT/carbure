@@ -7,11 +7,11 @@ import { DeepPartial } from "common/types"
 import {
   IcpeRegime,
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitAddRequest,
+  BiomethaneProductionUnitPatchRequest,
 } from "../../types"
-import { useMutateProductionUnit } from "../../production.hooks"
+import { useSaveProductionUnit } from "../../production.hooks"
 
-type ICPEForm = DeepPartial<BiomethaneProductionUnitAddRequest>
+type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
 export function ICPE({
   productionUnit,
@@ -20,9 +20,7 @@ export function ICPE({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<ICPEForm>(productionUnit ?? {})
-  const { execute: updateProductionUnit, loading } = useMutateProductionUnit(
-    productionUnit !== undefined
-  )
+  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
   const icpeRegimeOptions = [
     {
@@ -42,7 +40,7 @@ export function ICPE({
   return (
     <EditableCard title={t("ICPE")}>
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => updateProductionUnit(value!)}>
+        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <TextInput
             readOnly={!isEditing}
             label={t("N° ICPE")}

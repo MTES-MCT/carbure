@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import {
-  createProductionUnit,
   getProductionUnit,
-  updateProductionUnit,
+  saveProductionUnit,
   getDigestateStorages,
   addDigestateStorage,
   updateDigestateStorage,
@@ -22,31 +21,23 @@ export const useProductionUnit = () => {
   return query
 }
 
-/**
- * @param hasProductionUnit if true, the mutation will update the existing production unit, otherwise it will create a new one
- */
-export const useMutateProductionUnit = (hasProductionUnit: boolean = false) => {
+export const useSaveProductionUnit = () => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const mutation = useMutation(
-    hasProductionUnit
-      ? (data) => updateProductionUnit(entity.id, data)
-      : (data) => createProductionUnit(entity.id, data),
-    {
-      invalidates: ["production-unit"],
-      onSuccess: () => {
-        notify(t("L'unité de production a bien été mise à jour."), {
-          variant: "success",
-        })
-      },
-      onError: (e) => {
-        notifyError(e)
-      },
-    }
-  )
+  const mutation = useMutation((data) => saveProductionUnit(entity.id, data), {
+    invalidates: ["production-unit"],
+    onSuccess: () => {
+      notify(t("L'unité de production a bien été sauvegardée."), {
+        variant: "success",
+      })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
+  })
 
   return mutation
 }
