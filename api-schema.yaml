@@ -543,7 +543,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneContract"
-          description: Contract details for the entity
+          description: ""
   /api/biomethane/contract/amendments/:
     get:
       operationId: biomethane_contract_amendments_list
@@ -554,6 +554,30 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
       tags:
         - biomethane
       security:
@@ -626,6 +650,98 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneContractAmendment"
+          description: ""
+  /api/biomethane/injection-site/:
+    get:
+      operationId: biomethane_injection_site_retrieve
+      description: Retrieve the injection site for the current entity. Returns a
+        single object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneInjectionSite"
+          description: Injection site details for the entity
+        "404":
+          description: Injection site not found for this entity.
+    post:
+      operationId: biomethane_injection_site_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneInjectionSiteInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneInjectionSiteInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneInjectionSiteInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneInjectionSiteInput"
+          description: ""
+    put:
+      operationId: biomethane_injection_site_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneInjectionSiteRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneInjectionSiteRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneInjectionSiteRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneInjectionSite"
           description: ""
   /api/double-counting/agreements/:
     get:
@@ -9370,7 +9486,6 @@ components:
         signature_date:
           type: string
           format: date
-          nullable: true
         effective_date:
           type: string
           format: date
@@ -9440,6 +9555,172 @@ components:
         - amendment_object
         - effective_date
         - signature_date
+    BiomethaneInjectionSite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        unique_identification_number:
+          type: string
+          maxLength: 32
+        is_shared_injection_site:
+          type: boolean
+        meter_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        is_different_from_production_site:
+          type: boolean
+        company_address:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          maxLength: 10
+        network_type:
+          allOf:
+            - $ref: "#/components/schemas/NetworkTypeEnum"
+          nullable: true
+        network_manager_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        entity:
+          type: integer
+      required:
+        - city
+        - company_address
+        - entity
+        - id
+        - postal_code
+        - unique_identification_number
+    BiomethaneInjectionSiteInput:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        unique_identification_number:
+          type: string
+          maxLength: 32
+        is_shared_injection_site:
+          type: boolean
+        meter_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        is_different_from_production_site:
+          type: boolean
+        company_address:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          maxLength: 10
+        network_type:
+          allOf:
+            - $ref: "#/components/schemas/NetworkTypeEnum"
+          nullable: true
+        network_manager_name:
+          type: string
+          nullable: true
+          maxLength: 100
+      required:
+        - city
+        - company_address
+        - id
+        - postal_code
+        - unique_identification_number
+    BiomethaneInjectionSiteInputRequest:
+      type: object
+      properties:
+        unique_identification_number:
+          type: string
+          minLength: 1
+          maxLength: 32
+        is_shared_injection_site:
+          type: boolean
+        meter_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        is_different_from_production_site:
+          type: boolean
+        company_address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+        postal_code:
+          type: string
+          minLength: 1
+          maxLength: 10
+        network_type:
+          allOf:
+            - $ref: "#/components/schemas/NetworkTypeEnum"
+          nullable: true
+        network_manager_name:
+          type: string
+          nullable: true
+          maxLength: 100
+      required:
+        - city
+        - company_address
+        - postal_code
+        - unique_identification_number
+    BiomethaneInjectionSiteRequest:
+      type: object
+      properties:
+        unique_identification_number:
+          type: string
+          minLength: 1
+          maxLength: 32
+        is_shared_injection_site:
+          type: boolean
+        meter_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        is_different_from_production_site:
+          type: boolean
+        company_address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+        postal_code:
+          type: string
+          minLength: 1
+          maxLength: 10
+        network_type:
+          allOf:
+            - $ref: "#/components/schemas/NetworkTypeEnum"
+          nullable: true
+        network_manager_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        entity:
+          type: integer
+      required:
+        - city
+        - company_address
+        - entity
+        - postal_code
+        - unique_identification_number
     CarbureLotPublic:
       type: object
       properties:
@@ -11866,6 +12147,14 @@ components:
           type: integer
         tickets:
           type: integer
+    NetworkTypeEnum:
+      enum:
+        - TRANSPORT
+        - DISTRIBUTION
+      type: string
+      description: |-
+        * `TRANSPORT` - Transport
+        * `DISTRIBUTION` - Dristribution
     NotificationRequest:
       type: object
       properties:
