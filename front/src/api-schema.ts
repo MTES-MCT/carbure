@@ -2585,26 +2585,6 @@ export interface components {
             amendment_file: File;
             amendment_details?: string | null;
         };
-        BiomethaneContractPatch: {
-            tariff_reference: components["schemas"]["TariffReferenceEnum"];
-            buyer: number;
-            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
-            cmax?: number | null;
-            cmax_annualized?: boolean | null;
-            /** Format: double */
-            cmax_annualized_value?: number | null;
-            /** Format: double */
-            pap_contracted?: number | null;
-            /** Format: date */
-            signature_date?: string | null;
-            /** Format: date */
-            effective_date?: string | null;
-            /** Format: uri */
-            general_conditions_file?: string | null;
-            /** Format: uri */
-            specific_conditions_file?: string | null;
-        };
         CarbureLotPublic: {
             readonly id: number;
             year: number;
@@ -3921,6 +3901,7 @@ export interface components {
             general_conditions_file?: File | null;
             /** Format: binary */
             specific_conditions_file?: File | null;
+            is_red_ii?: boolean;
         };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
@@ -5024,12 +5005,13 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Contract details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneContractPatch"];
+                    "application/json": components["schemas"]["BiomethaneContract"];
                 };
             };
         };

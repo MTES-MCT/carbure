@@ -67,6 +67,14 @@ class BiomethaneContractViewSet(
         except BiomethaneContract.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneContractSerializer,
+            ),
+        },
+        request=BiomethaneContractPatchSerializer,
+    )
     def update(self, request, *args, **kwargs):
         try:
             contract = BiomethaneContract.objects.get(entity=request.entity)

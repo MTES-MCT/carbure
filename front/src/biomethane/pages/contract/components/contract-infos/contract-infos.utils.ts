@@ -38,3 +38,18 @@ export const isContractRedii = (
 
   return false
 }
+
+/**
+ * Gets the appropriate REDII threshold label based on tariff reference
+ * @param tariff_reference - The tariff reference to determine the threshold label
+ * @returns The threshold label with appropriate units, or empty string if no match
+ */
+export const getRediiThresholdLabel = (tariff_reference?: TariffReference) => {
+  if (isTariffReference2011Or2020(tariff_reference))
+    return `${REDII_CMAX_THRESHOLD} Nm³/h`
+
+  if (isTariffReference2021Or2023(tariff_reference))
+    return `${REDII_PAP_THRESHOLD} GWhPCS/an`
+
+  return ""
+}
