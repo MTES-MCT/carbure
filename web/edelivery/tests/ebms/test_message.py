@@ -29,11 +29,11 @@ class MessageTest(TestCase):
         message = Message("responder_id", "A request")
         self.assertEqual("initiator_id", message.initiator_id())
 
-    @patch("edelivery.ebms.messages.encode")
-    def test_encodes_its_body(self, patched_encode):
-        patched_encode.return_value = "abcdef"
+    @patch("edelivery.ebms.messages.zip_and_stream_udb_request")
+    def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
+        patched_zip_and_stream_udb_request.return_value = "abcdef"
         message = Message("responder_id", "A request")
 
-        encoded_message = message.encoded()
-        patched_encode.assert_called_with("A request")
+        encoded_message = message.zipped_encoded()
+        patched_zip_and_stream_udb_request.assert_called_with("A request")
         self.assertEqual("abcdef", encoded_message)

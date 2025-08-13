@@ -1,5 +1,10 @@
-import base64
+from base64 import b64encode
 
 
-def encode(s):
-    return base64.b64encode(bytes(s, "utf-8")).decode("utf-8")
+def encode(b, binary=False):
+    to_be_encoded = b if binary else bytes(b, "utf-8")
+    return b64encode(to_be_encoded).decode("utf-8")
+
+
+def encode_binary(b):
+    return encode(b, binary=True)

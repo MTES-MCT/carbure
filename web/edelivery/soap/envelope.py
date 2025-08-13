@@ -30,9 +30,9 @@ class Envelope:
           <eb:Property name="finalRecipient">EC</eb:Property>
         </eb:MessageProperties>
         <eb:PayloadInfo>
-          <eb:PartInfo href="cid:message">
+          <eb:PartInfo href="cid:attachment">
             <eb:PartProperties>
-              <eb:Property name="MimeType">text/xml</eb:Property>
+              <eb:Property name="MimeType">application/octet-stream</eb:Property>
             </eb:PartProperties>
           </eb:PartInfo>
         </eb:PayloadInfo>
@@ -42,8 +42,8 @@ class Envelope:
 
   <soap:Body>
     <_1:submitRequest>
-      <payload payloadId="cid:message" contentType="text/xml">
-        <value>{self.message.encoded()}</value>
+      <payload payloadId="cid:attachment" contentType="application/octet-stream">
+        <value>{self.message.zipped_encoded()}</value>
       </payload>
     </_1:submitRequest>
   </soap:Body>
