@@ -25,103 +25,6 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
         self.production_unit_url = reverse("biomethane-production-unit")
         self.production_unit_url += "?entity_id=" + str(self.producer_entity.id)
 
-    def test_basic_crud_works(self):
-        # POST creates production unit
-        data = {
-            "unit_name": "Test Unit",
-            "siret_number": "12345678901234",
-            "company_address": "123 Test Street",
-            "unit_type": "AGRICULTURAL_AUTONOMOUS",
-            "sanitary_approval_number": "SA12345",
-            "hygienization_exemption_type": "TOTAL",
-            "icpe_number": "ICPE12345",
-            "icpe_regime": "AUTHORIZATION",
-            "process_type": "LIQUID_PROCESS",
-            "methanization_process": "CONTINUOUS_INFINITELY_MIXED",
-            "production_efficiency": 85.0,
-            "installed_meters": [
-                BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER,
-                BiomethaneProductionUnit.GLOBAL_ELECTRICAL_METER,
-            ],
-            "raw_digestate_treatment_steps": "No additional steps",
-            "liquid_phase_treatment_steps": "Standard treatment",
-            "solid_phase_treatment_steps": "Composting",
-            "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
-            "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
-            "digestate_sale_type": "DIG_AGRI_SPECIFICATIONS",
-        }
-
-        response = self.client.post(self.production_unit_url, data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(BiomethaneProductionUnit.objects.filter(producer=self.producer_entity).exists())
-
-        # GET retrieves it back correctly
-        response = self.client.get(self.production_unit_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["unit_name"], "Test Unit")
-        self.assertEqual(response.data["producer"], self.producer_entity.id)
-
-        # PATCH updates fields properly
-        update_data = {"unit_name": "Updated Unit"}
-        response = self.client.patch(self.production_unit_url, update_data, content_type="application/json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["unit_name"], "Updated Unit")
-
-    def test_entity_constraint(self):
-        # Create first production unit
-        BiomethaneProductionUnit.objects.create(
-            producer=self.producer_entity,
-            unit_name="First Unit",
-            siret_number="12345678901234",
-            company_address="456 First Street",
-            unit_type="AGRICULTURAL_AUTONOMOUS",
-            sanitary_approval_number="SA56789",
-            hygienization_exemption_type="PARTIAL",
-            icpe_number="ICPE56789",
-            icpe_regime="AUTHORIZATION",
-            process_type="LIQUID_PROCESS",
-            methanization_process="CONTINUOUS_INFINITELY_MIXED",
-            production_efficiency=85.0,
-            installed_meters=[
-                BiomethaneProductionUnit.PURIFICATION_FLOWMETER,
-            ],
-            raw_digestate_treatment_steps="Basic steps",
-            liquid_phase_treatment_steps="Filtration",
-            solid_phase_treatment_steps="Drying",
-            digestate_valorization_methods=[BiomethaneProductionUnit.SPREADING],
-            spreading_management_methods=[BiomethaneProductionUnit.SPREADING_VIA_PROVIDER],
-            digestate_sale_type="HOMOLOGATION",
-        )
-
-        # Try to create second production unit for same entity
-        data = {
-            "unit_name": "Second Unit",
-            "siret_number": "98765432109876",
-            "company_address": "789 Second Street",
-            "unit_type": "AGRICULTURAL_TERRITORIAL",
-            "sanitary_approval_number": "SA98765",
-            "hygienization_exemption_type": "TOTAL",
-            "icpe_number": "ICPE98765",
-            "icpe_regime": "REGISTRATION",
-            "process_type": "DRY_PROCESS",
-            "methanization_process": "PLUG_FLOW_SEMI_CONTINUOUS",
-            "production_efficiency": 75.0,
-            "installed_meters": [
-                BiomethaneProductionUnit.FLARING_FLOWMETER,
-                BiomethaneProductionUnit.HEATING_FLOWMETER,
-            ],
-            "raw_digestate_treatment_steps": "Advanced steps",
-            "liquid_phase_treatment_steps": "Membrane treatment",
-            "solid_phase_treatment_steps": "Pelletizing",
-            "digestate_valorization_methods": [BiomethaneProductionUnit.COMPOSTING],
-            "spreading_management_methods": [BiomethaneProductionUnit.SALE],
-            "digestate_sale_type": "STANDARDIZED_PRODUCT",
-        }
-
-        response = self.client.post(self.production_unit_url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("producer", response.data)
-
     def test_permission_boundary(self):
         # Create non-biomethane producer entity
         wrong_entity = Entity.objects.create(
@@ -181,3 +84,39 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
         serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("spreading_management_methods", serializer.errors)
+
+    def test_put_upsert_functionality(self):
+        """Test that PUT creates or updates production unit automatically."""
+        upsert_data = {
+            "unit_name": "Upsert Unit",
+            "siret_number": "11111111111111",
+            "company_address": "100 Upsert Street",
+            "unit_type": "AGRICULTURAL_AUTONOMOUS",
+        }
+
+        # First PUT should create the production unit (201)
+        response = self.client.put(self.production_unit_url, upsert_data, content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["unit_name"], "Upsert Unit")
+
+        # Verify it was created in database
+        production_unit = BiomethaneProductionUnit.objects.get(producer=self.producer_entity)
+        self.assertEqual(production_unit.unit_name, "Upsert Unit")
+
+        # Second PUT should update the existing production unit (200)
+        updated_data = upsert_data.copy()
+        updated_data["unit_name"] = "Updated Upsert Unit"
+        updated_data["production_efficiency"] = 90.5
+
+        response = self.client.put(self.production_unit_url, updated_data, content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["unit_name"], "Updated Upsert Unit")
+        self.assertEqual(float(response.data["production_efficiency"]), 90.5)
+
+        # Verify it was updated in database
+        production_unit.refresh_from_db()
+        self.assertEqual(production_unit.unit_name, "Updated Upsert Unit")
+        self.assertEqual(production_unit.production_efficiency, 90.5)
+
+        # Verify only one production unit exists
+        self.assertEqual(BiomethaneProductionUnit.objects.filter(producer=self.producer_entity).count(), 1)
