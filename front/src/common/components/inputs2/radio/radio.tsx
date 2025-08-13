@@ -12,6 +12,7 @@ import { Text } from "common/components/text"
 type RadioValueType =
   | RadioButtonsProps["options"][number]["nativeInputProps"]["value"]
   | boolean
+  | null
 
 // Simplify the usage of the RadioButtons component
 type OptionsProps<V extends RadioValueType> = Omit<
