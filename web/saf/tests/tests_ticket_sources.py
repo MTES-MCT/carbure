@@ -142,6 +142,7 @@ class SafTicketSourcesTest(TestCase):
                 "id": 14,
                 "name": "AOT",
                 "entity_type": "Opérateur",
+                "registration_id": "",
             },
         }
 

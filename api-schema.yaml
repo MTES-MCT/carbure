@@ -1711,6 +1711,327 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecProvisionCertificateList"
           description: ""
+  /api/elec/provision-certificates-qualicharge/:
+    get:
+      operationId: elec_provision_certificates_qualicharge_list
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: not_validated
+          schema:
+            type: boolean
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: station_id
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: validated_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - BOTH
+                - CPO
+                - DGEC
+                - NO_ONE
+          description: |-
+            * `NO_ONE` - NO_ONE
+            * `DGEC` - DGEC
+            * `CPO` - CPO
+            * `BOTH` - BOTH
+          explode: true
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeList"
+          description: ""
+  /api/elec/provision-certificates-qualicharge/{id}/:
+    get:
+      operationId: elec_provision_certificates_qualicharge_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat de Fourniture
+            intermédiaire (elec).
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+          description: ""
+  /api/elec/provision-certificates-qualicharge/bulk-create/:
+    post:
+      operationId: bulk_create_provision_certificates_qualicharge
+      description: Create multiple provision certificates in bulk (from Qualicharge)
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProvisionCertificateBulkRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ProvisionCertificateBulkRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProvisionCertificateBulkRequest"
+        required: true
+      security:
+        - jwtAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+                errors: []
+          description: Success message
+  /api/elec/provision-certificates-qualicharge/bulk-update/:
+    post:
+      operationId: bulk_update_provision_certificates_qualicharge
+      description: Update multiple provision certificates in bulk (from Qualicharge)
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProvisionCertificateUpdateBulkRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ProvisionCertificateUpdateBulkRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProvisionCertificateUpdateBulkRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+                errors: []
+          description: Success message
+  /api/elec/provision-certificates-qualicharge/filters/:
+    get:
+      operationId: filter_provision_certificates_qualicharge
+      description: Retrieve content of a specific filter
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - cpo
+              - date_from
+              - operating_unit
+              - station_id
+              - validated_by
+              - year
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: not_validated
+          schema:
+            type: boolean
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: station_id
+          schema:
+            type: array
+            items:
+              type: string
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
+        - in: query
+          name: validated_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - BOTH
+                - CPO
+                - DGEC
+                - NO_ONE
+          description: |-
+            * `NO_ONE` - NO_ONE
+            * `DGEC` - DGEC
+            * `CPO` - CPO
+            * `BOTH` - BOTH
+          explode: true
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - AMENAGEUR 1
+                    - AMENAGEUR 2
+                    - AMENAGEUR 3
+                    - AMENAGEUR 4
+                    - AMENAGEUR 5
+                  summary: Example of filters response.
+          description: ""
   /api/elec/provision-certificates/{id}/:
     get:
       operationId: elec_provision_certificates_retrieve
@@ -8643,6 +8964,62 @@ paths:
               schema:
                 error: NOTHING_TO_DECLARE
           description: Error message
+  /api/token/:
+    post:
+      operationId: token_create
+      description: >-
+        Takes a set of user credentials and returns an access and refresh JSON
+        web
+
+        token pair to prove the authentication of those credentials.
+      tags:
+        - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenObtainPairRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TokenObtainPairRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TokenObtainPairRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenObtainPair"
+          description: ""
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+        - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenRefresh"
+          description: ""
   /api/user/:
     get:
       operationId: user_retrieve
@@ -10554,13 +10931,67 @@ components:
         remaining_energy_amount:
           type: number
           format: double
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
       required:
         - cpo
+        - created_at
         - energy_amount
         - id
         - operating_unit
         - quarter
         - remaining_energy_amount
+        - year
+    ElecProvisionCertificateQualicharge:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        operating_unit:
+          type: string
+          maxLength: 64
+        station_id:
+          type: string
+          maxLength: 64
+        energy_amount:
+          type: number
+          format: double
+        is_controlled_by_qualicharge:
+          type: boolean
+        validated_by:
+          $ref: "#/components/schemas/ValidatedByEnum"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+        - cpo
+        - created_at
+        - date_from
+        - date_to
+        - energy_amount
+        - id
+        - operating_unit
+        - station_id
         - year
     ElecTransferAcceptRequest:
       type: object
@@ -10947,10 +11378,14 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityTypeEnum"
           readOnly: true
+        registration_id:
+          type: string
+          readOnly: true
       required:
         - entity_type
         - id
         - name
+        - registration_id
     EntityProductionSite:
       type: object
       properties:
@@ -11859,6 +12294,27 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+    OperationalUnitRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 5
+          maxLength: 5
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        stations:
+          type: array
+          items:
+            $ref: "#/components/schemas/StationRequest"
+      required:
+        - code
+        - from
+        - to
     OtpResponse:
       type: object
       properties:
@@ -11975,6 +12431,31 @@ components:
           items:
             $ref: "#/components/schemas/ElecProvisionCertificate"
         available_energy:
+          type: number
+    PaginatedElecProvisionCertificateQualichargeList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+        total_quantity:
           type: number
     PaginatedElecTransferCertificateList:
       type: object
@@ -12321,6 +12802,36 @@ components:
         - name
         - postal_code
         - site_siret
+    ProvisionCertificateBulkRequest:
+      type: object
+      properties:
+        entity:
+          type: string
+          minLength: 1
+        siren:
+          type: string
+          minLength: 9
+        operational_units:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationalUnitRequest"
+      required:
+        - entity
+        - operational_units
+        - siren
+    ProvisionCertificateUpdateBulkRequest:
+      type: object
+      properties:
+        certificate_ids:
+          type: array
+          items:
+            type: integer
+          minItems: 1
+        validated_by:
+          $ref: "#/components/schemas/ValidatedByEnum"
+      required:
+        - certificate_ids
+        - validated_by
     QuarterEnum:
       enum:
         - 1
@@ -13309,6 +13820,23 @@ components:
         * `MANUAL` - MANUAL
         * `METER_READINGS` - METER_READINGS
         * `QUALICHARGE` - QUALICHARGE
+    StationRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 7
+          pattern: ^FR[A-Z]{3}P.*
+        energy:
+          type: number
+          format: double
+          minimum: 1
+        is_controlled:
+          type: boolean
+      required:
+        - energy
+        - id
+        - is_controlled
     StatsResponse:
       type: object
       properties:
@@ -13340,6 +13868,49 @@ components:
         has_trading:
           type: boolean
           default: false
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+        - access
+        - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - email
+        - password
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+      required:
+        - access
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - refresh
     TransportDocumentTypeEnum:
       enum:
         - DAU
@@ -13803,6 +14374,18 @@ components:
         - email
         - requests
         - rights
+    ValidatedByEnum:
+      enum:
+        - NO_ONE
+        - DGEC
+        - CPO
+        - BOTH
+      type: string
+      description: |-
+        * `NO_ONE` - NO_ONE
+        * `DGEC` - DGEC
+        * `CPO` - CPO
+        * `BOTH` - BOTH
     VerifyOTPRequest:
       type: object
       description: A serializer for submitting the OTP sent via email. Includes
@@ -13846,3 +14429,7 @@ components:
       type: apiKey
       in: cookie
       name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -559,6 +559,89 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/elec/provision-certificates-qualicharge/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_qualicharge_list"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/{id}/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations["elec_provision_certificates_qualicharge_retrieve"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/bulk-create/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Create multiple provision certificates in bulk (from Qualicharge) */
+    post: operations["bulk_create_provision_certificates_qualicharge"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/bulk-update/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Update multiple provision certificates in bulk (from Qualicharge) */
+    post: operations["bulk_update_provision_certificates_qualicharge"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/elec/provision-certificates-qualicharge/filters/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description Retrieve content of a specific filter */
+    get: operations["filter_provision_certificates_qualicharge"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/elec/provision-certificates/{id}/": {
     parameters: {
       query?: never
@@ -2266,6 +2349,42 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/token/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Takes a set of user credentials and returns an access and refresh JSON web
+     *     token pair to prove the authentication of those credentials. */
+    post: operations["token_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/token/refresh/": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description Takes a refresh type JSON web token and returns an access type JSON web
+     *     token if the refresh token is valid. */
+    post: operations["token_refresh_create"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/user/": {
     parameters: {
       query?: never
@@ -3040,6 +3159,25 @@ export interface components {
       energy_amount: number
       /** Format: double */
       remaining_energy_amount: number
+      /** Format: date-time */
+      readonly created_at: string | null
+    }
+    ElecProvisionCertificateQualicharge: {
+      readonly id: number
+      readonly cpo: components["schemas"]["EntityPreview"]
+      /** Format: date */
+      date_from: string
+      /** Format: date */
+      date_to: string
+      year: number
+      operating_unit: string
+      station_id: string
+      /** Format: double */
+      energy_amount: number
+      is_controlled_by_qualicharge?: boolean
+      validated_by?: components["schemas"]["ValidatedByEnum"]
+      /** Format: date-time */
+      readonly created_at: string | null
     }
     ElecTransferAcceptRequest: {
       used_in_tiruert: string
@@ -3196,6 +3334,7 @@ export interface components {
       readonly id: number
       readonly name: string
       readonly entity_type: components["schemas"]["EntityTypeEnum"]
+      readonly registration_id: string
     }
     EntityProductionSite: {
       readonly id: number
@@ -3570,6 +3709,14 @@ export interface components {
      * @enum {string}
      */
     OperationTypeEnum: OperationTypeEnum
+    OperationalUnitRequest: {
+      code: string
+      /** Format: date */
+      from: string
+      /** Format: date */
+      to: string
+      stations?: components["schemas"]["StationRequest"][]
+    }
     OtpResponse: {
       valid_until: string
     }
@@ -3643,6 +3790,22 @@ export interface components {
       previous?: string | null
       results: components["schemas"]["ElecProvisionCertificate"][]
       available_energy?: number
+    }
+    PaginatedElecProvisionCertificateQualichargeList: {
+      /** @example 123 */
+      count: number
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=4
+       */
+      next?: string | null
+      /**
+       * Format: uri
+       * @example http://api.example.org/accounts/?page=2
+       */
+      previous?: string | null
+      results: components["schemas"]["ElecProvisionCertificateQualicharge"][]
+      total_quantity?: number
     }
     PaginatedElecTransferCertificateList: {
       /** @example 123 */
@@ -3802,6 +3965,15 @@ export interface components {
       eligible_dc: boolean
       dc_reference?: string
       created_by?: number | null
+    }
+    ProvisionCertificateBulkRequest: {
+      entity: string
+      siren: string
+      operational_units: components["schemas"]["OperationalUnitRequest"][]
+    }
+    ProvisionCertificateUpdateBulkRequest: {
+      certificate_ids: number[]
+      validated_by: components["schemas"]["ValidatedByEnum"]
     }
     /**
      * @description * `1` - T1
@@ -4185,6 +4357,12 @@ export interface components {
      * @enum {string}
      */
     SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource
+    StationRequest: {
+      id: string
+      /** Format: double */
+      energy: number
+      is_controlled: boolean
+    }
     StatsResponse: {
       metabase_iframe_url: string
     }
@@ -4203,6 +4381,20 @@ export interface components {
     ToggleTradingRequest: {
       /** @default false */
       has_trading: boolean
+    }
+    TokenObtainPair: {
+      readonly access: string
+      readonly refresh: string
+    }
+    TokenObtainPairRequest: {
+      email: string
+      password: string
+    }
+    TokenRefresh: {
+      readonly access: string
+    }
+    TokenRefreshRequest: {
+      refresh: string
     }
     /**
      * @description * `DAU` - DAU
@@ -4375,6 +4567,14 @@ export interface components {
       rights: components["schemas"]["UserRights"][]
       requests: components["schemas"]["UserRightsRequests"][]
     }
+    /**
+     * @description * `NO_ONE` - NO_ONE
+     *     * `DGEC` - DGEC
+     *     * `CPO` - CPO
+     *     * `BOTH` - BOTH
+     * @enum {string}
+     */
+    ValidatedByEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by
     /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
     VerifyOTPRequest: {
       /** Entrez le code à 6 chiffres reçu par email */
@@ -5497,6 +5697,175 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["PaginatedElecProvisionCertificateList"]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_qualicharge_list: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        date_from?: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        not_validated?: boolean
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A page number within the paginated result set. */
+        page?: number
+        /** @description Number of results to return per page. */
+        page_size?: number
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        station_id?: string[]
+        /** @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH */
+        validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[]
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeList"]
+        }
+      }
+    }
+  }
+  elec_provision_certificates_qualicharge_retrieve: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path: {
+        /** @description A unique integer value identifying this Certificat de Fourniture intermédiaire (elec). */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ElecProvisionCertificateQualicharge"]
+        }
+      }
+    }
+  }
+  bulk_create_provision_certificates_qualicharge: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProvisionCertificateBulkRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ProvisionCertificateBulkRequest"]
+        "multipart/form-data": components["schemas"]["ProvisionCertificateBulkRequest"]
+      }
+    }
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  bulk_update_provision_certificates_qualicharge: {
+    parameters: {
+      query: {
+        /** @description Authorised entity ID. */
+        entity_id: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProvisionCertificateUpdateBulkRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["ProvisionCertificateUpdateBulkRequest"]
+        "multipart/form-data": components["schemas"]["ProvisionCertificateUpdateBulkRequest"]
+      }
+    }
+    responses: {
+      /** @description Success message */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": unknown
+        }
+      }
+    }
+  }
+  filter_provision_certificates_qualicharge: {
+    parameters: {
+      query: {
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        cpo?: string[]
+        date_from?: string
+        /** @description Authorised entity ID. */
+        entity_id: number
+        /** @description Filter string to apply */
+        filter: PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter
+        not_validated?: boolean
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        operating_unit?: string[]
+        /** @description Which field to use when ordering the results. */
+        ordering?: string
+        /** @description A search term. */
+        search?: string
+        /** @description Les valeurs multiples doivent être séparées par des virgules. */
+        station_id?: string[]
+        /** @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH */
+        validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[]
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": string[]
         }
       }
     }
@@ -9684,6 +10053,56 @@ export interface operations {
       }
     }
   }
+  token_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TokenObtainPairRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["TokenObtainPairRequest"]
+        "multipart/form-data": components["schemas"]["TokenObtainPairRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TokenObtainPair"]
+        }
+      }
+    }
+  }
+  token_refresh_create: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TokenRefreshRequest"]
+        "application/x-www-form-urlencoded": components["schemas"]["TokenRefreshRequest"]
+        "multipart/form-data": components["schemas"]["TokenRefreshRequest"]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TokenRefresh"]
+        }
+      }
+    }
+  }
   user_retrieve: {
     parameters: {
       query?: never
@@ -9798,6 +10217,20 @@ export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
   MANUAL = "MANUAL",
   METER_READINGS = "METER_READINGS",
   QUALICHARGE = "QUALICHARGE",
+}
+export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by {
+  BOTH = "BOTH",
+  CPO = "CPO",
+  DGEC = "DGEC",
+  NO_ONE = "NO_ONE",
+}
+export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter {
+  cpo = "cpo",
+  date_from = "date_from",
+  operating_unit = "operating_unit",
+  station_id = "station_id",
+  validated_by = "validated_by",
+  year = "year",
 }
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
   ValueMinuscertificate_id = "-certificate_id",

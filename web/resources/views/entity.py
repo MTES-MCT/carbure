@@ -2,6 +2,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_api_key.permissions import HasAPIKey
 
 from core.models import Entity
 from core.serializers import EntityPreviewSerializer
@@ -44,7 +45,7 @@ from core.serializers import EntityPreviewSerializer
     responses=EntityPreviewSerializer(many=True),
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated | HasAPIKey])
 def get_entities(request, *args, **kwargs):
     query = request.query_params.get("query")
     is_enabled = request.query_params.get("is_enabled") == "true"

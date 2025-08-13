@@ -96,7 +96,12 @@ class ElecCharginPointsTest(TestCase):
 
         data = response.json()
 
-        cpo = {"id": self.cpo.id, "entity_type": self.cpo.entity_type, "name": self.cpo.name}
+        cpo = {
+            "id": self.cpo.id,
+            "entity_type": self.cpo.entity_type,
+            "name": self.cpo.name,
+            "registration_id": self.cpo.registration_id,
+        }
 
         expected = {
             "status": "success",

@@ -258,20 +258,24 @@ export const safClients: apiTypes["EntityPreview"][] = [
     id: 1,
     name: "Compagnie aérienne 1",
     entity_type: EntityType.Airline,
+    registration_id: "",
   },
   {
     id: 2,
     name: "Compagnie aérienne 2",
     entity_type: EntityType.Airline,
+    registration_id: "",
   },
   {
     id: 3,
     name: "Opérateur 1",
     entity_type: EntityType.Operator,
+    registration_id: "",
   },
   {
     id: 4,
     name: "Opérateur 2",
     entity_type: EntityType.Operator,
+    registration_id: "",
   },
 ]
