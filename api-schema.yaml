@@ -10701,7 +10701,7 @@ components:
         * `DIG_AGRI_SPECIFICATIONS` - Cahier de charges DIG Agri
         * `HOMOLOGATION` - Homologation
         * `STANDARDIZED_PRODUCT` - Produit normé
-    DigestateValorizationMethodEnum:
+    DigestateValorizationMethodsEnum:
       enum:
         - SPREADING
         - COMPOSTING
@@ -12355,6 +12355,32 @@ components:
         * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
         * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
         * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+    InstalledMetersEnum:
+      enum:
+        - BIOGAS_PRODUCTION_FLOWMETER
+        - PURIFICATION_FLOWMETER
+        - FLARING_FLOWMETER
+        - HEATING_FLOWMETER
+        - PURIFICATION_ELECTRICAL_METER
+        - GLOBAL_ELECTRICAL_METER
+      type: string
+      description: >-
+        * `BIOGAS_PRODUCTION_FLOWMETER` - Débitmètre dédié à la production de
+        biogaz
+
+        * `PURIFICATION_FLOWMETER` - Débitmètre dédié au volume de biogaz traité
+        en épuration
+
+        * `FLARING_FLOWMETER` - Débitmètre dédié au volume de biogaz torché
+
+        * `HEATING_FLOWMETER` - Débitmètre dédié au volume de biogaz ou
+        biométhane utilisé pour le chauffage du digesteur
+
+        * `PURIFICATION_ELECTRICAL_METER` - Compteur dédié à la consommation
+        électrique au système d'épuration et traitement des évents
+
+        * `GLOBAL_ELECTRICAL_METER` - Compteur dédié à la consommation
+        électrique de l'ensemble de l'unité de production
     InviteUserRequest:
       type: object
       properties:
@@ -13290,18 +13316,10 @@ components:
           type: number
           format: double
           nullable: true
-        has_biogas_production_flowmeter:
-          type: boolean
-        has_purification_flowmeter:
-          type: boolean
-        has_flaring_flowmeter:
-          type: boolean
-        has_heating_flowmeter:
-          type: boolean
-        has_purification_electrical_meter:
-          type: boolean
-        has_global_electrical_meter:
-          type: boolean
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
         has_hygienization_unit:
           type: boolean
         has_co2_valorization_process:
@@ -13320,14 +13338,14 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_valorization_method:
-          allOf:
-            - $ref: "#/components/schemas/DigestateValorizationMethodEnum"
-          nullable: true
-        spreading_management:
-          allOf:
-            - $ref: "#/components/schemas/SpreadingManagementEnum"
-          nullable: true
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         digestate_sale_type:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
