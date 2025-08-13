@@ -2688,20 +2688,15 @@ export interface components {
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
             /** Format: double */
             production_efficiency?: number | null;
-            has_biogas_production_flowmeter?: boolean;
-            has_purification_flowmeter?: boolean;
-            has_flaring_flowmeter?: boolean;
-            has_heating_flowmeter?: boolean;
-            has_purification_electrical_meter?: boolean;
-            has_global_electrical_meter?: boolean;
+            readonly installed_meters: components["schemas"]["InstalledMetersEnum"][];
             has_hygienization_unit?: boolean;
             has_co2_valorization_process?: boolean;
             has_digestate_phase_separation?: boolean;
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_valorization_method?: components["schemas"]["DigestateValorizationMethodEnum"] | null;
-            spreading_management?: components["schemas"]["SpreadingManagementEnum"] | null;
+            readonly digestate_valorization_methods: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            readonly spreading_management_methods: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         BiomethaneProductionUnitAdd: {
@@ -2719,20 +2714,15 @@ export interface components {
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
             /** Format: double */
             production_efficiency?: number | null;
-            has_biogas_production_flowmeter?: boolean;
-            has_purification_flowmeter?: boolean;
-            has_flaring_flowmeter?: boolean;
-            has_heating_flowmeter?: boolean;
-            has_purification_electrical_meter?: boolean;
-            has_global_electrical_meter?: boolean;
+            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             has_hygienization_unit?: boolean;
             has_co2_valorization_process?: boolean;
             has_digestate_phase_separation?: boolean;
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_valorization_method?: components["schemas"]["DigestateValorizationMethodEnum"] | null;
-            spreading_management?: components["schemas"]["SpreadingManagementEnum"] | null;
+            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         BiomethaneProductionUnitAddRequest: {
@@ -2750,20 +2740,15 @@ export interface components {
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
             /** Format: double */
             production_efficiency?: number | null;
-            has_biogas_production_flowmeter?: boolean;
-            has_purification_flowmeter?: boolean;
-            has_flaring_flowmeter?: boolean;
-            has_heating_flowmeter?: boolean;
-            has_purification_electrical_meter?: boolean;
-            has_global_electrical_meter?: boolean;
+            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             has_hygienization_unit?: boolean;
             has_co2_valorization_process?: boolean;
             has_digestate_phase_separation?: boolean;
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_valorization_method?: components["schemas"]["DigestateValorizationMethodEnum"] | null;
-            spreading_management?: components["schemas"]["SpreadingManagementEnum"] | null;
+            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         BiomethaneProductionUnitPatch: {
@@ -2781,20 +2766,15 @@ export interface components {
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
             /** Format: double */
             production_efficiency?: number | null;
-            has_biogas_production_flowmeter?: boolean;
-            has_purification_flowmeter?: boolean;
-            has_flaring_flowmeter?: boolean;
-            has_heating_flowmeter?: boolean;
-            has_purification_electrical_meter?: boolean;
-            has_global_electrical_meter?: boolean;
+            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             has_hygienization_unit?: boolean;
             has_co2_valorization_process?: boolean;
             has_digestate_phase_separation?: boolean;
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_valorization_method?: components["schemas"]["DigestateValorizationMethodEnum"] | null;
-            spreading_management?: components["schemas"]["SpreadingManagementEnum"] | null;
+            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         CarbureLotPublic: {
@@ -3130,7 +3110,7 @@ export interface components {
          *     * `INCINERATION_LANDFILLING` - Incinération / Enfouissement
          * @enum {string}
          */
-        DigestateValorizationMethodEnum: DigestateValorizationMethodEnum;
+        DigestateValorizationMethodsEnum: DigestateValorizationMethodsEnum;
         DirectDeliveriesRequest: {
             /** @default false */
             has_direct_deliveries: boolean;
@@ -3736,6 +3716,16 @@ export interface components {
          * @enum {string}
          */
         InstallationCategoryEnum: InstallationCategoryEnum;
+        /**
+         * @description * `BIOGAS_PRODUCTION_FLOWMETER` - Débitmètre dédié à la production de biogaz
+         *     * `PURIFICATION_FLOWMETER` - Débitmètre dédié au volume de biogaz traité en épuration
+         *     * `FLARING_FLOWMETER` - Débitmètre dédié au volume de biogaz torché
+         *     * `HEATING_FLOWMETER` - Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur
+         *     * `PURIFICATION_ELECTRICAL_METER` - Compteur dédié à la consommation électrique au système d'épuration et traitement des évents
+         *     * `GLOBAL_ELECTRICAL_METER` - Compteur dédié à la consommation électrique de l'ensemble de l'unité de production
+         * @enum {string}
+         */
+        InstalledMetersEnum: InstalledMetersEnum;
         InviteUserRequest: {
             /** Format: email */
             email: string;
@@ -4171,20 +4161,15 @@ export interface components {
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
             /** Format: double */
             production_efficiency?: number | null;
-            has_biogas_production_flowmeter?: boolean;
-            has_purification_flowmeter?: boolean;
-            has_flaring_flowmeter?: boolean;
-            has_heating_flowmeter?: boolean;
-            has_purification_electrical_meter?: boolean;
-            has_global_electrical_meter?: boolean;
+            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             has_hygienization_unit?: boolean;
             has_co2_valorization_process?: boolean;
             has_digestate_phase_separation?: boolean;
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_valorization_method?: components["schemas"]["DigestateValorizationMethodEnum"] | null;
-            spreading_management?: components["schemas"]["SpreadingManagementEnum"] | null;
+            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         PatchedElecOperationUpdateRequest: {
@@ -4662,7 +4647,7 @@ export interface components {
          *     * `SALE` - Vente
          * @enum {string}
          */
-        SpreadingManagementEnum: SpreadingManagementEnum;
+        SpreadingManagementMethodsEnum: SpreadingManagementMethodsEnum;
         StatsResponse: {
             metabase_iframe_url: string;
         };
@@ -10959,7 +10944,7 @@ export enum DigestateSaleTypeEnum {
     HOMOLOGATION = "HOMOLOGATION",
     STANDARDIZED_PRODUCT = "STANDARDIZED_PRODUCT"
 }
-export enum DigestateValorizationMethodEnum {
+export enum DigestateValorizationMethodsEnum {
     SPREADING = "SPREADING",
     COMPOSTING = "COMPOSTING",
     INCINERATION_LANDFILLING = "INCINERATION_LANDFILLING"
@@ -11035,6 +11020,14 @@ export enum InstallationCategoryEnum {
     INSTALLATION_CATEGORY_2 = "INSTALLATION_CATEGORY_2",
     INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3"
 }
+export enum InstalledMetersEnum {
+    BIOGAS_PRODUCTION_FLOWMETER = "BIOGAS_PRODUCTION_FLOWMETER",
+    PURIFICATION_FLOWMETER = "PURIFICATION_FLOWMETER",
+    FLARING_FLOWMETER = "FLARING_FLOWMETER",
+    HEATING_FLOWMETER = "HEATING_FLOWMETER",
+    PURIFICATION_ELECTRICAL_METER = "PURIFICATION_ELECTRICAL_METER",
+    GLOBAL_ELECTRICAL_METER = "GLOBAL_ELECTRICAL_METER"
+}
 export enum LotStatusEnum {
     DRAFT = "DRAFT",
     PENDING = "PENDING",
@@ -11093,7 +11086,7 @@ export enum SiteTypeEnum {
     EFCA = "EFCA",
     AIRPORT = "AIRPORT"
 }
-export enum SpreadingManagementEnum {
+export enum SpreadingManagementMethodsEnum {
     DIRECT_SPREADING = "DIRECT_SPREADING",
     SPREADING_VIA_PROVIDER = "SPREADING_VIA_PROVIDER",
     TRANSFER = "TRANSFER",
