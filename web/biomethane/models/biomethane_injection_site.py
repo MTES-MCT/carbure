@@ -18,11 +18,11 @@ class BiomethaneInjectionSite(models.Model):
     # Le poste d'injection est différent du poste de production
     is_different_from_production_site = models.BooleanField(default=False)
     # Adresse de la société (Numéro et rue)
-    company_address = models.CharField(max_length=255)
+    company_address = models.CharField(max_length=255, blank=True)
     # Ville
-    city = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, blank=True)
     # Code postal
-    postal_code = models.CharField(max_length=10)
+    postal_code = models.CharField(max_length=10, blank=True)
     # Type de réseau
     network_type = models.CharField(
         max_length=32,

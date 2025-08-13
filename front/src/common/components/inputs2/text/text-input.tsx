@@ -1,6 +1,6 @@
 import { Input, InputProps } from "../input"
 export type TextInputProps = InputProps & {
-  value?: string
+  value?: string | null
   autoComplete?: boolean
   onChange?: (value: string | undefined) => void
 }
