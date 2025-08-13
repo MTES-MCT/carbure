@@ -109,6 +109,10 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
     # Allow null to distinguish between False and not provided
     cmax_annualized = serializers.BooleanField(allow_null=True, required=False)
 
+    # Allow the biomethane producer to set/unset the RED II status if the cmax or pap_contracted
+    # is lower than the threshold (see biomethane contract model)
+    is_red_ii = serializers.BooleanField(required=False)
+
     class Meta:
         model = BiomethaneContract
         fields = [
@@ -123,6 +127,7 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
             "effective_date",
             "general_conditions_file",
             "specific_conditions_file",
+            "is_red_ii",
         ]
 
     def validate(self, data):
@@ -151,6 +156,10 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         tariff_reference = validated_data.get("tariff_reference")
+        is_red_ii = validated_data.get("is_red_ii")
+        cmax = validated_data.get("cmax")
+        pap_contracted = validated_data.get("pap_contracted")
+
         if tariff_reference is not None and tariff_reference != instance.tariff_reference:
             # If tariff_reference is changed, reset certain fields
             if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
@@ -159,5 +168,11 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
                 validated_data["cmax_annualized"] = False
                 validated_data["cmax_annualized_value"] = None
                 validated_data["cmax"] = None
+
+        # If cmax or pap_contracted is below the threshold and
+        # the user does not want to be subject to RED II, then is_red_ii is set to False
+        if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
+            instance.entity.is_red_ii = is_red_ii
+            instance.entity.save()
 
         return super().update(instance, validated_data)
