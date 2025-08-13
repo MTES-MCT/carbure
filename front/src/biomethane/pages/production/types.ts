@@ -4,8 +4,8 @@ import {
   IcpeRegimeEnum as IcpeRegime,
   ProcessTypeEnum as ProcessType,
   MethanizationProcessEnum as MethanizationProcess,
-  DigestateValorizationMethodEnum as DigestateValorizationMethod,
-  SpreadingManagementEnum as SpreadingManagement,
+  DigestateValorizationMethodsEnum as DigestateValorizationMethods,
+  SpreadingManagementMethodsEnum as SpreadingManagementMethods,
   DigestateSaleTypeEnum as DigestateSaleType,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
@@ -16,8 +16,8 @@ export {
   IcpeRegime,
   ProcessType,
   MethanizationProcess,
-  DigestateValorizationMethod,
-  SpreadingManagement,
+  DigestateValorizationMethods,
+  SpreadingManagementMethods,
   DigestateSaleType,
 }
 
