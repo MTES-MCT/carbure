@@ -52,7 +52,6 @@ class UserLoginAction:
         try:
             if user.is_authenticated:
                 django_login(request, user)
-                request.session.set_expiry(3 * 30 * 24 * 60 * 60)  # 3 months
 
                 return Response({"status": "success", "message": "User logged in"})
             else:

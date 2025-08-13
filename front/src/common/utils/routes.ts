@@ -65,16 +65,8 @@ export const ROUTE_URLS = {
     }
   },
 
-  ELEC: (entity_id: number, year: number) => {
-    const baseUrl = urlWithOrgId(entity_id, `/elec/${year}`)
-
+  ELEC: (entity_id: number) => {
     return {
-      CERTIFICATES: {
-        PENDING: `${baseUrl}/pending`,
-        ACCEPTED: `${baseUrl}/accepted`,
-      },
-      PROVISIONNED_ENERGY: `${baseUrl}/provisioned`,
-      TRANSFERRED_ENERGY: `${baseUrl}/transferred`,
       CHARGE_POINTS: {
         PENDING: urlWithOrgId(entity_id, "/charge-points/applications"),
         METER_READINGS: urlWithOrgId(
@@ -86,15 +78,12 @@ export const ROUTE_URLS = {
     }
   },
   ELEC_ADMIN: (entity_id: number, year: number) => {
-    const baseUrl = urlWithOrgId(entity_id, `/elec-admin/${year}`)
     const baseChargePointsUrl = urlWithOrgId(
       entity_id,
       `/elec-admin-audit/${year}`
     )
 
     return {
-      PROVISION: `${baseUrl}/provision`,
-      TRANSFER: `${baseUrl}/transfer`,
       CHARGE_POINTS: {
         PENDING: `${baseChargePointsUrl}/charge-points`,
         METER_READINGS: `${baseChargePointsUrl}/meter-readings`,
@@ -103,6 +92,16 @@ export const ROUTE_URLS = {
   },
   ELEC_AUDITOR: (entity_id: number, year: number) =>
     urlWithOrgId(entity_id, `/elec-audit/${year}`),
+
+  ELEC_V2: (entity_id: number, year: number) => {
+    const certURL = urlWithOrgId(entity_id, `/elec-v2/certificates/${year}`)
+    return {
+      CERTIFICATES: {
+        PROVISION: `${certURL}/provision`,
+        TRANSFER: `${certURL}/transfer`,
+      },
+    }
+  },
 
   SAF: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/saf/${year}`)
@@ -117,13 +116,29 @@ export const ROUTE_URLS = {
     }
   },
 
-  SETTINGS: (entity_id: number) => urlWithOrgId(entity_id, "/settings"),
+  SETTINGS: (entity_id: number) => {
+    const baseUrl = urlWithOrgId(entity_id, "/settings")
+
+    return {
+      ROOT: baseUrl,
+      OPTIONS: `${baseUrl}/options`,
+      INFO: `${baseUrl}/info`,
+      CERTIFICATES: `${baseUrl}/certificates`,
+      PRODUCTION: `${baseUrl}/production`,
+      DEPOT: `${baseUrl}/depot`,
+      USERS: `${baseUrl}/users`,
+    }
+  },
 
   USER_GUIDE: "https://carbure-1.gitbook.io/faq",
 
   MY_ACCOUNT: {
     INDEX: "/account",
-    ADD_COMPANY: "/account/add-company",
+    IDENTIFIERS: "/account/identifiers",
+    ADD_COMPANY: "/account/companies/add",
+    COMPANIES: "/account/companies",
+    COMPANY_REGISTRATION: "/account/companies/registration",
+    FOREIGN_COMPANY_REGISTRATION: "/account/companies/registration/foreign",
   },
   AUTH: {
     LOGOUT: "/auth/logout",
@@ -139,21 +154,24 @@ export const ROUTE_URLS = {
 }
 
 /**
- * Ajoute des paramètres de requête à une URL
- * @param url - L'URL de base
- * @param params - Un objet contenant les paramètres de requête à ajouter
- * @returns L'URL avec les paramètres de requête
+ * Adds query parameters to a URL
+ * @param url - The base URL
+ * @param params - An object containing the query parameters to add
+ * @returns The URL with query parameters
  */
 export const addQueryParams = (
   url: string,
-  params: Record<string, string | number | boolean | undefined | null>,
+  params: Record<
+    string,
+    string | number | boolean | string[] | number[] | undefined | null
+  >,
   excludeEmptyValues: boolean = true
 ) => {
-  // Sépare l'URL de base des paramètres existants
+  // Separates the base URL from existing parameters
   const [baseUrl, existingQuery] = url.split("?")
   const searchParams = new URLSearchParams(existingQuery)
 
-  // Ajoute les nouveaux paramètres
+  // Adds new parameters
   Object.entries(params).forEach(([key, value]) => {
     if (
       excludeEmptyValues &&
@@ -161,7 +179,21 @@ export const addQueryParams = (
     )
       return
 
-    searchParams.append(key, value?.toString() ?? "")
+    // Array handling
+    if (Array.isArray(value)) {
+      // Filters empty values if excludeEmptyValues is true
+      const filteredValues = excludeEmptyValues
+        ? value.filter((v) => v !== null && v !== undefined && v !== "")
+        : value
+
+      // Adds each array value as a separate parameter
+      filteredValues.forEach((item) => {
+        searchParams.append(key, item?.toString() ?? "")
+      })
+    } else {
+      // Simple value handling
+      searchParams.append(key, value?.toString() ?? "")
+    }
   })
 
   const queryString = searchParams.toString()

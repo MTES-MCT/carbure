@@ -53,6 +53,7 @@ class Operation(models.Model):
     DECLARED = "DECLARED"  # Teneur validation
     CORRECTED = "CORRECTED"  # By customs
     VALIDATED = "VALIDATED"  # By customs
+    DRAFT = "DRAFT"  # For transfert operations
     OPERATION_STATUSES = (
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
@@ -61,6 +62,7 @@ class Operation(models.Model):
         (DECLARED, DECLARED),
         (CORRECTED, CORRECTED),
         (VALIDATED, VALIDATED),
+        (DRAFT, DRAFT),
     )
 
     INCORPORATION = "INCORPORATION"
@@ -88,7 +90,11 @@ class Operation(models.Model):
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
     CARBUREACTEUR = "CARBURÉACTEUR"
-    SECTOR_CODE_CHOICES = (ESSENCE, GAZOLE, CARBUREACTEUR)
+    SECTOR_CODE_CHOICES = (
+        (ESSENCE, ESSENCE),
+        (GAZOLE, GAZOLE),
+        (CARBUREACTEUR, CARBUREACTEUR),
+    )
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)

@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from core.models import Pays, UserRights
 from core.serializers import UserEntitySerializer as EntityUserEntitySerializer
-from core.serializers import UserRightsRequestsSerializer as UserRightsRequestsSeriaizer
+from core.serializers import UserRightsRequestsSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class SimplifiedUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
-class UserRightsSeriaizer(serializers.ModelSerializer):
+class UserRightsSerializer(serializers.ModelSerializer):
     entity = EntityUserEntitySerializer()
     name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
@@ -59,6 +59,6 @@ class UserRightsSeriaizer(serializers.ModelSerializer):
         return obj.user.email
 
 
-class UserRightsResponseSeriaizer(serializers.Serializer):
-    rights = UserRightsSeriaizer(many=True)
-    requests = UserRightsRequestsSeriaizer(many=True)
+class UserRightsResponseSerializer(serializers.Serializer):
+    rights = UserRightsSerializer(many=True)
+    requests = UserRightsRequestsSerializer(many=True)

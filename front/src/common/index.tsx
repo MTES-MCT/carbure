@@ -18,11 +18,8 @@ const DoubleCountingAdmin = lazy(() => import("double-counting-admin"))
 const AgreementPublicList = lazy(
   () => import("double-counting/components/agreement-public-list")
 )
-const ElecAdmin = lazy(() => import("elec-admin"))
 const ElecAdminAudit = lazy(() => import("elec-audit-admin"))
-const ElecCPO = lazy(() => import("elec/cpo"))
 const ChargePoints = lazy(() => import("elec-charge-points/charge-points"))
-const ElecOperator = lazy(() => import("elec/operator"))
 const Registry = lazy(() => import("registry"))
 const Saf = lazy(() => import("saf"))
 const Settings = lazy(() => import("settings"))
@@ -38,6 +35,7 @@ const Pending = lazy(() => import("carbure/components/pending"))
 const PublicStats = lazy(() => import("carbure/components/public-stats"))
 const ElecAudit = lazy(() => import("elec-auditor"))
 const ContactPage = lazy(() => import("contact"))
+const ElecCertificates = lazy(() => import("elec/pages/certificates"))
 
 const Carbure = () => {
   const user = useUserManager()
@@ -126,15 +124,15 @@ const Org = () => {
     isCPO,
     isPowerOrHeatProducer,
     isSafTrader,
-    has_elec,
     has_saf,
     accise_number,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight("DCA")
   const isSafAdmin = isExternal && entity.hasAdminRight("AIRLINE")
   const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
+  const isElecOperator = isOperator && entity.has_elec
   const isTiruertAdmin = isExternal && entity.hasAdminRight("TIRIB")
-  const isTransferredElecAdmin =
+  const isTransferElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
@@ -143,7 +141,7 @@ const Org = () => {
 
   return (
     <Routes>
-      <Route path="settings" element={<Settings />} />
+      <Route path="settings/*" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
 
       {(isIndustry || isPowerOrHeatProducer) && (
@@ -186,36 +184,26 @@ const Org = () => {
 
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
+      {(isCPO ||
+        isElecOperator ||
+        isAdmin ||
+        isElecAdmin ||
+        isTransferElecAdmin) && (
+        <Route
+          path="elec-v2/certificates/:year/*"
+          element={<ElecCertificates />}
+        />
+      )}
+
+      {isCPO && <Route path="charge-points/*" element={<ChargePoints />} />}
+
       {isCPO && (
-        <>
-          <Route path="elec/:year/*" element={<ElecCPO />} />
-          <Route
-            path="elec"
-            element={<Navigate replace to={`${currentYear}/provisioned`} />}
-          />
-          <Route
-            path="*"
-            element={
-              <Navigate replace to={`elec/${currentYear}/provisioned`} />
-            }
-          />
-        </>
-      )}
-      {isOperator && has_elec && (
-        <>
-          <Route path="elec/:year/*" element={<ElecOperator />} />
-          <Route
-            path="elec"
-            element={<Navigate replace to={`${currentYear}`} />}
-          />
-          <Route
-            path="*"
-            element={<Navigate replace to={`elec/${currentYear}/pending`} />}
-          />
-        </>
-      )}
-      {((isOperator && has_elec) || isCPO) && (
-        <Route path="charge-points/*" element={<ChargePoints />} />
+        <Route
+          path=""
+          element={
+            <Navigate to={`elec-v2/certificates/${currentYear}/provision`} />
+          }
+        />
       )}
 
       {isAuditor && (
@@ -253,15 +241,6 @@ const Org = () => {
         </>
       )}
 
-      {(isAdmin || isElecAdmin || isTransferredElecAdmin) && (
-        <>
-          <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
-          <Route
-            path="elec-admin"
-            element={<Navigate replace to={`${currentYear}`} />}
-          />
-        </>
-      )}
       {(isAdmin || isElecAdmin) && (
         <>
           <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />

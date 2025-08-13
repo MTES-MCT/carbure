@@ -63,7 +63,7 @@ if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 5  # 5 days
 SESSION_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod")
@@ -72,8 +72,9 @@ CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 CSRF_COOKIE_SAMESITE = "Strict"
 CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod")
 
+# OTP Email Configuration
 OTP_EMAIL_TOKEN_VALIDITY = 1800  # 30 minutes
-OTP_EMAIL_THROTTLE_FACTOR = 0  # no throttle
+OTP_EMAIL_THROTTLE_FACTOR = 2
 
 # Application definition
 INSTALLED_APPS = [
@@ -173,9 +174,18 @@ if env("TEST") == 1:
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "OPTIONS": {
+            "user_attributes": [
+                "name",
+                "email",
+            ],
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 12,
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -381,6 +391,16 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "core.utils.CustomPageNumberPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/s",
+        "user": "10/s",
+        "10/day": "10/day",
+    },
 }
 SPECTACULAR_SETTINGS = {
     "TITLE": "Carbure API",
@@ -406,5 +426,15 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
+if not env("TEST"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": env("REDIS_URL"),
+        }
+    }
+
 if env("TEST"):
     REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}

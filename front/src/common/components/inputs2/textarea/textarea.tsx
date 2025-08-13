@@ -8,7 +8,10 @@ export type TextAreaProps = {
   value: string | undefined
   onChange: (value: string | undefined) => void
 } & ExtendedInputProps &
-  InputPropsDSFR.TextArea & { inputRef?: React.RefObject<HTMLTextAreaElement> }
+  // Avoid defining textarea = true when using TextArea component
+  Omit<InputPropsDSFR.TextArea, "textArea"> & {
+    inputRef?: React.RefObject<HTMLTextAreaElement>
+  }
 
 export const TextArea = ({
   rows,
@@ -46,5 +49,6 @@ export const TextArea = ({
       },
       ref: inputRef,
     }}
+    readOnly={readOnly}
   />
 )

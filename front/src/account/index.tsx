@@ -1,43 +1,49 @@
 import { useTranslation } from "react-i18next"
-import { Main } from "common/components/scaffold"
-import { AccountAccesRights, EntityDialog } from "./components/access-rights"
-import { AccountAuthentication } from "./components/authentication"
+import { Content, Main } from "common/components/scaffold"
+import { AccountAccesRights } from "./components/access-rights"
+import { AccountAuthentication } from "./components/authentication/authentication"
 import useTitle from "common/hooks/title"
-import { CompanyRegistrationDialog } from "companies/components/registration-dialog"
-import { Route, Routes, useNavigate } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import { ROUTE_URLS } from "common/utils/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { Tabs } from "common/components/tabs2"
 
 const Account = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   useTitle(t("Mon compte"))
   usePrivateNavigation(t("Mon compte"))
 
   return (
     <Main>
-      <Routes>
-        <Route
-          path="add-company"
-          element={
-            <EntityDialog
-              onClose={() => navigate(ROUTE_URLS.MY_ACCOUNT.INDEX)}
-            />
-          }
-        />
-        <Route
-          path="company-registration"
-          element={<CompanyRegistrationDialog />}
-        />
-      </Routes>
-      <section>
-        <AccountAccesRights />
-      </section>
-
-      <section>
-        <AccountAuthentication />
-      </section>
+      <Tabs
+        tabs={[
+          {
+            key: "access",
+            label: t("Accès aux sociétés"),
+            path: ROUTE_URLS.MY_ACCOUNT.COMPANIES,
+            icon: "ri-profile-line",
+            iconActive: "ri-profile-fill",
+          },
+          {
+            key: "identifiers",
+            label: t("Identifiants"),
+            path: ROUTE_URLS.MY_ACCOUNT.IDENTIFIERS,
+            icon: "ri-settings-2-line",
+            iconActive: "ri-settings-2-fill",
+          },
+        ]}
+      />
+      <Content>
+        <Routes>
+          <Route path="identifiers" element={<AccountAuthentication />} />
+          <Route path="companies/*" element={<AccountAccesRights />} />
+          <Route
+            path="*"
+            element={<Navigate to={ROUTE_URLS.MY_ACCOUNT.COMPANIES} />}
+          />
+        </Routes>
+      </Content>
     </Main>
   )
 }

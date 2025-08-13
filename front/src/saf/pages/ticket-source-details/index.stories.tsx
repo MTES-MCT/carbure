@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { TicketSourceDetails } from "./index"
 import { okSafTicketSourceDetails } from "saf/__test__/api"
 import { COMMON_MOCKS } from "@storybook/mocks/common"
+import { getViewport } from "@storybook/mocks/utils"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const meta = {
@@ -9,6 +10,7 @@ const meta = {
   component: TicketSourceDetails,
   parameters: {
     layout: "centered",
+    viewport: getViewport("fullModal", { width: "1200px", height: "1100px" }),
     reactRouter: reactRouterParameters({
       location: {
         pathParams: { id: "123" },

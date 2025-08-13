@@ -15,12 +15,12 @@ export interface Tab<T extends string> {
   icon?: IconName
   iconActive?: IconName
   path?: string
+  count?: number
 }
 
 export interface TabsProps<T extends string> extends Layout {
   className?: string
   style?: React.CSSProperties
-  variant?: TabVariant
   keepSearch?: boolean
   tabs: Tab<T>[]
   focus?: T
@@ -54,12 +54,12 @@ export const Tabs = <T extends string>({
       className={cl(css.tabs, className, sticky && css.sticky)}
       style={style}
     >
-      {tabs.map(({ icon, iconActive, ...tab }) => {
+      {tabs.map((tab) => {
         const props = {
           className: cl(
             css.tab,
             tab.key === focus && css.active,
-            icon && css.icon
+            tab.icon && css.icon
           ),
           onClick: () => {
             setFocus(tab.key)
@@ -71,13 +71,7 @@ export const Tabs = <T extends string>({
         if (!tab.path) {
           return (
             <Text is="button" fontWeight="bold" {...props} key={tab.key}>
-              {((icon && tab.key !== focus) || (!iconActive && icon)) && (
-                <Icon size="sm" name={icon} />
-              )}
-              {iconActive && tab.key === focus && (
-                <Icon size="sm" name={iconActive} />
-              )}
-              {tab.label}
+              {renderTabContent(tab, focus)}
             </Text>
           )
         }
@@ -91,13 +85,7 @@ export const Tabs = <T extends string>({
               {...props}
               key={tab.key}
             >
-              {((icon && tab.key !== focus) || (!iconActive && icon)) && (
-                <Icon size="sm" name={icon} />
-              )}
-              {iconActive && tab.key === focus && (
-                <Icon size="sm" name={iconActive} />
-              )}
-              {tab.label}
+              {renderTabContent(tab, focus)}
             </Text>
           )
         }
@@ -112,16 +100,25 @@ export const Tabs = <T extends string>({
             {...props}
             key={tab.key}
           >
-            {((icon && tab.key !== focus) || (!iconActive && icon)) && (
-              <Icon size="sm" name={icon} />
-            )}
-            {iconActive && tab.key === focus && (
-              <Icon size="sm" name={iconActive} />
-            )}
-            {tab.label}
+            {renderTabContent(tab, focus)}
           </Text>
         )
       })}
     </nav>
+  )
+}
+
+function renderTabContent<T extends string>(tab: Tab<T>, focus: T) {
+  return (
+    <>
+      {((tab.icon && tab.key !== focus) || (!tab.iconActive && tab.icon)) && (
+        <Icon size="sm" name={tab.icon} />
+      )}
+      {tab.iconActive && tab.key === focus && (
+        <Icon size="sm" name={tab.iconActive} />
+      )}
+      {tab.label}
+      {tab.count !== undefined && <> ({tab.count})</>}
+    </>
   )
 }

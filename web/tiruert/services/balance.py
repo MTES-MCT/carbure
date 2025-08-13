@@ -128,7 +128,7 @@ class BalanceService:
         balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
 
         operations = operations.filter(
-            status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED]
+            status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED, Operation.DRAFT]
         )
 
         for operation in operations:
@@ -160,7 +160,7 @@ class BalanceService:
                     if group_by != BalanceService.GROUP_BY_CATEGORY:
                         balance[key]["biofuel"] = operation.biofuel
 
-                if not (credit_operation and operation.status == Operation.PENDING):
+                if not (credit_operation and (operation.status == Operation.PENDING or operation.status == Operation.DRAFT)):
                     # Update available balance
                     BalanceService._update_available_balance(
                         balance, key, operation, detail, credit_operation, conversion_factor
@@ -176,7 +176,7 @@ class BalanceService:
                 if group_by not in BalanceService.GROUP_BY_ALL:
                     BalanceService._update_ghg_min_max(balance, key, detail)
 
-            if "key" in locals() is not None and operation.status == Operation.PENDING:
+            if "key" in locals() is not None and operation.status in [Operation.PENDING, Operation.DRAFT]:
                 balance[key]["pending_operations"] += 1
 
         if group_by == BalanceService.GROUP_BY_DEPOT:

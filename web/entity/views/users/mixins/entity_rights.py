@@ -4,9 +4,9 @@ from rest_framework.response import Response
 
 from core.models import Entity, UserRights, UserRightsRequests
 from entity.serializers import (
-    UserRightsRequestsSeriaizer,
-    UserRightsResponseSeriaizer,
-    UserRightsSeriaizer,
+    UserRightsRequestsSerializer,
+    UserRightsResponseSerializer,
+    UserRightsSerializer,
 )
 
 
@@ -21,7 +21,7 @@ class EntityRightsRequestsActionMixin:
                 required=True,
             ),
         ],
-        responses=UserRightsResponseSeriaizer,
+        responses=UserRightsResponseSerializer,
     )
     @action(detail=False, methods=["get"], url_path="entity-rights-requests")
     def entity_rights_requests(self, request):
@@ -35,6 +35,6 @@ class EntityRightsRequestsActionMixin:
             requests = requests.filter(user__is_staff=False, user__is_superuser=False)
 
         data = {}
-        data["rights"] = UserRightsSeriaizer(instance=rights, many=True).data
-        data["requests"] = UserRightsRequestsSeriaizer(instance=requests, many=True).data
+        data["rights"] = UserRightsSerializer(instance=rights, many=True).data
+        data["requests"] = UserRightsRequestsSerializer(instance=requests, many=True).data
         return Response(data)

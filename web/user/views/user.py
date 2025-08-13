@@ -6,11 +6,13 @@ from rest_framework.response import Response
 
 from core.decorators import otp_or_403
 from core.models import UserRights, UserRightsRequests
-from user.serializers import UserSettingsResponseSeriaizer
+from user.serializers import (
+    UserSettingsResponseSerializer,
+)
 
 
 @extend_schema(
-    responses=UserSettingsResponseSeriaizer,
+    responses=UserSettingsResponseSerializer,
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

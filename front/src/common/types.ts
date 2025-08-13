@@ -15,7 +15,7 @@ export type Entity = apiTypes["UserEntity"]
 
 export type EntityPreview = apiTypes["EntityPreview"]
 
-export type User = apiTypes["UserSettingsResponseSeriaizer"]
+export type User = apiTypes["UserSettingsResponse"]
 
 export type UserRight = apiTypes["UserRights"]
 
@@ -77,6 +77,7 @@ export { CategoryEnum }
 // Add units that are not defined in the schema
 export enum ExtendedUnit {
   GJ = "GJ",
+  MWh = "MWh",
 }
 
 export { Unit }
@@ -84,7 +85,5 @@ export { Unit }
  * Make a type partial recursively
  */
 export type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>
-    }
+  ? { [P in keyof T]?: DeepPartial<T[P]> }
   : T

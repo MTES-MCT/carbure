@@ -52,7 +52,7 @@ def request_entity_access(request, *args, **kwargs):
             defaults={"comment": comment, "role": role, "status": "PENDING"},
         )
 
-        validation_url = f"{CarbureEnv.get_base_url()}/org/{entity.id}/settings#users"
+        validation_url = f"{CarbureEnv.get_base_url()}/org/{entity.id}/settings/users"
         email_subject = "Carbure - Demande d'accès"
         message = """
         Bonjour,

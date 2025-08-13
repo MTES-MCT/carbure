@@ -95,6 +95,24 @@ export const OperationDetail = () => {
       },
     })
 
+  const {
+    execute: validateDraftTransfer,
+    loading: validateDraftTransferLoading,
+  } = useMutation(api.patchOperation, {
+    invalidates: ["operations"],
+    onSuccess: () => {
+      notify(t("Le transfert a été réalisé avec succès."), {
+        variant: "success",
+      })
+      closeDialog()
+    },
+    onError: () => {
+      notify(t("Une erreur est survenue lors du transfert."), {
+        variant: "danger",
+      })
+    },
+  })
+
   const onAcceptOperation = () => {
     const patch = () => {
       if (
@@ -227,7 +245,7 @@ export const OperationDetail = () => {
           <>
             {/* Display reject/accept button in two cases :
              - Acquisition operation
-             - Transfert operation only if it's a credit operation
+             - Transfer operation only if it's a credit operation
             */}
             {(operation?.type === OperationType.ACQUISITION ||
               (operation?.type === OperationType.TRANSFERT &&
@@ -267,6 +285,32 @@ export const OperationDetail = () => {
                 >
                   {t("Annuler le certificat")}
                 </Button>
+              )}
+
+            {/* Display cancel/transfer button only if operation is a DRAFT transfer */}
+            {operation?.status === OperationsStatus.DRAFT &&
+              operation?.type === OperationType.TRANSFERT && (
+                <>
+                  <Button
+                    customPriority="danger"
+                    iconId="fr-icon-close-line"
+                    onClick={() => deleteOperation(entity.id, operation.id)}
+                    loading={deleteOperationLoading}
+                  >
+                    {t("Annuler la transaction")}
+                  </Button>
+                  <Button
+                    priority="primary"
+                    onClick={() =>
+                      validateDraftTransfer(entity.id, operation.id, {
+                        status: OperationsStatus.PENDING,
+                      })
+                    }
+                    loading={validateDraftTransferLoading}
+                  >
+                    {t("Transférer")}
+                  </Button>
+                </>
               )}
           </>
         }

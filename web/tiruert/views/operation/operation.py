@@ -105,7 +105,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         }
         multiplicator = multiplicators.get(self.request.unit, None)
 
-        return (
+        queryset = (
             super()
             .get_queryset()
             .annotate(
@@ -161,8 +161,19 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     default=Value(None),
                     output_field=FloatField(),
                 ),
+                _transaction=Case(
+                    When(credited_entity_id=self.request.entity.id, then=Value("CREDIT")),
+                    When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
+                    default=Value(None),
+                    output_field=CharField(),
+                ),
             )
         )
+
+        # exclude operations that are drafts and credits
+        queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
+
+        return queryset
 
     @extend_schema(
         operation_id="list_operations",
@@ -182,7 +193,16 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         },
     )
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @extend_schema(
         operation_id="get_operation",
@@ -286,6 +306,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         if instance.type in [Operation.CESSION, Operation.TENEUR, Operation.TRANSFERT] and instance.status in [
             Operation.PENDING,
             Operation.REJECTED,
+            Operation.DRAFT,
         ]:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
