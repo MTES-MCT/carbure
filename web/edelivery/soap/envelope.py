@@ -26,7 +26,7 @@ class Envelope:
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
-          <eb:Property name="originalSender">{self.message.initiator_id()}</eb:Property>
+          <eb:Property name="originalSender">CARBURE</eb:Property>
           <eb:Property name="finalRecipient">EC</eb:Property>
         </eb:MessageProperties>
         <eb:PayloadInfo>
