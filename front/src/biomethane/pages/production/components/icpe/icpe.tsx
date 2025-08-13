@@ -5,10 +5,10 @@ import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import {
+  IcpeRegime,
   BiomethaneProductionUnit,
   BiomethaneProductionUnitAddRequest,
-  IcpeRegime,
-} from "biomethane/types"
+} from "../../types"
 import { useMutateProductionUnit } from "../../production.hooks"
 
 type ICPEForm = DeepPartial<BiomethaneProductionUnitAddRequest>

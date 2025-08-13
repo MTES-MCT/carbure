@@ -8,11 +8,9 @@ import { DeepPartial } from "common/types"
 import {
   BiomethaneProductionUnit,
   BiomethaneProductionUnitAddRequest,
-} from "biomethane/types"
-import {
-  useMutateProductionUnit,
-  useUnitTypeOptions,
-} from "../../production.hooks"
+  UnitType,
+} from "../../types"
+import { useMutateProductionUnit } from "../../production.hooks"
 
 type GeneralInfoForm = DeepPartial<BiomethaneProductionUnitAddRequest>
 
@@ -23,10 +21,32 @@ export function GeneralInfo({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<GeneralInfoForm>(productionUnit ?? {})
-  const unitTypeOptions = useUnitTypeOptions()
   const { execute: updateProductionUnit, loading } = useMutateProductionUnit(
     productionUnit !== undefined
   )
+
+  const unitTypeOptions = [
+    {
+      label: t("Agricole autonome"),
+      value: UnitType.AGRICULTURAL_AUTONOMOUS,
+    },
+    {
+      label: t("Agricole territorial"),
+      value: UnitType.AGRICULTURAL_TERRITORIAL,
+    },
+    {
+      label: t("Industriel territorial"),
+      value: UnitType.INDUSTRIAL_TERRITORIAL,
+    },
+    {
+      label: t("Déchets ménagers et biodéchets"),
+      value: UnitType.HOUSEHOLD_WASTE_BIOWASTE,
+    },
+    {
+      label: t("ISDND"),
+      value: UnitType.ISDND,
+    },
+  ]
 
   return (
     <EditableCard title={t("Informations générales du site de production")}>

@@ -10,7 +10,7 @@ import {
   BiomethaneProductionUnit,
   BiomethaneProductionUnitAddRequest,
   HygienizationExemptionType,
-} from "biomethane/types"
+} from "../../types"
 import { useMutateProductionUnit } from "../../production.hooks"
 
 type SanitaryAgreementForm = DeepPartial<BiomethaneProductionUnitAddRequest>

@@ -5,7 +5,7 @@ import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { Box } from "common/components/scaffold"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
-import { BiomethaneDigestateStorageAddRequest } from "biomethane/types"
+import { BiomethaneDigestateStorageAddRequest } from "../../types"
 import { useAddDigestateStorage } from "../../production.hooks"
 import { DeepPartial } from "common/types"
 
