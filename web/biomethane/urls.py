@@ -33,8 +33,7 @@ contract_viewset = BiomethaneContractViewSet.as_view(
 production_unit_viewset = BiomethaneProductionUnitViewSet.as_view(
     {
         "get": "retrieve",
-        "post": "create",
-        "patch": "update",
+        "put": "upsert",
     }
 )
 

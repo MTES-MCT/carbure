@@ -1,8 +1,7 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, mixins
+from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models import BiomethaneProductionUnit
 from biomethane.serializers.production_unit import (
@@ -25,13 +24,10 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneProductionUnitViewSet(
-    GenericViewSet,
-    mixins.CreateModelMixin,
-):
+class BiomethaneProductionUnitViewSet(GenericViewSet):
     queryset = BiomethaneProductionUnit.objects.all()
     serializer_class = BiomethaneProductionUnitSerializer
-    permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
+    permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
     def get_serializer_context(self):
@@ -40,9 +36,7 @@ class BiomethaneProductionUnitViewSet(
         return context
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return BiomethaneProductionUnitAddSerializer
-        elif self.action in ["update"]:
+        if self.action == "upsert":
             return BiomethaneProductionUnitPatchSerializer
         return BiomethaneProductionUnitSerializer
 
@@ -65,18 +59,40 @@ class BiomethaneProductionUnitViewSet(
         except BiomethaneProductionUnit.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def update(self, request, *args, **kwargs):
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneProductionUnitSerializer,
+                description="Production unit updated successfully",
+            ),
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response=BiomethaneProductionUnitSerializer,
+                description="Production unit created successfully",
+            ),
+        },
+        description="Create or update the production unit for the current entity (upsert operation).",
+    )
+    def upsert(self, request, *args, **kwargs):
+        """Create or update production unit using upsert logic."""
+        serializer_context = self.get_serializer_context()
         try:
+            # Try to get existing production unit
             production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
-            serializer = self.get_serializer(production_unit, data=request.data, partial=True)
-
+            # Update existing production unit
+            serializer = BiomethaneProductionUnitPatchSerializer(
+                production_unit, data=request.data, partial=True, context=serializer_context
+            )
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
-
+                response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
+                return Response(response_data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except BiomethaneProductionUnit.DoesNotExist:
-            return Response(
-                {"detail": "Aucune unité de production trouvée pour cette entité"}, status=status.HTTP_404_NOT_FOUND
-            )
+            # Create new production unit
+            serializer = BiomethaneProductionUnitAddSerializer(data=request.data, context=serializer_context)
+            if serializer.is_valid():
+                production_unit = serializer.save()
+                response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
+                return Response(response_data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
