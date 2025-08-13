@@ -31,20 +31,24 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
             "unit_name": "Test Unit",
             "siret_number": "12345678901234",
             "company_address": "123 Test Street",
-            "unit_type": BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS,
+            "unit_type": "AGRICULTURAL_AUTONOMOUS",
             "sanitary_approval_number": "SA12345",
-            "hygienization_exemption_type": BiomethaneProductionUnit.TOTAL,
+            "hygienization_exemption_type": "TOTAL",
             "icpe_number": "ICPE12345",
-            "icpe_regime": BiomethaneProductionUnit.AUTHORIZATION,
-            "process_type": BiomethaneProductionUnit.LIQUID_PROCESS,
-            "methanization_process": BiomethaneProductionUnit.CONTINUOUS_INFINITELY_MIXED,
+            "icpe_regime": "AUTHORIZATION",
+            "process_type": "LIQUID_PROCESS",
+            "methanization_process": "CONTINUOUS_INFINITELY_MIXED",
             "production_efficiency": 85.0,
+            "installed_meters": [
+                BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER,
+                BiomethaneProductionUnit.GLOBAL_ELECTRICAL_METER,
+            ],
             "raw_digestate_treatment_steps": "No additional steps",
             "liquid_phase_treatment_steps": "Standard treatment",
             "solid_phase_treatment_steps": "Composting",
-            "digestate_valorization_method": BiomethaneProductionUnit.SPREADING,
-            "spreading_management": BiomethaneProductionUnit.DIRECT_SPREADING,
-            "digestate_sale_type": BiomethaneProductionUnit.DIG_AGRI_SPECIFICATIONS,
+            "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
+            "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
+            "digestate_sale_type": "DIG_AGRI_SPECIFICATIONS",
         }
 
         response = self.client.post(self.production_unit_url, data)
@@ -70,20 +74,23 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
             unit_name="First Unit",
             siret_number="12345678901234",
             company_address="456 First Street",
-            unit_type=BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS,
+            unit_type="AGRICULTURAL_AUTONOMOUS",
             sanitary_approval_number="SA56789",
-            hygienization_exemption_type=BiomethaneProductionUnit.PARTIAL,
+            hygienization_exemption_type="PARTIAL",
             icpe_number="ICPE56789",
-            icpe_regime=BiomethaneProductionUnit.AUTHORIZATION,
-            process_type=BiomethaneProductionUnit.LIQUID_PROCESS,
-            methanization_process=BiomethaneProductionUnit.CONTINUOUS_INFINITELY_MIXED,
+            icpe_regime="AUTHORIZATION",
+            process_type="LIQUID_PROCESS",
+            methanization_process="CONTINUOUS_INFINITELY_MIXED",
             production_efficiency=85.0,
+            installed_meters=[
+                BiomethaneProductionUnit.PURIFICATION_FLOWMETER,
+            ],
             raw_digestate_treatment_steps="Basic steps",
             liquid_phase_treatment_steps="Filtration",
             solid_phase_treatment_steps="Drying",
-            digestate_valorization_method=BiomethaneProductionUnit.SPREADING,
-            spreading_management=BiomethaneProductionUnit.SPREADING_VIA_PROVIDER,
-            digestate_sale_type=BiomethaneProductionUnit.HOMOLOGATION,
+            digestate_valorization_methods=[BiomethaneProductionUnit.SPREADING],
+            spreading_management_methods=[BiomethaneProductionUnit.SPREADING_VIA_PROVIDER],
+            digestate_sale_type="HOMOLOGATION",
         )
 
         # Try to create second production unit for same entity
@@ -91,20 +98,24 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
             "unit_name": "Second Unit",
             "siret_number": "98765432109876",
             "company_address": "789 Second Street",
-            "unit_type": BiomethaneProductionUnit.AGRICULTURAL_TERRITORIAL,
+            "unit_type": "AGRICULTURAL_TERRITORIAL",
             "sanitary_approval_number": "SA98765",
-            "hygienization_exemption_type": BiomethaneProductionUnit.TOTAL,
+            "hygienization_exemption_type": "TOTAL",
             "icpe_number": "ICPE98765",
-            "icpe_regime": BiomethaneProductionUnit.REGISTRATION,
-            "process_type": BiomethaneProductionUnit.DRY_PROCESS,
-            "methanization_process": BiomethaneProductionUnit.PLUG_FLOW_SEMI_CONTINUOUS,
+            "icpe_regime": "REGISTRATION",
+            "process_type": "DRY_PROCESS",
+            "methanization_process": "PLUG_FLOW_SEMI_CONTINUOUS",
             "production_efficiency": 75.0,
+            "installed_meters": [
+                BiomethaneProductionUnit.FLARING_FLOWMETER,
+                BiomethaneProductionUnit.HEATING_FLOWMETER,
+            ],
             "raw_digestate_treatment_steps": "Advanced steps",
             "liquid_phase_treatment_steps": "Membrane treatment",
             "solid_phase_treatment_steps": "Pelletizing",
-            "digestate_valorization_method": BiomethaneProductionUnit.COMPOSTING,
-            "spreading_management": BiomethaneProductionUnit.SALE,
-            "digestate_sale_type": BiomethaneProductionUnit.STANDARDIZED_PRODUCT,
+            "digestate_valorization_methods": [BiomethaneProductionUnit.COMPOSTING],
+            "spreading_management_methods": [BiomethaneProductionUnit.SALE],
+            "digestate_sale_type": "STANDARDIZED_PRODUCT",
         }
 
         response = self.client.post(self.production_unit_url, data)
@@ -131,3 +142,42 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
 
         response = self.client.get(wrong_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_json_field_validation(self):
+        """Test validation of the new JSON fields using Django REST Framework ListField."""
+        from biomethane.serializers.production_unit import BiomethaneProductionUnitAddSerializer
+
+        # Test valid data
+        valid_data = {
+            "unit_name": "Test Unit",
+            "installed_meters": [
+                BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER,
+                BiomethaneProductionUnit.GLOBAL_ELECTRICAL_METER,
+            ],
+            "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
+            "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
+        }
+        serializer = BiomethaneProductionUnitAddSerializer(data=valid_data)
+        # Should validate successfully for valid choices
+        self.assertTrue(serializer.is_valid())
+
+        # Test invalid installed_meters
+        invalid_data = valid_data.copy()
+        invalid_data["installed_meters"] = ["INVALID_METER_TYPE"]
+        serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("installed_meters", serializer.errors)
+
+        # Test invalid digestate valorization methods
+        invalid_data = valid_data.copy()
+        invalid_data["digestate_valorization_methods"] = ["INVALID_VALORIZATION_METHOD"]
+        serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("digestate_valorization_methods", serializer.errors)
+
+        # Test invalid spreading management methods
+        invalid_data = valid_data.copy()
+        invalid_data["spreading_management_methods"] = ["INVALID_SPREADING_METHOD"]
+        serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("spreading_management_methods", serializer.errors)
