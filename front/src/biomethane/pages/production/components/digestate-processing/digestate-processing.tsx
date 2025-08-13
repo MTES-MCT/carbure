@@ -4,25 +4,101 @@ import { Grid } from "common/components/scaffold"
 import { EditableCard } from "common/molecules/editable-card"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
+import { useForm } from "common/components/form2"
+import { DeepPartial } from "common/types"
+import {
+  BiomethaneProductionUnit,
+  BiomethaneProductionUnitPatchRequest,
+  DigestateSaleType,
+} from "../../types"
+import {
+  DigestateValorizationMethodsEnum as DigestateValorizationMethods,
+  SpreadingManagementMethodsEnum as SpreadingManagementMethods,
+} from "api-schema"
+import { useSaveProductionUnit } from "../../production.hooks"
 
-export function DigestateProcessing() {
+type DigestateProcessingForm =
+  DeepPartial<BiomethaneProductionUnitPatchRequest> & {
+    digestate_valorization_methods?: DigestateValorizationMethods[]
+    spreading_management_methods?: SpreadingManagementMethods[]
+  }
+
+export function DigestateProcessing({
+  productionUnit,
+}: {
+  productionUnit?: BiomethaneProductionUnit
+}) {
   const { t } = useTranslation()
+  const { bind, value } = useForm<DigestateProcessingForm>(productionUnit ?? {})
+
+  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
+
+  const digestateValorizationOptions = [
+    {
+      value: DigestateValorizationMethods.SPREADING,
+      label: t("Épandage"),
+    },
+    {
+      value: DigestateValorizationMethods.COMPOSTING,
+      label: t("Compostage"),
+    },
+    {
+      value: DigestateValorizationMethods.INCINERATION_LANDFILLING,
+      label: t("Incinération / Enfouissement"),
+    },
+  ]
+
+  const spreadingManagementOptions = [
+    {
+      value: SpreadingManagementMethods.DIRECT_SPREADING,
+      label: t("Épandage direct"),
+    },
+    {
+      value: SpreadingManagementMethods.SPREADING_VIA_PROVIDER,
+      label: t("Épandage via un prestataire"),
+    },
+    {
+      value: SpreadingManagementMethods.TRANSFER,
+      label: t("Cession"),
+    },
+    {
+      value: SpreadingManagementMethods.SALE,
+      label: t("Vente"),
+    },
+  ]
+
+  const digestateSaleTypeOptions = [
+    {
+      value: DigestateSaleType.DIG_AGRI_SPECIFICATIONS,
+      label: t("Cahier de charges DIG Agri"),
+    },
+    {
+      value: DigestateSaleType.HOMOLOGATION,
+      label: t("Homologation"),
+    },
+    {
+      value: DigestateSaleType.STANDARDIZED_PRODUCT,
+      label: t("Produit normé"),
+    },
+  ]
 
   return (
     <EditableCard title={t("Traitement et valorisation du digestat")}>
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => {}}>
+        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}
               label={t("Le digestat subit-il une séparation de phase?")}
               options={getYesNoOptions()}
               orientation="horizontal"
+              {...bind("has_digestate_phase_separation")}
             />
             <TextInput
               readOnly={!isEditing}
               label={t("Étapes complémentaires de traitement du digestat brut")}
               hintText={t("Que si séparation de phase = Non")}
+              {...bind("raw_digestate_treatment_steps")}
             />
             <TextInput
               readOnly={!isEditing}
@@ -30,6 +106,7 @@ export function DigestateProcessing() {
                 "Étape(s) complémentaire(s) de traitement de la phase liquide"
               )}
               hintText={t("Que si séparation de phase = Oui, optionnel")}
+              {...bind("liquid_phase_treatment_steps")}
             />
             <TextInput
               readOnly={!isEditing}
@@ -37,51 +114,34 @@ export function DigestateProcessing() {
                 "Étape(s) complémentaire(s) de traitement de la phase solide"
               )}
               hintText={t("Que si séparation de phase = Oui, optionnel")}
+              {...bind("solid_phase_treatment_steps")}
             />
             <CheckboxGroup
-              value={[]}
-              onChange={() => {}}
               readOnly={!isEditing}
               label={t("Mode de valorisation du digestat")}
-              options={[
-                {
-                  value: "",
-                  label: t("Épandage"),
-                },
-                {
-                  value: "",
-                  label: t("Compostage"),
-                },
-                {
-                  value: "",
-                  label: t("Incinération / Enfouissement"),
-                },
-              ]}
+              options={digestateValorizationOptions}
+              {...bind("digestate_valorization_methods")}
             />
             <CheckboxGroup
-              value={[]}
-              onChange={() => {}}
               readOnly={!isEditing}
-              label={t("Gestion de l’épandage")}
-              options={[
-                { value: "", label: t("Épandage direct") },
-                { value: "", label: t("Épandage via un prestataire") },
-                { value: "", label: t("Cession") },
-                { value: "", label: t("Vente") },
-              ]}
+              label={t("Gestion de l'épandage")}
+              options={spreadingManagementOptions}
+              {...bind("spreading_management_methods")}
             />
             <RadioGroup
               readOnly={!isEditing}
               label={t("En cas de vente du digestat")}
-              options={[
-                { value: "", label: t("Cahier de charges DIG Agri") },
-                { value: "", label: t("Homologation") },
-                { value: "", label: t("Produit normé") },
-              ]}
+              options={digestateSaleTypeOptions}
+              {...bind("digestate_sale_type")}
             />
           </Grid>
           {isEditing && (
-            <Button type="submit" iconId="ri-save-line" asideX>
+            <Button
+              type="submit"
+              iconId="ri-save-line"
+              asideX
+              loading={loading}
+            >
               {t("Sauvegarder")}
             </Button>
           )}
