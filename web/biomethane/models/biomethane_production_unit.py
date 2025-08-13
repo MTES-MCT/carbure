@@ -111,23 +111,27 @@ class BiomethaneProductionUnit(models.Model):
     # Rendement de l'installation de production de biométhane %
     production_efficiency = models.FloatField(null=True, blank=True)
 
-    # Débitmètre dédié à la production de biogaz
-    has_biogas_production_flowmeter = models.BooleanField(default=False)
+    # Équipements installés (débitmètres et compteurs)
+    BIOGAS_PRODUCTION_FLOWMETER = "BIOGAS_PRODUCTION_FLOWMETER"
+    PURIFICATION_FLOWMETER = "PURIFICATION_FLOWMETER"
+    FLARING_FLOWMETER = "FLARING_FLOWMETER"
+    HEATING_FLOWMETER = "HEATING_FLOWMETER"
+    PURIFICATION_ELECTRICAL_METER = "PURIFICATION_ELECTRICAL_METER"
+    GLOBAL_ELECTRICAL_METER = "GLOBAL_ELECTRICAL_METER"
 
-    # Débitmètre dédié au volume de biogaz traité en épuration
-    has_purification_flowmeter = models.BooleanField(default=False)
+    INSTALLED_METERS_CHOICES = [
+        (BIOGAS_PRODUCTION_FLOWMETER, "Débitmètre dédié à la production de biogaz"),
+        (PURIFICATION_FLOWMETER, "Débitmètre dédié au volume de biogaz traité en épuration"),
+        (FLARING_FLOWMETER, "Débitmètre dédié au volume de biogaz torché"),
+        (HEATING_FLOWMETER, "Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur"),
+        (
+            PURIFICATION_ELECTRICAL_METER,
+            "Compteur dédié à la consommation électrique au système d'épuration et traitement des évents",
+        ),
+        (GLOBAL_ELECTRICAL_METER, "Compteur dédié à la consommation électrique de l'ensemble de l'unité de production"),
+    ]
 
-    # Débitmètre dédié au volume de biogaz torché
-    has_flaring_flowmeter = models.BooleanField(default=False)
-
-    # Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur
-    has_heating_flowmeter = models.BooleanField(default=False)
-
-    # Compteur dédié à la consommation électrique au système d'épuration et traitement des évents
-    has_purification_electrical_meter = models.BooleanField(default=False)
-
-    # Compteur dédié à la consommation électrique de l'ensemble de l'unité de production
-    has_global_electrical_meter = models.BooleanField(default=False)
+    installed_meters = models.JSONField(default=list, blank=True)
 
     # Présence d'un hygiénisateur ?
     has_hygienization_unit = models.BooleanField(default=False)
@@ -152,16 +156,13 @@ class BiomethaneProductionUnit(models.Model):
     COMPOSTING = "COMPOSTING"
     INCINERATION_LANDFILLING = "INCINERATION_LANDFILLING"
 
-    digestate_valorization_method = models.CharField(
-        max_length=32,
-        choices=[
-            (SPREADING, "Épandage"),
-            (COMPOSTING, "Compostage"),
-            (INCINERATION_LANDFILLING, "Incinération / Enfouissement"),
-        ],
-        null=True,
-        blank=True,
-    )
+    DIGESTATE_VALORIZATION_METHODS_CHOICES = [
+        (SPREADING, "Épandage"),
+        (COMPOSTING, "Compostage"),
+        (INCINERATION_LANDFILLING, "Incinération / Enfouissement"),
+    ]
+
+    digestate_valorization_methods = models.JSONField(default=list, blank=True)
 
     # Gestion de l'épandage
     DIRECT_SPREADING = "DIRECT_SPREADING"
@@ -169,17 +170,14 @@ class BiomethaneProductionUnit(models.Model):
     TRANSFER = "TRANSFER"
     SALE = "SALE"
 
-    spreading_management = models.CharField(
-        max_length=32,
-        choices=[
-            (DIRECT_SPREADING, "Épandage direct"),
-            (SPREADING_VIA_PROVIDER, "Épandage via un prestataire"),
-            (TRANSFER, "Cession"),
-            (SALE, "Vente"),
-        ],
-        null=True,
-        blank=True,
-    )
+    SPREADING_MANAGEMENT_METHODS_CHOICES = [
+        (DIRECT_SPREADING, "Épandage direct"),
+        (SPREADING_VIA_PROVIDER, "Épandage via un prestataire"),
+        (TRANSFER, "Cession"),
+        (SALE, "Vente"),
+    ]
+
+    spreading_management_methods = models.JSONField(default=list, blank=True)
 
     # En cas de vente du digestat
     DIG_AGRI_SPECIFICATIONS = "DIG_AGRI_SPECIFICATIONS"
