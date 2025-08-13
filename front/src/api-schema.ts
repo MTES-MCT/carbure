@@ -281,12 +281,13 @@ export interface paths {
         };
         /** @description Retrieve the production unit for the current entity. Returns a single production unit object. */
         get: operations["biomethane_production_unit_retrieve"];
-        put?: never;
-        post: operations["biomethane_production_unit_create"];
+        /** @description Create or update the production unit for the current entity (upsert operation). */
+        put: operations["biomethane_production_unit_update"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["biomethane_production_unit_partial_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/double-counting/agreements/": {
@@ -2699,59 +2700,7 @@ export interface components {
             readonly spreading_management_methods: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
-        BiomethaneProductionUnitAdd: {
-            unit_name: string;
-            siret_number?: string | null;
-            company_address?: string | null;
-            unit_type?: components["schemas"]["UnitTypeEnum"] | null;
-            has_sanitary_approval?: boolean;
-            sanitary_approval_number?: string | null;
-            has_hygienization_exemption?: boolean;
-            hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
-            icpe_number?: string | null;
-            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
-            process_type?: components["schemas"]["ProcessTypeEnum"] | null;
-            methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
-            production_efficiency?: number | null;
-            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
-            has_hygienization_unit?: boolean;
-            has_co2_valorization_process?: boolean;
-            has_digestate_phase_separation?: boolean;
-            raw_digestate_treatment_steps?: string | null;
-            liquid_phase_treatment_steps?: string | null;
-            solid_phase_treatment_steps?: string | null;
-            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
-            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
-            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
-        };
-        BiomethaneProductionUnitAddRequest: {
-            unit_name: string;
-            siret_number?: string | null;
-            company_address?: string | null;
-            unit_type?: components["schemas"]["UnitTypeEnum"] | null;
-            has_sanitary_approval?: boolean;
-            sanitary_approval_number?: string | null;
-            has_hygienization_exemption?: boolean;
-            hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
-            icpe_number?: string | null;
-            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
-            process_type?: components["schemas"]["ProcessTypeEnum"] | null;
-            methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
-            production_efficiency?: number | null;
-            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
-            has_hygienization_unit?: boolean;
-            has_co2_valorization_process?: boolean;
-            has_digestate_phase_separation?: boolean;
-            raw_digestate_treatment_steps?: string | null;
-            liquid_phase_treatment_steps?: string | null;
-            solid_phase_treatment_steps?: string | null;
-            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
-            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
-            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
-        };
-        BiomethaneProductionUnitPatch: {
+        BiomethaneProductionUnitPatchRequest: {
             unit_name: string;
             siret_number?: string | null;
             company_address?: string | null;
@@ -4146,32 +4095,6 @@ export interface components {
             has_cover?: boolean;
             has_biogas_recovery?: boolean;
         };
-        PatchedBiomethaneProductionUnitPatchRequest: {
-            unit_name?: string;
-            siret_number?: string | null;
-            company_address?: string | null;
-            unit_type?: components["schemas"]["UnitTypeEnum"] | null;
-            has_sanitary_approval?: boolean;
-            sanitary_approval_number?: string | null;
-            has_hygienization_exemption?: boolean;
-            hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
-            icpe_number?: string | null;
-            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
-            process_type?: components["schemas"]["ProcessTypeEnum"] | null;
-            methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
-            production_efficiency?: number | null;
-            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
-            has_hygienization_unit?: boolean;
-            has_co2_valorization_process?: boolean;
-            has_digestate_phase_separation?: boolean;
-            raw_digestate_treatment_steps?: string | null;
-            liquid_phase_treatment_steps?: string | null;
-            solid_phase_treatment_steps?: string | null;
-            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
-            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
-            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
-        };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
             credited_entity?: number | null;
@@ -5452,7 +5375,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this biomethane digestate storage. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -5477,7 +5400,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this biomethane digestate storage. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -5508,7 +5431,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this biomethane digestate storage. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -5532,7 +5455,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this biomethane digestate storage. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -5585,7 +5508,7 @@ export interface operations {
             };
         };
     };
-    biomethane_production_unit_create: {
+    biomethane_production_unit_update: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -5597,46 +5520,28 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BiomethaneProductionUnitAddRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneProductionUnitAddRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneProductionUnitAddRequest"];
+                "application/json": components["schemas"]["BiomethaneProductionUnitPatchRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneProductionUnitPatchRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneProductionUnitPatchRequest"];
             };
         };
         responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneProductionUnitAdd"];
-                };
-            };
-        };
-    };
-    biomethane_production_unit_partial_update: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedBiomethaneProductionUnitPatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneProductionUnitPatchRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBiomethaneProductionUnitPatchRequest"];
-            };
-        };
-        responses: {
+            /** @description Production unit updated successfully */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneProductionUnitPatch"];
+                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
+                };
+            };
+            /** @description Production unit created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
                 };
             };
         };
