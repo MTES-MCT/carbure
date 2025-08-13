@@ -7,12 +7,12 @@ import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import {
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitAddRequest,
+  BiomethaneProductionUnitPatchRequest,
   UnitType,
 } from "../../types"
-import { useMutateProductionUnit } from "../../production.hooks"
+import { useSaveProductionUnit } from "../../production.hooks"
 
-type GeneralInfoForm = DeepPartial<BiomethaneProductionUnitAddRequest>
+type GeneralInfoForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
 export function GeneralInfo({
   productionUnit,
@@ -21,9 +21,7 @@ export function GeneralInfo({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<GeneralInfoForm>(productionUnit ?? {})
-  const { execute: updateProductionUnit, loading } = useMutateProductionUnit(
-    productionUnit !== undefined
-  )
+  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
   const unitTypeOptions = [
     {
@@ -51,7 +49,7 @@ export function GeneralInfo({
   return (
     <EditableCard title={t("Informations générales du site de production")}>
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => updateProductionUnit(value!)}>
+        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">
             <TextInput
               readOnly={!isEditing}

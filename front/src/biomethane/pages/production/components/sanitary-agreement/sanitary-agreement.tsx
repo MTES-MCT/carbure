@@ -8,12 +8,12 @@ import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import {
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitAddRequest,
+  BiomethaneProductionUnitPatchRequest,
   HygienizationExemptionType,
 } from "../../types"
-import { useMutateProductionUnit } from "../../production.hooks"
+import { useSaveProductionUnit } from "../../production.hooks"
 
-type SanitaryAgreementForm = DeepPartial<BiomethaneProductionUnitAddRequest>
+type SanitaryAgreementForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
 export function SanitaryAgreement({
   productionUnit,
@@ -22,9 +22,7 @@ export function SanitaryAgreement({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<SanitaryAgreementForm>(productionUnit ?? {})
-  const { execute: updateProductionUnit, loading } = useMutateProductionUnit(
-    productionUnit !== undefined
-  )
+  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
   const hygienizationExemptionOptions = [
     {
@@ -40,7 +38,7 @@ export function SanitaryAgreement({
   return (
     <EditableCard title={t("Agrément sanitaire")}>
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => updateProductionUnit(value!)}>
+        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}

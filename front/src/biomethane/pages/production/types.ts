@@ -24,10 +24,9 @@ export {
 // Production Unit
 
 export type BiomethaneProductionUnit = apiTypes["BiomethaneProductionUnit"]
-export type BiomethaneProductionUnitAddRequest =
-  apiTypes["BiomethaneProductionUnitAddRequest"]
 export type BiomethaneProductionUnitPatchRequest =
-  apiTypes["PatchedBiomethaneProductionUnitPatchRequest"]
+  apiTypes["BiomethaneProductionUnitPatchRequest"]
+
 // Digestate Storage
 
 export type BiomethaneDigestateStorage = apiTypes["BiomethaneDigestateStorage"]

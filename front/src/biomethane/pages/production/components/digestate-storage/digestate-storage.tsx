@@ -36,53 +36,55 @@ export function DigestateStorage() {
         </Button>
       }
     >
-      <Table
-        rows={storages || []}
-        columns={[
-          { header: t("Dispositif"), cell: (storage) => storage.type },
-          {
-            header: t("Capacité de stockage (m3)"),
-            cell: (storage) => formatNumber(storage.capacity) || "-",
-          },
-          {
-            header: t("Couverture du stockage"),
-            cell: (storage) => (storage.has_cover ? t("Oui") : t("Non")),
-          },
-          {
-            header: t("Récupération du biogaz"),
-            cell: (storage) =>
-              storage.has_biogas_recovery ? t("Oui") : t("Non"),
-          },
-          {
-            header: t("Actions"),
-            cell: (storage) => (
-              <Button
-                iconId="fr-icon-delete-fill"
-                size="small"
-                priority="secondary"
-                title={t("Supprimer")}
-                onClick={() =>
-                  portal((close) => (
-                    <Confirm
-                      title={t("Supprimer le fichier")}
-                      description={t(
-                        "Êtes-vous sûr de vouloir supprimer ce stockage de digestat ?"
-                      )}
-                      confirm={t("Supprimer")}
-                      customVariant="danger"
-                      onClose={close}
-                      onConfirm={async () => {
-                        await deleteStorage(storage.id)
-                        close()
-                      }}
-                    />
-                  ))
-                }
-              />
-            ),
-          },
-        ]}
-      />
+      {Boolean(storages?.length) && (
+        <Table
+          rows={storages!}
+          columns={[
+            { header: t("Dispositif"), cell: (storage) => storage.type },
+            {
+              header: t("Capacité de stockage (m3)"),
+              cell: (storage) => formatNumber(storage.capacity) || "-",
+            },
+            {
+              header: t("Couverture du stockage"),
+              cell: (storage) => (storage.has_cover ? t("Oui") : t("Non")),
+            },
+            {
+              header: t("Récupération du biogaz"),
+              cell: (storage) =>
+                storage.has_biogas_recovery ? t("Oui") : t("Non"),
+            },
+            {
+              header: t("Actions"),
+              cell: (storage) => (
+                <Button
+                  iconId="fr-icon-delete-fill"
+                  size="small"
+                  priority="secondary"
+                  title={t("Supprimer")}
+                  onClick={() =>
+                    portal((close) => (
+                      <Confirm
+                        title={t("Supprimer le fichier")}
+                        description={t(
+                          "Êtes-vous sûr de vouloir supprimer ce stockage de digestat ?"
+                        )}
+                        confirm={t("Supprimer")}
+                        customVariant="danger"
+                        onClose={close}
+                        onConfirm={async () => {
+                          await deleteStorage(storage.id)
+                          close()
+                        }}
+                      />
+                    ))
+                  }
+                />
+              ),
+            },
+          ]}
+        />
+      )}
 
       <Notice>
         {t("Capacité totale de stockage")} : {totalCapacity} m3
