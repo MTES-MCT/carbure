@@ -3,7 +3,6 @@ import { api } from "common/services/api-fetch"
 import { EntityType } from "common/types"
 import {
   BiomethaneAmendmentAddRequest,
-  BiomethaneContractAddRequest,
   BiomethaneContractPatchRequest,
 } from "./types"
 
@@ -25,26 +24,11 @@ export const getContract = async (entity_id: number) => {
   return response.data
 }
 
-export const createContract = async (
-  entity_id: number,
-  data: BiomethaneContractAddRequest
-) => {
-  const response = await api.POST("/biomethane/contract/", {
-    params: {
-      query: {
-        entity_id,
-      },
-    },
-    body: data,
-  })
-  return response.data
-}
-
-export const updateContract = async (
+export const saveContract = async (
   entity_id: number,
   data: BiomethaneContractPatchRequest
 ) => {
-  const response = await api.PATCH("/biomethane/contract/", {
+  const response = await api.PUT("/biomethane/contract/", {
     params: {
       query: {
         entity_id,

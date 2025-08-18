@@ -200,12 +200,13 @@ export interface paths {
         };
         /** @description Retrieve the contract for the current entity. Returns a single contract object. */
         get: operations["biomethane_contract_retrieve"];
-        put?: never;
-        post: operations["biomethane_contract_create"];
+        /** @description Create or update contract using upsert logic. */
+        put: operations["biomethane_contract_update"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["biomethane_contract_partial_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/biomethane/contract/amendments/": {
@@ -2529,30 +2530,6 @@ export interface components {
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
             entity: number;
         };
-        BiomethaneContractAdd: {
-            tariff_reference: components["schemas"]["TariffReferenceEnum"];
-            buyer: number;
-            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
-            cmax?: number | null;
-            cmax_annualized?: boolean | null;
-            /** Format: double */
-            cmax_annualized_value?: number | null;
-            /** Format: double */
-            pap_contracted?: number | null;
-        };
-        BiomethaneContractAddRequest: {
-            tariff_reference: components["schemas"]["TariffReferenceEnum"];
-            buyer: number;
-            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
-            cmax?: number | null;
-            cmax_annualized?: boolean | null;
-            /** Format: double */
-            cmax_annualized_value?: number | null;
-            /** Format: double */
-            pap_contracted?: number | null;
-        };
         BiomethaneContractAmendment: {
             readonly id: number;
             contract: number;
@@ -2584,6 +2561,27 @@ export interface components {
             /** Format: binary */
             amendment_file: File;
             amendment_details?: string | null;
+        };
+        BiomethaneContractPatchRequest: {
+            tariff_reference: components["schemas"]["TariffReferenceEnum"];
+            buyer: number;
+            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
+            /** Format: double */
+            cmax?: number | null;
+            cmax_annualized?: boolean | null;
+            /** Format: double */
+            cmax_annualized_value?: number | null;
+            /** Format: double */
+            pap_contracted?: number | null;
+            /** Format: date */
+            signature_date?: string | null;
+            /** Format: date */
+            effective_date?: string | null;
+            /** Format: binary */
+            general_conditions_file?: File | null;
+            /** Format: binary */
+            specific_conditions_file?: File | null;
+            is_red_ii?: boolean;
         };
         CarbureLotPublic: {
             readonly id: number;
@@ -3882,27 +3880,6 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
-        PatchedBiomethaneContractPatchRequest: {
-            tariff_reference?: components["schemas"]["TariffReferenceEnum"];
-            buyer?: number;
-            installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
-            cmax?: number | null;
-            cmax_annualized?: boolean | null;
-            /** Format: double */
-            cmax_annualized_value?: number | null;
-            /** Format: double */
-            pap_contracted?: number | null;
-            /** Format: date */
-            signature_date?: string | null;
-            /** Format: date */
-            effective_date?: string | null;
-            /** Format: binary */
-            general_conditions_file?: File | null;
-            /** Format: binary */
-            specific_conditions_file?: File | null;
-            is_red_ii?: boolean;
-        };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
             credited_entity?: number | null;
@@ -4959,7 +4936,7 @@ export interface operations {
             };
         };
     };
-    biomethane_contract_create: {
+    biomethane_contract_update: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -4971,41 +4948,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BiomethaneContractAddRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneContractAddRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneContractAddRequest"];
+                "application/json": components["schemas"]["BiomethaneContractPatchRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneContractPatchRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneContractPatchRequest"];
             };
         };
         responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneContractAdd"];
-                };
-            };
-        };
-    };
-    biomethane_contract_partial_update: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedBiomethaneContractPatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneContractPatchRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBiomethaneContractPatchRequest"];
-            };
-        };
-        responses: {
-            /** @description Contract details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;

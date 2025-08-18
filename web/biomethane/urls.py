@@ -16,8 +16,7 @@ router.register(
 contract_viewset = BiomethaneContractViewSet.as_view(
     {
         "get": "retrieve",
-        "post": "create",
-        "patch": "update",
+        "put": "upsert",
     }
 )
 
