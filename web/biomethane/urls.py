@@ -24,8 +24,7 @@ contract_viewset = BiomethaneContractViewSet.as_view(
 injection_site_viewset = BiomethaneInjectionSiteViewSet.as_view(
     {
         "get": "retrieve",
-        "post": "create",
-        "put": "update",
+        "put": "upsert",
     }
 )
 

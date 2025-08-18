@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { EditableCard } from "common/molecules/editable-card"
 import { RadioGroup, TextInput } from "common/components/inputs2"
-import { BiomethaneInjectionSiteUpdateRequest } from "./types"
+import { BiomethaneInjectionSiteAddRequest } from "./types"
 import { useForm } from "common/components/form2"
 import { Grid } from "common/components/scaffold"
 import { getYesNoOptions } from "common/utils/normalizers"
@@ -12,7 +12,7 @@ import {
 } from "./injection.hooks"
 import { Button } from "common/components/button2"
 
-type InjectionSiteForm = Partial<BiomethaneInjectionSiteUpdateRequest>
+type InjectionSiteForm = Partial<BiomethaneInjectionSiteAddRequest>
 export const BiomethaneInjectionPage = () => {
   const { t } = useTranslation()
 
@@ -21,7 +21,7 @@ export const BiomethaneInjectionPage = () => {
     company_address: "",
     postal_code: "",
   })
-  const { result: injectionSite } = useGetInjectionSite({
+  useGetInjectionSite({
     onSuccess: (data) => {
       if (data) {
         setValue(data)
@@ -29,7 +29,7 @@ export const BiomethaneInjectionPage = () => {
     },
   })
   const { execute: updateInjectionSite, loading: loadingUpdateInjectionSite } =
-    useMutateInjectionSite(injectionSite !== undefined)
+    useMutateInjectionSite()
   const networkTypesOptions = useGetInjectionNetworkTypesOption()
   const yesNoOptions = getYesNoOptions()
 

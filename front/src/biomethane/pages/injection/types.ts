@@ -7,5 +7,3 @@ export { NetworkType }
 export type BiomethaneInjectionSite = apiTypes["BiomethaneInjectionSite"]
 export type BiomethaneInjectionSiteAddRequest =
   apiTypes["BiomethaneInjectionSiteInputRequest"]
-export type BiomethaneInjectionSiteUpdateRequest =
-  apiTypes["BiomethaneInjectionSiteRequest"]

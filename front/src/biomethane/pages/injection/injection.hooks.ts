@@ -1,10 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { BiomethaneInjectionSite, NetworkType } from "./types"
-import {
-  createInjectionSite,
-  getInjectionSite,
-  updateInjectionSite,
-} from "./api"
+import { saveInjectionSite, getInjectionSite } from "./api"
 import { QueryOptions, useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useNotify, useNotifyError } from "common/components/notifications"
@@ -40,28 +36,23 @@ export const useGetInjectionSite = (
   return query
 }
 
-export const useMutateInjectionSite = (hasInjectionSite: boolean = false) => {
+export const useMutateInjectionSite = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const mutation = useMutation(
-    hasInjectionSite
-      ? (data) => updateInjectionSite(entity.id, data)
-      : (data) => createInjectionSite(entity.id, data),
-    {
-      invalidates: ["injection-site"],
-      onSuccess: () => {
-        notify(t("Le site d'injection a bien été mis à jour."), {
-          variant: "success",
-        })
-      },
-      onError: (e) => {
-        notifyError(e)
-      },
-    }
-  )
+  const mutation = useMutation((data) => saveInjectionSite(entity.id, data), {
+    invalidates: ["injection-site"],
+    onSuccess: () => {
+      notify(t("Le site d'injection a bien été mis à jour."), {
+        variant: "success",
+      })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
+  })
 
   return mutation
 }
