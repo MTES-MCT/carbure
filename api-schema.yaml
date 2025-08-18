@@ -10070,6 +10070,53 @@ components:
         - amendment_object
         - effective_date
         - signature_date
+    BiomethaneContractPatchRequest:
+      type: object
+      properties:
+        tariff_reference:
+          $ref: "#/components/schemas/TariffReferenceEnum"
+        buyer:
+          type: integer
+        installation_category:
+          allOf:
+            - $ref: "#/components/schemas/InstallationCategoryEnum"
+          nullable: true
+        cmax:
+          type: number
+          format: double
+          nullable: true
+        cmax_annualized:
+          type: boolean
+          nullable: true
+        cmax_annualized_value:
+          type: number
+          format: double
+          nullable: true
+        pap_contracted:
+          type: number
+          format: double
+          nullable: true
+        signature_date:
+          type: string
+          format: date
+          nullable: true
+        effective_date:
+          type: string
+          format: date
+          nullable: true
+        general_conditions_file:
+          type: string
+          format: binary
+          nullable: true
+        specific_conditions_file:
+          type: string
+          format: binary
+          nullable: true
+        is_red_ii:
+          type: boolean
+      required:
+        - buyer
+        - tariff_reference
     BiomethaneDigestateStorage:
       type: object
       properties:
