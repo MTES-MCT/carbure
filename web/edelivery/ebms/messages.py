@@ -10,6 +10,7 @@ class Message:
     def __init__(self, responder_id, body):
         self.id = new_uuid()
         self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
+        self.original_sender = environ["CARBURE_NTR"]
         self.responder = Responder(responder_id)
         self.timestamp = timestamp()
         self.body = body

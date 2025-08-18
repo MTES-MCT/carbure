@@ -8,11 +8,12 @@ class EnvelopeTest(TestCase):
     def test_knows_its_payload(self):
         message = MagicMock()
         message.id = "12345678-1234-1234-1234-1234567890ab"
+        message.original_sender = "CarbuRe_NTR"
         message.timestamp = "2025-07-15T13:00:00+00:00"
-        message.zipped_encoded.return_value = "abcdef"
         message.initiator_id.return_value = "initiator"
         message.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
         message.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
+        message.zipped_encoded.return_value = "abcdef"
         envelope = Envelope(message)
         expected_payload = """\
 <soap:Envelope
@@ -37,7 +38,7 @@ class EnvelopeTest(TestCase):
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
-          <eb:Property name="originalSender">CARBURE</eb:Property>
+          <eb:Property name="originalSender">CarbuRe_NTR</eb:Property>
           <eb:Property name="finalRecipient">EC</eb:Property>
         </eb:MessageProperties>
         <eb:PayloadInfo>
