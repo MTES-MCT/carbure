@@ -1,8 +1,8 @@
 from os import environ
 
-from edelivery.adapters.base64_encoder import encode
 from edelivery.adapters.clock import timestamp
 from edelivery.adapters.uuid_generator import new_uuid
+from edelivery.adapters.zip_compressor import zip_and_stream_udb_request
 from edelivery.ebms.access_points import Initiator, Responder
 
 
@@ -13,9 +13,6 @@ class Message:
         self.responder = Responder(responder_id)
         self.timestamp = timestamp()
         self.body = body
-
-    def encoded(self):
-        return encode(self.body)
 
     def identifier(self):
         return str(self.id)
@@ -28,6 +25,9 @@ class Message:
 
     def responder_to_XML(self):
         return self.responder.to_XML()
+
+    def zipped_encoded(self):
+        return zip_and_stream_udb_request(self.body)
 
 
 class TestMessage(Message):
