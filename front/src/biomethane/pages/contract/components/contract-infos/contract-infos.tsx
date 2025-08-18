@@ -82,28 +82,6 @@ export const ContractInfos = ({
     }
   }
 
-  const onSubmit = () => {
-    const update = (is_red_ii: boolean) => {
-      updateContract({ ...value, is_red_ii }).then(() => {
-        setIsEditing(false)
-      })
-    }
-
-    // Allow the biomethane producer to set/unset the RED II status if the cmax or pap_contracted
-    // is lower than the threshold
-    if (entity.is_red_ii && !isContractRedii(value)) {
-      portal((close) => (
-        <RedIIDialog
-          onClose={close}
-          onConfirm={update}
-          tariffReference={value.tariff_reference}
-        />
-      ))
-    } else {
-      updateContract(value)
-    }
-  }
-
   return (
     <EditableCard
       title={t("Caractéristiques du contrat d’achat à tarif réglementé")}
