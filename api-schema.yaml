@@ -479,8 +479,9 @@ paths:
           description: Contract details for the entity
         "404":
           description: Contract not found for this entity.
-    post:
-      operationId: biomethane_contract_create
+    put:
+      operationId: biomethane_contract_update
+      description: Create or update contract using upsert logic.
       parameters:
         - in: query
           name: entity_id
@@ -494,46 +495,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneContractAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractPatchRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneContractAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractPatchRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneContractAddRequest"
+              $ref: "#/components/schemas/BiomethaneContractPatchRequest"
         required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BiomethaneContractAdd"
-          description: ""
-    patch:
-      operationId: biomethane_contract_partial_update
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-      tags:
-        - biomethane
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PatchedBiomethaneContractPatchRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/PatchedBiomethaneContractPatchRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/PatchedBiomethaneContractPatchRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -543,7 +512,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneContract"
-          description: Contract details for the entity
+          description: ""
   /api/biomethane/contract/amendments/:
     get:
       operationId: biomethane_contract_amendments_list
@@ -9702,64 +9671,6 @@ components:
         - buyer
         - entity
         - tariff_reference
-    BiomethaneContractAdd:
-      type: object
-      properties:
-        tariff_reference:
-          $ref: "#/components/schemas/TariffReferenceEnum"
-        buyer:
-          type: integer
-        installation_category:
-          allOf:
-            - $ref: "#/components/schemas/InstallationCategoryEnum"
-          nullable: true
-        cmax:
-          type: number
-          format: double
-          nullable: true
-        cmax_annualized:
-          type: boolean
-          nullable: true
-        cmax_annualized_value:
-          type: number
-          format: double
-          nullable: true
-        pap_contracted:
-          type: number
-          format: double
-          nullable: true
-      required:
-        - buyer
-        - tariff_reference
-    BiomethaneContractAddRequest:
-      type: object
-      properties:
-        tariff_reference:
-          $ref: "#/components/schemas/TariffReferenceEnum"
-        buyer:
-          type: integer
-        installation_category:
-          allOf:
-            - $ref: "#/components/schemas/InstallationCategoryEnum"
-          nullable: true
-        cmax:
-          type: number
-          format: double
-          nullable: true
-        cmax_annualized:
-          type: boolean
-          nullable: true
-        cmax_annualized_value:
-          type: number
-          format: double
-          nullable: true
-        pap_contracted:
-          type: number
-          format: double
-          nullable: true
-      required:
-        - buyer
-        - tariff_reference
     BiomethaneContractAmendment:
       type: object
       properties:
@@ -9840,6 +9751,53 @@ components:
         - amendment_object
         - effective_date
         - signature_date
+    BiomethaneContractPatchRequest:
+      type: object
+      properties:
+        tariff_reference:
+          $ref: "#/components/schemas/TariffReferenceEnum"
+        buyer:
+          type: integer
+        installation_category:
+          allOf:
+            - $ref: "#/components/schemas/InstallationCategoryEnum"
+          nullable: true
+        cmax:
+          type: number
+          format: double
+          nullable: true
+        cmax_annualized:
+          type: boolean
+          nullable: true
+        cmax_annualized_value:
+          type: number
+          format: double
+          nullable: true
+        pap_contracted:
+          type: number
+          format: double
+          nullable: true
+        signature_date:
+          type: string
+          format: date
+          nullable: true
+        effective_date:
+          type: string
+          format: date
+          nullable: true
+        general_conditions_file:
+          type: string
+          format: binary
+          nullable: true
+        specific_conditions_file:
+          type: string
+          format: binary
+          nullable: true
+        is_red_ii:
+          type: boolean
+      required:
+        - buyer
+        - tariff_reference
     CarbureLotPublic:
       type: object
       properties:
@@ -13032,50 +12990,6 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
-    PatchedBiomethaneContractPatchRequest:
-      type: object
-      properties:
-        tariff_reference:
-          $ref: "#/components/schemas/TariffReferenceEnum"
-        buyer:
-          type: integer
-        installation_category:
-          allOf:
-            - $ref: "#/components/schemas/InstallationCategoryEnum"
-          nullable: true
-        cmax:
-          type: number
-          format: double
-          nullable: true
-        cmax_annualized:
-          type: boolean
-          nullable: true
-        cmax_annualized_value:
-          type: number
-          format: double
-          nullable: true
-        pap_contracted:
-          type: number
-          format: double
-          nullable: true
-        signature_date:
-          type: string
-          format: date
-          nullable: true
-        effective_date:
-          type: string
-          format: date
-          nullable: true
-        general_conditions_file:
-          type: string
-          format: binary
-          nullable: true
-        specific_conditions_file:
-          type: string
-          format: binary
-          nullable: true
-        is_red_ii:
-          type: boolean
     PatchedElecOperationUpdateRequest:
       type: object
       properties:

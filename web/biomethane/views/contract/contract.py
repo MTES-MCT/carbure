@@ -2,7 +2,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, mixins
+from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models import BiomethaneContract
 from biomethane.serializers.contract import (
@@ -27,10 +27,7 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneContractViewSet(
-    GenericViewSet,
-    mixins.CreateModelMixin,
-):
+class BiomethaneContractViewSet(GenericViewSet):
     queryset = BiomethaneContract.objects.all()
     serializer_class = BiomethaneContractSerializer
     permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
@@ -42,9 +39,7 @@ class BiomethaneContractViewSet(
         return context
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return BiomethaneContractAddSerializer
-        elif self.action in ["update"]:
+        if self.action == "upsert":
             return BiomethaneContractPatchSerializer
         return BiomethaneContractSerializer
 
@@ -75,16 +70,27 @@ class BiomethaneContractViewSet(
         },
         request=BiomethaneContractPatchSerializer,
     )
-    def update(self, request, *args, **kwargs):
+    def upsert(self, request, *args, **kwargs):
+        """Create or update contract using upsert logic."""
+        serializer_context = self.get_serializer_context()
         try:
+            # Try to get existing contract
             contract = BiomethaneContract.objects.get(entity=request.entity)
-            serializer = self.get_serializer(contract, data=request.data, partial=True)
-
+            # Update existing contract
+            serializer = BiomethaneContractPatchSerializer(
+                contract, data=request.data, partial=True, context=serializer_context
+            )
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
-
+                response_data = BiomethaneContractSerializer(contract, context=serializer_context).data
+                return Response(response_data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except BiomethaneContract.DoesNotExist:
-            return Response({"detail": "Aucun contrat trouvé pour cette entité"}, status=status.HTTP_404_NOT_FOUND)
+            # Create new contract
+            serializer = BiomethaneContractAddSerializer(data=request.data, context=serializer_context)
+            if serializer.is_valid():
+                contract = serializer.save()
+                response_data = BiomethaneContractSerializer(contract, context=serializer_context).data
+                return Response(response_data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -8,10 +8,8 @@ export { TariffReference, InstallationCategory }
 
 // Contracts
 export type BiomethaneContract = apiTypes["BiomethaneContract"]
-export type BiomethaneContractAddRequest =
-  apiTypes["BiomethaneContractAddRequest"]
 export type BiomethaneContractPatchRequest =
-  apiTypes["PatchedBiomethaneContractPatchRequest"]
+  apiTypes["BiomethaneContractPatchRequest"]
 
 // Amendments
 export type BiomethaneContractAmendment =

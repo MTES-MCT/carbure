@@ -1,7 +1,7 @@
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { InstallationCategory, TariffReference } from "biomethane/types"
-import { createContract, updateContract } from "biomethane/api"
+import { saveContract } from "biomethane/api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 
@@ -55,26 +55,21 @@ export const useInstallationCategoryOptions = () => {
 /**
  * @param hasContract if true, the mutation will create a new contract, otherwise it will update the existing one
  */
-export const useMutateContractInfos = (hasContract: boolean = false) => {
+export const useMutateContractInfos = () => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const mutation = useMutation(
-    hasContract
-      ? (data) => updateContract(entity.id, data)
-      : (data) => createContract(entity.id, data),
-    {
-      invalidates: ["contract-infos", "user-settings"],
-      onSuccess: () => {
-        notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
-      },
-      onError: (e) => {
-        notifyError(e)
-      },
-    }
-  )
+  const mutation = useMutation((data) => saveContract(entity.id, data), {
+    invalidates: ["contract-infos", "user-settings"],
+    onSuccess: () => {
+      notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
+  })
 
   return mutation
 }

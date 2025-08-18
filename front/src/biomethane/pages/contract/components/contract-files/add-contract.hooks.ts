@@ -1,4 +1,4 @@
-import { updateContract } from "biomethane/api"
+import { saveContract } from "biomethane/api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
@@ -10,7 +10,7 @@ export const useAddContract = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const mutation = useMutation((data) => updateContract(entity.id, data), {
+  const mutation = useMutation((data) => saveContract(entity.id, data), {
     invalidates: ["contract-infos"],
     onSuccess: () => {
       notify(t("Le contrat a bien été mis à jour."), { variant: "success" })

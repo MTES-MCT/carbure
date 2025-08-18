@@ -58,9 +58,7 @@ export const ContractInfos = ({
   )
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
-  const { execute: updateContract, loading } = useMutateContractInfos(
-    contract !== undefined
-  )
+  const { execute: updateContract, loading } = useMutateContractInfos()
 
   const onSubmit = () => {
     const update = (is_red_ii: boolean) => {
