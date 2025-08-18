@@ -8,9 +8,9 @@ import { ActionBar, Content } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import {
   SafFilter,
-  SafTicketSourceOrder,
   SafSnapshot,
   SafTicketSourcePreview,
+  SafTicketSourceQueryConfig,
 } from "saf/types"
 import * as api from "../../api"
 import { SafFilters } from "saf/components/filters"
@@ -20,11 +20,7 @@ import TicketSourceDetail from "saf/pages/ticket-source-details"
 import { StatusSwitcher } from "./components/status-switcher"
 import TicketSourcesTable from "./components/table"
 import { NoResult } from "common/components/no-result2"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
-import { SafTicketSourceStatus } from "../../types"
+
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExportButton } from "common/components/export"
@@ -32,6 +28,7 @@ import { Pagination } from "common/components/pagination2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "common/types"
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 export interface TicketSourcesProps {
   year: number
@@ -47,17 +44,12 @@ export const SafTicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
 
-  const [state, actions] = useCBQueryParamsStore<
-    SafTicketSourceStatus,
-    undefined
-  >(entity, year, status)
-
-  const query = useCBQueryBuilder<
-    SafTicketSourceOrder[],
-    SafTicketSourceStatus,
-    undefined
-  >(state)
-
+  const { query, state, actions } = useQueryBuilder<SafTicketSourceQueryConfig>(
+    {
+      status,
+      year,
+    }
+  )
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",
     params: [query],

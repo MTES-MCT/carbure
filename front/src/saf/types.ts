@@ -15,6 +15,7 @@ import {
   PathsApiSafTicketsGetParametersQueryConsumption_type as ConsumptionType,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus,
 } from "api-schema"
+import { QueryConfig, QueryParams } from "common/hooks/new-query-builder"
 
 // Generated enum is EnumStatus and the name is not readable
 export { SafTicketSourceStatus, SafTicketStatus, ConsumptionType }
@@ -115,12 +116,14 @@ export enum SafFilter {
 export type SafTicketSourceOrder =
   PathsApiSafTicketSourcesGetParametersQueryOrder_by
 
-export interface SafTicketSourceQuery
-  extends CBQueryParams<
-    SafTicketSourceOrder[],
-    SafTicketSourceSatus,
-    undefined
-  > {
+// Type à passer au hook useQueryBuilder pour typer le state
+export type SafTicketSourceQueryConfig = QueryConfig<
+  SafTicketSourceStatus,
+  SafTicketSourceOrder[]
+>
+
+// Utilisé uniquement pour typer la query qui arrive dans api.ts
+export type SafTicketSourceQuery = QueryParams<SafTicketSourceQueryConfig> & {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
