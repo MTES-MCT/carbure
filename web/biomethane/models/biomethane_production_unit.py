@@ -8,7 +8,7 @@ class BiomethaneProductionUnit(models.Model):
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_production_unit")
 
     # Nom de l'unité
-    unit_name = models.CharField(max_length=128)
+    unit_name = models.CharField(max_length=128, null=True, blank=True)
 
     # SIRET
     siret_number = models.CharField(max_length=16, null=True, blank=True)
