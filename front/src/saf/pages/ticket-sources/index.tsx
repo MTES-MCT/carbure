@@ -10,7 +10,7 @@ import {
   SafFilter,
   SafSnapshot,
   SafTicketSourcePreview,
-  SafTicketSourceQueryConfig,
+  SafTicketSourceQueryBuilder,
 } from "saf/types"
 import * as api from "../../api"
 import { SafFilters } from "saf/components/filters"
@@ -44,12 +44,12 @@ export const SafTicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
 
-  const { query, state, actions } = useQueryBuilder<SafTicketSourceQueryConfig>(
-    {
-      status,
-      year,
-    }
-  )
+  const { query, state, actions } = useQueryBuilder<
+    SafTicketSourceQueryBuilder["config"]
+  >({
+    status,
+    year,
+  })
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",

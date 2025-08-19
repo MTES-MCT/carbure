@@ -4,6 +4,7 @@ import {
   ElecDataQualichargeOverview,
   QualichargeFilter,
   QualichargeQuery,
+  QualichargeQueryBuilder,
   QualichargeTab,
   QualichargeValidatedBy,
 } from "./types"
@@ -13,10 +14,6 @@ import { getQualichargeFilters, getYears } from "./api"
 import { formatQualichargeStatus } from "./formatters"
 import { compact } from "common/utils/collection"
 import useEntity from "common/hooks/entity"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import useYears from "common/hooks/years-2"
 import { useMatch } from "react-router-dom"
 import { ExternalAdminPages } from "common/types"
@@ -90,14 +87,16 @@ const useStatus = () => {
 }
 
 export const useQualichargeQueryBuilder = () => {
-  const entity = useEntity()
   const status = useStatus()
   const years = useYears("/qualicharge", getYears)
   // const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
 
   // const query = useCBQueryBuilder(state)
-  const q = useQueryBuilder({ status, year: years.selected })
+  const queryBuilder = useQueryBuilder<QualichargeQueryBuilder["config"]>({
+    status,
+    year: years.selected,
+  })
 
   // return { state, actions, query, status, years }
-  return { ...q, status, years }
+  return { ...queryBuilder, status, years }
 }

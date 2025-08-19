@@ -2,11 +2,7 @@ import {
   PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter as QualichargeFilter,
   PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by as QualichargeValidatedBy,
 } from "api-schema"
-import {
-  QueryConfig,
-  QueryParams as QueryParams2,
-} from "common/hooks/new-query-builder"
-import { CBQueryParams } from "common/hooks/query-builder-2"
+import { QueryBuilder } from "common/hooks/new-query-builder"
 import { apiTypes, QueryParams } from "common/services/api-fetch.types"
 
 export { QualichargeValidatedBy, QualichargeFilter }
@@ -19,18 +15,19 @@ export enum QualichargeTab {
   VALIDATED = "validated",
 }
 
-export type QualichargeQuery = CBQueryParams<
-  string[],
-  QualichargeTab,
-  unknown
-> &
-  Pick<
-    QueryParams<"/elec/provision-certificates-qualicharge/">,
-    "validated_by" | "date_from" | "operating_unit"
-  >
+// export type QualichargeQuery = CBQueryParams<
+//   string[],
+//   QualichargeTab,
+//   unknown
+// > &
+//   Pick<
+//     QueryParams<"/elec/provision-certificates-qualicharge/">,
+//     "validated_by" | "date_from" | "operating_unit"
+//   >
 
-export type QualichargeQueryConfig2 = QueryConfig<QualichargeTab>
-export type QualichargeQuery2 = QueryParams2<QualichargeQueryConfig2> &
+export type QualichargeQueryBuilder = QueryBuilder<QualichargeTab>
+
+export type QualichargeQuery = QualichargeQueryBuilder["query"] &
   Pick<
     QueryParams<"/elec/provision-certificates-qualicharge/">,
     "validated_by" | "date_from" | "operating_unit"

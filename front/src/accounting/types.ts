@@ -20,6 +20,7 @@ import {
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
   ElecOperationTypeEnum as CreateElecOperationType,
 } from "api-schema"
+import { QueryBuilder } from "common/hooks/new-query-builder"
 
 // Type definitions
 export type Operation = apiTypes["OperationList"] & {
@@ -27,9 +28,12 @@ export type Operation = apiTypes["OperationList"] & {
 }
 
 export type Balance = apiTypes["Balance"]
-export interface OperationsQuery
-  extends CBQueryParams<[], OperationsStatus[], string[]> {
-  [OperationsFilter.status]?: OperationsStatus[]
+
+export type OperationsQueryBuilder = QueryBuilder<
+  OperationsStatus[],
+  OperationOrder[]
+>
+export type OperationsQuery = OperationsQueryBuilder["query"] & {
   [OperationsFilter.sector]?: OperationSector[]
   [OperationsFilter.customs_category]?: OperationBiofuelCategory[]
   [OperationsFilter.biofuel]?: string[]
