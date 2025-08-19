@@ -109,7 +109,7 @@ export const RadioGroup = <V extends RadioValueType>({
           title={title}
         />
       }
-      disabled={readOnly ?? props.disabled}
+      disabled={readOnly || props.disabled}
       small={readOnly ?? props.small}
     />
   )
