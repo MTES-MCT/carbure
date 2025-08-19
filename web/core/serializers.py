@@ -775,3 +775,22 @@ class UserRightsSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.EmailField)
     def get_email(self, obj):
         return obj.user.email
+
+
+class NullableMixin:
+    """
+    This class should be added to serializers when you want to deal
+    with the frontend sending "null" values in the FormData.
+    It will automatically replace them with None so your models can actually
+    empty columns in the database.
+
+    Ex:
+
+    class MySerializer(NullableMixin, serializers.Serializer):
+        ...
+    """
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            data = {k: (None if v == "null" else v) for k, v in data.items()}
+        return super().to_internal_value(data)
